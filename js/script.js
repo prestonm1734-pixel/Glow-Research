@@ -288,17 +288,6 @@ function animateCount(el) {
 /* ---------- attach reveal to static elements ---------- */
 document.querySelectorAll('.reveal').forEach(observeReveal);
 
-/* ---------- cursor glow ---------- */
-const cursorGlow = document.getElementById('cursorGlow');
-let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
-window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
-(function loop() {
-  glowX += (mouseX - glowX) * 0.12;
-  glowY += (mouseY - glowY) * 0.12;
-  cursorGlow.style.left = glowX + 'px';
-  cursorGlow.style.top = glowY + 'px';
-  requestAnimationFrame(loop);
-})();
 
 /* ---------- header shrink ---------- */
 const header = document.getElementById('siteHeader');
