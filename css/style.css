@@ -52,9 +52,15 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 .grad-text{
   background: var(--grad-main);
+  background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  animation: shimmer 6s ease-in-out infinite;
+}
+@keyframes shimmer{
+  0%,100%{ background-position: 0% 50%; }
+  50%{ background-position: 100% 50%; }
 }
 
 .mono{ font-family:'JetBrains Mono', monospace; letter-spacing: 0.08em; }
@@ -115,11 +121,14 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   text-transform: uppercase;
   font-family: 'JetBrains Mono', monospace;
 }
-.hex-bullet{
-  display:inline-block; width:6px; height:6px; margin: 0 40px 0 -8px;
-  background: #6b6b69;
-  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-  flex-shrink:0;
+.star-bullet{
+  display:inline-block; font-style:normal; color:#6b6b69; font-size: 0.6rem;
+  margin: 0 40px 0 -8px; flex-shrink:0;
+  animation: twinkle 2.4s ease-in-out infinite;
+}
+@keyframes twinkle{
+  0%,100%{ opacity:.35; transform: scale(.85) rotate(0deg); }
+  50%{ opacity:1; transform: scale(1.15) rotate(20deg); }
 }
 @keyframes marquee{
   from{ transform: translateX(0); }
@@ -140,18 +149,17 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   height: 76px;
 }
 .logo{
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.35rem;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.65rem;
   font-weight: 600;
-  display:flex; align-items:center; gap:10px;
+  display:inline-flex; align-items:center; gap:3px;
   color: #0a0a0a;
 }
-.logo-mark{
-  width: 34px; height:34px; border-radius:8px; border: 1.5px solid #0a0a0a;
-  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+.spark{
+  color: #0a0a0a; font-size: 0.7em; display:inline-block;
+  transition: transform .5s cubic-bezier(.34,1.56,.64,1);
 }
-.logo-word{ display:flex; align-items:center; gap:2px; letter-spacing:-0.01em; }
-.spark{ color: #0a0a0a; font-size: 0.75em; }
+.logo:hover .spark{ transform: rotate(90deg) scale(1.25); }
 .main-nav{ display:flex; gap: 34px; }
 .main-nav a{
   font-size: 0.88rem; font-weight: 500; color: #45453f;
@@ -460,6 +468,8 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* ---------- footer ---------- */
 .site-footer{ background: var(--bg-2); border-top:1px solid var(--border); padding: 80px 0 30px; }
+.site-footer .logo{ color: var(--text); }
+.site-footer .spark{ color: var(--text); }
 .footer-top{ display:grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 50px; }
 .footer-brand p{ font-size:0.88rem; max-width: 280px; margin: 14px 0 20px; }
 .footer-social{ display:flex; gap: 12px; }

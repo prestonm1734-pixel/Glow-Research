@@ -318,28 +318,56 @@ function resizeCanvas() {
   canvas.height = hero.offsetHeight;
 }
 function initParticles() {
-  const count = window.innerWidth < 768 ? 22 : 45;
+  const count = window.innerWidth < 768 ? 20 : 42;
   particles = Array.from({ length: count }, () => ({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
     r: Math.random() * 2 + 0.6,
-    vx: (Math.random() - 0.5) * 0.25,
-    vy: (Math.random() - 0.5) * 0.25,
+    vx: (Math.random() - 0.5) * 0.22,
+    vy: (Math.random() - 0.5) * 0.22,
     color: colors[Math.floor(Math.random() * colors.length)],
     alpha: Math.random() * 0.5 + 0.2,
+    isStar: Math.random() < 0.16,
+    phase: Math.random() * Math.PI * 2,
+    spin: (Math.random() - 0.5) * 0.01,
+    angle: Math.random() * Math.PI,
   }));
 }
+function drawSpark(p, size, alpha) {
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  ctx.rotate(p.angle);
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = p.color;
+  ctx.beginPath();
+  ctx.moveTo(0, -size);
+  ctx.quadraticCurveTo(size * 0.18, -size * 0.18, size, 0);
+  ctx.quadraticCurveTo(size * 0.18, size * 0.18, 0, size);
+  ctx.quadraticCurveTo(-size * 0.18, size * 0.18, -size, 0);
+  ctx.quadraticCurveTo(-size * 0.18, -size * 0.18, 0, -size);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+let frame = 0;
 function animateParticles() {
+  frame++;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   particles.forEach(p => {
     p.x += p.vx; p.y += p.vy;
     if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
     if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fillStyle = p.color;
-    ctx.globalAlpha = p.alpha;
-    ctx.fill();
+    const twinkle = 0.55 + Math.sin(frame * 0.02 + p.phase) * 0.45;
+    if (p.isStar) {
+      p.angle += p.spin;
+      drawSpark(p, p.r * 4.2, p.alpha * twinkle);
+    } else {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.alpha * twinkle;
+      ctx.fill();
+    }
   });
   ctx.globalAlpha = 1;
   requestAnimationFrame(animateParticles);
@@ -348,3 +376,28 @@ resizeCanvas();
 initParticles();
 animateParticles();
 window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+
+/* ---------- magnetic buttons ---------- */
+document.querySelectorAll('.btn-primary, .btn-outline').forEach(btn => {
+  btn.addEventListener('mousemove', (e) => {
+    const r = btn.getBoundingClientRect();
+    const x = e.clientX - r.left - r.width / 2;
+    const y = e.clientY - r.top - r.height / 2;
+    btn.style.transform = `translate(${x * 0.18}px, ${y * 0.35}px)`;
+  });
+  btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+});
+
+/* ---------- product card tilt ---------- */
+document.addEventListener('mousemove', (e) => {
+  const card = e.target.closest ? e.target.closest('.product-card') : null;
+  if (!card) return;
+  const r = card.getBoundingClientRect();
+  const px = (e.clientX - r.left) / r.width - 0.5;
+  const py = (e.clientY - r.top) / r.height - 0.5;
+  card.style.transform = `perspective(700px) rotateX(${py * -6}deg) rotateY(${px * 8}deg) translateY(-5px)`;
+});
+document.addEventListener('mouseout', (e) => {
+  const card = e.target.closest ? e.target.closest('.product-card') : null;
+  if (card && !card.contains(e.relatedTarget)) card.style.transform = '';
+});
