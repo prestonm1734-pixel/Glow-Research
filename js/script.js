@@ -461,13 +461,33 @@ if (orbitStage && ringBack && ringFront) {
   }
 
   // distribute particles over a torus (big ring + tube)
-  const COUNT = window.innerWidth < 768 ? 150 : 260;
+  const COUNT = window.innerWidth < 768 ? 80 : 140;
+  const GOLD = '#f4c96a';
   const torus = Array.from({ length: COUNT }, () => ({
     a: Math.random() * Math.PI * 2,          // around the big ring
     b: Math.random() * Math.PI * 2,          // around the tube
-    s: 0.5 + Math.random() * 1.6,            // dot size
+    s: 0.7 + Math.random() * 1.6,            // star size
+    sp: (Math.random() - 0.5) * 0.05,        // spin speed
+    ang: Math.random() * Math.PI,            // spin angle
     tw: Math.random() * Math.PI * 2,         // twinkle phase
   }));
+
+  function drawStar(c, x, y, size, alpha, angle) {
+    c.save();
+    c.translate(x, y);
+    c.rotate(angle);
+    c.globalAlpha = alpha;
+    c.fillStyle = GOLD;
+    c.beginPath();
+    c.moveTo(0, -size);
+    c.quadraticCurveTo(size * 0.2, -size * 0.2, size, 0);
+    c.quadraticCurveTo(size * 0.2, size * 0.2, 0, size);
+    c.quadraticCurveTo(-size * 0.2, size * 0.2, -size, 0);
+    c.quadraticCurveTo(-size * 0.2, -size * 0.2, 0, -size);
+    c.closePath();
+    c.fill();
+    c.restore();
+  }
 
   const FOC = 560;
   let rt = 0;
@@ -500,12 +520,10 @@ if (orbitStage && ringBack && ringFront) {
       const sy = scy + y1 * scale;
       const depth = Math.max(0, Math.min(1, (z2 + Rbig) / (2 * Rbig)));
       const twk = 0.7 + Math.sin(rt * 6 + p.tw) * 0.3;
-      const alpha = (0.12 + depth * 0.8) * twk;
+      const alpha = (0.18 + depth * 0.82) * twk;
       const ctx2 = z2 >= 0 ? fctx : bctx;
-      ctx2.beginPath();
-      ctx2.arc(sx, sy, Math.max(0.4, p.s * scale), 0, Math.PI * 2);
-      ctx2.fillStyle = `rgba(255,255,255,${alpha})`;
-      ctx2.fill();
+      p.ang += p.sp;
+      drawStar(ctx2, sx, sy, Math.max(1.6, p.s * scale * 3.4), alpha, p.ang);
     }
 
     if (vialTilt) {
