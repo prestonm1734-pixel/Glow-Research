@@ -97,7 +97,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   border-radius: 999px;
 }
 .btn-ghost:hover{ background: rgba(255,255,255,0.12); }
-.btn-lg{ padding: 15px 30px; font-size: 1rem; }
+.btn-lg{ padding: 12px 24px; font-size: 0.92rem; }
 
 /* ---------- marquee ---------- */
 .marquee-bar{
@@ -187,7 +187,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 /* ---------- hero ---------- */
 .hero{
   position: relative;
-  padding: 76px 0 78px;
+  padding: 34px 0 34px;
   overflow: hidden;
   isolation: isolate;
   background: #000000;
@@ -207,20 +207,20 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* two-column stage: copy left, showpiece right */
 .hero-grid{
-  display:grid; grid-template-columns: 1.05fr 0.95fr; align-items:center; gap: 40px;
-  min-height: min(56vh, 500px);
+  display:grid; grid-template-columns: 1.05fr 0.95fr; align-items:center; gap: 32px;
+  min-height: min(44vh, 400px);
 }
-.hero-copy{ text-align:left; max-width: 600px; transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: transform; }
+.hero-copy{ text-align:left; max-width: 560px; transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: transform; }
 .hero-eyebrow{
   display:inline-block; font-family:'JetBrains Mono', monospace;
-  font-size: 0.75rem; letter-spacing:.18em; text-transform:uppercase; font-weight:600;
-  color: #ffffff; margin-bottom: 22px; position: relative; z-index: 1;
+  font-size: 0.7rem; letter-spacing:.18em; text-transform:uppercase; font-weight:600;
+  color: #ffffff; margin-bottom: 14px; position: relative; z-index: 1;
 }
 @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
 .hero-title{
-  font-size: clamp(2.7rem, 5.6vw, 4.7rem);
-  margin-bottom: 22px;
+  font-size: clamp(2.1rem, 4vw, 3.4rem);
+  margin-bottom: 14px;
   letter-spacing: -0.03em;
 }
 .hero-title .outline{
@@ -233,27 +233,27 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   -webkit-text-stroke-color: transparent;
 }
 .hero-sub{
-  font-size: 1.12rem;
-  max-width: 500px;
-  margin: 0 0 34px;
+  font-size: 0.96rem;
+  max-width: 480px;
+  margin: 0 0 22px;
 }
-.hero-cta{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom: 52px; }
+.hero-cta{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom: 26px; }
 
 .hero-stats{
-  display:flex; gap: 44px; flex-wrap:wrap;
-  padding-top: 34px; border-top: 1px solid var(--border);
+  display:flex; gap: 34px; flex-wrap:wrap;
+  padding-top: 18px; border-top: 1px solid var(--border);
 }
 .stat{ text-align:left; }
 .stat-num, .stat-suffix{
-  font-family:'Space Grotesk', sans-serif; font-size: 2.1rem; font-weight:500;
+  font-family:'Space Grotesk', sans-serif; font-size: 1.55rem; font-weight:500;
   background: var(--grad-main); -webkit-background-clip:text; background-clip:text; color:transparent;
 }
-.stat p{ margin:4px 0 0; font-size: 0.78rem; color: var(--text-dimmer); text-transform: uppercase; letter-spacing:.06em; }
+.stat p{ margin:3px 0 0; font-size: 0.72rem; color: var(--text-dimmer); text-transform: uppercase; letter-spacing:.06em; }
 
 /* ---- hero showpiece: vial inside a particle torus ---- */
 .hero-visual{ perspective: 1200px; display:flex; justify-content:center; align-items:center; }
 .orbit-stage{
-  position:relative; width: min(480px, 90%); aspect-ratio: 1;
+  position:relative; width: min(360px, 85%); aspect-ratio: 1;
 }
 .ring-c{ position:absolute; inset:0; pointer-events:none; }
 .ring-back{ z-index:0; }
@@ -273,17 +273,17 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   transform-style: preserve-3d;
 }
 .vial-lg{
-  width: 100px; height: 214px;
+  width: 78px; height: 168px;
   animation: vialfloat 6s ease-in-out infinite;
 }
-@keyframes vialfloat{ 0%,100%{ transform: translateY(-6px);} 50%{ transform: translateY(6px);} }
+@keyframes vialfloat{ 0%,100%{ transform: translateY(-5px);} 50%{ transform: translateY(5px);} }
 .vial-cap{
-  width: 40px; height: 26px; margin: 0 auto;
+  width: 32px; height: 20px; margin: 0 auto;
   background: linear-gradient(180deg,#3a3a38,#0a0a0a); border-radius: 5px 5px 3px 3px;
   border:1px solid rgba(255,255,255,.12); border-bottom:none;
 }
 .vial-body{
-  width: 100px; height: 188px; border-radius: 10px 10px 14px 14px;
+  width: 78px; height: 148px; border-radius: 9px 9px 12px 12px;
   background: linear-gradient(115deg, rgba(255,255,255,.5), rgba(255,255,255,.16) 42%, rgba(255,255,255,.3));
   border:1px solid rgba(255,255,255,.55);
   backdrop-filter: blur(3px);
@@ -295,15 +295,15 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   background: linear-gradient(180deg, rgba(255,255,255,.55), transparent); border-radius:8px; opacity:.5;
 }
 .vial-label{
-  position:absolute; left:0; right:0; bottom:16px; padding: 14px 10px;
+  position:absolute; left:0; right:0; bottom:12px; padding: 10px 8px;
   background: linear-gradient(180deg,#161616,#0a0a0a);
-  display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center;
+  display:flex; flex-direction:column; align-items:center; gap:3px; text-align:center;
 }
-.vl-brand{ font-family:'Fraunces', serif; font-size:1rem; color:#fff; display:flex; align-items:center; gap:2px; }
+.vl-brand{ font-family:'Fraunces', serif; font-size:.8rem; color:#fff; display:flex; align-items:center; gap:2px; }
 .vl-brand i{ font-style:normal; font-size:.7em; }
-.vl-name{ font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:.82rem; color:#fff; letter-spacing:.02em; }
-.vl-meta{ font-family:'JetBrains Mono', monospace; font-size:.56rem; color:#b8b8b6; letter-spacing:.08em; }
-.vl-fine{ font-family:'JetBrains Mono', monospace; font-size:.42rem; color:#6b6b69; letter-spacing:.1em; margin-top:2px; }
+.vl-name{ font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:.68rem; color:#fff; letter-spacing:.02em; }
+.vl-meta{ font-family:'JetBrains Mono', monospace; font-size:.5rem; color:#b8b8b6; letter-spacing:.06em; }
+.vl-fine{ font-family:'JetBrains Mono', monospace; font-size:.38rem; color:#6b6b69; letter-spacing:.08em; margin-top:1px; }
 
 .scroll-cue{
   position:absolute; bottom: 24px; left:50%; transform:translateX(-50%);
