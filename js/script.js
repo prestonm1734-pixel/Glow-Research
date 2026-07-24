@@ -295,16 +295,14 @@ window.addEventListener('scroll', () => {
   header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
 });
 
-/* ---------- hero molecular constellation ---------- */
+/* ---------- hero molecular constellation (ambient, not cursor-reactive) ---------- */
 const canvas = document.getElementById('particleCanvas');
 const ctx = canvas.getContext('2d');
 const heroEl = document.querySelector('.hero');
 const DPR = Math.min(window.devicePixelRatio || 1, 2);
 let nodes = [];
 const heroSize = { w: 0, h: 0 };
-const pointer = { x: -9999, y: -9999, active: false };
 const LINK = 130;   // node-to-node link distance
-const PLINK = 200;  // cursor link distance
 
 function resizeCanvas() {
   heroSize.w = heroEl.offsetWidth;
@@ -335,16 +333,6 @@ function drawConstellation() {
     n.x += n.vx; n.y += n.vy;
     if (n.x < 0 || n.x > heroSize.w) n.vx *= -1;
     if (n.y < 0 || n.y > heroSize.h) n.vy *= -1;
-    // gentle push away from the cursor — the network "breathes" around your hand
-    if (pointer.active) {
-      const dx = n.x - pointer.x, dy = n.y - pointer.y;
-      const d = Math.hypot(dx, dy);
-      if (d < PLINK && d > 0.01) {
-        const f = (1 - d / PLINK) * 0.5;
-        n.x += (dx / d) * f;
-        n.y += (dy / d) * f;
-      }
-    }
   }
 
   // links between nearby nodes
@@ -361,56 +349,22 @@ function drawConstellation() {
     }
   }
 
-  // brighter links reaching toward the cursor
-  if (pointer.active) {
-    for (const n of nodes) {
-      const dx = n.x - pointer.x, dy = n.y - pointer.y;
-      const d = Math.hypot(dx, dy);
-      if (d < PLINK) {
-        ctx.strokeStyle = `rgba(255,255,255,${(1 - d / PLINK) * 0.55})`;
-        ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(pointer.x, pointer.y); ctx.stroke();
-      }
-    }
-  }
-
   // nodes
   for (const n of nodes) {
-    const near = pointer.active && Math.hypot(n.x - pointer.x, n.y - pointer.y) < PLINK;
     const tw = 0.5 + Math.sin(frame * 0.02 + n.phase) * 0.3;
     ctx.beginPath();
     ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-    ctx.fillStyle = near ? 'rgba(255,255,255,.95)' : `rgba(255,255,255,${0.35 + tw * 0.3})`;
+    ctx.fillStyle = `rgba(255,255,255,${0.35 + tw * 0.3})`;
     ctx.fill();
   }
 
   requestAnimationFrame(drawConstellation);
 }
 
-heroEl.addEventListener('mousemove', e => {
-  const r = heroEl.getBoundingClientRect();
-  pointer.x = e.clientX - r.left;
-  pointer.y = e.clientY - r.top;
-  pointer.active = true;
-});
-heroEl.addEventListener('mouseleave', () => { pointer.active = false; pointer.x = -9999; pointer.y = -9999; });
-
 resizeCanvas();
 initNodes();
 drawConstellation();
 window.addEventListener('resize', () => { resizeCanvas(); initNodes(); });
-
-/* ---------- hero copy parallax ---------- */
-const heroCopy = document.querySelector('.hero-copy');
-if (heroCopy) {
-  heroEl.addEventListener('mousemove', e => {
-    const r = heroEl.getBoundingClientRect();
-    const cx = (e.clientX - r.left) / r.width - 0.5;
-    const cy = (e.clientY - r.top) / r.height - 0.5;
-    heroCopy.style.transform = `translate(${cx * 8}px, ${cy * 6}px)`;
-  });
-  heroEl.addEventListener('mouseleave', () => { heroCopy.style.transform = ''; });
-}
 
 /* ---------- product card tilt ---------- */
 document.addEventListener('mousemove', (e) => {
