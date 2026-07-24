@@ -411,15 +411,17 @@ initNodes();
 drawConstellation();
 window.addEventListener('resize', () => { resizeCanvas(); initNodes(); });
 
-/* ---------- hero parallax ---------- */
-const heroInner = document.querySelector('.hero-inner');
-heroEl.addEventListener('mousemove', e => {
-  const r = heroEl.getBoundingClientRect();
-  const cx = (e.clientX - r.left) / r.width - 0.5;
-  const cy = (e.clientY - r.top) / r.height - 0.5;
-  heroInner.style.transform = `translate(${cx * 12}px, ${cy * 8}px)`;
-});
-heroEl.addEventListener('mouseleave', () => { heroInner.style.transform = ''; });
+/* ---------- hero copy parallax ---------- */
+const heroCopy = document.querySelector('.hero-copy');
+if (heroCopy) {
+  heroEl.addEventListener('mousemove', e => {
+    const r = heroEl.getBoundingClientRect();
+    const cx = (e.clientX - r.left) / r.width - 0.5;
+    const cy = (e.clientY - r.top) / r.height - 0.5;
+    heroCopy.style.transform = `translate(${cx * 8}px, ${cy * 6}px)`;
+  });
+  heroEl.addEventListener('mouseleave', () => { heroCopy.style.transform = ''; });
+}
 
 /* ---------- magnetic buttons ---------- */
 document.querySelectorAll('.btn-primary, .btn-outline').forEach(btn => {
@@ -446,25 +448,14 @@ document.addEventListener('mouseout', (e) => {
   if (card && !card.contains(e.relatedTarget)) card.style.transform = '';
 });
 
-/* ---------- statement: word-by-word scroll illumination ---------- */
-const stmt = document.getElementById('statementText');
-if (stmt) {
-  const words = stmt.dataset.text.trim().split(/\s+/);
-  stmt.innerHTML = words.map(w => `<span class="w">${w}</span>`).join(' ');
-  const wordEls = stmt.querySelectorAll('.w');
-  let stmtTicking = false;
-  function updateStatement() {
-    const r = stmt.getBoundingClientRect();
-    const vh = window.innerHeight;
-    const start = vh * 0.82;   // begin lighting when text enters lower third
-    const end = vh * 0.32;     // fully lit as it reaches upper third
-    const p = Math.max(0, Math.min(1, (start - r.top) / (start - end)));
-    const lit = Math.round(p * wordEls.length);
-    wordEls.forEach((el, i) => el.classList.toggle('lit', i < lit));
-    stmtTicking = false;
-  }
-  window.addEventListener('scroll', () => {
-    if (!stmtTicking) { stmtTicking = true; requestAnimationFrame(updateStatement); }
-  }, { passive: true });
-  updateStatement();
+/* ---------- hero showpiece: cursor tilt ---------- */
+const orbitStage = document.getElementById('orbitStage');
+if (orbitStage) {
+  heroEl.addEventListener('mousemove', e => {
+    const r = heroEl.getBoundingClientRect();
+    const cx = (e.clientX - r.left) / r.width - 0.5;
+    const cy = (e.clientY - r.top) / r.height - 0.5;
+    orbitStage.style.transform = `rotateX(${cy * -14}deg) rotateY(${cx * 18}deg)`;
+  });
+  heroEl.addEventListener('mouseleave', () => { orbitStage.style.transform = ''; });
 }
