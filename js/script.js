@@ -27,15 +27,15 @@ mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mai
 
 /* ---------- product data ---------- */
 const products = [
-  { name: 'BPC-157', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', size: '5mg', price: 59, color1:'#ff5fa2', color2:'#ff9966', badge:'Best Seller' },
-  { name: 'TB-500', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.6%', size: '5mg', price: 64, color1:'#7c5cff', color2:'#ff5fa2', badge:null },
-  { name: 'Ipamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.9%', size: '5mg', price: 54, color1:'#00d9c0', color2:'#7c5cff', badge:'Popular' },
-  { name: 'CJC-1295', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.7%', size: '5mg', price: 69, color1:'#ff9966', color2:'#ffd23f', badge:null },
-  { name: 'Semaglutide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.5%', size: '5mg', price: 89, color1:'#2dd4bf', color2:'#3b82f6', badge:'Trending' },
-  { name: 'Tirzepatide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', size: '10mg', price: 129, color1:'#ff4fa3', color2:'#8b5cf6', badge:null },
-  { name: 'Selank', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.6%', size: '5mg', price: 58, color1:'#ffd23f', color2:'#ff5fa2', badge:null },
-  { name: 'Semax', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.7%', size: '5mg', price: 58, color1:'#8b5cf6', color2:'#2dd4bf', badge:'New' },
-  { name: 'GHK-Cu', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', size: '50mg', price: 74, color1:'#ff8a4c', color2:'#ff4fa3', badge:null },
+  { name: 'BPC-157', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', size: '5mg', price: 59, badge:'Best Seller' },
+  { name: 'TB-500', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.6%', size: '5mg', price: 64, badge:null },
+  { name: 'Ipamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.9%', size: '5mg', price: 54, badge:'Popular' },
+  { name: 'CJC-1295', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.7%', size: '5mg', price: 69, badge:null },
+  { name: 'Semaglutide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.5%', size: '5mg', price: 89, badge:'Trending' },
+  { name: 'Tirzepatide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', size: '10mg', price: 129, badge:null },
+  { name: 'Selank', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.6%', size: '5mg', price: 58, badge:null },
+  { name: 'Semax', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.7%', size: '5mg', price: 58, badge:'New' },
+  { name: 'GHK-Cu', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', size: '50mg', price: 74, badge:null },
 ];
 
 const grid = document.getElementById('productGrid');
@@ -49,19 +49,18 @@ function renderProducts(filter) {
     card.style.transitionDelay = `${(i % 3) * 60}ms`;
     card.innerHTML = `
       <div class="product-visual">
-        ${p.badge ? `<span class="product-badge">${p.badge}</span>` : ''}
-        <div class="vial" style="--fill1:${p.color1};--fill2:${p.color2}">
-          <style>
-            .product-visual .vial:nth-of-type(1)::after{}
-          </style>
-        </div>
+        <span class="product-badge cat">${p.cat}</span>
+        ${p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
+        <div class="vial"></div>
       </div>
-      <span class="product-tag">${p.tag}</span>
-      <h3>${p.name}</h3>
-      <p>${p.purity} purity &middot; ${p.size} per vial &middot; Lyophilized &amp; nitrogen sealed.</p>
-      <div class="product-foot">
-        <span class="price">$${p.price} <span>/ vial</span></span>
-        <button class="add-btn" aria-label="Add ${p.name} to research order">+</button>
+      <div class="product-footer">
+        <span class="product-tag">${p.tag}</span>
+        <h3>${p.name}</h3>
+        <p>${p.purity} purity &middot; ${p.size} per vial &middot; Lyophilized &amp; nitrogen sealed.</p>
+        <div class="product-foot">
+          <span class="price">$${p.price} <span>/ vial</span></span>
+          <button class="add-btn" aria-label="Add ${p.name} to research order">+</button>
+        </div>
       </div>
     `;
     grid.appendChild(card);
@@ -77,37 +76,15 @@ function renderProducts(filter) {
     });
     observeReveal(card);
   });
-  // apply vial liquid color via CSS custom property on ::after using inline style hack
-  document.querySelectorAll('.vial').forEach((v, idx) => {
-    const p = list[idx];
-    if (!p) return;
-    v.style.setProperty('--liquid', p.color1);
-  });
-}
-
-// Add dynamic ::after background using a <style> injection since inline pseudo-el styling isn't possible directly
-const dynStyle = document.createElement('style');
-document.head.appendChild(dynStyle);
-function refreshVialStyles() {
-  let css = '';
-  document.querySelectorAll('.product-visual .vial').forEach((v, i) => {
-    v.classList.add('vial-' + i);
-    const c1 = getComputedStyle(v).getPropertyValue('--fill1') || '#ff5fa2';
-    const c2 = getComputedStyle(v).getPropertyValue('--fill2') || '#ff9966';
-    css += `.vial-${i}::after{ background: linear-gradient(180deg, ${c1}, ${c2}); }`;
-  });
-  dynStyle.textContent = css;
 }
 
 renderProducts('all');
-refreshVialStyles();
 
 document.querySelectorAll('.chip').forEach(chip => {
   chip.addEventListener('click', () => {
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     renderProducts(chip.dataset.filter);
-    setTimeout(refreshVialStyles, 0);
   });
 });
 
@@ -333,7 +310,7 @@ window.addEventListener('scroll', () => {
 const canvas = document.getElementById('particleCanvas');
 const ctx = canvas.getContext('2d');
 let particles = [];
-const colors = ['#ff4fa3', '#ff8a4c', '#8b5cf6', '#2dd4bf', '#ffd23f'];
+const colors = ['#ffffff', '#d9d9d6', '#a3a3a1', '#7a7a77', '#e4e4e2'];
 
 function resizeCanvas() {
   const hero = document.querySelector('.hero');
