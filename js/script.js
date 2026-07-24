@@ -412,17 +412,6 @@ if (heroCopy) {
   heroEl.addEventListener('mouseleave', () => { heroCopy.style.transform = ''; });
 }
 
-/* ---------- magnetic buttons ---------- */
-document.querySelectorAll('.btn-primary, .btn-outline').forEach(btn => {
-  btn.addEventListener('mousemove', (e) => {
-    const r = btn.getBoundingClientRect();
-    const x = e.clientX - r.left - r.width / 2;
-    const y = e.clientY - r.top - r.height / 2;
-    btn.style.transform = `translate(${x * 0.18}px, ${y * 0.35}px)`;
-  });
-  btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
-});
-
 /* ---------- product card tilt ---------- */
 document.addEventListener('mousemove', (e) => {
   const card = e.target.closest ? e.target.closest('.product-card') : null;
