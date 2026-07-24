@@ -306,76 +306,120 @@ window.addEventListener('scroll', () => {
   header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
 });
 
-/* ---------- hero particle canvas ---------- */
+/* ---------- hero molecular constellation ---------- */
 const canvas = document.getElementById('particleCanvas');
 const ctx = canvas.getContext('2d');
-let particles = [];
-const colors = ['#ffffff', '#d9d9d6', '#a3a3a1', '#7a7a77', '#e4e4e2'];
+const heroEl = document.querySelector('.hero');
+const DPR = Math.min(window.devicePixelRatio || 1, 2);
+let nodes = [];
+const heroSize = { w: 0, h: 0 };
+const pointer = { x: -9999, y: -9999, active: false };
+const LINK = 130;   // node-to-node link distance
+const PLINK = 200;  // cursor link distance
 
 function resizeCanvas() {
-  const hero = document.querySelector('.hero');
-  canvas.width = hero.offsetWidth;
-  canvas.height = hero.offsetHeight;
+  heroSize.w = heroEl.offsetWidth;
+  heroSize.h = heroEl.offsetHeight;
+  canvas.width = heroSize.w * DPR;
+  canvas.height = heroSize.h * DPR;
+  canvas.style.width = heroSize.w + 'px';
+  canvas.style.height = heroSize.h + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 }
-function initParticles() {
-  const count = window.innerWidth < 768 ? 20 : 42;
-  particles = Array.from({ length: count }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 2 + 0.6,
-    vx: (Math.random() - 0.5) * 0.22,
-    vy: (Math.random() - 0.5) * 0.22,
-    color: colors[Math.floor(Math.random() * colors.length)],
-    alpha: Math.random() * 0.5 + 0.2,
-    isStar: Math.random() < 0.16,
+function initNodes() {
+  const count = window.innerWidth < 768 ? 34 : 66;
+  nodes = Array.from({ length: count }, () => ({
+    x: Math.random() * heroSize.w,
+    y: Math.random() * heroSize.h,
+    vx: (Math.random() - 0.5) * 0.26,
+    vy: (Math.random() - 0.5) * 0.26,
+    r: Math.random() * 1.5 + 0.8,
     phase: Math.random() * Math.PI * 2,
-    spin: (Math.random() - 0.5) * 0.01,
-    angle: Math.random() * Math.PI,
   }));
 }
-function drawSpark(p, size, alpha) {
-  ctx.save();
-  ctx.translate(p.x, p.y);
-  ctx.rotate(p.angle);
-  ctx.globalAlpha = alpha;
-  ctx.fillStyle = p.color;
-  ctx.beginPath();
-  ctx.moveTo(0, -size);
-  ctx.quadraticCurveTo(size * 0.18, -size * 0.18, size, 0);
-  ctx.quadraticCurveTo(size * 0.18, size * 0.18, 0, size);
-  ctx.quadraticCurveTo(-size * 0.18, size * 0.18, -size, 0);
-  ctx.quadraticCurveTo(-size * 0.18, -size * 0.18, 0, -size);
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-}
 let frame = 0;
-function animateParticles() {
+function drawConstellation() {
   frame++;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach(p => {
-    p.x += p.vx; p.y += p.vy;
-    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-    const twinkle = 0.55 + Math.sin(frame * 0.02 + p.phase) * 0.45;
-    if (p.isStar) {
-      p.angle += p.spin;
-      drawSpark(p, p.r * 4.2, p.alpha * twinkle);
-    } else {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = p.alpha * twinkle;
-      ctx.fill();
+  ctx.clearRect(0, 0, heroSize.w, heroSize.h);
+
+  for (const n of nodes) {
+    n.x += n.vx; n.y += n.vy;
+    if (n.x < 0 || n.x > heroSize.w) n.vx *= -1;
+    if (n.y < 0 || n.y > heroSize.h) n.vy *= -1;
+    // gentle push away from the cursor — the network "breathes" around your hand
+    if (pointer.active) {
+      const dx = n.x - pointer.x, dy = n.y - pointer.y;
+      const d = Math.hypot(dx, dy);
+      if (d < PLINK && d > 0.01) {
+        const f = (1 - d / PLINK) * 0.5;
+        n.x += (dx / d) * f;
+        n.y += (dy / d) * f;
+      }
     }
-  });
-  ctx.globalAlpha = 1;
-  requestAnimationFrame(animateParticles);
+  }
+
+  // links between nearby nodes
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const a = nodes[i], b = nodes[j];
+      const dx = a.x - b.x, dy = a.y - b.y;
+      const d = Math.hypot(dx, dy);
+      if (d < LINK) {
+        ctx.strokeStyle = `rgba(255,255,255,${(1 - d / LINK) * 0.15})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
+    }
+  }
+
+  // brighter links reaching toward the cursor
+  if (pointer.active) {
+    for (const n of nodes) {
+      const dx = n.x - pointer.x, dy = n.y - pointer.y;
+      const d = Math.hypot(dx, dy);
+      if (d < PLINK) {
+        ctx.strokeStyle = `rgba(255,255,255,${(1 - d / PLINK) * 0.55})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(pointer.x, pointer.y); ctx.stroke();
+      }
+    }
+  }
+
+  // nodes
+  for (const n of nodes) {
+    const near = pointer.active && Math.hypot(n.x - pointer.x, n.y - pointer.y) < PLINK;
+    const tw = 0.5 + Math.sin(frame * 0.02 + n.phase) * 0.3;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = near ? 'rgba(255,255,255,.95)' : `rgba(255,255,255,${0.35 + tw * 0.3})`;
+    ctx.fill();
+  }
+
+  requestAnimationFrame(drawConstellation);
 }
+
+heroEl.addEventListener('mousemove', e => {
+  const r = heroEl.getBoundingClientRect();
+  pointer.x = e.clientX - r.left;
+  pointer.y = e.clientY - r.top;
+  pointer.active = true;
+});
+heroEl.addEventListener('mouseleave', () => { pointer.active = false; pointer.x = -9999; pointer.y = -9999; });
+
 resizeCanvas();
-initParticles();
-animateParticles();
-window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+initNodes();
+drawConstellation();
+window.addEventListener('resize', () => { resizeCanvas(); initNodes(); });
+
+/* ---------- hero parallax ---------- */
+const heroInner = document.querySelector('.hero-inner');
+heroEl.addEventListener('mousemove', e => {
+  const r = heroEl.getBoundingClientRect();
+  const cx = (e.clientX - r.left) / r.width - 0.5;
+  const cy = (e.clientY - r.top) / r.height - 0.5;
+  heroInner.style.transform = `translate(${cx * 12}px, ${cy * 8}px)`;
+});
+heroEl.addEventListener('mouseleave', () => { heroInner.style.transform = ''; });
 
 /* ---------- magnetic buttons ---------- */
 document.querySelectorAll('.btn-primary, .btn-outline').forEach(btn => {
@@ -401,3 +445,26 @@ document.addEventListener('mouseout', (e) => {
   const card = e.target.closest ? e.target.closest('.product-card') : null;
   if (card && !card.contains(e.relatedTarget)) card.style.transform = '';
 });
+
+/* ---------- statement: word-by-word scroll illumination ---------- */
+const stmt = document.getElementById('statementText');
+if (stmt) {
+  const words = stmt.dataset.text.trim().split(/\s+/);
+  stmt.innerHTML = words.map(w => `<span class="w">${w}</span>`).join(' ');
+  const wordEls = stmt.querySelectorAll('.w');
+  let stmtTicking = false;
+  function updateStatement() {
+    const r = stmt.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const start = vh * 0.82;   // begin lighting when text enters lower third
+    const end = vh * 0.32;     // fully lit as it reaches upper third
+    const p = Math.max(0, Math.min(1, (start - r.top) / (start - end)));
+    const lit = Math.round(p * wordEls.length);
+    wordEls.forEach((el, i) => el.classList.toggle('lit', i < lit));
+    stmtTicking = false;
+  }
+  window.addEventListener('scroll', () => {
+    if (!stmtTicking) { stmtTicking = true; requestAnimationFrame(updateStatement); }
+  }, { passive: true });
+  updateStatement();
+}
