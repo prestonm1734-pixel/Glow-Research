@@ -212,14 +212,24 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .hero-copy{ text-align:left; max-width: 600px; transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: transform; }
 .hero-eyebrow{
   display:inline-block; font-family:'JetBrains Mono', monospace;
-  font-size: 0.74rem; letter-spacing:.16em; text-transform:uppercase;
-  color: var(--text-dimmer); margin-bottom: 22px;
+  font-size: 0.75rem; letter-spacing:.18em; text-transform:uppercase;
+  color: #9a9a97; margin-bottom: 22px; position: relative; z-index: 1;
 }
 @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
 .hero-title{
-  font-size: clamp(2.5rem, 5.2vw, 4.4rem);
+  font-size: clamp(2.7rem, 5.6vw, 4.7rem);
   margin-bottom: 22px;
+  letter-spacing: -0.03em;
+}
+.hero-title .outline{
+  color: transparent;
+  -webkit-text-stroke: 1.4px rgba(255,255,255,.82);
+  transition: color .5s ease, -webkit-text-stroke-color .5s ease;
+}
+.hero-title:hover .outline{
+  color: var(--text);
+  -webkit-text-stroke-color: transparent;
 }
 .hero-sub{
   font-size: 1.12rem;
@@ -239,48 +249,40 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .stat p{ margin:4px 0 0; font-size: 0.78rem; color: var(--text-dimmer); text-transform: uppercase; letter-spacing:.06em; }
 
-/* ---- hero showpiece: orbiting vial ---- */
-.hero-visual{ perspective: 1100px; display:flex; justify-content:center; align-items:center; }
+/* ---- hero showpiece: vial inside a particle torus ---- */
+.hero-visual{ perspective: 1200px; display:flex; justify-content:center; align-items:center; }
 .orbit-stage{
-  position:relative; width: min(440px, 82%); aspect-ratio: 1;
-  transform-style: preserve-3d;
-  transition: transform .4s cubic-bezier(.2,.8,.2,1);
+  position:relative; width: min(480px, 90%); aspect-ratio: 1;
 }
+.ring-c{ position:absolute; inset:0; pointer-events:none; }
+.ring-back{ z-index:0; }
+.ring-front{ z-index:3; }
 .stage-glow{
-  position:absolute; inset:10%; border-radius:50%;
-  background: radial-gradient(circle, rgba(255,255,255,.28), rgba(255,255,255,.06) 52%, transparent 72%);
-  filter: blur(10px);
+  position:absolute; inset:20%; border-radius:50%; z-index:1;
+  background: radial-gradient(circle, rgba(255,255,255,.3), rgba(255,255,255,.06) 52%, transparent 72%);
+  filter: blur(14px);
   animation: glowpulse 6s ease-in-out infinite;
 }
-@keyframes glowpulse{ 0%,100%{ opacity:.85; } 50%{ opacity:1; } }
-.orbit-ring{
-  position:absolute; inset:4%; border:1px solid rgba(255,255,255,.24); border-radius:50%;
+@keyframes glowpulse{ 0%,100%{ opacity:.8; transform:scale(1); } 50%{ opacity:1; transform:scale(1.05); } }
+
+.vial-tilt{
+  position:absolute; top:50%; left:50%; z-index:2;
+  transform: translate(-50%,-50%);
+  transition: transform .4s cubic-bezier(.2,.8,.2,1);
   transform-style: preserve-3d;
 }
-.orbit-ring .node{
-  position:absolute; top:-4px; left:50%; width:9px; height:9px; margin-left:-4.5px;
-  border-radius:50%; background:#fff; box-shadow: 0 0 12px rgba(255,255,255,.85);
-}
-.r1{ animation: orbit1 15s linear infinite; }
-.r2{ inset:15%; animation: orbit2 21s linear infinite; }
-.r3{ inset:27%; animation: orbit3 27s linear infinite; }
-@keyframes orbit1{ from{ transform: rotateX(70deg) rotateZ(0); } to{ transform: rotateX(70deg) rotateZ(360deg); } }
-@keyframes orbit2{ from{ transform: rotateX(62deg) rotateY(46deg) rotateZ(0); } to{ transform: rotateX(62deg) rotateY(46deg) rotateZ(-360deg); } }
-@keyframes orbit3{ from{ transform: rotateX(78deg) rotateY(-32deg) rotateZ(0); } to{ transform: rotateX(78deg) rotateY(-32deg) rotateZ(360deg); } }
-
 .vial-lg{
-  position:absolute; top:50%; left:50%; transform: translate(-50%,-50%);
-  width: 96px; height: 210px; z-index:2;
+  width: 100px; height: 214px;
   animation: vialfloat 6s ease-in-out infinite;
 }
-@keyframes vialfloat{ 0%,100%{ transform: translate(-50%,-52%);} 50%{ transform: translate(-50%,-48%);} }
+@keyframes vialfloat{ 0%,100%{ transform: translateY(-6px);} 50%{ transform: translateY(6px);} }
 .vial-cap{
   width: 40px; height: 26px; margin: 0 auto;
   background: linear-gradient(180deg,#3a3a38,#0a0a0a); border-radius: 5px 5px 3px 3px;
   border:1px solid rgba(255,255,255,.12); border-bottom:none;
 }
 .vial-body{
-  width: 96px; height: 184px; border-radius: 10px 10px 14px 14px;
+  width: 100px; height: 188px; border-radius: 10px 10px 14px 14px;
   background: linear-gradient(115deg, rgba(255,255,255,.5), rgba(255,255,255,.16) 42%, rgba(255,255,255,.3));
   border:1px solid rgba(255,255,255,.55);
   backdrop-filter: blur(3px);

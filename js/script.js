@@ -448,14 +448,92 @@ document.addEventListener('mouseout', (e) => {
   if (card && !card.contains(e.relatedTarget)) card.style.transform = '';
 });
 
-/* ---------- hero showpiece: cursor tilt ---------- */
+/* ---------- hero showpiece: particle torus + vial tilt ---------- */
 const orbitStage = document.getElementById('orbitStage');
-if (orbitStage) {
+const vialTilt = document.getElementById('vialTilt');
+const ringBack = document.getElementById('ringBack');
+const ringFront = document.getElementById('ringFront');
+if (orbitStage && ringBack && ringFront) {
+  const bctx = ringBack.getContext('2d');
+  const fctx = ringFront.getContext('2d');
+  const DPR2 = Math.min(window.devicePixelRatio || 1, 2);
+  let SW = 0, SH = 0, scx = 0, scy = 0;
+  let tmx = 0, tmy = 0, mmx = 0, mmy = 0; // target + smoothed mouse (-0.5..0.5)
+
+  function sizeRing() {
+    const r = orbitStage.getBoundingClientRect();
+    SW = r.width; SH = r.height; scx = SW / 2; scy = SH / 2;
+    [ringBack, ringFront].forEach(c => {
+      c.width = SW * DPR2; c.height = SH * DPR2;
+      c.style.width = SW + 'px'; c.style.height = SH + 'px';
+    });
+    bctx.setTransform(DPR2, 0, 0, DPR2, 0, 0);
+    fctx.setTransform(DPR2, 0, 0, DPR2, 0, 0);
+  }
+
+  // distribute particles over a torus (big ring + tube)
+  const COUNT = window.innerWidth < 768 ? 150 : 260;
+  const torus = Array.from({ length: COUNT }, () => ({
+    a: Math.random() * Math.PI * 2,          // around the big ring
+    b: Math.random() * Math.PI * 2,          // around the tube
+    s: 0.5 + Math.random() * 1.6,            // dot size
+    tw: Math.random() * Math.PI * 2,         // twinkle phase
+  }));
+
+  const FOC = 560;
+  let rt = 0;
+  function drawRing() {
+    rt += 0.0042;
+    mmx += (tmx - mmx) * 0.06;
+    mmy += (tmy - mmy) * 0.06;
+    bctx.clearRect(0, 0, SW, SH);
+    fctx.clearRect(0, 0, SW, SH);
+
+    const Rbig = Math.min(SW, SH) * 0.40;
+    const Rtube = Rbig * 0.16;
+    const tiltX = 1.12 + mmy * 0.55;
+    const rotY = rt + mmx * 0.9;
+    const cX = Math.cos(tiltX), sX = Math.sin(tiltX);
+    const cY = Math.cos(rotY), sY = Math.sin(rotY);
+
+    for (const p of torus) {
+      const rr = Rbig + Rtube * Math.cos(p.b);
+      let x = Math.cos(p.a) * rr;
+      let z = Math.sin(p.a) * rr;
+      let y = Rtube * Math.sin(p.b);
+      // rotate X (tilt), then Y (spin)
+      const y1 = y * cX - z * sX;
+      const z1 = y * sX + z * cX;
+      const x2 = x * cY + z1 * sY;
+      const z2 = -x * sY + z1 * cY;
+      const scale = FOC / (FOC + z2);
+      const sx = scx + x2 * scale;
+      const sy = scy + y1 * scale;
+      const depth = Math.max(0, Math.min(1, (z2 + Rbig) / (2 * Rbig)));
+      const twk = 0.7 + Math.sin(rt * 6 + p.tw) * 0.3;
+      const alpha = (0.12 + depth * 0.8) * twk;
+      const ctx2 = z2 >= 0 ? fctx : bctx;
+      ctx2.beginPath();
+      ctx2.arc(sx, sy, Math.max(0.4, p.s * scale), 0, Math.PI * 2);
+      ctx2.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx2.fill();
+    }
+
+    if (vialTilt) {
+      vialTilt.style.transform =
+        `translate(-50%,-50%) rotateX(${mmy * -12}deg) rotateY(${mmx * 20}deg)`;
+    }
+    requestAnimationFrame(drawRing);
+  }
+
   heroEl.addEventListener('mousemove', e => {
     const r = heroEl.getBoundingClientRect();
-    const cx = (e.clientX - r.left) / r.width - 0.5;
-    const cy = (e.clientY - r.top) / r.height - 0.5;
-    orbitStage.style.transform = `rotateX(${cy * -14}deg) rotateY(${cx * 18}deg)`;
+    tmx = (e.clientX - r.left) / r.width - 0.5;
+    tmy = (e.clientY - r.top) / r.height - 0.5;
   });
-  heroEl.addEventListener('mouseleave', () => { orbitStage.style.transform = ''; });
+  heroEl.addEventListener('mouseleave', () => { tmx = 0; tmy = 0; });
+
+  sizeRing();
+  drawRing();
+  window.addEventListener('resize', sizeRing);
 }
