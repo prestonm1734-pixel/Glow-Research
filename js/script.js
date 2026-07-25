@@ -380,100 +380,83 @@ document.addEventListener('mouseout', (e) => {
   if (card && !card.contains(e.relatedTarget)) card.style.transform = '';
 });
 
-/* ---------- hero showpiece: particle torus + vial tilt ---------- */
-const orbitStage = document.getElementById('orbitStage');
+/* ---------- knock the white studio background out of the vial photo ----------
+   Flood-fills inward from the image border so only background white is made
+   transparent; white powder and glass highlights inside the vial are kept. */
+(function knockOutWhite() {
+  const img = document.querySelector('.vial-lg');
+  if (!img) return;
+
+  function process() {
+    const W = img.naturalWidth, H = img.naturalHeight;
+    if (!W || !H) return;
+    let data;
+    const cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    const cx = cv.getContext('2d', { willReadFrequently: true });
+    cx.drawImage(img, 0, 0);
+    try {
+      data = cx.getImageData(0, 0, W, H);
+    } catch (e) {
+      return; // tainted canvas — leave the original image alone
+    }
+
+    const p = data.data;
+    const TOL = 16;                 // how far from pure white still counts as background
+    const seen = new Uint8Array(W * H);
+    const stack = [];
+    for (let x = 0; x < W; x++) { stack.push(x, (H - 1) * W + x); }
+    for (let y = 0; y < H; y++) { stack.push(y * W, y * W + W - 1); }
+
+    while (stack.length) {
+      const idx = stack.pop();
+      if (idx < 0 || idx >= W * H || seen[idx]) continue;
+      const o = idx * 4;
+      if (p[o] < 255 - TOL || p[o + 1] < 255 - TOL || p[o + 2] < 255 - TOL) continue;
+      seen[idx] = 1;
+      p[o + 3] = 0;
+      const x0 = idx % W, y0 = (idx / W) | 0;
+      if (x0 > 0) stack.push(idx - 1);
+      if (x0 < W - 1) stack.push(idx + 1);
+      if (y0 > 0) stack.push(idx - W);
+      if (y0 < H - 1) stack.push(idx + W);
+    }
+
+    // soften the cut edge: fade pixels that border a knocked-out region
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        const idx = y * W + x;
+        if (seen[idx]) continue;
+        const o = idx * 4;
+        if (p[o + 3] === 0) continue;
+        let open = 0;
+        if (seen[idx - 1]) open++;
+        if (seen[idx + 1]) open++;
+        if (seen[idx - W]) open++;
+        if (seen[idx + W]) open++;
+        if (open) p[o + 3] = Math.round(p[o + 3] * (1 - open * 0.18));
+      }
+    }
+
+    cx.putImageData(data, 0, 0);
+    img.src = cv.toDataURL('image/png');
+  }
+
+  if (img.complete) process();
+  else img.addEventListener('load', process, { once: true });
+})();
+
+/* ---------- hero showpiece: vial tilt ---------- */
 const vialTilt = document.getElementById('vialTilt');
-const ringBack = document.getElementById('ringBack');
-const ringFront = document.getElementById('ringFront');
-if (orbitStage && ringBack && ringFront) {
-  const bctx = ringBack.getContext('2d');
-  const fctx = ringFront.getContext('2d');
-  const DPR2 = Math.min(window.devicePixelRatio || 1, 2);
-  let SW = 0, SH = 0, scx = 0, scy = 0;
+if (vialTilt) {
   let tmx = 0, tmy = 0, mmx = 0, mmy = 0; // target + smoothed mouse (-0.5..0.5)
 
-  function sizeRing() {
-    const r = orbitStage.getBoundingClientRect();
-    SW = r.width; SH = r.height; scx = SW / 2; scy = SH / 2;
-    [ringBack, ringFront].forEach(c => {
-      c.width = SW * DPR2; c.height = SH * DPR2;
-      c.style.width = SW + 'px'; c.style.height = SH + 'px';
-    });
-    bctx.setTransform(DPR2, 0, 0, DPR2, 0, 0);
-    fctx.setTransform(DPR2, 0, 0, DPR2, 0, 0);
-  }
-
-  // distribute particles over a torus (big ring + tube)
-  const COUNT = window.innerWidth < 768 ? 80 : 140;
-  const GOLD = '#f4c96a';
-  const torus = Array.from({ length: COUNT }, () => ({
-    a: Math.random() * Math.PI * 2,          // around the big ring
-    b: Math.random() * Math.PI * 2,          // around the tube
-    s: 0.7 + Math.random() * 1.6,            // star size
-    sp: (Math.random() - 0.5) * 0.05,        // spin speed
-    ang: Math.random() * Math.PI,            // spin angle
-    tw: Math.random() * Math.PI * 2,         // twinkle phase
-  }));
-
-  function drawStar(c, x, y, size, alpha, angle) {
-    c.save();
-    c.translate(x, y);
-    c.rotate(angle);
-    c.globalAlpha = alpha;
-    c.fillStyle = GOLD;
-    c.beginPath();
-    c.moveTo(0, -size);
-    c.quadraticCurveTo(size * 0.2, -size * 0.2, size, 0);
-    c.quadraticCurveTo(size * 0.2, size * 0.2, 0, size);
-    c.quadraticCurveTo(-size * 0.2, size * 0.2, -size, 0);
-    c.quadraticCurveTo(-size * 0.2, -size * 0.2, 0, -size);
-    c.closePath();
-    c.fill();
-    c.restore();
-  }
-
-  const FOC = 560;
-  let rt = 0;
-  function drawRing() {
-    rt += 0.0042;
+  function tiltLoop() {
     mmx += (tmx - mmx) * 0.06;
     mmy += (tmy - mmy) * 0.06;
-    bctx.clearRect(0, 0, SW, SH);
-    fctx.clearRect(0, 0, SW, SH);
-
-    const Rbig = Math.min(SW, SH) * 0.40;
-    const Rtube = Rbig * 0.16;
-    const tiltX = 1.12 + mmy * 0.55;
-    const rotY = rt + mmx * 0.9;
-    const cX = Math.cos(tiltX), sX = Math.sin(tiltX);
-    const cY = Math.cos(rotY), sY = Math.sin(rotY);
-
-    for (const p of torus) {
-      const rr = Rbig + Rtube * Math.cos(p.b);
-      let x = Math.cos(p.a) * rr;
-      let z = Math.sin(p.a) * rr;
-      let y = Rtube * Math.sin(p.b);
-      // rotate X (tilt), then Y (spin)
-      const y1 = y * cX - z * sX;
-      const z1 = y * sX + z * cX;
-      const x2 = x * cY + z1 * sY;
-      const z2 = -x * sY + z1 * cY;
-      const scale = FOC / (FOC + z2);
-      const sx = scx + x2 * scale;
-      const sy = scy + y1 * scale;
-      const depth = Math.max(0, Math.min(1, (z2 + Rbig) / (2 * Rbig)));
-      const twk = 0.7 + Math.sin(rt * 6 + p.tw) * 0.3;
-      const alpha = (0.18 + depth * 0.82) * twk;
-      const ctx2 = z2 >= 0 ? fctx : bctx;
-      p.ang += p.sp;
-      drawStar(ctx2, sx, sy, Math.max(1.6, p.s * scale * 3.4), alpha, p.ang);
-    }
-
-    if (vialTilt) {
-      vialTilt.style.transform =
-        `translate(-50%,-50%) rotateX(${mmy * -12}deg) rotateY(${mmx * 20}deg)`;
-    }
-    requestAnimationFrame(drawRing);
+    vialTilt.style.transform =
+      `translate(-50%,-50%) rotateX(${mmy * -12}deg) rotateY(${mmx * 20}deg)`;
+    requestAnimationFrame(tiltLoop);
   }
 
   heroEl.addEventListener('mousemove', e => {
@@ -483,7 +466,5 @@ if (orbitStage && ringBack && ringFront) {
   });
   heroEl.addEventListener('mouseleave', () => { tmx = 0; tmy = 0; });
 
-  sizeRing();
-  drawRing();
-  window.addEventListener('resize', sizeRing);
+  tiltLoop();
 }
