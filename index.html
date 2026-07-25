@@ -96,32 +96,22 @@
 
     <div class="hero-visual reveal" id="heroVisual">
       <div class="orbit-stage" id="orbitStage">
-        <!-- volumetric backlight; its position tracks the cursor -->
+        <!-- studio backlight; drifts against the cursor like a real softbox -->
         <div class="bloom" id="bloom" aria-hidden="true"></div>
-        <div class="stage-glow"></div>
 
-        <!-- half of the peptide helix that passes behind the vial -->
-        <canvas class="helix-c helix-back" id="helixBack" aria-hidden="true"></canvas>
-
-        <!-- flanking vials sit further back: smaller, dimmer, defocused -->
-        <div class="vial-layer vial-side vial-left" data-depth="0.4">
-          <img class="vial-img" src="assets/vial-bpc-157.png" alt="" aria-hidden="true" />
-        </div>
-        <div class="vial-layer vial-side vial-right" data-depth="0.55">
-          <img class="vial-img" src="assets/vial-bpc-157.png" alt="" aria-hidden="true" />
-        </div>
-
-        <!-- hero vial, sharp and up front -->
         <div class="vial-layer vial-main" data-depth="1">
-          <img class="vial-img" src="assets/vial-bpc-157.png"
-               alt="Glow Research BPC-157 research vial, 5 mg, 99.8% purity, for research use only" />
-          <span class="vial-glint" aria-hidden="true"></span>
+          <div class="vial-stack">
+            <img class="vial-img" src="assets/vial-bpc-157.png"
+                 alt="Glow Research BPC-157 research vial, 5 mg, 99.8% purity, for research use only" />
+            <span class="vial-glint" aria-hidden="true"></span>
+          </div>
+          <!-- contact shadow where the vial meets the surface -->
+          <span class="vial-contact" aria-hidden="true"></span>
+          <!-- mirrored reflection on the black glass floor -->
+          <img class="vial-reflect" src="assets/vial-bpc-157.png" alt="" aria-hidden="true" />
         </div>
 
-        <!-- half of the helix that passes in front, so the ring truly wraps -->
-        <canvas class="helix-c helix-front" id="helixFront" aria-hidden="true"></canvas>
-
-        <div class="vial-pool" aria-hidden="true"></div>
+        <div class="stage-vignette" aria-hidden="true"></div>
       </div>
     </div>
   </div>

@@ -256,56 +256,49 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   perspective: 1000px;
 }
 
-/* volumetric backlight sitting behind the vial — the halo Onyx renders,
-   except this one breathes and follows the cursor */
+/* studio backlight — a soft box behind the product, not a decoration.
+   Tall and slightly oval so it reads as a lit backdrop, and it drifts
+   against the cursor so the light feels like it occupies real space. */
 .bloom{
-  position:absolute; z-index:0; left:50%; top:44%;
-  width: 96%; height: 96%;
+  position:absolute; z-index:0; left:50%; top:40%;
+  width: 74%; height: 88%;
   transform: translate(-50%,-50%);
   background:
-    radial-gradient(circle,
-      rgba(255,255,255,.9)  0%,
-      rgba(255,255,255,.72) 14%,
-      rgba(255,255,255,.42) 26%,
-      rgba(255,255,255,.18) 38%,
-      rgba(255,255,255,.05) 52%,
+    radial-gradient(ellipse at center,
+      rgba(255,255,255,.8)  0%,
+      rgba(255,255,255,.46) 18%,
+      rgba(255,255,255,.2)  34%,
+      rgba(255,255,255,.07) 50%,
       transparent 70%);
-  filter: blur(18px);
-  animation: bloomPulse 7s ease-in-out infinite;
+  filter: blur(34px);
+  animation: bloomPulse 8s ease-in-out infinite;
   will-change: transform;
 }
 @keyframes bloomPulse{
-  0%,100%{ opacity:.75; }
+  0%,100%{ opacity:.8; }
   50%    { opacity:1; }
 }
-.stage-glow{
-  position:absolute; inset:26%; border-radius:50%; z-index:0;
-  background: radial-gradient(circle, rgba(255,255,255,.22), rgba(255,255,255,.05) 52%, transparent 72%);
-  filter: blur(16px);
-  animation: glowpulse 6s ease-in-out infinite;
+
+/* focus vignette so the eye lands on the product */
+.stage-vignette{
+  position:absolute; inset:-18%; z-index:5; pointer-events:none;
+  background: radial-gradient(ellipse at 50% 42%, transparent 42%, rgba(0,0,0,.55) 78%);
 }
-@keyframes glowpulse{ 0%,100%{ opacity:.8; transform:scale(1); } 50%{ opacity:1; transform:scale(1.05); } }
 
-/* the helix ring, split so it renders both behind and in front of the vial */
-.helix-c{ position:absolute; inset:0; pointer-events:none; }
-.helix-back{ z-index:1; }
-.helix-front{ z-index:4; }
-
-/* each vial sits on its own layer so JS can parallax them at different
-   rates — front vial travels furthest, giving real depth */
 .vial-layer{
   position:absolute; top:50%; left:50%;
   transform: translate(-50%,-50%);
   will-change: transform;
+  display:flex; flex-direction:column; align-items:center;
 }
 .vial-main{ z-index:3; }
-.vial-left,
-.vial-right{ z-index:2; }
+
+.vial-stack{ position:relative; }
 
 /* product photo — transparent PNG, sits directly on the black hero */
 .vial-img{
   display:block;
-  width: auto; height: 430px; max-width: none;
+  width: auto; height: 320px; max-width: none;
   object-fit: contain;
   /* tight shadow only — a big soft one would paint over the backlight */
   filter: drop-shadow(0 14px 18px rgba(0,0,0,.55)) contrast(1.06);
@@ -313,15 +306,39 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 @keyframes vialfloat{ 0%,100%{ transform: translateY(-7px);} 50%{ transform: translateY(7px);} }
 
-/* flanking vials: pushed way back — dim, defocused haze that adds depth
-   without competing with the hero vial */
-.vial-side .vial-img{
-  height: 210px;
-  opacity:.22;
-  filter: blur(5px) brightness(.55);
+/* contact shadow: the dark ellipse directly under the glass that sells
+   the vial as resting on a surface rather than pasted on */
+.vial-contact{
+  display:block; width: 122px; height: 14px; margin-top: -7px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,.9) 0%, rgba(0,0,0,.5) 45%, transparent 72%);
+  filter: blur(5px);
+  animation: contactBreathe 6s ease-in-out infinite;
 }
-.vial-left  .vial-img{ animation-delay: -2.4s; }
-.vial-right .vial-img{ animation-delay: -4.6s; }
+@keyframes contactBreathe{
+  0%,100%{ transform: scaleX(.94); opacity:.85; }
+  50%    { transform: scaleX(1.06); opacity:1; }
+}
+
+/* mirrored reflection on the black glass floor — flipped, faded downward
+   and softened, drifting opposite the vial so the two separate naturally */
+.vial-reflect{
+  display:block;
+  width:auto; height: 320px; max-width:none;
+  margin-top: -12px;
+  /* only the top ~40% of the flip is visible, so collapse the rest of the
+     box out of layout — otherwise it inflates the column and shoves the
+     vial off the top of the stage */
+  margin-bottom: -196px;
+  opacity:.32;
+  filter: blur(2.5px);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.22) 20%, transparent 40%);
+          mask-image: linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.22) 20%, transparent 40%);
+  animation: vialfloatRef 6s ease-in-out infinite;
+}
+@keyframes vialfloatRef{
+  0%,100%{ transform: scaleY(-1) translateY(-7px); }
+  50%    { transform: scaleY(-1) translateY(7px); }
+}
 
 /* specular glint: a light band sweeps across, masked to the vial silhouette
    so it rides the glass instead of a rectangle */
@@ -344,13 +361,6 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   86%, 100% { background-position: -60% 0; }
 }
 
-/* soft pool of light grounding the group */
-.vial-pool{
-  position:absolute; left:50%; bottom:11%; z-index:0;
-  width: 62%; height: 46px; transform: translateX(-50%);
-  background: radial-gradient(ellipse at center, rgba(255,255,255,.2), transparent 70%);
-  filter: blur(10px);
-}
 
 .scroll-cue{
   position:absolute; bottom: 24px; left:50%; transform:translateX(-50%);
@@ -631,10 +641,8 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .hero-visual{ order: 2; margin-top: 20px; }
   .orbit-stage{ width: min(340px, 78%); }
   .vial-img{ height: 260px; }
-  .vial-side .vial-img{ height: 165px; }
 }
 @media (max-width: 480px){
   .orbit-stage{ width: min(280px, 82%); }
   .vial-img{ height: 215px; }
-  .vial-side .vial-img{ height: 135px; }
 }
