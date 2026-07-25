@@ -559,19 +559,20 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 @media (max-width: 900px){
   .hero-grid{ min-height: 0; padding: 26px 0 34px; }
   .hero-copy{ max-width: none; }
-  /* full-bleed background instead of a stacked card, so mobile matches the
-     desktop concept (copy sitting over the image) instead of a different
-     stacked layout */
+  /* same technique as desktop: an oversized image bled off a corner, rather
+     than a full-bleed cover — that's what lets the vial actually hang off
+     the edge instead of being forced to fill the whole background */
   .hero-visual-img{
-    position:absolute; inset:0; z-index:0;
-    width:100%; height:100%; max-width:none; transform:none;
-    object-fit: cover; object-position: 92% 95%;
-    opacity:.3;
-    border:none; border-radius:0; box-shadow:none;
-    -webkit-mask-image: none; mask-image: none;
+    position:absolute; z-index:0;
+    left: -22%; bottom: -6%; top:auto; right:auto;
+    width: 96vw; height:auto; max-width:none; transform:none;
+    opacity:.62;
+    border:none; border-radius: var(--radius-sm); box-shadow:none;
+    -webkit-mask-image: linear-gradient(35deg, transparent, #000 38%);
+            mask-image: linear-gradient(35deg, transparent, #000 38%);
   }
   .hero-copy-scrim{
     display:block;
-    background: linear-gradient(180deg, #000 0%, rgba(0,0,0,.75) 55%, #000 100%);
+    background: linear-gradient(180deg, #000 0%, rgba(0,0,0,.5) 42%, rgba(0,0,0,.7) 100%);
   }
 }
