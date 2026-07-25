@@ -191,6 +191,22 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   isolation: isolate;
   background: #000000;
 }
+
+/* AI-generated nebula backdrop, used as atmosphere only — masked so its own
+   (mistyped) vial render fades to black and our real product stays the only
+   readable vial in the frame, and darkened on the left so the copy stays legible */
+.hero-nebula-bg{
+  position:absolute; inset:0; z-index:-4;
+  background: url('../assets/hero-nebula-bg.jpg') center 38% / cover no-repeat;
+  opacity:.4;
+}
+.hero-nebula-bg::after{
+  content:'';
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 62% 78% at 56% 50%, #000 0%, #000 32%, rgba(0,0,0,.85) 48%, transparent 72%),
+    linear-gradient(90deg, #000 0%, rgba(0,0,0,.96) 34%, rgba(0,0,0,.5) 60%, rgba(0,0,0,.62) 100%);
+}
 .hero-glow{
   position:absolute; border-radius:50%; filter: blur(110px); z-index:-1; opacity:.09;
   animation: float 12s ease-in-out infinite;
@@ -249,125 +265,12 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .stat p{ margin:4px 0 0; font-size: 0.76rem; color: var(--text-dimmer); text-transform: uppercase; letter-spacing:.06em; }
 
-/* ---- hero showpiece: floating vial ---- */
-.hero-visual{ perspective: 1200px; display:flex; justify-content:center; align-items:center; }
-.orbit-stage{
-  position:relative; width: min(540px, 100%); aspect-ratio: 1;
-  perspective: 1000px;
-}
-
-/* studio backlight — a soft box behind the product, not a decoration.
-   Tall and slightly oval so it reads as a lit backdrop, and it drifts
-   against the cursor so the light feels like it occupies real space. */
-.bloom{
-  position:absolute; z-index:0; left:50%; top:40%;
-  width: 74%; height: 88%;
-  transform: translate(-50%,-50%);
-  background:
-    radial-gradient(ellipse at center,
-      rgba(255,255,255,.8)  0%,
-      rgba(255,255,255,.46) 18%,
-      rgba(255,255,255,.2)  34%,
-      rgba(255,255,255,.07) 50%,
-      transparent 70%);
-  filter: blur(34px);
-  animation: bloomPulse 8s ease-in-out infinite;
-  will-change: transform;
-}
-@keyframes bloomPulse{
-  0%,100%{ opacity:.8; }
-  50%    { opacity:1; }
-}
-
-/* real-time 3D vial; sits above the backlight, below the vignette */
-.hero-canvas{
-  position:absolute; inset:0; z-index:2;
-  width:100%; height:100%;
-  display:block; pointer-events:none;
-}
-/* the PNG is the default and only steps aside once WebGL is actually running */
-.orbit-stage.is-3d .vial-layer{ display:none; }
-
-/* focus vignette so the eye lands on the product */
-.stage-vignette{
-  position:absolute; inset:-18%; z-index:5; pointer-events:none;
-  background: radial-gradient(ellipse at 50% 42%, transparent 42%, rgba(0,0,0,.55) 78%);
-}
-
-.vial-layer{
-  position:absolute; top:50%; left:50%;
-  transform: translate(-50%,-50%);
-  will-change: transform;
-  display:flex; flex-direction:column; align-items:center;
-}
-.vial-main{ z-index:3; }
-
-.vial-stack{ position:relative; }
-
-/* product photo — transparent PNG, sits directly on the black hero */
-.vial-img{
-  display:block;
-  width: auto; height: 320px; max-width: none;
-  object-fit: contain;
-  /* tight shadow only — a big soft one would paint over the backlight */
-  filter: drop-shadow(0 14px 18px rgba(0,0,0,.55)) contrast(1.06);
-  animation: vialfloat 6s ease-in-out infinite;
-}
-@keyframes vialfloat{ 0%,100%{ transform: translateY(-7px);} 50%{ transform: translateY(7px);} }
-
-/* contact shadow: the dark ellipse directly under the glass that sells
-   the vial as resting on a surface rather than pasted on */
-.vial-contact{
-  display:block; width: 122px; height: 14px; margin-top: -7px;
-  background: radial-gradient(ellipse at center, rgba(0,0,0,.9) 0%, rgba(0,0,0,.5) 45%, transparent 72%);
-  filter: blur(5px);
-  animation: contactBreathe 6s ease-in-out infinite;
-}
-@keyframes contactBreathe{
-  0%,100%{ transform: scaleX(.94); opacity:.85; }
-  50%    { transform: scaleX(1.06); opacity:1; }
-}
-
-/* mirrored reflection on the black glass floor — flipped, faded downward
-   and softened, drifting opposite the vial so the two separate naturally */
-.vial-reflect{
-  display:block;
-  width:auto; height: 320px; max-width:none;
-  margin-top: -12px;
-  /* only the top ~40% of the flip is visible, so collapse the rest of the
-     box out of layout — otherwise it inflates the column and shoves the
-     vial off the top of the stage */
-  margin-bottom: -196px;
-  opacity:.32;
-  filter: blur(2.5px);
-  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.22) 20%, transparent 40%);
-          mask-image: linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.22) 20%, transparent 40%);
-  animation: vialfloatRef 6s ease-in-out infinite;
-}
-@keyframes vialfloatRef{
-  0%,100%{ transform: scaleY(-1) translateY(-7px); }
-  50%    { transform: scaleY(-1) translateY(7px); }
-}
-
-/* specular glint: a light band sweeps across, masked to the vial silhouette
-   so it rides the glass instead of a rectangle */
-.vial-glint{
-  position:absolute; inset:0; pointer-events:none; z-index:4;
-  background: linear-gradient(102deg,
-    transparent 40%, rgba(255,255,255,.9) 50%, transparent 60%);
-  background-size: 320% 100%;
-  background-repeat: no-repeat;
-  -webkit-mask-image: url('../assets/vial-bpc-157.png');
-          mask-image: url('../assets/vial-bpc-157.png');
-  -webkit-mask-size: contain;  mask-size: contain;
-  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-  -webkit-mask-position: center;  mask-position: center;
-  mix-blend-mode: screen;
-  animation: glint 7s ease-in-out infinite;
-}
-@keyframes glint{
-  0%, 62%   { background-position: 160% 0; }
-  86%, 100% { background-position: -60% 0; }
+/* ---- hero showpiece: static product visual ---- */
+.hero-visual{ display:flex; justify-content:center; align-items:center; }
+.hero-visual-img{
+  width: min(560px, 100%);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 40px 90px -30px rgba(0,0,0,.8);
 }
 
 
@@ -648,10 +551,4 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .hero-grid{ grid-template-columns: 1fr; gap: 20px; min-height: 0; }
   .hero-copy{ max-width: none; order: 1; }
   .hero-visual{ order: 2; margin-top: 20px; }
-  .orbit-stage{ width: min(340px, 78%); }
-  .vial-img{ height: 260px; }
-}
-@media (max-width: 480px){
-  .orbit-stage{ width: min(280px, 82%); }
-  .vial-img{ height: 215px; }
 }
