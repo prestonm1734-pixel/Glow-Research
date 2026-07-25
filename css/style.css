@@ -557,18 +557,21 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* ---------- hero responsive ---------- */
 @media (max-width: 900px){
-  .hero-grid{ min-height: 0; }
+  .hero-grid{ min-height: 0; padding: 26px 0 34px; }
   .hero-copy{ max-width: none; }
-  /* framed like a photo card instead of bleeding — a hard-edged fade just
-     looked like an accidental crop once you scrolled past it */
+  /* full-bleed background instead of a stacked card, so mobile matches the
+     desktop concept (copy sitting over the image) instead of a different
+     stacked layout */
   .hero-visual-img{
-    position:static; display:block;
-    width: calc(100% - 48px); max-width:none; transform:none;
-    margin: 28px auto 8px; opacity:1;
-    border: 10px solid #000;
-    border-radius: var(--radius-sm);
-    box-shadow: 0 24px 50px -20px rgba(0,0,0,.85);
+    position:absolute; inset:0; z-index:0;
+    width:100%; height:100%; max-width:none; transform:none;
+    object-fit: cover; object-position: 92% 95%;
+    opacity:.3;
+    border:none; border-radius:0; box-shadow:none;
     -webkit-mask-image: none; mask-image: none;
   }
-  .hero-copy-scrim{ display:none; }
+  .hero-copy-scrim{
+    display:block;
+    background: linear-gradient(180deg, #000 0%, rgba(0,0,0,.75) 55%, #000 100%);
+  }
 }
