@@ -67,12 +67,12 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* ---------- buttons ---------- */
 .btn{
-  display: inline-flex; align-items:center; justify-content:center; gap:8px;
-  padding: 13px 24px;
-  border-radius: 4px;
-  font-weight: 600;
-  font-size: 0.92rem;
-  border: 1px solid transparent;
+  display: inline-flex; align-items:center; justify-content:center; gap:10px;
+  padding: 16px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  border: 1.5px solid transparent;
   cursor: pointer;
   transition: transform .25s ease, box-shadow .25s ease, background .25s ease, color .25s ease, border-color .25s ease;
   white-space: nowrap;
@@ -85,7 +85,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .btn-primary:hover{ background: #fff; box-shadow: 0 12px 36px -6px rgba(255,255,255,.35); }
 .btn-outline{
   background: transparent;
-  border-color: rgba(255,255,255,0.4);
+  border-color: rgba(255,255,255,0.55);
   color: var(--text);
 }
 .btn-outline:hover{ border-color: #fff; background: rgba(255,255,255,0.08); color: var(--text); }
@@ -97,7 +97,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   border-radius: 999px;
 }
 .btn-ghost:hover{ background: rgba(255,255,255,0.12); }
-.btn-lg{ padding: 14px 28px; font-size: 0.98rem; }
+.btn-lg{ padding: 17px 32px; font-size: 1.05rem; }
 
 /* ---------- marquee ---------- */
 .marquee-bar{
