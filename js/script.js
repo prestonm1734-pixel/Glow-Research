@@ -381,15 +381,36 @@ document.addEventListener('mouseout', (e) => {
 });
 
 /* ---------- hero showpiece: vial tilt ---------- */
-const vialTilt = document.getElementById('vialTilt');
-if (vialTilt) {
-  let tmx = 0, tmy = 0, mmx = 0, mmy = 0; // target + smoothed mouse (-0.5..0.5)
+const stageEl = document.getElementById('orbitStage');
+const vialLayers = Array.from(document.querySelectorAll('.vial-layer'));
+if (stageEl && vialLayers.length) {
+  // resting offsets as a fraction of stage width, so the group scales with it
+  const REST = {
+    'vial-left':  { fx: -0.325, fy: 0.045 },
+    'vial-right': { fx:  0.335, fy: 0.075 },
+    'vial-main':  { fx:  0,     fy: 0 },
+  };
+  const layers = vialLayers.map(el => {
+    const key = Object.keys(REST).find(k => el.classList.contains(k)) || 'vial-main';
+    return { el, rest: REST[key], depth: parseFloat(el.dataset.depth) || 1 };
+  });
 
+  let stageW = stageEl.offsetWidth;
+  const measure = () => { stageW = stageEl.offsetWidth; };
+  window.addEventListener('resize', measure);
+
+  let tmx = 0, tmy = 0, mmx = 0, mmy = 0; // target + smoothed mouse (-0.5..0.5)
   function tiltLoop() {
     mmx += (tmx - mmx) * 0.06;
     mmy += (tmy - mmy) * 0.06;
-    vialTilt.style.transform =
-      `translate(-50%,-50%) rotateX(${mmy * -12}deg) rotateY(${mmx * 20}deg)`;
+    for (const { el, rest, depth } of layers) {
+      const px = rest.fx * stageW + mmx * 46 * depth;
+      const py = rest.fy * stageW + mmy * 26 * depth;
+      el.style.transform =
+        `translate(calc(-50% + ${px.toFixed(2)}px), calc(-50% + ${py.toFixed(2)}px))` +
+        ` rotateY(${(mmx * 20 * depth).toFixed(2)}deg)` +
+        ` rotateX(${(mmy * -11 * depth).toFixed(2)}deg)`;
+    }
     requestAnimationFrame(tiltLoop);
   }
 
@@ -400,5 +421,6 @@ if (vialTilt) {
   });
   heroEl.addEventListener('mouseleave', () => { tmx = 0; tmy = 0; });
 
+  measure();
   tiltLoop();
 }

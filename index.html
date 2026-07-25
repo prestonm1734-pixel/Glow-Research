@@ -97,10 +97,23 @@
     <div class="hero-visual reveal" id="heroVisual">
       <div class="orbit-stage" id="orbitStage">
         <div class="stage-glow"></div>
-        <div class="vial-tilt" id="vialTilt">
-          <img class="vial-lg" src="assets/vial-bpc-157.png"
-               alt="Glow Research BPC-157 research vial, 5 mg, 99.8% purity, for research use only" />
+
+        <!-- flanking vials sit further back: smaller, dimmer, defocused -->
+        <div class="vial-layer vial-side vial-left" data-depth="0.4">
+          <img class="vial-img" src="assets/vial-bpc-157.png" alt="" aria-hidden="true" />
         </div>
+        <div class="vial-layer vial-side vial-right" data-depth="0.55">
+          <img class="vial-img" src="assets/vial-bpc-157.png" alt="" aria-hidden="true" />
+        </div>
+
+        <!-- hero vial, sharp and up front -->
+        <div class="vial-layer vial-main" data-depth="1">
+          <img class="vial-img" src="assets/vial-bpc-157.png"
+               alt="Glow Research BPC-157 research vial, 5 mg, 99.8% purity, for research use only" />
+          <span class="vial-glint" aria-hidden="true"></span>
+        </div>
+
+        <div class="vial-pool" aria-hidden="true"></div>
       </div>
     </div>
   </div>

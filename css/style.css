@@ -253,6 +253,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .hero-visual{ perspective: 1200px; display:flex; justify-content:center; align-items:center; }
 .orbit-stage{
   position:relative; width: min(420px, 88%); aspect-ratio: 1;
+  perspective: 900px;
 }
 .stage-glow{
   position:absolute; inset:20%; border-radius:50%; z-index:1;
@@ -262,21 +263,64 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 @keyframes glowpulse{ 0%,100%{ opacity:.8; transform:scale(1); } 50%{ opacity:1; transform:scale(1.05); } }
 
-.vial-tilt{
-  position:absolute; top:50%; left:50%; z-index:2;
+/* each vial sits on its own layer so JS can parallax them at different
+   rates — front vial travels furthest, giving real depth */
+.vial-layer{
+  position:absolute; top:50%; left:50%;
   transform: translate(-50%,-50%);
-  transition: transform .4s cubic-bezier(.2,.8,.2,1);
-  transform-style: preserve-3d;
+  will-change: transform;
 }
-/* product photo of the vial — transparent PNG, sits directly on the black hero */
-.vial-lg{
+.vial-main{ z-index:3; }
+.vial-left,
+.vial-right{ z-index:1; }
+
+/* product photo — transparent PNG, sits directly on the black hero */
+.vial-img{
   display:block;
   width: auto; height: 350px; max-width: none;
   object-fit: contain;
   filter: drop-shadow(0 26px 46px rgba(0,0,0,.75)) contrast(1.04);
   animation: vialfloat 6s ease-in-out infinite;
 }
-@keyframes vialfloat{ 0%,100%{ transform: translateY(-6px);} 50%{ transform: translateY(6px);} }
+@keyframes vialfloat{ 0%,100%{ transform: translateY(-7px);} 50%{ transform: translateY(7px);} }
+
+/* flanking vials: smaller, dimmer and defocused, like a shallow depth of field */
+.vial-side .vial-img{
+  height: 218px;
+  opacity:.34;
+  filter: blur(3px) brightness(.62) drop-shadow(0 18px 30px rgba(0,0,0,.7));
+}
+.vial-left  .vial-img{ animation-delay: -2.4s; }
+.vial-right .vial-img{ animation-delay: -4.6s; }
+
+/* specular glint: a light band sweeps across, masked to the vial silhouette
+   so it rides the glass instead of a rectangle */
+.vial-glint{
+  position:absolute; inset:0; pointer-events:none; z-index:4;
+  background: linear-gradient(102deg,
+    transparent 40%, rgba(255,255,255,.9) 50%, transparent 60%);
+  background-size: 320% 100%;
+  background-repeat: no-repeat;
+  -webkit-mask-image: url('../assets/vial-bpc-157.png');
+          mask-image: url('../assets/vial-bpc-157.png');
+  -webkit-mask-size: contain;  mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center;  mask-position: center;
+  mix-blend-mode: screen;
+  animation: glint 7s ease-in-out infinite;
+}
+@keyframes glint{
+  0%, 62%   { background-position: 160% 0; }
+  86%, 100% { background-position: -60% 0; }
+}
+
+/* soft pool of light grounding the group */
+.vial-pool{
+  position:absolute; left:50%; bottom:11%; z-index:0;
+  width: 62%; height: 46px; transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(255,255,255,.2), transparent 70%);
+  filter: blur(10px);
+}
 
 .scroll-cue{
   position:absolute; bottom: 24px; left:50%; transform:translateX(-50%);
@@ -556,9 +600,11 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .hero-copy{ max-width: none; order: 1; }
   .hero-visual{ order: 2; margin-top: 20px; }
   .orbit-stage{ width: min(340px, 78%); }
-  .vial-lg{ height: 250px; }
+  .vial-img{ height: 260px; }
+  .vial-side .vial-img{ height: 165px; }
 }
 @media (max-width: 480px){
   .orbit-stage{ width: min(280px, 82%); }
-  .vial-lg{ height: 210px; }
+  .vial-img{ height: 215px; }
+  .vial-side .vial-img{ height: 135px; }
 }
