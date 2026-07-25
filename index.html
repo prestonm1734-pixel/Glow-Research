@@ -353,5 +353,16 @@
 
 
 <script src="js/script.js"></script>
+
+<!-- Three.js is vendored locally: no CDN dependency, works offline -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "./assets/vendor/three/three.module.min.js",
+    "three/addons/": "./assets/vendor/three/jsm/"
+  }
+}
+</script>
+<script type="module" src="js/hero3d.js"></script>
 </body>
 </html>
