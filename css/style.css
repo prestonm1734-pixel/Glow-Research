@@ -559,20 +559,8 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 @media (max-width: 900px){
   .hero-grid{ min-height: 0; padding: 26px 0 34px; }
   .hero-copy{ max-width: none; }
-  /* same technique as desktop: an oversized image bled off a corner, rather
-     than a full-bleed cover — that's what lets the vial actually hang off
-     the edge instead of being forced to fill the whole background */
-  .hero-visual-img{
-    position:absolute; z-index:0;
-    left: -22%; bottom: -6%; top:auto; right:auto;
-    width: 96vw; height:auto; max-width:none; transform:none;
-    opacity:.62;
-    border:none; border-radius: var(--radius-sm); box-shadow:none;
-    -webkit-mask-image: linear-gradient(35deg, transparent, #000 38%);
-            mask-image: linear-gradient(35deg, transparent, #000 38%);
-  }
-  .hero-copy-scrim{
-    display:block;
-    background: linear-gradient(180deg, #000 0%, rgba(0,0,0,.5) 42%, rgba(0,0,0,.7) 100%);
-  }
+  /* the vial photo is a desktop-only flourish — on mobile the existing
+     ambient star field (#particleCanvas) carries the hero on its own */
+  .hero-visual-img{ display:none; }
+  .hero-copy-scrim{ display:none; }
 }
