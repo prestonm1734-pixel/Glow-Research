@@ -78,19 +78,11 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   white-space: nowrap;
 }
 .btn-primary{
-  background: var(--grad-main);
+  background: #ececea;
   color: #0a0a0a;
-  box-shadow: 0 0 0 rgba(255,255,255,0);
-  animation: btnGlowPulse 3.2s ease-in-out infinite;
 }
 .btn-primary:hover{
   background: #fff;
-  box-shadow: 0 0 46px 6px rgba(255,255,255,.55);
-  animation-play-state: paused;
-}
-@keyframes btnGlowPulse{
-  0%,100%{ box-shadow: 0 0 16px 0 rgba(255,255,255,.25); }
-  50%    { box-shadow: 0 0 30px 3px rgba(255,255,255,.45); }
 }
 .btn-outline{
   background: transparent;
@@ -281,14 +273,19 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .stat p{ margin:4px 0 0; font-size: 0.76rem; color: var(--text-dimmer); text-transform: uppercase; letter-spacing:.06em; }
 
 /* ---- hero showpiece: oversized product visual, bleeding into the frame ---- */
+/* portrait product shot — sized by height and anchored right, unlike the
+   old wide landscape image which was sized by width. The shot's own near-
+   black backdrop isn't pure #000, so a plain edge/left fade left a visible
+   rectangle; a radial fade centered on the vial hides all four edges into
+   the page background while still clearing the copy on the left. */
 .hero-visual-img{
   position:absolute; z-index:0;
-  right: -6%; top: 28%;
-  width: min(1180px, 82vw);
+  right: 4%; top: 36%;
+  width:auto; height: min(490px, 62vh); max-width:none;
   transform: translateY(-50%);
   border-radius: var(--radius-sm);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%);
-          mask-image: linear-gradient(90deg, transparent, #000 22%);
+  -webkit-mask-image: radial-gradient(ellipse 60% 68% at 66% 46%, #000 56%, transparent 92%);
+          mask-image: radial-gradient(ellipse 60% 68% at 66% 46%, #000 56%, transparent 92%);
 }
 /* scrim behind the copy column so the oversized image never fights legibility */
 .hero-copy-scrim{
