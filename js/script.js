@@ -380,9 +380,13 @@ document.addEventListener('mouseout', (e) => {
   if (card && !card.contains(e.relatedTarget)) card.style.transform = '';
 });
 
-/* ---------- hero showpiece: vial tilt ---------- */
+/* ---------- hero showpiece: peptide helix ring + vial parallax ---------- */
 const stageEl = document.getElementById('orbitStage');
 const vialLayers = Array.from(document.querySelectorAll('.vial-layer'));
+const helixBack = document.getElementById('helixBack');
+const helixFront = document.getElementById('helixFront');
+const bloomEl = document.getElementById('bloom');
+
 if (stageEl && vialLayers.length) {
   // resting offsets as a fraction of stage width, so the group scales with it
   const REST = {
@@ -395,14 +399,120 @@ if (stageEl && vialLayers.length) {
     return { el, rest: REST[key], depth: parseFloat(el.dataset.depth) || 1 };
   });
 
-  let stageW = stageEl.offsetWidth;
-  const measure = () => { stageW = stageEl.offsetWidth; };
+  const bctx = helixBack ? helixBack.getContext('2d') : null;
+  const fctx = helixFront ? helixFront.getContext('2d') : null;
+  const DPR2 = Math.min(window.devicePixelRatio || 1, 2);
+
+  let stageW = 0, stageH = 0;
+  function measure() {
+    stageW = stageEl.offsetWidth;
+    stageH = stageEl.offsetHeight;
+    if (!bctx || !fctx) return;
+    for (const c of [helixBack, helixFront]) {
+      c.width = stageW * DPR2; c.height = stageH * DPR2;
+      c.style.width = stageW + 'px'; c.style.height = stageH + 'px';
+    }
+    bctx.setTransform(DPR2, 0, 0, DPR2, 0, 0);
+    fctx.setTransform(DPR2, 0, 0, DPR2, 0, 0);
+  }
   window.addEventListener('resize', measure);
+
+  // --- peptide double helix wrapped around a ring ---
+  const SEG = window.innerWidth < 768 ? 130 : 210;  // samples around the ring
+  const TWIST = 13;       // helix turns per lap
+  const FOC = 780;        // perspective focal length
+  let spin = 0;
+
+  function project(p) {
+    const s = FOC / (FOC + p.z);
+    return { x: stageW / 2 + p.x * s, y: stageH / 2 + p.y * s, z: p.z, s };
+  }
+
+  function drawHelix(mmx, mmy) {
+    if (!bctx || !fctx) return;
+    bctx.clearRect(0, 0, stageW, stageH);
+    fctx.clearRect(0, 0, stageW, stageH);
+
+    const R = Math.min(stageW, stageH) * 0.40;   // ring radius
+    const r = R * 0.145;                          // helix radius
+    // ring leans back at the top; cursor nudges the lean and the yaw
+    const tiltX = 0.36 + mmy * 0.30;
+    const yaw   = -0.22 + mmx * 0.42;
+    const cX = Math.cos(tiltX), sX = Math.sin(tiltX);
+    const cY = Math.cos(yaw),   sY = Math.sin(yaw);
+
+    const A = [], B = [];
+    for (let i = 0; i <= SEG; i++) {
+      const t = (i / SEG) * Math.PI * 2;
+      const ct = Math.cos(t), st = Math.sin(t);
+      const ph = t * TWIST + spin;
+      const cp = Math.cos(ph), sp = Math.sin(ph);
+      // ring frame: outward normal in-plane, binormal along Z
+      for (let strand = 0; strand < 2; strand++) {
+        const o = strand ? -1 : 1;
+        const rx = R * ct + o * r * cp * ct;
+        const ry = R * st + o * r * cp * st;
+        const rz = o * r * sp;
+        // tilt about X, then yaw about Y
+        const y1 = ry * cX - rz * sX;
+        const z1 = ry * sX + rz * cX;
+        const x2 = rx * cY + z1 * sY;
+        const z2 = -rx * sY + z1 * cY;
+        (strand ? B : A).push(project({ x: x2, y: y1, z: z2 }));
+      }
+    }
+
+    // rungs between the strands, like residue bonds
+    for (let i = 0; i <= SEG; i += 3) {
+      const a = A[i], b = B[i];
+      const mz = (a.z + b.z) / 2;
+      const ctx2 = mz >= 0 ? fctx : bctx;
+      const depth = Math.max(0, Math.min(1, (mz + R) / (2 * R)));
+      ctx2.strokeStyle = `rgba(255,255,255,${(0.05 + depth * 0.3).toFixed(3)})`;
+      ctx2.lineWidth = Math.max(0.5, 1.1 * ((a.s + b.s) / 2));
+      ctx2.beginPath(); ctx2.moveTo(a.x, a.y); ctx2.lineTo(b.x, b.y); ctx2.stroke();
+    }
+
+    // the two backbones
+    for (const strand of [A, B]) {
+      for (let i = 0; i < SEG; i++) {
+        const p = strand[i], q = strand[i + 1];
+        const mz = (p.z + q.z) / 2;
+        const ctx2 = mz >= 0 ? fctx : bctx;
+        const depth = Math.max(0, Math.min(1, (mz + R) / (2 * R)));
+        ctx2.strokeStyle = `rgba(255,255,255,${(0.07 + depth * 0.5).toFixed(3)})`;
+        ctx2.lineWidth = Math.max(0.6, 1.7 * ((p.s + q.s) / 2));
+        ctx2.beginPath(); ctx2.moveTo(p.x, p.y); ctx2.lineTo(q.x, q.y); ctx2.stroke();
+      }
+    }
+
+    // residue nodes, brighter as they come toward the viewer
+    for (const strand of [A, B]) {
+      for (let i = 0; i <= SEG; i += 5) {
+        const p = strand[i];
+        const depth = Math.max(0, Math.min(1, (p.z + R) / (2 * R)));
+        const ctx2 = p.z >= 0 ? fctx : bctx;
+        const rad = Math.max(0.7, 2.3 * p.s);
+        ctx2.beginPath();
+        ctx2.arc(p.x, p.y, rad, 0, Math.PI * 2);
+        ctx2.fillStyle = `rgba(255,255,255,${(0.12 + depth * 0.8).toFixed(3)})`;
+        ctx2.fill();
+        if (depth > 0.72) {          // specular pop on the nearest beads
+          ctx2.beginPath();
+          ctx2.arc(p.x, p.y, rad * 2.6, 0, Math.PI * 2);
+          ctx2.fillStyle = `rgba(255,255,255,${((depth - 0.72) * 0.28).toFixed(3)})`;
+          ctx2.fill();
+        }
+      }
+    }
+  }
 
   let tmx = 0, tmy = 0, mmx = 0, mmy = 0; // target + smoothed mouse (-0.5..0.5)
   function tiltLoop() {
     mmx += (tmx - mmx) * 0.06;
     mmy += (tmy - mmy) * 0.06;
+    spin += 0.0034;
+
     for (const { el, rest, depth } of layers) {
       const px = rest.fx * stageW + mmx * 46 * depth;
       const py = rest.fy * stageW + mmy * 26 * depth;
@@ -411,6 +521,15 @@ if (stageEl && vialLayers.length) {
         ` rotateY(${(mmx * 20 * depth).toFixed(2)}deg)` +
         ` rotateX(${(mmy * -11 * depth).toFixed(2)}deg)`;
     }
+
+    // the backlight drifts opposite the cursor, so the halo feels like a
+    // real light source the vial is sitting in front of
+    if (bloomEl) {
+      bloomEl.style.transform =
+        `translate(calc(-50% + ${(mmx * -34).toFixed(1)}px), calc(-50% + ${(mmy * -22).toFixed(1)}px))`;
+    }
+
+    drawHelix(mmx, mmy);
     requestAnimationFrame(tiltLoop);
   }
 

@@ -252,16 +252,44 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 /* ---- hero showpiece: floating vial ---- */
 .hero-visual{ perspective: 1200px; display:flex; justify-content:center; align-items:center; }
 .orbit-stage{
-  position:relative; width: min(420px, 88%); aspect-ratio: 1;
-  perspective: 900px;
+  position:relative; width: min(540px, 100%); aspect-ratio: 1;
+  perspective: 1000px;
+}
+
+/* volumetric backlight sitting behind the vial — the halo Onyx renders,
+   except this one breathes and follows the cursor */
+.bloom{
+  position:absolute; z-index:0; left:50%; top:44%;
+  width: 96%; height: 96%;
+  transform: translate(-50%,-50%);
+  background:
+    radial-gradient(circle,
+      rgba(255,255,255,.9)  0%,
+      rgba(255,255,255,.72) 14%,
+      rgba(255,255,255,.42) 26%,
+      rgba(255,255,255,.18) 38%,
+      rgba(255,255,255,.05) 52%,
+      transparent 70%);
+  filter: blur(18px);
+  animation: bloomPulse 7s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes bloomPulse{
+  0%,100%{ opacity:.75; }
+  50%    { opacity:1; }
 }
 .stage-glow{
-  position:absolute; inset:20%; border-radius:50%; z-index:1;
-  background: radial-gradient(circle, rgba(255,255,255,.3), rgba(255,255,255,.06) 52%, transparent 72%);
-  filter: blur(14px);
+  position:absolute; inset:26%; border-radius:50%; z-index:0;
+  background: radial-gradient(circle, rgba(255,255,255,.22), rgba(255,255,255,.05) 52%, transparent 72%);
+  filter: blur(16px);
   animation: glowpulse 6s ease-in-out infinite;
 }
 @keyframes glowpulse{ 0%,100%{ opacity:.8; transform:scale(1); } 50%{ opacity:1; transform:scale(1.05); } }
+
+/* the helix ring, split so it renders both behind and in front of the vial */
+.helix-c{ position:absolute; inset:0; pointer-events:none; }
+.helix-back{ z-index:1; }
+.helix-front{ z-index:4; }
 
 /* each vial sits on its own layer so JS can parallax them at different
    rates — front vial travels furthest, giving real depth */
@@ -272,23 +300,25 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .vial-main{ z-index:3; }
 .vial-left,
-.vial-right{ z-index:1; }
+.vial-right{ z-index:2; }
 
 /* product photo — transparent PNG, sits directly on the black hero */
 .vial-img{
   display:block;
-  width: auto; height: 350px; max-width: none;
+  width: auto; height: 430px; max-width: none;
   object-fit: contain;
-  filter: drop-shadow(0 26px 46px rgba(0,0,0,.75)) contrast(1.04);
+  /* tight shadow only — a big soft one would paint over the backlight */
+  filter: drop-shadow(0 14px 18px rgba(0,0,0,.55)) contrast(1.06);
   animation: vialfloat 6s ease-in-out infinite;
 }
 @keyframes vialfloat{ 0%,100%{ transform: translateY(-7px);} 50%{ transform: translateY(7px);} }
 
-/* flanking vials: smaller, dimmer and defocused, like a shallow depth of field */
+/* flanking vials: pushed way back — dim, defocused haze that adds depth
+   without competing with the hero vial */
 .vial-side .vial-img{
-  height: 218px;
-  opacity:.34;
-  filter: blur(3px) brightness(.62) drop-shadow(0 18px 30px rgba(0,0,0,.7));
+  height: 210px;
+  opacity:.22;
+  filter: blur(5px) brightness(.55);
 }
 .vial-left  .vial-img{ animation-delay: -2.4s; }
 .vial-right .vial-img{ animation-delay: -4.6s; }
