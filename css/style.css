@@ -222,7 +222,8 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* two-column stage: copy left, showpiece right */
 .hero-grid{
-  display:grid; grid-template-columns: 1.05fr 0.95fr; align-items:center; gap: 36px;
+  position:relative; z-index:1;
+  display:grid; grid-template-columns: 1fr; align-items:center;
   min-height: min(60vh, 540px);
 }
 .hero-copy{ text-align:left; max-width: 580px; transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: transform; }
@@ -265,12 +266,20 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .stat p{ margin:4px 0 0; font-size: 0.76rem; color: var(--text-dimmer); text-transform: uppercase; letter-spacing:.06em; }
 
-/* ---- hero showpiece: static product visual ---- */
-.hero-visual{ display:flex; justify-content:center; align-items:center; }
+/* ---- hero showpiece: oversized product visual, bleeding into the frame ---- */
 .hero-visual-img{
-  width: min(560px, 100%);
+  position:absolute; z-index:0;
+  right: -6%; top: 50%;
+  width: min(1180px, 82vw);
+  transform: translateY(-50%);
   border-radius: var(--radius-sm);
-  box-shadow: 0 40px 90px -30px rgba(0,0,0,.8);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%);
+          mask-image: linear-gradient(90deg, transparent, #000 22%);
+}
+/* scrim behind the copy column so the oversized image never fights legibility */
+.hero-copy-scrim{
+  position:absolute; z-index:0; inset:0;
+  background: linear-gradient(90deg, #000 0%, #000 34%, rgba(0,0,0,.75) 52%, transparent 78%);
 }
 
 
@@ -548,7 +557,14 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* ---------- hero responsive ---------- */
 @media (max-width: 900px){
-  .hero-grid{ grid-template-columns: 1fr; gap: 20px; min-height: 0; }
-  .hero-copy{ max-width: none; order: 1; }
-  .hero-visual{ order: 2; margin-top: 20px; }
+  .hero-grid{ min-height: 0; }
+  .hero-copy{ max-width: none; }
+  .hero-visual-img{
+    position:static; display:block;
+    width:100%; max-width:none; transform:none;
+    margin-top: 28px; opacity:.85;
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 20%);
+            mask-image: linear-gradient(180deg, transparent, #000 20%);
+  }
+  .hero-copy-scrim{ display:none; }
 }
