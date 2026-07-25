@@ -69,7 +69,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .btn{
   display: inline-flex; align-items:center; justify-content:center; gap:10px;
   padding: 16px 28px;
-  border-radius: 8px;
+  border-radius: 0;
   font-weight: 700;
   font-size: 1rem;
   border: 1.5px solid transparent;
@@ -80,15 +80,29 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .btn-primary{
   background: var(--grad-main);
   color: #0a0a0a;
-  box-shadow: 0 8px 30px -8px rgba(255,255,255,.25);
+  box-shadow: 0 0 0 rgba(255,255,255,0);
+  animation: btnGlowPulse 3.2s ease-in-out infinite;
 }
-.btn-primary:hover{ background: #fff; box-shadow: 0 12px 36px -6px rgba(255,255,255,.35); }
+.btn-primary:hover{
+  background: #fff;
+  box-shadow: 0 0 46px 6px rgba(255,255,255,.55);
+  animation-play-state: paused;
+}
+@keyframes btnGlowPulse{
+  0%,100%{ box-shadow: 0 0 16px 0 rgba(255,255,255,.25); }
+  50%    { box-shadow: 0 0 30px 3px rgba(255,255,255,.45); }
+}
 .btn-outline{
   background: transparent;
   border-color: rgba(255,255,255,0.55);
   color: var(--text);
 }
-.btn-outline:hover{ border-color: #fff; background: rgba(255,255,255,0.08); color: var(--text); }
+.btn-outline:hover{
+  border-color: #fff;
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  box-shadow: 0 0 32px 2px rgba(255,255,255,.3);
+}
 .btn-ghost{
   background: rgba(255,255,255,0.06);
   border: 1px solid var(--border);
@@ -544,8 +558,8 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .hero{ padding: 48px 0 56px; }
   .hero-stats{ gap: 30px; }
   .footer-top{ grid-template-columns: 1fr; }
-  .btn-lg{ width:100%; }
-  .hero-cta{ flex-direction:column; align-items:stretch; }
+  .btn-lg{ width:100%; padding: 14px 24px; font-size: 0.95rem; }
+  .hero-cta{ flex-direction:column; align-items:stretch; gap: 12px; margin-bottom: 34px; }
 }
 
 /* mobile nav drawer */
@@ -563,4 +577,9 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
      ambient star field (#particleCanvas) carries the hero on its own */
   .hero-visual-img{ display:none; }
   .hero-copy-scrim{ display:none; }
+
+  /* the bigger button size added for the desktop CTAs was inflating every
+     button site-wide (nav, newsletter, etc.) once it lost the width
+     constraint of a wide screen — scale back down for breathing room */
+  .btn{ padding: 12px 20px; font-size: 0.88rem; }
 }
