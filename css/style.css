@@ -268,12 +268,10 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   transition: transform .4s cubic-bezier(.2,.8,.2,1);
   transform-style: preserve-3d;
 }
-/* product photo of the vial — its white studio background is stripped to
-   transparency at runtime (see knockOutWhite in script.js) so it sits
-   cleanly on the black hero */
+/* product photo of the vial — transparent PNG, sits directly on the black hero */
 .vial-lg{
   display:block;
-  width: auto; height: 300px; max-width: none;
+  width: auto; height: 350px; max-width: none;
   object-fit: contain;
   filter: drop-shadow(0 26px 46px rgba(0,0,0,.75)) contrast(1.04);
   animation: vialfloat 6s ease-in-out infinite;
