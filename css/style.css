@@ -269,7 +269,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 /* ---- hero showpiece: oversized product visual, bleeding into the frame ---- */
 .hero-visual-img{
   position:absolute; z-index:0;
-  right: -6%; top: 50%;
+  right: -6%; top: 28%;
   width: min(1180px, 82vw);
   transform: translateY(-50%);
   border-radius: var(--radius-sm);
