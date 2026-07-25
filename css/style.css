@@ -138,10 +138,9 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 /* ---------- header ---------- */
 .site-header{
   position: sticky; top:0; z-index: 100;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(14px) saturate(140%);
-  border-bottom: 1px solid rgba(0,0,0,0.08);
-  transition: background .3s ease;
+  background: #ececea;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  transition: box-shadow .3s ease;
   color: #0a0a0a;
 }
 .nav-inner{
@@ -573,7 +572,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 /* mobile nav drawer */
 .main-nav.open{
   display:flex; position:absolute; top:100%; left:0; right:0;
-  flex-direction:column; background: #fff; border-bottom:1px solid rgba(0,0,0,0.08);
+  flex-direction:column; background: #ececea; border-bottom:1px solid rgba(0,0,0,0.1);
   padding: 20px 24px; gap: 18px;
 }
 
