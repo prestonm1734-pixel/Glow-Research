@@ -291,15 +291,9 @@ document.querySelectorAll('.reveal').forEach(observeReveal);
 
 /* ---------- header shrink ---------- */
 const header = document.getElementById('siteHeader');
-let headerTicking = false;
-function updateHeader() {
-  header.classList.toggle('scrolled', window.scrollY > 20);
-  headerTicking = false;
-}
 window.addEventListener('scroll', () => {
-  if (!headerTicking) { headerTicking = true; requestAnimationFrame(updateHeader); }
-}, { passive: true });
-updateHeader();
+  header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
+});
 
 /* ---------- hero molecular constellation (ambient, not cursor-reactive) ---------- */
 const canvas = document.getElementById('particleCanvas');
