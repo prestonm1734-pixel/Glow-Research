@@ -16,6 +16,20 @@ const revealObserver = new IntersectionObserver((entries) => {
 
 function observeReveal(el) { revealObserver.observe(el); }
 
+/* ---------- cart count ---------- */
+/* the header badge is driven by the product "+" buttons; it stays hidden at
+   zero (see .nav-cart-badge[data-count="0"]) so an empty cart isn't shouted */
+const cartBadge = document.getElementById('cartBadge');
+let cartCount = 0;
+function bumpCart() {
+  cartCount += 1;
+  cartBadge.textContent = cartCount;
+  cartBadge.dataset.count = cartCount;
+  cartBadge.classList.remove('bump');
+  void cartBadge.offsetWidth;   // restart the animation on repeat adds
+  cartBadge.classList.add('bump');
+}
+
 /* ---------- mobile nav ---------- */
 const hamburger = document.getElementById('hamburger');
 const mainNav = document.getElementById('mainNav');
@@ -66,6 +80,7 @@ function renderProducts(filter) {
     grid.appendChild(card);
     const addBtn = card.querySelector('.add-btn');
     addBtn.addEventListener('click', () => {
+      bumpCart();
       addBtn.classList.add('added');
       addBtn.textContent = '✓';
       addBtn.setAttribute('aria-label', `${p.name} added`);

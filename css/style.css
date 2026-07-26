@@ -105,6 +105,20 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .btn-ghost:hover{ background: rgba(255,255,255,0.12); }
 .btn-lg{ padding: 17px 32px; font-size: 1.05rem; }
 
+/* press feedback — short duration so the push reads as a click, not a slide */
+.btn:active{ transform: translateY(1px) scale(.988); transition-duration: .06s; }
+
+/* keyboard focus: white ring on the dark hero, ink ring on the light header */
+.btn:focus-visible,
+.chip:focus-visible,
+.add-btn:focus-visible{
+  outline: 2px solid #fff; outline-offset: 3px;
+}
+.site-header :focus-visible,
+.section-light :focus-visible{
+  outline: 2px solid #0a0a0a; outline-offset: 3px;
+}
+
 /* ---------- marquee ---------- */
 .marquee-bar{
   background: linear-gradient(90deg, #0a0a0a, #1c1c1c);
@@ -140,6 +154,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   from{ transform: translateX(0); }
   to{ transform: translateX(-50%); }
 }
+.marquee-bar:hover .marquee-track{ animation-play-state: paused; }
 
 /* ---------- header ---------- */
 .site-header{
@@ -187,6 +202,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   transition: border-color .2s ease, background .2s ease;
 }
 .nav-icon-btn:hover{ border-color:#0a0a0a; background: rgba(0,0,0,0.05); }
+.nav-icon-btn:active{ transform: translateY(1px); transition-duration: .06s; }
 #searchToggle, .nav-cart{ width: 42px; padding:0; }
 .nav-cart{ position: relative; }
 .nav-cart-badge{
@@ -196,6 +212,14 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   background:#0a0a0a; color:#fff;
   font-size: 0.65rem; font-weight:700;
   border-radius: 0;
+}
+/* an empty cart shouldn't advertise itself — badge appears on first add */
+.nav-cart-badge[data-count="0"]{ display:none; }
+.nav-cart-badge.bump{ animation: badgeBump .32s ease; }
+@keyframes badgeBump{
+  0%{ transform: scale(1); }
+  40%{ transform: scale(1.45); }
+  100%{ transform: scale(1); }
 }
 .hamburger{
   display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding: 6px;
@@ -602,4 +626,18 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
      button site-wide (nav, newsletter, etc.) once it lost the width
      constraint of a wide screen — scale back down for breathing room */
   .btn{ padding: 12px 20px; font-size: 0.88rem; }
+}
+
+/* ---------- reduced motion ---------- */
+/* honour the OS-level "reduce motion" setting: kill the ambient loops
+   (marquee, glow drift, twinkle) and the reveal slide, but keep opacity
+   transitions so nothing ends up stuck invisible */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal{ opacity:1; transform:none; }
 }
