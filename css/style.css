@@ -182,8 +182,10 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   background: transparent; border: 1px solid rgba(0,0,0,0.15); color:#0a0a0a;
 }
 .nav-actions .btn-ghost:hover{ background: rgba(0,0,0,0.06); }
-.nav-actions .btn-primary{ background:#0a0a0a; color:#fff; }
-.nav-actions .btn-primary:hover{ box-shadow: 0 8px 24px -8px rgba(0,0,0,.5); }
+.nav-signin{
+  background: transparent; border: 1.5px solid rgba(0,0,0,0.4); color:#0a0a0a;
+}
+.nav-signin:hover{ border-color:#0a0a0a; background: rgba(0,0,0,0.05); }
 .hamburger{
   display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding: 6px;
 }
