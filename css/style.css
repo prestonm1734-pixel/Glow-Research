@@ -151,7 +151,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .nav-inner{
   display:flex; align-items:center; justify-content:space-between;
-  height: 62px;
+  height: 70px;
 }
 .logo{
   font-family: 'Fraunces', Georgia, serif;
