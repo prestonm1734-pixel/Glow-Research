@@ -234,9 +234,13 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .hero-copy{ text-align:left; max-width: 580px; transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: transform; }
 .hero-eyebrow{
-  display:inline-block; font-family:'JetBrains Mono', monospace;
+  display:inline-flex; align-items:center; gap: 8px; font-family:'JetBrains Mono', monospace;
   font-size: 0.74rem; letter-spacing:.18em; text-transform:uppercase; font-weight:600;
   color: #ffffff; margin-bottom: 20px; position: relative; z-index: 1;
+}
+.usa-flag-icon{
+  width: 18px; height: 12px; flex-shrink: 0; border-radius: 1.5px;
+  color: #fff;
 }
 @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
