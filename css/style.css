@@ -384,6 +384,15 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .section-light .chip:hover{ border-color:#0a0a0a; color:#0a0a0a; }
 .section-light .chip.active{ background:#0a0a0a; color:#fff; }
 
+.section-light .btn-outline{
+  border-color: rgba(0,0,0,0.35); color:#0a0a0a;
+}
+.section-light .btn-outline:hover{
+  border-color:#0a0a0a; background: rgba(0,0,0,0.05); color:#0a0a0a;
+  box-shadow: none;
+}
+.catalog-view-all{ display:flex; justify-content:center; margin-top: 40px; }
+
 /* ---------- product grid ---------- */
 .product-grid{
   display:grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 24px;

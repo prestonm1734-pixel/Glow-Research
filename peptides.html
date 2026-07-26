@@ -3,20 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Shipping & Fulfillment — Glow Research</title>
-<meta name="description" content="Shipping & Fulfillment at Glow Research." />
+<title>Full Catalog — Glow Research</title>
+<meta name="description" content="Browse the full Glow Research peptide catalog — growth, recovery, cognitive, and metabolic research compounds." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  .stub-hero{ position:relative; padding: 90px 0 100px; background:#000; overflow:hidden; isolation:isolate; }
-  .stub-hero .container{ position:relative; z-index:1; max-width: 720px; }
-  .stub-hero .hero-eyebrow{ margin-bottom:20px; }
-  .stub-hero h1{ font-size: clamp(2.1rem, 4.4vw, 3.4rem); margin-bottom:22px; letter-spacing:-0.03em; }
-  .stub-hero h1 .outline{ color: transparent; -webkit-text-stroke: 1.4px rgba(255,255,255,.82); }
-  .stub-hero p{ font-size: 1.08rem; max-width: 560px; margin: 0 0 32px; }
   .stub-back{ display:inline-flex; align-items:center; gap:8px; }
 </style>
 </head>
@@ -37,10 +31,10 @@
     <a href="index.html" class="logo" aria-label="Glow Research home">Glow<span class="spark">✦</span></a>
 
     <nav class="main-nav" id="mainNav">
-      <a href="peptides.html">Peptides</a>
+      <a href="peptides.html" class="active">Peptides</a>
       <a href="coa.html">COA</a>
       <a href="quality.html">Quality</a>
-      <a href="shipping.html" class="active">Shipping</a>
+      <a href="shipping.html">Shipping</a>
       <a href="wholesale.html">Wholesale</a>
     </nav>
 
@@ -54,7 +48,7 @@
       </a>
       <button class="nav-icon-btn nav-cart" aria-label="Cart">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
-        <span class="nav-cart-badge" data-count="0">0</span>
+        <span class="nav-cart-badge" id="cartBadge" data-count="0">0</span>
       </button>
       <button class="hamburger" id="hamburger" aria-label="Toggle menu">
         <span></span><span></span><span></span>
@@ -63,45 +57,27 @@
   </div>
 </header>
 
-<section class="stub-hero">
+<section class="section section-light">
   <div class="container">
-    <span class="hero-eyebrow">Shipping & Fulfillment</span>
-    <h1>Same-day dispatch,<br /><span class="outline">cold-chain done right.</span></h1>
-    <p>Every order ships the same business day it's placed, via 2-day FedEx Express with a refrigerated, temperature-controlled pack — built for compounds that don't tolerate a slow ride.</p>
-  </div>
-</section>
-
-<section class="stub-section">
-  <div class="container">
-    <div class="stub-features reveal">
-      <div class="stub-feature">
-        <h3>2-Day Cold-Chain</h3>
-        <p>FedEx Express, refrigerated pick-up and temperature-controlled transit on every order — no exceptions.</p>
-      </div>
-      <div class="stub-feature">
-        <h3>All 50 States</h3>
-        <p>Full nationwide coverage including Hawaii and Alaska, with Saturday delivery included.</p>
-      </div>
-      <div class="stub-feature">
-        <h3>Same-Day Dispatch</h3>
-        <p>Orders placed on a business day leave our facility that same day.</p>
-      </div>
-      <div class="stub-feature">
-        <h3>Shipment Protection</h3>
-        <p>Every order is covered for loss, damage, or delay up to $300 — automatically, at no extra step for you.</p>
-      </div>
+    <div class="section-head reveal">
+      <span class="eyebrow">The Catalog</span>
     </div>
 
-    <div class="stub-policy reveal">
-      <h2>Returns on Research Materials</h2>
-      <p>
-        Because our products are lyophilized and reconstituted for laboratory use, we're unable to accept returns
-        once a vial has been opened or shipped. If a package arrives damaged or lost in transit, it's covered under
-        shipment protection above — reach out and we'll make it right.
-      </p>
+    <div class="filter-row reveal" id="filterRow">
+      <button class="chip active" data-filter="all">All</button>
+      <button class="chip" data-filter="growth">Growth</button>
+      <button class="chip" data-filter="recovery">Recovery</button>
+      <button class="chip" data-filter="cognitive">Cognitive</button>
+      <button class="chip" data-filter="metabolic">Metabolic</button>
     </div>
 
-    <a href="index.html" class="btn btn-outline stub-back stub-cta-row">&larr; Back to Home</a>
+    <div class="product-grid" id="productGrid">
+      <!-- injected by JS -->
+    </div>
+
+    <div class="catalog-view-all reveal">
+      <a href="index.html" class="btn btn-outline stub-back">&larr; Back to Home</a>
+    </div>
   </div>
 </section>
 
@@ -167,14 +143,18 @@
   </div>
 </footer>
 
+<script src="js/products-data.js"></script>
 <script>
   document.getElementById('stubYear').textContent = new Date().getFullYear();
+
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
     });
   }, { threshold: 0.15 });
-  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  function observeReveal(el) { revealObserver.observe(el); }
+  document.querySelectorAll('.reveal').forEach(observeReveal);
+
   const hamburger = document.getElementById('hamburger');
   const mainNav = document.getElementById('mainNav');
   hamburger.addEventListener('click', () => {
@@ -182,10 +162,44 @@
     hamburger.classList.toggle('open');
   });
   mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mainNav.classList.remove('open')));
+
   const header = document.getElementById('siteHeader');
   window.addEventListener('scroll', () => {
     header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
   });
+
+  /* ---------- cart count ---------- */
+  const cartBadge = document.getElementById('cartBadge');
+  let cartCount = 0;
+  function bumpCart() {
+    cartCount += 1;
+    cartBadge.textContent = cartCount;
+    cartBadge.dataset.count = cartCount;
+    cartBadge.classList.remove('bump');
+    void cartBadge.offsetWidth;
+    cartBadge.classList.add('bump');
+  }
+
+  /* ---------- catalog grid + filters ---------- */
+  const grid = document.getElementById('productGrid');
+  function renderProducts(filter) {
+    renderProductGrid(grid, filter, { observeReveal, bumpCart });
+  }
+
+  const chips = document.querySelectorAll('#filterRow .chip');
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      renderProducts(chip.dataset.filter);
+    });
+  });
+
+  /* honour ?cat=growth|recovery|cognitive|metabolic from footer/nav links */
+  const requestedCat = new URLSearchParams(window.location.search).get('cat');
+  const initial = [...chips].find(c => c.dataset.filter === requestedCat) ? requestedCat : 'all';
+  chips.forEach(c => c.classList.toggle('active', c.dataset.filter === initial));
+  renderProducts(initial);
 </script>
 </body>
 </html>
