@@ -67,8 +67,41 @@
   <div class="container">
     <span class="hero-eyebrow">Shipping & Fulfillment</span>
     <h1>Same-day dispatch,<br /><span class="outline">cold-chain done right.</span></h1>
-    <p>Orders placed before 2PM EST ship same day, insulated and packed with ice packs for temperature-sensitive compounds. Full shipping rates, regions, and tracking details are coming to this page soon.</p>
-    <a href="index.html" class="btn btn-outline stub-back">&larr; Back to Home</a>
+    <p>Every order ships the same business day it's placed, via 2-day FedEx Express with a refrigerated, temperature-controlled pack — built for compounds that don't tolerate a slow ride.</p>
+  </div>
+</section>
+
+<section class="stub-section">
+  <div class="container">
+    <div class="stub-features reveal">
+      <div class="stub-feature">
+        <h3>2-Day Cold-Chain</h3>
+        <p>FedEx Express, refrigerated pick-up and temperature-controlled transit on every order — no exceptions.</p>
+      </div>
+      <div class="stub-feature">
+        <h3>All 50 States</h3>
+        <p>Full nationwide coverage including Hawaii and Alaska, with Saturday delivery included.</p>
+      </div>
+      <div class="stub-feature">
+        <h3>Same-Day Dispatch</h3>
+        <p>Orders placed on a business day leave our facility that same day.</p>
+      </div>
+      <div class="stub-feature">
+        <h3>Shipment Protection</h3>
+        <p>Every order is covered for loss, damage, or delay up to $300 — automatically, at no extra step for you.</p>
+      </div>
+    </div>
+
+    <div class="stub-policy reveal">
+      <h2>Returns on Research Materials</h2>
+      <p>
+        Because our products are lyophilized and reconstituted for laboratory use, we're unable to accept returns
+        once a vial has been opened or shipped. If a package arrives damaged or lost in transit, it's covered under
+        shipment protection above — reach out and we'll make it right.
+      </p>
+    </div>
+
+    <a href="index.html" class="btn btn-outline stub-back stub-cta-row">&larr; Back to Home</a>
   </div>
 </section>
 
@@ -136,6 +169,12 @@
 
 <script>
   document.getElementById('stubYear').textContent = new Date().getFullYear();
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   const hamburger = document.getElementById('hamburger');
   const mainNav = document.getElementById('mainNav');
   hamburger.addEventListener('click', () => {
