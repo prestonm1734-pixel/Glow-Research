@@ -568,7 +568,10 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* ---------- hero responsive ---------- */
 @media (max-width: 900px){
-  .hero-grid{ min-height: 0; padding: 26px 0 34px; }
+  /* padding-top/bottom only — this element is also .container, and a
+     shorthand here was wiping out its 24px left/right padding, which is
+     what made everything (buttons, nav) look flush against the edges */
+  .hero-grid{ min-height: 0; padding-top: 26px; padding-bottom: 34px; }
   .hero-copy{ max-width: none; }
   /* the vial photo is a desktop-only flourish — on mobile the existing
      ambient star field (#particleCanvas) carries the hero on its own */
