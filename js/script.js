@@ -7,7 +7,7 @@ const revealObserver = new IntersectionObserver((entries) => {
     if (entry.isIntersecting) {
       entry.target.classList.add('in');
       if (entry.target.classList.contains('hero-stats')) {
-        entry.target.querySelectorAll('.stat-num').forEach(animateCount);
+        entry.target.querySelectorAll('.stat-num:not(.stat-text)').forEach(animateCount);
       }
       revealObserver.unobserve(entry.target);
     }
