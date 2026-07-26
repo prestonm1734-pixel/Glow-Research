@@ -103,7 +103,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   border-radius: 999px;
 }
 .btn-ghost:hover{ background: rgba(255,255,255,0.12); }
-.btn-lg{ padding: 17px 32px; font-size: 1.05rem; }
+.btn-lg{ padding: 14px 26px; font-size: 0.95rem; }
 
 /* press feedback — short duration so the push reads as a click, not a slide */
 .btn:active{ transform: translateY(1px) scale(.988); transition-duration: .06s; }
