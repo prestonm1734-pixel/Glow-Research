@@ -192,6 +192,8 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .main-nav a:hover{ color: #0a0a0a; }
 .main-nav a:hover::after{ width: 100%; }
+.main-nav a.active{ color: #0a0a0a; }
+.main-nav a.active::after{ width: 100%; }
 .nav-actions{ display:flex; align-items:center; gap: 10px; }
 .nav-icon-btn{
   display:inline-flex; align-items:center; justify-content:center; gap:8px;
