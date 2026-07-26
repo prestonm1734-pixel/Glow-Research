@@ -239,7 +239,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   color: #ffffff; margin-bottom: 20px; position: relative; z-index: 1;
 }
 .usa-flag-icon{
-  width: 26px; height: 17.3px; flex-shrink: 0; border-radius: 1.5px;
+  width: 16px; height: 10.7px; flex-shrink: 0; border-radius: 1px;
   color: #fff;
 }
 @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
