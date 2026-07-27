@@ -167,6 +167,8 @@ ${body}
 
 ${footerShell.replace('id="stubYear"', 'id="blogYear"')}
 
+<script src="js/products-data.js"></script>
+<script src="js/search.js"></script>
 ${PAGE_SCRIPT}
 ${extraScript}
 </body>
