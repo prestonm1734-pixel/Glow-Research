@@ -393,6 +393,19 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .catalog-view-all{ display:flex; justify-content:center; margin-top: 40px; }
 
+.catalog-head{
+  display:flex; align-items:flex-end; justify-content:space-between; gap: 24px;
+  max-width: none;
+}
+.catalog-head-copy{ max-width: 640px; }
+.catalog-head .eyebrow{ margin-bottom: 10px; }
+.catalog-head h2{ margin:0; }
+.catalog-head .btn-outline{ flex-shrink:0; white-space:nowrap; }
+@media (max-width: 640px){
+  .catalog-head{ flex-direction:column; align-items:flex-start; }
+  .catalog-head .btn-outline{ width:100%; text-align:center; }
+}
+
 /* ---------- product grid ---------- */
 .product-grid{
   display:grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 24px;
