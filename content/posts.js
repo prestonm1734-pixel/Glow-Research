@@ -25,7 +25,7 @@ module.exports = [
     slug: 'how-to-read-a-certificate-of-analysis',
     title: 'How to Read a Peptide Certificate of Analysis',
     description:
-      'HPLC purity, mass spec identity, endotoxin limits — what each line on a peptide COA actually means, and the red flags that separate a real COA from a marketing document.',
+      'HPLC purity, mass spec identity, endotoxin limits, and what each line on a peptide COA actually means, and the red flags that separate a real COA from a marketing document.',
     category: 'Verification',
     date: '2026-07-07',
     readingTime: 7,

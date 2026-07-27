@@ -135,7 +135,9 @@ const PAGE_SCRIPT = `<script>
       jrRows.forEach(r => {
         const match = isAll ? r.dataset.lead !== 'true' : r.dataset.cat === cat;
         r.hidden = !match;
-        if (match) shown++;
+        /* a display:none row never triggers the reveal observer, so a row
+           unhidden by a filter would stay at opacity 0. Reveal it outright. */
+        if (match) { r.classList.add('in'); shown++; }
       });
       const total = isAll ? jrRows.length : shown;
       if (jrCount) jrCount.textContent = total + ' article' + (total === 1 ? '' : 's');
@@ -267,7 +269,7 @@ function buildPost(post) {
     ],
   };
 
-  const head = `<title>${esc(post.title)} — Glow Research</title>
+  const head = `<title>${esc(post.title)} | Glow Research</title>
 <meta name="description" content="${esc(post.description)}" />
 <link rel="canonical" href="${url}" />
 <meta property="og:type" content="article" />
@@ -425,12 +427,12 @@ function cardHtml(post) {
 
 function buildIndex() {
   const url = `${SITE}/blog.html`;
-  const head = `<title>Peptide Blog — News, Research &amp; Handling Guides | Glow Research</title>
-<meta name="description" content="Peptide news, research, and practical guidance — storage, reconstitution, certificates of analysis, quality standards, and what's changing across the research peptide industry." />
+  const head = `<title>Peptide Blog: News, Research &amp; Handling Guides | Glow Research</title>
+<meta name="description" content="Peptide news, research, and practical guidance covering storage, reconstitution, certificates of analysis, quality standards, and what's changing across the research peptide industry." />
 <link rel="canonical" href="${url}" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
-<meta property="og:title" content="Peptide Blog — News, Research &amp; Handling Guides" />
+<meta property="og:title" content="Peptide Blog: News, Research &amp; Handling Guides" />
 <meta property="og:description" content="Peptide news, research, and practical guidance from across the research peptide industry." />
 <meta property="og:url" content="${url}" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -448,6 +450,10 @@ function buildIndex() {
       description: p.description,
     })),
   })}</script>`;
+
+  if (!posts.length) {
+    throw new Error('content/posts.js is empty — the listing needs at least one post to build.');
+  }
 
   const [lead, ...rest] = posts;
 
@@ -467,7 +473,7 @@ function buildIndex() {
               <span aria-hidden="true">&bull;</span>
               <span>${lead.readingTime} min read</span>
             </span>
-            <span class="jr-cta">Continue reading</span>
+            <span class="jr-cta">Continue reading <span class="jr-arrow" aria-hidden="true">&rarr;</span></span>
           </div>
         </div>
         <div class="jr-lead-art">${coverSvg(lead.slug, { variant: 'lead' })}</div>
@@ -478,7 +484,7 @@ function buildIndex() {
   // a topic filter is applied, so filtering never drops an article.
   const rowsHtml = posts.map((p) => {
     const isLead = p.slug === lead.slug;
-    return `      <li class="jr-row" data-cat="${slugifyHeading(p.category)}"${isLead ? ' data-lead="true" hidden' : ''}>
+    return `      <li class="jr-row reveal" data-cat="${slugifyHeading(p.category)}"${isLead ? ' data-lead="true" hidden' : ''}>
         <a href="blog/${p.slug}/">
           <span class="jr-tag">${esc(p.category)}</span>
           <h3>${esc(p.title)}</h3>
@@ -514,7 +520,7 @@ ${sections.map(s => `      <button type="button" class="chip" data-cat="${slugif
         <span class="jr-mast-label">Blog</span>
         <span class="jr-count">${posts.length} article${posts.length === 1 ? '' : 's'}</span>
       </div>
-      <h1 class="jr-mast-title">Everything in peptides &mdash; news, research, handling, and industry.</h1>
+      <h1 class="jr-mast-title">Everything in peptides. News, research, handling, and industry.</h1>
     </header>
 
 ${filtersHtml}

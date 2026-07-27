@@ -649,10 +649,24 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
    grid. [hidden] needs stating outright: .jr-lead sets display:grid at the
    same specificity and later in the file, so it would otherwise win. */
 .jr-filters{ display:flex; flex-wrap:wrap; gap: 10px; margin: 26px 0 4px; }
-.journal .chip{ background:#f2f2f0; border-color: rgba(0,0,0,0.1); color:#55554f; }
+/* named properties instead of the base chip's `transition: all`, which
+   animated the focus ring's width and made it grow in rather than appear */
+.journal .chip{
+  background:#f2f2f0; border-color: rgba(0,0,0,0.1); color:#55554f;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
 .journal .chip:hover{ border-color:#0a0a0a; color:#0a0a0a; }
 .journal .chip.active{ background:#0a0a0a; color:#fff; border-color: transparent; }
+/* the global chip focus ring is white, which is invisible on this page */
+.journal .chip:focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 3px; }
 .jr-lead[hidden], .jr-row[hidden], .jr-sep[hidden]{ display:none; }
+
+/* rows fade up as they arrive; the lead is deliberately excluded so the
+   first thing on the page never depends on JS to become visible */
+.jr-row.reveal{ transition-duration: .55s; }
+.jr-row:nth-child(3), .jr-row:nth-child(4){ transition-delay: .05s; }
+.jr-row:nth-child(5), .jr-row:nth-child(6){ transition-delay: .10s; }
+.jr-row:nth-child(n+7){ transition-delay: .14s; }
 .jr-mast-title{
   font-family:'Fraunces', Georgia, serif; font-weight:600;
   font-size: clamp(1.85rem, 4vw, 2.9rem);
@@ -665,7 +679,9 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .jr-tag{
   font-family:'JetBrains Mono', monospace; font-size:0.64rem; font-weight:600;
   letter-spacing:.15em; text-transform:uppercase; color:#8a8a84;
+  transition: color .3s ease;
 }
+.jr-row > a:hover .jr-tag{ color:#0a0a0a; }
 .jr-tag-feature{
   background:#0a0a0a; color:#fff; padding: 4px 9px; border-radius: 3px; font-weight:700;
 }
@@ -714,10 +730,16 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .jr-byline{ color:#0a0a0a; font-weight:600; }
 .jr-cta{
+  display:inline-flex; align-items:center; gap: 8px;
   font-size:0.88rem; font-weight:600; color:#0a0a0a;
+}
+.jr-cta{
   text-decoration: underline; text-decoration-color: rgba(0,0,0,.3); text-underline-offset: 3px;
+  transition: text-decoration-color .3s ease;
 }
 .jr-lead:hover .jr-cta{ text-decoration-color:#0a0a0a; }
+.jr-arrow{ display:inline-block; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+.jr-lead:hover .jr-arrow{ transform: translateX(5px); }
 
 /* ---------- article list: text-forward newspaper grid ---------- */
 .jr-list{

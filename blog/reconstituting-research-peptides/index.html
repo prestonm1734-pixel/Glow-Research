@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../css/style.css" />
-<title>Reconstituting Research Peptides: A Practical Guide — Glow Research</title>
+<title>Reconstituting Research Peptides: A Practical Guide | Glow Research</title>
 <meta name="description" content="Choosing a diluent, calculating concentration, and avoiding the handling mistakes that denature peptides during reconstitution in a research setting." />
 <link rel="canonical" href="https://glowresearch.shop/blog/reconstituting-research-peptides/" />
 <meta property="og:type" content="article" />
@@ -124,7 +124,7 @@
 
 <p>
   Let the vial reach room temperature while still sealed. Opening a cold vial condenses atmospheric
-  moisture directly onto the powder — see our guide on
+  moisture directly onto the powder. See our guide on
   <a href="../../blog/how-to-store-lyophilized-peptides/">storing lyophilized peptides</a> for why that
   matters more than it sounds.
 </p>
@@ -138,7 +138,7 @@
 <h2 id="choosing-a-diluent">Choosing a diluent</h2>
 
 <p>
-  Bacteriostatic water — sterile water with 0.9% benzyl alcohol — is the standard choice for research
+  Bacteriostatic water (sterile water with 0.9% benzyl alcohol) is the standard choice for research
   work where the solution will be accessed more than once. The benzyl alcohol suppresses microbial
   growth, which sterile water alone does not.
 </p>
@@ -153,7 +153,7 @@
 <div class="post-callout">
   <strong>Never inject diluent directly onto the powder.</strong> Angle the needle so the stream runs
   down the inside wall of the vial. A jet hitting the cake directly causes localized denaturation and
-  foaming — and foam means the peptide is unfolding at the air-liquid interface.
+  foaming, and foam means the peptide is unfolding at the air-liquid interface.
 </div>
 
 <h2 id="adding-the-diluent">Adding the diluent</h2>
@@ -166,7 +166,7 @@
 <p>
   If material remains after sitting, swirl gently or roll the vial between your palms.
   <strong>Do not shake or vortex.</strong> Mechanical agitation denatures peptides and generates foam,
-  and foam is not cosmetic — it indicates protein unfolding at the interface.
+  and foam is not cosmetic: it indicates protein unfolding at the interface.
 </p>
 
 <h2 id="calculating-concentration">Calculating concentration</h2>
@@ -185,14 +185,14 @@
   Two things quietly break this calculation. First, <strong>net peptide content</strong>: the vial
   contains the stated mass of peptide plus counterions and residual moisture, so the actual peptide
   mass may be lower than the label figure. Your COA should state net peptide content if it was
-  measured. Second, <strong>volume displacement</strong> — the dissolved solid adds to total volume,
+  measured. Second, <strong>volume displacement</strong>: the dissolved solid adds to total volume,
   which is negligible at low concentrations and less so at high ones.
 </p>
 
 <h2 id="after-reconstitution">After reconstitution</h2>
 
 <ul>
-  <li>Label the vial with concentration, diluent, and date — not just concentration</li>
+  <li>Label the vial with concentration, diluent, and date, not just concentration</li>
   <li>Refrigerate at 2&ndash;8&deg;C and protect from light</li>
   <li>Aliquot into single-use volumes if the solution will be stored rather than used promptly</li>
   <li>Inspect before each use: cloudiness, precipitate, or discoloration means stop</li>
@@ -203,7 +203,7 @@
 
 <p>
   <strong>Powder won't dissolve.</strong> Give it more time before intervening. If it persists, the
-  sequence likely needs a different diluent — not more agitation.
+  sequence likely needs a different diluent, not more agitation.
 </p>
 
 <p>
@@ -213,14 +213,14 @@
 
 <p>
   <strong>Persistent foam.</strong> The solution was agitated too aggressively. Let it settle, and use
-  gentler technique next time — some of that peptide has already denatured.
+  gentler technique next time. Some of that peptide has already denatured.
 </p>
 
 <h2 id="start-from-a-known-quantity">Start from a known quantity</h2>
 
 <p>
   Every calculation above assumes the vial contains what the label says. That assumption is only as
-  good as the documentation behind it — which is why net peptide content and batch-specific purity
+  good as the documentation behind it, which is why net peptide content and batch-specific purity
   data matter before you ever pick up a syringe.
 </p>
 
@@ -257,7 +257,7 @@
       <a class="blog-card reveal" href="../../blog/how-to-read-a-certificate-of-analysis/">
         <span class="blog-card-cat">Verification</span>
         <h3>How to Read a Peptide Certificate of Analysis</h3>
-        <p>HPLC purity, mass spec identity, endotoxin limits — what each line on a peptide COA actually means, and the red flags that separate a real COA from a marketing document.</p>
+        <p>HPLC purity, mass spec identity, endotoxin limits, and what each line on a peptide COA actually means, and the red flags that separate a real COA from a marketing document.</p>
         <div class="blog-card-meta">
           <time datetime="2026-07-07">July 7, 2026</time>
           <span aria-hidden="true">&bull;</span>
@@ -377,7 +377,9 @@
       jrRows.forEach(r => {
         const match = isAll ? r.dataset.lead !== 'true' : r.dataset.cat === cat;
         r.hidden = !match;
-        if (match) shown++;
+        /* a display:none row never triggers the reveal observer, so a row
+           unhidden by a filter would stay at opacity 0. Reveal it outright. */
+        if (match) { r.classList.add('in'); shown++; }
       });
       const total = isAll ? jrRows.length : shown;
       if (jrCount) jrCount.textContent = total + ' article' + (total === 1 ? '' : 's');
