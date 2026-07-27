@@ -16,19 +16,8 @@ const revealObserver = new IntersectionObserver((entries) => {
 
 function observeReveal(el) { revealObserver.observe(el); }
 
-/* ---------- cart count ---------- */
-/* the header badge is driven by the product "+" buttons; it stays hidden at
-   zero (see .nav-cart-badge[data-count="0"]) so an empty cart isn't shouted */
-const cartBadge = document.getElementById('cartBadge');
-let cartCount = 0;
-function bumpCart() {
-  cartCount += 1;
-  cartBadge.textContent = cartCount;
-  cartBadge.dataset.count = cartCount;
-  cartBadge.classList.remove('bump');
-  void cartBadge.offsetWidth;   // restart the animation on repeat adds
-  cartBadge.classList.add('bump');
-}
+/* the header badge and the cart drawer both live in js/cart.js, so that the
+   cart survives navigation between pages */
 
 /* ---------- mobile nav ---------- */
 const hamburger = document.getElementById('hamburger');
@@ -43,7 +32,7 @@ mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mai
 const grid = document.getElementById('productGrid');
 
 function renderProducts(filter) {
-  renderProductGrid(grid, filter, { observeReveal, bumpCart, limit: 8 });
+  renderProductGrid(grid, filter, { observeReveal, limit: 8 });
 }
 
 renderProducts('all');
@@ -83,7 +72,7 @@ faqs.forEach(f => {
 /* ---------- newsletter ---------- */
 document.getElementById('newsletterForm').addEventListener('submit', e => {
   e.preventDefault();
-  document.getElementById('newsletterMsg').textContent = "You're on the list — welcome to the Glow research community.";
+  document.getElementById('newsletterMsg').textContent = "You're on the list. Welcome to the Glow research community.";
   e.target.reset();
 });
 

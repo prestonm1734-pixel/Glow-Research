@@ -148,6 +148,7 @@
 </footer>
 
 <script src="js/products-data.js"></script>
+<script src="js/cart.js"></script>
 <script src="js/search.js"></script>
 <script src="js/cart-modal.js"></script>
 <script>
@@ -174,22 +175,12 @@
     header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
   });
 
-  /* ---------- cart count ---------- */
-  const cartBadge = document.getElementById('cartBadge');
-  let cartCount = 0;
-  function bumpCart() {
-    cartCount += 1;
-    cartBadge.textContent = cartCount;
-    cartBadge.dataset.count = cartCount;
-    cartBadge.classList.remove('bump');
-    void cartBadge.offsetWidth;
-    cartBadge.classList.add('bump');
-  }
+  /* the cart badge and drawer live in js/cart.js */
 
   /* ---------- catalog grid + filters ---------- */
   const grid = document.getElementById('productGrid');
   function renderProducts(filter) {
-    renderProductGrid(grid, filter, { observeReveal, bumpCart });
+    renderProductGrid(grid, filter, { observeReveal });
   }
 
   const chips = document.querySelectorAll('#filterRow .chip');

@@ -35,7 +35,7 @@
     });
   }
 
-  function row(product, variant, opts) {
+  function row(product, variant) {
     const el = document.createElement('div');
     el.className = 'qa-row';
     el.innerHTML = `
@@ -50,7 +50,14 @@
     `;
     const btn = el.querySelector('.qa-row-add');
     btn.addEventListener('click', () => {
-      if (opts.bumpCart) opts.bumpCart();
+      if (window.GlowCart) {
+        window.GlowCart.add({
+          name: product.name,
+          variant: variant.label,
+          unitOriginal: variant.original,
+          unitSale: variant.sale,
+        });
+      }
       btn.classList.add('added');
       btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
       setTimeout(() => {
@@ -61,8 +68,7 @@
     return el;
   }
 
-  function open(product, opts) {
-    opts = opts || {};
+  function open(product) {
     if (!overlay) build();
     lastFocused = document.activeElement;
 
@@ -70,11 +76,11 @@
     const variants = getProductVariants(product);
     const sales = variants.map(v => v.sale);
     const lo = Math.min(...sales), hi = Math.max(...sales);
-    overlay.querySelector('#qaPriceRange').textContent = `$${lo.toFixed(2)} – $${hi.toFixed(2)}`;
+    overlay.querySelector('#qaPriceRange').textContent = `$${lo.toFixed(2)} to $${hi.toFixed(2)}`;
 
     const rowsEl = overlay.querySelector('#qaRows');
     rowsEl.innerHTML = '';
-    variants.forEach(v => rowsEl.appendChild(row(product, v, opts)));
+    variants.forEach(v => rowsEl.appendChild(row(product, v)));
 
     overlay.classList.add('open');
     document.body.classList.add('search-locked');

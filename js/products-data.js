@@ -34,7 +34,7 @@ function getProductVariants(p) {
 // gridEl: container to render into
 // filter: 'all' or a category key
 // opts.observeReveal(el): optional, hooks each card into a scroll-reveal observer
-// opts.bumpCart(): optional, called when a card's "+" is clicked
+// opts.limit: optional, render at most this many cards
 function renderProductGrid(gridEl, filter, opts) {
   opts = opts || {};
   gridEl.innerHTML = '';
@@ -63,11 +63,9 @@ function renderProductGrid(gridEl, filter, opts) {
     gridEl.appendChild(card);
     const addBtn = card.querySelector('.add-btn');
     addBtn.addEventListener('click', () => {
-      if (window.openQuickAdd) {
-        window.openQuickAdd(p, { bumpCart: opts.bumpCart });
-      } else if (opts.bumpCart) {
-        opts.bumpCart();
-      }
+      // the quick-add sheet is where a size gets chosen, so the cart is only
+      // ever touched from in there
+      if (window.openQuickAdd) window.openQuickAdd(p);
     });
     if (opts.observeReveal) opts.observeReveal(card);
   });
