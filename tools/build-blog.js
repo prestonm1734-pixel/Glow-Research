@@ -232,6 +232,72 @@ ${related.map(cardHtml).join('\n')}
   return page({ head, body: bodyHtml, depth: 2 });
 }
 
+/* ---------- generative cover art ----------
+   Each post gets a unique molecular-lattice cover derived from its slug, so
+   new articles get artwork automatically with no image assets to manage and
+   nothing extra to download. Deterministic: the same slug always renders the
+   same lattice. */
+
+function hashString(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+// small deterministic PRNG so covers are stable across rebuilds
+function seeded(seed) {
+  let s = seed;
+  return () => {
+    s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
+}
+
+function coverSvg(slug, { w = 640, h = 420, nodes = 26, variant = 'lead' } = {}) {
+  const rand = seeded(hashString(slug));
+  const pts = Array.from({ length: nodes }, () => ({
+    x: +(rand() * w).toFixed(1),
+    y: +(rand() * h).toFixed(1),
+    r: +(1.1 + rand() * 2.4).toFixed(2),
+  }));
+
+  const reach = Math.min(w, h) * 0.36;
+  const lines = [];
+  for (let i = 0; i < pts.length; i++) {
+    for (let j = i + 1; j < pts.length; j++) {
+      const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
+      if (d < reach) {
+        const o = ((1 - d / reach) * 0.42).toFixed(3);
+        lines.push(`<line x1="${pts[i].x}" y1="${pts[i].y}" x2="${pts[j].x}" y2="${pts[j].y}" stroke="#fff" stroke-opacity="${o}" stroke-width="1"/>`);
+      }
+    }
+  }
+
+  const dots = pts
+    .map(p => `<circle cx="${p.x}" cy="${p.y}" r="${p.r}" fill="#fff" fill-opacity="${(0.35 + rand() * 0.5).toFixed(2)}"/>`)
+    .join('');
+
+  // glow position also varies per post
+  const gx = (25 + rand() * 50).toFixed(0);
+  const gy = (25 + rand() * 50).toFixed(0);
+  const id = `g-${variant}-${slug}`;
+
+  return `<svg class="cover-art" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="${id}" cx="${gx}%" cy="${gy}%" r="72%">
+      <stop offset="0%" stop-color="#2a2a28"/>
+      <stop offset="100%" stop-color="#000"/>
+    </radialGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="url(#${id})"/>
+  <g>${lines.join('')}</g>
+  <g>${dots}</g>
+</svg>`;
+}
+
 /* ---------- listing ---------- */
 
 function cardHtml(post) {
@@ -273,19 +339,69 @@ function buildIndex() {
     })),
   })}</script>`;
 
-  const body = `<section class="blog-hero">
-  <div class="container">
-    <span class="eyebrow">The Blog</span>
-    <h1>Peptide research,<br /><span class="outline">documented.</span></h1>
-    <p>Handling protocols, verification guides, and notes on where the research peptide industry is going.</p>
-  </div>
-</section>
+  const [lead, ...rest] = posts;
 
-<section class="section section-light section-blog">
+  const leadHtml = `      <a class="jr-lead" href="blog/${lead.slug}/">
+        <div class="jr-lead-art">${coverSvg(lead.slug, { variant: 'lead' })}</div>
+        <div class="jr-lead-copy">
+          <div class="jr-tags">
+            <span class="jr-tag jr-tag-feature">Featured</span>
+            <span class="jr-tag">${esc(lead.category)}</span>
+          </div>
+          <h2>${esc(lead.title)}</h2>
+          <p>${esc(lead.description)}</p>
+          <div class="jr-lead-foot">
+            <span class="jr-meta">
+              <time datetime="${lead.date}">${displayDate(lead.date)}</time>
+              <span aria-hidden="true">&bull;</span>
+              <span>${lead.readingTime} min read</span>
+            </span>
+            <span class="jr-cta">Read article <span class="jr-arrow" aria-hidden="true">&rarr;</span></span>
+          </div>
+        </div>
+      </a>`;
+
+  const rowsHtml = rest.map((p, i) => `        <li class="jr-row">
+          <a href="blog/${p.slug}/">
+            <span class="jr-num">${String(i + 2).padStart(2, '0')}</span>
+            <span class="jr-thumb">${coverSvg(p.slug, { w: 200, h: 200, nodes: 26, variant: 'thumb' })}</span>
+            <span class="jr-row-copy">
+              <span class="jr-tag">${esc(p.category)}</span>
+              <h3>${esc(p.title)}</h3>
+              <p>${esc(p.description)}</p>
+            </span>
+            <span class="jr-row-meta">
+              <time datetime="${p.date}">${displayDate(p.date)}</time>
+              <em>${p.readingTime} min</em>
+            </span>
+            <span class="jr-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>`).join('\n');
+
+  const body = `<section class="journal">
   <div class="container">
-    <div class="blog-grid">
-${posts.map(cardHtml).join('\n')}
+
+    <header class="jr-masthead">
+      <div class="jr-masthead-title">
+        <span class="jr-kicker">Glow Research</span>
+        <h1>Blog</h1>
+      </div>
+      <div class="jr-masthead-side">
+        <p>Handling protocols, verification guides, and notes on where the research peptide industry is going.</p>
+        <span class="jr-count">${posts.length} article${posts.length === 1 ? '' : 's'}</span>
+      </div>
+    </header>
+
+${leadHtml}
+
+${rest.length ? `    <div class="jr-list-head">
+      <span class="eyebrow">All articles</span>
+      <span class="jr-rule" aria-hidden="true"></span>
     </div>
+    <ol class="jr-list">
+${rowsHtml}
+    </ol>` : ''}
+
   </div>
 </section>`;
 
