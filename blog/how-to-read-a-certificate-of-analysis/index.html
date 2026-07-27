@@ -328,12 +328,6 @@
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); } });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-  const jrDate = document.getElementById('jrDate');
-  if (jrDate) {
-    jrDate.textContent = new Date().toLocaleDateString('en-US', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-    });
-  }
 </script>
 <script>
   /* reading progress — measured against the article body, not the whole

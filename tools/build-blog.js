@@ -109,12 +109,6 @@ const PAGE_SCRIPT = `<script>
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); } });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-  const jrDate = document.getElementById('jrDate');
-  if (jrDate) {
-    jrDate.textContent = new Date().toLocaleDateString('en-US', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-    });
-  }
 </script>`;
 
 /* ---------- page assembly ---------- */
@@ -470,15 +464,12 @@ function buildIndex() {
   <div class="container">
 
     <header class="jr-masthead">
-      <div class="jr-mast-top">
-        <span id="jrDate">&nbsp;</span>
-        <span class="jr-mast-sections">${sections.map(esc).join(' &middot; ')}</span>
+      <div class="jr-mast-row">
+        <span class="jr-mast-label">Blog</span>
+        <span class="jr-mast-sections">${sections.map(esc).join(' / ')}</span>
         <span class="jr-count">${posts.length} article${posts.length === 1 ? '' : 's'}</span>
       </div>
-      <div class="jr-nameplate">
-        <h1>Glow Research</h1>
-        <p class="jr-mast-tagline">Handling protocols, verification guides, and notes on where the research peptide industry is going.</p>
-      </div>
+      <h1 class="jr-mast-title">Practical notes on handling, verifying, and storing research peptides.</h1>
     </header>
 
 ${leadHtml}

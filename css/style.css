@@ -631,29 +631,25 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .journal{ background:#fff; color:#0a0a0a; padding: 40px 0 100px; --jr-bleed: 22px; }
 @media (max-width: 1120px){ .journal{ --jr-bleed: 12px; } }
 
-/* ---------- masthead: newspaper nameplate, not a giant page heading ---------- */
-.jr-masthead{ margin-bottom: 46px; }
-.jr-mast-top{
-  display:flex; align-items:center; justify-content:space-between; gap: 16px;
-  padding-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,.16);
+/* ---------- masthead ----------
+   Left-aligned with a single hairline. The old centred nameplate + double
+   rule + italic dek read as an antique broadsheet; the statement line is
+   what identifies the section now, not a repeat of the brand in the header. */
+.jr-masthead{ margin-bottom: 22px; }
+.jr-mast-row{
+  display:flex; align-items:center; justify-content:space-between; gap: 20px;
+  padding-bottom: 14px; border-bottom: 1px solid rgba(0,0,0,.12);
   font-family:'JetBrains Mono', monospace; font-size:0.66rem;
-  letter-spacing:.1em; text-transform:uppercase; color:#8a8a84;
+  letter-spacing:.16em; text-transform:uppercase; color:#8a8a84;
 }
-.jr-nameplate{
-  text-align:center; padding: 22px 0 20px;
-  border-bottom: 4px double #0a0a0a;
-}
-.jr-nameplate h1{
+.jr-mast-label{ color:#0a0a0a; font-weight:600; }
+.jr-mast-sections{ letter-spacing:.12em; }
+.jr-mast-title{
   font-family:'Fraunces', Georgia, serif; font-weight:600;
-  font-size: clamp(2.2rem, 5vw, 3.4rem); line-height:1; letter-spacing:-0.01em;
-  margin:0 0 10px; color:#0a0a0a;
+  font-size: clamp(1.85rem, 4vw, 2.9rem);
+  line-height:1.12; letter-spacing:-0.03em;
+  color:#0a0a0a; margin: 30px 0 0; max-width: 21ch;
 }
-.jr-mast-tagline{
-  font-family: Georgia, 'Fraunces', serif; font-style:italic;
-  font-size: 0.92rem; color:#6b6b66; max-width: 480px; margin: 0 auto;
-}
-.jr-count{ font-style:normal; }
-.jr-mast-sections{ text-align:center; }
 
 /* ---------- shared bits ---------- */
 .cover-art{ display:block; width:100%; height:100%; }
@@ -933,10 +929,12 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 @media (max-width: 640px){
   .journal{ padding: 30px 0 64px; }
   .jr-masthead{ margin-bottom: 34px; }
-  .jr-nameplate{ padding: 18px 0 16px; }
   .jr-lead{ padding: 24px var(--jr-bleed); margin: 8px calc(var(--jr-bleed) * -1) 0; }
   .jr-row > a{ padding: 22px var(--jr-bleed); }
-  .jr-mast-top{ flex-wrap:wrap; justify-content:center; gap: 4px 10px; text-align:center; }
+  /* the section list is the first thing to go when the row gets tight —
+     every article already carries its own category label */
+  .jr-mast-sections{ display:none; }
+  .jr-mast-title{ margin-top: 22px; }
   .section-blog{ padding: 44px 0 56px; }
   .post-header{ padding: 32px 0 24px; }
   .post-standfirst{ font-size: 1.04rem; }
