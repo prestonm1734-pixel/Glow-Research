@@ -68,11 +68,12 @@
     <header class="jr-masthead">
       <div class="jr-mast-row">
         <span class="jr-mast-label">Blog</span>
-        <span class="jr-mast-sections">Handling / Verification / Protocols</span>
         <span class="jr-count">3 articles</span>
       </div>
       <h1 class="jr-mast-title">Everything in peptides &mdash; news, research, handling, and industry.</h1>
     </header>
+
+
 
       <a class="jr-lead" href="blog/how-to-store-lyophilized-peptides/">
         <div class="jr-lead-copy">
@@ -108,7 +109,21 @@
 
     <div class="jr-sep" aria-hidden="true"></div>
     <ul class="jr-list">
-      <li class="jr-row">
+      <li class="jr-row" data-cat="handling" data-lead="true" hidden>
+        <a href="blog/how-to-store-lyophilized-peptides/">
+          <span class="jr-tag">Handling</span>
+          <h3>How to Store Lyophilized Peptides in the Lab</h3>
+          <p>Temperature, light, and moisture all degrade lyophilized peptides. A practical storage guide for research labs, covering long-term, working, and reconstituted vials.</p>
+          <span class="jr-row-meta">
+            <span class="jr-byline">By Glow Research</span>
+            <span aria-hidden="true">&bull;</span>
+            <time datetime="2026-07-14">July 14, 2026</time>
+            <span aria-hidden="true">&bull;</span>
+            <span>6 min read</span>
+          </span>
+        </a>
+      </li>
+      <li class="jr-row" data-cat="verification">
         <a href="blog/how-to-read-a-certificate-of-analysis/">
           <span class="jr-tag">Verification</span>
           <h3>How to Read a Peptide Certificate of Analysis</h3>
@@ -122,7 +137,7 @@
           </span>
         </a>
       </li>
-      <li class="jr-row">
+      <li class="jr-row" data-cat="protocols">
         <a href="blog/reconstituting-research-peptides/">
           <span class="jr-tag">Protocols</span>
           <h3>Reconstituting Research Peptides: A Practical Guide</h3>
@@ -224,6 +239,38 @@
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); } });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* topic filter (listing page only; absent until the list is long enough) */
+  const jrFilters = document.querySelector('.jr-filters');
+  if (jrFilters) {
+    const jrLead = document.querySelector('.jr-lead');
+    const jrSep = document.querySelector('.jr-sep');
+    const jrCount = document.querySelector('.jr-count');
+    const jrRows = Array.from(document.querySelectorAll('.jr-row'));
+    jrFilters.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip');
+      if (!btn) return;
+      const cat = btn.dataset.cat;
+      const isAll = cat === 'all';
+      jrFilters.querySelectorAll('.chip').forEach(c => {
+        const on = c === btn;
+        c.classList.toggle('active', on);
+        c.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      /* the lead keeps its own slot only in the unfiltered view; inside a
+         topic it becomes an ordinary row so nothing is lost */
+      if (jrLead) jrLead.hidden = !isAll;
+      if (jrSep) jrSep.hidden = !isAll;
+      let shown = 0;
+      jrRows.forEach(r => {
+        const match = isAll ? r.dataset.lead !== 'true' : r.dataset.cat === cat;
+        r.hidden = !match;
+        if (match) shown++;
+      });
+      const total = isAll ? jrRows.length : shown;
+      if (jrCount) jrCount.textContent = total + ' article' + (total === 1 ? '' : 's');
+    });
+  }
 </script>
 
 </body>

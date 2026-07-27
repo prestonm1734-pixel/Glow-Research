@@ -109,6 +109,38 @@ const PAGE_SCRIPT = `<script>
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); } });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* topic filter (listing page only; absent until the list is long enough) */
+  const jrFilters = document.querySelector('.jr-filters');
+  if (jrFilters) {
+    const jrLead = document.querySelector('.jr-lead');
+    const jrSep = document.querySelector('.jr-sep');
+    const jrCount = document.querySelector('.jr-count');
+    const jrRows = Array.from(document.querySelectorAll('.jr-row'));
+    jrFilters.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip');
+      if (!btn) return;
+      const cat = btn.dataset.cat;
+      const isAll = cat === 'all';
+      jrFilters.querySelectorAll('.chip').forEach(c => {
+        const on = c === btn;
+        c.classList.toggle('active', on);
+        c.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      /* the lead keeps its own slot only in the unfiltered view; inside a
+         topic it becomes an ordinary row so nothing is lost */
+      if (jrLead) jrLead.hidden = !isAll;
+      if (jrSep) jrSep.hidden = !isAll;
+      let shown = 0;
+      jrRows.forEach(r => {
+        const match = isAll ? r.dataset.lead !== 'true' : r.dataset.cat === cat;
+        r.hidden = !match;
+        if (match) shown++;
+      });
+      const total = isAll ? jrRows.length : shown;
+      if (jrCount) jrCount.textContent = total + ' article' + (total === 1 ? '' : 's');
+    });
+  }
 </script>`;
 
 /* ---------- page assembly ---------- */
@@ -441,7 +473,12 @@ function buildIndex() {
         <div class="jr-lead-art">${coverSvg(lead.slug, { variant: 'lead' })}</div>
       </a>`;
 
-  const rowsHtml = rest.map((p) => `      <li class="jr-row">
+  // Every post gets a row, including the lead — its row stays hidden in the
+  // default view (the lead has its own treatment above) and is revealed when
+  // a topic filter is applied, so filtering never drops an article.
+  const rowsHtml = posts.map((p) => {
+    const isLead = p.slug === lead.slug;
+    return `      <li class="jr-row" data-cat="${slugifyHeading(p.category)}"${isLead ? ' data-lead="true" hidden' : ''}>
         <a href="blog/${p.slug}/">
           <span class="jr-tag">${esc(p.category)}</span>
           <h3>${esc(p.title)}</h3>
@@ -454,11 +491,20 @@ function buildIndex() {
             <span>${p.readingTime} min read</span>
           </span>
         </a>
-      </li>`).join('\n');
+      </li>`;
+  }).join('\n');
 
   // Sections come from the posts themselves, so the masthead can never
   // advertise a category that has nothing behind it.
   const sections = [...new Set(posts.map(p => p.category))];
+
+  // Filtering only earns its keep once the list is long enough to scan
+  // badly. Below that it would just be chrome over a handful of articles.
+  const showFilters = posts.length >= 6 && sections.length > 1;
+  const filtersHtml = showFilters ? `    <div class="jr-filters" role="group" aria-label="Filter articles by topic">
+      <button type="button" class="chip active" data-cat="all" aria-pressed="true">All</button>
+${sections.map(s => `      <button type="button" class="chip" data-cat="${slugifyHeading(s)}" aria-pressed="false">${esc(s)}</button>`).join('\n')}
+    </div>` : '';
 
   const body = `<section class="journal">
   <div class="container">
@@ -466,11 +512,12 @@ function buildIndex() {
     <header class="jr-masthead">
       <div class="jr-mast-row">
         <span class="jr-mast-label">Blog</span>
-        <span class="jr-mast-sections">${sections.map(esc).join(' / ')}</span>
         <span class="jr-count">${posts.length} article${posts.length === 1 ? '' : 's'}</span>
       </div>
       <h1 class="jr-mast-title">Everything in peptides &mdash; news, research, handling, and industry.</h1>
     </header>
+
+${filtersHtml}
 
 ${leadHtml}
 

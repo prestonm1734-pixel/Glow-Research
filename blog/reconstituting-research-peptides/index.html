@@ -351,6 +351,38 @@
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); } });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* topic filter (listing page only; absent until the list is long enough) */
+  const jrFilters = document.querySelector('.jr-filters');
+  if (jrFilters) {
+    const jrLead = document.querySelector('.jr-lead');
+    const jrSep = document.querySelector('.jr-sep');
+    const jrCount = document.querySelector('.jr-count');
+    const jrRows = Array.from(document.querySelectorAll('.jr-row'));
+    jrFilters.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip');
+      if (!btn) return;
+      const cat = btn.dataset.cat;
+      const isAll = cat === 'all';
+      jrFilters.querySelectorAll('.chip').forEach(c => {
+        const on = c === btn;
+        c.classList.toggle('active', on);
+        c.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      /* the lead keeps its own slot only in the unfiltered view; inside a
+         topic it becomes an ordinary row so nothing is lost */
+      if (jrLead) jrLead.hidden = !isAll;
+      if (jrSep) jrSep.hidden = !isAll;
+      let shown = 0;
+      jrRows.forEach(r => {
+        const match = isAll ? r.dataset.lead !== 'true' : r.dataset.cat === cat;
+        r.hidden = !match;
+        if (match) shown++;
+      });
+      const total = isAll ? jrRows.length : shown;
+      if (jrCount) jrCount.textContent = total + ' article' + (total === 1 ? '' : 's');
+    });
+  }
 </script>
 <script>
   /* reading progress — measured against the article body, not the whole

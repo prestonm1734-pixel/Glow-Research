@@ -643,7 +643,16 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   letter-spacing:.16em; text-transform:uppercase; color:#8a8a84;
 }
 .jr-mast-label{ color:#0a0a0a; font-weight:600; }
-.jr-mast-sections{ letter-spacing:.12em; }
+
+/* ---------- topic filter ----------
+   Reuses the catalog's .chip so the blog filters exactly like the product
+   grid. [hidden] needs stating outright: .jr-lead sets display:grid at the
+   same specificity and later in the file, so it would otherwise win. */
+.jr-filters{ display:flex; flex-wrap:wrap; gap: 10px; margin: 26px 0 4px; }
+.journal .chip{ background:#f2f2f0; border-color: rgba(0,0,0,0.1); color:#55554f; }
+.journal .chip:hover{ border-color:#0a0a0a; color:#0a0a0a; }
+.journal .chip.active{ background:#0a0a0a; color:#fff; border-color: transparent; }
+.jr-lead[hidden], .jr-row[hidden], .jr-sep[hidden]{ display:none; }
 .jr-mast-title{
   font-family:'Fraunces', Georgia, serif; font-weight:600;
   font-size: clamp(1.85rem, 4vw, 2.9rem);
@@ -931,9 +940,6 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .jr-masthead{ margin-bottom: 34px; }
   .jr-lead{ padding: 24px var(--jr-bleed); margin: 8px calc(var(--jr-bleed) * -1) 0; }
   .jr-row > a{ padding: 22px var(--jr-bleed); }
-  /* the section list is the first thing to go when the row gets tight —
-     every article already carries its own category label */
-  .jr-mast-sections{ display:none; }
   .jr-mast-title{ margin-top: 22px; }
   .section-blog{ padding: 44px 0 56px; }
   .post-header{ padding: 32px 0 24px; }
