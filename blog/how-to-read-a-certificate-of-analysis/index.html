@@ -65,35 +65,61 @@
       </button>
     </div>
   </div>
+  <div class="read-progress" id="readProgress"></div>
 </header>
 
 <article class="post">
-  <header class="post-header">
-    <div class="container post-container">
-      <nav class="post-breadcrumb" aria-label="Breadcrumb">
-        <a href="../../index.html">Home</a>
-        <span aria-hidden="true">/</span>
-        <a href="../../blog.html">Blog</a>
+  <div class="post-shell">
+    <aside class="post-toc">
+      <span class="post-toc-label">Contents</span>
+      <nav aria-label="Table of contents">
+        <a href="#what-a-coa-is-supposed-to-be">What a COA is supposed to be</a>
+        <a href="#reading-the-line-items">Reading the line items</a>
+        <a href="#red-flags">Red flags</a>
+        <a href="#in-house-versus-third-party">In-house versus third-party</a>
+        <a href="#what-to-do-with-it">What to do with it</a>
       </nav>
-      <span class="eyebrow">Verification</span>
-      <h1>How to Read a Peptide Certificate of Analysis</h1>
-      <p class="post-standfirst">HPLC purity, mass spec identity, endotoxin limits — what each line on a peptide COA actually means, and the red flags that separate a real COA from a marketing document.</p>
-      <div class="post-meta">
-        <time datetime="2026-07-07">July 7, 2026</time>
-        <span aria-hidden="true">&bull;</span>
-        <span>7 min read</span>
-      </div>
-    </div>
-  </header>
+    </aside>
 
-  <div class="container post-container post-body">
+    <div class="post-main">
+      <header class="post-header">
+        <nav class="post-breadcrumb" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a>
+          <span aria-hidden="true">/</span>
+          <a href="../../blog.html">Blog</a>
+        </nav>
+        <span class="post-kicker">Verification</span>
+        <h1>How to Read a Peptide Certificate of Analysis</h1>
+        <p class="post-standfirst">HPLC purity, mass spec identity, endotoxin limits — what each line on a peptide COA actually means, and the red flags that separate a real COA from a marketing document.</p>
+        <div class="post-meta">
+          <span class="post-byline">Glow Research</span>
+          <span aria-hidden="true">&bull;</span>
+          <time datetime="2026-07-07">July 7, 2026</time>
+          <span aria-hidden="true">&bull;</span>
+          <span>7 min read</span>
+        </div>
+      </header>
+
+      <div class="post-cover"><svg class="cover-art" viewBox="0 0 760 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="g-cover-how-to-read-a-certificate-of-analysis" cx="31%" cy="59%" r="72%">
+      <stop offset="0%" stop-color="#2a2a28"/>
+      <stop offset="100%" stop-color="#000"/>
+    </radialGradient>
+  </defs>
+  <rect width="760" height="300" fill="url(#g-cover-how-to-read-a-certificate-of-analysis)"/>
+  <g><line x1="130.2" y1="136.1" x2="159.9" y2="75.7" stroke="#fff" stroke-opacity="0.158" stroke-width="1"/><line x1="130.2" y1="136.1" x2="217.5" y2="136.1" stroke="#fff" stroke-opacity="0.080" stroke-width="1"/><line x1="130.2" y1="136.1" x2="86.7" y2="129.2" stroke="#fff" stroke-opacity="0.249" stroke-width="1"/><line x1="130.2" y1="136.1" x2="220.8" y2="132.1" stroke="#fff" stroke-opacity="0.067" stroke-width="1"/><line x1="130.2" y1="136.1" x2="78.4" y2="85" stroke="#fff" stroke-opacity="0.137" stroke-width="1"/><line x1="159.9" y1="75.7" x2="217.5" y2="136.1" stroke="#fff" stroke-opacity="0.095" stroke-width="1"/><line x1="159.9" y1="75.7" x2="232.9" y2="33.9" stroke="#fff" stroke-opacity="0.093" stroke-width="1"/><line x1="159.9" y1="75.7" x2="86.7" y2="129.2" stroke="#fff" stroke-opacity="0.067" stroke-width="1"/><line x1="159.9" y1="75.7" x2="72.2" y2="14.3" stroke="#fff" stroke-opacity="0.004" stroke-width="1"/><line x1="159.9" y1="75.7" x2="230" y2="75.7" stroke="#fff" stroke-opacity="0.147" stroke-width="1"/><line x1="159.9" y1="75.7" x2="220.8" y2="132.1" stroke="#fff" stroke-opacity="0.097" stroke-width="1"/><line x1="159.9" y1="75.7" x2="78.4" y2="85" stroke="#fff" stroke-opacity="0.101" stroke-width="1"/><line x1="217.5" y1="136.1" x2="232.9" y2="33.9" stroke="#fff" stroke-opacity="0.018" stroke-width="1"/><line x1="217.5" y1="136.1" x2="230" y2="75.7" stroke="#fff" stroke-opacity="0.180" stroke-width="1"/><line x1="217.5" y1="136.1" x2="298.5" y2="194.5" stroke="#fff" stroke-opacity="0.032" stroke-width="1"/><line x1="217.5" y1="136.1" x2="220.8" y2="132.1" stroke="#fff" stroke-opacity="0.400" stroke-width="1"/><line x1="657.1" y1="48.5" x2="605.5" y2="9.7" stroke="#fff" stroke-opacity="0.169" stroke-width="1"/><line x1="657.1" y1="48.5" x2="614.8" y2="58.7" stroke="#fff" stroke-opacity="0.251" stroke-width="1"/><line x1="657.1" y1="48.5" x2="680.6" y2="119.3" stroke="#fff" stroke-opacity="0.130" stroke-width="1"/><line x1="657.1" y1="48.5" x2="756.6" y2="28.1" stroke="#fff" stroke-opacity="0.025" stroke-width="1"/><line x1="657.1" y1="48.5" x2="742.2" y2="29.2" stroke="#fff" stroke-opacity="0.081" stroke-width="1"/><line x1="672.2" y1="271.3" x2="684.8" y2="267.3" stroke="#fff" stroke-opacity="0.369" stroke-width="1"/><line x1="672.2" y1="271.3" x2="624" y2="197.2" stroke="#fff" stroke-opacity="0.076" stroke-width="1"/><line x1="672.2" y1="271.3" x2="698.8" y2="276.1" stroke="#fff" stroke-opacity="0.315" stroke-width="1"/><line x1="232.9" y1="33.9" x2="296.2" y2="4.5" stroke="#fff" stroke-opacity="0.149" stroke-width="1"/><line x1="232.9" y1="33.9" x2="230" y2="75.7" stroke="#fff" stroke-opacity="0.257" stroke-width="1"/><line x1="232.9" y1="33.9" x2="261.7" y2="11.1" stroke="#fff" stroke-opacity="0.277" stroke-width="1"/><line x1="232.9" y1="33.9" x2="220.8" y2="132.1" stroke="#fff" stroke-opacity="0.035" stroke-width="1"/><line x1="86.7" y1="129.2" x2="78.4" y2="85" stroke="#fff" stroke-opacity="0.245" stroke-width="1"/><line x1="484.5" y1="283.6" x2="439.1" y2="293.2" stroke="#fff" stroke-opacity="0.240" stroke-width="1"/><line x1="484.5" y1="283.6" x2="480.4" y2="222.7" stroke="#fff" stroke-opacity="0.183" stroke-width="1"/><line x1="418.4" y1="62.5" x2="436.6" y2="74.2" stroke="#fff" stroke-opacity="0.336" stroke-width="1"/><line x1="418.4" y1="62.5" x2="486.9" y2="94.3" stroke="#fff" stroke-opacity="0.126" stroke-width="1"/><line x1="439.1" y1="293.2" x2="480.4" y2="222.7" stroke="#fff" stroke-opacity="0.102" stroke-width="1"/><line x1="439.1" y1="293.2" x2="404" y2="200.4" stroke="#fff" stroke-opacity="0.034" stroke-width="1"/><line x1="684.8" y1="267.3" x2="624" y2="197.2" stroke="#fff" stroke-opacity="0.059" stroke-width="1"/><line x1="684.8" y1="267.3" x2="698.8" y2="276.1" stroke="#fff" stroke-opacity="0.356" stroke-width="1"/><line x1="605.5" y1="9.7" x2="614.8" y2="58.7" stroke="#fff" stroke-opacity="0.226" stroke-width="1"/><line x1="565" y1="159.2" x2="624" y2="197.2" stroke="#fff" stroke-opacity="0.147" stroke-width="1"/><line x1="565" y1="159.2" x2="480.4" y2="222.7" stroke="#fff" stroke-opacity="0.009" stroke-width="1"/><line x1="565" y1="159.2" x2="486.9" y2="94.3" stroke="#fff" stroke-opacity="0.025" stroke-width="1"/><line x1="296.2" y1="4.5" x2="230" y2="75.7" stroke="#fff" stroke-opacity="0.042" stroke-width="1"/><line x1="296.2" y1="4.5" x2="261.7" y2="11.1" stroke="#fff" stroke-opacity="0.283" stroke-width="1"/><line x1="614.8" y1="58.7" x2="680.6" y2="119.3" stroke="#fff" stroke-opacity="0.072" stroke-width="1"/><line x1="72.2" y1="14.3" x2="78.4" y2="85" stroke="#fff" stroke-opacity="0.144" stroke-width="1"/><line x1="230" y1="75.7" x2="261.7" y2="11.1" stroke="#fff" stroke-opacity="0.140" stroke-width="1"/><line x1="230" y1="75.7" x2="220.8" y2="132.1" stroke="#fff" stroke-opacity="0.198" stroke-width="1"/><line x1="436.6" y1="74.2" x2="486.9" y2="94.3" stroke="#fff" stroke-opacity="0.209" stroke-width="1"/><line x1="624" y1="197.2" x2="680.6" y2="119.3" stroke="#fff" stroke-opacity="0.046" stroke-width="1"/><line x1="480.4" y1="222.7" x2="404" y2="200.4" stroke="#fff" stroke-opacity="0.110" stroke-width="1"/><line x1="298.5" y1="194.5" x2="220.8" y2="132.1" stroke="#fff" stroke-opacity="0.032" stroke-width="1"/><line x1="298.5" y1="194.5" x2="404" y2="200.4" stroke="#fff" stroke-opacity="0.009" stroke-width="1"/><line x1="756.6" y1="28.1" x2="742.2" y2="29.2" stroke="#fff" stroke-opacity="0.364" stroke-width="1"/></g>
+  <g><circle cx="130.2" cy="136.1" r="3.22" fill="#fff" fill-opacity="0.36"/><circle cx="159.9" cy="75.7" r="2.96" fill="#fff" fill-opacity="0.74"/><circle cx="217.5" cy="136.1" r="1.66" fill="#fff" fill-opacity="0.65"/><circle cx="657.1" cy="48.5" r="3.29" fill="#fff" fill-opacity="0.46"/><circle cx="672.2" cy="271.3" r="3.48" fill="#fff" fill-opacity="0.70"/><circle cx="232.9" cy="33.9" r="1.48" fill="#fff" fill-opacity="0.58"/><circle cx="86.7" cy="129.2" r="2.99" fill="#fff" fill-opacity="0.38"/><circle cx="484.5" cy="283.6" r="2.31" fill="#fff" fill-opacity="0.44"/><circle cx="418.4" cy="62.5" r="2.7" fill="#fff" fill-opacity="0.43"/><circle cx="439.1" cy="293.2" r="2.21" fill="#fff" fill-opacity="0.72"/><circle cx="684.8" cy="267.3" r="2.56" fill="#fff" fill-opacity="0.62"/><circle cx="605.5" cy="9.7" r="1.9" fill="#fff" fill-opacity="0.81"/><circle cx="565" cy="159.2" r="1.46" fill="#fff" fill-opacity="0.44"/><circle cx="296.2" cy="4.5" r="1.16" fill="#fff" fill-opacity="0.73"/><circle cx="614.8" cy="58.7" r="1.41" fill="#fff" fill-opacity="0.67"/><circle cx="72.2" cy="14.3" r="2.62" fill="#fff" fill-opacity="0.56"/><circle cx="230" cy="75.7" r="2.06" fill="#fff" fill-opacity="0.36"/><circle cx="436.6" cy="74.2" r="2.26" fill="#fff" fill-opacity="0.50"/><circle cx="624" cy="197.2" r="2.98" fill="#fff" fill-opacity="0.46"/><circle cx="480.4" cy="222.7" r="1.77" fill="#fff" fill-opacity="0.83"/><circle cx="298.5" cy="194.5" r="2.82" fill="#fff" fill-opacity="0.58"/><circle cx="486.9" cy="94.3" r="1.52" fill="#fff" fill-opacity="0.48"/><circle cx="261.7" cy="11.1" r="3.45" fill="#fff" fill-opacity="0.74"/><circle cx="220.8" cy="132.1" r="2.86" fill="#fff" fill-opacity="0.55"/><circle cx="680.6" cy="119.3" r="2.64" fill="#fff" fill-opacity="0.81"/><circle cx="78.4" cy="85" r="2.35" fill="#fff" fill-opacity="0.59"/><circle cx="698.8" cy="276.1" r="1.25" fill="#fff" fill-opacity="0.76"/><circle cx="404" cy="200.4" r="3.28" fill="#fff" fill-opacity="0.50"/><circle cx="756.6" cy="28.1" r="2" fill="#fff" fill-opacity="0.81"/><circle cx="742.2" cy="29.2" r="1.78" fill="#fff" fill-opacity="0.60"/></g>
+</svg></div>
+
+      <div class="post-body">
 <p class="lede">
   A certificate of analysis is the only objective evidence you have about what's actually in a vial.
   It's also the document most often faked, recycled across batches, or quietly replaced with a
   marketing sheet that looks official. Here's how to read one properly.
 </p>
 
-<h2>What a COA is supposed to be</h2>
+<h2 id="what-a-coa-is-supposed-to-be">What a COA is supposed to be</h2>
 
 <p>
   A real COA is a report from an analytical lab describing tests run on <em>one specific batch</em> of
@@ -102,7 +128,7 @@
   hand, it isn't telling you anything about your material.
 </p>
 
-<h2>Reading the line items</h2>
+<h2 id="reading-the-line-items">Reading the line items</h2>
 
 <h3>Identity (mass spectrometry)</h3>
 
@@ -143,7 +169,7 @@
   off-white lyophilized powder or cake. Discoloration is a flag.
 </p>
 
-<h2>Red flags</h2>
+<h2 id="red-flags">Red flags</h2>
 
 <div class="post-callout">
   <strong>The single most common trick:</strong> one certificate reused across every lot of a compound.
@@ -160,7 +186,7 @@
   <li><strong>COA available only on request, after purchase.</strong> Documentation that appears only after money changes hands is a sales tool</li>
 </ul>
 
-<h2>In-house versus third-party</h2>
+<h2 id="in-house-versus-third-party">In-house versus third-party</h2>
 
 <p>
   Suppliers testing their own material have an obvious conflict of interest. That doesn't make in-house
@@ -168,7 +194,7 @@
   stronger claim, and any supplier doing it will say who the lab is.
 </p>
 
-<h2>What to do with it</h2>
+<h2 id="what-to-do-with-it">What to do with it</h2>
 
 <p>
   Record the lot number and its COA alongside your experimental data. If a result looks anomalous
@@ -181,14 +207,14 @@
   printed on the vial. You can <a href="../../coa.html">see how we document each batch</a>, review our
   <a href="../../quality.html">quality standards</a>, or <a href="../../peptides.html">browse the catalog</a>.
 </p>
-  </div>
+      </div>
 
-  <div class="container post-container">
-    <aside class="post-disclaimer">
-      <strong>Research use only.</strong> This article is provided for informational purposes to
-      qualified researchers. Glow Research products are sold strictly for in-vitro laboratory
-      research and are not drugs, supplements, or medical products. Nothing here is medical advice.
-    </aside>
+      <aside class="post-disclaimer">
+        <strong>Research use only.</strong> This article is provided for informational purposes to
+        qualified researchers. Glow Research products are sold strictly for in-vitro laboratory
+        research and are not drugs, supplements, or medical products. Nothing here is medical advice.
+      </aside>
+    </div>
   </div>
 </article>
 
@@ -304,6 +330,41 @@
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); } });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+</script>
+<script>
+  /* reading progress — measured against the article body, not the whole
+     document, so the footer doesn't count as "read" */
+  (function () {
+    const bar = document.getElementById('readProgress');
+    const body = document.querySelector('.post-body');
+    if (!bar || !body) return;
+    function update() {
+      const start = body.offsetTop;
+      const end = start + body.offsetHeight - window.innerHeight;
+      const p = (window.scrollY - start) / Math.max(end - start, 1);
+      bar.style.width = Math.min(Math.max(p, 0), 1) * 100 + '%';
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  /* highlight the section currently in view in the sidebar */
+  (function () {
+    const links = [...document.querySelectorAll('.post-toc a')];
+    if (!links.length) return;
+    const heads = links
+      .map(a => document.getElementById(a.getAttribute('href').slice(1)))
+      .filter(Boolean);
+    const spy = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        links.forEach(l =>
+          l.classList.toggle('is-current', l.getAttribute('href') === '#' + e.target.id));
+      });
+    }, { rootMargin: '-88px 0px -68% 0px' });
+    heads.forEach(h => spy.observe(h));
+  })();
 </script>
 </body>
 </html>

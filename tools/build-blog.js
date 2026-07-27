@@ -113,8 +113,12 @@ const PAGE_SCRIPT = `<script>
 
 /* ---------- page assembly ---------- */
 
-function page({ head, body, depth }) {
-  const shell = setActiveNav(topShell);
+function page({ head, body, depth, progressBar = false, extraScript = '' }) {
+  let shell = setActiveNav(topShell);
+  // the progress bar rides the sticky header, so it stays pinned while reading
+  if (progressBar) {
+    shell = shell.replace('</header>', '  <div class="read-progress" id="readProgress"></div>\n</header>');
+  }
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,11 +134,71 @@ ${body}
 ${footerShell.replace('id="stubYear"', 'id="blogYear"')}
 
 ${PAGE_SCRIPT}
+${extraScript}
 </body>
 </html>
 `;
   return rewriteDepth(html, depth);
 }
+
+/* ---------- table of contents ----------
+   Pulls the <h2>s out of the article body, gives each a stable id, and
+   returns both the rewritten body and the list for the sidebar. */
+
+function slugifyHeading(text) {
+  return text.toLowerCase()
+    .replace(/<[^>]+>/g, '')
+    .replace(/&[a-z]+;/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function withToc(bodyHtml) {
+  const items = [];
+  const html = bodyHtml.replace(/<h2>([\s\S]*?)<\/h2>/g, (_m, inner) => {
+    const text = inner.replace(/<[^>]+>/g, '').trim();
+    const id = slugifyHeading(text);
+    items.push({ id, label: inner.trim() });
+    return `<h2 id="${id}">${inner}</h2>`;
+  });
+  return { html, items };
+}
+
+const POST_SCRIPT = `<script>
+  /* reading progress — measured against the article body, not the whole
+     document, so the footer doesn't count as "read" */
+  (function () {
+    const bar = document.getElementById('readProgress');
+    const body = document.querySelector('.post-body');
+    if (!bar || !body) return;
+    function update() {
+      const start = body.offsetTop;
+      const end = start + body.offsetHeight - window.innerHeight;
+      const p = (window.scrollY - start) / Math.max(end - start, 1);
+      bar.style.width = Math.min(Math.max(p, 0), 1) * 100 + '%';
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  /* highlight the section currently in view in the sidebar */
+  (function () {
+    const links = [...document.querySelectorAll('.post-toc a')];
+    if (!links.length) return;
+    const heads = links
+      .map(a => document.getElementById(a.getAttribute('href').slice(1)))
+      .filter(Boolean);
+    const spy = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        links.forEach(l =>
+          l.classList.toggle('is-current', l.getAttribute('href') === '#' + e.target.id));
+      });
+    }, { rootMargin: '-88px 0px -68% 0px' });
+    heads.forEach(h => spy.observe(h));
+  })();
+</script>`;
 
 /* ---------- individual post ---------- */
 
@@ -187,36 +251,50 @@ function buildPost(post) {
 <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`;
 
   const related = posts.filter(p => p.slug !== post.slug).slice(0, 2);
+  const { html: bodyWithIds, items: toc } = withToc(body);
+
+  const tocHtml = toc.length >= 3 ? `    <aside class="post-toc">
+      <span class="post-toc-label">Contents</span>
+      <nav aria-label="Table of contents">
+${toc.map(t => `        <a href="#${t.id}">${t.label}</a>`).join('\n')}
+      </nav>
+    </aside>` : '    <aside class="post-toc" aria-hidden="true"></aside>';
 
   const bodyHtml = `<article class="post">
-  <header class="post-header">
-    <div class="container post-container">
-      <nav class="post-breadcrumb" aria-label="Breadcrumb">
-        <a href="index.html">Home</a>
-        <span aria-hidden="true">/</span>
-        <a href="blog.html">Blog</a>
-      </nav>
-      <span class="eyebrow">${esc(post.category)}</span>
-      <h1>${esc(post.title)}</h1>
-      <p class="post-standfirst">${esc(post.description)}</p>
-      <div class="post-meta">
-        <time datetime="${post.date}">${displayDate(post.date)}</time>
-        <span aria-hidden="true">&bull;</span>
-        <span>${post.readingTime} min read</span>
+  <div class="post-shell">
+${tocHtml}
+
+    <div class="post-main">
+      <header class="post-header">
+        <nav class="post-breadcrumb" aria-label="Breadcrumb">
+          <a href="index.html">Home</a>
+          <span aria-hidden="true">/</span>
+          <a href="blog.html">Blog</a>
+        </nav>
+        <span class="post-kicker">${esc(post.category)}</span>
+        <h1>${esc(post.title)}</h1>
+        <p class="post-standfirst">${esc(post.description)}</p>
+        <div class="post-meta">
+          <span class="post-byline">Glow Research</span>
+          <span aria-hidden="true">&bull;</span>
+          <time datetime="${post.date}">${displayDate(post.date)}</time>
+          <span aria-hidden="true">&bull;</span>
+          <span>${post.readingTime} min read</span>
+        </div>
+      </header>
+
+      <div class="post-cover">${coverSvg(post.slug, { w: 760, h: 300, nodes: 30, variant: 'cover' })}</div>
+
+      <div class="post-body">
+${bodyWithIds}
       </div>
+
+      <aside class="post-disclaimer">
+        <strong>Research use only.</strong> This article is provided for informational purposes to
+        qualified researchers. Glow Research products are sold strictly for in-vitro laboratory
+        research and are not drugs, supplements, or medical products. Nothing here is medical advice.
+      </aside>
     </div>
-  </header>
-
-  <div class="container post-container post-body">
-${body}
-  </div>
-
-  <div class="container post-container">
-    <aside class="post-disclaimer">
-      <strong>Research use only.</strong> This article is provided for informational purposes to
-      qualified researchers. Glow Research products are sold strictly for in-vitro laboratory
-      research and are not drugs, supplements, or medical products. Nothing here is medical advice.
-    </aside>
   </div>
 </article>
 
@@ -229,7 +307,7 @@ ${related.map(cardHtml).join('\n')}
   </div>
 </section>`;
 
-  return page({ head, body: bodyHtml, depth: 2 });
+  return page({ head, body: bodyHtml, depth: 2, progressBar: true, extraScript: POST_SCRIPT });
 }
 
 /* ---------- generative cover art ----------
