@@ -112,6 +112,8 @@
       $('pdPhoto').alt = `${p.name} vial`;
       $('pdPhoto').hidden = false;
       $('pdVialArt').hidden = true;
+      // the stage turns light so the shot's own white background disappears
+      document.querySelector('.pd-visual').classList.add('has-photo');
     }
 
     const free = (window.GlowCart && window.GlowCart.FREE_SHIPPING_AT) || 250;

@@ -442,6 +442,15 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   position:relative; overflow:hidden;
   background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
 }
+/* A real product shot is photographed on white, which is already what
+   .product-visual fades to — so it drops straight in with no card or border
+   around it. Padding keeps its vial about the size of the drawn .vial below. */
+/* multiply drops the shot's white backdrop out against the tile's gradient,
+   so the vial sits on the tile instead of on a white rectangle */
+.product-photo{
+  height:100%; width:100%; object-fit:contain; padding: 24px 0;
+  mix-blend-mode: multiply;
+}
 .vial{
   width: 52px; height: 104px; border-radius: 4px 4px 3px 3px;
   background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.7) 45%, rgba(255,255,255,.35));

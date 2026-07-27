@@ -103,7 +103,9 @@ function renderProductGrid(gridEl, filter, opts) {
       <a class="product-visual" href="${href}">
         <span class="product-badge cat">${p.cat}</span>
         ${p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
-        <div class="vial"></div>
+        ${p.image
+          ? `<img class="product-photo" src="${p.image}" alt="${p.name} vial" loading="lazy" />`
+          : '<div class="vial"></div>'}
       </a>
       <div class="product-footer">
         <span class="product-tag">${p.tag}</span>
