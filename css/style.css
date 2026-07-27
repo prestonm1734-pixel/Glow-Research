@@ -84,6 +84,21 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .btn-primary:hover{
   background: #fff;
 }
+/* btn-primary is a pale chip built for dark sections. On the white overlay
+   surfaces (cart drawer, checkout, quick-add) it reads as a disabled button,
+   so invert it there. */
+.cart-drawer .btn-primary,
+.co-page .btn-primary,
+.qa-sheet .btn-primary,
+.search-modal .btn-primary{
+  background:#0a0a0a; color:#fff;
+}
+.cart-drawer .btn-primary:hover,
+.co-page .btn-primary:hover,
+.qa-sheet .btn-primary:hover,
+.search-modal .btn-primary:hover{
+  background:#2a2a28; color:#fff;
+}
 .btn-outline{
   background: transparent;
   border-color: rgba(255,255,255,0.55);

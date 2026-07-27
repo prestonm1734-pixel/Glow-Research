@@ -1,0 +1,212 @@
+// ===================== Glow Research — checkout =====================
+// UI only. Order totals shown here are for display; the real order must be
+// priced server-side (WooCommerce) so a tampered browser cannot set its own
+// price. Card fields are mounted by the payment processor, never by us.
+(function () {
+  /* ---------- config ----------
+     PLACEHOLDER RATES. Replace with the real published rates before launch,
+     and keep them in step with the shipping page. */
+  const SHIPPING = [
+    { id: '2day', label: 'FedEx 2-Day Express', note: 'Arrives in 2 business days', cost: 12.95, freeOver: 250 },
+    { id: 'overnight', label: 'FedEx Overnight', note: 'Next business day, order before 2:00 PM EST', cost: 39.95, freeOver: null },
+  ];
+
+  const PAY_METHODS = [
+    { id: 'card', label: 'Credit or debit card', note: 'Visa, Mastercard, American Express, Discover' },
+    { id: 'bank', label: 'US bank transfer', note: 'Paid directly from your account' },
+    { id: 'crypto', label: 'Crypto', note: 'BTC, ETH, and USDT' },
+  ];
+
+  const STATES = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','District of Columbia','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
+
+  let shipId = SHIPPING[0].id;
+  const money = n => '$' + n.toFixed(2);
+
+  const $ = id => document.getElementById(id);
+
+  /* ---------- state selects ---------- */
+  function fillStates() {
+    document.querySelectorAll('select[data-states]').forEach(sel => {
+      sel.innerHTML = '<option value="">Select a state</option>' +
+        STATES.map(s => `<option>${s}</option>`).join('');
+    });
+  }
+
+  /* ---------- summary ---------- */
+
+  function shippingCost(sub) {
+    const opt = SHIPPING.find(s => s.id === shipId) || SHIPPING[0];
+    return (opt.freeOver !== null && sub >= opt.freeOver) ? 0 : opt.cost;
+  }
+
+  function renderSummary() {
+    const items = window.GlowCart ? window.GlowCart.items() : [];
+    const shell = $('coShell');
+    const empty = $('coEmpty');
+
+    if (!items.length) {
+      shell.hidden = true;
+      empty.hidden = false;
+      return;
+    }
+    shell.hidden = false;
+    empty.hidden = true;
+
+    const sub = items.reduce((n, i) => n + i.unitSale * i.qty, 0);
+    const saved = items.reduce((n, i) => n + (i.unitOriginal - i.unitSale) * i.qty, 0);
+    const ship = shippingCost(sub);
+
+    $('coItems').innerHTML = items.map(i => {
+      const onSale = i.unitOriginal > i.unitSale;
+      const off = onSale ? Math.round((1 - i.unitSale / i.unitOriginal) * 100) : 0;
+      return `
+        <div class="co-item">
+          <span class="co-thumb"><span class="vial"></span></span>
+          <div class="co-item-main">
+            <p class="co-item-name">${i.name}</p>
+            <p class="co-item-meta">${i.variant} &middot; Qty ${i.qty}</p>
+          </div>
+          <div class="co-item-price">
+            ${onSale ? `<span class="co-was">${money(i.unitOriginal * i.qty)}</span>` : ''}
+            <span class="co-now">${money(i.unitSale * i.qty)}</span>
+            ${onSale ? `<span class="co-off">Save ${off}%</span>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+
+    $('coShipOptions').innerHTML = SHIPPING.map(s => {
+      const free = s.freeOver !== null && sub >= s.freeOver;
+      return `
+        <label class="co-ship ${s.id === shipId ? 'is-on' : ''}">
+          <input type="radio" name="shipmethod" value="${s.id}" ${s.id === shipId ? 'checked' : ''} />
+          <span class="co-ship-box" aria-hidden="true"></span>
+          <span class="co-ship-copy">
+            <span class="co-ship-label">${s.label}</span>
+            <span class="co-ship-note">${s.note}</span>
+          </span>
+          <span class="co-ship-cost">${free ? 'Free' : money(s.cost)}</span>
+        </label>`;
+    }).join('');
+
+    $('coSub').textContent = money(sub);
+    $('coShipCost').textContent = ship === 0 ? 'Free' : money(ship);
+    $('coTotal').textContent = money(sub + ship);
+
+    const saveRow = $('coSaveRow');
+    if (saved > 0) {
+      saveRow.hidden = false;
+      $('coSaved').textContent = money(saved);
+    } else {
+      saveRow.hidden = true;
+    }
+
+    renderUpsell(items);
+  }
+
+  /* ---------- "complete your order" ---------- */
+
+  function renderUpsell(items) {
+    const box = $('coUpsell');
+    if (typeof GLOW_PRODUCTS === 'undefined') { box.hidden = true; return; }
+    const inCart = new Set(items.map(i => i.name));
+    const pick = GLOW_PRODUCTS.find(p => !inCart.has(p.name));
+    if (!pick) { box.hidden = true; return; }
+
+    box.hidden = false;
+    $('coUpsellBody').innerHTML = `
+      <span class="co-thumb"><span class="vial"></span></span>
+      <div class="co-item-main">
+        <p class="co-item-name">${pick.name}</p>
+        <p class="co-item-meta">${pick.tag} &middot; ${pick.size}</p>
+      </div>
+      <div class="co-upsell-right">
+        <span class="co-now">$${pick.price.toFixed(2)}</span>
+        <button type="button" class="co-add-btn" id="coAdd">Add</button>
+      </div>`;
+    $('coAdd').addEventListener('click', () => {
+      window.GlowCart.add({
+        name: pick.name, variant: '1 vial',
+        unitOriginal: pick.price, unitSale: pick.price,
+      });
+    });
+  }
+
+  /* ---------- payment methods ---------- */
+
+  function renderPayMethods() {
+    $('coPay').innerHTML = PAY_METHODS.map((m, idx) => `
+      <div class="co-pay">
+        <label class="co-pay-head ${idx === 0 ? 'is-on' : ''}">
+          <input type="radio" name="paymethod" value="${m.id}" ${idx === 0 ? 'checked' : ''} />
+          <span class="co-ship-box" aria-hidden="true"></span>
+          <span class="co-ship-copy">
+            <span class="co-ship-label">${m.label}</span>
+            <span class="co-ship-note">${m.note}</span>
+          </span>
+        </label>
+        <div class="co-pay-body" data-for="${m.id}" ${idx === 0 ? '' : 'hidden'}>
+          <div class="co-processor">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="4" y="10" width="16" height="11" stroke="currentColor" stroke-width="2"/>
+              <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <p>Secure fields load here once the payment processor is connected. Card details
+               go straight to the processor and never touch this site.</p>
+          </div>
+        </div>
+      </div>`).join('');
+
+    $('coPay').addEventListener('change', e => {
+      if (e.target.name !== 'paymethod') return;
+      $('coPay').querySelectorAll('.co-pay-head').forEach(h => {
+        h.classList.toggle('is-on', h.contains(e.target));
+      });
+      $('coPay').querySelectorAll('.co-pay-body').forEach(b => {
+        b.hidden = b.dataset.for !== e.target.value;
+      });
+    });
+  }
+
+  /* ---------- wire up ---------- */
+
+  document.addEventListener('DOMContentLoaded', () => {
+    fillStates();
+    renderPayMethods();
+    renderSummary();
+
+    // the drawer can change the cart while this page is open
+    document.addEventListener('glow-cart-change', renderSummary);
+
+    $('coShipOptions').addEventListener('change', e => {
+      if (e.target.name !== 'shipmethod') return;
+      shipId = e.target.value;
+      renderSummary();
+    });
+
+    $('coEditCart').addEventListener('click', e => {
+      e.preventDefault();
+      window.GlowCart.open();
+    });
+
+    // billing address block, revealed only when it differs from shipping
+    $('coDiffAddr').addEventListener('change', e => {
+      $('coBilling').hidden = !e.target.checked;
+      $('coBilling').querySelectorAll('input,select').forEach(f => {
+        if (f.dataset.req) f.required = e.target.checked;
+      });
+    });
+
+    $('coPromoBtn').addEventListener('click', () => {
+      $('coPromoMsg').textContent = $('coPromo').value.trim()
+        ? 'Promo codes are validated at payment.'
+        : 'Enter a code first.';
+    });
+
+    $('coForm').addEventListener('submit', e => {
+      e.preventDefault();
+      $('coPlacedMsg').textContent =
+        'Details captured. Payment is not connected yet, so no order was placed and no card was charged.';
+      $('coPlacedMsg').scrollIntoView({ block: 'center', behavior: 'smooth' });
+    });
+  });
+})();

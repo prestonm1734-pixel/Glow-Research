@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Checkout | Glow Research</title>
+<meta name="description" content="Secure checkout for Glow Research." />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  /* ---------- checkout ----------
+     Light surface, boxes everywhere, zero border radius, matching the cart
+     drawer and the search modal. */
+  .co-page{ background:#fff; color:#0a0a0a; padding: 0 0 90px; }
+
+  /* trust strip under the header */
+  .co-trustbar{
+    border-bottom:1px solid rgba(0,0,0,0.1); background:#f7f7f5;
+  }
+  .co-trustbar ul{
+    list-style:none; margin:0; padding: 14px 0; display:flex; flex-wrap:wrap; gap: 12px 34px;
+  }
+  .co-trustbar li{
+    display:flex; align-items:center; gap:9px;
+    font-size:.84rem; color:#45453f;
+  }
+  .co-trustbar svg{ flex-shrink:0; color:#0a0a0a; }
+
+  .co-headrow{ padding: 34px 0 26px; }
+  .co-headrow h1{ font-size: clamp(1.6rem, 3vw, 2.1rem); margin:0 0 6px; letter-spacing:-.02em; color:#0a0a0a; }
+  .co-headrow p{ margin:0; font-size:.92rem; color:#55554f; }
+
+  .co-grid{ display:grid; grid-template-columns: 1.35fr .85fr; gap: 28px; align-items:start; }
+
+  /* ---------- steps ---------- */
+  .co-step{ border:1px solid rgba(0,0,0,0.14); margin-bottom: 22px; background:#fff; }
+  .co-step-head{
+    display:flex; align-items:center; gap:14px;
+    padding: 16px 22px; background:#f2f2f0; border-bottom:1px solid rgba(0,0,0,0.12);
+  }
+  .co-step-n{
+    width:28px; height:28px; flex-shrink:0; background:#0a0a0a; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono', monospace; font-size:.8rem; font-weight:700;
+  }
+  .co-step-head h2{
+    margin:0; font-family:'JetBrains Mono', monospace; font-size:.82rem; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:#0a0a0a;
+  }
+  .co-step-body{ padding: 24px 22px 26px; }
+
+  /* ---------- fields ---------- */
+  .co-fields{ display:grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .co-field{ display:flex; flex-direction:column; gap:8px; }
+  .co-field.full{ grid-column: 1 / -1; }
+  .co-field label{
+    font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; color:#6b6b69;
+  }
+  .co-field label .req{ color:#0a0a0a; }
+  .co-field input, .co-field select{
+    width:100%; padding: 13px 14px; border-radius:0;
+    border:1px solid rgba(0,0,0,0.18); background:#fff; color:#0a0a0a;
+    font-family:inherit; font-size:.94rem;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .co-field input::placeholder{ color:#a3a3a1; }
+  .co-field input:focus, .co-field select:focus{
+    outline:none; border-color:#0a0a0a; box-shadow: inset 0 0 0 1px #0a0a0a;
+  }
+  .co-field select{ appearance:none; cursor:pointer; background-image:none; }
+  .co-check{
+    grid-column: 1 / -1; display:flex; align-items:flex-start; gap:11px;
+    font-size:.9rem; color:#45453f; cursor:pointer;
+  }
+  .co-check input{ margin:0; width:17px; height:17px; flex-shrink:0; accent-color:#0a0a0a; margin-top:1px; }
+
+  /* ---------- radio rows (shipping + payment) ---------- */
+  .co-ship, .co-pay-head{
+    position:relative;   /* keeps the visually-hidden radio inside its own row */
+    display:flex; align-items:center; gap:13px; cursor:pointer;
+    padding: 14px 16px; border:1px solid rgba(0,0,0,0.14); background:#fff;
+    margin-bottom:10px; transition: border-color .15s ease, background .15s ease;
+  }
+  .co-ship:last-child{ margin-bottom:0; }
+  .co-ship:hover, .co-pay-head:hover{ border-color:#0a0a0a; }
+  .co-ship.is-on, .co-pay-head.is-on{ border-color:#0a0a0a; box-shadow: inset 0 0 0 1px #0a0a0a; }
+  .co-ship input, .co-pay-head input{ position:absolute; opacity:0; width:0; height:0; }
+  .co-ship-box{
+    width:16px; height:16px; flex-shrink:0; border:1px solid rgba(0,0,0,0.4); background:#fff;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .co-ship.is-on .co-ship-box::after, .co-pay-head.is-on .co-ship-box::after{
+    content:''; width:8px; height:8px; background:#0a0a0a;
+  }
+  .co-ship input:focus-visible + .co-ship-box,
+  .co-pay-head input:focus-visible + .co-ship-box{ outline:2px solid #0a0a0a; outline-offset:2px; }
+  .co-ship-copy{ flex:1; min-width:0; }
+  .co-ship-label{ display:block; font-weight:600; font-size:.93rem; }
+  .co-ship-note{ display:block; font-size:.8rem; color:#8a8a86; margin-top:2px; }
+  .co-ship-cost{
+    flex-shrink:0; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:.95rem;
+  }
+
+  /* ---------- payment ---------- */
+  .co-pay{ margin-bottom:10px; }
+  .co-pay-head{ margin-bottom:0; }
+  .co-pay-body{ border:1px solid rgba(0,0,0,0.14); border-top:none; padding: 18px 16px; background:#fafaf8; }
+  .co-processor{
+    display:flex; gap:12px; align-items:flex-start;
+    border:1px dashed rgba(0,0,0,0.28); padding: 16px 16px; background:#fff;
+  }
+  .co-processor svg{ flex-shrink:0; margin-top:2px; color:#45453f; }
+  .co-processor p{ margin:0; font-size:.86rem; color:#55554f; line-height:1.6; }
+  .co-cards{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .co-cards span{
+    font-family:'JetBrains Mono', monospace; font-size:.62rem; font-weight:700; letter-spacing:.08em;
+    border:1px solid rgba(0,0,0,0.16); padding: 5px 9px; color:#45453f;
+  }
+
+  .co-terms{ display:flex; align-items:flex-start; gap:11px; margin: 20px 0 0; font-size:.9rem; color:#45453f; cursor:pointer; }
+  .co-terms input{ margin:0; width:17px; height:17px; flex-shrink:0; accent-color:#0a0a0a; margin-top:1px; }
+  .co-place{ width:100%; justify-content:center; margin-top:20px; font-size:1rem; padding: 17px 24px; }
+  .co-secure{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin: 14px 0 0; font-size:.82rem; color:#8a8a86;
+  }
+  .co-placed-msg{ margin:14px 0 0; font-size:.9rem; color:#0a0a0a; text-align:center; }
+  .co-chips{ display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:18px; }
+  .co-chips span{
+    font-family:'JetBrains Mono', monospace; font-size:.62rem; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; color:#55554f;
+    border:1px solid rgba(0,0,0,0.16); padding: 7px 11px;
+  }
+
+  /* ---------- order summary ---------- */
+  .co-side{ position:sticky; top: 96px; }
+  .co-card{ border:1px solid rgba(0,0,0,0.14); background:#fff; margin-bottom:18px; }
+  .co-card-head{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding: 16px 20px; background:#f2f2f0; border-bottom:1px solid rgba(0,0,0,0.12);
+  }
+  .co-card-head h2, .co-card-head h3{
+    margin:0; font-family:'JetBrains Mono', monospace; font-size:.76rem; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:#0a0a0a;
+  }
+  .co-edit{ font-size:.74rem; font-family:'JetBrains Mono', monospace; letter-spacing:.1em;
+            text-transform:uppercase; color:#45453f; text-decoration:underline; text-underline-offset:3px; }
+  .co-edit:hover{ color:#0a0a0a; }
+  .co-card-body{ padding: 18px 20px 20px; }
+
+  .co-item{ display:flex; gap:13px; padding: 12px 0; border-bottom:1px solid rgba(0,0,0,0.08); }
+  .co-item:first-child{ padding-top:0; }
+  .co-item:last-child{ border-bottom:none; padding-bottom:0; }
+  .co-thumb{
+    width:52px; height:52px; flex-shrink:0;
+    background: linear-gradient(180deg,#f6f6f4,#e7e7e4); border:1px solid rgba(0,0,0,0.08);
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .co-thumb .vial{ width:16px; height:32px; box-shadow:none; }
+  .co-item-main{ flex:1; min-width:0; }
+  .co-item-name{ margin:0; font-weight:700; font-size:.92rem; line-height:1.3; }
+  .co-item-meta{ margin:3px 0 0; font-family:'JetBrains Mono', monospace; font-size:.72rem; color:#8a8a86; }
+  .co-item-price{ text-align:right; flex-shrink:0; }
+  .co-was{ display:block; font-family:'JetBrains Mono', monospace; font-size:.74rem; color:#a3a3a1; text-decoration: line-through; }
+  .co-now{ display:block; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:.96rem; }
+  .co-off{
+    display:inline-block; margin-top:4px;
+    font-family:'JetBrains Mono', monospace; font-size:.58rem; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase; background:#0a0a0a; color:#fff; padding: 3px 6px;
+  }
+
+  .co-sub-label{
+    font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; color:#8a8a86; margin: 20px 0 10px;
+  }
+  .co-line{ display:flex; justify-content:space-between; gap:14px; padding: 9px 0; font-size:.92rem; }
+  .co-line dt{ color:#55554f; }
+  .co-line dd{ margin:0; font-family:'JetBrains Mono', monospace; color:#0a0a0a; }
+  .co-line.included dd{ color:#45453f; }
+  .co-save{
+    display:flex; align-items:center; gap:9px; margin: 12px 0 0;
+    border:1px solid rgba(0,0,0,0.14); background:#f7f7f5; padding: 11px 13px;
+    font-size:.88rem; font-weight:600;
+  }
+  .co-total{
+    display:flex; justify-content:space-between; align-items:baseline; gap:14px;
+    margin-top:14px; padding-top:14px; border-top:2px solid #0a0a0a;
+    font-size:1.05rem; font-weight:700;
+  }
+  .co-total b{ font-family:'Space Grotesk', sans-serif; font-size:1.35rem; }
+  .co-taxnote{ margin:10px 0 0; font-size:.78rem; color:#8a8a86; }
+
+  .co-upsell-row{ display:flex; gap:13px; align-items:center; }
+  .co-upsell-right{ display:flex; flex-direction:column; align-items:flex-end; gap:7px; flex-shrink:0; }
+  .co-add-btn{
+    border:1px solid #0a0a0a; background:#fff; color:#0a0a0a; border-radius:0;
+    font-family:inherit; font-weight:700; font-size:.8rem; padding: 7px 15px; cursor:pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .co-add-btn:hover{ background:#0a0a0a; color:#fff; }
+
+  .co-promo{ display:flex; gap:0; }
+  .co-promo input{
+    flex:1; min-width:0; padding: 12px 13px; border-radius:0;
+    border:1px solid rgba(0,0,0,0.18); border-right:none; background:#fff; color:#0a0a0a;
+    font-family:inherit; font-size:.9rem;
+  }
+  .co-promo input:focus{ outline:none; border-color:#0a0a0a; }
+  .co-promo button{
+    flex-shrink:0; border:1px solid #0a0a0a; background:#0a0a0a; color:#fff; border-radius:0;
+    font-family:'JetBrains Mono', monospace; font-weight:700; font-size:.72rem; letter-spacing:.1em;
+    text-transform:uppercase; padding: 0 18px; cursor:pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .co-promo button:hover{ background:#fff; color:#0a0a0a; }
+  .co-promo-msg{ margin:10px 0 0; font-size:.82rem; color:#55554f; }
+
+  /* empty cart */
+  .co-empty{ text-align:center; padding: 70px 20px 90px; }
+  .co-empty h2{ font-size:1.4rem; margin:0 0 8px; color:#0a0a0a; }
+  .co-empty p{ margin:0 0 24px; color:#55554f; }
+
+  @media (max-width: 1000px){
+    .co-grid{ grid-template-columns:1fr; }
+    /* stacked, the summary must sit above the form: otherwise the total ends
+       up below the Place order button and you commit before seeing it */
+    .co-side{ position:static; order:-1; }
+  }
+  @media (max-width: 640px){
+    .co-fields{ grid-template-columns:1fr; }
+    .co-step-body{ padding: 20px 16px 22px; }
+    .co-step-head{ padding: 14px 16px; }
+    .co-trustbar ul{ gap: 10px 20px; }
+    .co-trustbar li{ font-size:.78rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="marquee-bar">
+  <div class="marquee-track">
+    <span>FOR LABORATORY &amp; RESEARCH USE ONLY</span><i class="star-bullet">✦</i>
+    <span>THIRD-PARTY LAB TESTED</span><i class="star-bullet">✦</i>
+    <span>COA ON EVERY BATCH</span><i class="star-bullet">✦</i>
+    <span>FREE SHIPPING OVER $250</span><i class="star-bullet">✦</i>
+    <span>SAME-DAY SHIPPING</span><i class="star-bullet">✦</i>
+  </div>
+</div>
+
+<header class="site-header" id="siteHeader">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo" aria-label="Glow Research home">Glow<span class="spark">✦</span></a>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="peptides.html">Peptides</a>
+      <a href="coa.html">COA</a>
+      <a href="shipping.html">Shipping</a>
+      <a href="wholesale.html">Wholesale</a>
+      <a href="blog.html">Blog</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="nav-icon-btn" id="searchToggle" aria-label="Search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+      <a href="index.html" class="nav-icon-btn nav-signin">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        Sign In
+      </a>
+      <button class="nav-icon-btn nav-cart" aria-label="Cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+        <span class="nav-cart-badge" data-count="0">0</span>
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="co-page">
+
+  <div class="co-trustbar">
+    <div class="container">
+      <ul>
+        <li>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="11" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg>
+          Encrypted, 256-bit SSL
+        </li>
+        <li>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="7" width="13" height="10" stroke="currentColor" stroke-width="2"/><path d="M15 10h4l3 3v4h-7" stroke="currentColor" stroke-width="2"/><circle cx="7" cy="18" r="2" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="18" r="2" stroke="currentColor" stroke-width="2"/></svg>
+          Discreet, tracked shipping
+        </li>
+        <li>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" stroke="currentColor" stroke-width="2"/><path d="M9 13l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          COA on every lot
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- empty cart -->
+    <div class="co-empty" id="coEmpty" hidden>
+      <h2>There is nothing to check out.</h2>
+      <p>Your cart is empty.</p>
+      <a href="peptides.html" class="btn btn-primary">Browse the catalog <span aria-hidden="true">&rarr;</span></a>
+    </div>
+
+    <div id="coShell" hidden>
+      <div class="co-headrow">
+        <h1>Checkout</h1>
+        <p>For laboratory and in-vitro research use only. Shipped within the United States.</p>
+      </div>
+
+      <div class="co-grid">
+
+        <!-- ---------- left: the form ---------- -->
+        <form id="coForm">
+
+          <section class="co-step">
+            <div class="co-step-head"><span class="co-step-n">1</span><h2>Contact</h2></div>
+            <div class="co-step-body">
+              <div class="co-fields">
+                <div class="co-field full">
+                  <label for="coEmail">Email address <span class="req">*</span></label>
+                  <input type="email" id="coEmail" name="email" placeholder="you@lab.com" required />
+                </div>
+                <label class="co-check">
+                  <input type="checkbox" name="news" />
+                  <span>Send me restock alerts and new compound announcements.</span>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="co-step">
+            <div class="co-step-head"><span class="co-step-n">2</span><h2>Shipping details</h2></div>
+            <div class="co-step-body">
+              <div class="co-fields">
+                <div class="co-field">
+                  <label for="coFirst">First name <span class="req">*</span></label>
+                  <input type="text" id="coFirst" name="first" required />
+                </div>
+                <div class="co-field">
+                  <label for="coLast">Last name <span class="req">*</span></label>
+                  <input type="text" id="coLast" name="last" required />
+                </div>
+                <div class="co-field full">
+                  <label for="coCompany">Company or institution</label>
+                  <input type="text" id="coCompany" name="company" placeholder="Optional" />
+                </div>
+                <div class="co-field full">
+                  <label for="coCountry">Country or region <span class="req">*</span></label>
+                  <select id="coCountry" name="country" required>
+                    <option>United States</option>
+                  </select>
+                </div>
+                <div class="co-field full">
+                  <label for="coAddr">Street address <span class="req">*</span></label>
+                  <input type="text" id="coAddr" name="address" placeholder="House number and street name" required />
+                </div>
+                <div class="co-field full">
+                  <label for="coAddr2">Apartment, suite, or unit</label>
+                  <input type="text" id="coAddr2" name="address2" placeholder="Optional" />
+                </div>
+                <div class="co-field">
+                  <label for="coCity">Town or city <span class="req">*</span></label>
+                  <input type="text" id="coCity" name="city" required />
+                </div>
+                <div class="co-field">
+                  <label for="coState">State <span class="req">*</span></label>
+                  <select id="coState" name="state" data-states required></select>
+                </div>
+                <div class="co-field">
+                  <label for="coZip">ZIP code <span class="req">*</span></label>
+                  <input type="text" id="coZip" name="zip" inputmode="numeric" required />
+                </div>
+                <div class="co-field">
+                  <label for="coPhone">Phone <span class="req">*</span></label>
+                  <input type="tel" id="coPhone" name="phone" required />
+                </div>
+                <label class="co-check">
+                  <input type="checkbox" id="coDiffAddr" />
+                  <span>Bill to a different address.</span>
+                </label>
+              </div>
+
+              <div id="coBilling" hidden>
+                <p class="co-sub-label">Billing address</p>
+                <div class="co-fields">
+                  <div class="co-field">
+                    <label for="coBFirst">First name <span class="req">*</span></label>
+                    <input type="text" id="coBFirst" data-req="1" />
+                  </div>
+                  <div class="co-field">
+                    <label for="coBLast">Last name <span class="req">*</span></label>
+                    <input type="text" id="coBLast" data-req="1" />
+                  </div>
+                  <div class="co-field full">
+                    <label for="coBAddr">Street address <span class="req">*</span></label>
+                    <input type="text" id="coBAddr" data-req="1" />
+                  </div>
+                  <div class="co-field">
+                    <label for="coBCity">Town or city <span class="req">*</span></label>
+                    <input type="text" id="coBCity" data-req="1" />
+                  </div>
+                  <div class="co-field">
+                    <label for="coBState">State <span class="req">*</span></label>
+                    <select id="coBState" data-states data-req="1"></select>
+                  </div>
+                  <div class="co-field">
+                    <label for="coBZip">ZIP code <span class="req">*</span></label>
+                    <input type="text" id="coBZip" inputmode="numeric" data-req="1" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="co-step">
+            <div class="co-step-head"><span class="co-step-n">3</span><h2>Payment</h2></div>
+            <div class="co-step-body">
+              <div id="coPay"></div>
+
+              <div class="co-cards">
+                <span>Visa</span><span>Mastercard</span><span>Amex</span><span>Discover</span>
+              </div>
+
+              <label class="co-terms">
+                <input type="checkbox" name="terms" required />
+                <span>
+                  I confirm I am a qualified researcher, at least 21 years of age, and that these
+                  products will be used strictly for in-vitro laboratory research. I agree to the
+                  terms of sale.
+                </span>
+              </label>
+
+              <button type="submit" class="btn btn-primary co-place">Place order</button>
+
+              <p class="co-secure">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="11" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg>
+                Encrypted and secure, protected with 256-bit SSL.
+              </p>
+              <p class="co-placed-msg" id="coPlacedMsg" role="status" aria-live="polite"></p>
+
+              <div class="co-chips">
+                <span>Discreet shipping</span>
+                <span>COA on every lot</span>
+                <span>Tracked &amp; insured</span>
+              </div>
+            </div>
+          </section>
+        </form>
+
+        <!-- ---------- right: order summary ---------- -->
+        <aside class="co-side">
+
+          <div class="co-card">
+            <div class="co-card-head">
+              <h2>Order summary</h2>
+              <a href="#" class="co-edit" id="coEditCart">Edit</a>
+            </div>
+            <div class="co-card-body">
+              <div id="coItems"></div>
+
+              <p class="co-sub-label">Shipping method</p>
+              <div id="coShipOptions"></div>
+
+              <dl style="margin:18px 0 0">
+                <div class="co-line"><dt>Subtotal</dt><dd id="coSub">$0.00</dd></div>
+                <div class="co-line"><dt>Shipping</dt><dd id="coShipCost">$0.00</dd></div>
+                <div class="co-line included">
+                  <dt>Shipment protection</dt><dd>Included</dd>
+                </div>
+              </dl>
+
+              <p class="co-save" id="coSaveRow" hidden>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                You&rsquo;re saving <span id="coSaved">$0.00</span> on this order
+              </p>
+
+              <div class="co-total"><span>Total</span><b id="coTotal">$0.00</b></div>
+              <p class="co-taxnote">Sales tax is calculated at payment, based on your address.</p>
+            </div>
+          </div>
+
+          <div class="co-card" id="coUpsell" hidden>
+            <div class="co-card-head"><h3>Complete your order</h3></div>
+            <div class="co-card-body">
+              <div class="co-upsell-row" id="coUpsellBody"></div>
+            </div>
+          </div>
+
+          <div class="co-card">
+            <div class="co-card-head"><h3>Promo code</h3></div>
+            <div class="co-card-body">
+              <div class="co-promo">
+                <input type="text" id="coPromo" placeholder="Enter code" aria-label="Promo code" />
+                <button type="button" id="coPromoBtn">Apply</button>
+              </div>
+              <p class="co-promo-msg" id="coPromoMsg" role="status" aria-live="polite"></p>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo">Glow<span class="spark">✦</span></a>
+        <p>Research-grade peptides, radically transparent. For laboratory and in-vitro research use only.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+          <a href="#" aria-label="X / Twitter"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h3l-7.5 8.6L22 22h-6.9l-5.4-6.7L3.5 22H.5l8-9.2L2 2h7l4.9 6.1L18 2z"/></svg></a>
+          <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2c.4 2.4 2 4 4.8 4.2V9c-1.7 0-3.2-.5-4.8-1.5V15a6 6 0 1 1-6-6c.3 0 .7 0 1 .1v2.9a3 3 0 1 0 3 3V2h2z"/></svg></a>
+        </div>
+        <div class="footer-legal">
+          <strong>Glow Nutrition LLC</strong>
+          <span>10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States</span>
+          <span>&copy; <span id="stubYear"></span> Glow Research. All rights reserved.</span>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="peptides.html?cat=growth">Growth</a>
+        <a href="peptides.html?cat=recovery">Recovery</a>
+        <a href="peptides.html?cat=cognitive">Cognitive</a>
+        <a href="peptides.html?cat=metabolic">Metabolic</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="coa.html">COA</a>
+        <a href="shipping.html">Shipping</a>
+        <a href="wholesale.html">Wholesale</a>
+        <a href="blog.html">Blog</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Contact</a>
+        <a href="shipping.html">Shipping Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <h5>Research Use Only Disclaimer</h5>
+      <p>
+        All products sold by Glow Research are intended <strong>strictly for in-vitro laboratory research and
+        experimental use only</strong>. These products are <strong>not dietary supplements, drugs, food, or
+        cosmetics</strong>, and are not intended for human or animal consumption, treatment, diagnosis, cure, or
+        prevention of any disease or condition. Products must be handled only by licensed, qualified researchers
+        and professionals trained in laboratory safety practices. By purchasing from Glow Research, you certify
+        that you are at least 21 years of age, are a qualified professional or researcher, and that any and all
+        products purchased will be used solely for laboratory research purposes in accordance with all applicable
+        local, state, and federal laws. Glow Research makes no claims as to the safety or efficacy of these
+        compounds for human use and assumes no liability for misuse. Statements on this website have not been
+        evaluated by the Food and Drug Administration (FDA). Glow Research does not sell to, and reserves the
+        right to refuse service to, anyone attempting to purchase for personal consumption. All sales are final
+        on opened or reconstituted materials. This website and its contents are for informational purposes only
+        and do not constitute medical advice.
+      </p>
+    </div>
+
+    <div class="footer-bottom">
+      <p>Not for human consumption. For laboratory research use only.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('stubYear').textContent = new Date().getFullYear();
+  const hamburger = document.getElementById('hamburger');
+  const mainNav = document.getElementById('mainNav');
+  hamburger.addEventListener('click', () => {
+    mainNav.classList.toggle('open');
+    hamburger.classList.toggle('open');
+  });
+  mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mainNav.classList.remove('open')));
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => {
+    header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
+  });
+</script>
+<script src="js/products-data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/search.js"></script>
+<script src="js/cart-modal.js"></script>
+<script src="js/checkout.js"></script>
+</body>
+</html>

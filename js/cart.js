@@ -132,6 +132,8 @@
 
   function render() {
     renderBadge();
+    // the checkout page mirrors the cart, so it needs to know when it moves
+    document.dispatchEvent(new CustomEvent('glow-cart-change'));
     if (!overlay) return;
 
     overlay.querySelector('#cartDrawerCount').textContent = count();
@@ -162,27 +164,26 @@
         You&rsquo;re saving ${money(saved)}</p>` : ''}
       <div class="cart-subtotal"><span>Subtotal</span><span>${money(subtotal())}</span></div>
       <p class="cart-tax">Shipping &amp; taxes calculated at checkout.</p>
-      <button type="button" class="btn btn-primary cart-checkout" id="cartCheckout">
+      <a href="${pageHref('checkout.html')}" class="btn btn-primary cart-checkout">
         Checkout <span aria-hidden="true">&rarr;</span>
-      </button>
-      <p class="cart-checkout-msg" id="cartCheckoutMsg" role="status" aria-live="polite"></p>
+      </a>
       <ul class="cart-trust">
         <li>Discreet shipping</li>
         <li>COA on every lot</li>
       </ul>
     `;
 
-    foot.querySelector('#cartCheckout').addEventListener('click', () => {
-      foot.querySelector('#cartCheckoutMsg').textContent =
-        'Checkout is not connected yet. Your cart is saved.';
-    });
   }
 
-  // the nav already carries a correctly-depthed link to the catalog, so reuse it
-  function catalogHref() {
+  // Blog articles live two directories deep, so a bare "checkout.html" would
+  // 404 from there. The nav already carries a correctly-depthed link, so lift
+  // its prefix rather than tracking depth separately.
+  function pageHref(file) {
     const link = document.querySelector('#mainNav a[href$="peptides.html"]');
-    return link ? link.getAttribute('href') : 'peptides.html';
+    const prefix = link ? link.getAttribute('href').replace(/peptides\.html$/, '') : '';
+    return prefix + file;
   }
+  const catalogHref = () => pageHref('peptides.html');
 
   /* ---------- events ---------- */
 
@@ -236,7 +237,14 @@
     render();
   }
 
-  window.GlowCart = { add, open, close, count, subtotal };
+  // items() hands back copies so callers (the checkout page) cannot mutate
+  // cart state behind our back
+  window.GlowCart = {
+    add, open, close, count, subtotal,
+    items: () => items.map(i => Object.assign({}, i)),
+    savings,
+    FREE_SHIPPING_AT,
+  };
 
   document.addEventListener('DOMContentLoaded', renderBadge);
   renderBadge();
