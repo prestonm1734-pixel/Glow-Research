@@ -625,7 +625,11 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
    theme so the listing and the articles read as one continuous, credible
    publication rather than a dark marketing page linking to a white one.
    ===================================================================== */
-.journal{ background:#fff; color:#0a0a0a; padding: 40px 0 100px; }
+/* --jr-bleed: how far the hover bubble extends past the text, on each side.
+   Must stay under .container's 24px gutter or the bubble hits the screen
+   edge — so it shrinks once the container stops being centred. */
+.journal{ background:#fff; color:#0a0a0a; padding: 40px 0 100px; --jr-bleed: 22px; }
+@media (max-width: 1120px){ .journal{ --jr-bleed: 12px; } }
 
 /* ---------- masthead: newspaper nameplate, not a giant page heading ---------- */
 .jr-masthead{ margin-bottom: 46px; }
@@ -651,22 +655,6 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .jr-count{ font-style:normal; }
 .jr-mast-sections{ text-align:center; }
 
-/* ---------- editorial commitments ----------
-   Sits directly under the nameplate so the first thing a reader learns is
-   how the writing is governed, before they read any of it. */
-.jr-standards{
-  display:grid; grid-template-columns: repeat(3, 1fr);
-  border-bottom: 1px solid rgba(0,0,0,.14);
-}
-.jr-std{ padding: 26px 34px 28px; border-right: 1px solid rgba(0,0,0,.1); }
-.jr-std:first-child{ padding-left: 0; }
-.jr-std:last-child{ padding-right: 0; border-right: none; }
-.jr-std h2{
-  font-family:'Fraunces', Georgia, serif; font-weight:600;
-  font-size: 1.02rem; letter-spacing:-0.01em; color:#0a0a0a; margin: 0 0 8px;
-}
-.jr-std p{ font-size: 0.87rem; line-height:1.62; color:#6b6b66; margin:0; }
-
 /* ---------- shared bits ---------- */
 .cover-art{ display:block; width:100%; height:100%; }
 .jr-tag{
@@ -677,13 +665,27 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   background:#0a0a0a; color:#fff; padding: 4px 9px; border-radius: 3px; font-weight:700;
 }
 
-/* ---------- featured lead ---------- */
+/* ---------- featured lead ----------
+   At rest it's flat newspaper text; the rounded surface and shadow only
+   exist on hover, so the page stays quiet until you reach for something.
+   Negative margin matches .container's 24px gutter, so the lifted bubble
+   has room to breathe without the text shifting out of alignment. */
 .jr-lead{
   display:grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items:center;
-  padding: 40px 0 42px; margin-bottom: 6px;
-  border-bottom: 1px solid rgba(0,0,0,.14);
+  padding: 32px var(--jr-bleed); margin: 12px calc(var(--jr-bleed) * -1) 0;
+  border-radius: 16px; border: 1px solid transparent;
+  transition: transform .4s cubic-bezier(.2,.8,.2,1),
+              box-shadow .4s ease, border-color .4s ease;
 }
-.jr-lead-art{ position:relative; overflow:hidden; aspect-ratio: 4 / 3; border-radius:2px; }
+.jr-lead:hover{
+  transform: translateY(-5px);
+  border-color: rgba(0,0,0,.07);
+  box-shadow: 0 26px 50px -24px rgba(0,0,0,.30), 0 3px 10px -4px rgba(0,0,0,.05);
+}
+.jr-lead-art{ position:relative; overflow:hidden; aspect-ratio: 4 / 3; border-radius:10px; }
+
+/* hairline between the lead and the rest of the list */
+.jr-sep{ height:1px; background: rgba(0,0,0,.14); margin: 30px 0 8px; }
 .jr-lead-art .cover-art{
   position:absolute; inset:0;
   transition: transform .7s cubic-bezier(.2,.8,.2,1);
@@ -714,15 +716,20 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* ---------- article list: text-forward newspaper grid ---------- */
 .jr-list{
-  list-style:none; margin: 0; padding: 0;
+  list-style:none; margin: 0 calc(var(--jr-bleed) * -1); padding: 0;
   display:grid; grid-template-columns: repeat(2, 1fr);
 }
-.jr-row{ border-bottom: 1px solid rgba(0,0,0,.14); }
-.jr-row:nth-child(odd){ border-right: 1px solid rgba(0,0,0,.14); }
-.jr-row > a{ display:block; padding: 32px; transition: background .25s ease; }
-.jr-row:nth-child(odd) > a{ padding-left:0; }
-.jr-row:nth-child(even) > a{ padding-right:0; }
-.jr-row > a:hover{ background: rgba(0,0,0,.02); }
+.jr-row > a{
+  display:block; padding: 26px var(--jr-bleed);
+  border-radius: 14px; border: 1px solid transparent;
+  transition: transform .4s cubic-bezier(.2,.8,.2,1),
+              box-shadow .4s ease, border-color .4s ease;
+}
+.jr-row > a:hover{
+  transform: translateY(-5px);
+  border-color: rgba(0,0,0,.07);
+  box-shadow: 0 22px 44px -22px rgba(0,0,0,.28), 0 3px 10px -4px rgba(0,0,0,.05);
+}
 .jr-row .jr-tag{ display:block; margin-bottom: 10px; }
 .jr-row h3{
   font-family:'Fraunces', Georgia, serif;
@@ -740,52 +747,10 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .jr-row-meta .jr-byline{ font-family:'JetBrains Mono', monospace; font-size:0.68rem; }
 
-/* ---------- editorial standards block ----------
-   The masthead colophon: who writes this, and what it will never be used
-   to sell. Stating the limits is what makes the rest credible. */
-.jr-policy{
-  margin-top: 72px; padding: 38px 42px 42px;
-  background:#f7f7f4; border:1px solid rgba(0,0,0,.09); border-radius:2px;
-}
-.jr-policy-head{
-  margin-bottom: 26px; padding-bottom: 20px;
-  border-bottom: 1px solid rgba(0,0,0,.12);
-}
-.jr-policy-head h2{
-  font-family:'Fraunces', Georgia, serif; font-weight:600;
-  font-size: 1.55rem; letter-spacing:-0.02em; color:#0a0a0a; margin: 10px 0 0;
-}
-.jr-policy-body{ display:grid; grid-template-columns: 1.35fr 1fr; gap: 48px; }
-.jr-policy-prose p{
-  font-size: 0.95rem; line-height:1.72; color:#4a4a45; margin: 0 0 1em;
-}
-.jr-policy-prose p:last-child{ margin-bottom: 0; }
-.jr-policy-list h3{
-  font-family:'JetBrains Mono', monospace; font-size:0.66rem; font-weight:600;
-  letter-spacing:.15em; text-transform:uppercase; color:#8a8a84; margin: 0 0 12px;
-}
-.jr-policy-list ul{ list-style:none; margin: 0 0 18px; padding: 0; }
-.jr-policy-list li{
-  position:relative; padding: 9px 0 9px 20px;
-  font-size: 0.9rem; line-height:1.55; color:#3a3a36;
-  border-bottom: 1px solid rgba(0,0,0,.07);
-}
-.jr-policy-list li::before{ content:"\2014"; position:absolute; left:0; color:#a8a8a2; }
-.jr-policy-note{ font-size: 0.85rem; line-height:1.6; color:#6b6b66; margin: 0; }
-
 @media (max-width: 900px){
   .jr-lead{ grid-template-columns: 1fr; gap: 24px; }
   .jr-lead-art{ order:-1; aspect-ratio: 16/10; }
   .jr-list{ grid-template-columns: 1fr; }
-  .jr-row:nth-child(odd){ border-right:none; }
-  .jr-row > a, .jr-row:nth-child(odd) > a, .jr-row:nth-child(even) > a{ padding: 28px 0; }
-  .jr-standards{ grid-template-columns: 1fr; }
-  .jr-std{
-    padding: 20px 0; border-right:none;
-    border-bottom: 1px solid rgba(0,0,0,.08);
-  }
-  .jr-std:last-child{ border-bottom:none; }
-  .jr-policy-body{ grid-template-columns: 1fr; gap: 30px; }
 }
 
 /* ---------- post cards (used by "keep reading" on articles) ---------- */
@@ -969,11 +934,9 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .journal{ padding: 30px 0 64px; }
   .jr-masthead{ margin-bottom: 34px; }
   .jr-nameplate{ padding: 18px 0 16px; }
-  .jr-lead{ padding: 30px 0 32px; }
-  .jr-row > a{ padding: 26px 0; }
+  .jr-lead{ padding: 24px var(--jr-bleed); margin: 8px calc(var(--jr-bleed) * -1) 0; }
+  .jr-row > a{ padding: 22px var(--jr-bleed); }
   .jr-mast-top{ flex-wrap:wrap; justify-content:center; gap: 4px 10px; text-align:center; }
-  .jr-policy{ margin-top: 48px; padding: 28px 22px 30px; }
-  .jr-policy-head h2{ font-size: 1.34rem; }
   .section-blog{ padding: 44px 0 56px; }
   .post-header{ padding: 32px 0 24px; }
   .post-standfirst{ font-size: 1.04rem; }
@@ -1007,7 +970,7 @@ html{ scrollbar-color: #3a3a38 #0a0a0a; }
 .nav-signin:active{ transform: translateY(1px) scale(.98); transition-duration:.06s; }
 .faq-q:active{ opacity:.72; transition-duration:.06s; }
 .jr-lead:active,
-.jr-row > a:active{ transform: scale(.994); transition-duration:.08s; }
+.jr-row > a:active{ transform: translateY(-2px) scale(.995); transition-duration:.09s; }
 .blog-card:active{ transform: translateY(-2px) scale(.992); transition-duration:.08s; }
 .product-card:active{ transition-duration:.08s; }
 

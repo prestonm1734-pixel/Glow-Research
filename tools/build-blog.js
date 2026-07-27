@@ -481,49 +481,12 @@ function buildIndex() {
       </div>
     </header>
 
-    <div class="jr-standards">
-      <div class="jr-std">
-        <h2>Written for the bench</h2>
-        <p>Storage, handling, and verification procedures aimed at the people who actually work with these compounds — not marketing copy dressed up as guidance.</p>
-      </div>
-      <div class="jr-std">
-        <h2>Specific, not vague</h2>
-        <p>Real temperatures, real tolerances, real timeframes. Where a figure comes from standard laboratory practice, we say so instead of asserting it.</p>
-      </div>
-      <div class="jr-std">
-        <h2>No protocols, no claims</h2>
-        <p>We don't publish dosing, administration, or therapeutic guidance of any kind. These are research materials, and we write about them that way.</p>
-      </div>
-    </div>
-
 ${leadHtml}
 
-${rest.length ? `    <ul class="jr-list">
+${rest.length ? `    <div class="jr-sep" aria-hidden="true"></div>
+    <ul class="jr-list">
 ${rowsHtml}
     </ul>` : ''}
-
-    <section class="jr-policy">
-      <div class="jr-policy-head">
-        <span class="jr-tag">Editorial standards</span>
-        <h2>How this blog is written</h2>
-      </div>
-      <div class="jr-policy-body">
-        <div class="jr-policy-prose">
-          <p>Articles are researched and written in-house, then checked against manufacturer documentation and standard laboratory references before they go up. Every article carries its publication date, and material revisions are noted on the article rather than quietly edited in.</p>
-          <p>We write about the same compounds we sell, so it is worth saying plainly: nothing here is written to move a product. Where the honest answer to a handling question is &ldquo;it depends&rdquo; or &ldquo;don't,&rdquo; that is what the article says.</p>
-        </div>
-        <div class="jr-policy-list">
-          <h3>What we don't publish</h3>
-          <ul>
-            <li>Dosing, administration, or protocol guidance</li>
-            <li>Therapeutic, cosmetic, or performance claims</li>
-            <li>Purity or stability figures we can't tie to a batch and a method</li>
-            <li>Sponsored posts or paid placements</li>
-          </ul>
-          <p class="jr-policy-note">Found an error in one of these articles? Tell us — we'll correct it and note the change.</p>
-        </div>
-      </div>
-    </section>
 
   </div>
 </section>`;
