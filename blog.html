@@ -3,22 +3,21 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Wholesale & Bulk Orders — Glow Research</title>
-<meta name="description" content="Wholesale & Bulk Orders at Glow Research." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
-<style>
-  .stub-hero{ position:relative; padding: 90px 0 100px; background:#000; overflow:hidden; isolation:isolate; }
-  .stub-hero .container{ position:relative; z-index:1; max-width: 720px; }
-  .stub-hero .hero-eyebrow{ margin-bottom:20px; }
-  .stub-hero h1{ font-size: clamp(2.1rem, 4.4vw, 3.4rem); margin-bottom:22px; letter-spacing:-0.03em; }
-  .stub-hero h1 .outline{ color: transparent; -webkit-text-stroke: 1.4px rgba(255,255,255,.82); }
-  .stub-hero p{ font-size: 1.08rem; max-width: 560px; margin: 0 0 32px; }
-  .stub-back{ display:inline-flex; align-items:center; gap:8px; }
-</style>
+<title>Blog — Peptide Research, Handling &amp; Industry Notes | Glow Research</title>
+<meta name="description" content="Practical guides and industry notes on research peptides — storage, reconstitution, certificates of analysis, and quality standards from Glow Research." />
+<link rel="canonical" href="https://glowresearch.shop/blog.html" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Glow Research" />
+<meta property="og:title" content="Glow Research Blog" />
+<meta property="og:description" content="Practical guides and industry notes on research peptides." />
+<meta property="og:url" content="https://glowresearch.shop/blog.html" />
+<meta name="twitter:card" content="summary_large_image" />
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Blog","name":"Glow Research Blog","url":"https://glowresearch.shop/blog.html","description":"Practical guides and industry notes on research peptides.","blogPost":[{"@type":"BlogPosting","headline":"How to Store Lyophilized Peptides in the Lab","url":"https://glowresearch.shop/blog/how-to-store-lyophilized-peptides/","datePublished":"2026-07-14","description":"Temperature, light, and moisture all degrade lyophilized peptides. A practical storage guide for research labs, covering long-term, working, and reconstituted vials."},{"@type":"BlogPosting","headline":"How to Read a Peptide Certificate of Analysis","url":"https://glowresearch.shop/blog/how-to-read-a-certificate-of-analysis/","datePublished":"2026-07-07","description":"HPLC purity, mass spec identity, endotoxin limits — what each line on a peptide COA actually means, and the red flags that separate a real COA from a marketing document."},{"@type":"BlogPosting","headline":"Reconstituting Research Peptides: A Practical Guide","url":"https://glowresearch.shop/blog/reconstituting-research-peptides/","datePublished":"2026-06-28","description":"Choosing a diluent, calculating concentration, and avoiding the handling mistakes that denature peptides during reconstitution in a research setting."}]}</script>
 </head>
 <body>
 
@@ -41,8 +40,8 @@
       <a href="coa.html">COA</a>
       <a href="quality.html">Quality</a>
       <a href="shipping.html">Shipping</a>
-      <a href="wholesale.html" class="active">Wholesale</a>
-      <a href="blog.html">Blog</a>
+      <a href="wholesale.html">Wholesale</a>
+      <a href="blog.html" class="active">Blog</a>
     </nav>
 
     <div class="nav-actions">
@@ -55,7 +54,7 @@
       </a>
       <button class="nav-icon-btn nav-cart" aria-label="Cart">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
-        <span class="nav-cart-badge" data-count="0">0</span>
+        <span class="nav-cart-badge" id="cartBadge" data-count="0">0</span>
       </button>
       <button class="hamburger" id="hamburger" aria-label="Toggle menu">
         <span></span><span></span><span></span>
@@ -64,45 +63,48 @@
   </div>
 </header>
 
-<section class="stub-hero">
+<section class="blog-hero">
   <div class="container">
-    <span class="hero-eyebrow">Wholesale & Bulk Orders</span>
-    <h1>Research at scale,<br /><span class="outline">priced for labs.</span></h1>
-    <p>Volume pricing, custom formulations, and dedicated support for research institutions and labs ordering at scale. Reach out and our team will get back to you within one business day.</p>
+    <span class="eyebrow">The Blog</span>
+    <h1>Peptide research,<br /><span class="outline">documented.</span></h1>
+    <p>Handling protocols, verification guides, and notes on where the research peptide industry is going.</p>
   </div>
 </section>
 
-<section class="stub-section">
+<section class="section section-light section-blog">
   <div class="container">
-    <div class="stub-features reveal">
-      <div class="stub-feature">
-        <h3>Volume Pricing</h3>
-        <p>Tiered pricing that scales down as your monthly order volume scales up — ask your account rep for a quote.</p>
-      </div>
-      <div class="stub-feature">
-        <h3>USA-Sourced</h3>
-        <p>Every compound is manufactured domestically and independently verified above 99% purity.</p>
-      </div>
-      <div class="stub-feature">
-        <h3>Dedicated Support</h3>
-        <p>A single account contact for reordering, COAs, and custom formulation requests — no ticket queue.</p>
-      </div>
-      <div class="stub-feature">
-        <h3>Fast Onboarding</h3>
-        <p>Most wholesale accounts are approved and placing their first order within one business day.</p>
-      </div>
+    <div class="blog-grid">
+      <a class="blog-card reveal" href="blog/how-to-store-lyophilized-peptides/">
+        <span class="blog-card-cat">Handling</span>
+        <h3>How to Store Lyophilized Peptides in the Lab</h3>
+        <p>Temperature, light, and moisture all degrade lyophilized peptides. A practical storage guide for research labs, covering long-term, working, and reconstituted vials.</p>
+        <div class="blog-card-meta">
+          <time datetime="2026-07-14">July 14, 2026</time>
+          <span aria-hidden="true">&bull;</span>
+          <span>6 min read</span>
+        </div>
+      </a>
+      <a class="blog-card reveal" href="blog/how-to-read-a-certificate-of-analysis/">
+        <span class="blog-card-cat">Verification</span>
+        <h3>How to Read a Peptide Certificate of Analysis</h3>
+        <p>HPLC purity, mass spec identity, endotoxin limits — what each line on a peptide COA actually means, and the red flags that separate a real COA from a marketing document.</p>
+        <div class="blog-card-meta">
+          <time datetime="2026-07-07">July 7, 2026</time>
+          <span aria-hidden="true">&bull;</span>
+          <span>7 min read</span>
+        </div>
+      </a>
+      <a class="blog-card reveal" href="blog/reconstituting-research-peptides/">
+        <span class="blog-card-cat">Protocols</span>
+        <h3>Reconstituting Research Peptides: A Practical Guide</h3>
+        <p>Choosing a diluent, calculating concentration, and avoiding the handling mistakes that denature peptides during reconstitution in a research setting.</p>
+        <div class="blog-card-meta">
+          <time datetime="2026-06-28">June 28, 2026</time>
+          <span aria-hidden="true">&bull;</span>
+          <span>8 min read</span>
+        </div>
+      </a>
     </div>
-
-    <div class="stub-policy reveal">
-      <h2>Getting Started</h2>
-      <p>
-        New wholesale accounts require a refundable deposit, applied in full toward your first order. Email our
-        wholesale team with your company name, expected monthly volume, and the compounds you're interested in,
-        and we'll follow up with pricing and next steps.
-      </p>
-    </div>
-
-    <a href="index.html" class="btn btn-outline stub-back stub-cta-row">&larr; Back to Home</a>
   </div>
 </section>
 
@@ -120,7 +122,7 @@
         <div class="footer-legal">
           <strong>Glow Nutrition LLC</strong>
           <span>10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States</span>
-          <span>&copy; <span id="stubYear"></span> Glow Research. All rights reserved.</span>
+          <span>&copy; <span id="blogYear"></span> Glow Research. All rights reserved.</span>
         </div>
       </div>
 
@@ -174,13 +176,7 @@
 </footer>
 
 <script>
-  document.getElementById('stubYear').textContent = new Date().getFullYear();
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
-    });
-  }, { threshold: 0.15 });
-  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  document.getElementById('blogYear').textContent = new Date().getFullYear();
   const hamburger = document.getElementById('hamburger');
   const mainNav = document.getElementById('mainNav');
   hamburger.addEventListener('click', () => {
@@ -192,6 +188,10 @@
   window.addEventListener('scroll', () => {
     header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
   });
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 </script>
 </body>
 </html>

@@ -615,3 +615,153 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .stub-policy h2{ font-size: 1.4rem; margin-bottom: 14px; }
 .stub-policy p{ font-size: 1rem; }
 .stub-cta-row{ margin-top: 26px; }
+
+/* =====================================================================
+   BLOG
+   ===================================================================== */
+
+/* ---------- listing hero ---------- */
+.blog-hero{
+  position:relative; background:#000; padding: 76px 0 60px; overflow:hidden;
+}
+.blog-hero .container{ max-width: 760px; }
+.blog-hero h1{
+  font-size: clamp(2.1rem, 4.6vw, 3.4rem); letter-spacing:-0.03em; margin-bottom: 18px;
+}
+.blog-hero h1 .outline{
+  color: transparent; -webkit-text-stroke: 1.4px rgba(255,255,255,.82);
+}
+.blog-hero p{ font-size: 1.05rem; max-width: 560px; margin: 0; }
+
+/* ---------- post cards ---------- */
+.section-blog{ padding: 70px 0 90px; }
+.blog-grid{
+  display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;
+}
+.blog-card{
+  display:flex; flex-direction:column;
+  background:#fff; border:1px solid rgba(0,0,0,0.1); border-radius: var(--radius-sm);
+  padding: 26px 24px 22px;
+  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+}
+.blog-card:hover{
+  transform: translateY(-4px); border-color: rgba(0,0,0,0.28);
+  box-shadow: 0 20px 40px -22px rgba(0,0,0,.4);
+}
+.blog-card-cat{
+  font-family:'JetBrains Mono', monospace; font-size:0.66rem; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; color:#8a8a86; margin-bottom: 14px;
+}
+.blog-card h3{
+  font-size: 1.24rem; line-height:1.25; color:#0a0a0a; margin: 0 0 10px;
+  letter-spacing:-0.015em;
+}
+.blog-card p{
+  font-size: 0.92rem; line-height:1.65; color:#55554f; margin: 0 0 20px;
+  /* keep every card's summary to the same visual weight */
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+}
+.blog-card-meta{
+  margin-top:auto; display:flex; align-items:center; gap: 8px;
+  font-family:'JetBrains Mono', monospace; font-size:0.7rem; color:#8a8a86;
+  letter-spacing:.04em;
+}
+
+/* ---------- article ---------- */
+.post{ background:#000; }
+/* 720px - 48px gutters = ~72 characters per line, which is inside the
+   65-75 band where long-form reading speed peaks */
+.post-container{ max-width: 720px; }
+
+.post-header{ padding: 54px 0 34px; border-bottom: 1px solid var(--border); }
+.post-breadcrumb{
+  font-family:'JetBrains Mono', monospace; font-size:0.7rem; letter-spacing:.08em;
+  text-transform:uppercase; color: var(--text-dimmer); margin-bottom: 22px;
+  display:flex; gap:10px;
+}
+.post-breadcrumb a{ color: var(--text-dimmer); transition: color .2s; }
+.post-breadcrumb a:hover{ color: var(--text); }
+.post-header h1{
+  font-size: clamp(1.9rem, 4.2vw, 2.9rem); line-height:1.12; letter-spacing:-0.03em;
+  margin: 0 0 18px;
+}
+.post-standfirst{
+  font-size: 1.08rem; line-height:1.7; color: var(--text-dim); margin: 0 0 24px;
+}
+.post-meta{
+  display:flex; align-items:center; gap:10px;
+  font-family:'JetBrains Mono', monospace; font-size:0.72rem;
+  letter-spacing:.06em; color: var(--text-dimmer);
+}
+
+/* body copy — measure capped near 70 characters, which is where long-form
+   reading speed peaks; brighter than --text-dim because this is the one place
+   on the site people read continuously rather than scan */
+.post-body{
+  /* padding-top/bottom only — this element is also .container, and a shorthand
+     here silently wipes out its 24px side gutters, pulling the body copy left
+     of the headline */
+  padding-top: 44px; padding-bottom: 20px;
+  font-size: 1.05rem; line-height: 1.8; color: #d5d5d2;
+}
+.post-body > *{ max-width: 68ch; }
+.post-body p{ margin: 0 0 1.45em; color: inherit; font-size: inherit; line-height: inherit; }
+.post-body .lede{
+  font-size: 1.16rem; line-height:1.7; color: var(--text); margin-bottom: 1.6em;
+}
+.post-body h2{
+  font-size: 1.5rem; letter-spacing:-0.02em; color: var(--text);
+  margin: 2.2em 0 .7em;   /* more space above than below: binds heading to its section */
+}
+.post-body h3{
+  font-size: 1.12rem; letter-spacing:-0.01em; color: var(--text);
+  margin: 1.9em 0 .55em;
+}
+.post-body h2:first-child, .post-body h3:first-child, .post-body .lede:first-child{ margin-top:0; }
+.post-body ul, .post-body ol{ margin: 0 0 1.45em; padding-left: 1.25em; }
+.post-body li{ margin-bottom: .6em; }
+.post-body li::marker{ color: var(--text-dimmer); }
+.post-body strong{ color: var(--text); font-weight:600; }
+.post-body em{ color: var(--text); }
+.post-body a{
+  color:#fff; text-decoration: underline;
+  text-decoration-color: rgba(255,255,255,.35); text-underline-offset: 3px;
+  transition: text-decoration-color .2s ease;
+}
+.post-body a:hover{ text-decoration-color:#fff; }
+
+.post-callout{
+  border-left: 2px solid rgba(255,255,255,.5);
+  background: rgba(255,255,255,.04);
+  padding: 20px 24px; margin: 2em 0;
+  font-size: 1rem; line-height:1.7; color: var(--text-dim);
+}
+.post-callout strong{ color: var(--text); }
+
+.post-disclaimer{
+  border-top: 1px solid var(--border);
+  margin: 30px 0 0; padding: 24px 0 60px;
+  font-size: 0.8rem; line-height:1.75; color: var(--text-dimmer);
+}
+.post-disclaimer strong{ color: var(--text-dim); }
+
+/* ---------- related ---------- */
+.section-related{ background: var(--bg-2); padding: 66px 0 80px; }
+.section-related .eyebrow{ margin-bottom: 26px; }
+.section-related .blog-card{
+  background: var(--surface); border-color: var(--border);
+}
+.section-related .blog-card:hover{ border-color: rgba(255,255,255,.22); box-shadow:none; }
+.section-related .blog-card h3{ color: var(--text); }
+.section-related .blog-card p{ color: var(--text-dim); }
+.section-related .blog-card-cat,
+.section-related .blog-card-meta{ color: var(--text-dimmer); }
+
+@media (max-width: 640px){
+  .blog-hero{ padding: 46px 0 40px; }
+  .section-blog{ padding: 44px 0 56px; }
+  .post-header{ padding: 34px 0 26px; }
+  .post-body{ padding-top: 32px; padding-bottom: 12px; font-size: 1.02rem; }
+  .post-body h2{ font-size: 1.32rem; margin: 1.9em 0 .6em; }
+  .section-related{ padding: 46px 0 56px; }
+}
