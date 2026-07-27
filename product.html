@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Product | Glow Research</title>
+<meta name="description" content="Research-grade peptide, third-party tested and lot-matched to its certificate of analysis. For laboratory research use only." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  /* ---------- breadcrumb ---------- */
+  .pd-crumb{ background:#ececea; border-bottom:1px solid rgba(0,0,0,0.1); padding: 14px 0; }
+  .pd-crumb-inner{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    font-family:'JetBrains Mono', monospace; font-size:.72rem; letter-spacing:.06em;
+    text-transform:uppercase; color:#6b6b69;
+  }
+  .pd-crumb-inner a{ color:#45453f; }
+  .pd-crumb-inner a:hover{ color:#0a0a0a; }
+  .pd-crumb-inner span{ color:#0a0a0a; }
+
+  /* ---------- hero ---------- */
+  .pd-hero{ background:#000; padding: 56px 0 72px; }
+  .pd-hero-grid{ display:grid; grid-template-columns: .95fr 1.05fr; gap: 56px; align-items:flex-start; }
+
+  .pd-visual{
+    position:relative; aspect-ratio: 1 / 1; display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(180deg,#151513,#0a0a0a);
+    border: 1px solid rgba(255,255,255,.1);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .pd-vial{
+    width: 108px; height: 216px; border-radius: 6px 6px 4px 4px;
+    background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.7) 45%, rgba(255,255,255,.35));
+    border: 1px solid rgba(0,0,0,.12);
+    position: relative;
+    box-shadow: 0 30px 60px -18px rgba(0,0,0,.6);
+  }
+  .pd-vial::before{
+    content:''; position:absolute; top:-22px; left:50%; transform:translateX(-50%);
+    width: 40px; height: 30px; background: linear-gradient(180deg,#2a2a28,#0a0a0a); border-radius: 4px 4px 0 0;
+  }
+  .pd-vial::after{
+    content:''; position:absolute; left:10px; right:10px; bottom:16px; top:82px; border-radius:3px;
+    background: linear-gradient(180deg,#141414,#0a0a0a);
+  }
+  .pd-vial-label{
+    position:absolute; left:16px; right:16px; bottom:34px;
+    font-family:'Space Grotesk',sans-serif; font-size:.62rem; font-weight:700; letter-spacing:.03em;
+    color:#e4e4e2; text-align:center; line-height:1.4;
+  }
+  .pd-visual-badges{ position:absolute; top:16px; left:16px; right:16px; display:flex; justify-content:space-between; }
+  .pd-visual-badges .product-badge{ position:static; }
+
+  .pd-right{ display:flex; flex-direction:column; }
+  .pd-tag{ font-size:0.72rem; color: var(--text-dimmer); text-transform:uppercase; letter-spacing:.1em; margin-bottom:10px; display:block; font-family:'JetBrains Mono', monospace; }
+  .pd-name{ font-size: clamp(2rem, 3.6vw, 2.9rem); margin: 0 0 16px; letter-spacing:-.02em; }
+  .pd-lede{ font-size: 1rem; max-width: 520px; margin: 0 0 26px; }
+
+  .pd-price-row{ display:flex; align-items:center; gap: 22px; flex-wrap:wrap; margin-bottom: 18px; }
+  .pd-price{ font-family:'Space Grotesk',sans-serif; font-size: 1.9rem; font-weight:700; color:#fff; }
+  .pd-stepper{ display:flex; align-items:center; border:1px solid var(--border); }
+  .pd-stepper button{
+    width:40px; height:44px; background:transparent; border:none; color:#fff; font-size:1.1rem; cursor:pointer;
+  }
+  .pd-stepper button:hover{ background: rgba(255,255,255,.08); }
+  .pd-stepper span{ width:44px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:.95rem; }
+  .pd-add-btn{ height:44px; padding: 0 30px; }
+
+  .pd-dispatch{
+    display:flex; align-items:center; gap:9px; font-size:.86rem; color: var(--text-dim);
+    margin-bottom: 30px; padding-bottom:28px; border-bottom:1px solid var(--border);
+  }
+  .pd-dispatch svg{ flex-shrink:0; color:#fff; }
+  .pd-dispatch strong{ color:#fff; font-weight:700; }
+
+  .pd-sub-eyebrow{
+    font-family:'JetBrains Mono', monospace; font-size:.68rem; font-weight:700; letter-spacing:.12em;
+    text-transform:uppercase; color: var(--text-dimmer); margin-bottom:14px; display:block;
+  }
+  .pd-tiers{ display:grid; grid-template-columns: repeat(4, 1fr); gap:1px; background: rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.1); margin-bottom: 32px; }
+  .pd-tier{
+    position:relative; background: linear-gradient(180deg,#121212,#080808); border:none; cursor:pointer;
+    padding: 18px 12px 16px; display:flex; flex-direction:column; align-items:flex-start; gap:4px;
+    color: var(--text); text-align:left; font-family:inherit; transition: background .2s ease;
+  }
+  .pd-tier:hover{ background: linear-gradient(180deg,#191919,#0d0d0d); }
+  .pd-tier.is-best{ box-shadow: inset 0 0 0 1px rgba(255,255,255,.4); }
+  .pd-tier-flag{
+    position:absolute; top:-1px; right:-1px; background:#fff; color:#0a0a0a; font-size:.6rem; font-weight:700;
+    padding:3px 8px; letter-spacing:.06em; text-transform:uppercase; font-family:'JetBrains Mono', monospace;
+  }
+  .pd-tier-qty{ font-size:.78rem; color: var(--text-dimmer); text-transform:uppercase; letter-spacing:.06em; font-family:'JetBrains Mono', monospace; }
+  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1.15rem; font-weight:700; color:#fff; }
+  .pd-tier-was{ font-size:.76rem; color: var(--text-dimmer); text-decoration: line-through; }
+  .pd-tier-per{ font-size:.72rem; color: var(--text-dimmer); }
+  .pd-tier-off{ font-size:.66rem; font-weight:700; color:#0a0a0a; background:#fff; padding:2px 7px; margin-top:2px; }
+  .pd-tier.is-added .pd-tier-price{ color:#fff; }
+
+  .pd-trust{ list-style:none; margin:0 0 20px; padding:0; }
+  .pd-trust li{ display:flex; gap:10px; align-items:center; padding:8px 0; font-size:.88rem; color: var(--text-dim); }
+  .pd-trust svg{ flex-shrink:0; color:#fff; }
+  .pd-coa-link{ display:inline-flex; align-items:center; gap:8px; font-size:.88rem; font-weight:600; color:#fff; border-bottom:1px solid rgba(255,255,255,.4); width:fit-content; padding-bottom:2px; }
+  .pd-coa-link:hover{ border-color:#fff; }
+
+  /* ---------- specs table ---------- */
+  .pd-specs{ background:#070707; padding: 64px 0; border-top:1px solid rgba(255,255,255,.08); }
+  .pd-specs h2{ font-size: clamp(1.4rem, 2.2vw, 1.8rem); margin: 0 0 28px; }
+  .pd-spec-table{ max-width: 720px; border-top:1px solid rgba(255,255,255,.1); }
+  .pd-spec-row{ display:flex; justify-content:space-between; gap:16px; padding: 15px 0; border-bottom:1px solid rgba(255,255,255,.08); }
+  .pd-spec-row dt{ color: var(--text-dimmer); font-size:.86rem; text-transform:uppercase; letter-spacing:.06em; font-family:'JetBrains Mono', monospace; }
+  .pd-spec-row dd{ margin:0; color:#fff; font-weight:600; font-size:.94rem; text-align:right; }
+  .pd-disclaimer{ max-width:720px; margin-top:22px; font-size:.86rem; color: var(--text-dimmer); }
+
+  /* ---------- related ---------- */
+  .pd-related{ background:#000; padding: 72px 0 84px; border-top:1px solid rgba(255,255,255,.08); }
+  .pd-related h2{ font-size: clamp(1.4rem, 2.2vw, 1.8rem); margin: 0 0 30px; }
+
+  /* ---------- missing product ---------- */
+  .pd-missing{ background:#000; padding: 120px 0; text-align:center; }
+  .pd-missing h2{ margin-bottom:14px; }
+  .pd-missing a{ display:inline-flex; margin-top:20px; }
+
+  @media (max-width: 900px){
+    .pd-hero-grid{ grid-template-columns:1fr; }
+    .pd-tiers{ grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 520px){
+    .pd-tiers{ grid-template-columns: 1fr 1fr; }
+    .pd-price-row{ gap:14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="marquee-bar">
+  <div class="marquee-track">
+    <span>FOR LABORATORY &amp; RESEARCH USE ONLY</span><i class="star-bullet">✦</i>
+    <span>THIRD-PARTY LAB TESTED</span><i class="star-bullet">✦</i>
+    <span>COA ON EVERY BATCH</span><i class="star-bullet">✦</i>
+    <span>FREE SHIPPING OVER $250</span><i class="star-bullet">✦</i>
+    <span>SAME-DAY SHIPPING</span><i class="star-bullet">✦</i>
+  </div>
+</div>
+
+<header class="site-header" id="siteHeader">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo" aria-label="Glow Research home">Glow<span class="spark">✦</span></a>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="peptides.html" class="active">Peptides</a>
+      <a href="coa.html">COA</a>
+      <a href="shipping.html">Shipping</a>
+      <a href="wholesale.html">Wholesale</a>
+      <a href="blog.html">Blog</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="nav-icon-btn" id="searchToggle" aria-label="Search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+      <a href="index.html" class="nav-icon-btn nav-signin">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        Sign In
+      </a>
+      <button class="nav-icon-btn nav-cart" aria-label="Cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+        <span class="nav-cart-badge" data-count="0">0</span>
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="pd-crumb" aria-label="Breadcrumb">
+  <div class="container pd-crumb-inner">
+    <a href="index.html">Home</a> /
+    <a href="peptides.html">Peptides</a> /
+    <a id="pdCrumbCat" href="peptides.html">Category</a> /
+    <span id="pdCrumbName">Product</span>
+  </div>
+</nav>
+
+<div id="pdShell">
+
+  <section class="pd-hero">
+    <div class="container pd-hero-grid">
+
+      <div class="pd-visual">
+        <div class="pd-visual-badges">
+          <span class="product-badge cat" id="pdCat">category</span>
+          <span class="product-badge status" id="pdBadge" hidden></span>
+        </div>
+        <div class="pd-vial">
+          <span class="pd-vial-label" id="pdVialLabel">GLOW<br />RESEARCH</span>
+        </div>
+      </div>
+
+      <div class="pd-right">
+        <span class="pd-tag" id="pdTag">Category</span>
+        <h1 class="pd-name" id="pdName">Product name</h1>
+        <p class="pd-lede" id="pdLede">Description.</p>
+
+        <div class="pd-price-row">
+          <span class="pd-price" id="pdPrice">$0</span>
+          <div class="pd-stepper">
+            <button type="button" id="pdQtyDec" aria-label="Decrease quantity">&minus;</button>
+            <span id="pdQty">1</span>
+            <button type="button" id="pdQtyInc" aria-label="Increase quantity">+</button>
+          </div>
+          <button type="button" class="btn btn-primary pd-add-btn" id="pdAddBtn">Add to cart</button>
+        </div>
+
+        <p class="pd-dispatch">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="1" y="3" width="15" height="13" stroke="currentColor" stroke-width="2"/><path d="M16 8h4l3 4v4h-7V8z" stroke="currentColor" stroke-width="2"/><circle cx="5.5" cy="18.5" r="1.7" stroke="currentColor" stroke-width="2"/><circle cx="18.5" cy="18.5" r="1.7" stroke="currentColor" stroke-width="2"/></svg>
+          <span id="pdDispatch">Order within 2h to ship today</span> &middot; <strong>FedEx 2-Day</strong>
+        </p>
+
+        <span class="pd-sub-eyebrow">Stock up &amp; save</span>
+        <div class="pd-tiers" id="pdTiers"></div>
+
+        <ul class="pd-trust">
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Third-party tested &middot; HPLC purity + mass-spec ID</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Lyophilized &amp; stable &middot; nitrogen sealed</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Same-day dispatch &middot; unmarked packaging</li>
+        </ul>
+
+        <a class="pd-coa-link" id="pdCoaLink" href="coa.html">
+          View certificate of analysis <span aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="pd-specs">
+    <div class="container">
+      <h2>Specifications</h2>
+      <dl class="pd-spec-table">
+        <div class="pd-spec-row"><dt>Form</dt><dd>Lyophilized powder</dd></div>
+        <div class="pd-spec-row"><dt>Purity</dt><dd id="pdSpecPurity">&ge;99% (HPLC verified)</dd></div>
+        <div class="pd-spec-row"><dt>Presentation</dt><dd id="pdSpecSize">Single vial</dd></div>
+        <div class="pd-spec-row"><dt>Storage</dt><dd>Store lyophilized at &minus;20&deg;C, protect from light</dd></div>
+      </dl>
+      <p class="pd-disclaimer">For research use only. Not for human or veterinary use. Not a drug, food, or supplement.</p>
+    </div>
+  </section>
+
+  <section class="pd-related" id="pdRelatedSection">
+    <div class="container">
+      <h2>Pairs well at the bench</h2>
+      <div class="product-grid" id="pdRelatedGrid"></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="pd-missing" id="pdMissing" hidden>
+  <div class="container">
+    <h2>We couldn't find that product.</h2>
+    <p>It may have been renamed or retired from the catalog.</p>
+    <a href="peptides.html" class="btn btn-outline">Browse the catalog <span aria-hidden="true">&rarr;</span></a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo">Glow<span class="spark">✦</span></a>
+        <p>Research-grade peptides, radically transparent. For laboratory and in-vitro research use only.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+          <a href="#" aria-label="X / Twitter"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h3l-7.5 8.6L22 22h-6.9l-5.4-6.7L3.5 22H.5l8-9.2L2 2h7l4.9 6.1L18 2z"/></svg></a>
+          <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2c.4 2.4 2 4 4.8 4.2V9c-1.7 0-3.2-.5-4.8-1.5V15a6 6 0 1 1-6-6c.3 0 .7 0 1 .1v2.9a3 3 0 1 0 3 3V2h2z"/></svg></a>
+        </div>
+        <div class="footer-legal">
+          <strong>Glow Nutrition LLC</strong>
+          <span>10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States</span>
+          <span>&copy; <span id="stubYear"></span> Glow Research. All rights reserved.</span>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="peptides.html?cat=growth">Growth</a>
+        <a href="peptides.html?cat=recovery">Recovery</a>
+        <a href="peptides.html?cat=cognitive">Cognitive</a>
+        <a href="peptides.html?cat=metabolic">Metabolic</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="coa.html">COA</a>
+        <a href="shipping.html">Shipping</a>
+        <a href="wholesale.html">Wholesale</a>
+        <a href="blog.html">Blog</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Contact</a>
+        <a href="shipping.html">Shipping Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <h5>Research Use Only Disclaimer</h5>
+      <p>
+        All products sold by Glow Research are intended <strong>strictly for in-vitro laboratory research and
+        experimental use only</strong>. These products are <strong>not dietary supplements, drugs, food, or
+        cosmetics</strong>, and are not intended for human or animal consumption, treatment, diagnosis, cure, or
+        prevention of any disease or condition. Products must be handled only by licensed, qualified researchers
+        and professionals trained in laboratory safety practices. By purchasing from Glow Research, you certify
+        that you are at least 21 years of age, are a qualified professional or researcher, and that any and all
+        products purchased will be used solely for laboratory research purposes in accordance with all applicable
+        local, state, and federal laws. Glow Research makes no claims as to the safety or efficacy of these
+        compounds for human use and assumes no liability for misuse. Statements on this website have not been
+        evaluated by the Food and Drug Administration (FDA). Glow Research does not sell to, and reserves the
+        right to refuse service to, anyone attempting to purchase for personal consumption. All sales are final
+        on opened or reconstituted materials. This website and its contents are for informational purposes only
+        and do not constitute medical advice.
+      </p>
+    </div>
+
+    <div class="footer-bottom">
+      <p>Not for human consumption. For laboratory research use only.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('stubYear').textContent = new Date().getFullYear();
+  const hamburger = document.getElementById('hamburger');
+  const mainNav = document.getElementById('mainNav');
+  hamburger.addEventListener('click', () => {
+    mainNav.classList.toggle('open');
+    hamburger.classList.toggle('open');
+  });
+  mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mainNav.classList.remove('open')));
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => {
+    header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
+  });
+</script>
+<script src="js/products-data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/cart-modal.js"></script>
+<script src="js/search.js"></script>
+<script src="js/product.js"></script>
+</body>
+</html>

@@ -31,6 +31,23 @@ function getProductVariants(p) {
   });
 }
 
+// URL-safe id for linking a card to its detail page: "BPC-157" -> "bpc-157"
+function productSlug(name) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+function findProductBySlug(slug) {
+  return GLOW_PRODUCTS.find(p => productSlug(p.name) === slug);
+}
+
+// Blog articles live two directories deep, so a bare "product.html" would
+// 404 from there. Lift the nav's already-depthed link rather than tracking
+// depth separately (same trick js/cart.js uses).
+function pageHref(file) {
+  const link = document.querySelector('#mainNav a[href$="peptides.html"]');
+  const prefix = link ? link.getAttribute('href').replace(/peptides\.html$/, '') : '';
+  return prefix + file;
+}
+
 // gridEl: container to render into
 // filter: 'all' or a category key
 // opts.observeReveal(el): optional, hooks each card into a scroll-reveal observer
@@ -41,18 +58,19 @@ function renderProductGrid(gridEl, filter, opts) {
   let list = filter === 'all' ? GLOW_PRODUCTS : GLOW_PRODUCTS.filter(p => p.cat === filter);
   if (opts.limit) list = list.slice(0, opts.limit);
   list.forEach((p, i) => {
+    const href = pageHref(`product.html?p=${productSlug(p.name)}`);
     const card = document.createElement('div');
     card.className = 'product-card reveal';
     card.style.transitionDelay = `${(i % 3) * 60}ms`;
     card.innerHTML = `
-      <div class="product-visual">
+      <a class="product-visual" href="${href}">
         <span class="product-badge cat">${p.cat}</span>
         ${p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
         <div class="vial"></div>
-      </div>
+      </a>
       <div class="product-footer">
         <span class="product-tag">${p.tag}</span>
-        <h3>${p.name}</h3>
+        <h3><a href="${href}">${p.name}</a></h3>
         <p>${p.purity} purity &middot; ${p.size} per vial &middot; Lyophilized &amp; nitrogen sealed.</p>
         <div class="product-foot">
           <span class="price">$${p.price} <span>/ vial</span></span>
