@@ -43,18 +43,10 @@ mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mai
 const grid = document.getElementById('productGrid');
 
 function renderProducts(filter) {
-  renderProductGrid(grid, filter, { observeReveal, bumpCart });
+  renderProductGrid(grid, filter, { observeReveal, bumpCart, limit: 8 });
 }
 
 renderProducts('all');
-
-document.querySelectorAll('.chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    renderProducts(chip.dataset.filter);
-  });
-});
 
 /* ---------- FAQ ---------- */
 const faqs = [

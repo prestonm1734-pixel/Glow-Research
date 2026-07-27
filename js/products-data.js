@@ -21,7 +21,8 @@ const GLOW_PRODUCTS = [
 function renderProductGrid(gridEl, filter, opts) {
   opts = opts || {};
   gridEl.innerHTML = '';
-  const list = filter === 'all' ? GLOW_PRODUCTS : GLOW_PRODUCTS.filter(p => p.cat === filter);
+  let list = filter === 'all' ? GLOW_PRODUCTS : GLOW_PRODUCTS.filter(p => p.cat === filter);
+  if (opts.limit) list = list.slice(0, opts.limit);
   list.forEach((p, i) => {
     const card = document.createElement('div');
     card.className = 'product-card reveal';
