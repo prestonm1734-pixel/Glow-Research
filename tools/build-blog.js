@@ -109,6 +109,12 @@ const PAGE_SCRIPT = `<script>
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); } });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  const jrDate = document.getElementById('jrDate');
+  if (jrDate) {
+    jrDate.textContent = new Date().toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    });
+  }
 </script>`;
 
 /* ---------- page assembly ---------- */
@@ -420,7 +426,6 @@ function buildIndex() {
   const [lead, ...rest] = posts;
 
   const leadHtml = `      <a class="jr-lead" href="blog/${lead.slug}/">
-        <div class="jr-lead-art">${coverSvg(lead.slug, { variant: 'lead' })}</div>
         <div class="jr-lead-copy">
           <div class="jr-tags">
             <span class="jr-tag jr-tag-feature">Featured</span>
@@ -430,55 +435,53 @@ function buildIndex() {
           <p>${esc(lead.description)}</p>
           <div class="jr-lead-foot">
             <span class="jr-meta">
+              <span class="jr-byline">By Glow Research</span>
+              <span aria-hidden="true">&bull;</span>
               <time datetime="${lead.date}">${displayDate(lead.date)}</time>
               <span aria-hidden="true">&bull;</span>
               <span>${lead.readingTime} min read</span>
             </span>
-            <span class="jr-cta">Read article <span class="jr-arrow" aria-hidden="true">&rarr;</span></span>
+            <span class="jr-cta">Continue reading</span>
           </div>
         </div>
+        <div class="jr-lead-art">${coverSvg(lead.slug, { variant: 'lead' })}</div>
       </a>`;
 
-  const rowsHtml = rest.map((p, i) => `        <li class="jr-row">
-          <a href="blog/${p.slug}/">
-            <span class="jr-num">${String(i + 2).padStart(2, '0')}</span>
-            <span class="jr-thumb">${coverSvg(p.slug, { w: 200, h: 200, nodes: 26, variant: 'thumb' })}</span>
-            <span class="jr-row-copy">
-              <span class="jr-tag">${esc(p.category)}</span>
-              <h3>${esc(p.title)}</h3>
-              <p>${esc(p.description)}</p>
-            </span>
-            <span class="jr-row-meta">
-              <time datetime="${p.date}">${displayDate(p.date)}</time>
-              <em>${p.readingTime} min</em>
-            </span>
-            <span class="jr-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-        </li>`).join('\n');
+  const rowsHtml = rest.map((p) => `      <li class="jr-row">
+        <a href="blog/${p.slug}/">
+          <span class="jr-tag">${esc(p.category)}</span>
+          <h3>${esc(p.title)}</h3>
+          <p>${esc(p.description)}</p>
+          <span class="jr-row-meta">
+            <span class="jr-byline">By Glow Research</span>
+            <span aria-hidden="true">&bull;</span>
+            <time datetime="${p.date}">${displayDate(p.date)}</time>
+            <span aria-hidden="true">&bull;</span>
+            <span>${p.readingTime} min read</span>
+          </span>
+        </a>
+      </li>`).join('\n');
 
   const body = `<section class="journal">
   <div class="container">
 
     <header class="jr-masthead">
-      <div class="jr-masthead-title">
-        <span class="jr-kicker">Glow Research</span>
-        <h1>Blog</h1>
-      </div>
-      <div class="jr-masthead-side">
-        <p>Handling protocols, verification guides, and notes on where the research peptide industry is going.</p>
+      <div class="jr-mast-top">
+        <span id="jrDate">&nbsp;</span>
+        <span>Peptide Research &amp; Handling</span>
         <span class="jr-count">${posts.length} article${posts.length === 1 ? '' : 's'}</span>
+      </div>
+      <div class="jr-nameplate">
+        <h1>Glow Research</h1>
+        <p class="jr-mast-tagline">Handling protocols, verification guides, and notes on where the research peptide industry is going.</p>
       </div>
     </header>
 
 ${leadHtml}
 
-${rest.length ? `    <div class="jr-list-head">
-      <span class="eyebrow">All articles</span>
-      <span class="jr-rule" aria-hidden="true"></span>
-    </div>
-    <ol class="jr-list">
+${rest.length ? `    <ul class="jr-list">
 ${rowsHtml}
-    </ol>` : ''}
+    </ul>` : ''}
 
   </div>
 </section>`;
