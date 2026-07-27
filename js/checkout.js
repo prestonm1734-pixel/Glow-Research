@@ -11,10 +11,10 @@
     { id: 'overnight', label: 'FedEx Overnight', note: 'Next business day, order before 2:00 PM EST', cost: 39.95, freeOver: null },
   ];
 
+  /* Card only for now. Add entries here to offer more (bank transfer, crypto);
+     the radio selector appears on its own as soon as there is a second one. */
   const PAY_METHODS = [
     { id: 'card', label: 'Credit or debit card', note: 'Visa, Mastercard, American Express, Discover' },
-    { id: 'bank', label: 'US bank transfer', note: 'Paid directly from your account' },
-    { id: 'crypto', label: 'Crypto', note: 'BTC, ETH, and USDT' },
   ];
 
   const STATES = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','District of Columbia','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
@@ -133,7 +133,35 @@
 
   /* ---------- payment methods ---------- */
 
+  // where the processor mounts its own secure fields; we never render inputs
+  const processorSlot = `
+    <div class="co-processor">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="4" y="10" width="16" height="11" stroke="currentColor" stroke-width="2"/>
+        <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <p>Secure fields load here once the payment processor is connected. Card details
+         go straight to the processor and never touch this site.</p>
+    </div>`;
+
   function renderPayMethods() {
+    // One method is not a choice, so skip the radio entirely rather than show
+    // a single option the visitor cannot deselect.
+    if (PAY_METHODS.length === 1) {
+      const m = PAY_METHODS[0];
+      $('coPay').innerHTML = `
+        <div class="co-pay co-pay-only">
+          <div class="co-pay-head is-on is-static">
+            <span class="co-ship-copy">
+              <span class="co-ship-label">${m.label}</span>
+              <span class="co-ship-note">${m.note}</span>
+            </span>
+          </div>
+          <div class="co-pay-body">${processorSlot}</div>
+        </div>`;
+      return;
+    }
+
     $('coPay').innerHTML = PAY_METHODS.map((m, idx) => `
       <div class="co-pay">
         <label class="co-pay-head ${idx === 0 ? 'is-on' : ''}">
@@ -145,14 +173,7 @@
           </span>
         </label>
         <div class="co-pay-body" data-for="${m.id}" ${idx === 0 ? '' : 'hidden'}>
-          <div class="co-processor">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="4" y="10" width="16" height="11" stroke="currentColor" stroke-width="2"/>
-              <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            <p>Secure fields load here once the payment processor is connected. Card details
-               go straight to the processor and never touch this site.</p>
-          </div>
+          ${processorSlot().replace(/^\s*<div class="co-pay-body" >|<\/div>\s*$/g, '')}
         </div>
       </div>`).join('');
 

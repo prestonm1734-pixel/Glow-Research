@@ -161,15 +161,15 @@
     foot.innerHTML = `
       ${saved > 0 ? `<p class="cart-saving">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        You&rsquo;re saving ${money(saved)}</p>` : ''}
+        ${money(saved)} off, already applied</p>` : ''}
       <div class="cart-subtotal"><span>Subtotal</span><span>${money(subtotal())}</span></div>
-      <p class="cart-tax">Shipping &amp; taxes calculated at checkout.</p>
+      <p class="cart-tax">Shipping and tax worked out at checkout.</p>
       <a href="${pageHref('checkout.html')}" class="btn btn-primary cart-checkout">
         Checkout <span aria-hidden="true">&rarr;</span>
       </a>
       <ul class="cart-trust">
-        <li>Discreet shipping</li>
-        <li>COA on every lot</li>
+        <li>Unmarked packaging</li>
+        <li>Lot-matched COA</li>
       </ul>
     `;
 

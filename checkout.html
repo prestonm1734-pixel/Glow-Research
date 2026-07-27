@@ -87,7 +87,8 @@
     margin-bottom:10px; transition: border-color .15s ease, background .15s ease;
   }
   .co-ship:last-child{ margin-bottom:0; }
-  .co-ship:hover, .co-pay-head:hover{ border-color:#0a0a0a; }
+  .co-ship:hover, .co-pay-head:not(.is-static):hover{ border-color:#0a0a0a; }
+  .co-pay-head.is-static{ cursor:default; }
   .co-ship.is-on, .co-pay-head.is-on{ border-color:#0a0a0a; box-shadow: inset 0 0 0 1px #0a0a0a; }
   .co-ship input, .co-pay-head input{ position:absolute; opacity:0; width:0; height:0; }
   .co-ship-box{
@@ -290,15 +291,15 @@
       <ul>
         <li>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="11" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg>
-          Encrypted, 256-bit SSL
+          Encrypted checkout
         </li>
         <li>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="7" width="13" height="10" stroke="currentColor" stroke-width="2"/><path d="M15 10h4l3 3v4h-7" stroke="currentColor" stroke-width="2"/><circle cx="7" cy="18" r="2" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="18" r="2" stroke="currentColor" stroke-width="2"/></svg>
-          Discreet, tracked shipping
+          Unmarked box, tracked the whole way
         </li>
         <li>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" stroke="currentColor" stroke-width="2"/><path d="M9 13l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          COA on every lot
+          Purity documented batch by batch
         </li>
       </ul>
     </div>
@@ -308,7 +309,7 @@
 
     <!-- empty cart -->
     <div class="co-empty" id="coEmpty" hidden>
-      <h2>There is nothing to check out.</h2>
+      <h2>Nothing to check out yet.</h2>
       <p>Your cart is empty.</p>
       <a href="peptides.html" class="btn btn-primary">Browse the catalog <span aria-hidden="true">&rarr;</span></a>
     </div>
@@ -316,7 +317,7 @@
     <div id="coShell" hidden>
       <div class="co-headrow">
         <h1>Checkout</h1>
-        <p>For laboratory and in-vitro research use only. Shipped within the United States.</p>
+        <p>Research use only. We ship inside the United States.</p>
       </div>
 
       <div class="co-grid">
@@ -334,14 +335,14 @@
                 </div>
                 <label class="co-check">
                   <input type="checkbox" name="news" />
-                  <span>Send me restock alerts and new compound announcements.</span>
+                  <span>Email me when compounds restock or new ones land.</span>
                 </label>
               </div>
             </div>
           </section>
 
           <section class="co-step">
-            <div class="co-step-head"><span class="co-step-n">2</span><h2>Shipping details</h2></div>
+            <div class="co-step-head"><span class="co-step-n">2</span><h2>Delivery address</h2></div>
             <div class="co-step-body">
               <div class="co-fields">
                 <div class="co-field">
@@ -446,14 +447,14 @@
 
               <p class="co-secure">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="11" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg>
-                Encrypted and secure, protected with 256-bit SSL.
+                Your connection is encrypted. Card details go to the processor, never to us.
               </p>
               <p class="co-placed-msg" id="coPlacedMsg" role="status" aria-live="polite"></p>
 
               <div class="co-chips">
-                <span>Discreet shipping</span>
-                <span>COA on every lot</span>
-                <span>Tracked &amp; insured</span>
+                <span>Unmarked packaging</span>
+                <span>Lot-matched COA</span>
+                <span>Tracked and covered</span>
               </div>
             </div>
           </section>
@@ -464,14 +465,21 @@
 
           <div class="co-card">
             <div class="co-card-head">
-              <h2>Order summary</h2>
+              <h2>Your order</h2>
               <a href="#" class="co-edit" id="coEditCart">Edit</a>
             </div>
             <div class="co-card-body">
               <div id="coItems"></div>
 
-              <p class="co-sub-label">Shipping method</p>
+              <p class="co-sub-label">Delivery</p>
               <div id="coShipOptions"></div>
+
+              <p class="co-sub-label">Discount code</p>
+              <div class="co-promo">
+                <input type="text" id="coPromo" placeholder="Enter a code" aria-label="Discount code" />
+                <button type="button" id="coPromoBtn">Apply</button>
+              </div>
+              <p class="co-promo-msg" id="coPromoMsg" role="status" aria-live="polite"></p>
 
               <dl style="margin:18px 0 0">
                 <div class="co-line"><dt>Subtotal</dt><dd id="coSub">$0.00</dd></div>
@@ -483,29 +491,18 @@
 
               <p class="co-save" id="coSaveRow" hidden>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                You&rsquo;re saving <span id="coSaved">$0.00</span> on this order
+                <span id="coSaved">$0.00</span> off, already applied
               </p>
 
               <div class="co-total"><span>Total</span><b id="coTotal">$0.00</b></div>
-              <p class="co-taxnote">Sales tax is calculated at payment, based on your address.</p>
+              <p class="co-taxnote">Sales tax is worked out at payment, once we have your address.</p>
             </div>
           </div>
 
           <div class="co-card" id="coUpsell" hidden>
-            <div class="co-card-head"><h3>Complete your order</h3></div>
+            <div class="co-card-head"><h3>Add to this order</h3></div>
             <div class="co-card-body">
               <div class="co-upsell-row" id="coUpsellBody"></div>
-            </div>
-          </div>
-
-          <div class="co-card">
-            <div class="co-card-head"><h3>Promo code</h3></div>
-            <div class="co-card-body">
-              <div class="co-promo">
-                <input type="text" id="coPromo" placeholder="Enter code" aria-label="Promo code" />
-                <button type="button" id="coPromoBtn">Apply</button>
-              </div>
-              <p class="co-promo-msg" id="coPromoMsg" role="status" aria-live="polite"></p>
             </div>
           </div>
 
