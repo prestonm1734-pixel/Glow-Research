@@ -505,8 +505,8 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .footer-col a:hover{ color: var(--pink-soft); }
 
 .disclaimer{
-  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-  padding: 30px 0; margin-bottom: 26px;
+  border-bottom: 1px solid var(--border);
+  padding: 0 0 30px; margin-bottom: 26px;
 }
 .disclaimer h5{ font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:.08em; font-size:0.78rem; color: var(--pink-soft); margin-bottom:12px; }
 .disclaimer p{ font-size: 0.78rem; line-height:1.8; color: var(--text-dimmer); }
@@ -516,10 +516,9 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 /* ---------- footer legal bar: LLC / address / copyright, called out as its
    own banded row rather than buried as fine print ---------- */
 .footer-legal-bar{
-  margin: 8px 0 40px;
-  padding: 16px 20px;
+  margin: 0 0 26px;
+  padding: 20px 0 0;
   border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
   text-align: center;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.74rem;
