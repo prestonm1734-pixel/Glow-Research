@@ -2,16 +2,28 @@
 // Used by both the homepage catalog preview (index.html) and the full
 // catalog page (peptides.html) so the product list only lives in one place.
 
+// `blurb` describes what each compound *is* and how it is studied. It must stay
+// structural and in-vitro framed: no dosing, no human outcome claims, nothing
+// that would read as therapeutic guidance on a research-use-only listing.
 const GLOW_PRODUCTS = [
-  { name: 'BPC-157', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', size: '5mg', price: 59, badge:'Best Seller' },
-  { name: 'TB-500', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.6%', size: '5mg', price: 64, badge:null },
-  { name: 'Ipamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.9%', size: '5mg', price: 54, badge:'Popular' },
-  { name: 'CJC-1295', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.7%', size: '5mg', price: 69, badge:null },
-  { name: 'Semaglutide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.5%', size: '5mg', price: 89, badge:'Trending' },
-  { name: 'Tirzepatide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', size: '10mg', price: 129, badge:null },
-  { name: 'Selank', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.6%', size: '5mg', price: 58, badge:null },
-  { name: 'Semax', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.7%', size: '5mg', price: 58, badge:'New' },
-  { name: 'GHK-Cu', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', size: '50mg', price: 74, badge:null },
+  { name: 'BPC-157', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', size: '5mg', price: 59, badge:'Best Seller',
+    blurb: 'A synthetic pentadecapeptide sequence derived from a protein found in gastric juice. Used in laboratory work examining tissue repair and angiogenic signalling pathways.' },
+  { name: 'TB-500', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.6%', size: '5mg', price: 64, badge:null,
+    blurb: 'A synthetic fragment of thymosin beta-4, the actin-binding regulatory protein. Studied in vitro for cell migration and cytoskeletal dynamics.' },
+  { name: 'Ipamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.9%', size: '5mg', price: 54, badge:'Popular',
+    blurb: 'A selective pentapeptide growth hormone secretagogue. Investigated in research settings for its binding behaviour at the ghrelin receptor.' },
+  { name: 'CJC-1295', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.7%', size: '5mg', price: 69, badge:null,
+    blurb: 'A synthetic analogue of growth hormone releasing hormone. Used in receptor binding and pulsatile signalling studies.' },
+  { name: 'Semaglutide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.5%', size: '5mg', price: 89, badge:'Trending',
+    blurb: 'A GLP-1 receptor agonist analogue supplied for laboratory investigation of incretin receptor signalling and metabolic pathway research.' },
+  { name: 'Tirzepatide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', size: '10mg', price: 129, badge:null,
+    blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.' },
+  { name: 'Selank', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.6%', size: '5mg', price: 58, badge:null,
+    blurb: 'A synthetic heptapeptide based on the endogenous tetrapeptide tuftsin. Studied in preclinical models of neuropeptide regulation.' },
+  { name: 'Semax', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.7%', size: '5mg', price: 58, badge:'New',
+    blurb: 'A synthetic peptide derived from the ACTH(4-10) fragment. Investigated in laboratory research on neurotrophic signalling.' },
+  { name: 'GHK-Cu', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', size: '50mg', price: 74, badge:null,
+    blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for its role in extracellular matrix remodelling.' },
 ];
 
 // Mock bulk-quantity tiers for the quick-add modal. WooCommerce will supply

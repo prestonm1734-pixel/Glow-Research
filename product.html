@@ -12,125 +12,308 @@
 <link rel="stylesheet" href="css/style.css" />
 <style>
   /* ---------- breadcrumb ---------- */
-  .pd-crumb{ background:#ececea; border-bottom:1px solid rgba(0,0,0,0.1); padding: 14px 0; }
+  .pd-crumb{ background:#ececea; border-bottom:1px solid rgba(0,0,0,0.1); padding: 13px 0; }
   .pd-crumb-inner{
     display:flex; align-items:center; gap:8px; flex-wrap:wrap;
-    font-family:'JetBrains Mono', monospace; font-size:.72rem; letter-spacing:.06em;
-    text-transform:uppercase; color:#6b6b69;
+    font-family:'JetBrains Mono', monospace; font-size:.7rem; letter-spacing:.08em;
+    text-transform:uppercase; color:#8a8a86;
   }
   .pd-crumb-inner a{ color:#45453f; }
   .pd-crumb-inner a:hover{ color:#0a0a0a; }
   .pd-crumb-inner span{ color:#0a0a0a; }
 
   /* ---------- hero ---------- */
-  .pd-hero{ background:#000; padding: 56px 0 72px; }
-  .pd-hero-grid{ display:grid; grid-template-columns: .95fr 1.05fr; gap: 56px; align-items:flex-start; }
+  .pd-hero{ background:#000; padding: 52px 0 0; position:relative; overflow:hidden; isolation:isolate; }
+  .pd-hero-grid{ display:grid; grid-template-columns: .92fr 1.08fr; gap: 60px; align-items:flex-start; padding-bottom: 64px; }
 
+  /* --- the stage --- */
   .pd-visual{
-    position:relative; aspect-ratio: 1 / 1; display:flex; align-items:center; justify-content:center;
-    background: linear-gradient(180deg,#151513,#0a0a0a);
-    border: 1px solid rgba(255,255,255,.1);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    position:relative; aspect-ratio: 1 / 1;
+    display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(180deg,#151513,#070707);
+    border: 1px solid rgba(255,255,255,.11);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 40px 80px -50px #000;
+    overflow:hidden;
   }
-  .pd-vial{
-    width: 108px; height: 216px; border-radius: 6px 6px 4px 4px;
-    background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.7) 45%, rgba(255,255,255,.35));
-    border: 1px solid rgba(0,0,0,.12);
-    position: relative;
-    box-shadow: 0 30px 60px -18px rgba(0,0,0,.6);
+  /* fine grid + a soft key light behind the vial, same recipe as the shipping hero */
+  .pd-visual::before{
+    content:''; position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(0deg,  rgba(255,255,255,.04) 0 1px, transparent 1px 64px);
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 25%, transparent 78%);
+    mask-image: radial-gradient(ellipse at center, #000 25%, transparent 78%);
   }
-  .pd-vial::before{
-    content:''; position:absolute; top:-22px; left:50%; transform:translateX(-50%);
-    width: 40px; height: 30px; background: linear-gradient(180deg,#2a2a28,#0a0a0a); border-radius: 4px 4px 0 0;
+  .pd-visual::after{
+    content:''; position:absolute; top:8%; left:50%; transform:translateX(-50%);
+    width:66%; height:70%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,.16), transparent 66%);
   }
-  .pd-vial::after{
-    content:''; position:absolute; left:10px; right:10px; bottom:16px; top:82px; border-radius:3px;
-    background: linear-gradient(180deg,#141414,#0a0a0a);
+  .pd-visual-badges{
+    position:absolute; top:16px; left:16px; right:16px; z-index:3;
+    display:flex; justify-content:space-between; align-items:flex-start;
   }
-  .pd-vial-label{
-    position:absolute; left:16px; right:16px; bottom:34px;
-    font-family:'Space Grotesk',sans-serif; font-size:.62rem; font-weight:700; letter-spacing:.03em;
-    color:#e4e4e2; text-align:center; line-height:1.4;
-  }
-  .pd-visual-badges{ position:absolute; top:16px; left:16px; right:16px; display:flex; justify-content:space-between; }
   .pd-visual-badges .product-badge{ position:static; }
 
-  .pd-right{ display:flex; flex-direction:column; }
-  .pd-tag{ font-size:0.72rem; color: var(--text-dimmer); text-transform:uppercase; letter-spacing:.1em; margin-bottom:10px; display:block; font-family:'JetBrains Mono', monospace; }
-  .pd-name{ font-size: clamp(2rem, 3.6vw, 2.9rem); margin: 0 0 16px; letter-spacing:-.02em; }
-  .pd-lede{ font-size: 1rem; max-width: 520px; margin: 0 0 26px; }
+  /* --- the vial --- */
+  .pd-vial-wrap{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; }
+  .pd-vial{
+    width: 132px; height: 268px; border-radius: 5px 5px 7px 7px;
+    background:
+      linear-gradient(100deg,
+        rgba(255,255,255,.30) 0%,
+        rgba(255,255,255,.92) 14%,
+        rgba(255,255,255,.55) 38%,
+        rgba(255,255,255,.34) 62%,
+        rgba(255,255,255,.78) 88%,
+        rgba(255,255,255,.28) 100%);
+    border: 1px solid rgba(255,255,255,.35);
+    position: relative;
+    box-shadow: 0 36px 60px -26px rgba(0,0,0,.85);
+  }
+  /* crimp cap */
+  .pd-vial-cap{
+    position:absolute; top:-30px; left:50%; transform:translateX(-50%);
+    width: 62px; height: 34px; border-radius:3px 3px 0 0;
+    background: linear-gradient(180deg,#2f3644,#161b24 60%,#0b0e13);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.16);
+  }
+  /* aluminium collar under the cap */
+  .pd-vial-collar{
+    position:absolute; top:2px; left:50%; transform:translateX(-50%);
+    width: 74px; height: 20px;
+    background: linear-gradient(180deg,#f2f2f0,#b9b9b5 45%,#8f8f8b 55%,#dcdcd9);
+    box-shadow: 0 1px 0 rgba(0,0,0,.2);
+  }
+  /* the printed label */
+  .pd-vial-label{
+    position:absolute; left:0; right:0; bottom:16px; top:96px;
+    background: linear-gradient(180deg,#1e2735,#111722);
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    padding: 12px 10px; text-align:center; color:#eef1f5;
+  }
+  .pd-vial-brand{
+    font-family:'Fraunces', Georgia, serif; font-size:.72rem; font-weight:600;
+    letter-spacing:.02em; margin-bottom:9px; color:#fff;
+  }
+  .pd-vial-name{
+    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:.98rem;
+    line-height:1.15; letter-spacing:-.01em; color:#fff; word-break:break-word;
+  }
+  .pd-vial-mg{
+    margin-top:8px; font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:600;
+    letter-spacing:.08em; padding: 3px 8px; border:1px solid rgba(255,255,255,.4); color:#fff;
+  }
+  .pd-vial-fine{
+    margin-top:auto; font-size:.5rem; line-height:1.6; color: rgba(238,241,245,.72);
+    letter-spacing:.02em;
+  }
+  /* contact shadow so the vial sits on the stage instead of floating */
+  .pd-vial-shadow{
+    width: 168px; height: 20px; margin-top: 16px;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,.85), transparent 70%);
+    filter: blur(3px);
+  }
 
-  .pd-price-row{ display:flex; align-items:center; gap: 22px; flex-wrap:wrap; margin-bottom: 18px; }
-  .pd-price{ font-family:'Space Grotesk',sans-serif; font-size: 1.9rem; font-weight:700; color:#fff; }
+  /* --- buy box --- */
+  .pd-right{ display:flex; flex-direction:column; }
+  .pd-tag{
+    font-size:0.72rem; color: var(--text-dimmer); text-transform:uppercase; letter-spacing:.12em;
+    margin-bottom:10px; display:block; font-family:'JetBrains Mono', monospace;
+  }
+  .pd-name{ font-size: clamp(2rem, 3.8vw, 3rem); margin: 0 0 14px; letter-spacing:-.025em; line-height:1.05; }
+
+  .pd-chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+  .pd-chip{
+    font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase;
+    padding: 5px 11px; border:1px solid rgba(255,255,255,.22); color: var(--text-dim);
+  }
+  .pd-chip.stock{ border-color: rgba(255,255,255,.4); color:#fff; display:inline-flex; align-items:center; gap:7px; }
+  .pd-dot{
+    width:6px; height:6px; background:#fff; flex-shrink:0;
+    animation: pdPulse 2.4s ease-out infinite;
+  }
+  @keyframes pdPulse{
+    0%{ box-shadow: 0 0 0 0 rgba(255,255,255,.5); }
+    70%{ box-shadow: 0 0 0 7px rgba(255,255,255,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+  }
+
+  .pd-lede{ font-size: .98rem; max-width: 540px; margin: 0 0 28px; }
+
+  .pd-price-row{ display:flex; align-items:center; gap: 16px; flex-wrap:wrap; margin-bottom: 12px; }
+  .pd-price{ font-family:'Space Grotesk',sans-serif; font-size: 2rem; font-weight:700; color:#fff; letter-spacing:-.02em; }
   .pd-stepper{ display:flex; align-items:center; border:1px solid var(--border); }
   .pd-stepper button{
-    width:40px; height:44px; background:transparent; border:none; color:#fff; font-size:1.1rem; cursor:pointer;
+    width:42px; height:46px; background:transparent; border:none; color:#fff; font-size:1.1rem; cursor:pointer;
+    transition: background .2s ease;
   }
-  .pd-stepper button:hover{ background: rgba(255,255,255,.08); }
-  .pd-stepper span{ width:44px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:.95rem; }
-  .pd-add-btn{ height:44px; padding: 0 30px; }
+  .pd-stepper button:hover:not(:disabled){ background: rgba(255,255,255,.1); }
+  .pd-stepper button:disabled{ opacity:.3; cursor:default; }
+  .pd-stepper span{ width:46px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:.95rem; }
+  .pd-add-btn{ height:46px; padding: 0 32px; flex:1; min-width: 180px; justify-content:center; }
+  .pd-freeship{ font-size:.82rem; color: var(--text-dimmer); margin: 0 0 22px; }
 
-  .pd-dispatch{
-    display:flex; align-items:center; gap:9px; font-size:.86rem; color: var(--text-dim);
-    margin-bottom: 30px; padding-bottom:28px; border-bottom:1px solid var(--border);
+  /* delivery estimate: the two lines that answer "when do I get it" */
+  .pd-deliver{
+    border:1px solid rgba(255,255,255,.13);
+    background: linear-gradient(180deg,#111,#0a0a0a);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    padding: 15px 18px; margin-bottom: 30px;
   }
-  .pd-dispatch svg{ flex-shrink:0; color:#fff; }
-  .pd-dispatch strong{ color:#fff; font-weight:700; }
+  .pd-deliver-row{
+    display:flex; align-items:center; gap:11px; font-size:.88rem; color: var(--text-dim);
+    padding: 6px 0;
+  }
+  .pd-deliver-row + .pd-deliver-row{ border-top:1px solid rgba(255,255,255,.08); padding-top:12px; margin-top:6px; }
+  .pd-deliver-row svg{ flex-shrink:0; color:#fff; }
+  .pd-deliver-row strong{ color:#fff; font-weight:700; }
 
   .pd-sub-eyebrow{
-    font-family:'JetBrains Mono', monospace; font-size:.68rem; font-weight:700; letter-spacing:.12em;
-    text-transform:uppercase; color: var(--text-dimmer); margin-bottom:14px; display:block;
+    font-family:'JetBrains Mono', monospace; font-size:.68rem; font-weight:700; letter-spacing:.14em;
+    text-transform:uppercase; color: var(--text-dimmer); margin-bottom:13px; display:block;
   }
-  .pd-tiers{ display:grid; grid-template-columns: repeat(4, 1fr); gap:1px; background: rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.1); margin-bottom: 32px; }
+  .pd-sub-eyebrow em{ font-style:normal; color: var(--text-dim); letter-spacing:.04em; text-transform:none; }
+
+  /* --- tiers --- */
+  .pd-tiers{
+    display:grid; grid-template-columns: repeat(4, 1fr); gap:1px;
+    background: rgba(255,255,255,.11); border:1px solid rgba(255,255,255,.11); margin-bottom: 28px;
+  }
   .pd-tier{
     position:relative; background: linear-gradient(180deg,#121212,#080808); border:none; cursor:pointer;
-    padding: 18px 12px 16px; display:flex; flex-direction:column; align-items:flex-start; gap:4px;
+    padding: 16px 12px 15px; display:flex; flex-direction:column; align-items:flex-start; gap:3px;
     color: var(--text); text-align:left; font-family:inherit; transition: background .2s ease;
   }
-  .pd-tier:hover{ background: linear-gradient(180deg,#191919,#0d0d0d); }
-  .pd-tier.is-best{ box-shadow: inset 0 0 0 1px rgba(255,255,255,.4); }
+  .pd-tier:hover{ background: linear-gradient(180deg,#1c1c1c,#0e0e0e); }
+  .pd-tier.is-best{ box-shadow: inset 0 0 0 1px rgba(255,255,255,.45); }
   .pd-tier-flag{
-    position:absolute; top:-1px; right:-1px; background:#fff; color:#0a0a0a; font-size:.6rem; font-weight:700;
+    position:absolute; top:0; right:0; background:#fff; color:#0a0a0a; font-size:.58rem; font-weight:700;
     padding:3px 8px; letter-spacing:.06em; text-transform:uppercase; font-family:'JetBrains Mono', monospace;
   }
-  .pd-tier-qty{ font-size:.78rem; color: var(--text-dimmer); text-transform:uppercase; letter-spacing:.06em; font-family:'JetBrains Mono', monospace; }
-  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1.15rem; font-weight:700; color:#fff; }
-  .pd-tier-was{ font-size:.76rem; color: var(--text-dimmer); text-decoration: line-through; }
-  .pd-tier-per{ font-size:.72rem; color: var(--text-dimmer); }
-  .pd-tier-off{ font-size:.66rem; font-weight:700; color:#0a0a0a; background:#fff; padding:2px 7px; margin-top:2px; }
-  .pd-tier.is-added .pd-tier-price{ color:#fff; }
+  .pd-tier-vials{ display:flex; align-items:flex-end; gap:3px; height: 34px; margin-bottom:8px; }
+  .pd-tier-vials .vial{ width:13px; height:26px; box-shadow:none; border-radius:2px; }
+  .pd-tier-vials .vial::before{ top:-5px; width:6px; height:6px; }
+  .pd-tier-vials .vial::after{ left:2px; right:2px; bottom:2px; top:11px; }
+  .pd-tier-qty{
+    font-size:.68rem; color: var(--text-dimmer); text-transform:uppercase; letter-spacing:.08em;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1.12rem; font-weight:700; color:#fff; }
+  .pd-tier-was{ font-size:.74rem; color: var(--text-dimmer); text-decoration: line-through; min-height:1em; }
+  .pd-tier-per{ font-size:.7rem; color: var(--text-dimmer); }
+  .pd-tier-off{ font-size:.64rem; font-weight:700; color:#0a0a0a; background:#fff; padding:2px 7px; margin-top:4px; }
 
-  .pd-trust{ list-style:none; margin:0 0 20px; padding:0; }
-  .pd-trust li{ display:flex; gap:10px; align-items:center; padding:8px 0; font-size:.88rem; color: var(--text-dim); }
+  /* --- inline trust list --- */
+  .pd-trust{ list-style:none; margin:0 0 22px; padding:0; }
+  .pd-trust li{ display:flex; gap:11px; align-items:center; padding:7px 0; font-size:.88rem; color: var(--text-dim); }
   .pd-trust svg{ flex-shrink:0; color:#fff; }
-  .pd-coa-link{ display:inline-flex; align-items:center; gap:8px; font-size:.88rem; font-weight:600; color:#fff; border-bottom:1px solid rgba(255,255,255,.4); width:fit-content; padding-bottom:2px; }
-  .pd-coa-link:hover{ border-color:#fff; }
+  .pd-links{ display:flex; gap:24px; flex-wrap:wrap; }
+  .pd-inline-link{
+    display:inline-flex; align-items:center; gap:8px; font-size:.88rem; font-weight:600; color:#fff;
+    border-bottom:1px solid rgba(255,255,255,.35); width:fit-content; padding-bottom:2px;
+    transition: border-color .2s ease;
+  }
+  .pd-inline-link:hover{ border-color:#fff; }
 
-  /* ---------- specs table ---------- */
-  .pd-specs{ background:#070707; padding: 64px 0; border-top:1px solid rgba(255,255,255,.08); }
-  .pd-specs h2{ font-size: clamp(1.4rem, 2.2vw, 1.8rem); margin: 0 0 28px; }
-  .pd-spec-table{ max-width: 720px; border-top:1px solid rgba(255,255,255,.1); }
-  .pd-spec-row{ display:flex; justify-content:space-between; gap:16px; padding: 15px 0; border-bottom:1px solid rgba(255,255,255,.08); }
-  .pd-spec-row dt{ color: var(--text-dimmer); font-size:.86rem; text-transform:uppercase; letter-spacing:.06em; font-family:'JetBrains Mono', monospace; }
-  .pd-spec-row dd{ margin:0; color:#fff; font-weight:600; font-size:.94rem; text-align:right; }
-  .pd-disclaimer{ max-width:720px; margin-top:22px; font-size:.86rem; color: var(--text-dimmer); }
+  /* ---------- trust strip, flush to the hero bottom ---------- */
+  .pd-strip{
+    display:grid; grid-template-columns: repeat(4, 1fr); gap:1px;
+    background: rgba(255,255,255,.1); border-top:1px solid rgba(255,255,255,.1);
+  }
+  .pd-strip-cell{ background:#000; padding: 24px 20px 26px; display:flex; gap:13px; align-items:flex-start; }
+  .pd-strip-cell svg{ flex-shrink:0; color:#fff; margin-top:2px; }
+  .pd-strip-cell b{ display:block; color:#fff; font-size:.9rem; font-weight:600; }
+  .pd-strip-cell span{ display:block; margin-top:3px; font-size:.8rem; color: var(--text-dimmer); line-height:1.5; }
+
+  /* ---------- generic sections ---------- */
+  .pd-section{ background:#000; padding: 76px 0; border-top:1px solid rgba(255,255,255,.08); }
+  .pd-section.alt{ background:#070707; }
+  .pd-head{ margin-bottom: 34px; max-width: 640px; }
+  .pd-head h2{ font-size: clamp(1.45rem, 2.5vw, 1.95rem); margin: 12px 0 12px; letter-spacing:-.02em; }
+  .pd-head p{ margin:0; font-size:.96rem; }
+
+  .pd-two{ display:grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items:start; }
+  .pd-card{
+    background: linear-gradient(180deg,#121212,#080808);
+    border:1px solid rgba(255,255,255,.11);
+    box-shadow: 0 30px 60px -38px #000, inset 0 1px 0 rgba(255,255,255,.06);
+    padding: 28px 30px 30px;
+  }
+  .pd-card h3{
+    font-family:'JetBrains Mono', monospace; font-size:.78rem; font-weight:600;
+    letter-spacing:.13em; text-transform:uppercase; color: var(--text-dim);
+    margin: 0 0 20px; padding-bottom:15px; border-bottom:1px solid rgba(255,255,255,.1);
+  }
+  .pd-spec-row{ display:flex; justify-content:space-between; gap:18px; padding: 13px 0; border-bottom:1px solid rgba(255,255,255,.07); }
+  .pd-spec-row:last-child{ border-bottom:none; }
+  .pd-spec-row dt{ color: var(--text-dimmer); font-size:.84rem; }
+  .pd-spec-row dd{ margin:0; color:#fff; font-weight:600; font-size:.9rem; text-align:right; }
+
+  .pd-list{ list-style:none; margin:0; padding:0; }
+  .pd-list li{
+    display:flex; gap:12px; align-items:flex-start; padding: 12px 0;
+    border-bottom:1px solid rgba(255,255,255,.07); color: var(--text-dim); font-size:.9rem; line-height:1.55;
+  }
+  .pd-list li:last-child{ border-bottom:none; }
+  .pd-list li b{ color: var(--text); font-weight:600; }
+  .pd-list svg{ flex-shrink:0; margin-top:3px; color:#fff; }
+
+  .pd-note{
+    border-left: 2px solid #fff; padding: 4px 0 4px 20px; margin: 26px 0 0;
+    color: var(--text-dim); font-size:.9rem; max-width: 660px;
+  }
+
+  /* ---------- COA block ---------- */
+  .pd-coa{ display:grid; grid-template-columns: 1fr .95fr; gap: 40px; align-items:center; }
+  .pd-coa-paper{
+    background:#fff; color:#0a0a0a; padding: 26px 28px 28px; position:relative; overflow:hidden;
+    box-shadow: 0 40px 70px -40px #000;
+  }
+  .pd-coa-paper::after{
+    content:'SPECIMEN'; position:absolute; top:50%; left:50%;
+    transform: translate(-50%,-50%) rotate(-24deg);
+    font-family:'Space Grotesk', sans-serif; font-size: 3.2rem; font-weight:700;
+    color: rgba(10,10,10,.07); letter-spacing:.1em; pointer-events:none; white-space:nowrap;
+  }
+  .pd-coa-paper-top{
+    display:flex; justify-content:space-between; align-items:baseline; gap:16px;
+    padding-bottom:14px; border-bottom:1px solid rgba(0,0,0,.15); margin-bottom:6px;
+  }
+  .pd-coa-paper-top strong{ font-family:'Space Grotesk', sans-serif; font-size:1rem; }
+  .pd-coa-paper-top span{ font-family:'JetBrains Mono', monospace; font-size:.62rem; color:#6b6b69; letter-spacing:.06em; }
+  .pd-coa-line{ display:flex; justify-content:space-between; gap:14px; padding: 10px 0; border-bottom:1px solid rgba(0,0,0,.08); font-size:.82rem; }
+  .pd-coa-line:last-of-type{ border-bottom:none; }
+  .pd-coa-line dt{ color:#6b6b69; }
+  .pd-coa-line dd{ margin:0; font-weight:600; font-family:'JetBrains Mono', monospace; }
+  .pd-coa-stamp{
+    margin-top:14px; padding-top:12px; border-top:1px dashed rgba(0,0,0,.2);
+    font-family:'JetBrains Mono', monospace; font-size:.58rem; letter-spacing:.1em;
+    text-transform:uppercase; color:#8a8a86;
+  }
 
   /* ---------- related ---------- */
-  .pd-related{ background:#000; padding: 72px 0 84px; border-top:1px solid rgba(255,255,255,.08); }
-  .pd-related h2{ font-size: clamp(1.4rem, 2.2vw, 1.8rem); margin: 0 0 30px; }
+  .pd-related h2{ font-size: clamp(1.45rem, 2.5vw, 1.95rem); margin: 0 0 28px; }
 
-  /* ---------- missing product ---------- */
-  .pd-missing{ background:#000; padding: 120px 0; text-align:center; }
-  .pd-missing h2{ margin-bottom:14px; }
-  .pd-missing a{ display:inline-flex; margin-top:20px; }
+  /* ---------- missing ---------- */
+  .pd-missing{ background:#000; padding: 130px 0; text-align:center; }
+  .pd-missing h2{ margin-bottom:12px; }
+  .pd-missing a{ display:inline-flex; margin-top:22px; }
 
-  @media (max-width: 900px){
-    .pd-hero-grid{ grid-template-columns:1fr; }
-    .pd-tiers{ grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 1000px){
+    .pd-hero-grid{ grid-template-columns:1fr; gap: 40px; }
+    .pd-strip{ grid-template-columns: repeat(2, 1fr); }
+    .pd-coa{ grid-template-columns:1fr; gap:32px; }
   }
-  @media (max-width: 520px){
-    .pd-tiers{ grid-template-columns: 1fr 1fr; }
-    .pd-price-row{ gap:14px; }
+  @media (max-width: 760px){
+    .pd-two{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 560px){
+    .pd-tiers{ grid-template-columns: repeat(2, 1fr); }
+    .pd-strip{ grid-template-columns: 1fr; }
+    .pd-add-btn{ width:100%; flex-basis:100%; }
+    .pd-coa-paper::after{ font-size:2.2rem; }
   }
 </style>
 </head>
@@ -188,6 +371,7 @@
 
 <div id="pdShell">
 
+  <!-- ============ hero ============ -->
   <section class="pd-hero">
     <div class="container pd-hero-grid">
 
@@ -196,15 +380,32 @@
           <span class="product-badge cat" id="pdCat">category</span>
           <span class="product-badge status" id="pdBadge" hidden></span>
         </div>
-        <div class="pd-vial">
-          <span class="pd-vial-label" id="pdVialLabel">GLOW<br />RESEARCH</span>
+        <div class="pd-vial-wrap">
+          <div class="pd-vial">
+            <span class="pd-vial-cap"></span>
+            <span class="pd-vial-collar"></span>
+            <span class="pd-vial-label">
+              <span class="pd-vial-brand">Glow ✦ Research</span>
+              <span class="pd-vial-name" id="pdVialName">Peptide</span>
+              <span class="pd-vial-mg" id="pdVialMg">5MG</span>
+              <span class="pd-vial-fine" id="pdVialFine"></span>
+            </span>
+          </div>
+          <div class="pd-vial-shadow" aria-hidden="true"></div>
         </div>
       </div>
 
       <div class="pd-right">
         <span class="pd-tag" id="pdTag">Category</span>
         <h1 class="pd-name" id="pdName">Product name</h1>
-        <p class="pd-lede" id="pdLede">Description.</p>
+
+        <div class="pd-chips">
+          <span class="pd-chip" id="pdPurityChip">99% HPLC</span>
+          <span class="pd-chip" id="pdSizeChip">5mg / vial</span>
+          <span class="pd-chip stock"><span class="pd-dot" aria-hidden="true"></span> In stock</span>
+        </div>
+
+        <p class="pd-lede" id="pdLede"></p>
 
         <div class="pd-price-row">
           <span class="pd-price" id="pdPrice">$0</span>
@@ -215,43 +416,152 @@
           </div>
           <button type="button" class="btn btn-primary pd-add-btn" id="pdAddBtn">Add to cart</button>
         </div>
+        <p class="pd-freeship" id="pdFreeShip">Free 2-day shipping on orders over $250</p>
 
-        <p class="pd-dispatch">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="1" y="3" width="15" height="13" stroke="currentColor" stroke-width="2"/><path d="M16 8h4l3 4v4h-7V8z" stroke="currentColor" stroke-width="2"/><circle cx="5.5" cy="18.5" r="1.7" stroke="currentColor" stroke-width="2"/><circle cx="18.5" cy="18.5" r="1.7" stroke="currentColor" stroke-width="2"/></svg>
-          <span id="pdDispatch">Order within 2h to ship today</span> &middot; <strong>FedEx 2-Day</strong>
-        </p>
+        <div class="pd-deliver">
+          <p class="pd-deliver-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span id="pdCutoff">Checking today's cutoff&hellip;</span>
+          </p>
+          <p class="pd-deliver-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="1" y="4" width="14" height="12" stroke="currentColor" stroke-width="2"/><path d="M15 8h4l3.5 4v4H15V8z" stroke="currentColor" stroke-width="2"/><circle cx="5.5" cy="18.5" r="1.8" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="18.5" r="1.8" stroke="currentColor" stroke-width="2"/></svg>
+            <span id="pdArrival">Calculating delivery&hellip;</span>
+          </p>
+        </div>
 
-        <span class="pd-sub-eyebrow">Stock up &amp; save</span>
+        <span class="pd-sub-eyebrow">Stock up &amp; save <em>&mdash; tap to add</em></span>
         <div class="pd-tiers" id="pdTiers"></div>
 
         <ul class="pd-trust">
-          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Third-party tested &middot; HPLC purity + mass-spec ID</li>
-          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Lyophilized &amp; stable &middot; nitrogen sealed</li>
-          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Same-day dispatch &middot; unmarked packaging</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Third-party tested &mdash; HPLC purity and mass-spec identity</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Lyophilized and nitrogen sealed, lot matched to its COA</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Ships cold in unmarked packaging, tracked the whole way</li>
         </ul>
 
-        <a class="pd-coa-link" id="pdCoaLink" href="coa.html">
-          View certificate of analysis <span aria-hidden="true">&rarr;</span>
-        </a>
+        <div class="pd-links">
+          <a class="pd-inline-link" id="pdCoaLink" href="coa.html">Certificate of analysis <span aria-hidden="true">&rarr;</span></a>
+          <a class="pd-inline-link" id="pdShipLink" href="shipping.html">Shipping details <span aria-hidden="true">&rarr;</span></a>
+        </div>
       </div>
 
     </div>
-  </section>
 
-  <section class="pd-specs">
-    <div class="container">
-      <h2>Specifications</h2>
-      <dl class="pd-spec-table">
-        <div class="pd-spec-row"><dt>Form</dt><dd>Lyophilized powder</dd></div>
-        <div class="pd-spec-row"><dt>Purity</dt><dd id="pdSpecPurity">&ge;99% (HPLC verified)</dd></div>
-        <div class="pd-spec-row"><dt>Presentation</dt><dd id="pdSpecSize">Single vial</dd></div>
-        <div class="pd-spec-row"><dt>Storage</dt><dd>Store lyophilized at &minus;20&deg;C, protect from light</dd></div>
-      </dl>
-      <p class="pd-disclaimer">For research use only. Not for human or veterinary use. Not a drug, food, or supplement.</p>
+    <div class="pd-strip">
+      <div class="pd-strip-cell">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span><b>Third-party tested</b><span>Every lot assayed by an independent lab before it is listed</span></span>
+      </div>
+      <div class="pd-strip-cell">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9V3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span><b>Lyophilized &amp; stable</b><span>Nitrogen sealed, shipped cold, stable at &minus;20&deg;C</span></span>
+      </div>
+      <div class="pd-strip-cell">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="1" y="4" width="14" height="12" stroke="currentColor" stroke-width="1.8"/><path d="M15 8h4l3.5 4v4H15V8z" stroke="currentColor" stroke-width="1.8"/><circle cx="5.5" cy="18.5" r="1.8" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="18.5" r="1.8" stroke="currentColor" stroke-width="1.8"/></svg>
+        <span><b>Same-day dispatch</b><span>Ordered before 2:00 PM EST, it leaves the same afternoon</span></span>
+      </div>
+      <div class="pd-strip-cell">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 2h8l4 4v16H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 2v5h4M9 13h6M9 17h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span><b>Lot-matched COA</b><span>The report you get belongs to the vial in your box</span></span>
+      </div>
     </div>
   </section>
 
-  <section class="pd-related" id="pdRelatedSection">
+  <!-- ============ specs + handling ============ -->
+  <section class="pd-section alt">
+    <div class="container">
+      <div class="pd-head reveal">
+        <span class="eyebrow">The detail</span>
+        <h2>What is in the vial, and how to keep it that way.</h2>
+        <p>Lyophilized peptide is stable material, but storage is what decides whether it stays at the purity we shipped it at.</p>
+      </div>
+
+      <div class="pd-two reveal">
+        <div class="pd-card">
+          <h3>Specifications</h3>
+          <dl>
+            <div class="pd-spec-row"><dt>Form</dt><dd>Lyophilized powder</dd></div>
+            <div class="pd-spec-row"><dt>Purity</dt><dd id="pdSpecPurity">&ge;99% (HPLC verified)</dd></div>
+            <div class="pd-spec-row"><dt>Presentation</dt><dd id="pdSpecSize">Single vial</dd></div>
+            <div class="pd-spec-row"><dt>Sealed under</dt><dd>Nitrogen</dd></div>
+            <div class="pd-spec-row"><dt>Testing</dt><dd>HPLC + mass spectrometry</dd></div>
+            <div class="pd-spec-row"><dt>Storage</dt><dd>&minus;20&deg;C, protected from light</dd></div>
+          </dl>
+        </div>
+
+        <div class="pd-card">
+          <h3>Handling</h3>
+          <ul class="pd-list">
+            <li>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><b>Store lyophilized at &minus;20&deg;C.</b> Sealed and frozen, the powder is the most stable form this material comes in.</span>
+            </li>
+            <li>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><b>Keep it out of light.</b> Leave the vial in its box until it goes into the freezer.</span>
+            </li>
+            <li>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><b>Let it reach room temperature before opening.</b> Opening a cold vial pulls in moisture, and moisture is what degrades a lyophilized powder.</span>
+            </li>
+            <li>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><b>Record the lot number before you discard the box.</b> It is the only way to pull the matching COA later.</span>
+            </li>
+            <li>
+              <svg class="pd-cross" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+              <span><b>Arrived warm or damaged?</b> Do not use it. Send us the order number and we will replace the shipment.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="pd-note reveal">
+        For research use only. Not for human or veterinary use. Not a drug, food, or supplement.
+        Nothing on this page is a dosing recommendation or a protocol.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ COA ============ -->
+  <section class="pd-section">
+    <div class="container">
+      <div class="pd-coa">
+        <div class="pd-head reveal" style="margin-bottom:0">
+          <span class="eyebrow">Certificate of analysis</span>
+          <h2>Tested before it is listed.</h2>
+          <p>
+            Every lot is assayed by an independent lab for purity by HPLC and identity by mass
+            spectrometry. The vial you receive carries a lot number, and that number is what ties
+            it to its own report rather than to a sample someone tested once.
+          </p>
+          <p>
+            The public COA library is still being built. Until it is live, send us the lot number
+            printed on your vial and we will send that batch report back.
+          </p>
+          <a class="pd-inline-link" id="pdCoaLink2" href="coa.html">How to read a COA <span aria-hidden="true">&rarr;</span></a>
+        </div>
+
+        <div class="pd-coa-paper reveal">
+          <div class="pd-coa-paper-top">
+            <strong>Certificate of Analysis</strong>
+            <span>LOT &middot; GR-0000-000</span>
+          </div>
+          <dl>
+            <div class="pd-coa-line"><dt>Compound</dt><dd>&mdash;</dd></div>
+            <div class="pd-coa-line"><dt>Purity (HPLC)</dt><dd>00.0%</dd></div>
+            <div class="pd-coa-line"><dt>Identity (MS)</dt><dd>Confirmed</dd></div>
+            <div class="pd-coa-line"><dt>Water content</dt><dd>0.0%</dd></div>
+            <div class="pd-coa-line"><dt>Date of analysis</dt><dd>YYYY-MM-DD</dd></div>
+            <div class="pd-coa-line"><dt>Analysed by</dt><dd>&mdash;</dd></div>
+          </dl>
+          <p class="pd-coa-stamp">Example layout &middot; not a real result</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ related ============ -->
+  <section class="pd-section alt pd-related" id="pdRelatedSection">
     <div class="container">
       <h2>Pairs well at the bench</h2>
       <div class="product-grid" id="pdRelatedGrid"></div>
