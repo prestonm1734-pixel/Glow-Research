@@ -39,7 +39,6 @@
     <nav class="main-nav" id="mainNav">
       <a href="peptides.html">Peptides</a>
       <a href="coa.html" class="active">COA</a>
-      <a href="quality.html">Quality</a>
       <a href="shipping.html">Shipping</a>
       <a href="wholesale.html">Wholesale</a>
       <a href="blog.html">Blog</a>
@@ -69,7 +68,40 @@
     <span class="hero-eyebrow">Certificates of Analysis</span>
     <h1>Every batch,<br /><span class="outline">independently verified.</span></h1>
     <p>Third-party lab results for every SKU we ship — HPLC purity, mass spec ID, and sterility, batch by batch. This page is being built out; in the meantime every product's COA link on the catalog page points to its latest report.</p>
-    <a href="index.html" class="btn btn-outline stub-back">&larr; Back to Home</a>
+  </div>
+</section>
+
+<section class="stub-section">
+  <div class="container">
+    <div class="stub-features reveal">
+      <div class="stub-feature">
+        <h3>Sourced Materials</h3>
+        <p>Raw peptide is sourced from vetted domestic manufacturers, with supplier documentation kept on file for every lot.</p>
+      </div>
+      <div class="stub-feature">
+        <h3>Lyophilization &amp; Sealing</h3>
+        <p>Every batch is freeze-dried and nitrogen-sealed to lock in purity from the lab to your vial.</p>
+      </div>
+      <div class="stub-feature">
+        <h3>Documented QC</h3>
+        <p>Identity, purity, endotoxin, and sterility are checked at each stage — not just before the batch ships.</p>
+      </div>
+      <div class="stub-feature">
+        <h3>Auditable Process</h3>
+        <p>Every step from sourcing to sealing is logged against the batch's lot number, tying back to its published COA.</p>
+      </div>
+    </div>
+
+    <div class="stub-policy reveal">
+      <h2>Purity Isn't a Claim — It's a Process</h2>
+      <p>
+        Quality control happens before the certificate of analysis is ever issued: at raw material intake, during
+        lyophilization, and again at final packaging. The COA above is the last checkpoint in that process, not
+        the only one — full manufacturing and QC documentation is available on request for qualified researchers.
+      </p>
+    </div>
+
+    <a href="index.html" class="btn btn-outline stub-back stub-cta-row">&larr; Back to Home</a>
   </div>
 </section>
 
@@ -101,7 +133,6 @@
       <div class="footer-col">
         <h4>Company</h4>
         <a href="coa.html">COA</a>
-        <a href="quality.html">Quality</a>
         <a href="shipping.html">Shipping</a>
         <a href="wholesale.html">Wholesale</a>
         <a href="blog.html">Blog</a>
@@ -142,6 +173,12 @@
 
 <script>
   document.getElementById('stubYear').textContent = new Date().getFullYear();
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   const hamburger = document.getElementById('hamburger');
   const mainNav = document.getElementById('mainNav');
   hamburger.addEventListener('click', () => {
