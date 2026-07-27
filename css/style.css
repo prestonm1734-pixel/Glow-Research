@@ -1041,7 +1041,7 @@ body.search-locked{ overflow:hidden; }
 .search-modal{
   width: 100%; max-width: 720px; max-height: 78vh;
   background:#fff; color:#0a0a0a;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   box-shadow: 0 40px 80px -20px rgba(0,0,0,.5);
   display:flex; flex-direction:column; overflow:hidden;
   transform: translateY(-14px); transition: transform .2s ease;
@@ -1059,25 +1059,27 @@ body.search-locked{ overflow:hidden; }
 .search-input-row input::placeholder{ color:#a3a3a1; }
 .search-esc{
   flex-shrink:0; font-family:'JetBrains Mono', monospace; font-size:0.72rem; font-weight:600;
-  padding: 5px 9px; border:1px solid rgba(0,0,0,0.15); border-radius:5px; color:#8a8a86;
+  padding: 5px 9px; border:1px solid rgba(0,0,0,0.15); border-radius:4px; color:#8a8a86;
   background:transparent; cursor:pointer;
 }
 .search-esc:hover{ border-color:#0a0a0a; color:#0a0a0a; }
-.search-results{ overflow-y:auto; padding: 8px 10px 14px; }
+.search-results{ overflow-y:auto; padding: 0; }
 .search-label{
   font-family:'JetBrains Mono', monospace; font-size:0.68rem; font-weight:700;
   letter-spacing:.1em; text-transform:uppercase; color:#a3a3a1;
-  padding: 12px 12px 6px;
+  padding: 16px 22px 10px;
 }
 .search-row{
-  display:flex; align-items:center; gap:14px; padding: 10px 12px;
-  border-radius: 10px; text-decoration:none; color:#0a0a0a;
+  display:flex; align-items:center; gap:16px; padding: 12px 22px;
+  border-radius: 0; text-decoration:none; color:#0a0a0a;
+  border-top: 1px solid rgba(0,0,0,0.07);
   transition: background .15s ease;
 }
-.search-row:hover, .search-row:focus-visible{ background:#f2f2f0; }
+.search-row:hover, .search-row:focus-visible{ background:#f7f7f5; }
 .search-thumb{
-  width:44px; height:44px; border-radius:8px; flex-shrink:0;
+  width:48px; height:48px; border-radius:0; flex-shrink:0;
   background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
+  border: 1px solid rgba(0,0,0,0.08);
   display:flex; align-items:center; justify-content:center; overflow:hidden;
 }
 .search-thumb .vial{ width:16px; height:32px; box-shadow:none; }
@@ -1089,7 +1091,7 @@ body.search-locked{ overflow:hidden; }
 }
 .search-row-arrow{ color:#a3a3a1; flex-shrink:0; }
 .search-row:hover .search-row-arrow{ color:#0a0a0a; }
-.search-empty{ padding: 30px 14px; text-align:center; color:#8a8a86; font-size:0.9rem; }
+.search-empty{ padding: 30px 22px; text-align:center; color:#8a8a86; font-size:0.9rem; }
 @media (max-width:640px){
   .search-overlay{ padding: 60px 14px 24px; }
   .search-input-row input{ font-size:1rem; }
