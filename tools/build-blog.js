@@ -393,13 +393,13 @@ function cardHtml(post) {
 
 function buildIndex() {
   const url = `${SITE}/blog.html`;
-  const head = `<title>Blog — Peptide Research, Handling &amp; Industry Notes | Glow Research</title>
-<meta name="description" content="Practical guides and industry notes on research peptides — storage, reconstitution, certificates of analysis, and quality standards from Glow Research." />
+  const head = `<title>Peptide Blog — News, Research &amp; Handling Guides | Glow Research</title>
+<meta name="description" content="Peptide news, research, and practical guidance — storage, reconstitution, certificates of analysis, quality standards, and what's changing across the research peptide industry." />
 <link rel="canonical" href="${url}" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
-<meta property="og:title" content="Glow Research Blog" />
-<meta property="og:description" content="Practical guides and industry notes on research peptides." />
+<meta property="og:title" content="Peptide Blog — News, Research &amp; Handling Guides" />
+<meta property="og:description" content="Peptide news, research, and practical guidance from across the research peptide industry." />
 <meta property="og:url" content="${url}" />
 <meta name="twitter:card" content="summary_large_image" />
 <script type="application/ld+json">${JSON.stringify({
@@ -407,7 +407,7 @@ function buildIndex() {
     '@type': 'Blog',
     name: 'Glow Research Blog',
     url,
-    description: 'Practical guides and industry notes on research peptides.',
+    description: 'Peptide news, research, and practical guidance from across the research peptide industry.',
     blogPost: posts.map(p => ({
       '@type': 'BlogPosting',
       headline: p.title,
@@ -469,7 +469,7 @@ function buildIndex() {
         <span class="jr-mast-sections">${sections.map(esc).join(' / ')}</span>
         <span class="jr-count">${posts.length} article${posts.length === 1 ? '' : 's'}</span>
       </div>
-      <h1 class="jr-mast-title">Practical notes on handling, verifying, and storing research peptides.</h1>
+      <h1 class="jr-mast-title">Everything in peptides &mdash; news, research, handling, and industry.</h1>
     </header>
 
 ${leadHtml}
