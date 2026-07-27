@@ -105,6 +105,15 @@
     $('pdLede').textContent = p.blurb;
     $('pdVialName').textContent = p.name;
 
+    // a handful of products ship with a real product photo; everything else
+    // falls back to the illustrated CSS vial so the page never shows a gap
+    if (p.image) {
+      $('pdPhoto').src = p.image;
+      $('pdPhoto').alt = `${p.name} vial`;
+      $('pdPhoto').hidden = false;
+      $('pdVialArt').hidden = true;
+    }
+
     const free = (window.GlowCart && window.GlowCart.FREE_SHIPPING_AT) || 250;
     $('pdMeta').innerHTML =
       `${p.purity} purity &middot; lyophilized &amp; nitrogen sealed &middot; ` +

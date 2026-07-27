@@ -27,6 +27,7 @@ const GLOW_PRODUCTS = [
     blurb: 'A GLP-1 receptor agonist analogue supplied for laboratory investigation of incretin receptor signalling and metabolic pathway research.' },
   { name: 'Tirzepatide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', badge:null,
     sizes: [{ mg: '10mg', price: 129 }, { mg: '20mg', price: 219 }],
+    image: 'assets/products/tirzepatide-vial.webp',
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.' },
   { name: 'Selank', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.6%', badge:null,
     sizes: [{ mg: '5mg', price: 58 }, { mg: '10mg', price: 99 }],
