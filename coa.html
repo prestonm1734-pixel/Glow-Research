@@ -3,21 +3,242 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Certificates of Analysis — Glow Research</title>
-<meta name="description" content="Certificates of Analysis at Glow Research." />
+<title>Certificates of Analysis | Glow Research</title>
+<meta name="description" content="Every batch is independently assayed for purity and identity before it ships. See what is on a Glow Research certificate of analysis and how to request the report for your lot." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  .stub-hero{ position:relative; padding: 90px 0 100px; background:#000; overflow:hidden; isolation:isolate; }
-  .stub-hero .container{ position:relative; z-index:1; max-width: 720px; }
-  .stub-hero .hero-eyebrow{ margin-bottom:20px; }
-  .stub-hero h1{ font-size: clamp(2.1rem, 4.4vw, 3.4rem); margin-bottom:22px; letter-spacing:-0.03em; }
-  .stub-hero h1 .outline{ color: transparent; -webkit-text-stroke: 1.4px rgba(255,255,255,.82); }
-  .stub-hero p{ font-size: 1.08rem; max-width: 560px; margin: 0 0 32px; }
-  .stub-back{ display:inline-flex; align-items:center; gap:8px; }
+  /* ---------- COA page ----------
+     Same depth system as the shipping and wholesale pages: page #000, cards
+     lifted with a gradient body, a hairline border, and an inset top
+     highlight. The specimen certificate inverts that: white paper on black,
+     which is the one place this site should feel like a physical document. */
+  .coa-hero{ position:relative; padding: 80px 0 0; background:#000; overflow:hidden; isolation:isolate; }
+  .coa-hero-bg{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+  .coa-hero-bg::before{
+    content:''; position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.045) 0 1px, transparent 1px 88px),
+      repeating-linear-gradient(0deg,  rgba(255,255,255,.045) 0 1px, transparent 1px 88px);
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.35) 55%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.35) 55%, transparent 100%);
+  }
+  .coa-hero-bg::after{
+    content:''; position:absolute; top:-30%; right:-10%; width:70%; height:120%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,.10), transparent 62%);
+  }
+  .coa-hero-inner{ position:relative; z-index:1; }
+  .coa-hero-top{
+    display:grid; grid-template-columns: 1.25fr .85fr; gap: 56px; align-items:start;
+    padding-bottom: 64px;
+  }
+  .coa-hero h1{
+    font-size: clamp(2.2rem, 4.6vw, 3.6rem); margin: 18px 0 22px; letter-spacing:-0.03em; line-height:1.06;
+  }
+  .coa-hero h1 .outline{ color: transparent; -webkit-text-stroke: 1.4px rgba(255,255,255,.82); }
+  .coa-lede{ font-size: 1.08rem; max-width: 520px; margin: 0; }
+
+  .coa-panel{
+    background: linear-gradient(180deg, #131313, #0b0b0b);
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 30px 60px -34px #000, inset 0 1px 0 rgba(255,255,255,.07);
+    padding: 26px 26px 22px;
+  }
+  .coa-panel-label{
+    font-family:'JetBrains Mono', monospace; font-size:.68rem; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color: var(--text-dimmer);
+    display:flex; align-items:center; gap:9px; margin-bottom:16px;
+  }
+  .coa-dot{ width:7px; height:7px; background:#fff; flex-shrink:0; animation: coaPulse 2.4s ease-out infinite; }
+  @keyframes coaPulse{
+    0%{ box-shadow: 0 0 0 0 rgba(255,255,255,.5); }
+    70%{ box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+  }
+  .coa-panel-lead{ font-size: 1.05rem; color: var(--text); line-height:1.5; margin:0 0 18px; }
+  .coa-panel-lead strong{ font-family:'Space Grotesk', sans-serif; font-weight:700; }
+  .coa-panel-rows{ border-top:1px solid rgba(255,255,255,.1); }
+  .coa-panel-row{
+    display:flex; justify-content:space-between; align-items:baseline; gap:14px;
+    padding: 11px 0; border-bottom:1px solid rgba(255,255,255,.07); font-size:.86rem;
+  }
+  .coa-panel-row:last-child{ border-bottom:none; }
+  .coa-panel-row dt{ color: var(--text-dimmer); }
+  .coa-panel-row dd{ margin:0; color: var(--text); font-family:'JetBrains Mono', monospace; text-align:right; }
+  .coa-panel-row dd.pending{ color:#a3a3a1; }
+
+  .coa-stats{
+    display:grid; grid-template-columns: repeat(4, 1fr);
+    gap:1px; background: rgba(255,255,255,.1); border-top:1px solid rgba(255,255,255,.1);
+  }
+  .coa-stat{ background:#000; padding: 26px 4px 30px; }
+  .coa-stat b{
+    display:block; font-family:'Space Grotesk', sans-serif; font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+    font-weight:700; color:#fff; letter-spacing:-.02em;
+  }
+  .coa-stat span{
+    display:block; margin-top:6px; font-family:'JetBrains Mono', monospace;
+    font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color: var(--text-dimmer);
+  }
+
+  .coa-section{ padding: 84px 0; background:#000; border-top:1px solid rgba(255,255,255,.08); }
+  .coa-section.alt{ background:#070707; }
+  .coa-head{ margin-bottom: 40px; max-width: 640px; }
+  .coa-head h2{ font-size: clamp(1.5rem, 2.6vw, 2rem); margin: 12px 0 12px; letter-spacing:-.02em; }
+  .coa-head p{ margin:0; font-size:.98rem; }
+
+  /* ---------- route ---------- */
+  .coa-route{ display:grid; grid-template-columns: repeat(4, 1fr); gap:1px; background: rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.1); }
+  .coa-step{
+    position:relative; background: linear-gradient(180deg, #101010, #050505);
+    padding: 30px 26px 32px; box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    transition: background .25s ease;
+  }
+  .coa-step:hover{ background: linear-gradient(180deg, #171717, #0a0a0a); }
+  .coa-step-n{
+    font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:700;
+    letter-spacing:.14em; color: var(--text-dimmer); display:block; margin-bottom:18px;
+  }
+  .coa-step::before{
+    content:''; position:absolute; top:52px; left:0; right:0; height:1px; background: rgba(255,255,255,.22);
+  }
+  .coa-step::after{
+    content:''; position:absolute; top:48px; left:26px; width:9px; height:9px;
+    background:#fff; box-shadow: 0 0 0 4px #0a0a0a, 0 0 14px 1px rgba(255,255,255,.45);
+  }
+  /* the last step is not live yet, so its node reads as hollow */
+  .coa-step.pending::after{ background:#0a0a0a; box-shadow: 0 0 0 1px rgba(255,255,255,.55), 0 0 0 4px #0a0a0a; }
+  .coa-step h3{ font-size:1.05rem; margin: 26px 0 8px; }
+  .coa-step p{ font-size:.9rem; margin:0; }
+  .coa-step-tag{
+    display:inline-block; margin-top:14px; font-family:'JetBrains Mono', monospace;
+    font-size:.62rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+    color:#0a0a0a; background:#fff; padding: 3px 8px;
+  }
+  .coa-step-tag.soon{ color:#e4e4e2; background:transparent; border:1px solid rgba(255,255,255,.35); }
+
+  /* ---------- specimen certificate: white paper on a black page ---------- */
+  .coa-spec-wrap{ display:grid; grid-template-columns: .82fr 1.18fr; gap: 48px; align-items:start; }
+  .coa-paper{
+    position:relative; background:#fff; color:#0a0a0a; padding: 30px 32px 34px;
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.14);
+    overflow:hidden;
+  }
+  /* unmistakable: this is a layout example, not a real report */
+  .coa-paper::after{
+    content:'SPECIMEN'; position:absolute; top:50%; left:50%;
+    transform: translate(-50%,-50%) rotate(-24deg);
+    font-family:'Space Grotesk', sans-serif; font-weight:700;
+    font-size: clamp(3rem, 8vw, 5.4rem); letter-spacing:.06em;
+    color: rgba(10,10,10,.07); pointer-events:none; white-space:nowrap;
+  }
+  .coa-paper > *{ position:relative; z-index:1; }
+  .coa-paper-head{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:18px;
+    padding-bottom:16px; border-bottom:2px solid #0a0a0a; margin-bottom:18px;
+  }
+  .coa-paper-head h3{ font-size:1.05rem; margin:0 0 3px; color:#0a0a0a; letter-spacing:-.01em; }
+  .coa-paper-head p{
+    margin:0; font-family:'JetBrains Mono', monospace; font-size:.68rem;
+    letter-spacing:.1em; text-transform:uppercase; color:#6b6b69;
+  }
+  .coa-paper-stamp{
+    flex-shrink:0; font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; color:#0a0a0a;
+    border:1.5px solid #0a0a0a; padding: 5px 9px; text-align:center; line-height:1.35;
+  }
+  .coa-paper-meta{
+    display:grid; grid-template-columns: repeat(2, 1fr); gap: 4px 20px; margin-bottom:20px;
+  }
+  .coa-paper-meta div{
+    display:flex; justify-content:space-between; gap:10px; padding: 6px 0;
+    border-bottom:1px solid rgba(0,0,0,.09); font-size:.78rem;
+  }
+  .coa-paper-meta dt{ color:#6b6b69; }
+  .coa-paper-meta dd{ margin:0; font-family:'JetBrains Mono', monospace; color:#0a0a0a; }
+  .coa-table{ width:100%; border-collapse:collapse; font-size:.78rem; }
+  .coa-table th{
+    text-align:left; font-family:'JetBrains Mono', monospace; font-size:.62rem; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; color:#6b6b69;
+    padding: 0 0 8px; border-bottom:1px solid #0a0a0a;
+  }
+  .coa-table th:last-child, .coa-table td:last-child{ text-align:right; }
+  .coa-table td{ padding: 9px 0; border-bottom:1px solid rgba(0,0,0,.09); color:#2a2a28; }
+  .coa-table td:first-child{ font-weight:600; color:#0a0a0a; }
+  .coa-table td.val{ font-family:'JetBrains Mono', monospace; color:#6b6b69; }
+  .coa-paper-foot{
+    margin: 18px 0 0; padding-top:14px; border-top:1px solid rgba(0,0,0,.12);
+    font-size:.7rem; color:#6b6b69; line-height:1.6;
+  }
+  .coa-spec-caption{
+    margin: 16px 0 0; font-size:.82rem; color: var(--text-dimmer); line-height:1.6;
+  }
+
+  /* ---------- cards & lists ---------- */
+  .coa-two{ display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .coa-card{
+    background: linear-gradient(180deg, #121212, #080808);
+    border:1px solid rgba(255,255,255,.11);
+    box-shadow: 0 30px 60px -38px #000, inset 0 1px 0 rgba(255,255,255,.06);
+    padding: 30px 30px 34px;
+  }
+  .coa-card h3{
+    font-family:'JetBrains Mono', monospace; font-size:.8rem; font-weight:600;
+    letter-spacing:.12em; text-transform:uppercase; color: var(--text-dim);
+    margin: 0 0 22px; padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,.1);
+  }
+  .coa-card p:last-child{ margin-bottom:0; }
+  .coa-list{ list-style:none; margin:0; padding:0; }
+  .coa-list li{
+    display:flex; gap:13px; align-items:flex-start;
+    padding: 13px 0; border-bottom:1px solid rgba(255,255,255,.07);
+    color: var(--text-dim); font-size:.94rem; line-height:1.55;
+  }
+  .coa-list li:last-child{ border-bottom:none; }
+  .coa-list li b{ color: var(--text); font-weight:600; }
+  .coa-tick{ flex-shrink:0; margin-top:3px; color:#fff; }
+
+  /* the honest status callout */
+  .coa-status{
+    background: linear-gradient(180deg, #141414, #0a0a0a);
+    border:1px solid rgba(255,255,255,.16);
+    box-shadow: 0 30px 60px -38px #000, inset 0 1px 0 rgba(255,255,255,.07);
+    padding: 34px 36px 36px; max-width: 780px;
+  }
+  .coa-status h3{ font-size:1.25rem; margin:0 0 14px; }
+  .coa-status p{ font-size:.98rem; }
+  .coa-status p:last-of-type{ margin-bottom:0; }
+  .coa-status-badge{
+    display:inline-block; font-family:'JetBrains Mono', monospace; font-size:.62rem; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:#0a0a0a; background:#fff;
+    padding: 4px 10px; margin-bottom:18px;
+  }
+  .coa-actions{ display:flex; flex-wrap:wrap; gap:14px; margin-top:26px; }
+
+  .coa-note{
+    border-left: 2px solid #fff; padding: 4px 0 4px 22px; margin: 40px 0 0;
+    color: var(--text-dim); font-size:.94rem; max-width: 680px;
+  }
+
+  @media (max-width: 1000px){
+    .coa-hero-top{ grid-template-columns:1fr; gap:38px; }
+    .coa-route{ grid-template-columns: repeat(2, 1fr); }
+    .coa-spec-wrap{ grid-template-columns:1fr; gap:34px; }
+  }
+  @media (max-width: 700px){
+    .coa-stats{ grid-template-columns: repeat(2, 1fr); }
+    .coa-two{ grid-template-columns:1fr; }
+    .coa-route{ grid-template-columns:1fr; }
+    /* the connector only reads while the steps sit in a row */
+    .coa-step::before, .coa-step::after{ display:none; }
+    .coa-step h3{ margin-top:0; }
+    .coa-paper{ padding: 24px 20px 26px; }
+    .coa-paper-meta{ grid-template-columns:1fr; }
+    .coa-status{ padding: 26px 22px 28px; }
+  }
 </style>
 </head>
 <body>
@@ -63,45 +284,243 @@
   </div>
 </header>
 
-<section class="stub-hero">
-  <div class="container">
-    <span class="hero-eyebrow">Certificates of Analysis</span>
-    <h1>Every batch,<br /><span class="outline">independently verified.</span></h1>
-    <p>Third-party lab results for every SKU we ship — HPLC purity, mass spec ID, and sterility, batch by batch. This page is being built out; in the meantime every product's COA link on the catalog page points to its latest report.</p>
+<section class="coa-hero">
+  <div class="coa-hero-bg" aria-hidden="true"></div>
+  <div class="container coa-hero-inner">
+
+    <div class="coa-hero-top">
+      <div>
+        <span class="hero-eyebrow">Certificates of Analysis</span>
+        <h1>Every batch,<br /><span class="outline">independently assayed.</span></h1>
+        <p class="coa-lede">
+          A certificate of analysis is the lab report behind a vial: what the compound is,
+          how pure it is, and who measured it. Every batch we ship has one.
+        </p>
+      </div>
+
+      <div class="coa-panel">
+        <div class="coa-panel-label"><span class="coa-dot" aria-hidden="true"></span> Library status</div>
+        <p class="coa-panel-lead">The public COA library is <strong>still being built</strong>. Until it is live, email us your lot number and we will send that batch report.</p>
+        <dl class="coa-panel-rows">
+          <div class="coa-panel-row"><dt>Batches assayed</dt><dd>Every batch</dd></div>
+          <div class="coa-panel-row"><dt>Testing</dt><dd>Third party</dd></div>
+          <div class="coa-panel-row"><dt>Available now</dt><dd>On request</dd></div>
+          <div class="coa-panel-row"><dt>Searchable library</dt><dd class="pending">In build</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="coa-stats">
+      <div class="coa-stat"><b>100%</b><span>Batches tested</span></div>
+      <div class="coa-stat"><b>99%+</b><span>Purity floor</span></div>
+      <div class="coa-stat"><b>Lot-Level</b><span>Traceability</span></div>
+      <div class="coa-stat"><b>USA</b><span>Manufactured</span></div>
+    </div>
+
   </div>
 </section>
 
-<section class="stub-section">
+<section class="coa-section">
   <div class="container">
-    <div class="stub-features reveal">
-      <div class="stub-feature">
-        <h3>Sourced Materials</h3>
-        <p>Raw peptide is sourced from vetted domestic manufacturers, with supplier documentation kept on file for every lot.</p>
-      </div>
-      <div class="stub-feature">
-        <h3>Lyophilization &amp; Sealing</h3>
-        <p>Every batch is freeze-dried and nitrogen-sealed to lock in purity from the lab to your vial.</p>
-      </div>
-      <div class="stub-feature">
-        <h3>Documented QC</h3>
-        <p>Identity, purity, endotoxin, and sterility are checked at each stage — not just before the batch ships.</p>
-      </div>
-      <div class="stub-feature">
-        <h3>Auditable Process</h3>
-        <p>Every step from sourcing to sealing is logged against the batch's lot number, tying back to its published COA.</p>
-      </div>
+    <div class="coa-head reveal">
+      <span class="eyebrow">Straight answer</span>
+      <h2>We do not have the library up yet.</h2>
     </div>
 
-    <div class="stub-policy reveal">
-      <h2>Purity Isn't a Claim — It's a Process</h2>
+    <div class="coa-status reveal">
+      <span class="coa-status-badge">In build</span>
+      <h3>What exists today, and what does not.</h3>
       <p>
-        Quality control happens before the certificate of analysis is ever issued: at raw material intake, during
-        lyophilization, and again at final packaging. The COA above is the last checkpoint in that process, not
-        the only one — full manufacturing and QC documentation is available on request for qualified researchers.
+        Every batch is assayed by an independent lab before it ships, and those reports exist.
+        What does not exist yet is the page where you can search a lot number and pull one down
+        yourself. We are building it.
       </p>
+      <p>
+        We would rather say that plainly than put up a page that looks finished and quietly goes
+        nowhere. If you have a vial in hand, send us the lot number printed on the label and we
+        will email you the report for that exact batch. If you are deciding whether to order,
+        ask for a recent report on the compound you are looking at and we will send it before
+        you buy anything.
+      </p>
+      <div class="coa-actions">
+        <a href="blog/how-to-read-a-certificate-of-analysis/" class="btn btn-primary">How to read a COA <span aria-hidden="true">&rarr;</span></a>
+        <a href="peptides.html" class="btn btn-outline">Browse the catalog <span aria-hidden="true">&rarr;</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="coa-section alt">
+  <div class="container">
+    <div class="coa-head reveal">
+      <span class="eyebrow">The document</span>
+      <h2>What is on a certificate.</h2>
+      <p>Here is the layout you will get, and what each line actually tells you.</p>
     </div>
 
-    <a href="index.html" class="btn btn-outline stub-back stub-cta-row">&larr; Back to Home</a>
+    <div class="coa-spec-wrap">
+      <div class="reveal">
+        <div class="coa-paper">
+          <div class="coa-paper-head">
+            <div>
+              <h3>Certificate of Analysis</h3>
+              <p>Independent Testing Laboratory</p>
+            </div>
+            <div class="coa-paper-stamp">Example<br />layout</div>
+          </div>
+
+          <dl class="coa-paper-meta">
+            <div><dt>Compound</dt><dd>Compound name</dd></div>
+            <div><dt>Lot</dt><dd>GR-0000-000</dd></div>
+            <div><dt>Quantity</dt><dd>0 mg / vial</dd></div>
+            <div><dt>Tested</dt><dd>YYYY-MM-DD</dd></div>
+          </dl>
+
+          <table class="coa-table">
+            <thead>
+              <tr><th scope="col">Test</th><th scope="col">Method</th><th scope="col">Result</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Purity</td><td class="val">HPLC</td><td class="val">00.0%</td></tr>
+              <tr><td>Identity</td><td class="val">Mass spec</td><td class="val">Confirmed</td></tr>
+              <tr><td>Endotoxin</td><td class="val">LAL</td><td class="val">0.00 EU/mg</td></tr>
+              <tr><td>Water content</td><td class="val">Karl Fischer</td><td class="val">0.0%</td></tr>
+              <tr><td>Appearance</td><td class="val">Visual</td><td class="val">White powder</td></tr>
+            </tbody>
+          </table>
+
+          <p class="coa-paper-foot">
+            Placeholder values shown for layout only. A real certificate carries the testing
+            laboratory name, the analyst signature, and the date of analysis.
+          </p>
+        </div>
+        <p class="coa-spec-caption">
+          This is a layout example with placeholder values, not a real report and not test data
+          for any batch we sell.
+        </p>
+      </div>
+
+      <div class="reveal">
+        <div class="coa-card">
+          <h3>Reading it line by line</h3>
+          <ul class="coa-list">
+            <li>
+              <svg class="coa-tick" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><b>Lot number.</b> The whole point of the document. It ties this report to the specific batch your vial came from, not to the compound in general.</span>
+            </li>
+            <li>
+              <svg class="coa-tick" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><b>Purity by HPLC.</b> The headline number. It measures how much of the material is the target compound versus everything else in the vial.</span>
+            </li>
+            <li>
+              <svg class="coa-tick" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><b>Identity by mass spec.</b> Purity alone cannot tell you the compound is the right one. Mass spec confirms the molecular weight matches what it should be.</span>
+            </li>
+            <li>
+              <svg class="coa-tick" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><b>Endotoxin and water content.</b> Contamination and residual moisture. High water content shortens how long the lyophilized powder stays stable.</span>
+            </li>
+            <li>
+              <svg class="coa-tick" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span><b>Lab name and date.</b> A report with no testing laboratory named on it is a marketing document, not a certificate.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="coa-section">
+  <div class="container">
+    <div class="coa-head reveal">
+      <span class="eyebrow">The process</span>
+      <h2>How a batch gets its certificate.</h2>
+      <p>Testing is not one checkpoint at the end. It runs the length of the batch.</p>
+    </div>
+
+    <div class="coa-route reveal">
+      <div class="coa-step">
+        <span class="coa-step-n">01</span>
+        <h3>Intake</h3>
+        <p>Raw peptide arrives from a vetted domestic manufacturer. Supplier documentation is logged against the lot before anything else happens.</p>
+        <span class="coa-step-tag">Live</span>
+      </div>
+      <div class="coa-step">
+        <span class="coa-step-n">02</span>
+        <h3>Manufacture</h3>
+        <p>The batch is lyophilized and nitrogen sealed, with QC checks at each stage rather than only before it ships.</p>
+        <span class="coa-step-tag">Live</span>
+      </div>
+      <div class="coa-step">
+        <span class="coa-step-n">03</span>
+        <h3>Independent assay</h3>
+        <p>A sample goes to a third-party lab. HPLC for purity, mass spec for identity. We do not grade our own work.</p>
+        <span class="coa-step-tag">Live</span>
+      </div>
+      <div class="coa-step pending">
+        <span class="coa-step-n">04</span>
+        <h3>Published</h3>
+        <p>The report attaches to the lot number so anyone holding a vial can pull it up. This is the piece we are still building.</p>
+        <span class="coa-step-tag soon">Coming</span>
+      </div>
+    </div>
+
+    <p class="coa-note reveal">
+      Steps one through three run on every batch today. Step four is the only part that is not
+      finished, and it is the reason this page asks you to email us instead of clicking a link.
+    </p>
+  </div>
+</section>
+
+<section class="coa-section alt">
+  <div class="container">
+    <div class="coa-head reveal">
+      <span class="eyebrow">Before you order</span>
+      <h2>Questions worth asking any supplier.</h2>
+      <p>Including us. If a supplier cannot answer these, that tells you something.</p>
+    </div>
+
+    <div class="coa-two reveal">
+      <div class="coa-card">
+        <h3>What to ask for</h3>
+        <ul class="coa-list">
+          <li>
+            <svg class="coa-tick" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>The report for your lot</b>, not a sample report for the compound.</span>
+          </li>
+          <li>
+            <svg class="coa-tick" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>The name of the testing laboratory</b>, so the result can be checked independently.</span>
+          </li>
+          <li>
+            <svg class="coa-tick" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>Both purity and identity.</b> A purity number on its own does not prove the compound is what the label says.</span>
+          </li>
+          <li>
+            <svg class="coa-tick" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>The date of analysis.</b> A report from two years ago says nothing about the batch in your hand.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="coa-card">
+        <h3>Where we stand</h3>
+        <p>
+          Every compound is manufactured domestically and independently verified above 99% purity.
+          Identity, purity, endotoxin, and sterility are checked through the batch, not only at
+          the end of it, and each step is logged against the lot number.
+        </p>
+        <p>
+          Full manufacturing and QC documentation is available on request for qualified
+          researchers. Ask and we will send it.
+        </p>
+        <p>
+          When the library goes live, everything above becomes a link instead of an email. Nothing
+          about the testing changes, only how you get to it.
+        </p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -159,9 +578,9 @@
         local, state, and federal laws. Glow Research makes no claims as to the safety or efficacy of these
         compounds for human use and assumes no liability for misuse. Statements on this website have not been
         evaluated by the Food and Drug Administration (FDA). Glow Research does not sell to, and reserves the
-        right to refuse service to, anyone attempting to purchase for personal consumption. All sales are final on
-        opened or reconstituted materials. This website and its contents are for informational purposes only and
-        do not constitute medical advice.
+        right to refuse service to, anyone attempting to purchase for personal consumption. All sales are final
+        on opened or reconstituted materials. This website and its contents are for informational purposes only
+        and do not constitute medical advice.
       </p>
     </div>
 
