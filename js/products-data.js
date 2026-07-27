@@ -14,6 +14,23 @@ const GLOW_PRODUCTS = [
   { name: 'GHK-Cu', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', size: '50mg', price: 74, badge:null },
 ];
 
+// Mock bulk-quantity tiers for the quick-add modal. WooCommerce will supply
+// real variant IDs/pricing later; this just needs to look and feel right.
+const QTY_TIERS = [
+  { label: '1 vial', qty: 1, off: 0 },
+  { label: '3 vials', qty: 3, off: 0.08 },
+  { label: '5 vials', qty: 5, off: 0.15 },
+  { label: '10 vials', qty: 10, off: 0.22 },
+];
+
+function getProductVariants(p) {
+  return QTY_TIERS.map(t => {
+    const original = t.qty * p.price;
+    const sale = Math.round(original * (1 - t.off));
+    return { label: t.label, qty: t.qty, original, sale };
+  });
+}
+
 // gridEl: container to render into
 // filter: 'all' or a category key
 // opts.observeReveal(el): optional, hooks each card into a scroll-reveal observer
@@ -46,14 +63,11 @@ function renderProductGrid(gridEl, filter, opts) {
     gridEl.appendChild(card);
     const addBtn = card.querySelector('.add-btn');
     addBtn.addEventListener('click', () => {
-      if (opts.bumpCart) opts.bumpCart();
-      addBtn.classList.add('added');
-      addBtn.textContent = '✓';
-      addBtn.setAttribute('aria-label', `${p.name} added`);
-      setTimeout(() => {
-        addBtn.classList.remove('added');
-        addBtn.textContent = '+';
-      }, 1400);
+      if (window.openQuickAdd) {
+        window.openQuickAdd(p, { bumpCart: opts.bumpCart });
+      } else if (opts.bumpCart) {
+        opts.bumpCart();
+      }
     });
     if (opts.observeReveal) opts.observeReveal(card);
   });
