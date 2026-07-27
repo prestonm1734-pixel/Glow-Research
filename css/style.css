@@ -649,6 +649,23 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   font-size: 0.92rem; color:#6b6b66; max-width: 480px; margin: 0 auto;
 }
 .jr-count{ font-style:normal; }
+.jr-mast-sections{ text-align:center; }
+
+/* ---------- editorial commitments ----------
+   Sits directly under the nameplate so the first thing a reader learns is
+   how the writing is governed, before they read any of it. */
+.jr-standards{
+  display:grid; grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid rgba(0,0,0,.14);
+}
+.jr-std{ padding: 26px 34px 28px; border-right: 1px solid rgba(0,0,0,.1); }
+.jr-std:first-child{ padding-left: 0; }
+.jr-std:last-child{ padding-right: 0; border-right: none; }
+.jr-std h2{
+  font-family:'Fraunces', Georgia, serif; font-weight:600;
+  font-size: 1.02rem; letter-spacing:-0.01em; color:#0a0a0a; margin: 0 0 8px;
+}
+.jr-std p{ font-size: 0.87rem; line-height:1.62; color:#6b6b66; margin:0; }
 
 /* ---------- shared bits ---------- */
 .cover-art{ display:block; width:100%; height:100%; }
@@ -723,12 +740,52 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .jr-row-meta .jr-byline{ font-family:'JetBrains Mono', monospace; font-size:0.68rem; }
 
+/* ---------- editorial standards block ----------
+   The masthead colophon: who writes this, and what it will never be used
+   to sell. Stating the limits is what makes the rest credible. */
+.jr-policy{
+  margin-top: 72px; padding: 38px 42px 42px;
+  background:#f7f7f4; border:1px solid rgba(0,0,0,.09); border-radius:2px;
+}
+.jr-policy-head{
+  margin-bottom: 26px; padding-bottom: 20px;
+  border-bottom: 1px solid rgba(0,0,0,.12);
+}
+.jr-policy-head h2{
+  font-family:'Fraunces', Georgia, serif; font-weight:600;
+  font-size: 1.55rem; letter-spacing:-0.02em; color:#0a0a0a; margin: 10px 0 0;
+}
+.jr-policy-body{ display:grid; grid-template-columns: 1.35fr 1fr; gap: 48px; }
+.jr-policy-prose p{
+  font-size: 0.95rem; line-height:1.72; color:#4a4a45; margin: 0 0 1em;
+}
+.jr-policy-prose p:last-child{ margin-bottom: 0; }
+.jr-policy-list h3{
+  font-family:'JetBrains Mono', monospace; font-size:0.66rem; font-weight:600;
+  letter-spacing:.15em; text-transform:uppercase; color:#8a8a84; margin: 0 0 12px;
+}
+.jr-policy-list ul{ list-style:none; margin: 0 0 18px; padding: 0; }
+.jr-policy-list li{
+  position:relative; padding: 9px 0 9px 20px;
+  font-size: 0.9rem; line-height:1.55; color:#3a3a36;
+  border-bottom: 1px solid rgba(0,0,0,.07);
+}
+.jr-policy-list li::before{ content:"\2014"; position:absolute; left:0; color:#a8a8a2; }
+.jr-policy-note{ font-size: 0.85rem; line-height:1.6; color:#6b6b66; margin: 0; }
+
 @media (max-width: 900px){
   .jr-lead{ grid-template-columns: 1fr; gap: 24px; }
   .jr-lead-art{ order:-1; aspect-ratio: 16/10; }
   .jr-list{ grid-template-columns: 1fr; }
   .jr-row:nth-child(odd){ border-right:none; }
   .jr-row > a, .jr-row:nth-child(odd) > a, .jr-row:nth-child(even) > a{ padding: 28px 0; }
+  .jr-standards{ grid-template-columns: 1fr; }
+  .jr-std{
+    padding: 20px 0; border-right:none;
+    border-bottom: 1px solid rgba(0,0,0,.08);
+  }
+  .jr-std:last-child{ border-bottom:none; }
+  .jr-policy-body{ grid-template-columns: 1fr; gap: 30px; }
 }
 
 /* ---------- post cards (used by "keep reading" on articles) ---------- */
@@ -914,6 +971,9 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .jr-nameplate{ padding: 18px 0 16px; }
   .jr-lead{ padding: 30px 0 32px; }
   .jr-row > a{ padding: 26px 0; }
+  .jr-mast-top{ flex-wrap:wrap; justify-content:center; gap: 4px 10px; text-align:center; }
+  .jr-policy{ margin-top: 48px; padding: 28px 22px 30px; }
+  .jr-policy-head h2{ font-size: 1.34rem; }
   .section-blog{ padding: 44px 0 56px; }
   .post-header{ padding: 32px 0 24px; }
   .post-standfirst{ font-size: 1.04rem; }
