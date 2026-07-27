@@ -947,3 +947,42 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .post-disclaimer{ padding-bottom: 46px; }
   .section-related{ padding: 46px 0 56px; }
 }
+
+/* =====================================================================
+   MICRO-POLISH
+   ===================================================================== */
+
+/* text selection — the browser default blue is the only non-monochrome
+   colour that ever appears on the site */
+::selection{ background:#fff; color:#0a0a0a; }
+.section-light ::selection, .post ::selection{ background:#0a0a0a; color:#fff; }
+
+/* scrollbar, so a bright default bar doesn't sit against the black page */
+html{ scrollbar-color: #3a3a38 #0a0a0a; }
+::-webkit-scrollbar{ width:11px; height:11px; }
+::-webkit-scrollbar-track{ background:#0a0a0a; }
+::-webkit-scrollbar-thumb{ background:#2e2e2c; border:3px solid #0a0a0a; border-radius:99px; }
+::-webkit-scrollbar-thumb:hover{ background:#454542; }
+
+/* press feedback everywhere something is clickable — buttons already had it,
+   these did not, so they felt dead on tap */
+.chip:active,
+.add-btn:active,
+.nav-signin:active{ transform: translateY(1px) scale(.98); transition-duration:.06s; }
+.faq-q:active{ opacity:.72; transition-duration:.06s; }
+.jr-lead:active,
+.jr-row > a:active{ transform: scale(.994); transition-duration:.08s; }
+.blog-card:active{ transform: translateY(-2px) scale(.992); transition-duration:.08s; }
+.product-card:active{ transition-duration:.08s; }
+
+/* keyboard focus for the blog surfaces, which the earlier pass missed */
+.jr-lead:focus-visible,
+.jr-row > a:focus-visible,
+.blog-card:focus-visible,
+.post-toc a:focus-visible,
+.post-body a:focus-visible{ outline:2px solid currentColor; outline-offset:3px; border-radius:2px; }
+
+/* scroll cue is a real control now, not decoration */
+.scroll-cue{ cursor:pointer; background:none; border:2px solid var(--border); padding:0; }
+.scroll-cue:hover{ border-color: rgba(255,255,255,.4); }
+.scroll-cue:focus-visible{ outline:2px solid #fff; outline-offset:4px; }

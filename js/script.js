@@ -184,25 +184,56 @@ function drawConstellation() {
     ctx.fill();
   }
 
-  requestAnimationFrame(drawConstellation);
+  rafId = requestAnimationFrame(drawConstellation);
 }
+
+/* The link pass is O(n²) over ~66 nodes every frame, so leaving it running
+   while the hero is off-screen (or the tab is hidden) burns battery for
+   something nobody can see. Start and stop it with visibility. */
+let rafId = null;
+function startConstellation() {
+  if (rafId === null) rafId = requestAnimationFrame(drawConstellation);
+}
+function stopConstellation() {
+  if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+}
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 resizeCanvas();
 initNodes();
-drawConstellation();
+
+if (reduceMotion.matches) {
+  drawConstellation();      // paint one static frame, then stop
+  stopConstellation();
+} else {
+  new IntersectionObserver(([entry]) => {
+    entry.isIntersecting ? startConstellation() : stopConstellation();
+  }, { threshold: 0 }).observe(heroEl);
+
+  document.addEventListener('visibilitychange', () => {
+    document.hidden ? stopConstellation() : startConstellation();
+  });
+}
+
 window.addEventListener('resize', () => { resizeCanvas(); initNodes(); });
 
-/* ---------- product card tilt ---------- */
-document.addEventListener('mousemove', (e) => {
-  const card = e.target.closest ? e.target.closest('.product-card') : null;
-  if (!card) return;
-  const r = card.getBoundingClientRect();
-  const px = (e.clientX - r.left) / r.width - 0.5;
-  const py = (e.clientY - r.top) / r.height - 0.5;
-  card.style.transform = `perspective(700px) rotateX(${py * -6}deg) rotateY(${px * 8}deg) translateY(-5px)`;
-});
-document.addEventListener('mouseout', (e) => {
-  const card = e.target.closest ? e.target.closest('.product-card') : null;
-  if (card && !card.contains(e.relatedTarget)) card.style.transform = '';
-});
+/* ---------- product card tilt ----------
+   Scoped to the grid rather than document, and skipped entirely for
+   reduced-motion users — the CSS media query can't stop it, because this
+   writes the transform inline. */
+if (!reduceMotion.matches && grid) {
+  grid.addEventListener('mousemove', (e) => {
+    const card = e.target.closest ? e.target.closest('.product-card') : null;
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    card.style.transform = `perspective(700px) rotateX(${py * -6}deg) rotateY(${px * 8}deg) translateY(-5px)`;
+  });
+  grid.addEventListener('mouseout', (e) => {
+    const card = e.target.closest ? e.target.closest('.product-card') : null;
+    if (card && !card.contains(e.relatedTarget)) card.style.transform = '';
+  });
+}
 
