@@ -352,6 +352,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* ---------- sections ---------- */
 .section{ padding: 110px 0; }
+#peptides{ padding-top: 78px; }
 .section-dark{ background: var(--bg-2); }
 .section-light{ background:#fff; color:#0a0a0a; }
 .section-light p{ color:#55554f; }
