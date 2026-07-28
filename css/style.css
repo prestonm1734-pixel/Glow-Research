@@ -514,28 +514,29 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .product-badge.cat{ left:14px; background: rgba(10,10,10,0.08); color:#45453f; }
 .product-badge.status{ right:14px; background:#0a0a0a; color:#fff; }
-.product-footer{ background:#0a0a0a; color:#fff; padding: 20px 22px 22px; }
-.product-card h3{ font-size: 1.15rem; margin-bottom: 4px; color:#fff; }
-.product-tag{ font-size:0.68rem; color: #9c9c99; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; display:block; font-family:'JetBrains Mono', monospace; }
-.product-footer p{ font-size: 0.82rem; margin-bottom: 14px; color:#a3a3a1; }
+/* the thin rule sits at the seam between the photo and the footer, standing
+   in for the tag line that used to separate the two */
+.product-footer{
+  background:#0a0a0a; color:#fff; padding: 20px 22px 22px;
+  border-top: 1px solid rgba(255,255,255,.14);
+}
+.product-card h3{ font-size: 1.15rem; margin: 4px 0 4px; color:#fff; }
 .price{ display:block; font-family:'Space Grotesk',sans-serif; font-size:1.2rem; color:#fff; font-weight:600; margin-bottom:14px; }
 .price span{ font-size:0.72rem; color: #8a8a86; font-family:'Inter',sans-serif; font-weight:400; }
 
 /* white on the card's black footer, flips to the reverse on hover — the same
-   invert every button on the site does, plus the cart icon nudges forward so
-   the hover has a little life to it */
+   invert every button on the site does, plus a lift so the hover has a
+   little life to it */
 .add-btn{
   width:100%; height:44px; border-radius:0; border:1px solid #fff;
   background:#fff; color:#0a0a0a; font-family:'Inter', sans-serif; font-size:.85rem; font-weight:700;
-  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:9px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
   transition: background .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
 }
-.add-btn svg{ transition: transform .2s ease; flex-shrink:0; }
 .add-btn:hover{
   background:#0a0a0a; color:#fff; border-color: rgba(255,255,255,.5);
   transform: translateY(-2px); box-shadow: 0 8px 18px -8px rgba(0,0,0,.6);
 }
-.add-btn:hover svg{ transform: translateX(-2px); }
 .add-btn.added{ background:#0a0a0a; color:#fff; border-color: rgba(255,255,255,.5); }
 
 

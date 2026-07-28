@@ -119,23 +119,27 @@ function renderProductGrid(gridEl, filter, opts) {
           : '<div class="vial"></div>'}
       </a>
       <div class="product-footer">
-        <span class="product-tag">${p.tag}</span>
         <h3><a href="${href}">${p.name}</a></h3>
-        <p>${p.purity} purity &middot; ${p.size} per vial &middot; Lyophilized &amp; nitrogen sealed.</p>
         <span class="price">$${p.price} <span>/ vial</span></span>
-        <button class="add-btn" aria-label="Add ${p.name} to research order">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>Add to Cart</span>
-        </button>
+        <button class="add-btn" aria-label="Add ${p.name} to research order">Add to Cart</button>
       </div>
     `;
     gridEl.appendChild(card);
+
+    // the whole card opens the product page; the button is the one exception,
+    // and it opens the quick-add sheet instead — the size/quantity picker,
+    // so the cart is only ever touched from in there
     const addBtn = card.querySelector('.add-btn');
-    addBtn.addEventListener('click', () => {
-      // the quick-add sheet is where a size gets chosen, so the cart is only
-      // ever touched from in there
+    addBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       if (window.openQuickAdd) window.openQuickAdd(p);
     });
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('a, button')) return;   // let real links/buttons behave normally
+      window.location.href = href;
+    });
+    card.style.cursor = 'pointer';
+
     if (opts.observeReveal) opts.observeReveal(card);
   });
 }
