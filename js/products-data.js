@@ -120,6 +120,7 @@ function renderProductGrid(gridEl, filter, opts) {
       </a>
       <div class="product-footer">
         <h3><a href="${href}">${p.name}</a></h3>
+        <span class="card-divider" aria-hidden="true"></span>
         <span class="price">$${p.price} <span>/ vial</span></span>
         <button class="add-btn" aria-label="Add ${p.name} to research order">Add to Cart</button>
       </div>

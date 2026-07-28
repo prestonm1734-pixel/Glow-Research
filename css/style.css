@@ -514,13 +514,19 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .product-badge.cat{ left:14px; background: rgba(10,10,10,0.08); color:#45453f; }
 .product-badge.status{ right:14px; background:#0a0a0a; color:#fff; }
-/* the thin rule sits at the seam between the photo and the footer, standing
-   in for the tag line that used to separate the two */
-.product-footer{
-  background:#0a0a0a; color:#fff; padding: 20px 22px 22px;
-  border-top: 1px solid rgba(255,255,255,.14);
+.product-footer{ background:#0a0a0a; color:#fff; padding: 20px 22px 22px; position:relative; }
+/* fades out at each edge instead of a hard-edged rule, so it reads as a
+   seam rather than a box border. Used both at the top of the footer (where
+   the tag line used to sit) and between the name and the price. */
+.product-footer::before{
+  content:''; position:absolute; top:0; left:22px; right:22px; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
 }
-.product-card h3{ font-size: 1.15rem; margin: 4px 0 4px; color:#fff; }
+.card-divider{
+  display:block; height:1px; margin: 2px 0 14px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+}
+.product-card h3{ font-size: 1.15rem; margin: 4px 0 10px; color:#fff; }
 .price{ display:block; font-family:'Space Grotesk',sans-serif; font-size:1.2rem; color:#fff; font-weight:600; margin-bottom:14px; }
 .price span{ font-size:0.72rem; color: #8a8a86; font-family:'Inter',sans-serif; font-weight:400; }
 
