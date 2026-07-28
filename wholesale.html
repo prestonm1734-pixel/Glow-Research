@@ -3,117 +3,40 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Wholesale &amp; Bulk Orders | Glow Research</title>
-<meta name="description" content="Volume pricing, a named account contact, and custom formulations for labs ordering at scale. Applications are answered within one business day." />
+<title>Wholesale | Glow Research</title>
+<meta name="description" content="Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  /* The shell (hero, rail, cards, stats) is .lp-* in css/style.css and is
-     shared with shipping and COA. Only what is specific to wholesale lives
-     here: the volume ladder and the application form. */
-
-  /* ---------- volume ladder ----------
-     The page's whole claim is "your rate steps down as your volume steps
-     up", so the bars draw that staircase instead of a sentence asserting
-     it. Widths are relative shape, not quoted prices. */
-  .ws-ladder{ border:1px solid rgba(0,0,0,.12); background:#fff; }
-  .ws-ladder-head, .ws-rung{
-    display:grid; grid-template-columns: 54px minmax(120px, .8fr) 1fr;
-    align-items:center; gap: 20px; padding: 0 20px;
-  }
-  .ws-ladder-head{
-    padding-top:13px; padding-bottom:13px; border-bottom:1px solid rgba(0,0,0,.12);
-    background:#f6f6f4;
-    font-family:'JetBrains Mono', monospace; font-size:.62rem; font-weight:700;
-    letter-spacing:.13em; text-transform:uppercase; color:#8a8a86;
-  }
-  .ws-rung{ padding-top:18px; padding-bottom:18px; border-bottom:1px solid rgba(0,0,0,.08); transition: background .2s ease; }
-  .ws-rung:last-child{ border-bottom:none; }
-  .ws-rung:hover{ background:#faf9f7; }
-  .ws-rung-n{
-    display:inline-flex; align-items:center; justify-content:center;
-    width:26px; height:26px; background:#0a0a0a; color:#fff;
-    font-family:'JetBrains Mono', monospace; font-size:.65rem; font-weight:700;
-  }
-  .ws-rung-band{ font-weight:600; font-size:.95rem; color:#0a0a0a; }
-  .ws-rung-track{ position:relative; height:14px; background:#efeeea; }
-  .ws-rung-fill{
-    display:block; height:100%; width:0; background:#0a0a0a;
-    transition: width .9s cubic-bezier(.22,1,.36,1);
-  }
-  /* the bars draw themselves once the block scrolls in, so the staircase is
-     something you watch descend rather than something already sitting there */
-  .ws-ladder.in .ws-rung-fill{ width: var(--w); }
-  .ws-ladder.in .ws-rung:nth-child(2) .ws-rung-fill{ transition-delay: .06s; }
-  .ws-ladder.in .ws-rung:nth-child(3) .ws-rung-fill{ transition-delay: .12s; }
-  .ws-ladder.in .ws-rung:nth-child(4) .ws-rung-fill{ transition-delay: .18s; }
-  .ws-ladder.in .ws-rung:nth-child(5) .ws-rung-fill{ transition-delay: .24s; }
-  .ws-ladder-foot{ margin: 14px 0 0; font-size:.85rem; color:#8a8a86; }
-
-  /* ---------- application form ---------- */
-  .ws-apply{ display:grid; grid-template-columns: 1.15fr .85fr; gap: 20px; align-items:start; }
-  .ws-form{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .ws-field{ display:flex; flex-direction:column; gap:7px; }
-  .ws-field.full{ grid-column: 1 / -1; }
+  /* Only the form is page-specific. Everything else is the shared .lp-* set. */
+  .ws-form{ max-width: 560px; margin: clamp(40px, 5vw, 58px) auto 0; text-align:left; }
+  .ws-field{ margin-bottom: 16px; }
   .ws-field label{
-    font-family:'JetBrains Mono', monospace; font-size:.64rem; font-weight:700;
-    letter-spacing:.12em; text-transform:uppercase; color:#8a8a86;
+    display:block; margin-bottom:7px; font-size:.85rem; font-weight:500; color:#6e6e73;
   }
   .ws-field input, .ws-field select, .ws-field textarea{
-    width:100%; padding: 12px 13px; border-radius:0;
-    border:1px solid rgba(0,0,0,.18); background:#fff; color:#0a0a0a;
-    font-family:inherit; font-size:.94rem;
+    width:100%; padding: 14px 16px; border-radius: 12px;
+    border:1px solid rgba(0,0,0,.16); background:#fff; color:#1d1d1f;
+    font-family:inherit; font-size:1rem;
     transition: border-color .18s ease, box-shadow .18s ease;
   }
-  .ws-field textarea{ resize:vertical; min-height: 92px; }
-  .ws-field input::placeholder, .ws-field textarea::placeholder{ color:#a3a39e; }
-  .ws-field input:hover, .ws-field select:hover, .ws-field textarea:hover{ border-color: rgba(0,0,0,.42); }
+  .ws-field textarea{ resize:vertical; min-height: 96px; }
+  .ws-field input::placeholder, .ws-field textarea::placeholder{ color:#a1a1a6; }
+  .ws-field input:hover, .ws-field select:hover, .ws-field textarea:hover{ border-color: rgba(0,0,0,.34); }
   .ws-field input:focus, .ws-field select:focus, .ws-field textarea:focus{
-    outline:none; border-color:#0a0a0a; box-shadow: 0 0 0 3px rgba(0,0,0,.07);
+    outline:none; border-color:#1d1d1f; box-shadow: 0 0 0 4px rgba(0,0,0,.06);
   }
   /* the rule above drops the outline for the mouse case, where the darkened
      border is enough. A keyboard user needs the ring back. */
   .ws-field input:focus-visible, .ws-field select:focus-visible, .ws-field textarea:focus-visible{
-    outline: 2px solid #0a0a0a; outline-offset: 2px; box-shadow:none;
+    outline: 2px solid #1d1d1f; outline-offset: 2px; box-shadow:none;
   }
   .ws-field select{ appearance:none; cursor:pointer; }
-  .ws-form-foot{ grid-column: 1 / -1; display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:2px; }
-  .ws-form-msg{ margin:0; font-size:.88rem; color:#0a0a0a; font-weight:600; }
-  .ws-fineprint{ grid-column: 1 / -1; margin: 4px 0 0; font-size:.8rem; color:#8a8a86; }
-
-  /* ---------- what happens next ---------- */
-  .ws-next{ counter-reset: wsnext; list-style:none; margin:0; padding:0; }
-  .ws-next li{
-    counter-increment: wsnext; position:relative; padding: 0 0 20px 40px;
-    color:#55554f; font-size:.93rem; line-height:1.6;
-  }
-  .ws-next li:last-child{ padding-bottom:0; }
-  .ws-next li b{ color:#0a0a0a; display:block; margin-bottom:3px; font-weight:600; }
-  .ws-next li::before{
-    content: counter(wsnext, decimal-leading-zero);
-    position:absolute; left:0; top:1px;
-    font-family:'JetBrains Mono', monospace; font-size:.65rem; font-weight:700;
-    color:#fff; background:#0a0a0a; padding: 3px 6px;
-  }
-  /* the rail tying the steps together */
-  .ws-next li:not(:last-child)::after{
-    content:''; position:absolute; left:11px; top:25px; bottom:6px; width:1px;
-    background: rgba(0,0,0,.14);
-  }
-
-  @media (max-width: 1000px){
-    .ws-apply{ grid-template-columns:1fr; }
-  }
-  @media (max-width: 700px){
-    .ws-form{ grid-template-columns:1fr; }
-    /* the band label and the bar need the full width once the row is this narrow */
-    .ws-ladder-head, .ws-rung{ grid-template-columns: 26px 1fr; gap: 12px 14px; }
-    .ws-ladder-head span:last-child{ display:none; }
-    .ws-rung-track{ grid-column: 2 / -1; }
-  }
+  .ws-submit{ margin-top: 24px; text-align:center; }
+  .ws-msg{ margin: 14px 0 0; font-size:.95rem; color:#1d1d1f; font-weight:500; }
 </style>
 </head>
 <body>
@@ -162,238 +85,86 @@
 <main class="lp-page">
 
 <section class="lp-hero">
-  <div class="container lp-hero-inner">
-
-    <div>
-      <span class="lp-tag">Wholesale</span>
-      <h1>Research at scale.<br /><span class="outline">Priced for volume.</span></h1>
-      <p class="lp-lede">
-        Volume pricing, a named contact, and custom fill sizes for labs ordering
-        in quantity. Send your numbers and we come back with pricing.
-      </p>
-      <p class="lp-lede-status">
-        <span class="lp-lede-dot" aria-hidden="true"></span>
-        Applications are answered within <strong>one business day</strong>.
-      </p>
-    </div>
-
-    <div class="lp-stats">
-      <div class="lp-stat"><b>1 Day</b><span>To approval</span></div>
-      <div class="lp-stat"><b>99%+</b><span>Verified purity</span></div>
-      <div class="lp-stat"><b>USA</b><span>Manufactured</span></div>
-      <div class="lp-stat"><b>Same-Day</b><span>Dispatch</span></div>
-    </div>
-
-  </div>
-</section>
-
-<section class="lp-section">
   <div class="container">
-    <div class="lp-head reveal">
-      <span class="lp-kicker">Volume pricing</span>
-      <h2>Your rate steps down as your volume steps up.</h2>
-    </div>
-
-    <div class="ws-ladder reveal">
-      <div class="ws-ladder-head">
-        <span>Tier</span>
-        <span>Monthly volume</span>
-        <span>Relative cost per vial</span>
-      </div>
-      <div class="ws-rung">
-        <span class="ws-rung-n">01</span>
-        <span class="ws-rung-band">Under 50 vials</span>
-        <div class="ws-rung-track"><span class="ws-rung-fill" style="--w:100%"></span></div>
-      </div>
-      <div class="ws-rung">
-        <span class="ws-rung-n">02</span>
-        <span class="ws-rung-band">50 to 200</span>
-        <div class="ws-rung-track"><span class="ws-rung-fill" style="--w:80%"></span></div>
-      </div>
-      <div class="ws-rung">
-        <span class="ws-rung-n">03</span>
-        <span class="ws-rung-band">200 to 500</span>
-        <div class="ws-rung-track"><span class="ws-rung-fill" style="--w:62%"></span></div>
-      </div>
-      <div class="ws-rung">
-        <span class="ws-rung-n">04</span>
-        <span class="ws-rung-band">500 or more</span>
-        <div class="ws-rung-track"><span class="ws-rung-fill" style="--w:45%"></span></div>
-      </div>
-    </div>
-    <p class="ws-ladder-foot reveal">
-      Shape only, not quoted rates. Your actual tier depends on the compound and the
-      commitment, and is priced when your application is approved.
+    <h1>Order more. Pay less.</h1>
+    <p class="lp-lede">
+      Volume pricing, a named contact, and custom fill sizes for labs buying in quantity.
     </p>
-  </div>
-</section>
-
-<section class="lp-section alt">
-  <div class="container">
-    <div class="lp-head reveal">
-      <span class="lp-kicker">How it works</span>
-      <h2>Four steps from first email to first shipment.</h2>
-      <p>No portal to sign up for and no sales call to sit through.</p>
-    </div>
-
-    <div class="lp-rail reveal">
-      <div class="lp-step">
-        <span class="lp-step-n">01</span>
-        <h3>Apply</h3>
-        <p>Your institution, the compounds you need, and roughly what you expect to order each month.</p>
-      </div>
-      <div class="lp-step">
-        <span class="lp-step-n">02</span>
-        <h3>Get approved</h3>
-        <p>We reply within one business day, usually with your pricing sheet already attached.</p>
-      </div>
-      <div class="lp-step">
-        <span class="lp-step-n">03</span>
-        <h3>Place the deposit</h3>
-        <p>New accounts put down a refundable deposit. It comes off your first order, so it is not a fee.</p>
-      </div>
-      <div class="lp-step">
-        <span class="lp-step-n">04</span>
-        <h3>Start ordering</h3>
-        <p>Direct through your contact, on the same 2:00 PM EST cutoff as everyone else.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="lp-section">
-  <div class="container">
-    <div class="lp-head reveal">
-      <span class="lp-kicker">The account</span>
-      <h2>What changes at volume, and what does not.</h2>
-    </div>
-
-    <div class="lp-two reveal">
-      <div class="lp-card">
-        <h3>What you get</h3>
-        <ul class="lp-list">
-          <li>
-            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>Tiered pricing</b> that steps down with monthly volume.</span>
-          </li>
-          <li>
-            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>A named contact.</b> One person who knows your account, not a ticket queue.</span>
-          </li>
-          <li>
-            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>Custom formulations.</b> Fill sizes and compounds outside the public catalog, on request.</span>
-          </li>
-          <li>
-            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>COAs on demand</b> for any lot you have ever received.</span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="lp-card">
-        <h3>What stays the same</h3>
-        <ul class="lp-list">
-          <li>
-            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>Manufactured in the USA.</b> Same domestic supply chain at any order size.</span>
-          </li>
-          <li>
-            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>Independently verified above 99% purity</b>, batch by batch.</span>
-          </li>
-          <li>
-            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>Lyophilized and nitrogen sealed</b>, lot number matched to a published COA.</span>
-          </li>
-          <li>
-            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>Cold chain on every shipment.</b> Bulk ships in the same refrigerated pack as a single vial.</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="lp-section alt" id="apply">
-  <div class="container">
-    <div class="lp-head reveal">
-      <span class="lp-kicker">Apply</span>
-      <h2>Open a wholesale account.</h2>
-      <p>Three fields and a rough volume is enough. We do the rest by email.</p>
-    </div>
-
-    <div class="ws-apply reveal">
-      <div class="lp-card">
-        <h3>Account application</h3>
-        <form class="ws-form" id="wsForm">
-          <div class="ws-field">
-            <label for="wsName">Contact name</label>
-            <input type="text" id="wsName" name="name" placeholder="Dr. Jane Okafor" required />
-          </div>
-          <div class="ws-field">
-            <label for="wsCompany">Company or institution</label>
-            <input type="text" id="wsCompany" name="company" placeholder="Northline Research Lab" required />
-          </div>
-          <div class="ws-field">
-            <label for="wsEmail">Work email</label>
-            <input type="email" id="wsEmail" name="email" placeholder="jane@lab.com" required />
-          </div>
-          <div class="ws-field">
-            <label for="wsVolume">Expected monthly volume</label>
-            <select id="wsVolume" name="volume" required>
-              <option value="">Select a range</option>
-              <option>Under 50 vials</option>
-              <option>50 to 200 vials</option>
-              <option>200 to 500 vials</option>
-              <option>500 or more vials</option>
-            </select>
-          </div>
-          <div class="ws-field full">
-            <label for="wsCompounds">Compounds of interest</label>
-            <textarea id="wsCompounds" name="compounds" placeholder="BPC-157, TB-500, Semaglutide. Note any custom fill sizes here." required></textarea>
-          </div>
-          <div class="ws-form-foot">
-            <button type="submit" class="btn btn-primary">Submit application</button>
-            <p class="ws-form-msg" id="wsFormMsg" role="status" aria-live="polite"></p>
-          </div>
-          <p class="ws-fineprint">
-            For qualified researchers and institutions inside the United States. All products are
-            sold strictly for in-vitro laboratory research use.
-          </p>
-        </form>
-      </div>
-
-      <div class="lp-card">
-        <h3>What happens next</h3>
-        <ol class="ws-next">
-          <li>
-            <b>We review it</b>
-            Your application goes to the wholesale desk, not a general inbox.
-          </li>
-          <li>
-            <b>You get pricing</b>
-            A reply within one business day, usually with your tier already priced out.
-          </li>
-          <li>
-            <b>You place the deposit</b>
-            Refundable, and applied in full toward your first order.
-          </li>
-          <li>
-            <b>You order direct</b>
-            Through your contact, with same-day dispatch before 2:00 PM EST.
-          </li>
-        </ol>
-      </div>
-    </div>
-
-    <p class="lp-note reveal">
-      Already ordering with us? Apply with the same email you order under and we will carry
-      your history across.
+    <p class="lp-hero-note">
+      <span class="lp-dot" aria-hidden="true"></span>
+      Applications answered in <strong>one business day</strong>
     </p>
+    <div class="lp-actions">
+      <a href="#apply" class="btn btn-primary">Apply for an account</a>
+    </div>
+  </div>
+</section>
 
-    <a href="peptides.html" class="btn btn-outline lp-cta reveal">Browse the catalog <span aria-hidden="true">&rarr;</span></a>
+<section class="lp-section tint">
+  <div class="container">
+    <h2 class="lp-h2">Your rate drops as your volume climbs.</h2>
+    <p class="lp-sub">Tell us roughly what you need each month and we come back with a priced tier sheet. No portal, no sales call.</p>
+
+    <div class="lp-points reveal">
+      <div class="lp-point">
+        <h3>Tiered pricing</h3>
+        <p>Four volume bands, from under 50 vials a month to 500 and up. Your rate is quoted on approval.</p>
+      </div>
+      <div class="lp-point">
+        <h3>A named contact</h3>
+        <p>One person who knows your account and reorders with you directly, not a ticket queue.</p>
+      </div>
+      <div class="lp-point">
+        <h3>Custom fills</h3>
+        <p>Fill sizes and compounds outside the public catalog, plus COAs on demand for any lot you have had.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section" id="apply">
+  <div class="container">
+    <h2 class="lp-h2">Open an account.</h2>
+    <p class="lp-sub">Five fields. We do the rest by email.</p>
+
+    <form class="ws-form reveal" id="wsForm">
+      <div class="ws-field">
+        <label for="wsName">Contact name</label>
+        <input type="text" id="wsName" name="name" placeholder="Dr. Jane Okafor" required />
+      </div>
+      <div class="ws-field">
+        <label for="wsCompany">Company or institution</label>
+        <input type="text" id="wsCompany" name="company" placeholder="Northline Research Lab" required />
+      </div>
+      <div class="ws-field">
+        <label for="wsEmail">Work email</label>
+        <input type="email" id="wsEmail" name="email" placeholder="jane@lab.com" required />
+      </div>
+      <div class="ws-field">
+        <label for="wsVolume">Expected monthly volume</label>
+        <select id="wsVolume" name="volume" required>
+          <option value="">Select a range</option>
+          <option>Under 50 vials</option>
+          <option>50 to 200 vials</option>
+          <option>200 to 500 vials</option>
+          <option>500 or more vials</option>
+        </select>
+      </div>
+      <div class="ws-field">
+        <label for="wsCompounds">Compounds of interest</label>
+        <textarea id="wsCompounds" name="compounds" placeholder="BPC-157, TB-500, Semaglutide. Note any custom fill sizes here." required></textarea>
+      </div>
+      <div class="ws-submit">
+        <button type="submit" class="btn btn-primary">Submit application</button>
+        <p class="ws-msg" id="wsFormMsg" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <p class="lp-fine">
+      New accounts place a <strong>refundable deposit</strong> that comes off the first order in
+      full, so it is not a fee. For qualified researchers and institutions inside the United
+      States. All products are sold strictly for in-vitro laboratory research use.
+    </p>
   </div>
 </section>
 

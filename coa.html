@@ -4,112 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Certificates of Analysis | Glow Research</title>
-<meta name="description" content="Every batch is independently assayed for purity and identity before it ships. See what is on a Glow Research certificate of analysis and how to request the report for your lot." />
+<meta name="description" content="Every batch is independently assayed for purity and identity before it ships. Email your lot number and we send that batch report." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
-<style>
-  /* The shell (hero, rail, cards, stats) is .lp-* in css/style.css and is
-     shared with shipping and wholesale. Only the specimen certificate and
-     the build-status block live here. */
-
-  /* ---------- specimen certificate ----------
-     Sits on the tinted section, not the white one, so the paper reads as a
-     sheet lying on a surface rather than a box drawn on the page. */
-  .coa-spec{ display:grid; grid-template-columns: 1.05fr .95fr; gap: 44px; align-items:start; }
-  .coa-paper{
-    position:relative; background:#fff; color:#0a0a0a; padding: 28px 30px 32px;
-    border:1px solid rgba(0,0,0,.16);
-    box-shadow: 0 24px 50px -28px rgba(0,0,0,.4);
-    overflow:hidden;
-  }
-  /* unmistakable: this is a layout example, not a real report */
-  .coa-paper::after{
-    content:'SPECIMEN'; position:absolute; top:50%; left:50%;
-    transform: translate(-50%,-50%) rotate(-24deg);
-    font-family:'Space Grotesk', sans-serif; font-weight:700;
-    font-size: clamp(3rem, 8vw, 5.2rem); letter-spacing:.06em;
-    color: rgba(10,10,10,.06); pointer-events:none; white-space:nowrap;
-  }
-  .coa-paper > *{ position:relative; z-index:1; }
-  .coa-paper-head{
-    display:flex; justify-content:space-between; align-items:flex-start; gap:18px;
-    padding-bottom:14px; border-bottom:2px solid #0a0a0a; margin-bottom:16px;
-  }
-  .coa-paper-head h3{ font-size:1.02rem; margin:0 0 3px; letter-spacing:-.01em; }
-  .coa-paper-head p{
-    margin:0; font-family:'JetBrains Mono', monospace; font-size:.66rem;
-    letter-spacing:.1em; text-transform:uppercase; color:#8a8a86;
-  }
-  .coa-paper-stamp{
-    flex-shrink:0; font-family:'JetBrains Mono', monospace; font-size:.58rem; font-weight:700;
-    letter-spacing:.12em; text-transform:uppercase; color:#0a0a0a;
-    border:1.5px solid #0a0a0a; padding: 5px 9px; text-align:center; line-height:1.35;
-  }
-  .coa-paper-meta{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 2px 20px; margin-bottom:18px; }
-  .coa-paper-meta div{
-    display:flex; justify-content:space-between; gap:10px; padding: 6px 0;
-    border-bottom:1px solid rgba(0,0,0,.09); font-size:.77rem;
-  }
-  .coa-paper-meta dt{ color:#8a8a86; }
-  .coa-paper-meta dd{ margin:0; font-family:'JetBrains Mono', monospace; color:#0a0a0a; }
-  .coa-table{ width:100%; border-collapse:collapse; font-size:.77rem; }
-  .coa-table th{
-    text-align:left; font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:700;
-    letter-spacing:.1em; text-transform:uppercase; color:#8a8a86;
-    padding: 0 0 8px; border-bottom:1px solid #0a0a0a;
-  }
-  .coa-table th:last-child, .coa-table td:last-child{ text-align:right; }
-  .coa-table td{ padding: 9px 0; border-bottom:1px solid rgba(0,0,0,.09); color:#55554f; }
-  .coa-table tr:last-child td{ border-bottom:none; }
-  .coa-table td:first-child{ font-weight:600; color:#0a0a0a; }
-  .coa-table td.val{ font-family:'JetBrains Mono', monospace; color:#8a8a86; }
-  .coa-paper-foot{
-    margin: 16px 0 0; padding-top:12px; border-top:1px solid rgba(0,0,0,.12);
-    font-size:.69rem; color:#8a8a86; line-height:1.6;
-  }
-  .coa-caption{ margin: 14px 0 0; font-size:.82rem; color:#8a8a86; line-height:1.6; }
-
-  /* ---------- build status ----------
-     The one thing this page has to say plainly is that the library is not
-     live yet, so it gets the inverted block. */
-  .coa-status{ max-width: 760px; padding: 30px 32px 32px; }
-  .coa-status h3{ font-size:1.2rem; margin:0 0 12px; }
-  .coa-status p{ font-size:.96rem; }
-  .coa-status p:last-of-type{ margin-bottom:0; }
-  .coa-status-badge{
-    display:inline-block; margin-bottom:16px; background:#fff; color:#0a0a0a;
-    font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:700;
-    letter-spacing:.14em; text-transform:uppercase; padding: 4px 10px;
-  }
-  .coa-actions{ display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
-  /* the outline button sits on the ink panel, so it flips back to white */
-  .coa-status .btn-primary{ background:#fff; color:#0a0a0a; }
-  .coa-status .btn-primary:hover{ background:#e4e4e2; color:#0a0a0a; }
-  .coa-status .btn-outline{ border-color: rgba(255,255,255,.5); color:#fff; }
-  .coa-status .btn-outline:hover{ border-color:#fff; background:#fff; color:#0a0a0a; }
-  .coa-status :focus-visible{ outline: 2px solid #fff; outline-offset: 3px; }
-
-  /* the last step of the process is not live yet, so its number reads hollow */
-  .lp-step.pending .lp-step-n{ background:#fff; color:#8a8a86; border:1px solid rgba(0,0,0,.28); }
-  .coa-step-tag{
-    display:inline-block; margin-top:12px; background:#0a0a0a; color:#fff;
-    font-family:'JetBrains Mono', monospace; font-size:.58rem; font-weight:700;
-    letter-spacing:.12em; text-transform:uppercase; padding: 3px 8px;
-  }
-  .coa-step-tag.soon{ background:transparent; color:#8a8a86; border:1px solid rgba(0,0,0,.28); }
-
-  @media (max-width: 1000px){
-    .coa-spec{ grid-template-columns:1fr; gap:32px; }
-  }
-  @media (max-width: 700px){
-    .coa-paper{ padding: 22px 18px 24px; }
-    .coa-paper-meta{ grid-template-columns:1fr; }
-    .coa-status{ padding: 24px 20px 26px; }
-  }
-</style>
 </head>
 <body>
 
@@ -157,227 +57,62 @@
 <main class="lp-page">
 
 <section class="lp-hero">
-  <div class="container lp-hero-inner">
-
-    <div>
-      <span class="lp-tag">Certificates of Analysis</span>
-      <h1>Every batch,<br /><span class="outline">independently assayed.</span></h1>
-      <p class="lp-lede">
-        A certificate of analysis is the lab report behind a vial. What the compound is,
-        how pure it is, and who measured it. Every batch we ship has one.
-      </p>
-      <p class="lp-lede-status">
-        <span class="lp-lede-dot" aria-hidden="true"></span>
-        Searchable library still in build. Email your lot number for that batch&rsquo;s report.
-      </p>
-    </div>
-
-    <div class="lp-stats">
-      <div class="lp-stat"><b>100%</b><span>Batches tested</span></div>
-      <div class="lp-stat"><b>99%+</b><span>Purity floor</span></div>
-      <div class="lp-stat"><b>Lot-Level</b><span>Traceability</span></div>
-      <div class="lp-stat"><b>USA</b><span>Manufactured</span></div>
-    </div>
-
-  </div>
-</section>
-
-<section class="lp-section">
   <div class="container">
-    <div class="lp-head reveal">
-      <span class="lp-kicker">Straight answer</span>
-      <h2>The library is not up yet.</h2>
-    </div>
-
-    <div class="lp-ink coa-status reveal">
-      <span class="coa-status-badge">In build</span>
-      <h3>What exists today, and what does not.</h3>
-      <p>
-        Every batch is assayed by an independent lab before it ships, and those reports exist.
-        What does not exist yet is the page where you search a lot number and pull one down
-        yourself. We are building it.
-      </p>
-      <p>
-        Until then, send us the lot number printed on your vial and we will email the report for
-        that exact batch. Still deciding whether to order? Ask for a recent report on the compound
-        you are looking at and we will send it before you buy anything.
-      </p>
-      <div class="coa-actions">
-        <a href="blog/how-to-read-a-certificate-of-analysis/" class="btn btn-primary">How to read a COA <span aria-hidden="true">&rarr;</span></a>
-        <a href="peptides.html" class="btn btn-outline">Browse the catalog <span aria-hidden="true">&rarr;</span></a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="lp-section alt">
-  <div class="container">
-    <div class="lp-head reveal">
-      <span class="lp-kicker">The document</span>
-      <h2>What is on a certificate.</h2>
-    </div>
-
-    <div class="coa-spec">
-      <div class="reveal">
-        <div class="coa-paper">
-          <div class="coa-paper-head">
-            <div>
-              <h3>Certificate of Analysis</h3>
-              <p>Independent Testing Laboratory</p>
-            </div>
-            <div class="coa-paper-stamp">Example<br />layout</div>
-          </div>
-
-          <dl class="coa-paper-meta">
-            <div><dt>Compound</dt><dd>Compound name</dd></div>
-            <div><dt>Lot</dt><dd>GR-0000-000</dd></div>
-            <div><dt>Quantity</dt><dd>0 mg / vial</dd></div>
-            <div><dt>Tested</dt><dd>YYYY-MM-DD</dd></div>
-          </dl>
-
-          <table class="coa-table">
-            <thead>
-              <tr><th scope="col">Test</th><th scope="col">Method</th><th scope="col">Result</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Purity</td><td class="val">HPLC</td><td class="val">00.0%</td></tr>
-              <tr><td>Identity</td><td class="val">Mass spec</td><td class="val">Confirmed</td></tr>
-              <tr><td>Endotoxin</td><td class="val">LAL</td><td class="val">0.00 EU/mg</td></tr>
-              <tr><td>Water content</td><td class="val">Karl Fischer</td><td class="val">0.0%</td></tr>
-              <tr><td>Appearance</td><td class="val">Visual</td><td class="val">White powder</td></tr>
-            </tbody>
-          </table>
-
-          <p class="coa-paper-foot">
-            Placeholder values shown for layout only. A real certificate carries the testing
-            laboratory name, the analyst signature, and the date of analysis.
-          </p>
-        </div>
-        <p class="coa-caption">
-          A layout example with placeholder values. Not a real report, and not test data for any
-          batch we sell.
-        </p>
-      </div>
-
-      <div class="reveal">
-        <div class="lp-card">
-          <h3>Reading it line by line</h3>
-          <ul class="lp-list">
-            <li>
-              <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span><b>Lot number.</b> The whole point of the document. It ties this report to the batch your vial came from, not to the compound in general.</span>
-            </li>
-            <li>
-              <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span><b>Purity by HPLC.</b> The headline number. How much of the material is the target compound versus everything else in the vial.</span>
-            </li>
-            <li>
-              <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span><b>Identity by mass spec.</b> Purity alone cannot tell you the compound is the right one. Mass spec confirms the molecular weight matches.</span>
-            </li>
-            <li>
-              <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span><b>Endotoxin and water content.</b> Contamination and residual moisture. High water content shortens how long the powder stays stable.</span>
-            </li>
-            <li>
-              <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span><b>Lab name and date.</b> A report with no testing laboratory named on it is a marketing document, not a certificate.</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="lp-section">
-  <div class="container">
-    <div class="lp-head reveal">
-      <span class="lp-kicker">The process</span>
-      <h2>How a batch gets its certificate.</h2>
-      <p>Testing is not one checkpoint at the end. It runs the length of the batch.</p>
-    </div>
-
-    <div class="lp-rail reveal">
-      <div class="lp-step">
-        <span class="lp-step-n">01</span>
-        <h3>Intake</h3>
-        <p>Raw peptide arrives from a vetted domestic manufacturer. Supplier documentation is logged against the lot first.</p>
-        <span class="coa-step-tag">Live</span>
-      </div>
-      <div class="lp-step">
-        <span class="lp-step-n">02</span>
-        <h3>Manufacture</h3>
-        <p>Lyophilized and nitrogen sealed, with QC checks at each stage rather than only before it ships.</p>
-        <span class="coa-step-tag">Live</span>
-      </div>
-      <div class="lp-step">
-        <span class="lp-step-n">03</span>
-        <h3>Independent assay</h3>
-        <p>A sample goes to a third-party lab. HPLC for purity, mass spec for identity. We do not grade our own work.</p>
-        <span class="coa-step-tag">Live</span>
-      </div>
-      <div class="lp-step pending">
-        <span class="lp-step-n">04</span>
-        <h3>Published</h3>
-        <p>The report attaches to the lot number so anyone holding a vial can pull it up. This is the piece still being built.</p>
-        <span class="coa-step-tag soon">Coming</span>
-      </div>
-    </div>
-
-    <p class="lp-note reveal">
-      Steps one through three run on every batch today. Step four is the only part that is not
-      finished, and it is why this page asks you to email us instead of clicking a link.
+    <h1>Every batch, tested.</h1>
+    <p class="lp-lede">
+      An independent lab measures what is in the vial before it ships. Not us. Them.
     </p>
   </div>
 </section>
 
-<section class="lp-section alt">
+<section class="lp-section tint">
   <div class="container">
-    <div class="lp-head reveal">
-      <span class="lp-kicker">Before you order</span>
-      <h2>Questions worth asking any supplier.</h2>
-      <p>Including us. If a supplier cannot answer these, that tells you something.</p>
+    <div class="lp-figs reveal">
+      <div class="lp-fig"><b>100%</b><span>Of batches assayed</span></div>
+      <div class="lp-fig"><b>99%+</b><span>Verified purity</span></div>
+      <div class="lp-fig"><b>Lot-level</b><span>Traceability</span></div>
     </div>
+  </div>
+</section>
 
-    <div class="lp-two reveal">
-      <div class="lp-card">
-        <h3>What to ask for</h3>
-        <ul class="lp-list">
-          <li>
-            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>The report for your lot</b>, not a sample report for the compound.</span>
-          </li>
-          <li>
-            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>The name of the testing laboratory</b>, so the result can be checked independently.</span>
-          </li>
-          <li>
-            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>Both purity and identity.</b> A purity number alone does not prove the compound is what the label says.</span>
-          </li>
-          <li>
-            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>The date of analysis.</b> A report from two years ago says nothing about the batch in your hand.</span>
-          </li>
-        </ul>
+<section class="lp-section">
+  <div class="container">
+    <h2 class="lp-h2">Three things a real certificate proves.</h2>
+    <p class="lp-sub">Ask any supplier for these. If they cannot produce them, that tells you something.</p>
+
+    <div class="lp-points reveal">
+      <div class="lp-point">
+        <h3>Purity</h3>
+        <p>Measured by HPLC. How much of the material is the target compound versus everything else in the vial.</p>
       </div>
+      <div class="lp-point">
+        <h3>Identity</h3>
+        <p>Confirmed by mass spec. Purity alone cannot tell you the compound is the one on the label.</p>
+      </div>
+      <div class="lp-point">
+        <h3>Your lot</h3>
+        <p>Tied to the batch number on your vial, with the testing lab named and the date of analysis on it.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-      <div class="lp-card">
-        <h3>Where we stand</h3>
-        <p>
-          Every compound is manufactured domestically and independently verified above 99% purity.
-          Identity, purity, endotoxin, and sterility are checked through the batch, not only at the
-          end of it, and each step is logged against the lot number.
-        </p>
-        <p>
-          Full manufacturing and QC documentation is available on request for qualified researchers.
-          Ask and we will send it.
-        </p>
-        <p>
-          When the library goes live, everything above becomes a link instead of an email. Nothing
-          about the testing changes, only how you get to it.
-        </p>
+<section class="lp-section tint">
+  <div class="container">
+    <div class="lp-panel lp-narrow reveal">
+      <h3>The library is not live yet.</h3>
+      <p>
+        Every batch is assayed and those reports exist. What does not exist yet is the page
+        where you search a lot number and pull one down yourself. We are building it.
+      </p>
+      <p>
+        Until then, send us the lot number printed on your vial and we will email the report
+        for that exact batch. Still deciding? Ask for a recent report on the compound you are
+        looking at and we will send it before you buy anything.
+      </p>
+      <div class="lp-actions">
+        <a href="blog/how-to-read-a-certificate-of-analysis/" class="btn btn-primary">How to read a COA</a>
+        <a href="peptides.html" class="btn btn-outline">Browse the catalog</a>
       </div>
     </div>
   </div>

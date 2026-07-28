@@ -713,159 +713,109 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* =====================================================================
    LIGHT PAGE: shared shell for shipping / wholesale / COA.
-   Those three were three copies of the same near-black layout with
-   different words in it, which is why they read as filler. The shell now
-   lives here once, on white, so each page only has to define the one
-   diagram that makes it its own page. White also matches the header
-   (#ececea) and the product page instead of fighting them.
+   These pages had turned into a lab-supplier catalogue: ruled grids,
+   hairline cards, mono data tables, numbered rails. All correct, all
+   forgettable. The vocabulary here is deliberately tiny (a hero, a row
+   of figures, a row of points, a soft panel) so the pages are carried
+   by type and space rather than by drawn furniture.
    ===================================================================== */
-.lp-page{ background:#fff; color:#0a0a0a; }
-.lp-page p{ color:#55554f; }
-.lp-page h1, .lp-page h2, .lp-page h3, .lp-page h4{ color:#0a0a0a; }
-/* the pale chip and the white-bordered outline are both built for dark
-   sections; on white they read as disabled, so both invert here */
-.lp-page .btn-primary{ background:#0a0a0a; color:#fff; }
-.lp-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
-.lp-page .btn-outline{ border-color: rgba(0,0,0,.25); color:#0a0a0a; }
-.lp-page .btn-outline:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; box-shadow:none; }
-.lp-page :focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 3px; }
+.lp-page{ background:#fff; color:#1d1d1f; }
+.lp-page p{ color:#6e6e73; }
+.lp-page h1, .lp-page h2, .lp-page h3{ color:#1d1d1f; letter-spacing:-.04em; font-weight:700; }
+/* the site's buttons are square and built for dark sections. On these
+   pages they round off and invert. */
+.lp-page .btn{ border-radius:980px; padding: 13px 26px; font-size:1rem; font-weight:500; }
+.lp-page .btn-primary{ background:#1d1d1f; color:#fff; border-color:transparent; }
+.lp-page .btn-primary:hover{ background:#000; color:#fff; }
+.lp-page .btn-outline{ border-color: rgba(0,0,0,.22); color:#1d1d1f; }
+.lp-page .btn-outline:hover{ border-color:#1d1d1f; background:#1d1d1f; color:#fff; box-shadow:none; }
+.lp-page :focus-visible{ outline: 2px solid #1d1d1f; outline-offset: 3px; }
+.lp-narrow{ max-width: 720px; margin-left:auto; margin-right:auto; }
 
 /* ---------- hero ---------- */
-.lp-hero{
-  position:relative; background:#f6f6f4; padding: 60px 0 0;
-  border-bottom:1px solid rgba(0,0,0,.12); overflow:hidden; isolation:isolate;
-}
-/* engineering paper: an ink grid masked to one corner so it never runs
-   under the copy and turn the lede into a texture */
-.lp-hero::before{
-  content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
-  background-image:
-    repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0 1px, transparent 1px 74px),
-    repeating-linear-gradient(0deg,  rgba(0,0,0,.06) 0 1px, transparent 1px 74px);
-  -webkit-mask-image: radial-gradient(115% 95% at 88% 4%, #000 0%, transparent 70%);
-  mask-image: radial-gradient(115% 95% at 88% 4%, #000 0%, transparent 70%);
-}
-.lp-hero-inner{ position:relative; z-index:1; }
-.lp-hero-top{ padding-bottom: 46px; }
-.lp-tag{
-  display:inline-block; font-family:'JetBrains Mono', monospace;
-  font-size:.64rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
-  color:#0a0a0a; border:1px solid #0a0a0a; padding: 5px 10px; margin-bottom: 20px;
-}
+.lp-hero{ background:#fff; padding: clamp(72px, 11vw, 130px) 0 clamp(56px, 8vw, 96px); text-align:center; }
+/* text-wrap:balance keeps these off a widowed last line, which at this size
+   is the difference between a headline and an accident */
 .lp-hero h1{
-  font-size: clamp(2.15rem, 4.8vw, 3.6rem); margin: 0 0 18px;
-  letter-spacing:-.035em; line-height:1.03;
+  font-size: clamp(2.6rem, 7vw, 4.9rem); line-height:1.04; margin:0 0 20px;
+  max-width: 17ch; margin-inline:auto; text-wrap: balance;
 }
-.lp-hero h1 .outline{ color: transparent; -webkit-text-stroke: 1.3px #0a0a0a; }
-.lp-lede{ font-size: 1.05rem; max-width: 48ch; margin:0; }
-/* the one live fact worth a glance without reading the paragraph above it */
-.lp-lede-status{
-  display:flex; align-items:center; gap:10px; margin: 20px 0 0;
-  font-family:'JetBrains Mono', monospace; font-size:.82rem; color:#55554f;
+.lp-lede{
+  font-size: clamp(1.12rem, 2vw, 1.45rem); line-height:1.42; color:#6e6e73;
+  max-width: 36ch; margin: 0 auto; font-weight:400; text-wrap: balance;
 }
-.lp-lede-status strong{ color:#0a0a0a; }
-.lp-lede-dot{
-  width:7px; height:7px; background:#0a0a0a; flex-shrink:0; border-radius:50%;
+/* one live fact, small enough that it never competes with the headline */
+.lp-hero-note{
+  display:inline-flex; align-items:center; gap:9px; margin: 30px 0 0;
+  font-size:.95rem; color:#6e6e73;
+}
+.lp-hero-note strong{ color:#1d1d1f; font-weight:600; }
+.lp-dot{
+  width:7px; height:7px; border-radius:50%; background:#1d1d1f; flex-shrink:0;
   animation: lpPulse 2.4s ease-out infinite;
 }
-
-/* ---------- stat strip, flush to the bottom of the hero ---------- */
-.lp-stats{
-  display:grid; grid-template-columns: repeat(4, 1fr); gap:1px;
-  background: rgba(0,0,0,.12); border-top:1px solid rgba(0,0,0,.12);
-}
-.lp-stat{ background:#f6f6f4; padding: 22px 4px 24px; }
-.lp-stat b{
-  display:block; font-family:'Space Grotesk', sans-serif;
-  font-size: clamp(1.35rem, 2.3vw, 1.9rem); font-weight:700; letter-spacing:-.02em; color:#0a0a0a;
-}
-.lp-stat span{
-  display:block; margin-top:5px; font-family:'JetBrains Mono', monospace;
-  font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:#8a8a86;
-}
-
-/* ---------- sections ---------- */
-.lp-section{ padding: 74px 0; background:#fff; }
-.lp-section.alt{
-  background:#f6f6f4;
-  border-top:1px solid rgba(0,0,0,.12); border-bottom:1px solid rgba(0,0,0,.12);
-}
-.lp-head{ max-width: 58ch; margin-bottom: 34px; }
-.lp-kicker{
-  display:block; margin-bottom: 12px; font-family:'JetBrains Mono', monospace;
-  font-size:.65rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#8a8a86;
-}
-.lp-head h2{ font-size: clamp(1.45rem, 2.7vw, 2.05rem); margin: 0 0 10px; letter-spacing:-.025em; }
-.lp-head p{ margin:0; font-size:1rem; }
-
-/* ---------- numbered rail ----------
-   The connector runs behind the number chips at their exact centre, so the
-   row reads as one track with four stations rather than four loose cards. */
-.lp-rail{
-  display:grid; grid-template-columns: repeat(4, 1fr); gap:1px;
-  background: rgba(0,0,0,.12); border:1px solid rgba(0,0,0,.12);
-}
-.lp-step{ position:relative; background:#fff; padding: 26px 24px 28px; transition: background .25s ease; }
-.lp-step:hover{ background:#f6f6f4; }
-.lp-step > *{ position:relative; z-index:1; }
-.lp-step::before{
-  content:''; position:absolute; top:39px; left:0; right:0; height:1px;
-  background: rgba(0,0,0,.16); z-index:0;
-}
-.lp-step-n{
-  display:inline-flex; align-items:center; justify-content:center;
-  width:26px; height:26px; margin-bottom:16px; background:#0a0a0a; color:#fff;
-  font-family:'JetBrains Mono', monospace; font-size:.65rem; font-weight:700;
-}
-.lp-step h3{ font-size:1rem; margin: 0 0 7px; }
-.lp-step p{ font-size:.9rem; margin:0; line-height:1.6; }
-
-/* ---------- cards, lists, notes ---------- */
-.lp-two{ display:grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.lp-card{ background:#fff; border:1px solid rgba(0,0,0,.12); padding: 26px 28px 30px; }
-.lp-card h3{
-  font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:700;
-  letter-spacing:.14em; text-transform:uppercase; color:#8a8a86;
-  margin: 0 0 18px; padding-bottom:14px; border-bottom:1px solid rgba(0,0,0,.12);
-}
-.lp-card p:last-child{ margin-bottom:0; }
-.lp-list{ list-style:none; margin:0; padding:0; }
-.lp-list li{
-  display:flex; gap:12px; align-items:flex-start; padding: 12px 0;
-  border-bottom:1px solid rgba(0,0,0,.08);
-  font-size:.94rem; line-height:1.55; color:#55554f;
-}
-.lp-list li:last-child{ border-bottom:none; }
-.lp-list li b{ color:#0a0a0a; font-weight:600; }
-.lp-ico{ flex-shrink:0; margin-top:3px; color:#0a0a0a; }
-.lp-ico.no{ color:#b4b4b0; }
-.lp-note{
-  border-left:2px solid #0a0a0a; padding: 2px 0 2px 20px; margin: 32px 0 0;
-  font-size:.94rem; color:#55554f; max-width: 72ch;
-}
-.lp-cta{ margin-top: 34px; display:inline-flex; align-items:center; gap:8px; }
-
-/* ---------- ink panel ----------
-   Used once, by the COA page's "library is not up yet" status card
-   further down that page: not the hero. */
-.lp-ink{ background:#0a0a0a; color:#fff; padding: 24px 26px 26px; }
-.lp-ink h3, .lp-ink b, .lp-ink strong{ color:#fff; }
-.lp-ink p{ color:#a3a3a1; }
 @keyframes lpPulse{
-  0%{ box-shadow: 0 0 0 0 rgba(0,0,0,.4); }
-  70%{ box-shadow: 0 0 0 8px rgba(0,0,0,0); }
+  0%{ box-shadow: 0 0 0 0 rgba(0,0,0,.34); }
+  70%{ box-shadow: 0 0 0 7px rgba(0,0,0,0); }
   100%{ box-shadow: 0 0 0 0 rgba(0,0,0,0); }
 }
+.lp-actions{ display:flex; justify-content:center; flex-wrap:wrap; gap:14px; margin-top: 34px; }
 
-@media (max-width: 1000px){
-  .lp-rail{ grid-template-columns: repeat(2, 1fr); }
+/* ---------- figures ----------
+   Numbers with air around them, no rules and no boxes. The spacing is
+   the only thing separating them. */
+.lp-figs{
+  display:flex; justify-content:center; flex-wrap:wrap;
+  gap: clamp(38px, 7vw, 96px); text-align:center;
 }
-@media (max-width: 700px){
-  .lp-stats{ grid-template-columns: repeat(2, 1fr); }
-  .lp-two{ grid-template-columns:1fr; }
-  .lp-rail{ grid-template-columns:1fr; }
-  /* the connector only means anything while the steps sit in a row */
-  .lp-step::before{ display:none; }
+.lp-fig b{
+  display:block; font-size: clamp(1.9rem, 3.6vw, 2.9rem); font-weight:700;
+  letter-spacing:-.045em; color:#1d1d1f; line-height:1;
+}
+.lp-fig span{ display:block; margin-top:9px; font-size:.95rem; color:#6e6e73; }
+
+/* ---------- sections ---------- */
+.lp-section{ padding: clamp(72px, 10vw, 118px) 0; text-align:center; }
+.lp-section.tint{ background:#f5f5f7; }
+.lp-h2{
+  font-size: clamp(1.95rem, 4.4vw, 3.1rem); line-height:1.07; margin:0 0 18px;
+  max-width: 20ch; margin-inline:auto; text-wrap: balance;
+}
+.lp-sub{
+  font-size: clamp(1.05rem, 1.7vw, 1.27rem); line-height:1.45; color:#6e6e73;
+  max-width: 42ch; margin:0 auto; text-wrap: balance;
+}
+
+/* ---------- points ---------- */
+.lp-points{
+  display:grid; grid-template-columns: repeat(3, 1fr);
+  gap: clamp(40px, 5vw, 64px); margin-top: clamp(52px, 7vw, 82px); text-align:center;
+}
+.lp-point svg{ color:#1d1d1f; margin: 0 auto 18px; display:block; }
+.lp-point h3{ font-size:1.2rem; margin:0 0 9px; letter-spacing:-.025em; }
+.lp-point p{ font-size:1rem; margin:0; line-height:1.6; }
+
+/* ---------- soft panel ---------- */
+.lp-panel{
+  background:#f5f5f7; border-radius: 24px;
+  padding: clamp(38px, 5.5vw, 62px) clamp(26px, 4.5vw, 56px);
+  text-align:center;
+}
+.lp-section.tint .lp-panel{ background:#fff; }
+.lp-panel h3{ font-size: clamp(1.4rem, 2.6vw, 1.95rem); margin:0 0 14px; }
+.lp-panel p{ font-size:1.05rem; line-height:1.6; max-width: 52ch; margin-inline:auto; }
+.lp-panel p:last-child{ margin-bottom:0; }
+
+/* ---------- fine print ---------- */
+.lp-fine{
+  margin: clamp(46px, 6vw, 72px) auto 0; max-width: 62ch;
+  font-size:.88rem; line-height:1.65; color:#86868b; text-align:center;
+}
+.lp-fine strong{ color:#6e6e73; font-weight:600; }
+
+@media (max-width: 860px){
+  .lp-points{ grid-template-columns:1fr; gap: 44px; }
+  .lp-hero h1{ max-width: 14ch; }
 }
 
 /* =====================================================================
