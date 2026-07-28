@@ -9,6 +9,17 @@
 // `sizes` is the mg picker on the product page, cheapest first. The first entry
 // is the one the catalog grid, search and quick-add all quote, so it doubles as
 // the product's headline size/price (see the normalise pass below).
+//
+// `coa` is optional: a URL to that compound's own certificate of analysis.
+// It is what "View certificate of analysis" on the product page opens. A
+// product without one falls back to COA_URL below.
+// One certificate link shared by every product that has no `coa` of its own.
+// Paste the hosted COA here (a PDF, a Drive link, whatever the lab gives you)
+// and every product page's "View certificate of analysis" goes live at once.
+// Left empty the box stays put and simply is not clickable, which is better
+// than sending a buyer to a dead link.
+const COA_URL = '';
+
 const GLOW_PRODUCTS = [
   { name: 'BPC-157', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', badge:'Best Seller',
     sizes: [{ mg: '5mg', price: 59 }, { mg: '10mg', price: 99 }],

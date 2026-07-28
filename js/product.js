@@ -115,7 +115,36 @@
       document.querySelector('.pd-visual').classList.add('has-photo');
     }
 
-    $('pdCoaLink').href = pageHref('coa.html');
+    renderCoa(p);
+  }
+
+  /* ================= certificate =================
+     There is no COA page any more. "View certificate of analysis" opens the
+     document itself: the product's own `coa` if it has one, otherwise the
+     shared COA_URL. Until either is filled in the box keeps its wording but
+     carries no href, so it can never send anyone to a 404. */
+
+  function renderCoa(p) {
+    const box = $('pdCoaLink');
+    if (!box) return;
+
+    const href = p.coa || (typeof COA_URL === 'string' ? COA_URL : '');
+    if (!href) {
+      box.removeAttribute('href');
+      box.classList.add('is-static');
+      // dropping href is not enough on its own: the anchor still reports
+      // tabIndex 0, so a keyboard user lands on a box that does nothing
+      box.tabIndex = -1;
+      return;
+    }
+
+    box.href = href;
+    box.classList.remove('is-static');
+    box.removeAttribute('tabindex');
+    // a certificate is a document, not a step in the buying flow, so it
+    // opens alongside the page rather than replacing it
+    box.target = '_blank';
+    box.rel = 'noopener';
   }
 
   /* ================= mg picker ================= */

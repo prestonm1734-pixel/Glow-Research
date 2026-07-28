@@ -21,7 +21,7 @@
 //   sitemap.xml                 every page on the site
 //
 // Links in posts.js and in article fragments are written ROOT-RELATIVE
-// ("coa.html"). rewriteDepth() rewrites them per output depth.
+// ("peptides.html"). rewriteDepth() rewrites them per output depth.
 
 const fs = require('fs');
 const path = require('path');
@@ -547,7 +547,6 @@ ${rowsHtml}
 function buildSitemap() {
   const staticPages = [
     ['', '1.0'], ['peptides.html', '0.9'], ['blog.html', '0.8'],
-    ['coa.html', '0.7'],
     ['shipping.html', '0.6'], ['wholesale.html', '0.6'],
   ];
   const today = new Date().toISOString().slice(0, 10);

@@ -257,6 +257,12 @@
     border:2px solid rgba(0,0,0,.7); padding: 14px 16px; color:#0a0a0a;
   }
   .pd-coa:hover{ background:#f7f7f5; }
+  /* no certificate URL set yet: the box keeps its wording but stops
+     behaving like something you can press */
+  .pd-coa.is-static{ cursor:default; }
+  .pd-coa.is-static b{ color:#55554f; }
+  .pd-coa.is-static:hover{ background:transparent; }
+  .pd-coa.is-static .pd-coa-arrow{ display:none; }
   .pd-coa > svg:first-child{ flex-shrink:0; }
   .pd-coa b{ display:block; font-size:1rem; font-weight:800; }
   .pd-coa small{ display:block; margin-top:3px; font-size:.8rem; color:#8a8a86; }
@@ -317,7 +323,6 @@
 
     <nav class="main-nav" id="mainNav">
       <a href="peptides.html" class="active">Peptides</a>
-      <a href="coa.html">COA</a>
       <a href="shipping.html">Shipping</a>
       <a href="wholesale.html">Wholesale</a>
       <a href="blog.html">Blog</a>
@@ -406,7 +411,7 @@
           <div class="pd-tiers" id="pdTiers"></div>
         </div>
 
-        <a class="pd-coa" id="pdCoaLink" href="coa.html">
+        <a class="pd-coa" id="pdCoaLink">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M6 2h8l4 4v16H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
             <path d="M14 2v5h4M9 12h6M9 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -469,7 +474,6 @@
       </div>
       <div class="footer-col">
         <h4>Company</h4>
-        <a href="coa.html">COA</a>
         <a href="shipping.html">Shipping</a>
         <a href="wholesale.html">Wholesale</a>
         <a href="blog.html">Blog</a>
