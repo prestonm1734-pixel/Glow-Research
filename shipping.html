@@ -4,208 +4,70 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Shipping &amp; Fulfillment | Glow Research</title>
-<meta name="description" content="Order before 2:00 PM EST and it ships the same business day, packed cold and moving on 2-day FedEx Express. Free over $250. All 50 states." />
+<meta name="description" content="Order before 2:00 PM EST and it ships the same business day, packed cold on 2-day FedEx Express. Free over $250. All 50 states." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  /* ---------- shipping page ----------
-     Layered dark surfaces: page #000, cards lifted with a gradient body, a
-     hairline border, and an inset top highlight. That top highlight is what
-     reads as depth on a near-black page; shadow alone disappears. */
-  .ship-hero{ position:relative; padding: 80px 0 0; background:#000; overflow:hidden; isolation:isolate; }
-  .ship-hero-bg{ position:absolute; inset:0; z-index:0; pointer-events:none; }
-  /* fine grid, fading out downward so it never competes with the copy */
-  .ship-hero-bg::before{
-    content:''; position:absolute; inset:0;
-    background-image:
-      repeating-linear-gradient(90deg, rgba(255,255,255,.045) 0 1px, transparent 1px 88px),
-      repeating-linear-gradient(0deg,  rgba(255,255,255,.045) 0 1px, transparent 1px 88px);
-    -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.35) 55%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.35) 55%, transparent 100%);
-  }
-  .ship-hero-bg::after{
-    content:''; position:absolute; top:-30%; right:-10%; width:70%; height:120%;
-    background: radial-gradient(ellipse at center, rgba(255,255,255,.10), transparent 62%);
-  }
-  .ship-hero-inner{ position:relative; z-index:1; }
+  /* The shell (hero, rail, cards, stats) is .lp-* in css/style.css and is
+     shared with wholesale and COA. Only what is specific to shipping lives
+     here: the dispatch clock and the pack diagram. */
 
-  .ship-hero-top{
-    display:grid; grid-template-columns: 1.25fr .85fr; gap: 56px; align-items:start;
-    padding-bottom: 64px;
+  /* ---------- the pack, drawn as the pack ----------
+     Five frames each literally inside the last, so the diagram carries the
+     information instead of a list describing it. */
+  .sh-pack{ display:grid; grid-template-columns: .9fr 1.1fr; gap: 48px; align-items:center; }
+  .sh-layer{
+    position:relative; background:#fff;
+    border:1px solid rgba(0,0,0,.22); padding: 38px 22px 22px;
+    transition: border-color .2s ease;
   }
-  .ship-hero h1{
-    font-size: clamp(2.2rem, 4.6vw, 3.6rem); margin: 18px 0 22px; letter-spacing:-0.03em; line-height:1.06;
+  /* each level sits a shade deeper so the nesting reads without needing
+     five different border weights */
+  .sh-layer > .sh-layer{ background:#faf9f7; }
+  .sh-layer > .sh-layer > .sh-layer{ background:#f4f3f0; }
+  .sh-layer > .sh-layer > .sh-layer > .sh-layer{ background:#ecebe7; }
+  .sh-layer-t{
+    position:absolute; top:-1px; left:-1px;
+    background:#55554f; color:#fff; padding: 5px 10px;
+    font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; white-space:nowrap;
+    transition: background .2s ease;
   }
-  .ship-hero h1 .outline{ color: transparent; -webkit-text-stroke: 1.4px rgba(255,255,255,.82); }
-  .ship-lede{ font-size: 1.08rem; max-width: 520px; margin: 0; }
+  .sh-layer-t i{ font-style:normal; color:#a3a3a1; margin-right:7px; }
+  .sh-layer:hover{ border-color:#0a0a0a; }
+  .sh-layer:hover > .sh-layer-t{ background:#0a0a0a; }
+  .sh-layer:hover > .sh-layer-t i{ color:#8a8a86; }
+  /* :hover matches every ancestor of the cursor too, which would light the
+     whole stack at once. Hand the highlight back to the innermost one. */
+  .sh-layer:has(.sh-layer:hover){ border-color: rgba(0,0,0,.22); }
+  .sh-layer:has(.sh-layer:hover) > .sh-layer-t{ background:#55554f; }
+  .sh-core{ background:#0a0a0a; color:#fff; padding: 26px 16px; text-align:center; }
+  .sh-core b{ display:block; font-family:'Space Grotesk', sans-serif; font-size:1rem; }
+  .sh-core span{ display:block; margin-top:5px; font-size:.78rem; color:#8a8a86; }
 
-  /* dispatch panel: the live cutoff clock */
-  .ship-panel{
-    background: linear-gradient(180deg, #131313, #0b0b0b);
-    border: 1px solid rgba(255,255,255,.12);
-    box-shadow: 0 30px 60px -34px #000, inset 0 1px 0 rgba(255,255,255,.07);
-    padding: 26px 26px 22px;
-  }
-  .ship-panel-label{
-    font-family:'JetBrains Mono', monospace; font-size:.68rem; font-weight:700;
-    letter-spacing:.14em; text-transform:uppercase; color: var(--text-dimmer);
-    display:flex; align-items:center; gap:9px; margin-bottom:16px;
-  }
-  .ship-dot{
-    width:7px; height:7px; background:#fff; flex-shrink:0;
-    box-shadow: 0 0 0 0 rgba(255,255,255,.55); animation: shipPulse 2.4s ease-out infinite;
-  }
-  @keyframes shipPulse{
-    0%{ box-shadow: 0 0 0 0 rgba(255,255,255,.5); }
-    70%{ box-shadow: 0 0 0 8px rgba(255,255,255,0); }
-    100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0); }
-  }
-  .ship-cutoff{ font-size: 1.15rem; color: var(--text); line-height:1.45; margin:0 0 18px; }
-  .ship-cutoff strong{ font-family:'Space Grotesk', sans-serif; font-weight:700; }
-  .ship-panel-rows{ border-top:1px solid rgba(255,255,255,.1); }
-  .ship-panel-row{
-    display:flex; justify-content:space-between; align-items:baseline; gap:14px;
-    padding: 11px 0; border-bottom:1px solid rgba(255,255,255,.07);
-    font-size:.86rem;
-  }
-  .ship-panel-row:last-child{ border-bottom:none; }
-  .ship-panel-row dt{ color: var(--text-dimmer); }
-  .ship-panel-row dd{ margin:0; color: var(--text); font-family:'JetBrains Mono', monospace; text-align:right; }
-
-  /* stat strip, flush to the bottom of the hero */
-  .ship-stats{
-    display:grid; grid-template-columns: repeat(4, 1fr);
-    gap:1px; background: rgba(255,255,255,.1);
-    border-top:1px solid rgba(255,255,255,.1);
-  }
-  .ship-stat{ background:#000; padding: 26px 4px 30px; }
-  .ship-stat b{
-    display:block; font-family:'Space Grotesk', sans-serif; font-size: clamp(1.5rem, 2.4vw, 2rem);
-    font-weight:700; color:#fff; letter-spacing:-.02em;
-  }
-  .ship-stat span{
-    display:block; margin-top:6px; font-family:'JetBrains Mono', monospace;
-    font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color: var(--text-dimmer);
-  }
-
-  /* ---------- shared section furniture ---------- */
-  .ship-section{ padding: 84px 0; background:#000; border-top:1px solid rgba(255,255,255,.08); }
-  .ship-section.alt{ background:#070707; }
-  .ship-head{ margin-bottom: 40px; max-width: 620px; }
-  .ship-head h2{ font-size: clamp(1.5rem, 2.6vw, 2rem); margin: 12px 0 12px; letter-spacing:-.02em; }
-  .ship-head p{ margin:0; font-size:.98rem; }
-
-  /* ---------- route ---------- */
-  .ship-route{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.1); }
-  .ship-step{
-    position:relative; background: linear-gradient(180deg, #101010, #050505);
-    padding: 30px 26px 32px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-    transition: background .25s ease, transform .25s ease;
-  }
-  .ship-step:hover{ background: linear-gradient(180deg, #171717, #0a0a0a); }
-  .ship-step-n{
-    font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:700;
-    letter-spacing:.14em; color: var(--text-dimmer); display:block; margin-bottom:18px;
-  }
-  /* the connector: a rail across the card tops with a node on each step */
-  .ship-step::before{
-    content:''; position:absolute; top:52px; left:0; right:0; height:1px;
-    background: rgba(255,255,255,.22);
-  }
-  .ship-step::after{
-    content:''; position:absolute; top:48px; left:26px; width:9px; height:9px;
-    background:#fff; box-shadow: 0 0 0 4px #0a0a0a, 0 0 14px 1px rgba(255,255,255,.45);
-  }
-  .ship-step h3{ font-size:1.05rem; margin: 26px 0 8px; }
-  .ship-step p{ font-size:.9rem; margin:0; }
-
-  /* ---------- two-up: rates + coverage ---------- */
-  .ship-two{ display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  .ship-card{
-    background: linear-gradient(180deg, #121212, #080808);
-    border:1px solid rgba(255,255,255,.11);
-    box-shadow: 0 30px 60px -38px #000, inset 0 1px 0 rgba(255,255,255,.06);
-    padding: 30px 30px 34px;
-  }
-  .ship-card h3{
-    font-family:'JetBrains Mono', monospace; font-size:.8rem; font-weight:600;
-    letter-spacing:.12em; text-transform:uppercase; color: var(--text-dim);
-    margin: 0 0 22px; padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,.1);
-  }
-  .ship-rate{
+  /* ---------- rates ---------- */
+  .sh-rate{
     display:flex; justify-content:space-between; align-items:baseline; gap:16px;
-    padding: 15px 0; border-bottom:1px solid rgba(255,255,255,.07);
+    padding: 14px 0; border-bottom:1px solid rgba(0,0,0,.08);
   }
-  .ship-rate:last-of-type{ border-bottom:none; }
-  .ship-rate-k{ color: var(--text); font-weight:600; font-size:.96rem; }
-  .ship-rate-k small{ display:block; font-weight:400; font-size:.82rem; color: var(--text-dimmer); margin-top:3px; }
-  .ship-rate-v{
-    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:1.05rem;
-    color:#fff; white-space:nowrap; text-align:right;
+  .sh-rate:last-of-type{ border-bottom:none; }
+  .sh-rate-k{ color:#0a0a0a; font-weight:600; font-size:.95rem; }
+  .sh-rate-k small{ display:block; font-weight:400; font-size:.82rem; color:#8a8a86; margin-top:3px; }
+  .sh-rate-v{
+    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:1.02rem;
+    color:#0a0a0a; white-space:nowrap; text-align:right;
   }
-  .ship-rate-v.free{ background:#fff; color:#0a0a0a; padding: 3px 10px; font-size:.9rem; }
-
-  .ship-list{ list-style:none; margin:0; padding:0; }
-  .ship-list li{
-    display:flex; gap:13px; align-items:flex-start;
-    padding: 13px 0; border-bottom:1px solid rgba(255,255,255,.07);
-    color: var(--text-dim); font-size:.94rem; line-height:1.55;
-  }
-  .ship-list li:last-child{ border-bottom:none; }
-  .ship-list li b{ color: var(--text); font-weight:600; }
-  .ship-tick{ flex-shrink:0; margin-top:3px; color:#fff; }
-  .ship-cross{ flex-shrink:0; margin-top:3px; color: var(--text-dimmer); }
-
-  /* ---------- the pack, as literal stacked layers ---------- */
-  .ship-pack{ display:grid; grid-template-columns: .9fr 1.1fr; gap: 48px; align-items:center; }
-  .ship-layers{ display:flex; flex-direction:column; gap:1px; background: rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.12); }
-  .ship-layer{
-    background: linear-gradient(180deg, #131313, #090909);
-    padding: 18px 22px; display:flex; align-items:center; gap:16px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-    transition: transform .25s ease, background .25s ease;
-  }
-  .ship-layer:hover{ background: linear-gradient(180deg, #1b1b1b, #0d0d0d); transform: translateX(6px); }
-  /* step each layer inward so the stack reads as nested, outermost at the top */
-  .ship-layer:nth-child(2){ padding-left: 40px; }
-  .ship-layer:nth-child(3){ padding-left: 58px; }
-  .ship-layer:nth-child(4){ padding-left: 76px; }
-  .ship-layer:nth-child(5){ padding-left: 94px; }
-  .ship-layer-n{
-    width:30px; flex-shrink:0; font-family:'JetBrains Mono', monospace;
-    font-size:.7rem; color: var(--text-dimmer); letter-spacing:.08em;
-  }
-  .ship-layer-t{ color: var(--text); font-weight:600; font-size:.95rem; }
-  .ship-layer-d{ display:block; color: var(--text-dimmer); font-weight:400; font-size:.84rem; margin-top:2px; }
-
-  /* ---------- protection / returns ---------- */
-  .ship-note{
-    border-left: 2px solid #fff; padding: 4px 0 4px 22px; margin: 26px 0 0;
-    color: var(--text-dim); font-size:.94rem; max-width: 640px;
-  }
-  .ship-cta{ margin-top: 44px; display:inline-flex; align-items:center; gap:8px; }
+  .sh-rate-v.free{ background:#0a0a0a; color:#fff; padding: 3px 10px; font-size:.88rem; }
 
   @media (max-width: 1000px){
-    .ship-hero-top{ grid-template-columns:1fr; gap:38px; }
-    .ship-route{ grid-template-columns: repeat(2, 1fr); }
-    .ship-pack{ grid-template-columns:1fr; gap:32px; }
+    .sh-pack{ grid-template-columns:1fr; gap:32px; }
   }
-  @media (max-width: 700px){
-    .ship-stats{ grid-template-columns: repeat(2, 1fr); }
-    .ship-two{ grid-template-columns:1fr; }
-    .ship-route{ grid-template-columns:1fr; }
-    /* the connector only makes sense while the steps sit in a row */
-    .ship-step::before, .ship-step::after{ display:none; }
-    .ship-step h3{ margin-top:0; }
-    /* a 94px indent eats the copy at this width, so shrink the nesting step */
-    .ship-layer:nth-child(2){ padding-left: 30px; }
-    .ship-layer:nth-child(3){ padding-left: 38px; }
-    .ship-layer:nth-child(4){ padding-left: 46px; }
-    .ship-layer:nth-child(5){ padding-left: 54px; }
+  @media (max-width: 560px){
+    /* four levels of 22px inset eats the core label at this width */
+    .sh-layer{ padding: 34px 12px 12px; }
   }
 </style>
 </head>
@@ -252,117 +114,146 @@
   </div>
 </header>
 
-<section class="ship-hero">
-  <div class="ship-hero-bg" aria-hidden="true"></div>
-  <div class="container ship-hero-inner">
+<main class="lp-page">
 
-    <div class="ship-hero-top">
+<section class="lp-hero">
+  <div class="container lp-hero-inner">
+
+    <div class="lp-hero-top">
       <div>
-        <span class="hero-eyebrow">Shipping &amp; Fulfillment</span>
+        <span class="lp-tag">Shipping</span>
         <h1>Ships the same day.<br /><span class="outline">Cold the whole way.</span></h1>
-        <p class="ship-lede">
-          Order before 2:00 PM EST on a business day and it leaves our facility that
-          afternoon, packed in a refrigerated cooler and moving on 2-day FedEx Express.
+        <p class="lp-lede">
+          Order before 2:00 PM EST on a business day and it leaves that afternoon,
+          packed in a refrigerated cooler on 2-day FedEx Express.
         </p>
       </div>
 
-      <div class="ship-panel">
-        <div class="ship-panel-label"><span class="ship-dot" aria-hidden="true"></span> Dispatch status</div>
-        <p class="ship-cutoff" id="shipCutoff">Orders placed before <strong>2:00 PM EST</strong> ship the same business day.</p>
-        <dl class="ship-panel-rows">
-          <div class="ship-panel-row"><dt>Daily cutoff</dt><dd>2:00 PM EST</dd></div>
-          <div class="ship-panel-row"><dt>Carrier</dt><dd>FedEx Express</dd></div>
-          <div class="ship-panel-row"><dt>Transit</dt><dd>2 business days</dd></div>
-          <div class="ship-panel-row"><dt>Tracking sent</dt><dd>Within 24 hours</dd></div>
+      <div class="lp-ink">
+        <div class="lp-ink-label"><span class="lp-ink-dot" aria-hidden="true"></span> Dispatch window</div>
+        <p class="lp-ink-big" id="shipClock">2:00 PM</p>
+        <p class="lp-ink-sub" id="shipClockNote">Daily cutoff, Monday to Friday.</p>
+        <dl class="lp-ink-rows">
+          <div class="lp-ink-row"><dt>Carrier</dt><dd>FedEx Express</dd></div>
+          <div class="lp-ink-row"><dt>Transit</dt><dd>2 business days</dd></div>
+          <div class="lp-ink-row"><dt>Tracking</dt><dd>Within 24 hours</dd></div>
         </dl>
       </div>
     </div>
 
-    <div class="ship-stats">
-      <div class="ship-stat"><b>2:00 PM</b><span>EST cutoff</span></div>
-      <div class="ship-stat"><b>2-Day</b><span>FedEx Express</span></div>
-      <div class="ship-stat"><b>50</b><span>States covered</span></div>
-      <div class="ship-stat"><b>$250+</b><span>Ships free</span></div>
+    <div class="lp-stats">
+      <div class="lp-stat"><b>2:00 PM</b><span>EST cutoff</span></div>
+      <div class="lp-stat"><b>2-Day</b><span>FedEx Express</span></div>
+      <div class="lp-stat"><b>50</b><span>States covered</span></div>
+      <div class="lp-stat"><b>$250+</b><span>Ships free</span></div>
     </div>
 
   </div>
 </section>
 
-<section class="ship-section">
+<section class="lp-section">
   <div class="container">
-    <div class="ship-head reveal">
-      <span class="eyebrow">The route</span>
-      <h2>From our cooler to your bench in two days.</h2>
-      <p>Four steps, no guesswork. Here is exactly what happens after you check out.</p>
+    <div class="lp-head reveal">
+      <span class="lp-kicker">Route</span>
+      <h2>What happens after you check out.</h2>
     </div>
 
-    <div class="ship-route reveal">
-      <div class="ship-step">
-        <span class="ship-step-n">01</span>
+    <div class="lp-rail reveal">
+      <div class="lp-step">
+        <span class="lp-step-n">01</span>
         <h3>Order in</h3>
-        <p>Place your order before 2:00 PM EST, Monday through Friday. Anything after that goes out the next business morning.</p>
+        <p>Before 2:00 PM EST, Monday to Friday. Anything later goes out the next business morning.</p>
       </div>
-      <div class="ship-step">
-        <span class="ship-step-n">02</span>
+      <div class="lp-step">
+        <span class="lp-step-n">02</span>
         <h3>Packed cold</h3>
-        <p>Vials are pulled from cold storage and sealed into an insulated cooler with gel packs, so the compound never warms in transit.</p>
+        <p>Vials come straight out of cold storage into an insulated cooler with frozen gel packs.</p>
       </div>
-      <div class="ship-step">
-        <span class="ship-step-n">03</span>
-        <h3>Handed to FedEx</h3>
-        <p>The box moves on 2-day FedEx Express the same afternoon. Your tracking number lands in your inbox within 24 hours.</p>
+      <div class="lp-step">
+        <span class="lp-step-n">03</span>
+        <h3>Handed off</h3>
+        <p>On 2-day FedEx Express the same afternoon. Your tracking number follows within 24 hours.</p>
       </div>
-      <div class="ship-step">
-        <span class="ship-step-n">04</span>
-        <h3>At your bench</h3>
-        <p>Delivered anywhere in the 50 states, Saturdays included wherever FedEx runs weekend service.</p>
+      <div class="lp-step">
+        <span class="lp-step-n">04</span>
+        <h3>Delivered</h3>
+        <p>Anywhere in the 50 states, Saturdays included where FedEx runs weekend service.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="ship-section alt">
+<section class="lp-section alt">
   <div class="container">
-    <div class="ship-head reveal">
-      <span class="eyebrow">Rates &amp; coverage</span>
+    <div class="sh-pack">
+      <div class="lp-head reveal" style="margin-bottom:0">
+        <span class="lp-kicker">Inside the box</span>
+        <h2>Five layers between the vial and the road.</h2>
+        <p>Lyophilized peptide is stable, but heat and light still cost you purity. Every order ships in this pack, whether it is one vial or twenty.</p>
+      </div>
+
+      <div class="sh-layer reveal">
+        <span class="sh-layer-t"><i>01</i>Outer corrugate</span>
+        <div class="sh-layer">
+          <span class="sh-layer-t"><i>02</i>Insulated liner</span>
+          <div class="sh-layer">
+            <span class="sh-layer-t"><i>03</i>Frozen gel packs</span>
+            <div class="sh-layer">
+              <span class="sh-layer-t"><i>04</i>Foam vial tray</span>
+              <div class="sh-core">
+                <b>05 Sealed vial</b>
+                <span>Nitrogen sealed, lot matched to its COA</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section">
+  <div class="container">
+    <div class="lp-head reveal">
+      <span class="lp-kicker">Rates and coverage</span>
       <h2>What it costs, and where it goes.</h2>
     </div>
 
-    <div class="ship-two reveal">
-      <div class="ship-card">
+    <div class="lp-two reveal">
+      <div class="lp-card">
         <h3>Rates</h3>
-        <div class="ship-rate">
-          <span class="ship-rate-k">Orders $250 and over<small>2-day FedEx Express, cold pack included</small></span>
-          <span class="ship-rate-v free">Free</span>
+        <div class="sh-rate">
+          <span class="sh-rate-k">Orders $250 and over<small>2-day FedEx Express, cold pack included</small></span>
+          <span class="sh-rate-v free">Free</span>
         </div>
-        <div class="ship-rate">
-          <span class="ship-rate-k">Orders under $250<small>Same service, flat rate shown at checkout</small></span>
-          <span class="ship-rate-v">Flat rate</span>
+        <div class="sh-rate">
+          <span class="sh-rate-k">Orders under $250<small>Same service, flat rate shown at checkout</small></span>
+          <span class="sh-rate-v">Flat rate</span>
         </div>
-        <div class="ship-rate">
-          <span class="ship-rate-k">Saturday delivery<small>Where FedEx offers weekend service</small></span>
-          <span class="ship-rate-v free">Included</span>
+        <div class="sh-rate">
+          <span class="sh-rate-k">Saturday delivery<small>Where FedEx offers weekend service</small></span>
+          <span class="sh-rate-v free">Included</span>
         </div>
       </div>
 
-      <div class="ship-card">
+      <div class="lp-card">
         <h3>Coverage</h3>
-        <ul class="ship-list">
+        <ul class="lp-list">
           <li>
-            <svg class="ship-tick" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <span><b>All 50 states</b>, including Hawaii and Alaska.</span>
           </li>
           <li>
-            <svg class="ship-tick" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span><b>Saturday delivery</b> included on eligible routes.</span>
+            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>Saturday delivery</b> on eligible routes.</span>
           </li>
           <li>
-            <svg class="ship-tick" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg class="lp-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <span><b>Every order is temperature controlled.</b> There is no cheaper tier that skips the cold pack.</span>
           </li>
           <li>
-            <svg class="ship-cross" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
-            <span><b>No international shipping.</b> We ship to verified research institutions and qualified buyers inside the United States only.</span>
+            <svg class="lp-ico no" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span><b>No international shipping.</b> United States only, to verified institutions and qualified buyers.</span>
           </li>
         </ul>
       </div>
@@ -370,55 +261,37 @@
   </div>
 </section>
 
-<section class="ship-section">
+<section class="lp-section alt">
   <div class="container">
-    <div class="ship-pack">
-      <div class="ship-head reveal" style="margin-bottom:0">
-        <span class="eyebrow">Inside the box</span>
-        <h2>Five layers between the vial and the road.</h2>
-        <p>Lyophilized peptide is stable, but heat and light still cost you purity. Every order ships in the same pack, whether it is one vial or twenty.</p>
-      </div>
-
-      <div class="ship-layers reveal">
-        <div class="ship-layer"><span class="ship-layer-n">01</span><span class="ship-layer-t">Outer corrugate<span class="ship-layer-d">Rigid double-wall box, unmarked</span></span></div>
-        <div class="ship-layer"><span class="ship-layer-n">02</span><span class="ship-layer-t">Insulated liner<span class="ship-layer-d">Holds temperature through a 2-day transit</span></span></div>
-        <div class="ship-layer"><span class="ship-layer-n">03</span><span class="ship-layer-t">Frozen gel packs<span class="ship-layer-d">Loaded cold at pack time, not at the depot</span></span></div>
-        <div class="ship-layer"><span class="ship-layer-n">04</span><span class="ship-layer-t">Foam vial tray<span class="ship-layer-d">Each vial seated separately so nothing knocks</span></span></div>
-        <div class="ship-layer"><span class="ship-layer-n">05</span><span class="ship-layer-t">Sealed vial<span class="ship-layer-d">Nitrogen sealed, lot number matched to its COA</span></span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="ship-section alt">
-  <div class="container">
-    <div class="ship-head reveal">
-      <span class="eyebrow">If something goes wrong</span>
+    <div class="lp-head reveal">
+      <span class="lp-kicker">If something goes wrong</span>
       <h2>Protection and returns.</h2>
     </div>
 
-    <div class="ship-two reveal">
-      <div class="ship-card">
+    <div class="lp-two reveal">
+      <div class="lp-card">
         <h3>Shipment protection</h3>
-        <p>Every order is covered up to $300 against loss, damage, or carrier delay. It is applied automatically. There is no box to tick and nothing extra to buy.</p>
-        <p style="margin-bottom:0">If your package arrives damaged or never arrives at all, contact us with your order number and we will replace it.</p>
+        <p>Every order is covered up to $300 against loss, damage, or carrier delay. It applies automatically. There is no box to tick and nothing extra to buy.</p>
+        <p>Arrived damaged, or never arrived? Send us your order number and we will replace it.</p>
       </div>
 
-      <div class="ship-card">
+      <div class="lp-card">
         <h3>Returns</h3>
-        <p>Because these are lyophilized research materials, we cannot accept a return once a vial has shipped or been opened. All sales on opened or reconstituted material are final.</p>
-        <p style="margin-bottom:0">That limit exists for one reason: we cannot verify how a vial was stored once it leaves our cold chain, and we will not resell material we cannot vouch for.</p>
+        <p>We cannot accept a return once a vial has shipped or been opened. All sales on opened or reconstituted material are final.</p>
+        <p>That limit exists for one reason. We cannot verify how a vial was stored once it leaves our cold chain, and we will not resell material we cannot vouch for.</p>
       </div>
     </div>
 
-    <p class="ship-note reveal">
-      Questions about a specific order, a bulk shipment, or a delivery address that needs
-      special handling? Reach out before you check out and we will confirm it in writing.
+    <p class="lp-note reveal">
+      Bulk shipment, or a delivery address that needs special handling? Ask before you check out
+      and we will confirm it in writing.
     </p>
 
-    <a href="peptides.html" class="btn btn-outline ship-cta reveal">Browse the catalog <span aria-hidden="true">&rarr;</span></a>
+    <a href="peptides.html" class="btn btn-outline lp-cta reveal">Browse the catalog <span aria-hidden="true">&rarr;</span></a>
   </div>
 </section>
+
+</main>
 
 <footer class="site-footer">
   <div class="container">
@@ -506,13 +379,14 @@
     header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
   });
 
-  /* live dispatch cutoff.
-     The claim on this page is "order by 2PM EST and it ships today", so show
-     the visitor whether that is still true right now. All arithmetic is done
-     on New York wall-clock parts, which sidesteps the DST offset entirely. */
+  /* Live dispatch clock.
+     The page claims "order by 2PM EST and it ships today", so show whether
+     that is still true right now. All arithmetic runs on New York wall-clock
+     parts, which sidesteps the DST offset entirely. */
   (function () {
-    const el = document.getElementById('shipCutoff');
-    if (!el) return;
+    const timeEl = document.getElementById('shipClock');
+    const noteEl = document.getElementById('shipClockNote');
+    if (!timeEl || !noteEl) return;
     const CUTOFF_HOUR = 14;
 
     function nyParts(date) {
@@ -544,11 +418,11 @@
       if (isWeekday && secsLeft > 0) {
         const h = Math.floor(secsLeft / 3600);
         const m = Math.floor((secsLeft % 3600) / 60);
-        const left = h > 0 ? (m > 0 ? h + 'h ' + m + 'm' : h + 'h') : m + 'm';
-        el.innerHTML = 'Order within <strong>' + left + '</strong> and it ships today.';
+        timeEl.textContent = h > 0 ? (m > 0 ? h + 'h ' + m + 'm' : h + 'h') : m + 'm';
+        noteEl.textContent = 'Left to order and still ship today.';
       } else {
-        el.innerHTML = 'Today’s cutoff has passed. Next dispatch is <strong>' +
-          nextBusinessDayName() + ' morning</strong>.';
+        timeEl.textContent = 'Closed';
+        noteEl.textContent = 'Next dispatch is ' + nextBusinessDayName() + ' morning.';
       }
     }
 

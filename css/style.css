@@ -711,23 +711,179 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .reveal{ opacity:1; transform:none; }
 }
 
-/* ---------- stub page: feature grid + policy block (shipping/wholesale pages) ---------- */
-.stub-section{ padding: 20px 0 90px; background:#000; }
-.stub-features{
-  display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1px; background: var(--border); border: 1px solid var(--border);
-  margin-bottom: 60px;
+/* =====================================================================
+   LIGHT PAGE: shared shell for shipping / wholesale / COA.
+   Those three were three copies of the same near-black layout with
+   different words in it, which is why they read as filler. The shell now
+   lives here once, on white, so each page only has to define the one
+   diagram that makes it its own page. White also matches the header
+   (#ececea) and the product page instead of fighting them.
+   ===================================================================== */
+.lp-page{ background:#fff; color:#0a0a0a; }
+.lp-page p{ color:#55554f; }
+.lp-page h1, .lp-page h2, .lp-page h3, .lp-page h4{ color:#0a0a0a; }
+/* the pale chip and the white-bordered outline are both built for dark
+   sections; on white they read as disabled, so both invert here */
+.lp-page .btn-primary{ background:#0a0a0a; color:#fff; }
+.lp-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
+.lp-page .btn-outline{ border-color: rgba(0,0,0,.25); color:#0a0a0a; }
+.lp-page .btn-outline:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; box-shadow:none; }
+.lp-page :focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 3px; }
+
+/* ---------- hero ---------- */
+.lp-hero{
+  position:relative; background:#f6f6f4; padding: 60px 0 0;
+  border-bottom:1px solid rgba(0,0,0,.12); overflow:hidden; isolation:isolate;
 }
-.stub-feature{ background:#000; padding: 28px 24px; }
-.stub-feature h3{
-  font-size: 0.95rem; text-transform:uppercase; letter-spacing:.06em;
-  margin-bottom: 10px; font-family:'JetBrains Mono', monospace; font-weight:600;
+/* engineering paper: an ink grid masked to one corner so it never runs
+   under the copy and turn the lede into a texture */
+.lp-hero::before{
+  content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0 1px, transparent 1px 74px),
+    repeating-linear-gradient(0deg,  rgba(0,0,0,.06) 0 1px, transparent 1px 74px);
+  -webkit-mask-image: radial-gradient(115% 95% at 88% 4%, #000 0%, transparent 70%);
+  mask-image: radial-gradient(115% 95% at 88% 4%, #000 0%, transparent 70%);
 }
-.stub-feature p{ font-size: 0.92rem; margin:0; }
-.stub-policy{ max-width: 680px; }
-.stub-policy h2{ font-size: 1.4rem; margin-bottom: 14px; }
-.stub-policy p{ font-size: 1rem; }
-.stub-cta-row{ margin-top: 26px; }
+.lp-hero-inner{ position:relative; z-index:1; }
+.lp-hero-top{
+  display:grid; grid-template-columns: 1.15fr .85fr; gap: 52px;
+  align-items:end; padding-bottom: 46px;
+}
+.lp-tag{
+  display:inline-block; font-family:'JetBrains Mono', monospace;
+  font-size:.64rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+  color:#0a0a0a; border:1px solid #0a0a0a; padding: 5px 10px; margin-bottom: 20px;
+}
+.lp-hero h1{
+  font-size: clamp(2.15rem, 4.8vw, 3.6rem); margin: 0 0 18px;
+  letter-spacing:-.035em; line-height:1.03;
+}
+.lp-hero h1 .outline{ color: transparent; -webkit-text-stroke: 1.3px #0a0a0a; }
+.lp-lede{ font-size: 1.05rem; max-width: 48ch; margin:0; }
+
+/* ---------- stat strip, flush to the bottom of the hero ---------- */
+.lp-stats{
+  display:grid; grid-template-columns: repeat(4, 1fr); gap:1px;
+  background: rgba(0,0,0,.12); border-top:1px solid rgba(0,0,0,.12);
+}
+.lp-stat{ background:#f6f6f4; padding: 22px 4px 24px; }
+.lp-stat b{
+  display:block; font-family:'Space Grotesk', sans-serif;
+  font-size: clamp(1.35rem, 2.3vw, 1.9rem); font-weight:700; letter-spacing:-.02em; color:#0a0a0a;
+}
+.lp-stat span{
+  display:block; margin-top:5px; font-family:'JetBrains Mono', monospace;
+  font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; color:#8a8a86;
+}
+
+/* ---------- sections ---------- */
+.lp-section{ padding: 74px 0; background:#fff; }
+.lp-section.alt{
+  background:#f6f6f4;
+  border-top:1px solid rgba(0,0,0,.12); border-bottom:1px solid rgba(0,0,0,.12);
+}
+.lp-head{ max-width: 58ch; margin-bottom: 34px; }
+.lp-kicker{
+  display:block; margin-bottom: 12px; font-family:'JetBrains Mono', monospace;
+  font-size:.65rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#8a8a86;
+}
+.lp-head h2{ font-size: clamp(1.45rem, 2.7vw, 2.05rem); margin: 0 0 10px; letter-spacing:-.025em; }
+.lp-head p{ margin:0; font-size:1rem; }
+
+/* ---------- numbered rail ----------
+   The connector runs behind the number chips at their exact centre, so the
+   row reads as one track with four stations rather than four loose cards. */
+.lp-rail{
+  display:grid; grid-template-columns: repeat(4, 1fr); gap:1px;
+  background: rgba(0,0,0,.12); border:1px solid rgba(0,0,0,.12);
+}
+.lp-step{ position:relative; background:#fff; padding: 26px 24px 28px; transition: background .25s ease; }
+.lp-step:hover{ background:#f6f6f4; }
+.lp-step > *{ position:relative; z-index:1; }
+.lp-step::before{
+  content:''; position:absolute; top:39px; left:0; right:0; height:1px;
+  background: rgba(0,0,0,.16); z-index:0;
+}
+.lp-step-n{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:26px; height:26px; margin-bottom:16px; background:#0a0a0a; color:#fff;
+  font-family:'JetBrains Mono', monospace; font-size:.65rem; font-weight:700;
+}
+.lp-step h3{ font-size:1rem; margin: 0 0 7px; }
+.lp-step p{ font-size:.9rem; margin:0; line-height:1.6; }
+
+/* ---------- cards, lists, notes ---------- */
+.lp-two{ display:grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.lp-card{ background:#fff; border:1px solid rgba(0,0,0,.12); padding: 26px 28px 30px; }
+.lp-card h3{
+  font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:#8a8a86;
+  margin: 0 0 18px; padding-bottom:14px; border-bottom:1px solid rgba(0,0,0,.12);
+}
+.lp-card p:last-child{ margin-bottom:0; }
+.lp-list{ list-style:none; margin:0; padding:0; }
+.lp-list li{
+  display:flex; gap:12px; align-items:flex-start; padding: 12px 0;
+  border-bottom:1px solid rgba(0,0,0,.08);
+  font-size:.94rem; line-height:1.55; color:#55554f;
+}
+.lp-list li:last-child{ border-bottom:none; }
+.lp-list li b{ color:#0a0a0a; font-weight:600; }
+.lp-ico{ flex-shrink:0; margin-top:3px; color:#0a0a0a; }
+.lp-ico.no{ color:#b4b4b0; }
+.lp-note{
+  border-left:2px solid #0a0a0a; padding: 2px 0 2px 20px; margin: 32px 0 0;
+  font-size:.94rem; color:#55554f; max-width: 72ch;
+}
+.lp-cta{ margin-top: 34px; display:inline-flex; align-items:center; gap:8px; }
+
+/* ---------- ink panel ----------
+   One inverted block per page, on whatever fact the page exists to deliver.
+   On an all-dark page nothing could be emphasised; on white this can. */
+.lp-ink{ background:#0a0a0a; color:#fff; padding: 24px 26px 26px; }
+.lp-ink h3, .lp-ink b, .lp-ink strong{ color:#fff; }
+.lp-ink p{ color:#a3a3a1; }
+.lp-ink-label{
+  display:flex; align-items:center; gap:9px; margin-bottom:14px;
+  font-family:'JetBrains Mono', monospace; font-size:.64rem; font-weight:700;
+  letter-spacing:.15em; text-transform:uppercase; color:#8a8a86;
+}
+.lp-ink-dot{ width:7px; height:7px; background:#fff; flex-shrink:0; animation: lpPulse 2.4s ease-out infinite; }
+/* the one figure the page exists to deliver, set at display size instead of
+   buried in a sentence. tabular-nums stops the live clock jittering as the
+   digits tick over. */
+.lp-ink-big{
+  margin:0; color:#fff; font-family:'Space Grotesk', sans-serif; font-weight:700;
+  font-size: clamp(2.3rem, 5vw, 3.1rem); line-height:1; letter-spacing:-.04em;
+  font-variant-numeric: tabular-nums;
+}
+.lp-ink-sub{ margin: 8px 0 20px; font-size:.9rem; color:#a3a3a1; }
+@keyframes lpPulse{
+  0%{ box-shadow: 0 0 0 0 rgba(255,255,255,.5); }
+  70%{ box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+  100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+}
+.lp-ink-rows{ border-top:1px solid rgba(255,255,255,.14); }
+.lp-ink-row{
+  display:flex; justify-content:space-between; align-items:baseline; gap:14px;
+  padding: 10px 0; border-bottom:1px solid rgba(255,255,255,.09); font-size:.84rem;
+}
+.lp-ink-row:last-child{ border-bottom:none; }
+.lp-ink-row dt{ color:#8a8a86; }
+.lp-ink-row dd{ margin:0; color:#fff; font-family:'JetBrains Mono', monospace; text-align:right; }
+
+@media (max-width: 1000px){
+  .lp-hero-top{ grid-template-columns:1fr; gap:34px; align-items:start; }
+  .lp-rail{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px){
+  .lp-stats{ grid-template-columns: repeat(2, 1fr); }
+  .lp-two{ grid-template-columns:1fr; }
+  .lp-rail{ grid-template-columns:1fr; }
+  /* the connector only means anything while the steps sit in a row */
+  .lp-step::before{ display:none; }
+}
 
 /* =====================================================================
    BLOG
