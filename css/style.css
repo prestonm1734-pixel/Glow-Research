@@ -872,9 +872,13 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .bl-lead .bl-art{ aspect-ratio: 4 / 3; border-radius: 24px; }
 .bl-lead .bl-tag{ margin-top:0; }
+/* These cards are reused at the foot of an article, outside .lp-page and
+   outside .post, where they would otherwise inherit the dark site's
+   near-white body colour and vanish against the tint. Colour them here so
+   a card is self-contained wherever it is dropped. */
 .bl-lead h2{
   font-size: clamp(1.75rem, 3.4vw, 2.6rem); line-height:1.1; margin:0 0 14px;
-  letter-spacing:-.035em; text-wrap: balance;
+  letter-spacing:-.035em; text-wrap: balance; color:#1d1d1f;
 }
 .bl-lead p{ font-size: 1.08rem; line-height:1.55; margin:0; color:#6e6e73; }
 
@@ -885,7 +889,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .bl-card h3{
   font-size: clamp(1.2rem, 1.9vw, 1.45rem); line-height:1.2; margin:0 0 10px;
-  letter-spacing:-.03em; text-wrap: balance;
+  letter-spacing:-.03em; text-wrap: balance; color:#1d1d1f;
 }
 .bl-card p{ font-size:1rem; line-height:1.55; margin:0; color:#6e6e73; }
 
@@ -931,162 +935,127 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 
 /* ---------- article: light reading surface ----------
-   Long-form gets a white page even though the rest of the site is dark —
-   sustained reading on a dark background is more fatiguing, and this is the
-   one place people read continuously rather than scan. */
-.post{ background:#fff; color:#0a0a0a; }
+   Same language as the listing and the shipping/wholesale/COA pages.
+   Long-form gets a white page even though the rest of the site is dark:
+   sustained reading on a dark background is more fatiguing, and this is
+   the one place people read continuously rather than scan. */
+.post{ background:#fff; color:#1d1d1f; }
 
-/* reading progress, pinned to the bottom edge of the sticky header */
+/* reading progress, pinned to the bottom edge of the sticky header. Two
+   pixels of hairline is the only chrome the article gets. */
 .read-progress{
   position:absolute; left:0; bottom:-1px; height:2px; width:0;
-  background:#0a0a0a; transition: width .1s linear; z-index:2;
+  background:#1d1d1f; transition: width .1s linear; z-index:2;
 }
 
-/* TOC rail + article column, centred as a pair */
+/* one centred column. The sticky contents rail that used to sit beside
+   this was the last piece of furniture on the page. */
 .post-shell{
-  display:grid; grid-template-columns: 208px minmax(0, 720px);
-  gap: 56px; justify-content:center;
-  max-width: var(--container); margin: 0 auto;
-  padding-left: 24px; padding-right: 24px;
+  max-width: 740px; margin: 0 auto; padding: 0 24px;
 }
 .post-main{ min-width:0; }
 
-/* ---------- sticky table of contents ---------- */
-.post-toc{ position:sticky; top: 104px; align-self:start; padding-top: 62px; }
-.post-toc-label{
-  display:block; font-family:'JetBrains Mono', monospace; font-size:0.64rem;
-  letter-spacing:.16em; text-transform:uppercase; color:#a0a09b; margin-bottom: 14px;
-}
-.post-toc nav{ display:flex; flex-direction:column; border-left:1px solid rgba(0,0,0,.12); }
-.post-toc a{
-  font-size: 0.82rem; line-height:1.4; color:#7a7a74;
-  padding: 8px 0 8px 14px; margin-left:-1px;
-  border-left: 2px solid transparent;
-  transition: color .2s ease, border-color .2s ease;
-}
-.post-toc a:hover{ color:#0a0a0a; }
-.post-toc a.is-current{ color:#0a0a0a; border-left-color:#0a0a0a; font-weight:500; }
-
-/* ---------- header ---------- */
-.post-header{ padding: 54px 0 30px; }
+/* ---------- header ----------
+   Centred over the column, the way the hero is on every other page, then
+   the body drops back to ranged left where it is actually read. */
+.post-header{ padding: clamp(46px, 7vw, 78px) 0 clamp(30px, 4vw, 44px); text-align:center; }
 .post-breadcrumb{
-  font-family:'JetBrains Mono', monospace; font-size:0.68rem; letter-spacing:.1em;
-  text-transform:uppercase; color:#a0a09b; margin-bottom: 26px;
-  display:flex; gap:10px;
+  display:flex; justify-content:center; gap:9px;
+  font-size:.88rem; color:#86868b; margin-bottom: 26px;
 }
-.post-breadcrumb a{ color:#a0a09b; transition: color .2s; }
-.post-breadcrumb a:hover{ color:#0a0a0a; }
+.post-breadcrumb a{ color:#86868b; transition: color .2s ease; }
+.post-breadcrumb a:hover{ color:#1d1d1f; }
 .post-kicker{
-  display:block; font-family:'JetBrains Mono', monospace; font-size:0.68rem;
-  font-weight:600; letter-spacing:.16em; text-transform:uppercase;
-  color:#8a8a84; margin-bottom: 16px;
+  display:block; margin-bottom: 14px;
+  font-size:.85rem; font-weight:600; color:#6e6e73;
 }
-/* serif headline ties the article back to the blog masthead */
 .post-header h1{
-  font-family:'Fraunces', Georgia, serif;
-  font-size: clamp(2rem, 4.4vw, 3.05rem); line-height:1.08; letter-spacing:-0.025em;
-  color:#0a0a0a; margin: 0 0 20px;
+  font-family:'Space Grotesk', 'Inter', system-ui, sans-serif; font-weight:700;
+  font-size: clamp(2.1rem, 4.8vw, 3.3rem); line-height:1.06; letter-spacing:-.04em;
+  color:#1d1d1f; margin: 0 0 18px; text-wrap: balance;
 }
 .post-standfirst{
-  font-size: 1.12rem; line-height:1.65; color:#55554f; margin: 0 0 24px; max-width: 58ch;
+  font-size: 1.16rem; line-height:1.5; color:#6e6e73; margin: 0 auto 26px;
+  max-width: 46ch; text-wrap: balance;
 }
 .post-meta{
-  display:flex; align-items:center; flex-wrap:wrap; gap:10px;
-  font-family:'JetBrains Mono', monospace; font-size:0.72rem;
-  letter-spacing:.05em; color:#8a8a84;
+  display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:9px;
+  font-size:.9rem; color:#86868b;
 }
-.post-byline{ color:#0a0a0a; font-weight:600; }
+.post-byline{ color:#1d1d1f; font-weight:600; }
 
-/* ---------- cover ---------- */
+/* ---------- cover ----------
+   The same drawn mark the post carries on the listing, so arriving here
+   from a card is continuous. */
 .post-cover{
-  border-radius: var(--radius-sm); overflow:hidden; margin-bottom: 8px;
-  aspect-ratio: 76 / 30; background:#000;
+  background:#f5f5f7; border-radius: 24px; aspect-ratio: 16 / 7;
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+  margin-bottom: 4px;
 }
-.post-cover .cover-art{ width:100%; height:100%; }
+.post-cover svg{ width: 30%; min-width: 150px; height:auto; color:#1d1d1f; }
 
 /* ---------- body copy ----------
-   ~72 characters per line, where long-form reading speed peaks. Text is a
-   soft near-black rather than pure #000 to cut glare on white. */
+   ~70 characters per line, where long-form reading speed peaks. */
 .post-body{
-  padding-top: 40px; padding-bottom: 20px;
-  font-size: 1.07rem; line-height: 1.78; color:#2b2b28;
+  padding-top: clamp(36px, 5vw, 54px); padding-bottom: 20px;
+  font-size: 1.12rem; line-height: 1.72; color:#2b2b30;
 }
-.post-body > *{ max-width: 68ch; }
-.post-body p{ margin: 0 0 1.45em; color: inherit; font-size: inherit; line-height: inherit; }
-.post-body .lede{
-  font-size: 1.2rem; line-height:1.66; color:#1a1a18; margin-bottom: 1.5em;
-}
+.post-body p{ margin: 0 0 1.4em; color: inherit; font-size: inherit; line-height: inherit; }
+.post-body .lede{ font-size: 1.28rem; line-height:1.55; color:#1d1d1f; margin-bottom: 1.3em; }
 .post-body h2{
-  font-family:'Fraunces', Georgia, serif;
-  font-size: 1.62rem; letter-spacing:-0.015em; color:#0a0a0a;
-  margin: 2.15em 0 .6em;   /* more space above than below, binding heading to its section */
+  font-family:'Space Grotesk', 'Inter', system-ui, sans-serif; font-weight:700;
+  font-size: clamp(1.5rem, 2.6vw, 1.85rem); letter-spacing:-.035em; color:#1d1d1f;
+  margin: 2em 0 .55em;      /* more space above than below, binding a heading to its section */
   scroll-margin-top: 100px; /* so anchor jumps clear the sticky header */
 }
 .post-body h3{
-  font-size: 1.08rem; letter-spacing:-0.005em; color:#0a0a0a; font-weight:600;
-  margin: 1.85em 0 .5em;
+  font-size: 1.12rem; letter-spacing:-.02em; color:#1d1d1f; font-weight:600;
+  margin: 1.8em 0 .5em;
 }
 .post-body h2:first-child, .post-body h3:first-child, .post-body .lede:first-child{ margin-top:0; }
-.post-body ul, .post-body ol{ margin: 0 0 1.45em; padding-left: 1.25em; }
-.post-body li{ margin-bottom: .6em; }
-.post-body li::marker{ color:#b0b0aa; }
-.post-body strong{ color:#0a0a0a; font-weight:600; }
-.post-body em{ color:#0a0a0a; }
+.post-body ul, .post-body ol{ margin: 0 0 1.4em; padding-left: 1.2em; }
+.post-body li{ margin-bottom: .55em; }
+.post-body li::marker{ color:#c7c7cc; }
+.post-body strong{ color:#1d1d1f; font-weight:600; }
+.post-body em{ color:#1d1d1f; }
 .post-body a{
-  color:#0a0a0a; text-decoration: underline;
-  text-decoration-color: rgba(0,0,0,.3); text-underline-offset: 3px;
+  color:#1d1d1f; text-decoration: underline;
+  text-decoration-color: rgba(0,0,0,.28); text-underline-offset: 3px;
   transition: text-decoration-color .2s ease;
 }
-.post-body a:hover{ text-decoration-color:#0a0a0a; }
+.post-body a:hover{ text-decoration-color:#1d1d1f; }
 
+/* a soft panel rather than a ruled box */
 .post-callout{
-  border-left: 2px solid #0a0a0a;
-  background:#f4f4f1;
-  padding: 20px 24px; margin: 2em 0;
-  font-size: 1rem; line-height:1.7; color:#44443f;
-  border-radius: 0 6px 6px 0;
+  background:#f5f5f7; border-radius: 16px;
+  padding: 24px 28px; margin: 2em 0;
+  font-size: 1.04rem; line-height:1.65; color:#4a4a52;
 }
-.post-callout strong{ color:#0a0a0a; }
+.post-callout strong{ color:#1d1d1f; }
 
 .post-disclaimer{
-  border-top: 1px solid rgba(0,0,0,.12);
-  margin: 30px 0 0; padding: 24px 0 64px;
-  font-size: 0.8rem; line-height:1.75; color:#8a8a84;
+  margin: clamp(40px, 5vw, 58px) 0 0; padding: 0 0 clamp(56px, 7vw, 80px);
+  font-size: .86rem; line-height:1.7; color:#86868b;
 }
-.post-disclaimer strong{ color:#44443f; }
+.post-disclaimer strong{ color:#6e6e73; }
 
-@media (max-width: 1080px){
-  /* not enough room for the rail — the article takes the full column */
-  .post-shell{ grid-template-columns: minmax(0, 720px); }
-  .post-toc{ display:none; }
+/* ---------- keep reading ----------
+   Light now, and using the listing's own cards so the end of an article
+   looks like the page it came from. */
+.section-related{ background:#f5f5f7; padding: clamp(56px, 7vw, 84px) 0 clamp(64px, 8vw, 96px); }
+.section-related h2{
+  font-size: clamp(1.5rem, 2.6vw, 1.9rem); letter-spacing:-.035em; color:#1d1d1f;
+  margin: 0 0 clamp(28px, 4vw, 40px); text-align:center;
 }
-
-/* ---------- related ---------- */
-.section-related{ background: var(--bg-2); padding: 66px 0 80px; }
-.section-related .eyebrow{ margin-bottom: 26px; }
-.section-related .blog-card{
-  background: var(--surface); border-color: var(--border);
-}
-.section-related .blog-card:hover{ border-color: rgba(255,255,255,.22); box-shadow:none; }
-.section-related .blog-card h3{ color: var(--text); }
-.section-related .blog-card p{ color: var(--text-dim); }
-.section-related .blog-card-cat,
-.section-related .blog-card-meta{ color: var(--text-dimmer); }
+/* the tint panel inverts against this section so the marks still sit on
+   a surface, not on the section colour itself */
+.section-related .bl-art{ background:#fff; }
+.section-related .bl-card:hover .bl-art{ background:#ececef; }
 
 @media (max-width: 640px){
-  .journal{ padding: 30px 0 64px; }
-  .jr-masthead{ margin-bottom: 34px; }
-  .jr-lead{ padding: 24px var(--jr-bleed); margin: 8px calc(var(--jr-bleed) * -1) 0; }
-  .jr-row > a{ padding: 22px var(--jr-bleed); }
-  .jr-mast-title{ margin-top: 22px; }
-  .section-blog{ padding: 44px 0 56px; }
-  .post-header{ padding: 32px 0 24px; }
-  .post-standfirst{ font-size: 1.04rem; }
   .post-cover{ aspect-ratio: 16 / 10; }
-  .post-body{ padding-top: 30px; padding-bottom: 12px; font-size: 1.03rem; }
-  .post-body h2{ font-size: 1.36rem; margin: 1.9em 0 .55em; }
-  .post-disclaimer{ padding-bottom: 46px; }
-  .section-related{ padding: 46px 0 56px; }
+  .post-cover svg{ width: 40%; }
+  .post-body{ font-size: 1.06rem; }
 }
 
 /* =====================================================================
