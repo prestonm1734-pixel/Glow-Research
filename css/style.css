@@ -133,6 +133,18 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .section-light :focus-visible{
   outline: 2px solid #0a0a0a; outline-offset: 3px;
 }
+/* The white ring above is for the dark sections. These surfaces are white, so
+   it lands white-on-white and a keyboard user sees nothing at all. Declared
+   after the .btn rule so it wins the specificity tie. */
+.pd-page :focus-visible,
+.co-page :focus-visible,
+.cart-drawer :focus-visible,
+.qa-sheet :focus-visible,
+.search-modal :focus-visible,
+.cart-toast-view:focus-visible{
+  outline: 2px solid #0a0a0a; outline-offset: 3px;
+}
+.cart-toast-view:focus-visible{ outline-offset: 2px; }
 
 /* ---------- marquee ---------- */
 .marquee-bar{
@@ -555,7 +567,11 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   display:flex; justify-content:space-between; align-items:center; gap: 20px;
   font-family:'Space Grotesk', sans-serif;
 }
-.faq-q .icon{ flex-shrink:0; width:26px;height:26px; border-radius:50%; border:1px solid var(--border); display:flex;align-items:center;justify-content:center; transition: transform .3s ease, background .3s ease; }
+.faq-q .icon{ flex-shrink:0; width:26px;height:26px; border-radius:50%; border:1px solid var(--border); display:flex;align-items:center;justify-content:center; transition: transform .3s ease, background .3s ease, border-color .3s ease; }
+/* the row is a button but gave no feedback at all before it was clicked */
+.faq-q{ transition: color .2s ease; }
+.faq-q:hover{ color:#fff; }
+.faq-q:hover .icon{ border-color: rgba(255,255,255,.5); background: rgba(255,255,255,.08); }
 .faq-item.open .faq-q .icon{ transform: rotate(45deg); background: var(--grad-main); border-color: transparent; color:#0a0a0a; }
 .faq-a{ max-height:0; overflow:hidden; transition: max-height .4s ease; }
 .faq-a p{ padding: 0 4px 22px; font-size:0.92rem; }
@@ -572,6 +588,8 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   padding: 12px 18px; border-radius: 0; border:1px solid var(--border); background: var(--surface);
   color: var(--text); min-width: 240px; font-size: 0.92rem;
 }
+.newsletter-form input{ transition: border-color .18s ease; }
+.newsletter-form input:hover{ border-color: rgba(255,255,255,.3); }
 .newsletter-form input:focus{ outline:none; border-color: var(--pink); }
 .newsletter-msg{ width:100%; margin: 10px 0 0; font-size:0.85rem; color: var(--teal); min-height: 1em; text-align:right; }
 .newsletter-msg:empty{ margin:0; min-height:0; }

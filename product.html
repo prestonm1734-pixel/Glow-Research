@@ -163,8 +163,11 @@
     padding: 15px 30px; border:2px solid rgba(0,0,0,.7); background:transparent; color:#0a0a0a;
     cursor:pointer;
   }
-  .pd-size:hover{ border-color:#0a0a0a; }
+  .pd-size:hover{ border-color:#0a0a0a; background:#f2f2f0; }
   .pd-size.is-active{ background:#0a0a0a; border-color:#0a0a0a; color:#fff; }
+  /* the selected chip is already black, so the border hover above is a no-op
+     on it — it needs to move the fill instead */
+  .pd-size.is-active:hover{ background:#333330; border-color:#333330; }
 
   .pd-price{
     font-family:'Space Grotesk',sans-serif; font-size: 1.7rem; font-weight:800; color:#0a0a0a;
@@ -205,8 +208,11 @@
     padding: 18px 10px 16px; display:flex; flex-direction:column; align-items:center; gap:2px;
     color:#0a0a0a; text-align:center; font-family:inherit; width:100%;
   }
-  .pd-tier:hover{ border-color:#0a0a0a; }
+  .pd-tier:hover{ border-color:#0a0a0a; background:#f2f2f0; }
+  /* same problem as the active size chip: is-best already has the hover
+     border colour, so without a fill change it looks unclickable */
   .pd-tier.is-best{ border-color:#0a0a0a; border-width:2px; background:#fff; }
+  .pd-tier.is-best:hover{ background:#f2f2f0; }
 
   /* the vials themselves — overlapped so three still fit a narrow card */
   .pd-tier-vials{
