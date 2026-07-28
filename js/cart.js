@@ -220,6 +220,32 @@
     if (lastFocused) lastFocused.focus();
   }
 
+  /* ---------- toast ----------
+     One toast for every add-to-cart entry point (product page, quick-add,
+     checkout upsell) since they all funnel through add() below. */
+  let toastEl, toastTimer;
+
+  function toast() {
+    if (!toastEl) {
+      toastEl = document.createElement('div');
+      toastEl.className = 'cart-toast';
+      toastEl.innerHTML = `
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Added to cart</span>
+        <button type="button" class="cart-toast-view">View cart</button>
+      `;
+      document.body.appendChild(toastEl);
+      toastEl.querySelector('.cart-toast-view').addEventListener('click', () => { open(); hideToast(); });
+    }
+    clearTimeout(toastTimer);
+    toastEl.classList.add('is-shown');
+    toastTimer = setTimeout(hideToast, 2600);
+  }
+
+  function hideToast() {
+    if (toastEl) toastEl.classList.remove('is-shown');
+  }
+
   /* ---------- public surface ---------- */
 
   function add(item) {
@@ -235,6 +261,7 @@
     });
     save();
     render();
+    toast();
   }
 
   // items() hands back copies so callers (the checkout page) cannot mutate
