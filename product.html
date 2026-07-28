@@ -34,14 +34,23 @@
 
   /* ---------- hero ---------- */
   .pd-hero{ background:#fff; padding: 60px 0 78px; }
-  .pd-hero-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items:start; }
+  /* image column is the narrower of the two — the buy column carries more */
+  .pd-hero-grid{
+    display:grid; grid-template-columns: minmax(0,.82fr) minmax(0,1fr);
+    gap: 56px; align-items:start;
+  }
 
   /* --- the stage ---
      Top-aligned with the copy, both starting at the same offset below the
      breadcrumb, so the image's top edge lines up with "METABOLIC RESEARCH"
      rather than either floating past it or matching the copy's full height. */
+  /* Sticky so the vial stays in view while the buy column scrolls past it.
+     top clears the sticky site header (64px) plus a little breathing room. */
   .pd-visual{
-    position:relative; min-height: 580px;
+    /* an explicit height, not min-height: .pd-photo is height:100%, and against
+       an indefinite parent that percentage does not resolve, so the photo's own
+       aspect ratio would drive the box and blow it up past 700px */
+    position: sticky; top: 84px; height: clamp(340px, 40vw, 470px);
     display:flex; align-items:center; justify-content:center;
     background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
     border: 1px solid rgba(0,0,0,.1);
@@ -63,7 +72,7 @@
      and printed label in proportion instead of re-tuning eight numbers. */
   .pd-vial-wrap{
     position:relative; z-index:2; display:flex; flex-direction:column; align-items:center;
-    transform: scale(1.45);
+    transform: scale(1.1);
   }
   .pd-vial-wrap[hidden]{ display:none; }
   /* glass on a light stage: near-opaque white body with specular edges, so it
@@ -244,7 +253,8 @@
 
   @media (max-width: 900px){
     .pd-hero-grid{ grid-template-columns:1fr; gap: 36px; }
-    .pd-visual{ min-height: 420px; }
+    /* stacked on mobile, so pinning the image would just cover the copy */
+    .pd-visual{ position:static; height: clamp(300px, 78vw, 380px); }
     .pd-tiers{ grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 560px){
