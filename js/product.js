@@ -234,6 +234,44 @@
     });
   }
 
+  /* ================= image scroll ==================
+     The stage is a fixed-height window and the photo is cropped to fill it, so
+     only a slice of the vial shows at a time. Tie that slice to how far the
+     pinned stage has travelled through the hero: cap at the top, base by the
+     bottom. Not an animation — it tracks the scroll position exactly. */
+
+  function wireImageScroll() {
+    const stage = document.querySelector('.pd-visual');
+    const grid = document.querySelector('.pd-hero-grid');
+    const photo = $('pdPhoto');
+    if (!stage || !grid || !photo || photo.hidden) return;
+
+    let queued = false;
+
+    function update() {
+      queued = false;
+      // below 900px the stage is static and the columns stack, so panning the
+      // crop as the page scrolls would just look like a glitch
+      if (window.matchMedia('(max-width: 900px)').matches) {
+        photo.style.objectPosition = '50% 30%';
+        return;
+      }
+      const travel = grid.offsetHeight - stage.offsetHeight;
+      if (travel <= 0) { photo.style.objectPosition = '50% 0%'; return; }
+
+      const pin = parseFloat(getComputedStyle(stage).top) || 0;
+      const moved = Math.min(Math.max(pin - grid.getBoundingClientRect().top, 0), travel);
+      photo.style.objectPosition = `50% ${(moved / travel) * 100}%`;
+    }
+
+    const onScroll = () => {
+      if (!queued) { queued = true; requestAnimationFrame(update); }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+  }
+
   /* ================= related ================= */
 
   // renderProductGrid marks every card ".reveal", which starts at opacity:0 and
@@ -268,5 +306,6 @@
     wireBuy();
     renderDelivery();
     renderRelated(product);
+    wireImageScroll();
   });
 })();
