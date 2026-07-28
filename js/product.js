@@ -195,12 +195,6 @@
       addCurrent();
       flash($('pdAddBtn'), 'Added to cart ✓');
     });
-
-    // same add, then straight to checkout — skips the cart drawer entirely
-    $('pdBuyNow').addEventListener('click', () => {
-      addCurrent();
-      window.location.href = pageHref('checkout.html');
-    });
   }
 
   /* ================= stock up & save ================= */
@@ -242,21 +236,15 @@
 
   /* ================= related ================= */
 
-  // renderProductGrid marks every card ".reveal" and expects a caller to flip
-  // it to ".in" via IntersectionObserver (see js/script.js on the homepage);
-  // without one the cards render but stay at opacity:0 forever.
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
-    });
-  }, { threshold: 0.15 });
-
+  // renderProductGrid marks every card ".reveal", which starts at opacity:0 and
+  // waits for a scroll observer. This page has no scroll animations, so the
+  // cards are shown outright instead.
   function renderRelated(p) {
     const grid = $('pdRelatedGrid');
     const pool = GLOW_PRODUCTS.filter(x => x.cat === p.cat && x.name !== p.name);
     if (!pool.length) { $('pdRelatedSection').hidden = true; return; }
 
-    renderProductGrid(grid, p.cat, { limit: 5, observeReveal: el => revealObserver.observe(el) });
+    renderProductGrid(grid, p.cat, { limit: 5, observeReveal: el => el.classList.add('in') });
     // renderProductGrid doesn't know to exclude the product we're already on
     grid.querySelectorAll('.product-card').forEach(card => {
       if (card.querySelector('h3').textContent === p.name) card.remove();
@@ -280,7 +268,5 @@
     wireBuy();
     renderDelivery();
     renderRelated(product);
-
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   });
 })();

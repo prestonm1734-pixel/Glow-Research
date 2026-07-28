@@ -157,7 +157,7 @@
   .pd-size{
     font-family:'JetBrains Mono', monospace; font-size:.76rem; font-weight:600;
     padding: 10px 20px; border:1px solid rgba(0,0,0,.18); background:transparent; color:#0a0a0a;
-    cursor:pointer; transition: border-color .18s ease, color .18s ease;
+    cursor:pointer;
   }
   .pd-size:hover{ border-color:#0a0a0a; }
   .pd-size.is-active{ background:#0a0a0a; border-color:#0a0a0a; color:#fff; }
@@ -171,21 +171,11 @@
   .pd-stepper{ display:flex; align-items:center; border:1px solid rgba(0,0,0,.18); }
   .pd-stepper button{
     width:38px; height:46px; background:transparent; border:none; color:#0a0a0a; font-size:1.05rem; cursor:pointer;
-    transition: background .2s ease;
   }
   .pd-stepper button:hover:not(:disabled){ background: rgba(0,0,0,.06); }
   .pd-stepper button:disabled{ opacity:.3; cursor:default; }
   .pd-stepper span{ width:40px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:.9rem; }
   .pd-add{ height:46px; padding: 0 32px; flex:1; min-width: 180px; justify-content:center; font-size:.92rem; }
-  /* secondary action: same footprint as Add to cart so the pair reads as one
-     block, but outlined so it never competes with the primary button */
-  .pd-buynow{
-    width:100%; height:46px; margin-bottom: 16px;
-    background:#fff; color:#0a0a0a; border:1px solid #0a0a0a;
-    font-family:'Inter', sans-serif; font-size:.92rem; font-weight:700; cursor:pointer;
-    transition: background .18s ease, color .18s ease;
-  }
-  .pd-buynow:hover{ background:#0a0a0a; color:#fff; }
 
   /* --- when it ships, when it lands. two lines, no box --- */
   .pd-deliver{ margin: 0 0 14px; }
@@ -194,12 +184,6 @@
   .pd-dot{
     display:inline-block; width:6px; height:6px; border-radius:50%; background:#0a0a0a;
     margin-right:8px; vertical-align:middle;
-    animation: pdPulse 2.4s ease-out infinite;
-  }
-  @keyframes pdPulse{
-    0%{ box-shadow: 0 0 0 0 rgba(10,10,10,.4); }
-    70%{ box-shadow: 0 0 0 7px rgba(10,10,10,0); }
-    100%{ box-shadow: 0 0 0 0 rgba(10,10,10,0); }
   }
 
   /* ---------- sections ---------- */
@@ -216,7 +200,6 @@
     position:relative; background:#fff; border:1px solid rgba(0,0,0,.14); cursor:pointer;
     padding: 9px 12px; display:flex; align-items:baseline; gap:9px;
     color:#0a0a0a; text-align:left; font-family:inherit; width:100%;
-    transition: border-color .18s ease, background .18s ease;
   }
   .pd-tier + .pd-tier{ margin-top:-1px; }               /* collapse shared borders */
   .pd-tier:hover{ border-color:#0a0a0a; z-index:1; }
@@ -240,18 +223,28 @@
   .pd-coa{
     display:flex; align-items:center; gap:13px; margin-top:16px;
     border:1px solid rgba(0,0,0,.16); padding: 13px 15px; color:#0a0a0a;
-    transition: border-color .18s ease, background .18s ease;
   }
-  .pd-coa:hover{ border-color:#0a0a0a; background:#f7f7f5; }
+  .pd-coa:hover{ border-color:#0a0a0a; }
   .pd-coa > svg:first-child{ flex-shrink:0; }
   .pd-coa b{ display:block; font-size:.87rem; font-weight:700; }
   .pd-coa small{ display:block; margin-top:2px; font-size:.74rem; color:#8a8a86; }
   .pd-coa span{ flex:1; min-width:0; }
-  .pd-coa-arrow{ flex-shrink:0; transition: transform .18s ease; }
-  .pd-coa:hover .pd-coa-arrow{ transform: translateX(3px); }
+  .pd-coa-arrow{ flex-shrink:0; }
 
   /* --- related --- */
   .pd-related h2{ margin-bottom: 28px; }
+
+  /* ---------- no motion ----------
+     Hover states still change (border, colour) so things stay obviously
+     clickable, they just change instantly. This also cancels the lift-on-hover
+     and fade-in-on-scroll that .btn and .product-card carry site-wide.
+     Scoped to .pd-page so other pages keep their existing feel. */
+  .pd-page *, .pd-page *::before, .pd-page *::after{
+    transition: none !important;
+    animation: none !important;
+  }
+  .pd-page .btn:hover,
+  .pd-page .product-card:hover{ transform: none; box-shadow: none; }
 
   /* ---------- missing ---------- */
   .pd-missing{ background:#fff; color:#0a0a0a; padding: 130px 0; text-align:center; }
@@ -370,9 +363,6 @@
           </div>
           <button type="button" class="btn btn-primary pd-add" id="pdAddBtn">Add to cart</button>
         </div>
-        <!-- straight to checkout, skipping the cart drawer entirely -->
-        <button type="button" class="pd-buynow" id="pdBuyNow">Buy now</button>
-
         <div class="pd-deliver">
           <p><span class="pd-dot" aria-hidden="true"></span><span id="pdCutoff">Checking dispatch&hellip;</span></p>
           <p id="pdArrival">Calculating delivery&hellip;</p>
