@@ -436,19 +436,20 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .product-card:hover{ transform: translateY(-5px); box-shadow: 0 20px 40px -20px rgba(0,0,0,.35); }
 
+/* A vial is a tall, narrow subject, so a short wide tile letterboxes it and
+   the bottle ends up tiny. Keeping the tile roughly square gives the vial the
+   height it needs to fill the frame. */
 .product-visual{
-  height: 190px;
+  aspect-ratio: 1 / 1;
   display:flex; align-items:center; justify-content:center;
   position:relative; overflow:hidden;
   background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
 }
 /* A real product shot is photographed on white, which is already what
    .product-visual fades to — so it drops straight in with no card or border
-   around it. Padding keeps its vial about the size of the drawn .vial below. */
-/* multiply drops the shot's white backdrop out against the tile's gradient,
-   so the vial sits on the tile instead of on a white rectangle */
+   around it, and multiply drops the shot's white backdrop out entirely. */
 .product-photo{
-  height:100%; width:100%; object-fit:contain; padding: 14px 0;
+  height:100%; width:100%; object-fit:contain; padding: 8% 0;
   mix-blend-mode: multiply;
 }
 /* the small square thumb used by search, the cart drawer and checkout — they
@@ -471,6 +472,38 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .vial::after{
   content:''; position:absolute; left:5px; right:5px; bottom:8px; top:40px; border-radius:2px;
   background: linear-gradient(180deg,#141414,#0a0a0a);
+}
+/* On a catalog tile the drawn vial stands in for a product photo, so it is
+   sized to match one. Everything is a percentage: the tile is square but its
+   px size changes with the breakpoint, and the cap/label percentages resolve
+   against the vial's own box, so the whole thing scales as one piece.
+   Scoped to .product-visual so the small thumbnails in search, quick-add and
+   the cart keep the compact px dimensions above. */
+.product-visual .vial{
+  width: 33%; height: 74%;
+  /* a shouldered top, so the silhouette reads as a vial and not a box */
+  border-radius: 24% 24% 5% 5% / 10% 10% 3% 3%;
+  background:
+    linear-gradient(100deg,
+      rgba(255,255,255,.30) 0%,
+      rgba(255,255,255,.98) 9%,
+      rgba(255,255,255,.62) 26%,
+      rgba(255,255,255,.45) 52%,
+      rgba(255,255,255,.66) 76%,
+      rgba(255,255,255,.98) 92%,
+      rgba(255,255,255,.32) 100%);
+  border: 1px solid rgba(0,0,0,.13);
+  box-shadow: 0 20px 32px -16px rgba(0,0,0,.4);
+}
+/* crimp cap */
+.product-visual .vial::before{
+  top:-9%; width:42%; height:13%; border-radius:3px 3px 1px 1px;
+  background: linear-gradient(100deg,#39414f,#1b2029 32%,#11151c 68%,#2a313c);
+}
+/* printed label */
+.product-visual .vial::after{
+  left:6%; right:6%; bottom:9%; top:40%; border-radius:2px;
+  background: linear-gradient(180deg,#1e2735,#111722);
 }
 .product-badge{
   position:absolute; top:14px; font-size: 0.62rem; font-weight:700;
