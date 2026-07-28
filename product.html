@@ -50,7 +50,7 @@
     /* an explicit height, not min-height: .pd-photo is height:100%, and against
        an indefinite parent that percentage does not resolve, so the photo's own
        aspect ratio would drive the box and blow it up past 700px */
-    position: sticky; top: 84px; height: clamp(300px, 30vw, 400px);
+    position: sticky; top: 84px; height: clamp(340px, 34vw, 460px);
     display:flex; align-items:center; justify-content:center;
     background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
     border: 1px solid rgba(0,0,0,.1);
@@ -60,12 +60,11 @@
      dark stage as a card-in-a-card, the stage itself goes light and the photo
      fills it edge to edge, so there is no frame around the vial. */
   .pd-visual.has-photo{ background: linear-gradient(180deg,#f7f7f5,#eaeae7); }
-  /* cover, not contain: the panel is a window onto a vial taller than it, so
-     you see the cap first and the label as you scroll. js/product.js drives
-     object-position from the scroll offset. */
+  /* the whole vial, always — the stage is sticky, so the image stays with you
+     as the page scrolls rather than being cropped or panned */
   .pd-photo{
     position:relative; z-index:2; width:100%; height:100%;
-    object-fit: cover; object-position: 50% 0%;
+    object-fit: contain;
     mix-blend-mode: multiply;
   }
   .pd-photo[hidden]{ display:none; }
