@@ -152,38 +152,38 @@
   .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:800; margin: 0 0 8px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
 
   .pd-label{
-    font-family:'JetBrains Mono', monospace; font-size:.64rem; font-weight:700; letter-spacing:.14em;
-    text-transform:uppercase; color:#0a0a0a; display:block; margin-bottom:10px;
+    font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:700; letter-spacing:.14em;
+    text-transform:uppercase; color:#0a0a0a; display:block; margin-bottom:11px;
   }
 
   /* --- mg picker: the one decision on this page --- */
-  .pd-sizes{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 20px; }
+  .pd-sizes{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 22px; }
   .pd-size{
-    font-family:'JetBrains Mono', monospace; font-size:.78rem; font-weight:700;
-    padding: 11px 22px; border:2px solid rgba(0,0,0,.7); background:transparent; color:#0a0a0a;
+    font-family:'JetBrains Mono', monospace; font-size:.92rem; font-weight:700;
+    padding: 15px 30px; border:2px solid rgba(0,0,0,.7); background:transparent; color:#0a0a0a;
     cursor:pointer;
   }
   .pd-size:hover{ border-color:#0a0a0a; }
   .pd-size.is-active{ background:#0a0a0a; border-color:#0a0a0a; color:#fff; }
 
   .pd-price{
-    font-family:'Space Grotesk',sans-serif; font-size: 2.1rem; font-weight:800; color:#0a0a0a;
+    font-family:'Space Grotesk',sans-serif; font-size: 1.7rem; font-weight:800; color:#0a0a0a;
     letter-spacing:-.03em; display:block; margin-bottom: 22px;
   }
 
   .pd-buy{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; margin-bottom: 10px; }
   .pd-stepper{ display:flex; align-items:center; border:2px solid rgba(0,0,0,.7); }
   .pd-stepper button{
-    width:38px; height:46px; background:transparent; border:none; color:#0a0a0a; font-size:1.05rem; cursor:pointer;
+    width:44px; height:56px; background:transparent; border:none; color:#0a0a0a; font-size:1.2rem; cursor:pointer;
   }
   .pd-stepper button:hover:not(:disabled){ background: rgba(0,0,0,.06); }
   .pd-stepper button:disabled{ opacity:.3; cursor:default; }
-  .pd-stepper span{ width:40px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:.9rem; }
-  .pd-add{ height:50px; padding: 0 32px; flex:1; min-width: 180px; justify-content:center; font-size:.95rem; font-weight:700; }
+  .pd-stepper span{ width:46px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:1rem; font-weight:700; }
+  .pd-add{ height:56px; padding: 0 32px; flex:1; min-width: 180px; justify-content:center; font-size:1.02rem; font-weight:700; }
 
   /* --- when it ships, when it lands. two lines, no box --- */
-  .pd-deliver{ margin: 0 0 14px; }
-  .pd-deliver p{ font-size:.86rem; color:#3a3a38; margin:0; padding: 3px 0; }
+  .pd-deliver{ margin: 2px 0 16px; }
+  .pd-deliver p{ font-size:.92rem; color:#3a3a38; margin:0; padding: 4px 0; }
   .pd-deliver strong{ color:#0a0a0a; font-weight:800; }
   .pd-dot{
     display:inline-block; width:6px; height:6px; border-radius:50%; background:#0a0a0a;
@@ -202,7 +202,7 @@
   .pd-tiers{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .pd-tier{
     position:relative; background:#fafaf8; border:1.5px solid rgba(0,0,0,.14); cursor:pointer;
-    padding: 16px 8px 14px; display:flex; flex-direction:column; align-items:center; gap:2px;
+    padding: 18px 10px 16px; display:flex; flex-direction:column; align-items:center; gap:2px;
     color:#0a0a0a; text-align:center; font-family:inherit; width:100%;
   }
   .pd-tier:hover{ border-color:#0a0a0a; }
@@ -211,7 +211,7 @@
   /* the vials themselves — overlapped so three still fit a narrow card */
   .pd-tier-vials{
     display:flex; align-items:flex-end; justify-content:center;
-    height: 74px; margin-bottom: 8px;
+    height: 86px; margin-bottom: 10px;
   }
   .pd-tier-vials img{
     height:100%; width:auto; object-fit:contain; mix-blend-mode: multiply;
@@ -223,21 +223,21 @@
   .pd-tier-vials .vial + .vial{ margin-left:4px; }
 
   .pd-tier-qty{
-    font-size:.72rem; font-weight:700; color:#0a0a0a;
+    font-size:.8rem; font-weight:700; color:#0a0a0a;
     font-family:'JetBrains Mono', monospace; margin-bottom:2px;
   }
-  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1.08rem; font-weight:800; color:#0a0a0a; letter-spacing:-.02em; }
-  .pd-tier-was{ font-size:.72rem; color:#9a9a96; text-decoration: line-through; }
-  .pd-tier-per{ font-size:.68rem; color:#8a8a86; }
+  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1.2rem; font-weight:800; color:#0a0a0a; letter-spacing:-.02em; }
+  .pd-tier-was{ font-size:.78rem; color:#9a9a96; text-decoration: line-through; }
+  .pd-tier-per{ font-size:.74rem; color:#8a8a86; }
   .pd-tier-off{
-    margin-top:6px; font-size:.66rem; font-weight:700; color:#0a0a0a;
-    background:#ececea; padding: 3px 9px;
+    margin-top:7px; font-size:.72rem; font-weight:700; color:#0a0a0a;
+    background:#ececea; padding: 4px 10px;
   }
   /* a tab straddling the top border, like a ribbon on the winning card */
   .pd-tier-flag{
     position:absolute; top:0; left:50%; transform: translate(-50%, -50%);
-    font-size:.55rem; font-weight:700; background:#0a0a0a; color:#fff;
-    padding:4px 9px; letter-spacing:.08em; text-transform:uppercase;
+    font-size:.62rem; font-weight:700; background:#0a0a0a; color:#fff;
+    padding:5px 10px; letter-spacing:.08em; text-transform:uppercase;
     font-family:'JetBrains Mono', monospace; white-space:nowrap;
   }
 
@@ -248,8 +248,8 @@
   }
   .pd-coa:hover{ background:#f7f7f5; }
   .pd-coa > svg:first-child{ flex-shrink:0; }
-  .pd-coa b{ display:block; font-size:.92rem; font-weight:800; }
-  .pd-coa small{ display:block; margin-top:2px; font-size:.74rem; color:#8a8a86; }
+  .pd-coa b{ display:block; font-size:1rem; font-weight:800; }
+  .pd-coa small{ display:block; margin-top:3px; font-size:.8rem; color:#8a8a86; }
   .pd-coa span{ flex:1; min-width:0; }
   .pd-coa-arrow{ flex-shrink:0; }
 
@@ -282,8 +282,10 @@
   @media (max-width: 560px){
     .pd-hero{ padding: 36px 0 56px; }
     .pd-add{ width:100%; flex-basis:100%; }
-    .pd-spec-row{ flex-direction:column; gap:3px; }
-    .pd-spec-row dd{ text-align:left; }
+    /* three vials in a ~83px card: at the desktop size the strip needs 118px
+       and spills out the side, so it scales down and overlaps harder */
+    .pd-tier-vials{ height: 54px; margin-bottom: 8px; }
+    .pd-tier-vials img + img{ margin-left:-14px; }
   }
 </style>
 </head>
