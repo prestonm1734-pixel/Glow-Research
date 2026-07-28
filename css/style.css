@@ -449,7 +449,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
    .product-visual fades to — so it drops straight in with no card or border
    around it, and multiply drops the shot's white backdrop out entirely. */
 .product-photo{
-  height:100%; width:100%; object-fit:contain; padding: 8% 0;
+  height:100%; width:100%; object-fit:contain; padding: 2% 0;
   mix-blend-mode: multiply;
 }
 /* the small square thumb used by search, the cart drawer and checkout — they
@@ -480,9 +480,11 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
    Scoped to .product-visual so the small thumbnails in search, quick-add and
    the cart keep the compact px dimensions above. */
 .product-visual .vial{
-  width: 33%; height: 74%;
+  /* height stops at 82% because the cap sits above the body box — any taller
+     and it clips against the top of the tile */
+  width: 37%; height: 82%;
   /* a shouldered top, so the silhouette reads as a vial and not a box */
-  border-radius: 24% 24% 5% 5% / 10% 10% 3% 3%;
+  border-radius: 24% 24% 5% 5% / 9% 9% 3% 3%;
   background:
     linear-gradient(100deg,
       rgba(255,255,255,.30) 0%,
