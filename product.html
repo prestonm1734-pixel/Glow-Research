@@ -50,11 +50,18 @@
     /* an explicit height, not min-height: .pd-photo is height:100%, and against
        an indefinite parent that percentage does not resolve, so the photo's own
        aspect ratio would drive the box and blow it up past 700px */
-    position: sticky; top: 84px; height: clamp(340px, 34vw, 460px);
+    /* tall enough to read as a real product photo rather than a thumbnail,
+       but capped near the buy column's own height — taller than that leaves
+       dead space under the shorter column once the row is forced to match */
+    position: sticky; top: 84px; height: clamp(480px, 78vh, 680px);
     display:flex; align-items:center; justify-content:center;
     background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
     border: 1px solid rgba(0,0,0,.1);
     overflow:hidden;
+    /* real margin, not just aspect-ratio slack — the box got much taller, but
+       object-fit:contain alone would just scale the vial up to match rather
+       than leaving air around it */
+    padding: 9% 14%;
   }
   /* A real product shot is photographed on white. Rather than float it on the
      dark stage as a card-in-a-card, the stage itself goes light and the photo
@@ -258,7 +265,7 @@
   @media (max-width: 900px){
     .pd-hero-grid{ grid-template-columns:1fr; gap: 36px; }
     /* stacked on mobile, so pinning the image would just cover the copy */
-    .pd-visual{ position:static; height: clamp(300px, 78vw, 380px); }
+    .pd-visual{ position:static; height: clamp(300px, 78vw, 380px); padding: 6% 12%; }
     .pd-tiers{ grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 560px){
