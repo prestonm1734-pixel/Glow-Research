@@ -189,27 +189,31 @@
   .pd-section h2{ font-size: clamp(1.4rem, 2.4vw, 1.85rem); margin: 0 0 6px; letter-spacing:-.02em; color:#0a0a0a; }
   .pd-section-sub{ font-size:.9rem; color:#8a8a86; margin: 0 0 30px; }
 
-  /* --- stock up & save --- */
-  .pd-tiers{ display:grid; grid-template-columns: repeat(4, 1fr); gap:14px; }
+  /* --- stock up & save ---
+     Compact by necessity: four tiers now share the buy box column rather than
+     the full page width, so the type and padding step down to suit. */
+  .pd-bulk{ margin-top: 26px; padding-top: 24px; border-top:1px solid rgba(0,0,0,.1); }
+  .pd-bulk-sub{ font-size:.8rem; color:#8a8a86; margin: -4px 0 14px; }
+  .pd-tiers{ display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; }
   .pd-tier{
     position:relative; background:#fff; border:1px solid rgba(0,0,0,.14); cursor:pointer;
-    padding: 24px 20px; display:flex; flex-direction:column; align-items:flex-start; gap:6px;
+    padding: 13px 11px 12px; display:flex; flex-direction:column; align-items:flex-start; gap:3px;
     color:#0a0a0a; text-align:left; font-family:inherit;
     transition: border-color .18s ease, background .18s ease;
   }
   .pd-tier:hover{ border-color:#0a0a0a; }
   .pd-tier.is-best{ border-color:#0a0a0a; }
   .pd-tier-flag{
-    position:absolute; top:-1px; right:-1px; background:#0a0a0a; color:#fff; font-size:.56rem; font-weight:700;
-    padding:4px 9px; letter-spacing:.08em; text-transform:uppercase; font-family:'JetBrains Mono', monospace;
+    position:absolute; top:-1px; right:-1px; background:#0a0a0a; color:#fff; font-size:.48rem; font-weight:700;
+    padding:3px 6px; letter-spacing:.06em; text-transform:uppercase; font-family:'JetBrains Mono', monospace;
   }
   .pd-tier-qty{
-    font-size:.68rem; color:#8a8a86; text-transform:uppercase; letter-spacing:.1em;
+    font-size:.6rem; color:#8a8a86; text-transform:uppercase; letter-spacing:.08em;
     font-family:'JetBrains Mono', monospace;
   }
-  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1.4rem; font-weight:700; color:#0a0a0a; letter-spacing:-.02em; }
-  .pd-tier-per{ font-size:.76rem; color:#8a8a86; }
-  .pd-tier-off{ font-size:.68rem; font-weight:600; color:#0a0a0a; margin-top:2px; }
+  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1.02rem; font-weight:700; color:#0a0a0a; letter-spacing:-.02em; }
+  .pd-tier-per{ font-size:.66rem; color:#8a8a86; }
+  .pd-tier-off{ font-size:.6rem; font-weight:600; color:#0a0a0a; margin-top:1px; }
 
   /* --- specifications --- */
   .pd-specs{ max-width: 620px; }
@@ -344,17 +348,16 @@
         </div>
 
         <p class="pd-meta" id="pdMeta"></p>
+
+        <!-- bulk pricing sits in the buy box, where the quantity decision is
+             actually being made, rather than in a section further down -->
+        <div class="pd-bulk">
+          <span class="pd-label">Stock up &amp; save</span>
+          <p class="pd-bulk-sub" id="pdTiersSub">Tap a quantity to add it straight to your order.</p>
+          <div class="pd-tiers" id="pdTiers"></div>
+        </div>
       </div>
 
-    </div>
-  </section>
-
-  <!-- ============ stock up & save ============ -->
-  <section class="pd-section alt">
-    <div class="container">
-      <h2>Stock up &amp; save</h2>
-      <p class="pd-section-sub" id="pdTiersSub">Tap a quantity to add it straight to your order.</p>
-      <div class="pd-tiers" id="pdTiers"></div>
     </div>
   </section>
 
