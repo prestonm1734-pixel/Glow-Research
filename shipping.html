@@ -119,26 +119,17 @@
 <section class="lp-hero">
   <div class="container lp-hero-inner">
 
-    <div class="lp-hero-top">
-      <div>
-        <span class="lp-tag">Shipping</span>
-        <h1>Ships the same day.<br /><span class="outline">Cold the whole way.</span></h1>
-        <p class="lp-lede">
-          Order before 2:00 PM EST on a business day and it leaves that afternoon,
-          packed in a refrigerated cooler on 2-day FedEx Express.
-        </p>
-      </div>
-
-      <div class="lp-ink">
-        <div class="lp-ink-label"><span class="lp-ink-dot" aria-hidden="true"></span> Dispatch window</div>
-        <p class="lp-ink-big" id="shipClock">2:00 PM</p>
-        <p class="lp-ink-sub" id="shipClockNote">Daily cutoff, Monday to Friday.</p>
-        <dl class="lp-ink-rows">
-          <div class="lp-ink-row"><dt>Carrier</dt><dd>FedEx Express</dd></div>
-          <div class="lp-ink-row"><dt>Transit</dt><dd>2 business days</dd></div>
-          <div class="lp-ink-row"><dt>Tracking</dt><dd>Within 24 hours</dd></div>
-        </dl>
-      </div>
+    <div>
+      <span class="lp-tag">Shipping</span>
+      <h1>Ships the same day.<br /><span class="outline">Cold the whole way.</span></h1>
+      <p class="lp-lede">
+        Order before 2:00 PM EST on a business day and it leaves that afternoon,
+        packed in a refrigerated cooler on 2-day FedEx Express.
+      </p>
+      <p class="lp-lede-status">
+        <span class="lp-lede-dot" aria-hidden="true"></span>
+        <span id="shipClock">Checking today&rsquo;s cutoff&hellip;</span>
+      </p>
     </div>
 
     <div class="lp-stats">
@@ -385,8 +376,7 @@
      parts, which sidesteps the DST offset entirely. */
   (function () {
     const timeEl = document.getElementById('shipClock');
-    const noteEl = document.getElementById('shipClockNote');
-    if (!timeEl || !noteEl) return;
+    if (!timeEl) return;
     const CUTOFF_HOUR = 14;
 
     function nyParts(date) {
@@ -418,11 +408,11 @@
       if (isWeekday && secsLeft > 0) {
         const h = Math.floor(secsLeft / 3600);
         const m = Math.floor((secsLeft % 3600) / 60);
-        timeEl.textContent = h > 0 ? (m > 0 ? h + 'h ' + m + 'm' : h + 'h') : m + 'm';
-        noteEl.textContent = 'Left to order and still ship today.';
+        const left = h > 0 ? (m > 0 ? h + 'h ' + m + 'm' : h + 'h') : m + 'm';
+        timeEl.innerHTML = 'Order within <strong>' + left + '</strong> and it ships today.';
       } else {
-        timeEl.textContent = 'Closed';
-        noteEl.textContent = 'Next dispatch is ' + nextBusinessDayName() + ' morning.';
+        timeEl.innerHTML = 'Today&rsquo;s cutoff has passed. Next dispatch is <strong>' +
+          nextBusinessDayName() + ' morning</strong>.';
       }
     }
 
