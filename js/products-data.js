@@ -25,7 +25,7 @@ const GLOW_PRODUCTS = [
   { name: 'Semaglutide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.5%', badge:'Trending',
     sizes: [{ mg: '5mg', price: 89 }, { mg: '10mg', price: 152 }],
     blurb: 'A GLP-1 receptor agonist analogue supplied for laboratory investigation of incretin receptor signalling and metabolic pathway research.' },
-  { name: 'Tirzepatide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', badge:null,
+  { name: 'GLP3-RT', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', badge:null,
     sizes: [{ mg: '10mg', price: 129 }, { mg: '20mg', price: 219 }],
     image: 'assets/products/tirzepatide-vial.webp',
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.' },
