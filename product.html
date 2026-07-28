@@ -196,32 +196,50 @@
   .pd-section h2{ font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight:800; margin: 0 0 6px; letter-spacing:-.02em; color:#0a0a0a; }
 
   /* --- buy more, pay less ---
-     Rows rather than tiles: each one is a single line to scan (how many, what
-     it costs, what you save) and stays readable in a half-width column. */
+     Cards rather than rows: each tier shows the vials you actually get, so
+     the quantity reads at a glance before any of the numbers do. */
   .pd-bulk{ margin-top: 2px; padding-top: 18px; border-top:1px solid rgba(0,0,0,.1); }
-  .pd-tiers{ display:flex; flex-direction:column; }
+  .pd-tiers{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
   .pd-tier{
-    position:relative; background:#fff; border:1.5px solid rgba(0,0,0,.35); cursor:pointer;
-    padding: 11px 14px; display:flex; align-items:baseline; gap:9px;
-    color:#0a0a0a; text-align:left; font-family:inherit; width:100%;
+    position:relative; background:#fafaf8; border:1.5px solid rgba(0,0,0,.14); cursor:pointer;
+    padding: 16px 8px 14px; display:flex; flex-direction:column; align-items:center; gap:2px;
+    color:#0a0a0a; text-align:center; font-family:inherit; width:100%;
   }
-  .pd-tier + .pd-tier{ margin-top:-1px; }               /* collapse shared borders */
-  .pd-tier:hover{ border-color:#0a0a0a; z-index:1; }
-  .pd-tier.is-best{ border-color:#0a0a0a; z-index:1; }
+  .pd-tier:hover{ border-color:#0a0a0a; }
+  .pd-tier.is-best{ border-color:#0a0a0a; border-width:2px; background:#fff; }
+
+  /* the vials themselves — overlapped so three still fit a narrow card */
+  .pd-tier-vials{
+    display:flex; align-items:flex-end; justify-content:center;
+    height: 74px; margin-bottom: 8px;
+  }
+  .pd-tier-vials img{
+    height:100%; width:auto; object-fit:contain; mix-blend-mode: multiply;
+  }
+  .pd-tier-vials .vial{ width:22px; height:44px; box-shadow:none; }
+  /* photos carry their own whitespace, so they overlap; the drawn vial is a
+     bare 22px shape and would merge into one block, so it gets a real gap */
+  .pd-tier-vials img + img{ margin-left:-10px; }
+  .pd-tier-vials .vial + .vial{ margin-left:4px; }
+
   .pd-tier-qty{
-    font-size:.68rem; font-weight:600; color:#0a0a0a; min-width:54px;
-    font-family:'JetBrains Mono', monospace;
+    font-size:.72rem; font-weight:700; color:#0a0a0a;
+    font-family:'JetBrains Mono', monospace; margin-bottom:2px;
   }
-  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1rem; font-weight:800; color:#0a0a0a; letter-spacing:-.02em; }
+  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1.08rem; font-weight:800; color:#0a0a0a; letter-spacing:-.02em; }
+  .pd-tier-was{ font-size:.72rem; color:#9a9a96; text-decoration: line-through; }
   .pd-tier-per{ font-size:.68rem; color:#8a8a86; }
-  /* pushed right so the saving is the last thing on the row */
-  .pd-tier-off{ font-size:.68rem; font-weight:700; color:#0a0a0a; margin-left:auto; }
-  .pd-tier-flag{
-    font-size:.55rem; font-weight:700; background:#0a0a0a; color:#fff;
-    padding:3px 6px; letter-spacing:.06em; text-transform:uppercase;
-    font-family:'JetBrains Mono', monospace; margin-left:auto;
+  .pd-tier-off{
+    margin-top:6px; font-size:.66rem; font-weight:700; color:#0a0a0a;
+    background:#ececea; padding: 3px 9px;
   }
-  .pd-tier-off + .pd-tier-flag{ margin-left:10px; }
+  /* a tab straddling the top border, like a ribbon on the winning card */
+  .pd-tier-flag{
+    position:absolute; top:0; left:50%; transform: translate(-50%, -50%);
+    font-size:.55rem; font-weight:700; background:#0a0a0a; color:#fff;
+    padding:4px 9px; letter-spacing:.08em; text-transform:uppercase;
+    font-family:'JetBrains Mono', monospace; white-space:nowrap;
+  }
 
   /* --- COA link box --- */
   .pd-coa{

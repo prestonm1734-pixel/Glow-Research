@@ -199,17 +199,25 @@
     const variants = getProductVariants(product, s.price);
     const wrap = $('pdTiers');
 
+    // one vial per unit, but three is enough to read as "several" — past that
+    // they just overlap into a smudge, and the label already says the count
+    const vialArt = product.image
+      ? `<img src="${pageHref(product.image)}" alt="" loading="lazy" />`
+      : '<span class="vial"></span>';
+
     wrap.innerHTML = variants.map((v, i) => {
       const onSale = v.original > v.sale;
       const off = onSale ? Math.round((1 - v.sale / v.original) * 100) : 0;
       const best = i === variants.length - 1;
       return `
         <button type="button" class="pd-tier${best ? ' is-best' : ''}" data-i="${i}">
+          ${best ? '<span class="pd-tier-flag">Best value</span>' : ''}
+          <span class="pd-tier-vials">${vialArt.repeat(Math.min(v.qty, 3))}</span>
           <span class="pd-tier-qty">${v.label}</span>
           <span class="pd-tier-price">${money(v.sale)}</span>
-          <span class="pd-tier-per">${money(v.sale / v.qty)} ea</span>
+          ${onSale ? `<span class="pd-tier-was">${money(v.original)}</span>` : ''}
+          <span class="pd-tier-per">${money(v.sale / v.qty)} / vial</span>
           ${onSale ? `<span class="pd-tier-off">Save ${off}%</span>` : ''}
-          ${best ? '<span class="pd-tier-flag">Best</span>' : ''}
         </button>`;
     }).join('');
 
