@@ -130,8 +130,8 @@
     font-size:0.72rem; color:#8a8a86; text-transform:uppercase; letter-spacing:.12em;
     display:block; font-family:'JetBrains Mono', monospace; margin-bottom:12px;
   }
-  .pd-name{ font-size: clamp(2.1rem, 4vw, 3.1rem); margin: 0 0 16px; letter-spacing:-.03em; line-height:1.03; color:#0a0a0a; }
-  .pd-lede{ font-size: .98rem; max-width: 460px; margin: 0 0 34px; color:#55554f; }
+  .pd-name{ font-size: clamp(1.9rem, 3.4vw, 2.6rem); margin: 0 0 10px; letter-spacing:-.03em; line-height:1.05; color:#0a0a0a; }
+  .pd-lede{ font-size: .92rem; max-width: 460px; margin: 0 0 28px; color:#55554f; line-height:1.65; }
 
   .pd-label{
     font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:600; letter-spacing:.14em;
@@ -139,7 +139,7 @@
   }
 
   /* --- mg picker: the one decision on this page --- */
-  .pd-sizes{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 34px; }
+  .pd-sizes{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 26px; }
   .pd-size{
     font-family:'JetBrains Mono', monospace; font-size:.82rem; font-weight:600;
     padding: 13px 26px; border:1px solid rgba(0,0,0,.18); background:transparent; color:#0a0a0a;
@@ -149,8 +149,8 @@
   .pd-size.is-active{ background:#0a0a0a; border-color:#0a0a0a; color:#fff; }
 
   .pd-price{
-    font-family:'Space Grotesk',sans-serif; font-size: 2.4rem; font-weight:700; color:#0a0a0a;
-    letter-spacing:-.03em; display:block; margin-bottom: 20px;
+    font-family:'Space Grotesk',sans-serif; font-size: 2.1rem; font-weight:700; color:#0a0a0a;
+    letter-spacing:-.03em; display:block; margin-bottom: 14px;
   }
 
   .pd-buy{ display:flex; align-items:center; gap: 12px; flex-wrap:wrap; margin-bottom: 18px; }
@@ -163,6 +163,15 @@
   .pd-stepper button:disabled{ opacity:.3; cursor:default; }
   .pd-stepper span{ width:48px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:.95rem; }
   .pd-add{ height:52px; padding: 0 40px; flex:1; min-width: 200px; justify-content:center; }
+  /* secondary action: same footprint as Add to cart so the pair reads as one
+     block, but outlined so it never competes with the primary button */
+  .pd-buynow{
+    width:100%; height:52px; margin-bottom: 22px;
+    background:#fff; color:#0a0a0a; border:1px solid #0a0a0a;
+    font-family:'Inter', sans-serif; font-size:.95rem; font-weight:700; cursor:pointer;
+    transition: background .18s ease, color .18s ease;
+  }
+  .pd-buynow:hover{ background:#0a0a0a; color:#fff; }
 
   /* --- when it ships, when it lands. two lines, no box --- */
   .pd-deliver{ margin: 0 0 26px; }
@@ -179,55 +188,49 @@
     100%{ box-shadow: 0 0 0 0 rgba(10,10,10,0); }
   }
 
-  .pd-meta{
-    font-size:.82rem; color:#8a8a86; margin:0; padding-top: 22px;
-    border-top:1px solid rgba(0,0,0,.1);
-  }
-  .pd-meta a{ color:#0a0a0a; border-bottom:1px solid rgba(0,0,0,.35); padding-bottom:1px; }
-  .pd-meta a:hover{ border-color:#0a0a0a; }
-
   /* ---------- sections ---------- */
   .pd-section{ background:#fff; padding: 74px 0; border-top:1px solid rgba(0,0,0,.1); }
   .pd-section.alt{ background:#f7f7f5; }
   .pd-section h2{ font-size: clamp(1.4rem, 2.4vw, 1.85rem); margin: 0 0 6px; letter-spacing:-.02em; color:#0a0a0a; }
-  .pd-section-sub{ font-size:.9rem; color:#8a8a86; margin: 0 0 30px; }
 
-  /* --- stock up & save ---
-     Compact by necessity: four tiers now share the buy box column rather than
-     the full page width, so the type and padding step down to suit. */
-  .pd-bulk{ margin-top: 26px; padding-top: 24px; border-top:1px solid rgba(0,0,0,.1); }
-  .pd-bulk-sub{ font-size:.8rem; color:#8a8a86; margin: -4px 0 14px; }
-  .pd-tiers{ display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; }
+  /* --- buy more, pay less ---
+     Rows rather than tiles: each one is a single line to scan (how many, what
+     it costs, what you save) and stays readable in a half-width column. */
+  .pd-bulk{ margin-top: 4px; padding-top: 24px; border-top:1px solid rgba(0,0,0,.1); }
+  .pd-tiers{ display:flex; flex-direction:column; }
   .pd-tier{
     position:relative; background:#fff; border:1px solid rgba(0,0,0,.14); cursor:pointer;
-    padding: 13px 11px 12px; display:flex; flex-direction:column; align-items:flex-start; gap:3px;
-    color:#0a0a0a; text-align:left; font-family:inherit;
+    padding: 12px 14px; display:flex; align-items:baseline; gap:10px;
+    color:#0a0a0a; text-align:left; font-family:inherit; width:100%;
     transition: border-color .18s ease, background .18s ease;
   }
-  .pd-tier:hover{ border-color:#0a0a0a; }
-  .pd-tier.is-best{ border-color:#0a0a0a; }
-  .pd-tier-flag{
-    position:absolute; top:-1px; right:-1px; background:#0a0a0a; color:#fff; font-size:.48rem; font-weight:700;
-    padding:3px 6px; letter-spacing:.06em; text-transform:uppercase; font-family:'JetBrains Mono', monospace;
-  }
+  .pd-tier + .pd-tier{ margin-top:-1px; }               /* collapse shared borders */
+  .pd-tier:hover{ border-color:#0a0a0a; z-index:1; }
+  .pd-tier.is-best{ border-color:#0a0a0a; z-index:1; }
   .pd-tier-qty{
-    font-size:.6rem; color:#8a8a86; text-transform:uppercase; letter-spacing:.08em;
+    font-size:.74rem; font-weight:600; color:#0a0a0a; min-width:58px;
     font-family:'JetBrains Mono', monospace;
   }
-  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1.02rem; font-weight:700; color:#0a0a0a; letter-spacing:-.02em; }
-  .pd-tier-per{ font-size:.66rem; color:#8a8a86; }
-  .pd-tier-off{ font-size:.6rem; font-weight:600; color:#0a0a0a; margin-top:1px; }
+  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1rem; font-weight:700; color:#0a0a0a; letter-spacing:-.02em; }
+  .pd-tier-per{ font-size:.74rem; color:#8a8a86; }
+  /* pushed right so the saving is the last thing on the row */
+  .pd-tier-off{ font-size:.72rem; font-weight:700; color:#0a0a0a; margin-left:auto; }
+  .pd-tier-flag{
+    font-size:.55rem; font-weight:700; background:#0a0a0a; color:#fff;
+    padding:3px 6px; letter-spacing:.06em; text-transform:uppercase;
+    font-family:'JetBrains Mono', monospace; margin-left:auto;
+  }
+  .pd-tier-off + .pd-tier-flag{ margin-left:10px; }
 
   /* --- specifications --- */
-  .pd-specs{ max-width: 620px; }
+  .pd-specs{ margin: 28px 0 0; padding-top: 24px; border-top:1px solid rgba(0,0,0,.1); }
   .pd-spec-row{
-    display:flex; justify-content:space-between; gap:20px;
-    padding: 14px 0; border-bottom:1px solid rgba(0,0,0,.1);
+    display:flex; justify-content:space-between; gap:20px; padding: 9px 0;
   }
-  .pd-spec-row dt{ font-size:.88rem; color:#8a8a86; margin:0; }
-  .pd-spec-row dd{ font-size:.88rem; color:#0a0a0a; margin:0; text-align:right; }
+  .pd-spec-row dt{ font-size:.84rem; color:#8a8a86; margin:0; }
+  .pd-spec-row dd{ font-size:.84rem; color:#0a0a0a; margin:0; text-align:right; }
   .pd-note{
-    font-size:.78rem; color:#8a8a86; line-height:1.7; margin: 26px 0 0; max-width: 620px;
+    font-size:.76rem; color:#8a8a86; line-height:1.7; margin: 18px 0 0;
   }
 
   /* --- related --- */
@@ -327,15 +330,18 @@
         </div>
       </div>
 
+      <!-- Order top to bottom the way the decision is actually made: what it
+           is, what it costs, which size, buy. Everything else is reference
+           material and sits underneath. -->
       <div class="pd-right">
         <span class="pd-tag" id="pdTag">Category</span>
         <h1 class="pd-name" id="pdName">Product name</h1>
-        <p class="pd-lede" id="pdLede"></p>
-
-        <span class="pd-label">Select mg</span>
-        <div class="pd-sizes" id="pdSizes"></div>
 
         <span class="pd-price" id="pdPrice">$0</span>
+        <p class="pd-lede" id="pdLede"></p>
+
+        <span class="pd-label">Size</span>
+        <div class="pd-sizes" id="pdSizes"></div>
 
         <div class="pd-buy">
           <div class="pd-stepper">
@@ -345,52 +351,39 @@
           </div>
           <button type="button" class="btn btn-primary pd-add" id="pdAddBtn">Add to cart</button>
         </div>
+        <!-- straight to checkout, skipping the cart drawer entirely -->
+        <button type="button" class="pd-buynow" id="pdBuyNow">Buy now</button>
 
         <div class="pd-deliver">
           <p><span class="pd-dot" aria-hidden="true"></span><span id="pdCutoff">Checking dispatch&hellip;</span></p>
           <p id="pdArrival">Calculating delivery&hellip;</p>
         </div>
 
-        <p class="pd-meta" id="pdMeta"></p>
-
-        <!-- bulk pricing sits in the buy box, where the quantity decision is
-             actually being made, rather than in a section further down -->
+        <!-- bulk pricing sits with the quantity decision, not in its own
+             section further down the page -->
         <div class="pd-bulk">
-          <span class="pd-label">Stock up &amp; save</span>
-          <p class="pd-bulk-sub" id="pdTiersSub">Tap a quantity to add it straight to your order.</p>
+          <span class="pd-label">Buy more, pay less</span>
           <div class="pd-tiers" id="pdTiers"></div>
         </div>
+
+        <dl class="pd-specs">
+          <div class="pd-spec-row"><dt>Purity</dt><dd id="pdSpecPurity">&ge;99% (HPLC verified)</dd></div>
+          <div class="pd-spec-row"><dt>Contents</dt><dd id="pdSpecSize">Single vial</dd></div>
+          <div class="pd-spec-row"><dt>Form</dt><dd>Lyophilized powder, nitrogen sealed</dd></div>
+          <div class="pd-spec-row"><dt>Storage</dt><dd>&minus;20&deg;C, protected from light</dd></div>
+          <div class="pd-spec-row"><dt>Shipping</dt><dd id="pdSpecShip">Unmarked box, tracked</dd></div>
+        </dl>
+
+        <p class="pd-note">For laboratory research use only. Not for human or veterinary use.</p>
       </div>
 
-    </div>
-  </section>
-
-  <!-- ============ specifications ============ -->
-  <section class="pd-section">
-    <div class="container">
-      <h2>Specifications</h2>
-      <p class="pd-section-sub">Every lot is assayed by an independent lab before it is listed.</p>
-
-      <dl class="pd-specs">
-        <div class="pd-spec-row"><dt>Form</dt><dd>Lyophilized powder</dd></div>
-        <div class="pd-spec-row"><dt>Purity</dt><dd id="pdSpecPurity">&ge;99% (HPLC verified)</dd></div>
-        <div class="pd-spec-row"><dt>Presentation</dt><dd id="pdSpecSize">Single vial</dd></div>
-        <div class="pd-spec-row"><dt>Sealed under</dt><dd>Nitrogen</dd></div>
-        <div class="pd-spec-row"><dt>Testing</dt><dd>HPLC + mass spectrometry</dd></div>
-        <div class="pd-spec-row"><dt>Storage</dt><dd>&minus;20&deg;C, protected from light</dd></div>
-      </dl>
-
-      <p class="pd-note">
-        For research use only. Not for human or veterinary use. Not a drug, food, or supplement.
-        Nothing on this page is a dosing recommendation or a protocol.
-      </p>
     </div>
   </section>
 
   <!-- ============ related ============ -->
   <section class="pd-section alt pd-related" id="pdRelatedSection">
     <div class="container">
-      <h2>Pairs well at the bench</h2>
+      <h2>More in this category</h2>
       <div class="product-grid" id="pdRelatedGrid"></div>
     </div>
   </section>

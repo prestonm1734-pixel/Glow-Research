@@ -117,10 +117,7 @@
     }
 
     const free = (window.GlowCart && window.GlowCart.FREE_SHIPPING_AT) || 250;
-    $('pdMeta').innerHTML =
-      `${p.purity} purity &middot; lyophilized &amp; nitrogen sealed &middot; ` +
-      `<a href="${pageHref('coa.html')}">lot-matched COA</a> &middot; ` +
-      `free shipping over $${free}`;
+    $('pdSpecShip').textContent = `Unmarked box, tracked \u00b7 free over $${free}`;
   }
 
   /* ================= mg picker ================= */
@@ -150,8 +147,7 @@
       `${product.purity} Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.com`;
 
     $('pdSpecPurity').textContent = `${product.purity} (HPLC verified)`;
-    $('pdSpecSize').textContent = `Single vial, ${s.mg}`;
-    $('pdTiersSub').textContent = `Priced for the ${s.mg} vial. Tap a quantity to add it straight to your order.`;
+    $('pdSpecSize').textContent = `1 vial \u00b7 ${s.mg}`;
 
     document.title = `${product.name} ${s.mg} | Glow Research`;
     const desc = document.querySelector('meta[name="description"]');
@@ -183,9 +179,9 @@
     $('pdQtyDec').addEventListener('click', () => { qty = Math.max(1, qty - 1); draw(); });
     $('pdQtyInc').addEventListener('click', () => { qty += 1; draw(); });
 
-    $('pdAddBtn').addEventListener('click', () => {
+    // the cart lines up as unitSale × qty, so a plain vial goes in as a unit
+    const addCurrent = () => {
       const s = size();
-      // the cart lines up as unitSale × qty, so a plain vial goes in as a unit
       window.GlowCart.add({
         name: product.name,
         variant: s.mg,
@@ -193,7 +189,17 @@
         unitOriginal: s.price,
         unitSale: s.price,
       });
+    };
+
+    $('pdAddBtn').addEventListener('click', () => {
+      addCurrent();
       flash($('pdAddBtn'), 'Added to cart ✓');
+    });
+
+    // same add, then straight to checkout — skips the cart drawer entirely
+    $('pdBuyNow').addEventListener('click', () => {
+      addCurrent();
+      window.location.href = pageHref('checkout.html');
     });
   }
 
@@ -210,11 +216,11 @@
       const best = i === variants.length - 1;
       return `
         <button type="button" class="pd-tier${best ? ' is-best' : ''}" data-i="${i}">
-          ${best ? '<span class="pd-tier-flag">Best value</span>' : ''}
           <span class="pd-tier-qty">${v.label}</span>
           <span class="pd-tier-price">${money(v.sale)}</span>
-          <span class="pd-tier-per">${money(v.sale / v.qty)} per vial</span>
+          <span class="pd-tier-per">${money(v.sale / v.qty)} ea</span>
           ${onSale ? `<span class="pd-tier-off">Save ${off}%</span>` : ''}
+          ${best ? '<span class="pd-tier-flag">Best</span>' : ''}
         </button>`;
     }).join('');
 
