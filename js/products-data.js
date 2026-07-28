@@ -85,6 +85,17 @@ function pageHref(file) {
   return prefix + file;
 }
 
+// Thumbnail markup for a product, looked up by name so the cart and checkout
+// can call it with nothing but a stored line item. Falls back to the drawn
+// vial for products that have no photo yet.
+function productThumb(name) {
+  const p = GLOW_PRODUCTS.find(x => x.name === name);
+  if (p && p.image) {
+    return `<img class="thumb-photo" src="${pageHref(p.image)}" alt="" loading="lazy" />`;
+  }
+  return '<span class="vial"></span>';
+}
+
 // gridEl: container to render into
 // filter: 'all' or a category key
 // opts.observeReveal(el): optional, hooks each card into a scroll-reveal observer
@@ -104,7 +115,7 @@ function renderProductGrid(gridEl, filter, opts) {
         <span class="product-badge cat">${p.cat}</span>
         ${p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
         ${p.image
-          ? `<img class="product-photo" src="${p.image}" alt="${p.name} vial" loading="lazy" />`
+          ? `<img class="product-photo" src="${pageHref(p.image)}" alt="${p.name} vial" loading="lazy" />`
           : '<div class="vial"></div>'}
       </a>
       <div class="product-footer">

@@ -448,7 +448,13 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 /* multiply drops the shot's white backdrop out against the tile's gradient,
    so the vial sits on the tile instead of on a white rectangle */
 .product-photo{
-  height:100%; width:100%; object-fit:contain; padding: 24px 0;
+  height:100%; width:100%; object-fit:contain; padding: 14px 0;
+  mix-blend-mode: multiply;
+}
+/* the small square thumb used by search, the cart drawer and checkout — they
+   all share the same light gradient tile, so one rule covers all three */
+.thumb-photo{
+  height:92%; width:92%; object-fit:contain;
   mix-blend-mode: multiply;
 }
 .vial{

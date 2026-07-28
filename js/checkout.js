@@ -61,7 +61,7 @@
       const off = onSale ? Math.round((1 - i.unitSale / i.unitOriginal) * 100) : 0;
       return `
         <div class="co-item">
-          <span class="co-thumb"><span class="vial"></span></span>
+          <span class="co-thumb">${productThumb(i.name)}</span>
           <div class="co-item-main">
             <p class="co-item-name">${i.name}</p>
             <p class="co-item-meta">${i.variant} &middot; Qty ${i.qty}</p>
@@ -114,7 +114,7 @@
 
     box.hidden = false;
     $('coUpsellBody').innerHTML = `
-      <span class="co-thumb"><span class="vial"></span></span>
+      <span class="co-thumb">${productThumb(pick.name)}</span>
       <div class="co-item-main">
         <p class="co-item-name">${pick.name}</p>
         <p class="co-item-meta">${pick.tag} &middot; ${pick.size}</p>

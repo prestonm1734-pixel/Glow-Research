@@ -99,7 +99,7 @@
     const off = onSale ? Math.round((1 - item.unitSale / item.unitOriginal) * 100) : 0;
     return `
       <div class="cart-row" data-i="${i}">
-        <span class="cart-thumb"><span class="vial"></span></span>
+        <span class="cart-thumb">${typeof productThumb === 'function' ? productThumb(item.name) : '<span class="vial"></span>'}</span>
         <div class="cart-row-main">
           <div class="cart-row-top">
             <div>

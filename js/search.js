@@ -41,7 +41,7 @@
   function row(p) {
     return `
       <a class="search-row" href="${CATALOG_HREF}">
-        <span class="search-thumb"><span class="vial"></span></span>
+        <span class="search-thumb">${productThumb(p.name)}</span>
         <span class="search-row-copy">
           <span class="search-row-name">${p.name}</span>
           <span class="search-row-meta">${p.tag} &middot; $${p.price}</span>
