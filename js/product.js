@@ -145,10 +145,6 @@
     $('pdVialFine').innerHTML =
       `${product.purity} Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.com`;
 
-    // the spec table's five rows, compressed to the facts worth scanning
-    $('pdFacts').textContent =
-      `${product.purity} PURITY \u00b7 ${s.mg.toUpperCase()} \u00b7 LYOPHILIZED \u00b7 NITROGEN SEALED`;
-
     document.title = `${product.name} ${s.mg} | Glow Research`;
     const desc = document.querySelector('meta[name="description"]');
     if (desc) {
