@@ -10,6 +10,27 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
+<style>
+  /* Each mark draws itself on arrival (shared .lp-* motion rules). Hover
+     then replays that mark's own idea rather than applying one generic
+     wobble to all three: the snowflake turns, the clock runs, the tick
+     re-checks. transform-box:view-box lets the origin be stated in the
+     24x24 user space instead of guessing at a percentage. */
+  .sh-cold, .sh-hands{ transform-box: view-box; transform-origin: 12px 12px; }
+  .sh-cold{ transition: transform 1s var(--lp-ease); }
+  .lp-point:hover .sh-cold{ transform: rotate(90deg); }
+  .sh-hands{ transition: transform 1.15s var(--lp-ease); }
+  .lp-point:hover .sh-hands{ transform: rotate(360deg); }
+  /* the tick already sits at dashoffset 0, so replaying it needs a
+     keyframe rather than a transition */
+  .lp-point:hover .sh-check{ animation: shCheck .6s var(--lp-ease); }
+  @keyframes shCheck{ from{ stroke-dashoffset: 1; } to{ stroke-dashoffset: 0; } }
+
+  @media (prefers-reduced-motion: reduce){
+    .lp-point:hover .sh-cold, .lp-point:hover .sh-hands{ transform: none; }
+    .lp-point:hover .sh-check{ animation: none; }
+  }
+</style>
 </head>
 <body>
 
@@ -65,7 +86,9 @@
     </p>
     <p class="lp-hero-note">
       <span class="lp-dot" aria-hidden="true"></span>
-      <span id="shipClock">Checking today&rsquo;s cutoff&hellip;</span>
+      <!-- the static claim is the no-JS fallback; the script swaps in the live
+           countdown against today's cutoff -->
+      <span id="shipClock">Ordered before <strong>2:00 PM EST</strong>, it ships the same business day.</span>
     </p>
   </div>
 </section>
@@ -73,8 +96,8 @@
 <section class="lp-section tint">
   <div class="container">
     <div class="lp-figs reveal">
-      <div class="lp-fig"><b>2 days</b><span>FedEx Express transit</span></div>
-      <div class="lp-fig"><b>50 states</b><span>Hawaii and Alaska included</span></div>
+      <div class="lp-fig"><b><span data-count="2">2</span> days</b><span>FedEx Express transit</span></div>
+      <div class="lp-fig"><b><span data-count="50">50</span> states</b><span>Hawaii and Alaska included</span></div>
       <div class="lp-fig"><b>Free</b><span>On orders over $250</span></div>
     </div>
   </div>
@@ -87,17 +110,30 @@
 
     <div class="lp-points reveal">
       <div class="lp-point">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M12 2.5v19M4.2 7l15.6 9M4.2 17l15.6-9"/><path d="M12 6.6 9.6 4.2M12 6.6l2.4-2.4M12 17.4l-2.4 2.4M12 17.4l2.4 2.4"/></svg>
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+          <g class="sh-cold">
+            <path pathLength="1" class="lp-draw" d="M12 2.5v19"/>
+            <path pathLength="1" class="lp-draw" d="M4.2 7l15.6 9"/>
+            <path pathLength="1" class="lp-draw" d="M4.2 17l15.6-9"/>
+            <path pathLength="1" class="lp-draw" d="M12 6.6 9.6 4.2M12 6.6l2.4-2.4M12 17.4l-2.4 2.4M12 17.4l2.4 2.4"/>
+          </g>
+        </svg>
         <h3>Packed cold</h3>
         <p>Pulled from cold storage into an insulated cooler with frozen gel packs, sealed with the vial.</p>
       </div>
       <div class="lp-point">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2" stroke-linecap="round"/></svg>
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+          <circle pathLength="1" class="lp-draw" cx="12" cy="12" r="9"/>
+          <g class="sh-hands"><path pathLength="1" class="lp-draw" d="M12 7v5l3.5 2" stroke-linecap="round"/></g>
+        </svg>
         <h3>Tracked in a day</h3>
         <p>Your tracking number lands within 24 hours. Saturday delivery where FedEx runs it.</p>
       </div>
       <div class="lp-point">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M12 3l7.5 3v5.5c0 4.3-3 8.2-7.5 9.5-4.5-1.3-7.5-5.2-7.5-9.5V6z"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+          <path pathLength="1" class="lp-draw" d="M12 3l7.5 3v5.5c0 4.3-3 8.2-7.5 9.5-4.5-1.3-7.5-5.2-7.5-9.5V6z"/>
+          <path pathLength="1" class="lp-draw sh-check" d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
         <h3>Covered to $300</h3>
         <p>Loss, damage, or carrier delay, applied automatically. Nothing to tick and nothing to buy.</p>
       </div>
@@ -110,7 +146,7 @@
     </p>
 
     <div class="lp-actions">
-      <a href="peptides.html" class="btn btn-primary">Browse the catalog</a>
+      <a href="peptides.html" class="btn btn-primary">Browse the catalog <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
     </div>
   </div>
 </section>
@@ -202,6 +238,37 @@
   window.addEventListener('scroll', () => {
     header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
   });
+
+  /* Count the figures up as the row arrives. The markup already carries
+     the final value, so with JS off, or under reduced motion, the number
+     is simply sitting there. */
+  (function () {
+    const row = document.querySelector('.lp-figs');
+    if (!row) return;
+    const nums = [...row.querySelectorAll('[data-count]')];
+    if (!nums.length) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    nums.forEach(el => { el.textContent = '0'; });
+
+    function run() {
+      nums.forEach(el => {
+        const to = +el.dataset.count, t0 = performance.now(), dur = 950;
+        (function tick(now) {
+          const p = Math.min((now - t0) / dur, 1);
+          /* the same ease-out the CSS uses, so the digits settle at the
+             moment the row finishes rising */
+          el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+          if (p < 1) requestAnimationFrame(tick);
+        })(t0);
+      });
+    }
+
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { run(); io.disconnect(); } });
+    }, { threshold: 0.4 });
+    io.observe(row);
+  })();
 
   /* Live dispatch cutoff. The page claims "it ships today", so say whether
      that is still true right now. All arithmetic runs on New York wall-clock

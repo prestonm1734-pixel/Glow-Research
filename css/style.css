@@ -813,6 +813,68 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 }
 .lp-fine strong{ color:#6e6e73; font-weight:600; }
 
+/* =====================================================================
+   MOTION
+   The pages are quiet enough now that motion is what gives them life,
+   so it is deliberate rather than decorative: things arrive in reading
+   order, numbers count, and line art draws itself the way it would be
+   drawn by hand. One easing curve throughout so it all feels like one
+   hand. Everything degrades to a plain static page under
+   prefers-reduced-motion via the global block further down.
+   ===================================================================== */
+:root{ --lp-ease: cubic-bezier(.22,1,.36,1); }
+
+/* ---------- hero, on load ----------
+   Above the fold, so it cannot wait for a scroll observer. Each line
+   follows the one above it at reading pace. */
+.lp-hero > .container > *{ opacity:0; animation: lpRise .9s var(--lp-ease) forwards; }
+.lp-hero h1{ animation-delay: .04s; }
+.lp-hero .lp-lede{ animation-delay: .14s; }
+.lp-hero .lp-hero-note{ animation-delay: .26s; }
+.lp-hero .lp-actions{ animation-delay: .34s; }
+@keyframes lpRise{ from{ opacity:0; transform: translateY(16px); } to{ opacity:1; transform:none; } }
+
+/* the site-wide .reveal travels 26px over .7s, which is right for big
+   dark sections and too heavy here */
+.lp-page .reveal{
+  transform: translateY(16px);
+  transition: opacity .75s var(--lp-ease), transform .75s var(--lp-ease);
+}
+
+/* ---------- staggered groups ----------
+   The container is the observer target but hands its motion to the
+   children, so the row arrives one item at a time instead of as a slab. */
+.lp-figs.reveal, .lp-points.reveal{ opacity:1; transform:none; }
+.lp-fig, .lp-point{
+  opacity:0; transform: translateY(18px);
+  transition: opacity .75s var(--lp-ease), transform .75s var(--lp-ease);
+}
+.lp-figs.in .lp-fig, .lp-points.in .lp-point{ opacity:1; transform:none; }
+.lp-figs.in .lp-fig:nth-child(2), .lp-points.in .lp-point:nth-child(2){ transition-delay: .1s; }
+.lp-figs.in .lp-fig:nth-child(3), .lp-points.in .lp-point:nth-child(3){ transition-delay: .2s; }
+
+/* counting numbers must not reflow the row as digits change width */
+.lp-fig b{ font-variant-numeric: tabular-nums; }
+
+/* ---------- line art that draws itself ----------
+   Every animated shape carries pathLength="1", so one dasharray value
+   works for a 4px tick and a 300px curve without measuring in JS.
+   Selected by class, not by [pathLength]: an attribute selector matches
+   these in querySelector but does not apply through the cascade, because
+   attribute names on SVG-namespaced elements are case-sensitive while the
+   CSS parser has already folded the selector to lowercase. */
+.lp-point .lp-draw{
+  stroke-dasharray: 1; stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1.1s var(--lp-ease);
+}
+.lp-points.in .lp-point .lp-draw{ stroke-dashoffset: 0; }
+.lp-points.in .lp-point:nth-child(2) .lp-draw{ transition-delay: .16s; }
+.lp-points.in .lp-point:nth-child(3) .lp-draw{ transition-delay: .32s; }
+
+/* ---------- buttons ---------- */
+.lp-arrow{ display:inline-block; transition: transform .32s var(--lp-ease); }
+.btn:hover .lp-arrow{ transform: translateX(4px); }
+
 @media (max-width: 860px){
   .lp-points{ grid-template-columns:1fr; gap: 44px; }
   .lp-hero h1{ max-width: 14ch; }
