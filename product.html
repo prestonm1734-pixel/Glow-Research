@@ -146,51 +146,51 @@
 
   /* ---------- buy box ---------- */
   .pd-tag{
-    font-size:0.66rem; color:#8a8a86; text-transform:uppercase; letter-spacing:.12em;
-    display:block; font-family:'JetBrains Mono', monospace; margin-bottom:8px;
+    font-size:0.7rem; color:#0a0a0a; text-transform:uppercase; letter-spacing:.14em; font-weight:700;
+    display:block; font-family:'JetBrains Mono', monospace; margin-bottom:10px;
   }
-  .pd-name{ font-size: clamp(1.6rem, 2.6vw, 2.05rem); margin: 0 0 6px; letter-spacing:-.03em; line-height:1.05; color:#0a0a0a; }
-  .pd-lede{ font-size: .87rem; max-width: 460px; margin: 0 0 10px; color:#55554f; line-height:1.6; }
+  .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:800; margin: 0 0 8px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
+  .pd-lede{ font-size: .92rem; max-width: 460px; margin: 0 0 12px; color:#3a3a38; line-height:1.65; }
   /* the five-row spec table collapsed into one scannable line */
   .pd-facts{
-    font-family:'JetBrains Mono', monospace; font-size:.68rem; letter-spacing:.04em;
-    color:#8a8a86; margin: 0 0 16px;
+    font-family:'JetBrains Mono', monospace; font-size:.7rem; font-weight:600; letter-spacing:.04em;
+    color:#55554f; margin: 0 0 18px;
   }
 
   .pd-label{
-    font-family:'JetBrains Mono', monospace; font-size:.62rem; font-weight:600; letter-spacing:.14em;
-    text-transform:uppercase; color:#8a8a86; display:block; margin-bottom:9px;
+    font-family:'JetBrains Mono', monospace; font-size:.64rem; font-weight:700; letter-spacing:.14em;
+    text-transform:uppercase; color:#0a0a0a; display:block; margin-bottom:10px;
   }
 
   /* --- mg picker: the one decision on this page --- */
-  .pd-sizes{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 18px; }
+  .pd-sizes{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 20px; }
   .pd-size{
-    font-family:'JetBrains Mono', monospace; font-size:.76rem; font-weight:600;
-    padding: 10px 20px; border:1px solid rgba(0,0,0,.18); background:transparent; color:#0a0a0a;
+    font-family:'JetBrains Mono', monospace; font-size:.78rem; font-weight:700;
+    padding: 11px 22px; border:2px solid rgba(0,0,0,.7); background:transparent; color:#0a0a0a;
     cursor:pointer;
   }
   .pd-size:hover{ border-color:#0a0a0a; }
   .pd-size.is-active{ background:#0a0a0a; border-color:#0a0a0a; color:#fff; }
 
   .pd-price{
-    font-family:'Space Grotesk',sans-serif; font-size: 1.75rem; font-weight:700; color:#0a0a0a;
-    letter-spacing:-.03em; display:block; margin-bottom: 10px;
+    font-family:'Space Grotesk',sans-serif; font-size: 2.1rem; font-weight:800; color:#0a0a0a;
+    letter-spacing:-.03em; display:block; margin-bottom: 8px;
   }
 
   .pd-buy{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; margin-bottom: 10px; }
-  .pd-stepper{ display:flex; align-items:center; border:1px solid rgba(0,0,0,.18); }
+  .pd-stepper{ display:flex; align-items:center; border:2px solid rgba(0,0,0,.7); }
   .pd-stepper button{
     width:38px; height:46px; background:transparent; border:none; color:#0a0a0a; font-size:1.05rem; cursor:pointer;
   }
   .pd-stepper button:hover:not(:disabled){ background: rgba(0,0,0,.06); }
   .pd-stepper button:disabled{ opacity:.3; cursor:default; }
   .pd-stepper span{ width:40px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:.9rem; }
-  .pd-add{ height:46px; padding: 0 32px; flex:1; min-width: 180px; justify-content:center; font-size:.92rem; }
+  .pd-add{ height:50px; padding: 0 32px; flex:1; min-width: 180px; justify-content:center; font-size:.95rem; font-weight:700; }
 
   /* --- when it ships, when it lands. two lines, no box --- */
   .pd-deliver{ margin: 0 0 14px; }
-  .pd-deliver p{ font-size:.84rem; color:#55554f; margin:0; padding: 3px 0; }
-  .pd-deliver strong{ color:#0a0a0a; font-weight:600; }
+  .pd-deliver p{ font-size:.86rem; color:#3a3a38; margin:0; padding: 3px 0; }
+  .pd-deliver strong{ color:#0a0a0a; font-weight:800; }
   .pd-dot{
     display:inline-block; width:6px; height:6px; border-radius:50%; background:#0a0a0a;
     margin-right:8px; vertical-align:middle;
@@ -199,7 +199,7 @@
   /* ---------- sections ---------- */
   .pd-section{ background:#fff; padding: 74px 0; border-top:1px solid rgba(0,0,0,.1); }
   .pd-section.alt{ background:#f7f7f5; }
-  .pd-section h2{ font-size: clamp(1.4rem, 2.4vw, 1.85rem); margin: 0 0 6px; letter-spacing:-.02em; color:#0a0a0a; }
+  .pd-section h2{ font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight:800; margin: 0 0 6px; letter-spacing:-.02em; color:#0a0a0a; }
 
   /* --- buy more, pay less ---
      Rows rather than tiles: each one is a single line to scan (how many, what
@@ -207,8 +207,8 @@
   .pd-bulk{ margin-top: 2px; padding-top: 18px; border-top:1px solid rgba(0,0,0,.1); }
   .pd-tiers{ display:flex; flex-direction:column; }
   .pd-tier{
-    position:relative; background:#fff; border:1px solid rgba(0,0,0,.14); cursor:pointer;
-    padding: 9px 12px; display:flex; align-items:baseline; gap:9px;
+    position:relative; background:#fff; border:1.5px solid rgba(0,0,0,.35); cursor:pointer;
+    padding: 11px 14px; display:flex; align-items:baseline; gap:9px;
     color:#0a0a0a; text-align:left; font-family:inherit; width:100%;
   }
   .pd-tier + .pd-tier{ margin-top:-1px; }               /* collapse shared borders */
@@ -218,7 +218,7 @@
     font-size:.68rem; font-weight:600; color:#0a0a0a; min-width:54px;
     font-family:'JetBrains Mono', monospace;
   }
-  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:.92rem; font-weight:700; color:#0a0a0a; letter-spacing:-.02em; }
+  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1rem; font-weight:800; color:#0a0a0a; letter-spacing:-.02em; }
   .pd-tier-per{ font-size:.68rem; color:#8a8a86; }
   /* pushed right so the saving is the last thing on the row */
   .pd-tier-off{ font-size:.68rem; font-weight:700; color:#0a0a0a; margin-left:auto; }
@@ -232,11 +232,11 @@
   /* --- COA link box --- */
   .pd-coa{
     display:flex; align-items:center; gap:13px; margin-top:16px;
-    border:1px solid rgba(0,0,0,.16); padding: 13px 15px; color:#0a0a0a;
+    border:2px solid rgba(0,0,0,.7); padding: 14px 16px; color:#0a0a0a;
   }
-  .pd-coa:hover{ border-color:#0a0a0a; }
+  .pd-coa:hover{ background:#f7f7f5; }
   .pd-coa > svg:first-child{ flex-shrink:0; }
-  .pd-coa b{ display:block; font-size:.87rem; font-weight:700; }
+  .pd-coa b{ display:block; font-size:.92rem; font-weight:800; }
   .pd-coa small{ display:block; margin-top:2px; font-size:.74rem; color:#8a8a86; }
   .pd-coa span{ flex:1; min-width:0; }
   .pd-coa-arrow{ flex-shrink:0; }
