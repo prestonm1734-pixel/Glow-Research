@@ -33,21 +33,20 @@
   .pd-page .btn-outline:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; }
 
   /* ---------- hero ---------- */
-  .pd-hero{ background:#fff; padding: 0 0 78px; }
+  .pd-hero{ background:#fff; padding: 60px 0 78px; }
   .pd-hero-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items:start; }
 
   /* --- the stage ---
-     The image sits flush against the breadcrumb with no gap, while the copy
-     keeps its own top padding — so the vial reads as the dominant element
-     instead of matching the text column's height. */
+     Top-aligned with the copy, both starting at the same offset below the
+     breadcrumb, so the image's top edge lines up with "METABOLIC RESEARCH"
+     rather than either floating past it or matching the copy's full height. */
   .pd-visual{
-    position:relative; min-height: 640px;
+    position:relative; min-height: 580px;
     display:flex; align-items:center; justify-content:center;
     background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
-    border: 1px solid rgba(0,0,0,.1); border-top:none;
+    border: 1px solid rgba(0,0,0,.1);
     overflow:hidden;
   }
-  .pd-right{ padding-top: 60px; }
   /* A real product shot is photographed on white. Rather than float it on the
      dark stage as a card-in-a-card, the stage itself goes light and the photo
      fills it edge to edge, so there is no frame around the vial. */
@@ -241,13 +240,12 @@
   .pd-missing a{ display:inline-flex; margin-top:22px; }
 
   @media (max-width: 900px){
-    .pd-hero-grid{ grid-template-columns:1fr; gap: 0; }
-    .pd-visual{ min-height: 420px; border-left:none; border-right:none; }
-    .pd-right{ padding-top: 32px; }
+    .pd-hero-grid{ grid-template-columns:1fr; gap: 36px; }
+    .pd-visual{ min-height: 420px; }
     .pd-tiers{ grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 560px){
-    .pd-hero{ padding: 0 0 56px; }
+    .pd-hero{ padding: 36px 0 56px; }
     .pd-add{ width:100%; flex-basis:100%; }
     .pd-spec-row{ flex-direction:column; gap:3px; }
     .pd-spec-row dd{ text-align:left; }
