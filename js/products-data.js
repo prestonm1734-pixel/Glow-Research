@@ -52,9 +52,8 @@ GLOW_PRODUCTS.forEach(p => {
 // real variant IDs/pricing later; this just needs to look and feel right.
 const QTY_TIERS = [
   { label: '1 vial', qty: 1, off: 0 },
-  { label: '3 vials', qty: 3, off: 0.08 },
-  { label: '5 vials', qty: 5, off: 0.15 },
-  { label: '10 vials', qty: 10, off: 0.22 },
+  { label: '2 vials', qty: 2, off: 0.08 },
+  { label: '3 vials', qty: 3, off: 0.15 },
 ];
 
 // unitPrice lets the product page price its tiers off whichever mg is selected;

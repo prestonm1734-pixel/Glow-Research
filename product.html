@@ -199,7 +199,7 @@
      Cards rather than rows: each tier shows the vials you actually get, so
      the quantity reads at a glance before any of the numbers do. */
   .pd-bulk{ margin-top: 2px; padding-top: 18px; border-top:1px solid rgba(0,0,0,.1); }
-  .pd-tiers{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .pd-tiers{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .pd-tier{
     position:relative; background:#fafaf8; border:1.5px solid rgba(0,0,0,.14); cursor:pointer;
     padding: 16px 8px 14px; display:flex; flex-direction:column; align-items:center; gap:2px;
@@ -278,7 +278,6 @@
     .pd-hero-grid{ grid-template-columns:1fr; gap: 36px; }
     /* stacked on mobile, so pinning the image would just cover the copy */
     .pd-visual{ position:static; height: clamp(300px, 78vw, 380px); padding: 6% 12%; }
-    .pd-tiers{ grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 560px){
     .pd-hero{ padding: 36px 0 56px; }
