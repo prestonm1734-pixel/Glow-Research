@@ -823,163 +823,77 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
    ===================================================================== */
 
 /* =====================================================================
-   BLOG LISTING — light editorial surface, matching the article reading
-   theme so the listing and the articles read as one continuous, credible
-   publication rather than a dark marketing page linking to a white one.
+   BLOG LISTING
+   Same language as shipping / wholesale / COA: white, centred hero,
+   soft #f5f5f7 panels, no rules. The old listing leaned on a mono
+   masthead, hairline separators and a generated constellation graphic
+   that looked like every other peptide supplier. Each post now carries
+   one drawn mark of its own subject instead.
    ===================================================================== */
-/* --jr-bleed: how far the hover bubble extends past the text, on each side.
-   Must stay under .container's 24px gutter or the bubble hits the screen
-   edge — so it shrinks once the container stops being centred. */
-.journal{ background:#fff; color:#0a0a0a; padding: 40px 0 100px; --jr-bleed: 22px; }
-@media (max-width: 1120px){ .journal{ --jr-bleed: 12px; } }
+.bl{ padding: 0 0 clamp(80px, 10vw, 124px); }
 
-/* ---------- masthead ----------
-   Left-aligned with a single hairline. The old centred nameplate + double
-   rule + italic dek read as an antique broadsheet; the statement line is
-   what identifies the section now, not a repeat of the brand in the header. */
-.jr-masthead{ margin-bottom: 22px; }
-.jr-mast-row{
-  display:flex; align-items:center; justify-content:space-between; gap: 20px;
-  padding-bottom: 14px; border-bottom: 1px solid rgba(0,0,0,.12);
-  font-family:'JetBrains Mono', monospace; font-size:0.66rem;
-  letter-spacing:.16em; text-transform:uppercase; color:#8a8a84;
+/* ---------- the art panel ---------- */
+.bl-art{
+  background:#f5f5f7; border-radius: 20px; aspect-ratio: 16 / 10;
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+  transition: background .3s ease;
 }
-.jr-mast-label{ color:#0a0a0a; font-weight:600; }
-
-/* ---------- topic filter ----------
-   Reuses the catalog's .chip so the blog filters exactly like the product
-   grid. [hidden] needs stating outright: .jr-lead sets display:grid at the
-   same specificity and later in the file, so it would otherwise win. */
-.jr-filters{ display:flex; flex-wrap:wrap; gap: 10px; margin: 26px 0 4px; }
-/* named properties instead of the base chip's `transition: all`, which
-   animated the focus ring's width and made it grow in rather than appear */
-.journal .chip{
-  background:#f2f2f0; border-color: rgba(0,0,0,0.1); color:#55554f;
-  transition: background .2s ease, border-color .2s ease, color .2s ease;
-}
-.journal .chip:hover{ border-color:#0a0a0a; color:#0a0a0a; }
-.journal .chip.active{ background:#0a0a0a; color:#fff; border-color: transparent; }
-/* the global chip focus ring is white, which is invisible on this page */
-.journal .chip:focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 3px; }
-.jr-lead[hidden], .jr-row[hidden], .jr-sep[hidden]{ display:none; }
-
-/* rows fade up as they arrive; the lead is deliberately excluded so the
-   first thing on the page never depends on JS to become visible */
-.jr-row.reveal{ transition-duration: .55s; }
-.jr-row:nth-child(3), .jr-row:nth-child(4){ transition-delay: .05s; }
-.jr-row:nth-child(5), .jr-row:nth-child(6){ transition-delay: .10s; }
-.jr-row:nth-child(n+7){ transition-delay: .14s; }
-.jr-mast-title{
-  font-family:'Fraunces', Georgia, serif; font-weight:600;
-  font-size: clamp(1.85rem, 4vw, 2.9rem);
-  line-height:1.12; letter-spacing:-0.03em;
-  color:#0a0a0a; margin: 30px 0 0; max-width: 21ch;
+.bl-art svg{
+  width: 66%; height:auto; color:#1d1d1f;
+  transition: transform .55s cubic-bezier(.2,.8,.2,1);
 }
 
-/* ---------- shared bits ---------- */
-.cover-art{ display:block; width:100%; height:100%; }
-.jr-tag{
-  font-family:'JetBrains Mono', monospace; font-size:0.64rem; font-weight:600;
-  letter-spacing:.15em; text-transform:uppercase; color:#8a8a84;
-  transition: color .3s ease;
+/* ---------- shared card bits ---------- */
+.bl-tag{
+  display:block; margin: 22px 0 10px;
+  font-size:.82rem; font-weight:600; color:#6e6e73;
 }
-.jr-row > a:hover .jr-tag{ color:#0a0a0a; }
-.jr-tag-feature{
-  background:#0a0a0a; color:#fff; padding: 4px 9px; border-radius: 3px; font-weight:700;
+.bl-meta{
+  display:block; margin-top: 14px; font-size:.88rem; color:#86868b;
 }
+.bl-more{
+  display:inline-flex; align-items:center; gap:7px; margin-top:18px;
+  font-size:1rem; font-weight:500; color:#1d1d1f;
+}
+.bl-arrow{ display:inline-block; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
 
-/* ---------- featured lead ----------
-   At rest it's flat newspaper text; the rounded surface and shadow only
-   exist on hover, so the page stays quiet until you reach for something.
-   Negative margin matches .container's 24px gutter, so the lifted bubble
-   has room to breathe without the text shifting out of alignment. */
-.jr-lead{
-  display:grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items:center;
-  padding: 32px var(--jr-bleed); margin: 12px calc(var(--jr-bleed) * -1) 0;
-  border-radius: 16px; border: 1px solid transparent;
-  transition: transform .4s cubic-bezier(.2,.8,.2,1),
-              box-shadow .4s ease, border-color .4s ease;
-}
-.jr-lead:hover{
-  transform: translateY(-5px);
-  border-color: rgba(0,0,0,.07);
-  box-shadow: 0 26px 50px -24px rgba(0,0,0,.30), 0 3px 10px -4px rgba(0,0,0,.05);
-}
-.jr-lead-art{ position:relative; overflow:hidden; aspect-ratio: 4 / 3; border-radius:10px; }
+/* the whole card is the link, so the hover lives on it rather than on
+   any one child */
+.bl-lead:hover .bl-art, .bl-card:hover .bl-art{ background:#e9e9ec; }
+.bl-lead:hover .bl-art svg, .bl-card:hover .bl-art svg{ transform: scale(1.06); }
+.bl-lead:hover .bl-arrow, .bl-card:hover .bl-arrow{ transform: translateX(5px); }
+.bl-lead:focus-visible, .bl-card:focus-visible{ outline: 2px solid #1d1d1f; outline-offset: 6px; border-radius: 20px; }
 
-/* hairline between the lead and the rest of the list */
-.jr-sep{ height:1px; background: rgba(0,0,0,.14); margin: 30px 0 8px; }
-.jr-lead-art .cover-art{
-  position:absolute; inset:0;
-  transition: transform .7s cubic-bezier(.2,.8,.2,1);
+/* ---------- lead post ---------- */
+.bl-lead{
+  display:grid; grid-template-columns: 1.02fr .98fr;
+  gap: clamp(30px, 4.5vw, 62px); align-items:center;
+  padding-bottom: clamp(56px, 7vw, 88px);
 }
-.jr-lead:hover .jr-lead-art .cover-art{ transform: scale(1.04); }
-.jr-tags{ display:flex; align-items:center; gap: 12px; margin-bottom: 18px; }
-.jr-lead h2{
-  font-family:'Fraunces', Georgia, serif;
-  font-size: clamp(1.7rem, 3vw, 2.35rem); line-height:1.1; letter-spacing:-0.022em;
-  margin: 0 0 16px; color:#0a0a0a;
+.bl-lead .bl-art{ aspect-ratio: 4 / 3; border-radius: 24px; }
+.bl-lead .bl-tag{ margin-top:0; }
+.bl-lead h2{
+  font-size: clamp(1.75rem, 3.4vw, 2.6rem); line-height:1.1; margin:0 0 14px;
+  letter-spacing:-.035em; text-wrap: balance;
 }
-.jr-lead p{
-  font-size: 1.02rem; line-height:1.65; color:#4a4a45;
-  margin: 0 0 22px; max-width: 46ch;
-}
-.jr-lead-foot{ display:flex; flex-direction:column; gap: 10px; align-items:flex-start; }
-.jr-meta{
-  display:flex; align-items:center; gap:7px; flex-wrap:wrap;
-  font-family:'JetBrains Mono', monospace; font-size:0.7rem;
-  letter-spacing:.03em; color:#8a8a84;
-}
-.jr-byline{ color:#0a0a0a; font-weight:600; }
-.jr-cta{
-  display:inline-flex; align-items:center; gap: 8px;
-  font-size:0.88rem; font-weight:600; color:#0a0a0a;
-}
-.jr-cta{
-  text-decoration: underline; text-decoration-color: rgba(0,0,0,.3); text-underline-offset: 3px;
-  transition: text-decoration-color .3s ease;
-}
-.jr-lead:hover .jr-cta{ text-decoration-color:#0a0a0a; }
-.jr-arrow{ display:inline-block; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
-.jr-lead:hover .jr-arrow{ transform: translateX(5px); }
+.bl-lead p{ font-size: 1.08rem; line-height:1.55; margin:0; color:#6e6e73; }
 
-/* ---------- article list: text-forward newspaper grid ---------- */
-.jr-list{
-  list-style:none; margin: 0 calc(var(--jr-bleed) * -1); padding: 0;
-  display:grid; grid-template-columns: repeat(2, 1fr);
+/* ---------- the rest ---------- */
+.bl-grid{
+  display:grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  gap: clamp(30px, 4vw, 46px);
 }
-.jr-row > a{
-  display:block; padding: 26px var(--jr-bleed);
-  border-radius: 14px; border: 1px solid transparent;
-  transition: transform .4s cubic-bezier(.2,.8,.2,1),
-              box-shadow .4s ease, border-color .4s ease;
+.bl-card h3{
+  font-size: clamp(1.2rem, 1.9vw, 1.45rem); line-height:1.2; margin:0 0 10px;
+  letter-spacing:-.03em; text-wrap: balance;
 }
-.jr-row > a:hover{
-  transform: translateY(-5px);
-  border-color: rgba(0,0,0,.07);
-  box-shadow: 0 22px 44px -22px rgba(0,0,0,.28), 0 3px 10px -4px rgba(0,0,0,.05);
-}
-.jr-row .jr-tag{ display:block; margin-bottom: 10px; }
-.jr-row h3{
-  font-family:'Fraunces', Georgia, serif;
-  font-size: 1.28rem; line-height:1.25; letter-spacing:-0.015em;
-  margin: 0 0 8px; color:#0a0a0a;
-}
-.jr-row p{
-  font-size: 0.92rem; line-height:1.6; color:#6b6b66; margin: 0 0 14px;
-  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-}
-.jr-row-meta{
-  display:flex; align-items:center; gap:7px; flex-wrap:wrap;
-  font-family:'JetBrains Mono', monospace; font-size:0.68rem;
-  letter-spacing:.03em; color:#8a8a84;
-}
-.jr-row-meta .jr-byline{ font-family:'JetBrains Mono', monospace; font-size:0.68rem; }
+.bl-card p{ font-size:1rem; line-height:1.55; margin:0; color:#6e6e73; }
 
-@media (max-width: 900px){
-  .jr-lead{ grid-template-columns: 1fr; gap: 24px; }
-  .jr-lead-art{ order:-1; aspect-ratio: 16/10; }
-  .jr-list{ grid-template-columns: 1fr; }
+@media (max-width: 860px){
+  .bl-lead{ grid-template-columns:1fr; gap: 26px; }
+  /* the mark should lead the card on a phone, the way it does in the grid */
+  .bl-lead .bl-art{ order:-1; aspect-ratio: 16 / 10; }
+  .bl-lead .bl-tag{ margin-top: 4px; }
 }
 
 /* ---------- post cards (used by "keep reading" on articles) ---------- */
