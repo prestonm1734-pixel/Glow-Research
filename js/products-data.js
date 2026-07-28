@@ -122,10 +122,11 @@ function renderProductGrid(gridEl, filter, opts) {
         <span class="product-tag">${p.tag}</span>
         <h3><a href="${href}">${p.name}</a></h3>
         <p>${p.purity} purity &middot; ${p.size} per vial &middot; Lyophilized &amp; nitrogen sealed.</p>
-        <div class="product-foot">
-          <span class="price">$${p.price} <span>/ vial</span></span>
-          <button class="add-btn" aria-label="Add ${p.name} to research order">+</button>
-        </div>
+        <span class="price">$${p.price} <span>/ vial</span></span>
+        <button class="add-btn" aria-label="Add ${p.name} to research order">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Add to Cart</span>
+        </button>
       </div>
     `;
     gridEl.appendChild(card);
