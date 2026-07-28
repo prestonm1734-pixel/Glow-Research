@@ -116,8 +116,7 @@
       document.querySelector('.pd-visual').classList.add('has-photo');
     }
 
-    const free = (window.GlowCart && window.GlowCart.FREE_SHIPPING_AT) || 250;
-    $('pdSpecShip').textContent = `Unmarked box, tracked \u00b7 free over $${free}`;
+    $('pdCoaLink').href = pageHref('coa.html');
   }
 
   /* ================= mg picker ================= */
@@ -146,8 +145,9 @@
     $('pdVialFine').innerHTML =
       `${product.purity} Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.com`;
 
-    $('pdSpecPurity').textContent = `${product.purity} (HPLC verified)`;
-    $('pdSpecSize').textContent = `1 vial \u00b7 ${s.mg}`;
+    // the spec table's five rows, compressed to the facts worth scanning
+    $('pdFacts').textContent =
+      `${product.purity} PURITY \u00b7 ${s.mg.toUpperCase()} \u00b7 LYOPHILIZED \u00b7 NITROGEN SEALED`;
 
     document.title = `${product.name} ${s.mg} | Glow Research`;
     const desc = document.querySelector('meta[name="description"]');
