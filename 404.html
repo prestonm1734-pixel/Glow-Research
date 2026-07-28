@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- set before first paint: every scroll-reveal below starts hidden and
+     needs the observer to show it, so without scripting the page must
+     opt out of hiding rather than opt in to showing -->
+<script>document.documentElement.classList.add('js');</script>
 <title>Page Not Found — Glow Research</title>
 <meta name="description" content="That page could not be found." />
 <meta name="robots" content="noindex" />
