@@ -102,7 +102,6 @@
   function renderHeader(p) {
     $('pdTag').textContent = p.tag;
     $('pdName').textContent = p.name;
-    $('pdLede').textContent = p.blurb;
     $('pdVialName').textContent = p.name;
 
     // a handful of products ship with a real product photo; everything else
