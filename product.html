@@ -269,6 +269,73 @@
   .pd-coa span{ flex:1; min-width:0; }
   .pd-coa-arrow{ flex-shrink:0; }
 
+  /* --- description & research ---
+     A rule the tabs sit on, an indicator that slides between them, and
+     prose set to a reading measure. No card, no box: the page is already
+     white, so a panel drawn on top of it would only add furniture. */
+  /* Both panels are filled from the catalog at runtime, like the rest of
+     this page (name, price and sizes are all injected too). Rather than
+     leave a tab bar over two empty headings when scripting is off, the
+     whole section waits for the .js flag. */
+  .pd-info{ display:none; background:#fff; padding: 8px 0 76px; }
+  .js .pd-info{ display:block; }
+  .pd-tabs{
+    position:relative; display:flex; gap: 34px;
+    border-bottom: 1px solid rgba(0,0,0,.12); margin-bottom: 44px;
+  }
+  .pd-tab{
+    appearance:none; background:none; border:0; cursor:pointer;
+    padding: 0 0 16px; margin:0;
+    font-family:'JetBrains Mono', monospace; font-size:.74rem; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase; color:#8a8a86;
+  }
+  .pd-tab:hover{ color:#0a0a0a; }
+  .pd-tab.is-on{ color:#0a0a0a; }
+  .pd-tab:focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 3px; }
+  /* one bar that travels, rather than a border toggling on each tab */
+  .pd-tab-ink{
+    position:absolute; left:0; bottom:-1px; height:2px; width:0;
+    background:#0a0a0a; pointer-events:none;
+  }
+
+  .pd-panel[hidden]{ display:none; }
+  .pd-panel:focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 6px; }
+  .pd-panel-h{
+    font-size: clamp(1.5rem, 2.6vw, 2rem); letter-spacing:-.03em; margin: 0 0 20px; color:#0a0a0a;
+  }
+  .pd-prose{ max-width: 68ch; }
+  .pd-prose p{ font-size: 1.05rem; line-height:1.72; color:#45453f; margin: 0 0 1.15em; }
+  .pd-prose p:last-child{ margin-bottom:0; }
+
+  /* research areas: a hairline list, which suits three short entries
+     better than three cards would */
+  .pd-areas{ max-width: 72ch; border-top: 1px solid rgba(0,0,0,.1); }
+  .pd-area{ padding: 22px 0; border-bottom: 1px solid rgba(0,0,0,.1); }
+  .pd-area h3{
+    font-size: 1.05rem; font-weight:700; letter-spacing:-.015em; margin: 0 0 7px; color:#0a0a0a;
+  }
+  .pd-area p{ font-size: 1rem; line-height:1.65; color:#55554f; margin:0; }
+  .pd-ruo{
+    max-width: 72ch; margin: 26px 0 0; font-size:.85rem; line-height:1.7; color:#8a8a86;
+  }
+  .pd-ruo strong{ color:#55554f; }
+
+  /* The page kills all motion sitewide (see below), which is right for the
+     buy box but leaves a tab control feeling broken. These two are direct
+     feedback for a press, not ambient movement, so they are exempt. */
+  .pd-page .pd-tab-ink{
+    transition: transform .38s cubic-bezier(.22,1,.36,1), width .38s cubic-bezier(.22,1,.36,1) !important;
+  }
+  .pd-page .pd-tab{ transition: color .2s ease !important; }
+  @media (prefers-reduced-motion: reduce){
+    .pd-page .pd-tab-ink{ transition: none !important; }
+  }
+
+  @media (max-width: 560px){
+    .pd-tabs{ gap: 22px; }
+    .pd-tab{ font-size:.68rem; letter-spacing:.1em; }
+  }
+
   /* --- related --- */
   .pd-related h2{ margin-bottom: 28px; }
 
@@ -426,6 +493,34 @@
         </a>
       </div>
 
+    </div>
+  </section>
+
+  <!-- ============ description & research ============ -->
+  <section class="pd-info">
+    <div class="container">
+      <div class="pd-tabs" role="tablist" aria-label="Product information">
+        <button type="button" class="pd-tab is-on" role="tab" id="pdTabAbout"
+                aria-controls="pdPanelAbout" aria-selected="true">Description</button>
+        <button type="button" class="pd-tab" role="tab" id="pdTabResearch"
+                aria-controls="pdPanelResearch" aria-selected="false" tabindex="-1">Research</button>
+        <span class="pd-tab-ink" id="pdTabInk" aria-hidden="true"></span>
+      </div>
+
+      <div class="pd-panel" role="tabpanel" id="pdPanelAbout" aria-labelledby="pdTabAbout" tabindex="0">
+        <h2 class="pd-panel-h" id="pdAboutH">About</h2>
+        <div class="pd-prose" id="pdAbout"></div>
+      </div>
+
+      <div class="pd-panel" role="tabpanel" id="pdPanelResearch" aria-labelledby="pdTabResearch" tabindex="0" hidden>
+        <h2 class="pd-panel-h" id="pdResearchH">Research</h2>
+        <div class="pd-areas" id="pdResearch"></div>
+        <p class="pd-ruo">
+          Listed to describe what this compound is and where it appears in the literature.
+          Nothing here is a claim of efficacy or safety, and none of it is guidance for use.
+          <strong>For laboratory research use only.</strong>
+        </p>
+      </div>
     </div>
   </section>
 

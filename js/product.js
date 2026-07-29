@@ -147,6 +147,71 @@
     box.rel = 'noopener';
   }
 
+  /* ================= description & research =================
+     A real tablist: arrow keys move between tabs, Home/End jump to the
+     ends, and only the selected tab is in the tab order, so a keyboard
+     user tabs past the control rather than through every tab in it. */
+
+  function renderInfo(p) {
+    const about = $('pdAbout');
+    const research = $('pdResearch');
+    if (!about || !research) return;
+
+    $('pdAboutH').textContent = `About ${p.name}`;
+    $('pdResearchH').textContent = `${p.name} research`;
+    about.innerHTML = (p.about || []).map(t => `<p>${t}</p>`).join('');
+    research.innerHTML = (p.research || []).map(a =>
+      `<div class="pd-area"><h3>${a.t}</h3><p>${a.d}</p></div>`).join('');
+  }
+
+  function wireTabs() {
+    const tabs = [$('pdTabAbout'), $('pdTabResearch')];
+    const panels = [$('pdPanelAbout'), $('pdPanelResearch')];
+    const ink = $('pdTabInk');
+    if (tabs.some(t => !t) || !ink) return;
+
+    function moveInk(tab) {
+      ink.style.width = tab.offsetWidth + 'px';
+      ink.style.transform = `translateX(${tab.offsetLeft}px)`;
+    }
+
+    function select(i, focus) {
+      tabs.forEach((t, n) => {
+        const on = n === i;
+        t.classList.toggle('is-on', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        // only the selected tab stays tabbable, per the tablist pattern
+        t.tabIndex = on ? 0 : -1;
+        panels[n].hidden = !on;
+      });
+      moveInk(tabs[i]);
+      if (focus) tabs[i].focus();
+    }
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i));
+      tab.addEventListener('keydown', e => {
+        const last = tabs.length - 1;
+        let next = null;
+        if (e.key === 'ArrowRight') next = i === last ? 0 : i + 1;
+        else if (e.key === 'ArrowLeft') next = i === 0 ? last : i - 1;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = last;
+        if (next === null) return;
+        e.preventDefault();
+        select(next, true);
+      });
+    });
+
+    select(0);
+    // the bar is positioned in pixels, so it has to be re-measured when the
+    // tabs reflow or when the webfont finally swaps in and changes their width
+    addEventListener('resize', () => moveInk(tabs.find(t => t.classList.contains('is-on'))));
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => moveInk(tabs.find(t => t.classList.contains('is-on'))));
+    }
+  }
+
   /* ================= mg picker ================= */
 
   function renderSizes(p) {
@@ -295,6 +360,8 @@
 
     renderBreadcrumb(product);
     renderHeader(product);
+    renderInfo(product);
+    wireTabs();
     renderSizes(product);
     renderSelection();
     wireBuy();
