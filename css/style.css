@@ -90,13 +90,15 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .cart-drawer .btn-primary,
 .co-page .btn-primary,
 .qa-sheet .btn-primary,
-.search-modal .btn-primary{
+.search-modal .btn-primary,
+.lp-hero .btn-primary{
   background:#0a0a0a; color:#fff;
 }
 .cart-drawer .btn-primary:hover,
 .co-page .btn-primary:hover,
 .qa-sheet .btn-primary:hover,
-.search-modal .btn-primary:hover{
+.search-modal .btn-primary:hover,
+.lp-hero .btn-primary:hover{
   background:#2a2a28; color:#fff;
 }
 .btn-outline{
@@ -808,6 +810,27 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0); }
 }
 .lp-actions{ display:flex; flex-wrap:wrap; gap:14px; margin-top: 30px; }
+
+/* the hero on its own white plate, rest of the page stays the site's near-black */
+.lp-hero{
+  background:#fff; color:#0a0a0a;
+  margin-bottom: clamp(56px, 8vw, 96px);
+}
+.lp-hero .lp-eyebrow{ color:#0a0a0a; }
+.lp-hero h1{ color:#0a0a0a; }
+.lp-hero h1 .outline{ -webkit-text-stroke-color: rgba(10,10,10,.82); }
+.lp-hero h1:hover .outline{ color:#0a0a0a; -webkit-text-stroke-color: transparent; }
+.lp-hero .lp-lede{ color:#55554f; }
+.lp-hero .lp-hero-note{ color:#55554f; }
+.lp-hero .lp-hero-note strong{ color:#0a0a0a; }
+.lp-hero .lp-dot{ background:#0a0a0a; animation-name: lpPulseDark; }
+@keyframes lpPulseDark{
+  0%{ box-shadow: 0 0 0 0 rgba(10,10,10,.5); }
+  70%{ box-shadow: 0 0 0 8px rgba(10,10,10,0); }
+  100%{ box-shadow: 0 0 0 0 rgba(10,10,10,0); }
+}
+.lp-hero .lp-figs{ border-top-color: rgba(0,0,0,.14); }
+.lp-hero .lp-fig > span{ color:#8a8a86; }
 
 /* ---------- figures ----------
    The homepage stat row: hairline, gradient numerals, mono caption. */
