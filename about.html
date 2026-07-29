@@ -46,10 +46,11 @@
     gap: clamp(28px, 4vw, 56px); align-items:center;
   }
   .ab-hero-fig{ margin:0; }
+  /* the flag is vector and must never crop, so it scales on width alone.
+     The hairline matters here: the outer stripe is white and would
+     otherwise bleed into the page. */
   .ab-hero-fig img{
-    display:block; width:100%; height:100%; max-height: 340px;
-    object-fit: cover; object-position: center 30%;
-    /* square corners and a hairline, like every other box on the site */
+    display:block; width:100%; height:auto;
     border:1px solid rgba(0,0,0,.14);
   }
 
@@ -98,9 +99,9 @@
   .ab-ruo strong{ color:#55554f; font-weight:600; }
 
   @media (max-width: 860px){
-    /* photo drops below the copy rather than squeezing into a sliver */
+    /* flag drops below the copy rather than squeezing into a sliver */
     .ab-hero-grid{ grid-template-columns:1fr; }
-    .ab-hero-fig img{ max-height: 260px; }
+    .ab-hero-fig{ max-width: 420px; }
   }
   @media (max-width: 760px){
     .ab-grid{ grid-template-columns:1fr; }
@@ -181,8 +182,8 @@
            renamed file degrades to the one-column layout instead of a broken
            image icon on a live page -->
       <figure class="ab-hero-fig">
-        <img src="assets/about-lab.jpg" alt="Two researchers in lab coats reviewing analytical data on a monitor in a laboratory."
-             loading="lazy" decoding="async"
+        <img src="assets/us-flag.svg" alt="Flag of the United States"
+             decoding="async"
              onerror="this.closest('.ab-hero-fig').remove()" />
       </figure>
     </div>
