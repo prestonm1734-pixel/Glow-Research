@@ -39,6 +39,20 @@
   }
   .ab-lede{ font-size: 1.06rem; line-height:1.6; color:#55554f; margin:0; max-width: 60ch; }
 
+  /* copy left, photo top-right. The copy column leads, so the image is the
+     narrower of the two and never pushes the headline into extra lines. */
+  .ab-hero-grid{
+    display:grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: clamp(28px, 4vw, 56px); align-items:center;
+  }
+  .ab-hero-fig{ margin:0; }
+  .ab-hero-fig img{
+    display:block; width:100%; height:100%; max-height: 340px;
+    object-fit: cover; object-position: center 30%;
+    /* square corners and a hairline, like every other box on the site */
+    border:1px solid rgba(0,0,0,.14);
+  }
+
   /* the honest-position callout: this is the thing most suppliers bury */
   .ab-callout{
     border-left: 2px solid #0a0a0a; padding: 4px 0 4px 24px;
@@ -83,6 +97,11 @@
   }
   .ab-ruo strong{ color:#55554f; font-weight:600; }
 
+  @media (max-width: 860px){
+    /* photo drops below the copy rather than squeezing into a sliver */
+    .ab-hero-grid{ grid-template-columns:1fr; }
+    .ab-hero-fig img{ max-height: 260px; }
+  }
   @media (max-width: 760px){
     .ab-grid{ grid-template-columns:1fr; }
     .ab-fact{ flex-direction:column; gap:6px; }
@@ -147,13 +166,26 @@
 
 <section class="ab-hero">
   <div class="container">
-    <span class="ab-eyebrow">About</span>
-    <h1>A US-based supplier, built for research buyers.</h1>
-    <p class="ab-lede">
-      Glow Research supplies high-purity research peptides to laboratories,
-      institutions, and qualified researchers across the United States. Everything
-      we sell is intended for in-vitro laboratory research use only.
-    </p>
+    <div class="ab-hero-grid">
+      <div class="ab-hero-copy">
+        <span class="ab-eyebrow">About</span>
+        <h1>A US-based supplier, built for research buyers.</h1>
+        <p class="ab-lede">
+          Glow Research supplies high-purity research peptides to laboratories,
+          institutions, and qualified researchers across the United States. Everything
+          we sell is intended for in-vitro laboratory research use only.
+        </p>
+      </div>
+
+      <!-- the figure removes itself if the asset is missing, so a dropped or
+           renamed file degrades to the one-column layout instead of a broken
+           image icon on a live page -->
+      <figure class="ab-hero-fig">
+        <img src="assets/about-lab.jpg" alt="Two researchers in lab coats reviewing analytical data on a monitor in a laboratory."
+             loading="lazy" decoding="async"
+             onerror="this.closest('.ab-hero-fig').remove()" />
+      </figure>
+    </div>
 
     <div class="ab-callout">
       <p>
