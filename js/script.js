@@ -41,9 +41,9 @@ renderProducts('all');
 const faqs = [
   { q: 'Are Glow Research peptides intended for human consumption?', a: 'No. All products sold by Glow Research are strictly for laboratory and in-vitro research use only. They are not drugs, supplements, or foods, and are not intended for human or animal use of any kind.' },
   { q: 'Why are Glow Research peptides priced the way they are?', a: 'Our pricing reflects what goes into every batch: US-based manufacturing, cGMP-aligned quality practices, and independent third-party lab testing on every lot. Peptides priced well below market are almost always cutting one of those corners, and we would rather hold the standard than the lowest price.' },
-  { q: 'How do I verify a certificate of analysis (COA)?', a: 'Every vial ships with a lot number that corresponds to a public, third-party lab COA available on this site or via the QR code on the label, so you can verify identity and purity before you ever open the vial.' },
+  { q: 'Can I get a lot’s COA before I order?', a: 'Yes. Email support@glowresearch.shop with the compound and quantity you’re considering and we’ll send the current lot’s certificate before you buy, not just after.' },
   { q: 'How fast do orders ship?', a: 'Orders placed before 2PM EST ship the same day from our US-based, climate-controlled facility, with tracking provided within 24 hours.' },
-  { q: 'How should compounds be stored?', a: 'Lyophilized peptides should be stored at -20°C and protected from light until reconstitution, per standard laboratory protocol.' },
+  { q: 'What if my order arrives damaged or improperly packed?', a: 'Email us within 48 hours with photos of the packaging and the affected vials, and we’ll replace them at no cost.' },
   { q: 'Do you ship internationally?', a: 'Currently we ship to verified research institutions and qualified buyers within the United States only.' },
 ];
 const faqList = document.getElementById('faqList');
