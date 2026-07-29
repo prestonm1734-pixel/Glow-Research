@@ -103,6 +103,33 @@
   }
   .cl-warn[hidden]{ display:none; }
 
+  /* the syringe: a visual read on where the draw lands on a 100-unit barrel */
+  .cl-syringe{ margin-top: 26px; padding-top: 22px; border-top:1px solid rgba(0,0,0,.14); }
+  .cl-syringe-label{
+    display:block; font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:#8a8a86; margin-bottom: 14px;
+  }
+  .cl-syringe-track{
+    position:relative; height: 22px; background:#f2f2f0; border:1.5px solid #0a0a0a;
+  }
+  .cl-syringe-fill{
+    position:absolute; inset:0; width:0%; background:#0a0a0a;
+    transition: width .25s var(--lp-ease, ease);
+  }
+  .cl-syringe-ticks{ position:absolute; inset:0; display:flex; }
+  .cl-syringe-ticks span{
+    flex:1; border-right:1px solid rgba(255,255,255,.35); position:relative;
+  }
+  .cl-syringe-ticks span:last-child{ border-right:none; }
+  .cl-syringe-ticks span.is-major::after{
+    content:''; position:absolute; right:-1px; top:0; bottom:0; width:1px; background:rgba(255,255,255,.7);
+  }
+  .cl-syringe-scale{
+    display:flex; justify-content:space-between; margin-top: 6px;
+    font-family:'JetBrains Mono', monospace; font-size:.7rem; color:#8a8a86;
+  }
+  .cl-syringe-overflow .cl-syringe-fill{ background: repeating-linear-gradient(135deg, #0a0a0a, #0a0a0a 6px, #45453f 6px, #45453f 12px); }
+
   .cl-notes{ border-top:1px solid rgba(0,0,0,.12); padding: clamp(40px, 5vw, 60px) 0 clamp(60px, 8vw, 90px); }
   .cl-notes h2{ font-size: clamp(1.4rem, 2.4vw, 1.8rem); letter-spacing:-.03em; margin: 0 0 18px; color:#0a0a0a; }
   .cl-notes-grid{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: clamp(24px, 4vw, 48px); max-width: 74ch; }
@@ -230,6 +257,18 @@
         <div class="cl-row"><dt>On a U-100 syringe</dt><dd id="clUnits">10.0 units</dd></div>
         <div class="cl-row"><dt>Aliquots per vial</dt><dd id="clCount">20</dd></div>
       </dl>
+
+      <div class="cl-syringe" id="clSyringe" aria-hidden="true">
+        <span class="cl-syringe-label">U-100 syringe</span>
+        <div class="cl-syringe-track">
+          <div class="cl-syringe-fill" id="clSyringeFill"></div>
+          <div class="cl-syringe-ticks" id="clSyringeTicks"></div>
+        </div>
+        <div class="cl-syringe-scale">
+          <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+        </div>
+      </div>
+
       <p class="cl-warn" id="clWarn" hidden></p>
     </aside>
   </div>
@@ -366,6 +405,14 @@
     if (fields.some(f => !f.input)) return;
 
     const out = { conc: $('clConc'), alt: $('clConcAlt'), draw: $('clDraw'), units: $('clUnits'), count: $('clCount'), warn: $('clWarn') };
+    const syringe = { box: $('clSyringe'), fill: $('clSyringeFill'), ticks: $('clSyringeTicks') };
+    if (syringe.ticks) {
+      for (let i = 0; i < 20; i++) {
+        const tick = document.createElement('span');
+        if (i % 5 === 0) tick.classList.add('is-major');
+        syringe.ticks.appendChild(tick);
+      }
+    }
     const num = n => n.toLocaleString('en-US');
     const dash = '&mdash;';
     // fixed decimals, then strip the padding: 0.100 reads as 0.1, but 0.025
@@ -400,6 +447,10 @@
         out.units.innerHTML = dash;
         out.count.innerHTML = dash;
         out.warn.hidden = true;
+        if (syringe.fill) {
+          syringe.fill.style.width = '0%';
+          syringe.box.classList.remove('cl-syringe-overflow');
+        }
         return;
       }
 
@@ -410,7 +461,14 @@
       out.conc.innerHTML = (mcgPerMl / 1000).toFixed(2) + '<small>mg / mL</small>';
       out.alt.textContent = num(Math.round(mcgPerMl)) + ' mcg per mL';
       out.draw.textContent = trim(drawMl, drawMl < 0.01 ? 4 : 3) + ' mL';
-      out.units.textContent = (drawMl * 100).toFixed(1) + ' units';
+      const units = drawMl * 100;
+      out.units.textContent = units.toFixed(1) + ' units';
+
+      if (syringe.fill) {
+        const overflow = units > 100;
+        syringe.box.classList.toggle('cl-syringe-overflow', overflow);
+        syringe.fill.style.width = Math.min(units, 100) + '%';
+      }
 
       // a partial aliquot is not an aliquot, so this floors rather than rounds
       const count = Math.floor(mcg / target);
