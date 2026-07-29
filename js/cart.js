@@ -278,3 +278,44 @@
 
   document.querySelectorAll('.nav-cart').forEach(b => b.addEventListener('click', open));
 })();
+
+/* ===================== nav dropdown =====================
+   Lives here because cart.js is the one script every page loads, so the
+   Resources menu gets one implementation rather than eleven copies.
+
+   A disclosure, not a hover menu: click toggles, Escape closes and
+   returns focus to the button, and a click anywhere outside closes it.
+   Hover-only menus cannot be opened on touch and are awkward by
+   keyboard, and this same markup has to work inside the mobile drawer. */
+(function () {
+  document.querySelectorAll('.nav-group').forEach(group => {
+    const btn = group.querySelector('.nav-group-btn');
+    const menu = group.querySelector('.nav-menu');
+    if (!btn || !menu) return;
+
+    const setOpen = on => {
+      btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+      menu.hidden = !on;
+    };
+
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      setOpen(menu.hidden);
+    });
+
+    // a click inside the menu is a link doing its job, so let it through
+    menu.addEventListener('click', e => e.stopPropagation());
+
+    document.addEventListener('click', () => setOpen(false));
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape' || menu.hidden) return;
+      setOpen(false);
+      btn.focus();
+    });
+
+    // tabbing out of the group is a clear signal the visitor has moved on
+    group.addEventListener('focusout', () => {
+      if (!group.contains(document.activeElement)) setOpen(false);
+    });
+  });
+})();

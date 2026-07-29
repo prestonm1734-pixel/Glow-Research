@@ -546,7 +546,7 @@ ${rowsHtml}
 
 function buildSitemap() {
   const staticPages = [
-    ['', '1.0'], ['peptides.html', '0.9'], ['blog.html', '0.8'],
+    ['', '1.0'], ['peptides.html', '0.9'], ['blog.html', '0.8'], ['calculator.html', '0.7'],
     ['shipping.html', '0.6'], ['wholesale.html', '0.6'],
   ];
   const today = new Date().toISOString().slice(0, 10);
