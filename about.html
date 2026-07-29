@@ -7,65 +7,87 @@
      needs the observer to show it, so without scripting the page must
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
-<title>Contact Us | Glow Research</title>
-<meta name="description" content="Reach the Glow Research team at support@glowresearch.shop for order status, wholesale applications, or general questions." />
+<title>About Us | Glow Research</title>
+<meta name="description" content="Glow Research is a San Diego based supplier of research peptides for laboratory use only. We do not manufacture; we partner with a US-based, cGMP-aligned facility and third-party test every lot." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  /* White surface, like the calculator and blog. Square boxes, mono for
-     labels, Space Grotesk for the heading. Straight to the point: this
-     page exists to hand over one email address. */
-  .ct-page{ background:#fff; color:#0a0a0a; }
-  .ct-page .btn-primary{ background:#0a0a0a; color:#fff; }
-  .ct-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
-  .ct-page :focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 3px; }
+  /* Same white surface as the calculator and contact pages. Square boxes,
+     mono for labels, Space Grotesk for headings. */
+  .ab-page{ background:#fff; color:#0a0a0a; }
+  .ab-page .btn-primary{ background:#0a0a0a; color:#fff; }
+  .ab-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
+  /* btn-outline is built for dark sections: a white border on white is
+     invisible. Same inversion .section-light already does. */
+  .ab-page .btn-outline{ border-color: rgba(0,0,0,.35); color:#0a0a0a; }
+  .ab-page .btn-outline:hover{
+    border-color:#0a0a0a; background: rgba(0,0,0,.05); color:#0a0a0a; box-shadow:none;
+  }
+  .ab-page :focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 3px; }
 
-  .ct-hero{ padding: clamp(52px, 7vw, 84px) 0 clamp(30px, 4vw, 44px); }
-  .ct-eyebrow{
+  .ab-hero{ padding: clamp(52px, 7vw, 84px) 0 clamp(30px, 4vw, 44px); }
+  .ab-eyebrow{
     display:block; margin-bottom: 16px; font-family:'JetBrains Mono', monospace;
     font-size:.7rem; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#8a8a86;
   }
-  .ct-hero h1{
+  .ab-hero h1{
     font-size: clamp(2.2rem, 4.6vw, 3.4rem); line-height:1.06; letter-spacing:-.035em;
-    margin: 0 0 16px; color:#0a0a0a; max-width: 18ch;
+    margin: 0 0 16px; color:#0a0a0a; max-width: 20ch;
   }
-  .ct-lede{ font-size: 1.06rem; line-height:1.6; color:#55554f; margin:0; max-width: 56ch; }
+  .ab-lede{ font-size: 1.06rem; line-height:1.6; color:#55554f; margin:0; max-width: 60ch; }
 
-  .ct-main{ padding-bottom: clamp(60px, 8vw, 96px); }
-  .ct-card{
-    border:2px solid #0a0a0a; padding: clamp(28px, 4vw, 40px);
-    max-width: 640px; margin-top: clamp(28px, 4vw, 40px);
+  /* the honest-position callout: this is the thing most suppliers bury */
+  .ab-callout{
+    border-left: 2px solid #0a0a0a; padding: 4px 0 4px 24px;
+    max-width: 68ch; margin: clamp(36px, 5vw, 52px) 0 0;
   }
-  .ct-card-label{
-    display:block; font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:700;
-    letter-spacing:.14em; text-transform:uppercase; color:#8a8a86; margin-bottom: 14px;
-  }
-  .ct-email{
-    display:inline-block; font-family:'Space Grotesk', sans-serif; font-weight:700;
-    font-size: clamp(1.6rem, 3.6vw, 2.2rem); letter-spacing:-.02em; color:#0a0a0a;
-    text-decoration: underline; text-decoration-color: rgba(10,10,10,.28);
-    text-underline-offset: 6px; transition: text-decoration-color .2s ease;
-  }
-  .ct-email:hover{ text-decoration-color: #0a0a0a; }
-  .ct-reply{ margin: 14px 0 0; font-size:.94rem; color:#55554f; }
-  .ct-reply strong{ color:#0a0a0a; font-weight:600; }
+  .ab-callout p{ font-size: 1.12rem; line-height:1.6; color:#0a0a0a; margin:0; font-weight:500; }
 
-  .ct-topics{ margin-top: 24px; border-top:1px solid rgba(0,0,0,.14); padding-top: 20px; }
-  .ct-topic{
-    display:flex; justify-content:space-between; align-items:baseline; gap:16px;
-    padding: 10px 0; border-bottom:1px solid rgba(0,0,0,.1); font-size:.92rem;
+  .ab-main{ padding-bottom: clamp(60px, 8vw, 96px); }
+  .ab-grid{
+    display:grid; grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: clamp(28px, 4vw, 52px); margin-top: clamp(40px, 5vw, 60px);
   }
-  .ct-topic:last-child{ border-bottom:none; }
-  .ct-topic dt{ color:#55554f; }
-  .ct-topic dd{ margin:0; font-family:'JetBrains Mono', monospace; font-size:.86rem; color:#0a0a0a; }
+  .ab-block h2{
+    font-size: 1.14rem; font-weight:700; letter-spacing:-.02em;
+    margin: 0 0 10px; color:#0a0a0a;
+  }
+  .ab-block p{ font-size:.98rem; line-height:1.68; color:#55554f; margin:0; }
+  .ab-block p + p{ margin-top: 12px; }
 
-  .ct-mail-btn{ margin-top: 26px; }
+  /* the facts strip: short, checkable claims rather than adjectives */
+  .ab-facts{
+    margin-top: clamp(44px, 6vw, 68px); border-top:1px solid rgba(0,0,0,.14);
+  }
+  .ab-fact{
+    display:flex; justify-content:space-between; align-items:baseline; gap: 24px;
+    padding: 16px 0; border-bottom:1px solid rgba(0,0,0,.1);
+  }
+  .ab-fact dt{
+    font-family:'JetBrains Mono', monospace; font-size:.68rem; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:#8a8a86; flex-shrink:0;
+  }
+  .ab-fact dd{
+    margin:0; font-size:.98rem; color:#0a0a0a; text-align:right; max-width: 52ch;
+  }
 
-  .ct-addr{ margin-top: clamp(28px, 4vw, 40px); max-width: 640px; font-size:.9rem; line-height:1.7; color:#8a8a86; }
-  .ct-addr strong{ color:#55554f; font-weight:600; }
+  .ab-cta{ margin-top: clamp(40px, 5vw, 56px); display:flex; flex-wrap:wrap; gap:14px; }
+
+  .ab-ruo{
+    max-width: 74ch; margin: clamp(40px, 5vw, 60px) 0 0; padding-top: clamp(28px, 4vw, 36px);
+    border-top:1px solid rgba(0,0,0,.14);
+    font-size:.88rem; line-height:1.72; color:#8a8a86;
+  }
+  .ab-ruo strong{ color:#55554f; font-weight:600; }
+
+  @media (max-width: 760px){
+    .ab-grid{ grid-template-columns:1fr; }
+    .ab-fact{ flex-direction:column; gap:6px; }
+    .ab-fact dd{ text-align:left; }
+  }
 </style>
 </head>
 <body>
@@ -96,8 +118,8 @@
         <div class="nav-menu" id="navResources" hidden>
           <a href="blog.html">Research Blog</a>
           <a href="calculator.html">Peptide Calculator</a>
-          <a href="about.html">About Us</a>
-          <a href="contact.html" class="active">Contact Us</a>
+          <a href="about.html" class="active">About Us</a>
+          <a href="contact.html">Contact Us</a>
         </div>
       </div>
     </nav>
@@ -121,41 +143,137 @@
   </div>
 </header>
 
-<main class="ct-page">
+<main class="ab-page">
 
-<section class="ct-hero">
+<section class="ab-hero">
   <div class="container">
-    <span class="ct-eyebrow">Resources</span>
-    <h1>Contact us.</h1>
-    <p class="ct-lede">
-      One inbox, checked by a person. Email us and we will get back to you.
+    <span class="ab-eyebrow">About</span>
+    <h1>A San Diego supplier, built for research buyers.</h1>
+    <p class="ab-lede">
+      Glow Research supplies high-purity research peptides to laboratories,
+      institutions, and qualified researchers across the United States. Everything
+      we sell is intended for in-vitro laboratory research use only.
     </p>
+
+    <div class="ab-callout">
+      <p>
+        We are not a manufacturer, and we do not pretend to be one. We are a
+        US-based retailer that partners with a domestic, cGMP-aligned production
+        facility, and we third-party test what we sell.
+      </p>
+    </div>
   </div>
 </section>
 
-<section class="ct-main">
+<section class="ab-main">
   <div class="container">
-    <div class="ct-card">
-      <span class="ct-card-label">Email</span>
-      <a class="ct-email" href="mailto:support@glowresearch.shop">support@glowresearch.shop</a>
-      <p class="ct-reply">We reply within <strong>one business day</strong>.</p>
 
-      <dl class="ct-topics">
-        <div class="ct-topic"><dt>Order status or shipping</dt><dd>Include your order number</dd></div>
-        <div class="ct-topic"><dt>Wholesale &amp; bulk</dt><dd>See the Wholesale page first</dd></div>
-        <div class="ct-topic"><dt>Certificates of analysis</dt><dd>Include the lot number</dd></div>
-        <div class="ct-topic"><dt>Everything else</dt><dd>Just ask</dd></div>
-      </dl>
+    <div class="ab-grid">
+      <div class="ab-block">
+        <h2>Where we sit in the chain</h2>
+        <p>
+          Most peptide sites are vague about this on purpose. We would rather be
+          direct: Glow Research is the retailer. Synthesis and fill happen at a
+          US-based partner facility that operates to cGMP-aligned quality
+          practices, and our role is sourcing, qualifying, verifying, and
+          shipping.
+        </p>
+        <p>
+          That distinction matters when you are evaluating a supplier, because it
+          tells you exactly which claims are ours to make and which belong to the
+          facility behind the vial.
+        </p>
+      </div>
 
-      <div class="ct-mail-btn">
-        <a href="mailto:support@glowresearch.shop" class="btn btn-primary">Email support <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+      <div class="ab-block">
+        <h2>Why the supply chain stays domestic</h2>
+        <p>
+          Production, fill, storage, and fulfillment all happen inside the United
+          States. Keeping the chain domestic means shorter transit, fewer
+          temperature excursions in transit, and a paper trail we can actually
+          follow back to a specific lot when a customer asks.
+        </p>
+        <p>
+          It also means we are not reconciling documentation across jurisdictions
+          when you need a certificate for a specific batch.
+        </p>
+      </div>
+
+      <div class="ab-block">
+        <h2>Verification, not adjectives</h2>
+        <p>
+          Every lot is tested by an independent third-party laboratory, and every
+          vial carries a lot number that maps to its certificate of analysis. If
+          you want to see a lot's COA before you order rather than after, email
+          us and we will send it.
+        </p>
+        <p>
+          Purity claims that are not attached to a document are marketing. We try
+          to keep ours attached to one.
+        </p>
+      </div>
+
+      <div class="ab-block">
+        <h2>Research use, enforced</h2>
+        <p>
+          Our products are not drugs, supplements, foods, or cosmetics. They are
+          not for human or animal consumption, and we do not sell to anyone
+          purchasing for personal use.
+        </p>
+        <p>
+          We operate under the applicable federal, state, and local requirements
+          for research chemical distribution, and we reserve the right to refuse
+          any order that falls outside a legitimate research context.
+        </p>
       </div>
     </div>
 
-    <p class="ct-addr">
-      <strong>Glow Nutrition LLC</strong><br />
-      10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States
+    <dl class="ab-facts">
+      <div class="ab-fact">
+        <dt>Based in</dt>
+        <dd>San Diego, California</dd>
+      </div>
+      <div class="ab-fact">
+        <dt>Legal entity</dt>
+        <dd>Glow Nutrition LLC</dd>
+      </div>
+      <div class="ab-fact">
+        <dt>Our role</dt>
+        <dd>Retailer and distributor — we do not manufacture in-house</dd>
+      </div>
+      <div class="ab-fact">
+        <dt>Manufacturing</dt>
+        <dd>US-based partner facility operating to cGMP-aligned quality practices</dd>
+      </div>
+      <div class="ab-fact">
+        <dt>Testing</dt>
+        <dd>Independent third-party laboratory, every lot, COA on request</dd>
+      </div>
+      <div class="ab-fact">
+        <dt>We ship to</dt>
+        <dd>Verified research institutions and qualified buyers in the United States</dd>
+      </div>
+      <div class="ab-fact">
+        <dt>Intended use</dt>
+        <dd>In-vitro laboratory research only — never human or animal use</dd>
+      </div>
+    </dl>
+
+    <div class="ab-cta">
+      <a href="peptides.html" class="btn btn-primary">Shop peptides <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+      <a href="contact.html" class="btn btn-outline">Contact us <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+    </div>
+
+    <p class="ab-ruo">
+      Glow Research makes no claims as to the safety or efficacy of any compound for
+      human use, and nothing on this site constitutes medical advice. Statements here
+      have not been evaluated by the Food and Drug Administration. By purchasing, you
+      certify that you are at least 21 years of age, that you are a qualified
+      professional or researcher, and that every product will be used solely for
+      laboratory research in accordance with all applicable laws.
+      <strong>For laboratory research use only. Not for human or animal consumption.</strong>
     </p>
+
   </div>
 </section>
 
