@@ -313,9 +313,20 @@
       btn.focus();
     });
 
-    // tabbing out of the group is a clear signal the visitor has moved on
-    group.addEventListener('focusout', () => {
-      if (!group.contains(document.activeElement)) setOpen(false);
+    /* Tabbing out of the group closes it.
+       This has to read e.relatedTarget, not document.activeElement.
+       focusout fires on mousedown, before mouseup, and at that moment
+       activeElement is still transitioning (it reads as <body>), so an
+       activeElement check concluded focus had left, hid the menu, and
+       destroyed the link before the click could land on it: pressing Blog
+       or Peptide Calculator did nothing at all. relatedTarget is the
+       element focus is actually heading to, so a press on a menu link
+       keeps the menu open long enough to follow it.
+       When relatedTarget is null, focus is going nowhere nameable (some
+       browsers do not focus a clicked link), so leave it open and let the
+       document click handler above close it. */
+    group.addEventListener('focusout', e => {
+      if (e.relatedTarget && !group.contains(e.relatedTarget)) setOpen(false);
     });
   });
 })();
