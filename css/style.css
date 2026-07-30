@@ -764,6 +764,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
     text-align:center;
     font-size: clamp(0.98rem, 6.4vw, 1.6rem);
   }
+  .hero-sub{ display:none; }
 
   /* pure black behind the copy — the vial photo now sits in the flow,
      right under the title, instead of as a full-bleed background */
