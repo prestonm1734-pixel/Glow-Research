@@ -755,12 +755,27 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
      what made everything (buttons, nav) look flush against the edges */
   .hero-grid{ min-height: 0; padding-top: 26px; padding-bottom: 34px; }
   .hero-copy{ max-width: none; }
-  /* trying it flat: pure black, nothing else — no vial photo, no scrim,
-     no glow blobs, no star field. Just the copy over #000. */
-  .hero-visual-img{ display:none; }
-  .hero-copy-scrim{ display:none; }
-  .hero-glow{ display:none; }
-  #particleCanvas{ display:none; }
+  /* on mobile there's no room to compose the vials as a showpiece beside
+     the copy, so instead they become ambience: full-bleed behind the
+     text, zoomed in past their desktop crop and faded hard, with the
+     star field and a near-black scrim doing the work of keeping the
+     copy readable over them. */
+  .hero-visual-img{
+    display:block;
+    position:absolute; inset:0; z-index:0;
+    width:100%; height:100%; max-width:none;
+    object-fit:cover; object-position: 60% 35%;
+    transform: scale(1.35);
+    opacity:.32;
+    -webkit-mask-image: radial-gradient(ellipse 130% 85% at 55% 40%, #000 42%, transparent 92%);
+    -webkit-mask-composite: source-in;
+            mask-image: radial-gradient(ellipse 130% 85% at 55% 40%, #000 42%, transparent 92%);
+            mask-composite: intersect;
+  }
+  .hero-copy-scrim{
+    display:block;
+    background: linear-gradient(180deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.88) 60%, #000 100%);
+  }
 
   /* the bigger button size added for the desktop CTAs was inflating every
      button site-wide (nav, newsletter, etc.) once it lost the width
