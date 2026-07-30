@@ -746,28 +746,17 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* ---------- hero responsive ---------- */
 @media (max-width: 900px){
-  /* the section itself carries its own 62/68px padding on top of the grid's;
-     with the sub, stats, and scroll cue all gone there's nothing left to
-     justify either, so both get cut down together */
-  .hero{ padding: 32px 0 40px; }
   /* padding-top/bottom only — this element is also .container, and a
      shorthand here was wiping out its 24px left/right padding, which is
      what made everything (buttons, nav) look flush against the edges */
-  .hero-grid{ min-height: 0; padding-top: 18px; padding-bottom: 8px; }
+  .hero-grid{ min-height: 0; padding-top: 26px; padding-bottom: 34px; }
   .hero-copy{ max-width: none; }
   /* trying stripped-down: just the eyebrow, headline, and CTA over a flat
-     black field. No vial photo, no subhead, no stat row, no scroll cue. */
+     black field. No vial photo, no subhead, no stat row. */
   .hero-visual-img{ display:none; }
   .hero-copy-scrim{ display:none; }
   .hero-sub{ display:none; }
   .hero-stats{ display:none; }
-  .scroll-cue{ display:none; }
-
-  /* the catalog section leads with the grid itself instead of a heading —
-     the "Shop all Peptides" button at the foot of the grid still gets you
-     to the full list, so nothing here is a dead end */
-  .catalog-head{ display:none; }
-  #peptides{ padding-top: 34px; }
 
   /* the bigger button size added for the desktop CTAs was inflating every
      button site-wide (nav, newsletter, etc.) once it lost the width
