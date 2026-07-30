@@ -756,7 +756,13 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .hero-grid{ min-height: 0; padding-top: 26px; padding-bottom: 34px; }
   .hero-copy{ max-width: none; }
   .hero-eyebrow{ display:flex; justify-content:center; width:100%; }
-  .hero-title{ text-align:center; }
+  /* one line, words spread edge-to-edge instead of stacked/centered */
+  .hero-title-break{ display:none; }
+  .hero-title{
+    white-space:nowrap;
+    text-align:justify; text-align-last:justify;
+    font-size: clamp(0.98rem, 6.4vw, 1.6rem);
+  }
 
   /* pure black — nothing behind the copy */
   .hero{ background:#000; }
