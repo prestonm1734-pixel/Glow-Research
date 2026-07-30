@@ -755,6 +755,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
      what made everything (buttons, nav) look flush against the edges */
   .hero-grid{ min-height: 0; padding-top: 26px; padding-bottom: 34px; }
   .hero-copy{ max-width: none; }
+  .hero-eyebrow{ display:flex; justify-content:center; width:100%; }
   /* on mobile there's no room to compose the vials as a showpiece beside
      the copy, so instead they become ambience: full-bleed behind the
      text, zoomed in past their desktop crop and faded hard, with the
