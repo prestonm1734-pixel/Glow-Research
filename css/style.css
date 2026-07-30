@@ -751,14 +751,10 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
      gradient, matching the hero below it */
   .marquee-bar{ background:#000; }
 
-  /* dot-grid backdrop on black, in place of the glow blobs / star field —
-     a quieter, cleaner texture behind the centered stack below */
-  .hero{
-    background:
-      radial-gradient(rgba(255,255,255,.16) 1px, transparent 1.4px) 0 0/18px 18px,
-      #000;
-  }
-  .hero-glow, #particleCanvas, .hero-copy-scrim{ display:none; }
+  /* back to plain black with the ambient star field + glow blobs, same as
+     before — the dot-grid texture didn't read well */
+  .hero{ background:#000; }
+  .hero-copy-scrim{ display:none; }
 
   /* stack: headline -> made-in-usa/tested line -> button -> vial photo,
      all centered, image restored to the flow (was hidden/absolute before) */
@@ -784,8 +780,9 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .hero-visual-img{
     display:block; position:static; z-index:auto;
     width:100%; max-width: 380px; height:auto;
-    margin: 28px auto 0; opacity:1;
-    -webkit-mask-image:none; mask-image:none;
+    margin: 28px auto 0; opacity:.9;
+    -webkit-mask-image: radial-gradient(ellipse 72% 78% at 50% 46%, #000 50%, transparent 96%);
+            mask-image: radial-gradient(ellipse 72% 78% at 50% 46%, #000 50%, transparent 96%);
   }
 
   /* the bigger button size added for the desktop CTAs was inflating every
