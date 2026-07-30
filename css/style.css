@@ -695,6 +695,30 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .footer-top{ grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 640px){
+  /* Two products per row on phones. auto-fill with a 260px floor collapses
+     to one column here, which wastes most of the screen on a single tile
+     and turns the catalog into a long scroll. Forcing two columns needs
+     minmax(0,1fr) rather than 1fr, or a long compound name refuses to
+     shrink below its content width and overflows the row. */
+  .product-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+
+  /* everything inside the tile steps down to suit the narrower column */
+  .product-footer{ padding: 14px 13px 15px; }
+  .product-footer::before{ left:13px; right:13px; }
+  .product-card h3{ font-size: .92rem; margin: 3px 0 7px; }
+  .card-divider{ margin: 2px 0 10px; }
+  .price{ font-size: 1rem; margin-bottom: 10px; }
+  .price span{ font-size: .66rem; }
+  .add-btn{ height: 38px; font-size: .78rem; }
+  /* Both badges cannot coexist on a half-width tile: "recovery" + "Best
+     Seller" measures 139px against a 130px card at 320px, so they collide.
+     The category is the one to drop — the catalog has filter chips for it
+     and the product page repeats it, whereas the status badge is the only
+     place "Best Seller" appears at all. */
+  .product-badge{ top: 9px; font-size: .55rem; padding: 3px 7px; }
+  .product-badge.cat{ display:none; }
+  .product-badge.status{ right: 9px; }
+
   .hero{ padding: 48px 0 56px; }
   .hero-stats{ gap: 30px; }
   .footer-top{ grid-template-columns: 1fr; }
