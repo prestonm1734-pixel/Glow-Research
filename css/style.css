@@ -348,7 +348,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   display:grid; grid-template-columns: 1fr; align-items:center;
   min-height: min(60vh, 540px);
 }
-.hero-copy{ text-align:left; max-width: 700px; transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: transform; }
+.hero-copy{ text-align:left; max-width: 700px; }
 .hero-eyebrow{
   display:inline-flex; align-items:center; gap: 8px; font-family:'JetBrains Mono', monospace;
   font-size: 0.74rem; letter-spacing:.18em; text-transform:uppercase; font-weight:600;
@@ -765,9 +765,15 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
     font-size: clamp(0.98rem, 6.4vw, 1.6rem);
   }
 
-  /* pure black — nothing behind the copy */
+  /* pure black behind the copy — the vial photo now sits in the flow,
+     right under the title, instead of as a full-bleed background */
   .hero{ background:#000; }
-  .hero-visual-img{ display:none; }
+  .hero-visual-img{
+    display:block; position:static; z-index:auto;
+    width:100%; max-width:360px; height:auto; max-height:none;
+    margin:20px auto 0; opacity:1;
+    -webkit-mask-image:none; mask-image:none;
+  }
   .hero-copy-scrim{ display:none; }
   .hero-glow{ display:none; }
   #particleCanvas{ display:none; }
