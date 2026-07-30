@@ -358,7 +358,6 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   width: 16px; height: 10.7px; flex-shrink: 0; border-radius: 1px;
   color: #fff;
 }
-.eyebrow-extra{ display:none; }
 @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
 .hero-title{
@@ -751,42 +750,17 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
      gradient, matching the hero below it */
   .marquee-bar{ background:#000; }
 
-  /* dot-grid backdrop on black, in place of the glow blobs / star field —
-     a quieter, cleaner texture behind the centered stack below */
-  .hero{
-    background:
-      radial-gradient(rgba(255,255,255,.16) 1px, transparent 1.4px) 0 0/18px 18px,
-      #000;
-  }
-  .hero-glow, #particleCanvas, .hero-copy-scrim{ display:none; }
-
-  /* stack: headline -> made-in-usa/tested line -> button -> vial photo,
-     all centered, image restored to the flow (was hidden/absolute before) */
-  .hero{ display:flex; flex-direction:column; }
-  .container.hero-grid{ order:1; }
-  .hero-visual-img{ order:2; }
-
-  .hero-grid{ min-height: 0; padding-top: 26px; padding-bottom: 8px; }
-  .hero-copy{
-    max-width: none; display:flex; flex-direction:column; align-items:center;
-    text-align:center;
-  }
-  .hero-title{ order:1; }
-  .hero-eyebrow{
-    order:2; margin-top: 6px; flex-wrap:wrap; justify-content:center;
-    row-gap:4px; font-size:.68rem;
-  }
-  .eyebrow-extra{ display:inline; }
-  .hero-sub, .hero-stats{ display:none; }
-  .hero-cta{ order:3; align-items:center; margin-bottom: 0; }
-  .hero-cta .btn-lg{ width:auto; }
-
-  .hero-visual-img{
-    display:block; position:static; z-index:auto;
-    width:100%; max-width: 380px; height:auto;
-    margin: 28px auto 0; opacity:1;
-    -webkit-mask-image:none; mask-image:none;
-  }
+  /* padding-top/bottom only — this element is also .container, and a
+     shorthand here was wiping out its 24px left/right padding, which is
+     what made everything (buttons, nav) look flush against the edges */
+  .hero-grid{ min-height: 0; padding-top: 26px; padding-bottom: 34px; }
+  .hero-copy{ max-width: none; }
+  /* trying it flat: pure black, nothing else — no vial photo, no scrim,
+     no glow blobs, no star field. Just the copy over #000. */
+  .hero-visual-img{ display:none; }
+  .hero-copy-scrim{ display:none; }
+  .hero-glow{ display:none; }
+  #particleCanvas{ display:none; }
 
   /* the bigger button size added for the desktop CTAs was inflating every
      button site-wide (nav, newsletter, etc.) once it lost the width
