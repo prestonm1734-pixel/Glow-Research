@@ -67,11 +67,12 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* ---------- buttons ---------- */
 .btn{
-  display: inline-flex; align-items:center; justify-content:center; gap:10px;
-  padding: 16px 28px;
+  display: inline-flex; align-items:center; justify-content:center; gap:9px;
+  padding: 14px 24px;
   border-radius: 0;
   font-weight: 700;
   font-size: 1rem;
+  letter-spacing: -0.005em;
   border: 1.5px solid transparent;
   cursor: pointer;
   transition: transform .25s ease, box-shadow .25s ease, background .25s ease, color .25s ease, border-color .25s ease;
@@ -80,10 +81,24 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .btn-primary{
   background: #ececea;
   color: #0a0a0a;
+  /* a hairline edge, not a full border — enough to keep the chip from
+     dissolving into the hero's black when it's not being hovered */
+  border-color: rgba(10,10,10,.16);
 }
 .btn-primary:hover{
   background: #fff;
+  border-color: rgba(10,10,10,.28);
+  box-shadow: 0 10px 28px -12px rgba(255,255,255,.35);
 }
+/* the spark rides along with the label; on hover it spins and pops the way
+   the logo's does, so the button feels like part of the same system rather
+   than a stock component dropped in */
+.btn-spark{
+  display:inline-block;
+  transition: transform .45s cubic-bezier(.2,.8,.2,1);
+}
+.btn:hover .btn-spark{ transform: rotate(90deg) scale(1.3); }
+.btn:active .btn-spark{ transform: rotate(90deg) scale(1.1); transition-duration: .1s; }
 /* btn-primary is a pale chip built for dark sections. On the white overlay
    surfaces (cart drawer, checkout, quick-add) it reads as a disabled button,
    so invert it there. */
@@ -118,7 +133,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   border-radius: 999px;
 }
 .btn-ghost:hover{ background: rgba(255,255,255,0.12); }
-.btn-lg{ padding: 15.5px 29px; font-size: 1rem; }
+.btn-lg{ padding: 15px 26px; font-size: 1rem; }
 
 /* press feedback — short duration so the push reads as a click, not a slide */
 .btn:active{ transform: translateY(1px) scale(.988); transition-duration: .06s; }
