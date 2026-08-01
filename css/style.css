@@ -373,11 +373,14 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   max-width: 500px;
   margin: 0 0 30px;
 }
-.hero-cta{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom: 40px; }
+.hero-cta{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom: 30px; }
 
+/* tighter gap + a slightly stronger rule than the site's default border
+   color, so the divider actually reads as sealing the stats to the CTA
+   above rather than floating as its own separate block */
 .hero-stats{
   display:flex; gap: 42px; flex-wrap:wrap;
-  padding-top: 28px; border-top: 1px solid var(--border);
+  padding-top: 22px; border-top: 1px solid rgba(255,255,255,.18);
 }
 .stat{ text-align:left; }
 .stat-num, .stat-suffix{
