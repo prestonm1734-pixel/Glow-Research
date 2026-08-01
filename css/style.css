@@ -465,45 +465,9 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
    dead band of white between the header and the first chip. This page opens
    straight into the goods instead. Bottom padding leaves room for the fixed
    search bar so the last row of cards isn't sitting under it. */
-.catalog-page{ padding: 34px 0 132px; }
+.catalog-page{ padding: 34px 0 90px; }
 .catalog-page .section-head{ margin-bottom: 20px; }
 .catalog-page .filter-row{ margin-bottom: 26px; }
-
-/* ---------- fixed catalog search ---------- */
-.catalog-search{
-  position: fixed; left:0; right:0; bottom:0; z-index: 60;
-  padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
-  background: rgba(10,10,10,.86);
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-  border-top: 1px solid rgba(255,255,255,.14);
-}
-.catalog-search-field{
-  display:flex; align-items:center; gap:12px;
-  background: rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.16);
-  padding: 0 14px; height: 52px;
-  transition: border-color .2s ease, background .2s ease;
-}
-.catalog-search-field:focus-within{
-  border-color: rgba(255,255,255,.5);
-  background: rgba(255,255,255,.09);
-}
-.catalog-search-field svg{ color: var(--text-dimmer); flex-shrink:0; }
-.catalog-search-field input{
-  flex:1; min-width:0; height:100%;
-  background:transparent; border:0; outline:none;
-  color: var(--text); font-family:'Inter', sans-serif; font-size: 1rem;
-}
-.catalog-search-field input::placeholder{ color: var(--text-dimmer); }
-/* the UA's own clear affordance would sit next to ours */
-.catalog-search-field input::-webkit-search-cancel-button{ -webkit-appearance:none; }
-.catalog-search-clear{
-  flex-shrink:0; width:28px; height:28px; line-height:1;
-  background:transparent; border:0; cursor:pointer;
-  color: var(--text-dim); font-size:1.4rem;
-  transition: color .2s ease;
-}
-.catalog-search-clear:hover{ color: var(--text); }
 
 .product-grid-empty{
   grid-column: 1 / -1; margin: 0; padding: 44px 0;
@@ -512,16 +476,21 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
 /* ---------- filter chips ---------- */
 .filter-row{ display:flex; gap: 10px; flex-wrap:wrap; margin-bottom: 36px; }
+/* squared boxes rather than pills — the site's buttons and product tiles are
+   all sharp-cornered, so a rounded pill was the one soft shape left. The
+   active state inverts to solid, the same flip every button here does. */
 .chip{
-  padding: 9px 18px; border-radius: 999px; border:1px solid var(--border);
-  background: var(--surface); color: var(--text-dim); font-size:0.85rem; font-weight:600;
-  cursor:pointer; transition: all .2s ease;
+  padding: 12px 22px; border-radius: 0; border:1px solid var(--border);
+  background: transparent; color: var(--text-dim);
+  font-family:'Inter', sans-serif; font-size:0.9rem; font-weight:600;
+  letter-spacing:-0.005em; cursor:pointer;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
 }
-.chip:hover{ border-color: var(--pink); color: var(--text); }
-.chip.active{ background: var(--grad-main); color:#0a0a0a; border-color: transparent; }
-.section-light .chip{ background:#f2f2f0; border-color: rgba(0,0,0,0.1); color:#55554f; }
-.section-light .chip:hover{ border-color:#0a0a0a; color:#0a0a0a; }
-.section-light .chip.active{ background:#0a0a0a; color:#fff; }
+.chip:hover{ border-color: var(--pink); color: var(--text); background: rgba(255,255,255,.06); }
+.chip.active{ background: var(--text); color:#0a0a0a; border-color: var(--text); }
+.section-light .chip{ background:transparent; border-color: rgba(0,0,0,0.22); color:#45453f; }
+.section-light .chip:hover{ border-color:#0a0a0a; color:#0a0a0a; background: rgba(0,0,0,.04); }
+.section-light .chip.active{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
 
 .section-light .btn-outline{
   border-color: rgba(0,0,0,0.35); color:#0a0a0a;

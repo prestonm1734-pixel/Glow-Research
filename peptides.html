@@ -95,23 +95,6 @@
   </div>
 </section>
 
-<!-- rides along the bottom of the viewport for the whole catalog scroll, so
-     filtering by name never means scrolling back up to the header -->
-<div class="catalog-search" id="catalogSearch">
-  <div class="container">
-    <div class="catalog-search-field">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
-        <path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-      <input type="search" id="catalogSearchInput" placeholder="Search the catalog&hellip;"
-             autocomplete="off" aria-label="Search the catalog" aria-controls="productGrid" />
-      <button type="button" class="catalog-search-clear" id="catalogSearchClear"
-              aria-label="Clear search" hidden>&times;</button>
-    </div>
-  </div>
-</div>
-
 <footer class="site-footer">
   <div class="container">
     <div class="footer-top">
@@ -203,41 +186,33 @@
   /* the cart badge and drawer live in js/cart.js */
 
   /* ---------- catalog grid + filters ---------- */
-  /* the chip and the search box narrow the same list rather than overriding
-     each other, so "Recovery" + "bpc" is a valid combination */
   const grid = document.getElementById('productGrid');
-  const searchInput = document.getElementById('catalogSearchInput');
-  const searchClear = document.getElementById('catalogSearchClear');
-  let activeFilter = 'all';
-
-  function renderProducts() {
-    const query = searchInput.value;
-    renderProductGrid(grid, activeFilter, { observeReveal, query });
-    searchClear.hidden = !query;
+  function renderProducts(filter) {
+    renderProductGrid(grid, filter, { observeReveal });
   }
 
   const chips = document.querySelectorAll('#filterRow .chip');
   chips.forEach(chip => {
     chip.addEventListener('click', () => {
-      chips.forEach(c => c.classList.remove('active'));
+      chips.forEach(c => {
+        c.classList.remove('active');
+        c.setAttribute('aria-pressed', 'false');
+      });
       chip.classList.add('active');
-      activeFilter = chip.dataset.filter;
-      renderProducts();
+      chip.setAttribute('aria-pressed', 'true');
+      renderProducts(chip.dataset.filter);
     });
-  });
-
-  searchInput.addEventListener('input', renderProducts);
-  searchClear.addEventListener('click', () => {
-    searchInput.value = '';
-    renderProducts();
-    searchInput.focus();
   });
 
   /* honour ?cat=growth|recovery|cognitive|metabolic from footer/nav links */
   const requestedCat = new URLSearchParams(window.location.search).get('cat');
-  activeFilter = [...chips].find(c => c.dataset.filter === requestedCat) ? requestedCat : 'all';
-  chips.forEach(c => c.classList.toggle('active', c.dataset.filter === activeFilter));
-  renderProducts();
+  const initial = [...chips].find(c => c.dataset.filter === requestedCat) ? requestedCat : 'all';
+  chips.forEach(c => {
+    const on = c.dataset.filter === initial;
+    c.classList.toggle('active', on);
+    c.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  renderProducts(initial);
 </script>
 </body>
 </html>
