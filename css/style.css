@@ -460,6 +460,56 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 
+/* ---------- catalog page ----------
+   The catalog has no hero above it, so the stock 110px section padding left a
+   dead band of white between the header and the first chip. This page opens
+   straight into the goods instead. Bottom padding leaves room for the fixed
+   search bar so the last row of cards isn't sitting under it. */
+.catalog-page{ padding: 34px 0 132px; }
+.catalog-page .section-head{ margin-bottom: 20px; }
+.catalog-page .filter-row{ margin-bottom: 26px; }
+
+/* ---------- fixed catalog search ---------- */
+.catalog-search{
+  position: fixed; left:0; right:0; bottom:0; z-index: 60;
+  padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+  background: rgba(10,10,10,.86);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255,255,255,.14);
+}
+.catalog-search-field{
+  display:flex; align-items:center; gap:12px;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.16);
+  padding: 0 14px; height: 52px;
+  transition: border-color .2s ease, background .2s ease;
+}
+.catalog-search-field:focus-within{
+  border-color: rgba(255,255,255,.5);
+  background: rgba(255,255,255,.09);
+}
+.catalog-search-field svg{ color: var(--text-dimmer); flex-shrink:0; }
+.catalog-search-field input{
+  flex:1; min-width:0; height:100%;
+  background:transparent; border:0; outline:none;
+  color: var(--text); font-family:'Inter', sans-serif; font-size: 1rem;
+}
+.catalog-search-field input::placeholder{ color: var(--text-dimmer); }
+/* the UA's own clear affordance would sit next to ours */
+.catalog-search-field input::-webkit-search-cancel-button{ -webkit-appearance:none; }
+.catalog-search-clear{
+  flex-shrink:0; width:28px; height:28px; line-height:1;
+  background:transparent; border:0; cursor:pointer;
+  color: var(--text-dim); font-size:1.4rem;
+  transition: color .2s ease;
+}
+.catalog-search-clear:hover{ color: var(--text); }
+
+.product-grid-empty{
+  grid-column: 1 / -1; margin: 0; padding: 44px 0;
+  text-align:center; color:#55554f;
+}
+
 /* ---------- filter chips ---------- */
 .filter-row{ display:flex; gap: 10px; flex-wrap:wrap; margin-bottom: 36px; }
 .chip{
@@ -499,15 +549,22 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .product-grid{
   display:grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 24px;
 }
+/* squared off with a defined edge so each tile reads as an actual box on the
+   page, matching the sharp-cornered language the buttons already use — the
+   12px radius was rounding them into soft blobs */
 .product-card{
   background:#fff;
-  border: 1px solid rgba(0,0,0,0.1);
-  border-radius: var(--radius-sm);
+  border: 1px solid rgba(0,0,0,0.16);
+  border-radius: 0;
   overflow:hidden;
   position: relative;
-  transition: transform .3s ease, box-shadow .3s ease;
+  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
 }
-.product-card:hover{ transform: translateY(-5px); box-shadow: 0 20px 40px -20px rgba(0,0,0,.35); }
+.product-card:hover{
+  transform: translateY(-5px);
+  border-color: rgba(0,0,0,.38);
+  box-shadow: 0 20px 40px -20px rgba(0,0,0,.35);
+}
 
 /* A vial is a tall, narrow subject, so a short wide tile letterboxes it and
    the bottle ends up tiny. Keeping the tile roughly square gives the vial the
@@ -580,13 +637,17 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   left:6%; right:6%; bottom:9%; top:40%; border-radius:2px;
   background: linear-gradient(180deg,#1e2735,#111722);
 }
+/* square to match the tile; z-index keeps them above the photo, and the two
+   badges are capped so a long status ("Best Seller") can't run under the
+   category chip on a narrow two-up mobile tile */
 .product-badge{
-  position:absolute; top:14px; font-size: 0.62rem; font-weight:700;
-  padding: 4px 10px; border-radius: 4px; text-transform:uppercase; letter-spacing:.06em;
+  position:absolute; top:0; font-size: 0.62rem; font-weight:700;
+  padding: 5px 10px; border-radius: 0; text-transform:uppercase; letter-spacing:.06em;
   font-family:'JetBrains Mono', monospace;
+  z-index:2; max-width: calc(50% - 6px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-.product-badge.cat{ left:14px; background: rgba(10,10,10,0.08); color:#45453f; }
-.product-badge.status{ right:14px; background:#0a0a0a; color:#fff; }
+.product-badge.cat{ left:0; background: rgba(10,10,10,0.72); color:#fff; }
+.product-badge.status{ right:0; background:#0a0a0a; color:#fff; }
 .product-footer{ background:#0a0a0a; color:#fff; padding: 20px 22px 22px; position:relative; }
 /* fades out at each edge instead of a hard-edged rule, so it reads as a
    seam rather than a box border. Used both at the top of the footer (where

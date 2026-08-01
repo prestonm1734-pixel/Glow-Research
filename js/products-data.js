@@ -196,10 +196,31 @@ function productThumb(name) {
 // filter: 'all' or a category key
 // opts.observeReveal(el): optional, hooks each card into a scroll-reveal observer
 // opts.limit: optional, render at most this many cards
+// opts.query: optional, free-text narrowing on top of the category filter —
+//   matched against name, tag and category so "recovery", "bpc" and "growth
+//   hormone" all land somewhere sensible
 function renderProductGrid(gridEl, filter, opts) {
   opts = opts || {};
   gridEl.innerHTML = '';
   let list = filter === 'all' ? GLOW_PRODUCTS : GLOW_PRODUCTS.filter(p => p.cat === filter);
+
+  const q = (opts.query || '').trim().toLowerCase();
+  if (q) {
+    list = list.filter(p =>
+      `${p.name} ${p.tag} ${p.cat}`.toLowerCase().includes(q)
+    );
+  }
+
+  if (!list.length) {
+    const empty = document.createElement('p');
+    empty.className = 'product-grid-empty';
+    empty.textContent = q
+      ? `No compounds match “${opts.query.trim()}”.`
+      : 'No compounds in this category yet.';
+    gridEl.appendChild(empty);
+    return;
+  }
+
   if (opts.limit) list = list.slice(0, opts.limit);
   list.forEach((p, i) => {
     const href = pageHref(`product.html?p=${productSlug(p.name)}`);
