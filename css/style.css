@@ -80,9 +80,17 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .btn-primary{
   background: #ececea;
   color: #0a0a0a;
+  /* a shade darker than the fill, so the chip has a defined edge instead of
+     dissolving into whatever sits behind it */
+  border-color: #d8d8d5;
+  /* background/border settle faster than the transform so the hover reads as
+     an immediate response rather than a slide */
+  transition: background .15s ease, border-color .15s ease,
+              transform .25s ease, box-shadow .25s ease, color .25s ease;
 }
 .btn-primary:hover{
-  background: #fff;
+  background: #f0f0f0;
+  border-color: #cfcfcb;
 }
 /* btn-primary is a pale chip built for dark sections. On the white overlay
    surfaces (cart drawer, checkout, quick-add) it reads as a disabled button,
@@ -92,12 +100,16 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .qa-sheet .btn-primary,
 .search-modal .btn-primary{
   background:#0a0a0a; color:#fff;
+  /* the light edge that defines the chip on dark sections would ring a black
+     button here, so match the border to the inverted fill */
+  border-color:#0a0a0a;
 }
 .cart-drawer .btn-primary:hover,
 .co-page .btn-primary:hover,
 .qa-sheet .btn-primary:hover,
 .search-modal .btn-primary:hover{
   background:#2a2a28; color:#fff;
+  border-color:#2a2a28;
 }
 .btn-outline{
   background: transparent;
@@ -352,7 +364,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .hero-eyebrow{
   display:inline-flex; align-items:center; gap: 8px; font-family:'JetBrains Mono', monospace;
   font-size: 0.74rem; letter-spacing:.18em; text-transform:uppercase; font-weight:600;
-  color: #ffffff; margin-bottom: 20px; position: relative; z-index: 1;
+  color: #ffffff; margin-bottom: 16px; position: relative; z-index: 1;
 }
 .usa-flag-icon{
   width: 16px; height: 10.7px; flex-shrink: 0; border-radius: 1px;
@@ -365,22 +377,24 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   font-size: clamp(2.4rem, 5vw, 4.1rem);
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   letter-spacing: -0.03em;
 }
 .hero-sub{
   font-size: 1.08rem;
   max-width: 500px;
-  margin: 0 0 30px;
+  margin: 0 0 32px;
 }
-.hero-cta{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom: 30px; }
+/* hero rhythm runs on an 8px scale end to end: eyebrow 16 → title 24 →
+   sub 32 → cta 24 → rule → stats 24. The gaps were previously 20/20/30/30/22,
+   close enough to look almost-systematic, which is what read as sloppy. */
+.hero-cta{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom: 24px; }
 
-/* tighter gap + a slightly stronger rule than the site's default border
-   color, so the divider actually reads as sealing the stats to the CTA
-   above rather than floating as its own separate block */
+/* the rule seals the stats to the block above rather than letting them float
+   as a separate stack — equal 24px breathing room on both sides of it */
 .hero-stats{
-  display:flex; gap: 42px; flex-wrap:wrap;
-  padding-top: 22px; border-top: 1px solid rgba(255,255,255,.18);
+  display:flex; gap: 40px; flex-wrap:wrap;
+  padding-top: 24px; border-top: 1px solid var(--border);
 }
 .stat{ text-align:left; }
 .stat-num, .stat-suffix{
@@ -717,10 +731,10 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .product-badge.status{ right: 9px; }
 
   .hero{ padding: 48px 0 56px; }
-  .hero-stats{ gap: 30px; }
+  .hero-stats{ gap: 32px; }
   .footer-top{ grid-template-columns: 1fr; }
   .btn-lg{ width:100%; padding: 14px 24px; font-size: 0.95rem; }
-  .hero-cta{ flex-direction:column; align-items:stretch; gap: 12px; margin-bottom: 34px; }
+  .hero-cta{ flex-direction:column; align-items:stretch; gap: 16px; margin-bottom: 24px; }
 
   /* footer runs very tall stacked on mobile — tighten every gap in the
      chain so it reads as one compact column instead of a scroll marathon */
