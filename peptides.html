@@ -77,12 +77,28 @@
       <span class="eyebrow">The Catalog</span>
     </div>
 
-    <div class="filter-row reveal" id="filterRow">
-      <button class="chip active" data-filter="all">All</button>
-      <button class="chip" data-filter="growth">Growth</button>
-      <button class="chip" data-filter="recovery">Recovery</button>
-      <button class="chip" data-filter="cognitive">Cognitive</button>
-      <button class="chip" data-filter="metabolic">Metabolic</button>
+    <div class="catalog-controls reveal">
+      <div class="filter-row" id="filterRow">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="growth">Growth</button>
+        <button class="chip" data-filter="recovery">Recovery</button>
+        <button class="chip" data-filter="cognitive">Cognitive</button>
+        <button class="chip" data-filter="metabolic">Metabolic</button>
+      </div>
+
+      <div class="sort-field">
+        <select id="sortSelect" class="sort-select" aria-label="Sort compounds" aria-controls="productGrid">
+          <option value="featured">Featured</option>
+          <option value="az">A &rarr; Z</option>
+          <option value="za">Z &rarr; A</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="purity">Purity: High to Low</option>
+        </select>
+        <svg class="sort-caret" width="12" height="12" viewBox="0 0 16 16" fill="none"
+             stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5 8 10.5 12 6.5"/></svg>
+      </div>
     </div>
 
     <div class="product-grid" id="productGrid">
@@ -186,9 +202,14 @@
   /* the cart badge and drawer live in js/cart.js */
 
   /* ---------- catalog grid + filters ---------- */
+  /* category and sort narrow/order the same list rather than resetting each
+     other, so picking "Recovery" keeps whatever sort is selected */
   const grid = document.getElementById('productGrid');
-  function renderProducts(filter) {
-    renderProductGrid(grid, filter, { observeReveal });
+  const sortSelect = document.getElementById('sortSelect');
+  let activeFilter = 'all';
+
+  function renderProducts() {
+    renderProductGrid(grid, activeFilter, { observeReveal, sort: sortSelect.value });
   }
 
   const chips = document.querySelectorAll('#filterRow .chip');
@@ -200,19 +221,22 @@
       });
       chip.classList.add('active');
       chip.setAttribute('aria-pressed', 'true');
-      renderProducts(chip.dataset.filter);
+      activeFilter = chip.dataset.filter;
+      renderProducts();
     });
   });
 
+  sortSelect.addEventListener('change', renderProducts);
+
   /* honour ?cat=growth|recovery|cognitive|metabolic from footer/nav links */
   const requestedCat = new URLSearchParams(window.location.search).get('cat');
-  const initial = [...chips].find(c => c.dataset.filter === requestedCat) ? requestedCat : 'all';
+  activeFilter = [...chips].find(c => c.dataset.filter === requestedCat) ? requestedCat : 'all';
   chips.forEach(c => {
-    const on = c.dataset.filter === initial;
+    const on = c.dataset.filter === activeFilter;
     c.classList.toggle('active', on);
     c.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
-  renderProducts(initial);
+  renderProducts();
 </script>
 </body>
 </html>

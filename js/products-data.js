@@ -145,6 +145,19 @@ GLOW_PRODUCTS.forEach(p => {
   p.price = p.sizes[0].price;
 });
 
+// Sort comparators for the catalog's sort control. Keyed so the <option>
+// values and the sorting logic can't drift apart. 'featured' is deliberately
+// absent — no comparator means the curated GLOW_PRODUCTS order stands.
+// Names are compared with localeCompare + numeric so GLP3-RT and CJC-1295
+// order by their digits rather than lexically ("CJC-1295" before "CJC-295").
+const PRODUCT_SORTS = {
+  az:          (a, b) => a.name.localeCompare(b.name, 'en', { numeric: true }),
+  za:          (a, b) => b.name.localeCompare(a.name, 'en', { numeric: true }),
+  'price-asc': (a, b) => a.price - b.price,
+  'price-desc':(a, b) => b.price - a.price,
+  purity:      (a, b) => parseFloat(b.purity) - parseFloat(a.purity),
+};
+
 // Mock bulk-quantity tiers for the quick-add modal. WooCommerce will supply
 // real variant IDs/pricing later; this just needs to look and feel right.
 const QTY_TIERS = [
@@ -196,6 +209,10 @@ function productThumb(name) {
 // filter: 'all' or a category key
 // opts.observeReveal(el): optional, hooks each card into a scroll-reveal observer
 // opts.limit: optional, render at most this many cards
+// opts.sort: optional key from PRODUCT_SORTS. Omitted leaves the curated
+//   order in GLOW_PRODUCTS alone, which is what the homepage preview wants —
+//   its limit:8 slice is meant to be the featured eight, not the first eight
+//   alphabetically.
 function renderProductGrid(gridEl, filter, opts) {
   opts = opts || {};
   gridEl.innerHTML = '';
@@ -209,6 +226,11 @@ function renderProductGrid(gridEl, filter, opts) {
     gridEl.appendChild(empty);
     return;
   }
+
+  const compare = PRODUCT_SORTS[opts.sort];
+  // slice() so sorting a view never reorders GLOW_PRODUCTS itself — the
+  // curated order has to survive for every other caller
+  if (compare) list = list.slice().sort(compare);
 
   if (opts.limit) list = list.slice(0, opts.limit);
   list.forEach((p, i) => {
