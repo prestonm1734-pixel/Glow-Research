@@ -794,7 +794,15 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .product-badge.status{ right: 9px; }
 
   .hero{ padding: 48px 0 56px; }
-  .hero-stats{ gap: 32px; }
+  /* keep all three stats on a single row. The compliance captions are longer
+     than the old ones ("Lots Third-Party Tested" vs "Batches Tested"), which
+     wrapped the third stat onto its own line — so the row is pinned to nowrap
+     and each stat takes an equal share, letting its caption wrap inside its
+     own column instead of pushing a sibling down. */
+  .hero-stats{ gap: 14px; flex-wrap: nowrap; align-items: flex-start; }
+  .stat{ flex: 1 1 0; min-width: 0; }
+  .stat-num, .stat-suffix{ font-size: 1.5rem; }
+  .stat p{ font-size: .6rem; letter-spacing: .04em; line-height: 1.35; }
   .footer-top{ grid-template-columns: 1fr; }
   .btn-lg{ width:100%; padding: 14px 24px; font-size: 0.95rem; }
   .hero-cta{ flex-direction:column; align-items:stretch; gap: 16px; margin-bottom: 24px; }
