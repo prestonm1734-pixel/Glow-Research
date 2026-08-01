@@ -236,7 +236,7 @@
     $('pdPrice').textContent = money(s.price);
     $('pdVialMg').textContent = s.mg.toUpperCase();
     $('pdVialFine').innerHTML =
-      `${product.purity} Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.com`;
+      `${product.purity} Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.shop`;
 
     document.title = `${product.name} ${s.mg} | Glow Research`;
     const desc = document.querySelector('meta[name="description"]');
