@@ -1640,3 +1640,64 @@ body.search-locked{ overflow:hidden; }
   .cart-drawer{ transition:none; }
   .cart-ship-bar span{ transition:none; }
 }
+
+/* ---------- age / RUO gate ----------
+   First-visit only; acceptance is remembered in localStorage. Sits above the
+   cart drawer and search overlay (z-index 300–340) so nothing can surface
+   over it, and locks the page behind it from scrolling. */
+.age-gate{
+  position: fixed; inset: 0; z-index: 400;
+  display: flex; align-items: center; justify-content: center;
+  padding: 28px 24px;
+  background: #000;
+  overflow-y: auto;
+  transition: opacity .25s ease;
+}
+.age-gate.is-going{ opacity: 0; pointer-events: none; }
+html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
+
+.age-gate-panel{
+  width: 100%; max-width: 520px; margin: auto;
+  text-align: center;
+}
+.age-gate-logo{
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 2rem; font-weight: 600; color: var(--text);
+  display: inline-flex; align-items: center; gap: 3px;
+  margin-bottom: 26px;
+}
+/* .spark is near-black for the light header; on this overlay it needs the
+   same inversion the footer logo gets */
+.age-gate-logo .spark{ font-size: .62em; color: var(--text); }
+.age-gate-eyebrow{
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72rem; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--text-dimmer); margin-bottom: 16px;
+}
+.age-gate-title{
+  font-size: clamp(1.6rem, 5.4vw, 2.1rem);
+  font-weight: 700; color: var(--text);
+  letter-spacing: -.03em; margin: 0 0 20px;
+}
+.age-gate-copy{
+  font-size: 1rem; line-height: 1.65; color: var(--text-dim);
+  margin: 0 0 32px;
+}
+.age-gate-copy a{ color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+
+/* full-width stacked buttons, matching the reference layout */
+.age-gate .btn{ width: 100%; justify-content: center; }
+.age-gate-enter{ padding: 16px 24px; font-size: 1rem; }
+.age-gate-exit{ margin-top: 12px; padding: 15px 24px; color: var(--text-dim); }
+.age-gate-exit:hover{ color: var(--text); }
+
+@media (max-width: 480px){
+  .age-gate-logo{ font-size: 1.75rem; margin-bottom: 20px; }
+  .age-gate-copy{ font-size: .94rem; margin-bottom: 26px; }
+}
+@media (prefers-reduced-motion: reduce){
+  .age-gate{ transition: none; }
+}
+/* the panel is only a focus target, never an outlined control */
+.age-gate-panel:focus{ outline: none; }
