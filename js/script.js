@@ -40,11 +40,9 @@ renderProducts('all');
 /* ---------- FAQ ---------- */
 const faqs = [
   { q: 'Are Glow Research peptides intended for human consumption?', a: 'No. All products sold by Glow Research are strictly for laboratory and in-vitro research use only. They are not drugs, supplements, foods, or cosmetics. They have not been evaluated or approved by the FDA for any use, and they are not intended to diagnose, treat, cure, or prevent any disease. They are not for human or animal use of any kind.' },
-  { q: 'Does Glow Research manufacture these peptides?', a: 'No. Glow Research is a retailer. We do not manufacture, synthesise, compound, or repackage any product we sell, and we do not operate a laboratory. Synthesis and fill are performed by a US-based partner facility, testing is performed by an independent third-party laboratory, and orders are picked, packed, and shipped by our fulfilment partner. Our role is sourcing, qualifying suppliers, and standing behind the documentation that comes with each lot.' },
   { q: 'Why are Glow Research peptides priced the way they are?', a: 'Our pricing reflects what goes into every lot at the facilities behind it: US-based production held to cGMP-aligned quality practices, and independent third-party lab testing on every lot. Peptides priced well below market are almost always cutting one of those corners, and we would rather hold the standard than the lowest price.' },
   { q: 'Can I get a lot’s COA before I order?', a: 'Yes. Email support@glowresearch.shop with the compound and quantity you’re considering and we’ll send the current lot’s certificate before you buy, not just after. Certificates are issued by the independent laboratory that performed the analysis, not by us.' },
   { q: 'How fast do orders ship?', a: 'Orders placed before 2PM EST are dispatched the same business day from our fulfilment partner’s US-based, climate-controlled facility, with tracking provided within 24 hours.' },
-  { q: 'What if my order arrives damaged or improperly packed?', a: 'Email us within 48 hours with photos of the packaging and the affected vials, and we’ll replace them at no cost.' },
   { q: 'Do you ship internationally?', a: 'No. Orders are shipped within the United States only, to verified research institutions and qualified buyers.' },
 ];
 const faqList = document.getElementById('faqList');
