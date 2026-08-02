@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- set before first paint: every scroll-reveal below starts hidden and
+     needs the observer to show it, so without scripting the page must
+     opt out of hiding rather than opt in to showing -->
+<script>document.documentElement.classList.add('js');</script>
+<title>Affiliate Program | Glow Research</title>
+<meta name="description" content="Earn commission referring qualified research buyers to Glow Research. 60-day attribution, monthly payouts, no therapeutic claims." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  /* Same lp-* landing system as Wholesale and Shipping. Only the form and the
+     commission table are page-specific. */
+  .af-form{ max-width: 560px; margin: clamp(40px, 5vw, 58px) 0 0; }
+  .af-field{ margin-bottom: 16px; }
+  .af-field label{
+    display:block; margin-bottom:8px; font-family:'JetBrains Mono', monospace;
+    font-size:.68rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+    color: var(--text-dimmer);
+  }
+  .af-field input, .af-field select, .af-field textarea{
+    width:100%; padding: 14px 16px; border-radius: 0;
+    border:1px solid var(--border); background: var(--surface); color: var(--text);
+    font-family:inherit; font-size:1rem;
+    transition: border-color .18s ease, background .18s ease;
+  }
+  .af-field textarea{ resize:vertical; min-height: 96px; }
+  .af-field input::placeholder, .af-field textarea::placeholder{ color:#5a5a58; }
+  .af-field input:hover, .af-field select:hover, .af-field textarea:hover{ border-color: rgba(255,255,255,.32); }
+  .af-field input:focus, .af-field select:focus, .af-field textarea:focus{
+    outline:none; border-color:#fff; background: var(--surface-2);
+  }
+  .af-field input:focus-visible, .af-field select:focus-visible, .af-field textarea:focus-visible{
+    outline: 2px solid #fff; outline-offset: 2px;
+  }
+  .af-field select{ appearance:none; cursor:pointer; padding-right: 44px; }
+  .af-selwrap{ position:relative; }
+  .af-chev{
+    position:absolute; right:16px; top:50%; transform: translateY(-50%);
+    pointer-events:none; color: var(--text-dimmer);
+    transition: transform .32s var(--lp-ease), color .2s ease;
+  }
+  .af-selwrap:focus-within .af-chev{ transform: translateY(-50%) rotate(180deg); color:#fff; }
+  .af-field:focus-within label{ color:#fff; }
+  .af-check{ display:flex; gap:11px; align-items:flex-start; margin-top: 22px; font-size:.92rem; color: var(--text-dim); cursor:pointer; }
+  .af-check input{ width:17px; height:17px; flex-shrink:0; margin:2px 0 0; accent-color:#fff; }
+  .af-submit{ margin-top: 26px; }
+  .af-msg{ margin-top: 18px; font-size:.94rem; color: var(--text); }
+
+  /* commission tiers */
+  .af-tiers{ width:100%; border-collapse:collapse; margin-top: clamp(28px, 4vw, 38px); }
+  .af-tiers th, .af-tiers td{
+    text-align:left; padding: 15px 12px; border-bottom:1px solid var(--border); font-size:.96rem;
+  }
+  .af-tiers th{
+    font-family:'JetBrains Mono', monospace; font-size:.64rem; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase; color: var(--text-dimmer);
+  }
+  .af-tiers td:first-child{ color: var(--text); font-weight:600; }
+  .af-tiers td:last-child, .af-tiers th:last-child{ text-align:right; }
+  .af-rate{ font-family:'Space Grotesk',sans-serif; font-size:1.15rem; font-weight:700; color:#fff; }
+
+  /* how attribution works, as numbered steps */
+  .af-steps{ counter-reset: afstep; list-style:none; margin: clamp(28px,4vw,38px) 0 0; padding:0; }
+  .af-step{
+    counter-increment: afstep; position:relative; padding: 0 0 26px 52px;
+    border-left:1px solid var(--border); margin-left: 13px;
+  }
+  .af-step:last-child{ border-left-color: transparent; padding-bottom:0; }
+  .af-step::before{
+    content: counter(afstep); position:absolute; left:-13px; top:-2px;
+    width:26px; height:26px; display:grid; place-items:center;
+    background:#fff; color:#0a0a0a; border-radius:50%;
+    font-family:'JetBrains Mono', monospace; font-size:.7rem; font-weight:700;
+  }
+  .af-step h3{ font-size:1.02rem; margin:0 0 6px; letter-spacing:-.01em; }
+  .af-step p{ margin:0; font-size:.95rem; color: var(--text-dim); }
+  .af-step code{
+    font-family:'JetBrains Mono', monospace; font-size:.86rem; color:#fff;
+    background: rgba(255,255,255,.08); padding: 2px 6px;
+  }
+
+  .af-rules{ margin: clamp(28px,4vw,38px) 0 0; padding:0; list-style:none; max-width: 62ch; }
+  .af-rules li{
+    position:relative; padding: 0 0 12px 22px; font-size:.96rem; color: var(--text-dim); line-height:1.6;
+  }
+  .af-rules li::before{ content:'—'; position:absolute; left:0; color: var(--text-dimmer); }
+  .af-rules strong{ color: var(--text); font-weight:600; }
+</style>
+</head>
+<body>
+
+<!-- first-visit age / RUO gate. Loaded here, not with the other
+     scripts at the foot of the page, so the overlay is in the DOM
+     before anything behind it paints. -->
+<script src="js/age-gate.js"></script>
+
+<div class="marquee-bar">
+  <div class="marquee-track">
+    <span>FOR LABORATORY &amp; RESEARCH USE ONLY</span><i class="star-bullet">✦</i>
+    <span>THIRD-PARTY LAB TESTED</span><i class="star-bullet">✦</i>
+    <span>COA ON EVERY BATCH</span><i class="star-bullet">✦</i>
+    <span>FREE SHIPPING OVER $400</span><i class="star-bullet">✦</i>
+    <span>SAME-DAY SHIPPING</span><i class="star-bullet">✦</i>
+  </div>
+</div>
+
+<header class="site-header" id="siteHeader">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo" aria-label="Glow Research home">Glow<span class="spark">✦</span></a>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="peptides.html">Peptides</a>
+      <a href="shipping.html">Shipping</a>
+      <a href="wholesale.html">Wholesale</a>
+      <a href="about.html">About Us</a>
+      <div class="nav-group">
+        <button type="button" class="nav-group-btn" aria-expanded="false" aria-controls="navResources">
+          Resources
+          <svg class="nav-caret" width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5 8 10.5 12 6.5"/></svg>
+        </button>
+        <div class="nav-menu" id="navResources" hidden>
+          <a href="blog.html">Research Blog</a>
+          <a href="calculator.html">Peptide Calculator</a>
+          <a href="contact.html">Contact Us</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="nav-icon-btn" id="searchToggle" aria-label="Search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+      <a href="signin.html" class="nav-icon-btn nav-signin">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        <span class="nav-signin-label">Sign In</span>
+      </a>
+      <button class="nav-icon-btn nav-cart" aria-label="Cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+        <span class="nav-cart-badge" data-count="0">0</span>
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="lp-page">
+
+<section class="lp-hero">
+  <div class="container">
+    <span class="lp-eyebrow">Affiliate Program</span>
+    <h1>Refer labs.<br /><span class="outline">Earn on every order.</span></h1>
+    <p class="lp-lede">
+      For researchers, educators and lab suppliers whose audience already buys
+      research peptides. You send qualified buyers, we handle the rest.
+    </p>
+    <p class="lp-hero-note">
+      <span class="lp-dot" aria-hidden="true"></span>
+      Applications answered in <strong>one business day</strong>
+    </p>
+    <div class="lp-actions">
+      <a href="#apply" class="btn btn-primary btn-lg">Apply to the program <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+    </div>
+
+    <div class="lp-figs">
+      <div class="lp-fig"><b><span data-count="10">10</span>%</b><span>Starting commission</span></div>
+      <div class="lp-fig"><b><span data-count="60">60</span> days</b><span>Attribution window</span></div>
+      <div class="lp-fig"><b>Monthly</b><span>Payouts</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section tint">
+  <div class="container">
+    <span class="eyebrow">How it works</span>
+    <h2 class="lp-h2">From click to payout.</h2>
+    <p class="lp-sub">No dashboard gymnastics. A link, a window, a monthly transfer.</p>
+
+    <ol class="af-steps reveal">
+      <li class="af-step">
+        <h3>You get a code and a link</h3>
+        <p>On approval your account issues a code — <code>GLOW-XXXXXX</code> — and a link
+           in the form <code>glowresearch.shop/?ref=GLOW-XXXXXX</code>. Point it at any
+           page on the site; the code travels regardless of where it lands.</p>
+      </li>
+      <li class="af-step">
+        <h3>The click is credited for 60 days</h3>
+        <p>We record the code in the visitor's browser and strip it back out of the
+           address bar. Any order they place in the next 60 days is credited to you,
+           on any device where that browser session persists. Last click wins if a
+           buyer arrives through more than one affiliate.</p>
+      </li>
+      <li class="af-step">
+        <h3>Commission clears after the return window</h3>
+        <p>Commission is calculated on the order subtotal, before shipping and tax.
+           It sits as <strong>pending</strong> for 30 days after delivery so refunds
+           and chargebacks can settle, then moves to <strong>approved</strong>.</p>
+      </li>
+      <li class="af-step">
+        <h3>Paid monthly, once you clear $50</h3>
+        <p>Approved commission is paid on the 1st of the month to PayPal or by ACH,
+           once the balance passes $50. Below that it rolls into the next month.
+           US affiliates paid $600 or more in a year get a 1099-NEC, so a W-9 is
+           collected at approval.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="lp-section">
+  <div class="container">
+    <span class="eyebrow">Commission</span>
+    <h2 class="lp-h2">Your rate climbs with volume.</h2>
+    <p class="lp-sub">Reviewed each quarter against the trailing three months.</p>
+
+    <table class="af-tiers reveal">
+      <thead>
+        <tr><th>Tier</th><th>Referred revenue per month</th><th>Commission</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Standard</td><td>Up to $2,500</td><td><span class="af-rate">10%</span></td></tr>
+        <tr><td>Partner</td><td>$2,500 to $10,000</td><td><span class="af-rate">12.5%</span></td></tr>
+        <tr><td>Lab</td><td>$10,000 and above</td><td><span class="af-rate">15%</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="lp-section tint">
+  <div class="container">
+    <span class="eyebrow">The rules</span>
+    <h2 class="lp-h2">What gets an account closed.</h2>
+    <p class="lp-sub">Short list, strictly enforced. Read it before you apply.</p>
+
+    <ul class="af-rules reveal">
+      <li><strong>No therapeutic claims.</strong> You may not promote these compounds as
+          treating, curing, preventing or improving any condition, and you may not
+          publish dosing guidance or human protocols. This is the fastest way to lose
+          an account, and it is the one rule we do not give warnings on.</li>
+      <li><strong>Research audiences only.</strong> No promotion to consumers looking for
+          personal use, and no placement in weight-loss, bodybuilding or wellness
+          contexts that imply human consumption.</li>
+      <li><strong>No paid search on our brand.</strong> Bidding on "Glow Research" or
+          close variants competes with us for traffic we already have.</li>
+      <li><strong>No self-referral.</strong> Commission on your own orders is reversed.</li>
+      <li><strong>No coupon-site listing</strong> of codes you were not given for that
+          purpose, and no unsolicited email.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="lp-section" id="apply">
+  <div class="container">
+    <span class="eyebrow">Apply</span>
+    <h2 class="lp-h2">Join the program.</h2>
+    <p class="lp-sub">Tell us where you would be sharing. We review every application by hand.</p>
+
+    <form class="af-form reveal" id="afForm">
+      <div class="af-field">
+        <label for="afName">Name</label>
+        <input type="text" id="afName" name="name" placeholder="Dr. Jane Okafor" required />
+      </div>
+      <div class="af-field">
+        <label for="afEmail">Email</label>
+        <input type="email" id="afEmail" name="email" placeholder="jane@lab.com" required />
+      </div>
+      <div class="af-field">
+        <label for="afSite">Where you will share</label>
+        <input type="url" id="afSite" name="site" placeholder="https://your-site.com or a channel URL" required />
+      </div>
+      <div class="af-field">
+        <label for="afAudience">Audience</label>
+        <div class="af-selwrap">
+          <select id="afAudience" name="audience" required>
+            <option value="">Select the closest fit</option>
+            <option>Academic or institutional researchers</option>
+            <option>Independent research lab</option>
+            <option>Lab supply or equipment reseller</option>
+            <option>Scientific publication or newsletter</option>
+            <option>Other</option>
+          </select>
+          <svg class="af-chev" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5 8 10.5 12 6.5"/></svg>
+        </div>
+      </div>
+      <div class="af-field">
+        <label for="afReach">Monthly reach</label>
+        <div class="af-selwrap">
+          <select id="afReach" name="reach" required>
+            <option value="">Select a range</option>
+            <option>Under 1,000</option>
+            <option>1,000 to 10,000</option>
+            <option>10,000 to 50,000</option>
+            <option>50,000 or more</option>
+          </select>
+          <svg class="af-chev" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5 8 10.5 12 6.5"/></svg>
+        </div>
+      </div>
+      <div class="af-field">
+        <label for="afNotes">Anything else</label>
+        <textarea id="afNotes" name="notes" placeholder="How you plan to introduce us to your audience."></textarea>
+      </div>
+
+      <label class="af-check">
+        <input type="checkbox" id="afAgree" required />
+        <span>I have read the rules above and agree not to make therapeutic claims,
+              publish dosing guidance, or promote these products for human use.</span>
+      </label>
+
+      <button type="submit" class="btn btn-primary btn-lg af-submit">
+        Submit application <span class="lp-arrow" aria-hidden="true">&rarr;</span>
+      </button>
+      <p class="af-msg" id="afMsg" role="status"></p>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo">Glow<span class="spark">✦</span></a>
+        <div class="footer-legal">
+          <strong>Glow Nutrition LLC</strong>
+          <span>10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States</span>
+          <span>&copy; <span id="stubYear"></span> Glow Research. All rights reserved.</span>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="peptides.html?cat=growth">Growth</a>
+        <a href="peptides.html?cat=recovery">Recovery</a>
+        <a href="peptides.html?cat=cognitive">Cognitive</a>
+        <a href="peptides.html?cat=metabolic">Metabolic</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="about.html">About Us</a>
+        <a href="shipping.html">Shipping</a>
+        <a href="wholesale.html">Wholesale</a>
+        <a href="affiliate.html">Affiliate</a>
+        <a href="blog.html">Research Blog</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="contact.html">Contact</a>
+        <a href="shipping.html">Shipping Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <h5>Research Use Only Disclaimer</h5>
+      <p>
+        All products sold by Glow Research are intended <strong>strictly for in-vitro laboratory research and
+        experimental use only</strong>. These products are <strong>not dietary supplements, drugs, food, or
+        cosmetics</strong>, and are not intended for human or animal consumption, treatment, diagnosis, cure, or
+        prevention of any disease or condition. Products must be handled only by licensed, qualified researchers
+        and professionals trained in laboratory safety practices. By purchasing from Glow Research, you certify
+        that you are at least 21 years of age, are a qualified professional or researcher, and that any and all
+        products purchased will be used solely for laboratory research purposes in accordance with all applicable
+        local, state, and federal laws. Glow Research is a retailer only: we do not manufacture, synthesise,
+        compound, repackage, or test any product sold on this site. Manufacturing is performed by a
+        third-party facility, analysis by an independent third-party laboratory, and order fulfilment by a
+        third-party partner. Glow Research makes no claims as to the safety or efficacy of these
+        compounds for human use and assumes no liability for misuse. Statements on this website have not been
+        evaluated by the Food and Drug Administration (FDA). Glow Research does not sell to, and reserves the
+        right to refuse service to, anyone attempting to purchase for personal consumption. All sales are final
+        on opened or reconstituted materials. This website and its contents are for informational purposes only
+        and do not constitute medical advice.
+      </p>
+    </div>
+
+    <div class="footer-bottom">
+      <p>Not for human consumption. For laboratory research use only.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('stubYear').textContent = new Date().getFullYear();
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  const hamburger = document.getElementById('hamburger');
+  const mainNav = document.getElementById('mainNav');
+  hamburger.addEventListener('click', () => {
+    mainNav.classList.toggle('open');
+    hamburger.classList.toggle('open');
+  });
+  mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mainNav.classList.remove('open')));
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => {
+    header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
+  });
+
+  /* Application form. UI only for now, same as the newsletter signup: it
+     confirms to the visitor. Wire it to a real endpoint when the wholesale
+     desk has one.
+
+     Submitting swaps the form for a confirmation rather than appending a
+     line under the button, since the form has done its job by then. The
+     panel carries role="status", so the swap is announced rather than just
+     seen. */
+  (function () {
+    const form = document.getElementById('wsForm');
+    const done = document.getElementById('wsDone');
+    if (!form || !done) return;
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function show() {
+      form.hidden = true;
+      done.hidden = false;
+      if (still) { done.classList.add('is-in'); return; }
+      // one frame with the panel laid out but not yet marked, so the
+      // transition has a start value to run from
+      requestAnimationFrame(() => requestAnimationFrame(() => done.classList.add('is-in')));
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      form.reset();
+      if (still) { show(); return; }
+      form.classList.add('is-gone');
+      setTimeout(show, 300);
+    });
+  })();
+</script>
+<script src="js/products-data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/cart-modal.js"></script>
+<script src="js/search.js"></script>
+<script src="js/account.js"></script>
+<script>
+  document.getElementById('afForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!document.getElementById('afAgree').checked) return;
+    // No application endpoint yet, same position as the wholesale form and
+    // checkout. Say so rather than implying it was filed.
+    document.getElementById('afMsg').textContent =
+      'Details captured. Applications are not being received automatically yet — email support@glowresearch.shop and we will set you up.';
+  });
+</script>
+<script src="js/referral.js"></script>
+</body>
+</html>

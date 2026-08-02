@@ -226,8 +226,12 @@
 
     $('coForm').addEventListener('submit', e => {
       e.preventDefault();
+      // the referral code rides along with the order so the backend can credit
+      // it. Attribution is decided here, at the point of sale, not later.
+      const ref = window.GlowReferral ? window.GlowReferral.code() : null;
       $('coPlacedMsg').textContent =
-        'Details captured. Payment is not connected yet, so no order was placed and no card was charged.';
+        'Details captured. Payment is not connected yet, so no order was placed and no card was charged.' +
+        (ref ? ' Referral ' + ref + ' would be credited on this order.' : '');
       $('coPlacedMsg').scrollIntoView({ block: 'center', behavior: 'smooth' });
     });
   });
