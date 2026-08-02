@@ -665,6 +665,13 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .product-card h3{ font-size: 1.15rem; margin: 4px 0 10px; color:#fff; }
 .price{ display:block; font-family:'Space Grotesk',sans-serif; font-size:1.2rem; color:#fff; font-weight:600; margin-bottom:14px; }
 .price span{ font-size:0.72rem; color: #8a8a86; font-family:'Inter',sans-serif; font-weight:400; }
+/* the struck list price sits a step back from the live one — dimmer, lighter
+   and a size down, so the eye lands on what you actually pay */
+.price-was{
+  font-size:0.85rem; font-weight:400; color:#6f6f6c;
+  text-decoration-thickness: 1px; margin-right:7px;
+}
+.search-row-meta s{ color:#6f6f6c; margin-right:4px; }
 
 /* white on the card's black footer, flips to the reverse on hover — the same
    invert every button on the site does, plus a lift so the hover has a

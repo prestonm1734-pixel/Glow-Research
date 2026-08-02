@@ -96,7 +96,7 @@
 
   function rowHtml(item, i) {
     const onSale = item.unitOriginal > item.unitSale;
-    const off = onSale ? Math.round((1 - item.unitSale / item.unitOriginal) * 100) : 0;
+    const off = bulkSavingPct(item.unitOriginal, item.unitSale);
     return `
       <div class="cart-row" data-i="${i}">
         <span class="cart-thumb">${typeof productThumb === 'function' ? productThumb(item.name) : '<span class="vial"></span>'}</span>
@@ -122,7 +122,7 @@
             <div class="cart-row-price">
               ${onSale ? `<span class="cart-was">${money(item.unitOriginal * item.qty)}</span>` : ''}
               <span class="cart-now">${money(item.unitSale * item.qty)}</span>
-              ${onSale ? `<span class="cart-off">Save ${off}%</span>` : ''}
+              ${off ? `<span class="cart-off">Save ${off}%</span>` : ''}
             </div>
           </div>
         </div>

@@ -158,6 +158,32 @@ const PRODUCT_SORTS = {
   purity:      (a, b) => parseFloat(b.purity) - parseFloat(a.purity),
 };
 
+// ---------------------------------------------------------------------------
+// Sitewide markdown. The figures in `sizes` above stay the list price — this is
+// the single knob that discounts them, so display and what actually gets
+// charged can never drift apart. Set to 0 to take the sale down.
+//
+// Every price the buyer sees runs through salePrice(); every cart line carries
+// the list price as unitOriginal and the marked-down one as unitSale, which is
+// what the cart and checkout already total against.
+const SITEWIDE_DISCOUNT = 0.10;
+
+const round2 = n => Math.round(n * 100) / 100;
+const salePrice = n => round2(n * (1 - SITEWIDE_DISCOUNT));
+const onSaleNow = () => SITEWIDE_DISCOUNT > 0;
+// whole dollars stay clean ($59), marked-down ones keep their cents ($53.10)
+const fmtPrice = n => '$' + (Number.isInteger(n) ? n : n.toFixed(2));
+
+// "Save N%" badges are for bulk tiers only. The sitewide markdown is not
+// advertised anywhere — the struck-through list price is the whole signal — so
+// a line saving exactly the sitewide rate gets no badge, and one saving more
+// (because a bulk tier stacked on top) reports the combined figure.
+function bulkSavingPct(original, sale) {
+  if (!(original > sale)) return 0;
+  const pct = Math.round((1 - sale / original) * 100);
+  return pct > Math.round(SITEWIDE_DISCOUNT * 100) ? pct : 0;
+}
+
 // Mock bulk-quantity tiers for the quick-add modal. WooCommerce will supply
 // real variant IDs/pricing later; this just needs to look and feel right.
 const QTY_TIERS = [
@@ -172,7 +198,9 @@ function getProductVariants(p, unitPrice) {
   const unit = unitPrice || p.price;
   return QTY_TIERS.map(t => {
     const original = t.qty * unit;
-    const sale = Math.round(original * (1 - t.off));
+    // the sitewide markdown comes off first, then the bulk tier stacks on it,
+    // so `original` stays the true list price for the struck-through figure
+    const sale = round2(original * (1 - SITEWIDE_DISCOUNT) * (1 - t.off));
     return { label: t.label, qty: t.qty, original, sale };
   });
 }
@@ -249,7 +277,10 @@ function renderProductGrid(gridEl, filter, opts) {
       <div class="product-footer">
         <h3><a href="${href}">${p.name}</a></h3>
         <span class="card-divider" aria-hidden="true"></span>
-        <span class="price">$${p.price} <span>/ vial</span></span>
+        <span class="price">
+          ${onSaleNow() ? `<s class="price-was">${fmtPrice(p.price)}</s>` : ''}
+          ${fmtPrice(salePrice(p.price))} <span>/ vial</span>
+        </span>
         <button class="add-btn" aria-label="Add ${p.name} to research order">Add to Cart</button>
       </div>
     `;

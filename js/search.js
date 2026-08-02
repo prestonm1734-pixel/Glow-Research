@@ -44,7 +44,9 @@
         <span class="search-thumb">${productThumb(p.name)}</span>
         <span class="search-row-copy">
           <span class="search-row-name">${p.name}</span>
-          <span class="search-row-meta">${p.tag} &middot; $${p.price}</span>
+          <span class="search-row-meta">${p.tag} &middot; ${onSaleNow()
+            ? `<s>${fmtPrice(p.price)}</s> ${fmtPrice(salePrice(p.price))}`
+            : fmtPrice(p.price)}</span>
         </span>
         <svg class="search-row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

@@ -233,7 +233,11 @@
   function renderSelection() {
     const s = size();
 
-    $('pdPrice').textContent = money(s.price);
+    // list price struck through beside the marked-down one; unitSale below has
+    // to agree with what is rendered here or the cart charges a different figure
+    $('pdPrice').innerHTML = onSaleNow()
+      ? `<s class="pd-price-was">${money(s.price)}</s>${money(salePrice(s.price))}`
+      : money(s.price);
     $('pdVialMg').textContent = s.mg.toUpperCase();
     $('pdVialFine').innerHTML =
       `${product.purity} Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.shop`;
@@ -276,7 +280,7 @@
         variant: s.mg,
         qty,
         unitOriginal: s.price,
-        unitSale: s.price,
+        unitSale: salePrice(s.price),
       });
     };
 
@@ -301,7 +305,7 @@
 
     wrap.innerHTML = variants.map((v, i) => {
       const onSale = v.original > v.sale;
-      const off = onSale ? Math.round((1 - v.sale / v.original) * 100) : 0;
+      const off = bulkSavingPct(v.original, v.sale);
       const best = i === variants.length - 1;
       return `
         <button type="button" class="pd-tier${best ? ' is-best' : ''}" data-i="${i}">
@@ -311,7 +315,7 @@
           <span class="pd-tier-price">${money(v.sale)}</span>
           ${onSale ? `<span class="pd-tier-was">${money(v.original)}</span>` : ''}
           <span class="pd-tier-per">${money(v.sale / v.qty)} / vial</span>
-          ${onSale ? `<span class="pd-tier-off">Save ${off}%</span>` : ''}
+          ${off ? `<span class="pd-tier-off">Save ${off}%</span>` : ''}
         </button>`;
     }).join('');
 

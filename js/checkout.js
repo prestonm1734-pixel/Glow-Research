@@ -58,7 +58,7 @@
 
     $('coItems').innerHTML = items.map(i => {
       const onSale = i.unitOriginal > i.unitSale;
-      const off = onSale ? Math.round((1 - i.unitSale / i.unitOriginal) * 100) : 0;
+      const off = bulkSavingPct(i.unitOriginal, i.unitSale);
       return `
         <div class="co-item">
           <span class="co-thumb">${productThumb(i.name)}</span>
@@ -69,7 +69,7 @@
           <div class="co-item-price">
             ${onSale ? `<span class="co-was">${money(i.unitOriginal * i.qty)}</span>` : ''}
             <span class="co-now">${money(i.unitSale * i.qty)}</span>
-            ${onSale ? `<span class="co-off">Save ${off}%</span>` : ''}
+            ${off ? `<span class="co-off">Save ${off}%</span>` : ''}
           </div>
         </div>`;
     }).join('');
@@ -120,13 +120,14 @@
         <p class="co-item-meta">${pick.tag} &middot; ${pick.size}</p>
       </div>
       <div class="co-upsell-right">
-        <span class="co-now">$${pick.price.toFixed(2)}</span>
+        ${onSaleNow() ? `<s class="co-was">${money(pick.price)}</s>` : ''}
+        <span class="co-now">${money(salePrice(pick.price))}</span>
         <button type="button" class="co-add-btn" id="coAdd">Add</button>
       </div>`;
     $('coAdd').addEventListener('click', () => {
       window.GlowCart.add({
         name: pick.name, variant: '1 vial',
-        unitOriginal: pick.price, unitSale: pick.price,
+        unitOriginal: pick.price, unitSale: salePrice(pick.price),
       });
     });
   }
