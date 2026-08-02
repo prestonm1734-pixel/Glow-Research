@@ -17,41 +17,24 @@
 <style>
   /* Same lp-* landing system as Wholesale and Shipping. Only the form and the
      commission table are page-specific. */
-  .af-form{ max-width: 560px; margin: clamp(40px, 5vw, 58px) 0 0; }
-  .af-field{ margin-bottom: 16px; }
-  .af-field label{
-    display:block; margin-bottom:8px; font-family:'JetBrains Mono', monospace;
-    font-size:.68rem; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
-    color: var(--text-dimmer);
-  }
-  .af-field input, .af-field select, .af-field textarea{
-    width:100%; padding: 14px 16px; border-radius: 0;
-    border:1px solid var(--border); background: var(--surface); color: var(--text);
-    font-family:inherit; font-size:1rem;
-    transition: border-color .18s ease, background .18s ease;
-  }
-  .af-field textarea{ resize:vertical; min-height: 96px; }
-  .af-field input::placeholder, .af-field textarea::placeholder{ color:#5a5a58; }
-  .af-field input:hover, .af-field select:hover, .af-field textarea:hover{ border-color: rgba(255,255,255,.32); }
-  .af-field input:focus, .af-field select:focus, .af-field textarea:focus{
-    outline:none; border-color:#fff; background: var(--surface-2);
-  }
-  .af-field input:focus-visible, .af-field select:focus-visible, .af-field textarea:focus-visible{
-    outline: 2px solid #fff; outline-offset: 2px;
-  }
-  .af-field select{ appearance:none; cursor:pointer; padding-right: 44px; }
-  .af-selwrap{ position:relative; }
-  .af-chev{
-    position:absolute; right:16px; top:50%; transform: translateY(-50%);
-    pointer-events:none; color: var(--text-dimmer);
-    transition: transform .32s var(--lp-ease), color .2s ease;
-  }
-  .af-selwrap:focus-within .af-chev{ transform: translateY(-50%) rotate(180deg); color:#fff; }
-  .af-field:focus-within label{ color:#fff; }
-  .af-check{ display:flex; gap:11px; align-items:flex-start; margin-top: 22px; font-size:.92rem; color: var(--text-dim); cursor:pointer; }
-  .af-check input{ width:17px; height:17px; flex-shrink:0; margin:2px 0 0; accent-color:#fff; }
-  .af-submit{ margin-top: 26px; }
-  .af-msg{ margin-top: 18px; font-size:.94rem; color: var(--text); }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   /* commission tiers */
   .af-tiers{ width:100%; border-collapse:collapse; margin-top: clamp(28px, 4vw, 38px); }
@@ -261,64 +244,26 @@
   <div class="container">
     <span class="eyebrow">Apply</span>
     <h2 class="lp-h2">Join the program.</h2>
-    <p class="lp-sub">Tell us where you would be sharing. We review every application by hand.</p>
+    <p class="lp-sub">
+      Applying takes a minute and happens inside your Glow Research account &mdash; the same
+      place your link, referral stats and payouts live once you are approved.
+    </p>
 
-    <form class="af-form reveal" id="afForm">
-      <div class="af-field">
-        <label for="afName">Name</label>
-        <input type="text" id="afName" name="name" placeholder="Dr. Jane Okafor" required />
-      </div>
-      <div class="af-field">
-        <label for="afEmail">Email</label>
-        <input type="email" id="afEmail" name="email" placeholder="jane@lab.com" required />
-      </div>
-      <div class="af-field">
-        <label for="afSite">Where you will share</label>
-        <input type="url" id="afSite" name="site" placeholder="https://your-site.com or a channel URL" required />
-      </div>
-      <div class="af-field">
-        <label for="afAudience">Audience</label>
-        <div class="af-selwrap">
-          <select id="afAudience" name="audience" required>
-            <option value="">Select the closest fit</option>
-            <option>Academic or institutional researchers</option>
-            <option>Independent research lab</option>
-            <option>Lab supply or equipment reseller</option>
-            <option>Scientific publication or newsletter</option>
-            <option>Other</option>
-          </select>
-          <svg class="af-chev" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5 8 10.5 12 6.5"/></svg>
-        </div>
-      </div>
-      <div class="af-field">
-        <label for="afReach">Monthly reach</label>
-        <div class="af-selwrap">
-          <select id="afReach" name="reach" required>
-            <option value="">Select a range</option>
-            <option>Under 1,000</option>
-            <option>1,000 to 10,000</option>
-            <option>10,000 to 50,000</option>
-            <option>50,000 or more</option>
-          </select>
-          <svg class="af-chev" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5 8 10.5 12 6.5"/></svg>
-        </div>
-      </div>
-      <div class="af-field">
-        <label for="afNotes">Anything else</label>
-        <textarea id="afNotes" name="notes" placeholder="How you plan to introduce us to your audience."></textarea>
-      </div>
+    <div class="lp-actions" style="margin-top: clamp(28px, 4vw, 38px)">
+      <a href="signin.html?next=affiliate" class="btn btn-primary btn-lg">
+        Become an affiliate <span class="lp-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+      <a href="signin.html?next=affiliate" class="btn btn-outline btn-lg">
+        Already have an account? Sign in
+      </a>
+    </div>
 
-      <label class="af-check">
-        <input type="checkbox" id="afAgree" required />
-        <span>I have read the rules above and agree not to make therapeutic claims,
-              publish dosing guidance, or promote these products for human use.</span>
-      </label>
-
-      <button type="submit" class="btn btn-primary btn-lg af-submit">
-        Submit application <span class="lp-arrow" aria-hidden="true">&rarr;</span>
-      </button>
-      <p class="af-msg" id="afMsg" role="status"></p>
-    </form>
+    <ul class="af-rules" style="margin-top: clamp(30px,4vw,40px)">
+      <li>Create an account, or sign in to the one you have.</li>
+      <li>Open the <strong>Affiliate</strong> tab and tell us where you will be sharing.</li>
+      <li>We review by hand and answer within one business day. Your link and dashboard
+          appear in that same tab on approval.</li>
+    </ul>
   </div>
 </section>
 
@@ -445,16 +390,7 @@
 <script src="js/cart-modal.js"></script>
 <script src="js/search.js"></script>
 <script src="js/account.js"></script>
-<script>
-  document.getElementById('afForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!document.getElementById('afAgree').checked) return;
-    // No application endpoint yet, same position as the wholesale form and
-    // checkout. Say so rather than implying it was filed.
-    document.getElementById('afMsg').textContent =
-      'Details captured. Applications are not being received automatically yet — email support@glowresearch.shop and we will set you up.';
-  });
-</script>
+
 <script src="js/referral.js"></script>
 </body>
 </html>

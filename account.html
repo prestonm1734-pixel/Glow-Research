@@ -144,7 +144,6 @@
       <a href="peptides.html">Peptides</a>
       <a href="shipping.html">Shipping</a>
       <a href="wholesale.html">Wholesale</a>
-        <a href="affiliate.html">Affiliate</a>
       <a href="about.html">About Us</a>
       <div class="nav-group is-active">
         <button type="button" class="nav-group-btn" aria-expanded="false" aria-controls="navResources">
@@ -246,31 +245,13 @@
           </p>
         </section>
 
+        <!-- Three states, rendered by js/account.js: not yet applied, under
+             review, or approved. Showing a referral link and earnings to
+             everyone signed in implied every customer was already an affiliate. -->
         <section class="ac-panel" data-panel="affiliate" role="tabpanel" hidden>
           <h2>Affiliate</h2>
-          <p class="ac-panel-sub">Share your link. You earn <span id="acRefRate">10%</span> of every order it brings in.</p>
-
-          <div class="ac-card">
-            <label class="ac-eyebrow" for="acRefLink">Your referral link</label>
-            <div class="ac-ref-row">
-              <input type="text" id="acRefLink" readonly value="" aria-label="Your referral link" />
-              <button type="button" class="btn btn-primary" id="acRefCopy">Copy</button>
-            </div>
-
-            <div class="ac-stats">
-              <div class="ac-stat"><b id="acRefClicks">0</b><span>Clicks</span></div>
-              <div class="ac-stat"><b id="acRefSignups">0</b><span>Sign-ups</span></div>
-              <div class="ac-stat"><b id="acRefOrders">0</b><span>Orders</span></div>
-              <div class="ac-stat"><b id="acRefEarned">$0.00</b><span>Paid out</span></div>
-              <div class="ac-stat"><b id="acRefPending">$0.00</b><span>Pending</span></div>
-            </div>
-          </div>
-
-          <p class="ac-note">
-            <strong>Research buyers only.</strong> Referral links may not be promoted with
-            claims of human benefit, dosing guidance, or any therapeutic use. Accounts doing
-            so are closed and commission is withheld.
-          </p>
+          <p class="ac-panel-sub" id="acAffSub">&mdash;</p>
+          <div id="acAffBody"></div>
         </section>
 
         <section class="ac-panel" data-panel="details" role="tabpanel" hidden>
@@ -318,6 +299,7 @@
         <a href="about.html">About Us</a>
         <a href="shipping.html">Shipping</a>
         <a href="wholesale.html">Wholesale</a>
+        <a href="affiliate.html">Affiliate</a>
         <a href="blog.html">Research Blog</a>
       </div>
       <div class="footer-col">

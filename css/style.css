@@ -1701,3 +1701,22 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
 }
 /* the panel is only a focus target, never an outlined control */
 .age-gate-panel:focus{ outline: none; }
+
+/* affiliate application checkbox inside the account panel */
+.ac-agree{ display:flex; gap:11px; align-items:flex-start; margin-top:18px; font-size:.9rem; color:#55554f; cursor:pointer; }
+.ac-agree input{ width:17px; height:17px; flex-shrink:0; margin:2px 0 0; accent-color:#0a0a0a; }
+.ac-agree a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
+/* the account panels reuse the sign-in field styling */
+.ac-page .si-field{ margin-bottom:16px; }
+.ac-page .si-field label{
+  display:block; margin-bottom:8px; font-family:'JetBrains Mono', monospace;
+  font-size:.66rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#8a8a86;
+}
+.ac-page .si-field input, .ac-page .si-field select{
+  width:100%; padding:13px 15px; border-radius:0;
+  border:1px solid rgba(0,0,0,.22); background:#fff; color:#0a0a0a;
+  font-family:inherit; font-size:.96rem; transition: border-color .18s ease;
+}
+.ac-page .si-field select{ appearance:none; cursor:pointer; }
+.ac-page .si-field input:hover, .ac-page .si-field select:hover{ border-color: rgba(0,0,0,.45); }
+.ac-page .si-field input:focus, .ac-page .si-field select:focus{ outline:none; border-color:#0a0a0a; }
