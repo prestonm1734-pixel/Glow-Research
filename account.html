@@ -111,9 +111,23 @@
 
   @media (max-width: 760px){
     .ac-shell{ grid-template-columns: 1fr; }
-    .ac-nav{ flex-direction:row; overflow-x:auto; }
-    .ac-nav-btn{ border-bottom:none; border-right:1px solid rgba(0,0,0,.1); white-space:nowrap; }
-    .ac-nav-btn:last-child{ border-right:none; }
+    /* A horizontal scroll strip hid Affiliate and Details off the right edge
+       with nothing to suggest they were there. Wrap instead, so every tab is
+       on screen — same gapless grid as .ac-stats. */
+    .ac-nav{
+      display:grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+      gap:1px; background: rgba(0,0,0,.16); border:1px solid rgba(0,0,0,.16);
+    }
+    .ac-nav-btn{
+      border:none; background:#fff; text-align:center; padding: 13px 10px;
+      font-size:.86rem;
+    }
+    .ac-nav-btn.is-on{ background:#0a0a0a; color:#fff; }
+    /* these grids are two columns here, so an odd number of cells leaves the
+       container's background showing through as an empty grey box — let the
+       last one span instead */
+    .ac-nav-btn:last-child:nth-child(odd),
+    .ac-stats > :last-child:nth-child(odd){ grid-column: 1 / -1; }
     .ac-head-meta{ text-align:left; }
     .ac-head-meta button{ margin-left:0; }
   }
