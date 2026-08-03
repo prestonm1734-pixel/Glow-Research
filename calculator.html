@@ -9,8 +9,8 @@
 
 
 <script>document.documentElement.classList.add('js');</script>
-<title>Peptide Reconstitution Calculator | Glow Research</title>
-<meta name="description" content="Work out concentration, draw volume and aliquots per vial from the mass in the vial and the diluent you add. For laboratory research use only." />
+<title>Peptide Concentration Calculator | Glow Research</title>
+<meta name="description" content="Work out concentration from the mass in the vial and the diluent you add. For laboratory research use only." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -103,33 +103,6 @@
   }
   .cl-warn[hidden]{ display:none; }
 
-  /* the syringe: a visual read on where the draw lands on a 100-unit barrel */
-  .cl-syringe{ margin-top: 26px; padding-top: 22px; border-top:1px solid rgba(0,0,0,.14); }
-  .cl-syringe-label{
-    display:block; font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:700;
-    letter-spacing:.14em; text-transform:uppercase; color:#8a8a86; margin-bottom: 14px;
-  }
-  .cl-syringe-track{
-    position:relative; height: 22px; background:#f2f2f0; border:1.5px solid #0a0a0a;
-  }
-  .cl-syringe-fill{
-    position:absolute; inset:0; width:0%; background:#0a0a0a;
-    transition: width .25s var(--lp-ease, ease);
-  }
-  .cl-syringe-ticks{ position:absolute; inset:0; display:flex; }
-  .cl-syringe-ticks span{
-    flex:1; border-right:1px solid rgba(255,255,255,.35); position:relative;
-  }
-  .cl-syringe-ticks span:last-child{ border-right:none; }
-  .cl-syringe-ticks span.is-major::after{
-    content:''; position:absolute; right:-1px; top:0; bottom:0; width:1px; background:rgba(255,255,255,.7);
-  }
-  .cl-syringe-scale{
-    display:flex; justify-content:space-between; margin-top: 6px;
-    font-family:'JetBrains Mono', monospace; font-size:.7rem; color:#8a8a86;
-  }
-  .cl-syringe-overflow .cl-syringe-fill{ background: repeating-linear-gradient(135deg, #0a0a0a, #0a0a0a 6px, #45453f 6px, #45453f 12px); }
-
   .cl-notes{ border-top:1px solid rgba(0,0,0,.12); padding: clamp(40px, 5vw, 60px) 0 clamp(60px, 8vw, 90px); }
   .cl-notes h2{ font-size: clamp(1.4rem, 2.4vw, 1.8rem); letter-spacing:-.03em; margin: 0 0 18px; color:#0a0a0a; }
   .cl-notes-grid{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: clamp(24px, 4vw, 48px); max-width: 74ch; }
@@ -212,10 +185,10 @@
 <section class="cl-hero">
   <div class="container">
     <span class="cl-eyebrow">Resources</span>
-    <h1>Reconstitution calculator.</h1>
+    <h1>Concentration calculator.</h1>
     <p class="cl-lede">
-      Enter what is in the vial and how much diluent you are adding. Concentration,
-      draw volume and aliquots per vial update as you type.
+      Enter what is in the vial and how much diluent you are adding. Concentration
+      updates as you type.
     </p>
   </div>
 </section>
@@ -242,41 +215,12 @@
         <p class="cl-hint">Bacteriostatic or sterile water drawn into the vial.</p>
         <p class="cl-err" id="clVolErr" role="alert" hidden></p>
       </div>
-
-      <div class="cl-field" id="clAliField">
-        <label for="clAli">Target per aliquot</label>
-        <div class="cl-input">
-          <input type="number" id="clAli" inputmode="decimal" step="any" min="0" value="250" />
-          <span class="cl-unit" aria-hidden="true">mcg</span>
-        </div>
-        <p class="cl-hint">How much compound you want in each aliquot you draw.</p>
-        <p class="cl-err" id="clAliErr" role="alert" hidden></p>
-      </div>
     </form>
 
     <aside class="cl-out" aria-live="polite">
       <span class="cl-out-label">Concentration</span>
       <p class="cl-big" id="clConc">2.50<small>mg / mL</small></p>
       <p class="cl-alt" id="clConcAlt">2,500 mcg per mL</p>
-
-      <dl class="cl-rows">
-        <div class="cl-row"><dt>Draw for one aliquot</dt><dd id="clDraw">0.10 mL</dd></div>
-        <div class="cl-row"><dt>On a U-100 syringe</dt><dd id="clUnits">10.0 units</dd></div>
-        <div class="cl-row"><dt>Aliquots per vial</dt><dd id="clCount">20</dd></div>
-      </dl>
-
-      <div class="cl-syringe" id="clSyringe" aria-hidden="true">
-        <span class="cl-syringe-label">U-100 syringe</span>
-        <div class="cl-syringe-track">
-          <div class="cl-syringe-fill" id="clSyringeFill"></div>
-          <div class="cl-syringe-ticks" id="clSyringeTicks"></div>
-        </div>
-        <div class="cl-syringe-scale">
-          <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
-        </div>
-      </div>
-
-      <p class="cl-warn" id="clWarn" hidden></p>
     </aside>
   </div>
 </section>
@@ -290,23 +234,19 @@
         <p>Mass divided by diluent volume: <code>5 mg / 2 mL = 2.5 mg/mL</code>. Adding diluent does not change how much compound is in the vial, only how much liquid it is spread through.</p>
       </div>
       <div class="cl-note">
-        <h3>Draw volume</h3>
-        <p>Target amount divided by concentration. Because the target is in micrograms, the concentration is converted first: <code>250 mcg / 2500 mcg/mL = 0.1 mL</code>.</p>
+        <h3>Net peptide content</h3>
+        <p>The vial's stated mass includes counterions and residual moisture, so actual peptide content can run lower than the label figure. Check your certificate of analysis for a net content value where one is reported.</p>
       </div>
       <div class="cl-note">
-        <h3>Syringe units</h3>
-        <p>A U-100 insulin syringe is marked in hundredths of a millilitre, so <code>1 mL = 100 units</code>. The unit figure is just the draw volume multiplied by 100.</p>
-      </div>
-      <div class="cl-note">
-        <h3>Aliquots per vial</h3>
-        <p>Total mass divided by the target amount, rounded down. Reconstituted material has a much shorter working life than the lyophilized powder, so plan the whole vial before you open it.</p>
+        <h3>Shelf life after reconstitution</h3>
+        <p>Reconstituted material has a much shorter working life than the lyophilized powder. Refrigerate, protect from light, and do not refreeze a thawed solution.</p>
       </div>
     </div>
 
     <p class="cl-ruo">
       This tool does arithmetic on the numbers you enter. It is not a protocol, and nothing
-      here suggests a quantity to use. Confirm every calculation against your own experimental
-      design and the certificate of analysis for your lot.
+      here suggests a quantity to use or how to administer it. Confirm every calculation
+      against your own experimental design and the certificate of analysis for your lot.
       <strong>For laboratory research use only. Not for human or animal consumption.</strong>
     </p>
   </div>
@@ -388,27 +328,12 @@
     const fields = [
       { input: $('clMass'), wrap: $('clMassField'), err: $('clMassErr'), name: 'Peptide mass' },
       { input: $('clVol'),  wrap: $('clVolField'),  err: $('clVolErr'),  name: 'Diluent volume' },
-      { input: $('clAli'),  wrap: $('clAliField'),  err: $('clAliErr'),  name: 'Target per aliquot' },
     ];
     if (fields.some(f => !f.input)) return;
 
-    const out = { conc: $('clConc'), alt: $('clConcAlt'), draw: $('clDraw'), units: $('clUnits'), count: $('clCount'), warn: $('clWarn') };
-    const syringe = { box: $('clSyringe'), fill: $('clSyringeFill'), ticks: $('clSyringeTicks') };
-    if (syringe.ticks) {
-      for (let i = 0; i < 20; i++) {
-        const tick = document.createElement('span');
-        if (i % 5 === 0) tick.classList.add('is-major');
-        syringe.ticks.appendChild(tick);
-      }
-    }
+    const out = { conc: $('clConc'), alt: $('clConcAlt') };
     const num = n => n.toLocaleString('en-US');
     const dash = '&mdash;';
-    // fixed decimals, then strip the padding: 0.100 reads as 0.1, but 0.025
-    // has to keep both places
-    const trim = (n, dp) => {
-      const s = n.toFixed(dp);
-      return s.includes('.') ? s.replace(/\.?0+$/, '') : s;
-    };
 
     function check(f) {
       const raw = f.input.value.trim();
@@ -424,54 +349,21 @@
     }
 
     function render() {
-      const [mass, vol, target] = fields.map(check);
+      const [mass, vol] = fields.map(check);
 
       // a zero or empty field would otherwise produce Infinity or NaN and
       // print it straight into the answer
-      if (mass === null || vol === null || target === null) {
+      if (mass === null || vol === null) {
         out.conc.innerHTML = dash;
-        out.alt.textContent = 'Enter all three values.';
-        out.draw.innerHTML = dash;
-        out.units.innerHTML = dash;
-        out.count.innerHTML = dash;
-        out.warn.hidden = true;
-        if (syringe.fill) {
-          syringe.fill.style.width = '0%';
-          syringe.box.classList.remove('cl-syringe-overflow');
-        }
+        out.alt.textContent = 'Enter both values.';
         return;
       }
 
       const mcg = mass * 1000;
       const mcgPerMl = mcg / vol;
-      const drawMl = target / mcgPerMl;
 
       out.conc.innerHTML = (mcgPerMl / 1000).toFixed(2) + '<small>mg / mL</small>';
       out.alt.textContent = num(Math.round(mcgPerMl)) + ' mcg per mL';
-      out.draw.textContent = trim(drawMl, drawMl < 0.01 ? 4 : 3) + ' mL';
-      const units = drawMl * 100;
-      out.units.textContent = units.toFixed(1) + ' units';
-
-      if (syringe.fill) {
-        const overflow = units > 100;
-        syringe.box.classList.toggle('cl-syringe-overflow', overflow);
-        syringe.fill.style.width = Math.min(units, 100) + '%';
-      }
-
-      // a partial aliquot is not an aliquot, so this floors rather than rounds
-      const count = Math.floor(mcg / target);
-      out.count.textContent = count > 0 ? num(count) : 'less than one';
-
-      /* The arithmetic is happy to say "draw 10 mL" out of a 2 mL vial. It
-         is right and useless: the target is simply more compound than the
-         vial holds, and the fix is a different target or less diluent. */
-      const over = drawMl > vol;
-      out.warn.hidden = !over;
-      if (over) {
-        out.warn.textContent =
-          'That aliquot needs ' + trim(drawMl, 2) + ' mL, but the vial only holds ' + vol +
-          ' mL. The whole vial is ' + num(mcg) + ' mcg, so lower the target or add less diluent.';
-      }
     }
 
     fields.forEach(f => f.input.addEventListener('input', render));
