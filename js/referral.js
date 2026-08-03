@@ -9,7 +9,7 @@
 // getting paid. See AFFILIATE.md for how the two halves meet.
 (function () {
   var KEY = 'glow-ref';
-  var WINDOW_DAYS = 30;          // how long a click stays credited
+  var WINDOW_DAYS = 60;          // how long a click stays credited
   var DAY = 24 * 60 * 60 * 1000;
 
   function read() {
