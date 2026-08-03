@@ -1645,26 +1645,41 @@ body.search-locked{ overflow:hidden; }
    First-visit only; acceptance is remembered in localStorage. Sits above the
    cart drawer and search overlay (z-index 300–340) so nothing can surface
    over it, and locks the page behind it from scrolling. */
+/* A dimmed, blurred backdrop rather than solid black: the site stays visible
+   behind the dialog, so it reads as a gate over the page instead of a wall
+   in front of it. */
 .age-gate{
   position: fixed; inset: 0; z-index: 400;
   display: flex; align-items: center; justify-content: center;
-  padding: 28px 24px;
-  background: #000;
+  padding: 24px 20px;
+  background: rgba(6,6,6,.68);
+  -webkit-backdrop-filter: blur(14px) saturate(.85);
+          backdrop-filter: blur(14px) saturate(.85);
   overflow-y: auto;
   transition: opacity .25s ease;
 }
 .age-gate.is-going{ opacity: 0; pointer-events: none; }
 html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
 
+/* the panel carries its own surface now, since the backdrop is see-through */
 .age-gate-panel{
-  width: 100%; max-width: 520px; margin: auto;
+  width: 100%; max-width: 380px; margin: auto;
   text-align: center;
+  background: rgba(12,12,12,.94);
+  border: 1px solid rgba(255,255,255,.16);
+  padding: 30px 26px 26px;
+  box-shadow: 0 40px 90px -28px rgba(0,0,0,.95);
+  animation: ageGateIn .3s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes ageGateIn{
+  from{ opacity:0; transform: translateY(10px) scale(.98); }
+  to{ opacity:1; transform:none; }
 }
 .age-gate-logo{
   font-family: 'Fraunces', Georgia, serif;
-  font-size: 2rem; font-weight: 600; color: var(--text);
+  font-size: 1.45rem; font-weight: 600; color: var(--text);
   display: inline-flex; align-items: center; gap: 3px;
-  margin-bottom: 26px;
+  margin-bottom: 16px;
 }
 /* .spark is near-black for the light header; on this overlay it needs the
    same inversion the footer logo gets */
@@ -1672,32 +1687,33 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
 .age-gate-eyebrow{
   display: block;
   font-family: 'JetBrains Mono', monospace;
-  font-size: .72rem; letter-spacing: .22em; text-transform: uppercase;
-  color: var(--text-dimmer); margin-bottom: 16px;
+  font-size: .6rem; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--text-dimmer); margin-bottom: 10px;
 }
 .age-gate-title{
-  font-size: clamp(1.6rem, 5.4vw, 2.1rem);
+  font-size: clamp(1.2rem, 4.4vw, 1.4rem);
   font-weight: 700; color: var(--text);
-  letter-spacing: -.03em; margin: 0 0 20px;
+  letter-spacing: -.02em; line-height: 1.2; margin: 0 0 12px;
 }
 .age-gate-copy{
-  font-size: 1rem; line-height: 1.65; color: var(--text-dim);
-  margin: 0 0 32px;
+  font-size: .84rem; line-height: 1.6; color: var(--text-dim);
+  margin: 0 0 22px;
 }
 .age-gate-copy a{ color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
 
 /* full-width stacked buttons, matching the reference layout */
 .age-gate .btn{ width: 100%; justify-content: center; }
-.age-gate-enter{ padding: 16px 24px; font-size: 1rem; }
-.age-gate-exit{ margin-top: 12px; padding: 15px 24px; color: var(--text-dim); }
+.age-gate-enter{ padding: 13px 22px; font-size: .92rem; }
+.age-gate-exit{ margin-top: 9px; padding: 12px 22px; font-size: .88rem; color: var(--text-dim); }
 .age-gate-exit:hover{ color: var(--text); }
 
 @media (max-width: 480px){
-  .age-gate-logo{ font-size: 1.75rem; margin-bottom: 20px; }
-  .age-gate-copy{ font-size: .94rem; margin-bottom: 26px; }
+  .age-gate-panel{ padding: 26px 22px 22px; }
+  .age-gate-copy{ font-size: .82rem; }
 }
 @media (prefers-reduced-motion: reduce){
   .age-gate{ transition: none; }
+  .age-gate-panel{ animation: none; }
 }
 /* the panel is only a focus target, never an outlined control */
 .age-gate-panel:focus{ outline: none; }
