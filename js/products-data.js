@@ -88,7 +88,7 @@ const GLOW_PRODUCTS = [
     ] },
   { name: 'GLP3-RT', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', badge:null,
     sizes: [{ mg: '10mg', price: 129 }, { mg: '20mg', price: 219 }],
-    image: 'assets/products/tirzepatide-vial.webp',
+    image: 'assets/products/glp3-rt-vial.webp',
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
     about: [
       'GLP3-RT is a dual receptor co-agonist peptide, active at both the GIP and the GLP-1 receptor from a single molecule.',
@@ -267,7 +267,7 @@ function renderProductGrid(gridEl, filter, opts) {
     card.className = 'product-card reveal';
     card.style.transitionDelay = `${(i % 3) * 60}ms`;
     card.innerHTML = `
-      <a class="product-visual" href="${href}">
+      <a class="product-visual${p.image ? ' has-photo' : ''}" href="${href}">
         <span class="product-badge cat">${p.cat}</span>
         ${p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
         ${p.image

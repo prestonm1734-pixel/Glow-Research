@@ -584,6 +584,12 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   height:100%; width:100%; object-fit:contain; padding: 2% 0;
   mix-blend-mode: multiply;
 }
+/* …except when the shot carries its own studio backdrop rather than pure
+   white. Multiplying that over the tile's gradient prints a darker square
+   inside the frame, so the tile matches the backdrop and the photo lands
+   flat on it instead. */
+.product-visual.has-photo{ background:#ebebeb; }
+.product-visual.has-photo .product-photo{ mix-blend-mode: normal; }
 /* the small square thumb used by search, the cart drawer and checkout — they
    all share the same light gradient tile, so one rule covers all three */
 .thumb-photo{
