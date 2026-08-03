@@ -52,7 +52,7 @@
         items: [{ name: 'GLP3-RT', variant: '10mg', qty: 1, lot: 'G9-3364' },
                 { name: 'TB-500', variant: '5mg', qty: 1, lot: 'T5-2210' }] },
     ],
-    referral: { code: 'GLOW-R4417', rate: 10, clicks: 84, signups: 11, orders: 6, earned: 128.40, pending: 42.10 },
+    referral: { code: 'GLOW-R4417', firstRate: 20, rate: 10, clicks: 84, signups: 11, orders: 6, earned: 128.40, pending: 42.10 },
   };
 
   var REWARDS = [
@@ -248,9 +248,9 @@
     body.innerHTML = '' +
       '<div class="ac-card">' +
         '<div class="ac-stats" style="margin-bottom:18px">' +
-          '<div class="ac-stat"><b>10%</b><span>Starting commission</span></div>' +
-          '<div class="ac-stat"><b>60 days</b><span>Attribution window</span></div>' +
-          '<div class="ac-stat"><b>Monthly</b><span>Payouts</span></div>' +
+          '<div class="ac-stat"><b>20%</b><span>First order</span></div>' +
+          '<div class="ac-stat"><b>10%</b><span>Lifetime recurring</span></div>' +
+          '<div class="ac-stat"><b>30 days</b><span>Attribution window</span></div>' +
         '</div>' +
         '<form id="acAffForm">' +
           '<div class="si-field"><label for="acAffSite">Where you will share</label>' +
@@ -302,7 +302,8 @@
 
   function affApproved(d, body, sub) {
     var r = d.referral;
-    sub.innerHTML = 'Share your link. You earn <strong>' + r.rate + '%</strong> of every order it brings in.';
+    sub.innerHTML = 'Share your link. You earn <strong>' + r.firstRate + '%</strong> on a buyer\'s ' +
+      'first order and <strong>' + r.rate + '%</strong> on every order after, for life.';
     body.innerHTML = '' +
       '<div class="ac-card">' +
         '<label class="ac-eyebrow" for="acRefLink">Your referral link</label>' +

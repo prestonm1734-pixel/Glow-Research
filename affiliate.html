@@ -8,7 +8,7 @@
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
 <title>Affiliate Program | Glow Research</title>
-<meta name="description" content="Earn commission referring qualified research buyers to Glow Research. 60-day attribution, monthly payouts, no therapeutic claims." />
+<meta name="description" content="Earn 20% on a referred buyer's first order and 10% on every order after, for life. 30-day attribution, monthly payouts, no therapeutic claims." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,6 +48,9 @@
   .af-tiers td:first-child{ color: var(--text); font-weight:600; }
   .af-tiers td:last-child, .af-tiers th:last-child{ text-align:right; }
   .af-rate{ font-family:'Space Grotesk',sans-serif; font-size:1.15rem; font-weight:700; color:#fff; }
+  .af-note{
+    margin: 20px 0 0; max-width: 62ch; font-size:.94rem; line-height:1.65; color: var(--text-dim);
+  }
 
   /* how attribution works, as numbered steps */
   .af-steps{ counter-reset: afstep; list-style:none; margin: clamp(28px,4vw,38px) 0 0; padding:0; }
@@ -84,6 +87,13 @@
   /* the numbered marker picks up as you read down the column */
   .af-step::before{ transition: transform .32s var(--lp-ease); }
   .af-step:hover::before{ transform: scale(1.12); }
+
+  /* three columns squeeze the middle one into two-word ribbons on a phone.
+     Drop it — the note under the table already says what each row covers. */
+  @media (max-width: 620px){
+    .af-tiers th:nth-child(2), .af-tiers td:nth-child(2){ display:none; }
+    .af-tiers th, .af-tiers td{ padding: 15px 4px; }
+  }
 </style>
 </head>
 <body>
@@ -163,9 +173,9 @@
     </div>
 
     <div class="lp-figs">
-      <div class="lp-fig"><b><span data-count="10">10</span>%</b><span>Starting commission</span></div>
-      <div class="lp-fig"><b><span data-count="60">60</span> days</b><span>Attribution window</span></div>
-      <div class="lp-fig"><b>Monthly</b><span>Payouts</span></div>
+      <div class="lp-fig"><b><span data-count="20">20</span>%</b><span>First order</span></div>
+      <div class="lp-fig"><b><span data-count="10">10</span>%</b><span>Lifetime recurring</span></div>
+      <div class="lp-fig"><b><span data-count="30">30</span> days</b><span>Attribution window</span></div>
     </div>
   </div>
 </section>
@@ -184,17 +194,19 @@
            page on the site; the code travels regardless of where it lands.</p>
       </li>
       <li class="af-step">
-        <h3>The click is credited for 60 days</h3>
+        <h3>The click is credited for 30 days</h3>
         <p>We record the code in the visitor's browser and strip it back out of the
-           address bar. Any order they place in the next 60 days is credited to you,
+           address bar. If they order within 30 days, that buyer is credited to you,
            on any device where that browser session persists. Last click wins if a
            buyer arrives through more than one affiliate.</p>
       </li>
       <li class="af-step">
-        <h3>Commission clears after the return window</h3>
+        <h3>20% on the first order, 10% on every one after</h3>
         <p>Commission is calculated on the order subtotal, before shipping and tax.
-           It sits as <strong>pending</strong> for 30 days after delivery so refunds
-           and chargebacks can settle, then moves to <strong>approved</strong>.</p>
+           Their first order pays <strong>20%</strong>; every repeat order they place
+           pays <strong>10%</strong> for as long as they keep buying. Each commission
+           sits as <strong>pending</strong> for 30 days after delivery so refunds and
+           chargebacks can settle, then moves to <strong>approved</strong>.</p>
       </li>
       <li class="af-step">
         <h3>Paid monthly, once you clear $50</h3>
@@ -210,19 +222,24 @@
 <section class="lp-section">
   <div class="container">
     <span class="eyebrow">Commission</span>
-    <h2 class="lp-h2">Your rate climbs with volume.</h2>
-    <p class="lp-sub">Reviewed each quarter against the trailing three months.</p>
+    <h2 class="lp-h2">Twenty on the first. Ten for life.</h2>
+    <p class="lp-sub">No tiers to climb and no monthly quota to hold.</p>
 
     <table class="af-tiers reveal">
       <thead>
-        <tr><th>Tier</th><th>Referred revenue per month</th><th>Commission</th></tr>
+        <tr><th>Order</th><th>What it covers</th><th>Commission</th></tr>
       </thead>
       <tbody>
-        <tr><td>Standard</td><td>Up to $2,500</td><td><span class="af-rate">10%</span></td></tr>
-        <tr><td>Partner</td><td>$2,500 to $10,000</td><td><span class="af-rate">12.5%</span></td></tr>
-        <tr><td>Lab</td><td>$10,000 and above</td><td><span class="af-rate">15%</span></td></tr>
+        <tr><td>First order</td><td>The first order a referred buyer places</td><td><span class="af-rate">20%</span></td></tr>
+        <tr><td>Every order after</td><td>All repeat orders from that buyer, for life</td><td><span class="af-rate">10%</span></td></tr>
       </tbody>
     </table>
+
+    <p class="af-note">
+      Once a buyer is credited to you, they stay credited to you. The 30-day window
+      decides who gets the customer &mdash; after that, every order they place keeps
+      earning without them needing to click your link again.
+    </p>
   </div>
 </section>
 
