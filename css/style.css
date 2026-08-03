@@ -802,7 +802,10 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 
   .hero{ padding: 48px 0 56px; }
   .hero-stats{ gap: 32px; }
-  .footer-top{ grid-template-columns: 1fr; }
+  /* the three link columns are short enough now to sit side by side rather
+     than stacking into one long list — the brand block takes its own row */
+  .footer-top{ grid-template-columns: repeat(3, 1fr); }
+  .footer-brand{ grid-column: 1 / -1; }
   .btn-lg{ width:100%; padding: 14px 24px; font-size: 0.95rem; }
   .hero-cta{ flex-direction:column; align-items:stretch; gap: 16px; margin-bottom: 24px; }
 
@@ -811,8 +814,11 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   .site-footer{ padding: 48px 0 24px; }
   .footer-newsletter{ padding: 20px 0; gap: 16px; }
   .newsletter-msg{ text-align:left; }
-  .footer-top{ gap: 32px; margin: 32px 0; }
-  .disclaimer{ padding: 22px 0; margin-bottom: 18px; }
+  .footer-top{ gap: 26px 14px; margin: 30px 0; }
+  /* the disclaimer is the tallest thing down here. Nothing is removed from
+     it — the leading just comes in so it takes fewer screens to scroll past. */
+  .disclaimer{ padding: 20px 0; margin-bottom: 16px; }
+  .disclaimer p{ line-height: 1.62; }
   .footer-legal-bar{ margin: 0 0 24px; padding: 14px 0; text-align:left; line-height: 1.7; }
   .footer-legal-bar .divider{ display:block; margin: 4px 0 0; width:0; overflow:hidden; }
   .footer-bottom{ justify-content:flex-start; text-align:left; }
