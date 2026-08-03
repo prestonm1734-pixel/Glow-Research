@@ -75,6 +75,15 @@
   }
   .af-rules li::before{ content:'—'; position:absolute; left:0; color: var(--text-dimmer); }
   .af-rules strong{ color: var(--text); font-weight:600; }
+
+  /* the tier a reader is comparing against lights up as they scan the table */
+  .af-tiers tbody tr{ transition: background .2s ease; }
+  .af-tiers tbody tr:hover{ background: rgba(255,255,255,.04); }
+  .af-tiers tbody tr:hover .af-rate{ color:#fff; }
+
+  /* the numbered marker picks up as you read down the column */
+  .af-step::before{ transition: transform .32s var(--lp-ease); }
+  .af-step:hover::before{ transform: scale(1.12); }
 </style>
 </head>
 <body>

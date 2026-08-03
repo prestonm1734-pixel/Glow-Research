@@ -45,7 +45,11 @@
   }
   .ct-email{
     display:inline-block; font-family:'Space Grotesk', sans-serif; font-weight:700;
-    font-size: clamp(1.6rem, 3.6vw, 2.2rem); letter-spacing:-.02em; color:#0a0a0a;
+    /* the 1.6rem floor was wider than a 390px screen once the card padding
+       was taken off, pushing the page 5px sideways — the address is long and
+       cannot wrap, so the floor has to come down instead */
+    font-size: clamp(1.2rem, 4.6vw, 2.2rem); letter-spacing:-.02em; color:#0a0a0a;
+    overflow-wrap: anywhere;
     text-decoration: underline; text-decoration-color: rgba(10,10,10,.28);
     text-underline-offset: 6px; transition: text-decoration-color .2s ease;
   }

@@ -131,7 +131,7 @@
 </header>
 
 <main class="si-page">
-  <div class="container si-wrap">
+  <div class="container si-wrap reveal">
     <span class="si-eyebrow">Account</span>
     <h1>Sign in to Glow Research</h1>
 
@@ -233,6 +233,15 @@
 
 <script>
   document.getElementById('stubYear').textContent = new Date().getFullYear();
+
+  /* Same scroll-reveal the rest of the site uses. These two pages had no
+     entrance motion at all, so they snapped in while every other page eased. */
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   const hamburger = document.getElementById('hamburger');
   const mainNav = document.getElementById('mainNav');
   hamburger.addEventListener('click', () => {

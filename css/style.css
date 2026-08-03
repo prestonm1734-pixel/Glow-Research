@@ -1720,3 +1720,17 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
 .ac-page .si-field select{ appearance:none; cursor:pointer; }
 .ac-page .si-field input:hover, .ac-page .si-field select:hover{ border-color: rgba(0,0,0,.45); }
 .ac-page .si-field input:focus, .ac-page .si-field select:focus{ outline:none; border-color:#0a0a0a; }
+
+/* ---------- very narrow phones ----------
+   At 320px the header actions ran past the viewport and clipped the
+   hamburger, so the menu could not be opened at all. The Sign In / Account
+   label is the widest non-essential thing in that row — the person icon
+   still carries the meaning — so it drops out and the row fits again. */
+@media (max-width: 359px){
+  .nav-signin-label{
+    position:absolute; width:1px; height:1px; overflow:hidden;
+    clip-path: inset(50%); white-space:nowrap;
+  }
+  .nav-actions{ gap: 7px; }
+  .nav-icon-btn{ padding: 9px; }
+}
