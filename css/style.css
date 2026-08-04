@@ -902,7 +902,14 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
    is not left half empty, and one clear step between a heading, its
    subhead and its detail.
    ===================================================================== */
-.lp-page{ background: var(--bg); color: var(--text); }
+.lp-page{
+  background: var(--bg); color: var(--text);
+  /* #6b6b69 is 3.7:1 on this background — under 4.5:1, and it carries the
+     smallest type on these pages (the "last updated" line, the clause
+     numbers, the card labels). Lifted here rather than on :root so the
+     homepage and the catalog keep the tone they were designed with. */
+  --text-dimmer: #8a8a87;
+}
 
 /* ---------- hero ----------
    Ranged left and stacked exactly like the homepage hero, down to the
