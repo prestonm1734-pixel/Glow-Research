@@ -8,7 +8,7 @@
 // window.openQuickAdd(product) is the entry point, called from
 // products-data.js when a card's "+" button is pressed.
 (function () {
-  let overlay, sheet, lastFocused;
+  let overlay, sheet, lastFocused, dismissTimer;
 
   function build() {
     overlay = document.createElement('div');
@@ -70,14 +70,22 @@
           unitSale: sale,
         });
       }
+      // The cart toast fires immediately from GlowCart.add() and sits at the
+      // bottom of the screen, i.e. on top of this sheet. Holding the sheet
+      // open to admire the tick just means the two overlap. So the tick is a
+      // flash at the point of the tap and the sheet starts leaving straight
+      // away — it stays visible through the .28s slide, and by the time it is
+      // gone the toast is standing on its own saying the same thing.
       el.classList.add('added');
-      setTimeout(() => el.classList.remove('added'), 1400);
+      clearTimeout(dismissTimer);
+      dismissTimer = setTimeout(close, 150);
     });
     return el;
   }
 
   function open(product) {
     if (!overlay) build();
+    clearTimeout(dismissTimer);
     lastFocused = document.activeElement;
 
     overlay.querySelector('#qaName').textContent = product.name;
@@ -87,14 +95,17 @@
     (product.sizes || []).forEach(sz => rowsEl.appendChild(row(product, sz)));
 
     overlay.classList.add('open');
-    document.body.classList.add('search-locked');
+    document.body.classList.add('search-locked', 'qa-open');
     setTimeout(() => overlay.querySelector('#qaClose').focus(), 30);
   }
 
   function close() {
     if (!overlay) return;
+    clearTimeout(dismissTimer);
     overlay.classList.remove('open');
-    document.body.classList.remove('search-locked');
+    // dropped here, at the start of the slide, so the toast fades in while
+    // the sheet is on its way out rather than after it has gone
+    document.body.classList.remove('search-locked', 'qa-open');
     if (lastFocused) lastFocused.focus();
   }
 

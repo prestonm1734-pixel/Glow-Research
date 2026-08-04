@@ -1536,6 +1536,12 @@ body.search-locked{ overflow:hidden; }
   transition: opacity .15s ease;      /* a plain fade, no slide or bounce */
 }
 .cart-toast.is-shown{ opacity:1; pointer-events:auto; }
+/* The toast lives at the bottom of the screen and so does the quick-add
+   sheet, and GlowCart.add() fires the toast in the same tick as the tap —
+   so without this the toast lands straddling a row of the sheet it was
+   triggered from. Held back until the sheet starts leaving, then it fades in
+   as the sheet slides out from under it. */
+body.qa-open .cart-toast{ opacity:0; pointer-events:none; }
 .cart-toast svg{ flex-shrink:0; color:#fff; }
 .cart-toast span{ font-size:.88rem; font-weight:600; white-space:nowrap; }
 .cart-toast-view{
