@@ -192,6 +192,36 @@
     }
   }
 
+  /* ---------- place-order button state ----------
+     A ring of eight ticks with staggered negative animation-delays, the
+     same spinner iOS and macOS use, rather than a spinning arc (that
+     reads as a web-app loader, not this site) or a bare "Placing your
+     order…" that never changes and looks stuck the moment the request
+     takes longer than an instant. */
+  const SPIN_TICKS = 8;
+  const SPIN_HTML = '<span class="co-spin" aria-hidden="true">' +
+    Array.from({ length: SPIN_TICKS }, (_, i) => {
+      const angle = i * (360 / SPIN_TICKS);
+      const delay = (i * (0.8 / SPIN_TICKS)).toFixed(3);
+      return `<i style="transform:rotate(${angle}deg) translate(0,-6px);animation-delay:-${delay}s"></i>`;
+    }).join('') +
+    '</span>';
+
+  // Crossfades the label so a status change reads as something happening
+  // rather than a flicker, and carries the spinner + aria-busy while a
+  // request is actually in flight.
+  function setPlaceBtn(btn, label, busy) {
+    if (!btn) return;
+    const labelEl = btn.querySelector('.co-place-label');
+    labelEl.style.opacity = '0';
+    setTimeout(() => {
+      labelEl.innerHTML = (busy ? SPIN_HTML : '') + '<span>' + label + '</span>';
+      labelEl.style.opacity = '1';
+    }, 120);
+    btn.disabled = !!busy;
+    btn.setAttribute('aria-busy', busy ? 'true' : 'false');
+  }
+
   /* ---------- wire up ---------- */
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -255,9 +285,8 @@
       const billAddr = null;
 
       const submitBtn = $('coForm').querySelector('button[type="submit"]');
-      if (submitBtn) submitBtn.disabled = true;
-      $('coPlacedMsg').textContent = 'Placing your order…';
-      $('coPlacedMsg').scrollIntoView({ block: 'center', behavior: 'smooth' });
+      setPlaceBtn(submitBtn, 'Placing your order…', true);
+      $('coPlacedMsg').textContent = '';
 
       try {
         const resp = await fetch('/api/create-order', {
@@ -281,6 +310,10 @@
         let accountMessage = '';
         let hasAccount = !!(window.localStorage && localStorage.getItem('glow-session'));
         if ($('coMakeAcct').checked) {
+          // a real second request, so it gets its own honest label rather
+          // than leaving "Placing your order…" up for a step it is not
+          // actually describing anymore
+          setPlaceBtn(submitBtn, 'Setting up your account…', true);
           const result = await createAccount($('coEmail').value, $('coPass').value, shipAddr);
           accountMessage = result.message;
           hasAccount = hasAccount || result.ok;
@@ -308,8 +341,9 @@
         location.href = 'thank-you.html';
         return;
       } catch (err) {
+        setPlaceBtn(submitBtn, 'Place order', false);
         $('coPlacedMsg').textContent = err.message || 'Something went wrong placing the order. Please try again.';
-        if (submitBtn) submitBtn.disabled = false;
+        $('coPlacedMsg').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       }
     });
   });

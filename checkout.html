@@ -120,6 +120,24 @@
   .co-terms input{ margin:0; width:17px; height:17px; flex-shrink:0; accent-color:#0a0a0a; margin-top:2px; }
   .co-terms a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:2px; }
   .co-place{ width:100%; justify-content:center; margin-top:24px; font-size:1rem; padding: 18px 24px; }
+  /* the label crossfades rather than jumping straight to new text, so a
+     status change reads as something happening rather than a flicker */
+  .co-place-label{ display:inline-flex; align-items:center; gap:10px; transition: opacity .12s ease; }
+  .co-place[disabled]{ cursor: progress; opacity:1; }
+  .co-place[disabled]:hover{ background:#0a0a0a; border-color:#0a0a0a; }
+  /* the iOS/macOS system spinner: eight ticks fading in sequence around a
+     ring, not a spinning arc — a rotating arc reads as a generic web-app
+     loader, this is the mark people actually associate with Apple */
+  .co-spin{ position:relative; width:16px; height:16px; flex-shrink:0; }
+  .co-spin i{
+    position:absolute; top:50%; left:50%; width:2px; height:5.5px;
+    margin:-2.75px 0 0 -1px; border-radius:1px; background:currentColor;
+    animation: coTick .8s linear infinite;
+  }
+  @keyframes coTick{ 0%{ opacity:1; } 100%{ opacity:.15; } }
+  @media (prefers-reduced-motion: reduce){
+    .co-spin i{ animation: none; opacity:.55; }
+  }
   .co-secure{
     display:flex; align-items:center; justify-content:center; gap:8px;
     margin: 16px 0 0; font-size:.84rem; color:#86868b;
@@ -365,7 +383,9 @@
               </span>
             </label>
 
-            <button type="submit" class="btn btn-primary co-place">Place order</button>
+            <button type="submit" class="btn btn-primary co-place">
+              <span class="co-place-label">Place order</span>
+            </button>
 
             <p class="co-secure">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="11" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg>
