@@ -7,7 +7,7 @@
 // history and points rather than starting a second empty account.
 
 import {
-  wc, findCustomerByEmail, metaValue, hashPassword, verifyPassword,
+  wc, wcConfig, findCustomerByEmail, metaValue, hashPassword, verifyPassword,
   makeToken, sessionCookie, readBody, isEmail,
 } from './_lib.js';
 
@@ -17,6 +17,14 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Checked before anything else touches WooCommerce. Signing the session is
+  // the last step of signing up, so leaving this to the catch below meant a
+  // misconfigured deploy created a real customer record and *then* failed —
+  // the account existed but nobody could ever be told they had it.
+  if (!process.env.SESSION_SECRET || !wcConfig()) {
+    return res.status(500).json({ error: 'Accounts are not configured yet.' });
   }
 
   const { action, email, password, name } = readBody(req);
@@ -39,9 +47,6 @@ export default async function handler(req, res) {
     if (action === 'login') return await signIn(res, cleanEmail, password);
     return res.status(400).json({ error: 'Unknown action.' });
   } catch (err) {
-    if (!process.env.SESSION_SECRET) {
-      return res.status(500).json({ error: 'Accounts are not configured yet.' });
-    }
     return res.status(502).json({ error: err.message || 'Could not reach the store.' });
   }
 }
