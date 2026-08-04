@@ -7,17 +7,17 @@
      needs the observer to show it, so without scripting the page must
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
-<title>Terms &amp; Conditions | Glow Research</title>
-<meta name="description" content="Terms of service for Glow Research: eligibility, research-use-only sales, shipping, returns, and the retailer relationship with our fulfilment partner." />
+<title>Privacy Policy | Glow Research</title>
+<meta name="description" content="How Glow Research collects, stores, and uses information — what's saved in your browser, what we don't track, and what changes once accounts and payment go live." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  /* Legal prose: narrower measure than the marketing lp-* sections, and
-     the number lives in the heading text itself rather than a counter
-     badge — this is a document to read in order, not a scannable list. */
+  /* Same legal-prose treatment as Terms & Conditions: narrower measure than
+     the marketing lp-* sections, number in the heading text rather than a
+     counter badge, read top to bottom. */
   .tc-body{ max-width: 68ch; }
   .tc-updated{
     display:block; margin-bottom: clamp(28px, 4vw, 40px);
@@ -35,6 +35,18 @@
   .tc-body strong{ color: var(--text); font-weight:600; }
   .tc-body a{ color: var(--text); text-decoration-color: var(--text-dimmer); text-underline-offset: 3px; }
   .tc-body a:hover{ text-decoration-color: var(--text); }
+  .tc-body code{
+    font-family:'JetBrains Mono', monospace; font-size:.86rem;
+    background: var(--bg-2); padding: 2px 6px; color: var(--text);
+  }
+
+  /* Same honesty pattern as checkout's payment-processor note and signin's
+     "accounts are not live yet" note — say plainly what isn't built. */
+  .tc-note{
+    margin: 0 0 1.4em; padding: 16px 18px; border:1px solid var(--border);
+    font-size:.9rem; line-height:1.65; color: var(--text-dim);
+  }
+  .tc-note strong{ color: var(--text); }
 </style>
 </head>
 <body>
@@ -100,9 +112,9 @@
 <section class="lp-hero">
   <div class="container">
     <span class="lp-eyebrow">Legal</span>
-    <h1>Terms &amp; Conditions</h1>
+    <h1>Privacy Policy</h1>
     <p class="lp-lede">
-      The agreement between you and Glow Research when you use this site or place an order.
+      What we collect, what we don't, and where your information actually lives.
     </p>
   </div>
 </section>
@@ -112,116 +124,104 @@
     <span class="tc-updated">Last updated August 2026</span>
 
     <p>
-      By accessing this website or purchasing from Glow Research, you agree to the terms below.
-      If you do not agree, please do not use the site or place an order.
+      This policy covers glowresearch.shop, operated by Glow Nutrition LLC. It describes
+      what information the site collects, how it's used, and what's stored only in your
+      own browser rather than sent to us.
     </p>
 
-    <h2>1. Eligibility</h2>
+    <h2>1. Information You Provide</h2>
     <p>
-      You must be at least 21 years old to browse or purchase from Glow Research. By using this
-      site, you confirm that you meet that age requirement and have the authority to enter into
-      this agreement, and that you are a qualified researcher or are purchasing on behalf of a
-      legitimate research institution or laboratory.
+      If you use the contact form, sign-up form, or checkout, you may give us your name,
+      email address, phone number, shipping and billing address, and company name. We use
+      this to respond to inquiries, process orders, and ship products.
     </p>
+    <div class="tc-note">
+      <strong>Accounts and checkout are not connected to a live backend yet.</strong>
+      Nothing typed into the sign-in or checkout forms today is transmitted, stored on a
+      server, or seen by anyone — the password field in particular is never read at all.
+      This policy will be updated with specifics once the account system and payment
+      processor go live, and we'll note the change here rather than update it quietly.
+    </div>
 
-    <h2>2. Research Use Only</h2>
+    <h2>2. Information Stored in Your Browser</h2>
     <p>
-      All products sold by Glow Research are supplied strictly for laboratory research use.
-      They are not drugs, dietary supplements, or medical devices, and are not sold for human
-      or animal consumption. By purchasing from Glow Research, you agree that:
+      Glow Research uses your browser's local storage, not tracking cookies, to remember
+      a small set of functional details on the device you're using:
     </p>
     <ul>
-      <li>You will not use these products for personal, diagnostic, therapeutic, or recreational purposes.</li>
-      <li>You understand the risks involved in handling research compounds and will handle them accordingly.</li>
-      <li>You will not resell, relabel, or represent these products as approved for human or veterinary use.</li>
+      <li><strong>Cart contents</strong> — what you've added, so it's still there if you reload the page.</li>
+      <li><strong>Age and RUO gate confirmation</strong> — so the entry screen doesn't reappear on every visit.</li>
+      <li><strong>Referral code</strong> — if you arrived through an affiliate link, which affiliate should be credited.</li>
+      <li><strong>Sample sign-in state</strong> — while the account system is a design preview, this is a placeholder value, not real authentication.</li>
     </ul>
     <p>
-      These statements have not been evaluated by the FDA. Glow Research products are not
-      intended to diagnose, treat, cure, or prevent any disease.
+      This information stays on your device. We do not receive it, sell it, or share it
+      with anyone. Clearing your browser's site data for glowresearch.shop removes all of it.
     </p>
 
-    <h2>3. Glow Research Is a Retailer</h2>
+    <h2>3. What We Don't Do</h2>
     <p>
-      Glow Research sells research compounds sourced from third-party manufacturers. We do not
-      manufacture the products listed on this site, and orders are picked, packed, and dispatched
-      on our behalf by a third-party fulfilment partner. Certificates of analysis for each lot
-      are provided by that supply chain, not generated by Glow Research.
+      Glow Research does not run third-party analytics, advertising pixels, or behavioral
+      tracking scripts. We don't sell or rent personal information to anyone, and we don't
+      build advertising profiles from your activity on this site.
     </p>
 
-    <h2>4. Limitation of Liability</h2>
+    <h2>4. Third-Party Services</h2>
     <p>
-      Glow Research is not liable for any damages, injuries, or losses arising from the misuse,
-      mishandling, or off-label use of products purchased through this site. Responsibility for
-      proper storage, handling, and research-use-only application rests with the buyer upon
-      receipt of the product.
+      A small number of outside services support the site:
+    </p>
+    <ul>
+      <li><strong>Google Fonts</strong> — typefaces are loaded from Google's servers, which
+        means your browser makes a request to Google when the page loads.</li>
+      <li><strong>Fulfilment partner</strong> — once an order is placed, your shipping details
+        are shared with the third-party partner who picks, packs, and dispatches it on our
+        behalf. See <a href="terms.html">Terms &amp; Conditions</a> for how that relationship works.</li>
+      <li><strong>Payment processor</strong> — when checkout is connected to a live payment
+        gateway, card details will be handled directly by that processor. Glow Research does
+        not store full card numbers.</li>
+    </ul>
+
+    <h2>5. Cookies</h2>
+    <p>
+      This site does not set tracking or advertising cookies. Any first-party cookie a
+      future payment or hosting provider requires for the checkout to function will be
+      disclosed here when checkout goes live.
     </p>
 
-    <h2>5. Order Acceptance &amp; Cancellations</h2>
+    <h2>6. Your Choices</h2>
     <p>
-      We reserve the right to refuse or cancel any order at our discretion, including where
-      misuse is suspected, where shipping restrictions apply, or where the information provided
-      at checkout is incomplete or incorrect.
+      You can clear everything the site has stored in your browser at any time through
+      your browser's settings — this removes your cart, age-gate confirmation, and referral
+      code. To ask about, correct, or delete information tied to an order, contact us using
+      the details below.
     </p>
 
-    <h2>6. Pricing &amp; Payment</h2>
+    <h2>7. Children's Privacy</h2>
     <p>
-      All prices are listed in USD and may change without notice. Payment is processed through
-      a third-party payment gateway; Glow Research does not store your full card or payment
-      details.
+      Glow Research products are restricted to buyers 21 and older, and this site is not
+      directed at anyone under that age. We do not knowingly collect information from
+      minors.
     </p>
 
-    <h2>7. Shipping &amp; Delivery</h2>
+    <h2>8. Data Security</h2>
     <p>
-      Shipping timelines, coverage, and cold-chain handling are described on our
-      <a href="shipping.html">Shipping page</a>. Glow Research is not responsible for delivery
-      delays caused by the carrier, customs, incorrect address information provided at checkout,
-      or events outside our control.
+      We take reasonable steps to protect information you provide to us. No method of
+      transmission or storage is completely secure, and we can't guarantee absolute
+      security for information sent over the internet.
     </p>
 
-    <h2>8. Returns &amp; Undeliverable Packages</h2>
+    <h2>9. Changes to This Policy</h2>
     <p>
-      Because these are lyophilized research materials whose storage conditions cannot be
-      verified once they leave the cold chain, <strong>all sales are final once a vial has
-      shipped or been opened.</strong> We do not accept returns for personal-use dissatisfaction.
-    </p>
-    <p>
-      If a package is returned to our fulfilment partner as undeliverable by the carrier — for
-      example due to an incomplete address or a failed delivery attempt — we will contact you
-      using the information provided at checkout to arrange reshipment. Glow Research is not
-      responsible for orders that are delayed, returned, or lost due to incorrect address
-      information supplied by the buyer.
+      We may update this policy as the site changes, particularly once accounts and
+      payment processing go live. Continued use of the site after an update constitutes
+      acceptance of the revised policy.
     </p>
 
-    <h2>9. Affiliate Program</h2>
+    <h2>10. Contact</h2>
     <p>
-      Participation in our <a href="affiliate.html">affiliate program</a> is governed by the
-      rules published on that page, including the prohibition on therapeutic claims, dosing
-      guidance, and promotion to non-research audiences. Violating those rules is grounds for
-      forfeiting unpaid commission and closing the affiliate account.
-    </p>
-
-    <h2>10. Intellectual Property</h2>
-    <p>
-      The Glow Research name, logo, and the content of this site are the property of Glow
-      Nutrition LLC and may not be reproduced without permission.
-    </p>
-
-    <h2>11. Governing Law</h2>
-    <p>
-      These terms are governed by the laws of the State of California, without regard to its
-      conflict-of-law provisions.
-    </p>
-
-    <h2>12. Changes to These Terms</h2>
-    <p>
-      We may update these terms from time to time. Continued use of the site after a change is
-      posted constitutes acceptance of the updated terms.
-    </p>
-
-    <h2>13. Contact</h2>
-    <p>
-      Questions about these terms can be sent to
-      <a href="mailto:support@glowresearch.shop">support@glowresearch.shop</a>.
+      Questions about this policy or a request about your information can be sent to
+      <a href="mailto:support@glowresearch.shop">support@glowresearch.shop</a>, or by mail to
+      Glow Nutrition LLC, 10755 Scripps Poway Pkwy #376, San Diego, CA 92131.
     </p>
   </div>
 </section>
@@ -277,6 +277,12 @@
 
 <script>
   document.getElementById('stubYear').textContent = new Date().getFullYear();
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   const hamburger = document.getElementById('hamburger');
   const mainNav = document.getElementById('mainNav');
   hamburger.addEventListener('click', () => {
