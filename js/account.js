@@ -274,13 +274,23 @@
         return '<li><span>' + esc(i.name) + (i.qty > 1 ? ' × ' + i.qty : '') + '</span></li>';
       }).join('');
 
-      // tracking replaces the total once there is a number to click; before
-      // that the total is the more useful thing to show
-      var right = o.track
-        ? '<a class="ac-track" href="https://www.fedex.com/fedextrack/?trknbr=' +
-          esc(o.track.replace(/\s/g, '')) + '" target="_blank" rel="noopener">Track ' +
-          '<span aria-hidden="true">&rarr;</span></a>'
-        : '<span class="ac-total">' + money(o.total) + '</span>';
+      // Tracking replaces the total once there is a number to show; before
+      // that the total is the more useful thing.
+      //
+      // A link only renders when /api/me actually resolved one — from the
+      // shipment-tracking plugin, once it is installed, which knows the
+      // real carrier and the real URL. Without it, every number used to get
+      // sent to FedEx's tracker regardless of which carrier actually shipped
+      // it, which resolved for exactly the orders that happened to be FedEx
+      // and quietly 404'd for everything else. A number with no confirmed
+      // carrier is shown as plain text instead of a guess.
+      var right = '<span class="ac-total">' + money(o.total) + '</span>';
+      if (o.track && o.track.number) {
+        right = o.track.link
+          ? '<a class="ac-track" href="' + esc(o.track.link) + '" target="_blank" rel="noopener">Track ' +
+            '<span aria-hidden="true">&rarr;</span></a>'
+          : '<span class="ac-track-num">' + esc(o.track.number) + '</span>';
+      }
 
       var status = o.status || 'Order placed';
       return '' +

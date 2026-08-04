@@ -18,13 +18,14 @@ export function wcConfig() {
   };
 }
 
-// Thin wrapper over the WooCommerce REST API. Throws on a non-2xx so callers
-// can let one try/catch cover both transport and API-level failures.
-export async function wc(path, options = {}) {
+// Shared request plumbing. `path` is the full path after the store's base
+// URL, so callers outside the `/wp-json/wc/v3` namespace (a tracking plugin,
+// say) can use it too.
+async function wcRequest(path, options = {}) {
   const cfg = wcConfig();
   if (!cfg) throw new Error('Store is not configured yet.');
 
-  const res = await fetch(`${cfg.base}/wp-json/wc/v3${path}`, {
+  const res = await fetch(`${cfg.base}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -34,6 +35,13 @@ export async function wc(path, options = {}) {
   });
 
   const data = await res.json().catch(() => null);
+  return { res, data };
+}
+
+// Thin wrapper over the WooCommerce REST API. Throws on a non-2xx so callers
+// can let one try/catch cover both transport and API-level failures.
+export async function wc(path, options = {}) {
+  const { res, data } = await wcRequest(`/wp-json/wc/v3${path}`, options);
   if (!res.ok) {
     const err = new Error((data && data.message) || 'The store rejected the request.');
     err.status = res.status;
@@ -41,6 +49,20 @@ export async function wc(path, options = {}) {
     throw err;
   }
   return data;
+}
+
+// For endpoints that may legitimately not be there — an optional plugin
+// that isn't installed yet, a feature not turned on for this store. "Not
+// there" and "briefly unreachable" are treated the same way: the caller
+// gets null and moves on, rather than one missing plugin taking the rest
+// of a page down with a thrown error.
+export async function wcOptional(path) {
+  try {
+    const { res, data } = await wcRequest(path);
+    return res.ok ? data : null;
+  } catch (e) {
+    return null;
+  }
 }
 
 /* ============================ passwords ============================ */
