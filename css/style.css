@@ -380,6 +380,12 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   margin-bottom: 24px;
   letter-spacing: -0.03em;
 }
+/* Pin the headline to "Lab-Tested" / "Research Peptides." Left to wrap on its
+   own it breaks after "Research", which orphans "Peptides." on its own line.
+   Dropped on narrow screens, where the forced break would push the second
+   line wider than the column. */
+.hero-br{ display:none; }
+@media (min-width: 680px){ .hero-br{ display:inline; } }
 .hero-sub{
   font-size: 1.08rem;
   max-width: 500px;
