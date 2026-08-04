@@ -88,12 +88,19 @@
 
     // ?next=affiliate lands them on the affiliate tab once they are in, so the
     // "become an affiliate" journey doesn't dump people on the Overview panel
-    var next = new URLSearchParams(location.search).get('next');
+    var params = new URLSearchParams(location.search);
+    var next = params.get('next');
     var dest = root() + 'account.html' +
       (next && /^[a-z]+$/.test(next) ? '#' + next : '');
 
     // already signed in? go straight through
     if (session()) { location.replace(dest); return; }
+
+    // the thank-you page sends people here with ?email= when it already
+    // knows this address has an account — filling it in means the one
+    // extra step is typing a password, not the address too
+    var prefill = params.get('email');
+    if (prefill) document.getElementById('siEmail').value = prefill;
 
     var tabs = document.querySelectorAll('.si-tab');
     var nameField = document.getElementById('siNameField');
@@ -124,10 +131,31 @@
         var hint = document.getElementById('siPassHint');
         pass.setAttribute('autocomplete', mode === 'up' ? 'new-password' : 'current-password');
         if (hint) hint.hidden = mode !== 'up';
+        // a new account has no old password to forget
+        var forgot = document.getElementById('siForgot');
+        var forgotNote = document.getElementById('siForgotNote');
+        if (forgot) forgot.hidden = mode !== 'in';
+        if (forgotNote) forgotNote.hidden = true;
         var m = document.getElementById('siMsg');
         if (m) { m.hidden = true; m.textContent = ''; }
       });
     });
+
+    var forgotBtn = document.getElementById('siForgot');
+    if (forgotBtn) {
+      forgotBtn.addEventListener('click', function () {
+        var note = document.getElementById('siForgotNote');
+        var link = document.getElementById('siForgotMail');
+        var email = document.getElementById('siEmail').value.trim();
+        if (link) {
+          link.href = 'mailto:support@glowresearch.shop?subject=' +
+            encodeURIComponent('Password reset') + '&body=' +
+            encodeURIComponent('Please reset the password on my account.' +
+              (email ? '\n\nAccount email: ' + email : ''));
+        }
+        note.hidden = !note.hidden;
+      });
+    }
 
     var msg = document.getElementById('siMsg');
 

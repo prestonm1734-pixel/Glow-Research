@@ -102,15 +102,30 @@
   // A guest with no account cannot follow "track this order" anywhere useful,
   // so point them at signing up with the email the order already carries —
   // which claims this order rather than starting an empty account.
+  //
+  // order.accountExists means checkout tried to sign them up and the store
+  // said this email already has a password. Offering "Create an account"
+  // there would be telling someone with a real account to make another one
+  // — the honest next step for them is signing in to the one they have.
   if (!order.hasAccount) {
     var btn = document.getElementById('tyOrdersBtn');
-    btn.setAttribute('href', 'signin.html');
-    btn.innerHTML = 'Create an account to track it <span aria-hidden="true">&rarr;</span>';
+    var email = order.email || '';
+    btn.setAttribute('href', order.accountExists
+      ? 'signin.html?email=' + encodeURIComponent(email)
+      : 'signin.html');
+    btn.innerHTML = order.accountExists
+      ? 'Sign in to track it <span aria-hidden="true">&rarr;</span>'
+      : 'Create an account to track it <span aria-hidden="true">&rarr;</span>';
 
+    // Only reached when nobody ever tried creating an account this trip —
+    // accountMessage is always set on every createAccount() outcome
+    // (success, already-exists, or failure), including the accountExists
+    // case above, which the block at the top of this function already
+    // renders with the right wording.
     if (!order.accountMessage) {
       note.hidden = false;
       note.innerHTML = '<strong>Track this order.</strong> Create an account with ' +
-        esc(order.email || 'the email above') +
+        esc(email || 'the email above') +
         ' and this order, its tracking and its points will already be in it.';
     }
   }

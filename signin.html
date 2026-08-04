@@ -57,6 +57,20 @@
   .si-field input:focus{ outline:none; border-color:#0a0a0a; }
   .si-field input:focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 2px; }
 
+  .si-forgot{
+    display:block; margin: 9px 0 0; padding:0; border:none; background:none;
+    font-family:inherit; font-size:.84rem; color:#6e6e73; cursor:pointer;
+    text-decoration:underline; text-underline-offset:3px;
+  }
+  .si-forgot:hover{ color:#0a0a0a; }
+  .si-forgot[hidden]{ display:none; }
+  .si-forgot-note{
+    margin: 10px 0 0; padding: 12px 14px; background:#f5f5f7;
+    font-size:.84rem; line-height:1.55; color:#45453f;
+  }
+  .si-forgot-note[hidden]{ display:none; }
+  .si-forgot-note a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
+
   /* same shape as the affiliate apply checkbox on the account page, so
      the "acknowledge and agree" pattern reads the same wherever it shows up */
   .si-agree{
@@ -171,6 +185,15 @@
         <label for="siPassword">Password</label>
         <input type="password" id="siPassword" required minlength="8" autocomplete="current-password" placeholder="••••••••" />
         <span class="si-hint" id="siPassHint" hidden>At least 8 characters.</span>
+        <!-- Sign-in mode only — a new account has no old password to forget.
+             There is no automated reset yet, so this says so plainly rather
+             than pretending a "send reset link" button would do anything. -->
+        <button type="button" class="si-forgot" id="siForgot">Forgot password?</button>
+        <p class="si-forgot-note" id="siForgotNote" hidden>
+          There is no automated reset yet. Email
+          <a href="#" id="siForgotMail">support@glowresearch.shop</a>
+          from the address on your account and we will reset it by hand.
+        </p>
       </div>
       <label class="si-agree" id="siAgreeField" hidden>
         <input type="checkbox" id="siAgree" />

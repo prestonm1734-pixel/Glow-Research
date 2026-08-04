@@ -157,11 +157,39 @@
     });
   }
 
+  /* ---------- signed-in state ----------
+     Confirmed against the server, not guessed from the localStorage mirror
+     that account.js writes. That mirror is only ever refreshed when
+     account.js itself runs, so it goes stale the moment someone signs in
+     on a different browser, or clears storage without clearing cookies —
+     the HttpOnly session cookie is still good, but the mirror is not, and
+     trusting the mirror alone is exactly how a signed-in shopper ends up
+     told to "create an account" for an order already sitting in the one
+     they have. /api/me reads the real cookie, so this is ground truth. */
+  let signedInUser = null;
+
+  async function checkSession() {
+    try {
+      const resp = await fetch('/api/me', { credentials: 'same-origin' });
+      if (!resp.ok) return; // 401 (guest) or accounts not configured — proceed as guest, not an error
+      const data = await resp.json();
+      signedInUser = { email: data.email, name: data.name };
+
+      $('coSignedIn').hidden = false;
+      $('coSignedInEmail').textContent = signedInUser.email;
+      $('coMakeAcctRow').hidden = true;
+      $('coPassField').hidden = true;
+      $('coMakeAcct').checked = false;
+      $('coPass').required = false;
+      if (signedInUser.email) $('coEmail').value = signedInUser.email;
+    } catch (e) { /* network hiccup — proceed as guest */ }
+  }
+
   /* ---------- optional account ---------- */
 
-  // Returns { ok, message } for the confirmation page. Never throws: the order
-  // is already placed by the time this runs, so the worst case is telling them
-  // the account part did not take.
+  // Returns { ok, message, exists } for the confirmation page. Never
+  // throws: the order is already placed by the time this runs, so the
+  // worst case is telling them the account part did not take.
   async function createAccount(email, password, shipAddr) {
     try {
       const resp = await fetch('/api/auth', {
@@ -177,8 +205,18 @@
       });
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok) {
-        return { ok: false, message: 'Your account could not be created: ' +
-          (data.error || 'please try from the sign-in page.') };
+        // 409 means this email already has a password set — a returning
+        // customer who did not realise it, or a typo of their usual
+        // address. The confirmation page needs to know this specifically:
+        // "create an account" is the wrong thing to offer someone who
+        // already has one.
+        const exists = resp.status === 409;
+        return {
+          ok: false, exists,
+          message: exists
+            ? 'An account already exists for this email. Sign in to see this order and its points.'
+            : 'Your account could not be created: ' + (data.error || 'please try from the sign-in page.'),
+        };
       }
 
       // mirrors the session cookie so the header reads "Account"
@@ -228,6 +266,7 @@
     fillStates();
     renderPayMethods();
     renderSummary();
+    checkSession();
 
     // the drawer can change the cart while this page is open
     document.addEventListener('glow-cart-change', renderSummary);
@@ -292,6 +331,7 @@
         const resp = await fetch('/api/create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
           body: JSON.stringify({
             customer: { email: $('coEmail').value, phone: $('coPhone').value },
             shipping: shipAddr,
@@ -308,8 +348,15 @@
         // The order is placed and must not be undone by a signup problem, so
         // this runs after it and only ever annotates the confirmation.
         let accountMessage = '';
-        let hasAccount = !!(window.localStorage && localStorage.getItem('glow-session'));
-        if ($('coMakeAcct').checked) {
+        let accountExists = false;
+        // signedInUser comes from a real /api/me check at page load — the
+        // authoritative answer. The localStorage mirror is a fallback for
+        // the rare case that check itself could not complete.
+        let hasAccount = !!signedInUser || !!(window.localStorage && localStorage.getItem('glow-session'));
+        // Someone already signed in has nothing to sign up for — the
+        // checkbox is hidden for them, but guard here too rather than
+        // trust that it was never checked.
+        if (!signedInUser && $('coMakeAcct').checked) {
           // a real second request, so it gets its own honest label rather
           // than leaving "Placing your order…" up for a step it is not
           // actually describing anymore
@@ -317,6 +364,7 @@
           const result = await createAccount($('coEmail').value, $('coPass').value, shipAddr);
           accountMessage = result.message;
           hasAccount = hasAccount || result.ok;
+          accountExists = !!result.exists;
         }
 
         // handed to the confirmation page rather than passed in the URL, so an
@@ -334,6 +382,7 @@
             referral: ref,
             accountMessage,
             hasAccount,
+            accountExists,
           }));
         } catch (e) { /* private mode: the fallback message below still shows */ }
 

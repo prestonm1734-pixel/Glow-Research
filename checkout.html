@@ -77,7 +77,17 @@
     grid-column: 1 / -1; display:flex; align-items:flex-start; gap:11px;
     font-size:.92rem; color:#45453f; cursor:pointer; margin-top: 6px;
   }
+  /* the class's own display:flex outranks the browser's default
+     [hidden]{display:none} — without this, setting .hidden = true in JS
+     silently does nothing and the row stays on screen */
+  .co-check[hidden]{ display:none; }
   .co-check input{ margin:0; width:17px; height:17px; flex-shrink:0; accent-color:#0a0a0a; margin-top:1px; }
+  .co-signed-in{
+    grid-column: 1 / -1; margin:6px 0 0; padding: 12px 14px;
+    background:#f5f5f7; font-size:.88rem; color:#45453f; line-height:1.5;
+  }
+  .co-signed-in strong{ color:#0a0a0a; }
+  .co-signed-in a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
 
   /* ---------- delivery + payment rows ---------- */
   .co-ship, .co-pay-head{
@@ -315,6 +325,15 @@
                 <input type="tel" id="coPhone" name="phone" placeholder=" " autocomplete="tel" required />
                 <label for="coPhone">Phone</label>
               </div>
+              <!-- Shown once /api/me confirms a real signed-in session — never
+                   guessed from the localStorage mirror alone, since that can
+                   go stale (cleared storage, a different browser) while the
+                   cookie is still good. Replaces the account checkbox below:
+                   someone already signed in has nothing to create. -->
+              <p class="co-signed-in" id="coSignedIn" hidden>
+                Signed in as <strong id="coSignedInEmail"></strong>.
+                This order will be in your account. <a href="account.html">Not you?</a>
+              </p>
               <!-- The order creates a customer record either way; this only
                    decides whether they can sign in to it straight away.
                    Skipping it is not a dead end — signing up later with the
