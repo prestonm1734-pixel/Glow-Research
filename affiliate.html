@@ -47,7 +47,7 @@
   }
   .af-tiers td:first-child{ color: var(--text); font-weight:600; }
   .af-tiers td:last-child, .af-tiers th:last-child{ text-align:right; }
-  .af-rate{ font-family:'Space Grotesk',sans-serif; font-size:1.15rem; font-weight:700; color:#0a0a0a; }
+  .af-rate{ font-family:'Space Grotesk',sans-serif; font-size:1.15rem; font-weight:700; color:#fff; }
 
   /* how attribution works, as numbered steps */
   .af-steps{ counter-reset: afstep; list-style:none; margin: clamp(28px,4vw,38px) 0 0; padding:0; }
@@ -59,14 +59,14 @@
   .af-step::before{
     content: counter(afstep); position:absolute; left:-13px; top:-2px;
     width:26px; height:26px; display:grid; place-items:center;
-    background:#0a0a0a; color:#fff; border-radius:50%;
+    background:#fff; color:#0a0a0a; border-radius:50%;
     font-family:'JetBrains Mono', monospace; font-size:.7rem; font-weight:700;
   }
   .af-step h3{ font-size:1.02rem; margin:0 0 6px; letter-spacing:-.01em; }
   .af-step p{ margin:0; font-size:.95rem; color: var(--text-dim); }
   .af-step code{
-    font-family:'JetBrains Mono', monospace; font-size:.86rem; color:#0a0a0a;
-    background: rgba(0,0,0,.06); padding: 2px 6px;
+    font-family:'JetBrains Mono', monospace; font-size:.86rem; color:#fff;
+    background: rgba(255,255,255,.08); padding: 2px 6px;
   }
 
   .af-rules{ margin: clamp(28px,4vw,38px) 0 0; padding:0; list-style:none; max-width: 62ch; }
@@ -78,8 +78,8 @@
 
   /* the tier a reader is comparing against lights up as they scan the table */
   .af-tiers tbody tr{ transition: background .2s ease; }
-  .af-tiers tbody tr:hover{ background: rgba(0,0,0,.03); }
-  .af-tiers tbody tr:hover .af-rate{ color:#0a0a0a; }
+  .af-tiers tbody tr:hover{ background: rgba(255,255,255,.04); }
+  .af-tiers tbody tr:hover .af-rate{ color:#fff; }
 
   /* the numbered marker picks up as you read down the column */
   .af-step::before{ transition: transform .32s var(--lp-ease); }
@@ -144,7 +144,7 @@
   </div>
 </header>
 
-<main class="lp-page lp-light">
+<main class="lp-page">
 
 <section class="lp-hero">
   <div class="container">

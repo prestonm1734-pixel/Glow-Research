@@ -31,15 +31,15 @@
     transition: border-color .18s ease, background .18s ease;
   }
   .ws-field textarea{ resize:vertical; min-height: 96px; }
-  .ws-field input::placeholder, .ws-field textarea::placeholder{ color:#a1a1a6; }
-  .ws-field input:hover, .ws-field select:hover, .ws-field textarea:hover{ border-color: rgba(0,0,0,.34); }
+  .ws-field input::placeholder, .ws-field textarea::placeholder{ color:#5a5a58; }
+  .ws-field input:hover, .ws-field select:hover, .ws-field textarea:hover{ border-color: rgba(255,255,255,.32); }
   .ws-field input:focus, .ws-field select:focus, .ws-field textarea:focus{
-    outline:none; border-color:#0a0a0a; box-shadow: inset 0 0 0 1px #0a0a0a;
+    outline:none; border-color:#fff; background: var(--surface-2);
   }
   /* the rule above drops the outline for the mouse case, where the brightened
      border is enough. A keyboard user needs the ring back. */
   .ws-field input:focus-visible, .ws-field select:focus-visible, .ws-field textarea:focus-visible{
-    outline: 2px solid #0a0a0a; outline-offset: 2px;
+    outline: 2px solid #fff; outline-offset: 2px;
   }
   /* appearance:none removed the native arrow and nothing replaced it, so the
      volume field looked like a text input. A real element rather than a
@@ -51,9 +51,9 @@
     pointer-events:none; color: var(--text-dimmer);
     transition: transform .32s var(--lp-ease), color .2s ease;
   }
-  .ws-selwrap:focus-within .ws-chev{ transform: translateY(-50%) rotate(180deg); color:#0a0a0a; }
+  .ws-selwrap:focus-within .ws-chev{ transform: translateY(-50%) rotate(180deg); color:#fff; }
   /* the label leans in with its field */
-  .ws-field:focus-within label{ color:#0a0a0a; }
+  .ws-field:focus-within label{ color:#fff; }
 
   /* fields arrive one after another, like the rows above them */
   .js .ws-form .ws-field, .js .ws-form .ws-submit{
@@ -76,7 +76,7 @@
      instead of a line of text appearing under the button. */
   .ws-done{ max-width: 560px; margin: clamp(40px, 5vw, 58px) 0 0; }
   .ws-done[hidden]{ display:none; }
-  .ws-done-mark{ display:block; margin: 0 0 20px; color:#0a0a0a; }
+  .ws-done-mark{ display:block; margin: 0 0 20px; color:#fff; }
   .js .ws-done-mark .lp-draw{
     stroke-dasharray: 1; stroke-dashoffset: 1;
     transition: stroke-dashoffset .85s var(--lp-ease);
@@ -169,7 +169,7 @@
   </div>
 </header>
 
-<main class="lp-page lp-light">
+<main class="lp-page">
 
 <section class="lp-hero">
   <div class="container">

@@ -900,47 +900,6 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
    ===================================================================== */
 .lp-page{ background: var(--bg); color: var(--text); }
 
-/* ---------- light variant ----------
-   Shipping, Wholesale and Partner Program run white. Rather than fork the
-   system, the palette variables are redefined on the page root so every
-   var(--text) / var(--border) / var(--bg-2) below inherits the light value and
-   the layout stays byte-identical. Only the handful of rules that hardcode
-   white are restated underneath. */
-.lp-page.lp-light{
-  --bg:        #ffffff;
-  --bg-2:      #f5f5f7;
-  --surface:   #ffffff;
-  --surface-2: #ffffff;
-  --border:    rgba(0,0,0,0.11);
-  --text:      #0a0a0a;
-  /* Apple's own #86868b lands at 3.6:1 on white and 3.3:1 on the tint, which
-     is under 4.5:1 — and these two tones carry the mono captions and the
-     fine print, the smallest type on the page. Darkened until both clear it
-     while keeping the two steps distinct from each other. */
-  --text-dim:  #55555a;
-  --text-dimmer: #6e6e73;
-  --grad-main: linear-gradient(120deg, #0a0a0a 0%, #3a3a3c 55%, #6e6e73 100%);
-}
-.lp-light .lp-eyebrow{ color:#0a0a0a; }
-/* a thin dark stroke fades on white faster than a thin light one does on
-   black, so the light hero gets a touch more weight to land the same */
-.lp-light .lp-hero h1 .outline{ -webkit-text-stroke: 1.6px rgba(0,0,0,.78); }
-.lp-light .lp-hero-note strong{ color:#0a0a0a; }
-.lp-light .lp-dot{ background:#0a0a0a; animation-name: lpPulseInk; }
-@keyframes lpPulseInk{
-  0%{ box-shadow: 0 0 0 0 rgba(0,0,0,.35); }
-  70%{ box-shadow: 0 0 0 8px rgba(0,0,0,0); }
-  100%{ box-shadow: 0 0 0 0 rgba(0,0,0,0); }
-}
-.lp-light .lp-point svg{ color:#0a0a0a; }
-/* the pale chip disappears on white, same inversion the checkout does */
-.lp-light .btn-primary{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
-.lp-light .btn-primary:hover{ background:#2a2a28; border-color:#2a2a28; }
-.lp-light .btn-outline{ border-color: rgba(0,0,0,.32); color:#0a0a0a; }
-.lp-light .btn-outline:hover{
-  border-color:#0a0a0a; background: rgba(0,0,0,.04); color:#0a0a0a; box-shadow:none;
-}
-
 /* ---------- hero ----------
    Ranged left and stacked exactly like the homepage hero, down to the
    rule above the figures. */
