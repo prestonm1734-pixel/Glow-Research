@@ -59,6 +59,7 @@
   .ac-stat{ background:#fff; padding: 18px; }
   .ac-stat b{ display:block; font-family:'Space Grotesk',sans-serif; font-size:1.7rem; font-weight:700; letter-spacing:-.03em; }
   .ac-stat span{ display:block; margin-top:4px; font-family:'JetBrains Mono', monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:#8a8a86; }
+  .ac-stat-note{ display:block; margin-top:7px; font-style:normal; font-size:.82rem; color:#45453f; }
 
   .ac-bar{ height:6px; background: rgba(0,0,0,.1); margin: 4px 0 10px; }
   .ac-bar i{ display:block; height:100%; background:#0a0a0a; transition: width .6s cubic-bezier(.2,.8,.2,1); }
@@ -270,7 +271,10 @@
           <p class="ac-panel-sub">Your points, orders and tracking in one place.</p>
 
           <div class="ac-stats">
-            <div class="ac-stat"><b id="acPoints">0</b><span>Points balance</span></div>
+            <div class="ac-stat">
+              <b id="acPoints">0</b><span>Points balance</span>
+              <em id="acPointsWorth" class="ac-stat-note">&mdash;</em>
+            </div>
             <div class="ac-stat"><b id="acLifetime">0</b><span>Lifetime points</span></div>
             <div class="ac-stat"><b id="acOrderCount">0</b><span>Orders placed</span></div>
           </div>
@@ -299,15 +303,18 @@
 
         <section class="ac-panel" data-panel="rewards" role="tabpanel" hidden>
           <h2>Rewards</h2>
-          <p class="ac-panel-sub">Earn 10 points for every $1 spent. Points never expire.</p>
+          <p class="ac-panel-sub">Earn 1 point for every $1 spent. 100 points is $1 off. Points never expire.</p>
           <div class="ac-stats" style="grid-template-columns:1fr">
-            <div class="ac-stat"><b id="acRewardBalance">0</b><span>Points available</span></div>
+            <div class="ac-stat">
+              <b id="acRewardBalance">0</b><span>Points available</span>
+              <em id="acRewardWorth" class="ac-stat-note">&mdash;</em>
+            </div>
           </div>
           <div id="acRewards"></div>
           <p class="ac-note" id="acRedeemNote" hidden></p>
           <p class="ac-note">
-            Points are earned on every order that is not cancelled or refunded, at 10 per $1.
-            Rewards apply to the order subtotal and stack with volume pricing. One reward per order.
+            Points are earned on every order that is not cancelled or refunded. Rewards apply
+            to the order subtotal and stack with volume pricing. One reward per order.
           </p>
         </section>
 

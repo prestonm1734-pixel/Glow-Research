@@ -5,7 +5,10 @@
 // never off anything the browser sends in the request body, or one customer
 // could read another's orders by changing a number.
 
-import { wc, currentSession, metaValue, pointsForOrders, POINTS_PER_DOLLAR } from './_lib.js';
+import {
+  wc, currentSession, metaValue, pointsForOrders,
+  POINTS_PER_DOLLAR, POINTS_PER_DOLLAR_REDEEMED,
+} from './_lib.js';
 
 // Where a tracking number might land depends on which plugin the fulfillment
 // partner writes through, so check the common keys rather than betting on one.
@@ -62,6 +65,7 @@ export default async function handler(req, res) {
       points: Math.max(0, earned - spent),
       lifetime: earned,
       pointsPerDollar: POINTS_PER_DOLLAR,
+      pointsPerDollarRedeemed: POINTS_PER_DOLLAR_REDEEMED,
       orders: orders.map(o => {
         const tracking = trackingFor(o);
         return {

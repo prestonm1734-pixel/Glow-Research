@@ -52,11 +52,27 @@
     referral: { code: 'GLOW-R4417', rate: 10, clicks: 84, signups: 11, orders: 6, earned: 128.40, pending: 42.10 },
   };
 
-  var REWARDS = [
-    { cost: 750,  label: '$10 off any order' },
-    { cost: 1500, label: '$25 off any order' },
-    { cost: 3000, label: '10% off a full order' },
-  ];
+  /* Points earn at 1 per $1 and redeem at 100 per $1 off — a flat 1% back.
+     The redemption rate is whatever the API says it is, so the tiers below
+     are derived from it rather than hardcoded alongside it: change the rate
+     server-side and these follow, instead of quietly disagreeing. */
+  var REDEEM_RATE = 100;
+  var REWARD_DOLLARS = [5, 10, 25];
+
+  function rewards() {
+    return REWARD_DOLLARS.map(function (d) {
+      return { cost: d * REDEEM_RATE, dollars: d, label: '$' + d + ' off any order' };
+    });
+  }
+
+  // what a balance is worth, rounded down to whole dollars. Formatted without
+  // cents because it is always a whole number — "$13.00" is just noise.
+  function pointsValue(points) {
+    return Math.floor(points / REDEEM_RATE);
+  }
+  function pointsValueText(points) {
+    return '$' + pointsValue(points).toLocaleString();
+  }
 
   var money = function (n) { return '$' + n.toFixed(2); };
   var when = function (iso) {
@@ -160,6 +176,9 @@
         document.getElementById('acEmail').textContent = data.email || '—';
         write(SESSION, JSON.stringify({ email: data.email, name: data.name }));
 
+        // the server owns the rate; only fall back if it did not send one
+        if (data.pointsPerDollarRedeemed > 0) REDEEM_RATE = data.pointsPerDollarRedeemed;
+
         renderOverview(data);
         renderOrders(data);
         renderRewards(data);
@@ -212,7 +231,7 @@
     document.getElementById('acOrderCount').textContent = d.orders.length;
 
     // next reward the balance has not reached yet
-    var next = REWARDS.find(function (r) { return r.cost > d.points; });
+    var next = rewards().find(function (r) { return r.cost > d.points; });
     var bar = document.getElementById('acProgress');
     var note = document.getElementById('acProgressNote');
     if (next) {
@@ -221,6 +240,15 @@
     } else {
       bar.style.width = '100%';
       note.textContent = 'Every reward unlocked';
+    }
+
+    // a balance means nothing without its cash value, which is the whole
+    // point of a 100-to-1 scheme
+    var worth = document.getElementById('acPointsWorth');
+    if (worth) {
+      worth.textContent = d.points > 0
+        ? 'Worth ' + pointsValueText(d.points) + ' off'
+        : 'Earn 1 point per $1 spent';
     }
   }
 
@@ -276,7 +304,11 @@
     document.getElementById('acRewardBalance').textContent = d.points.toLocaleString();
     var box = document.getElementById('acRewards');
 
-    box.innerHTML = REWARDS.map(function (r, i) {
+    var sub = document.getElementById('acRewardWorth');
+    if (sub) sub.textContent = pointsValueText(d.points) + ' of rewards available';
+
+    var list = rewards();
+    box.innerHTML = list.map(function (r, i) {
       var ready = d.points >= r.cost;
       return '' +
         '<div class="ac-reward' + (ready ? ' is-ready' : '') + '">' +
@@ -297,7 +329,7 @@
     box.addEventListener('click', function (e) {
       var btn = e.target.closest('[data-reward]');
       if (!btn) return;
-      var r = REWARDS[+btn.dataset.reward];
+      var r = list[+btn.dataset.reward];
       var note = document.getElementById('acRedeemNote');
       if (!note) return;
       note.hidden = false;

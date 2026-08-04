@@ -145,7 +145,11 @@ export function metaValue(record, key) {
 // A stored counter drifts the first time an order is refunded or edited in
 // wp-admin; a derived one cannot.
 
-export const POINTS_PER_DOLLAR = 10;
+// 1 point per $1 spent, 100 points redeems for $1 off — a flat 1% back.
+// Both numbers are sent to the client so the account page never has to
+// restate the rate and drift out of step with what is actually awarded.
+export const POINTS_PER_DOLLAR = 1;
+export const POINTS_PER_DOLLAR_REDEEMED = 100;
 
 // Orders that never became revenue must not earn points.
 const VOID_STATUSES = new Set(['cancelled', 'failed', 'refunded', 'trash']);
