@@ -50,7 +50,7 @@
           'Glow Research supplies research compounds strictly for in-vitro laboratory ' +
           'use — not for human or veterinary consumption. By entering you confirm ' +
           'you are at least 21 and agree to our ' +
-          '<a href="' + root + 'about.html">Research Use Only terms</a>.' +
+          '<a href="' + root + 'ruo-agreement.html">Research Use Only Agreement</a>.' +
         '</p>' +
         '<button type="button" class="btn btn-primary age-gate-enter" id="ageGateEnter">' +
           'I am 21 or older — Enter' +
