@@ -1,16 +1,14 @@
 // ===================== Glow Research — account =====================
-// UI layer only. There is no auth backend yet, exactly as there is no payment
-// processor yet on checkout: the sign-in form below does not verify anything,
-// and the orders, points and referral figures are seeded sample data so the
-// screens can be designed and reviewed before the backend exists.
+// Real accounts, backed by WooCommerce customer records through /api/*.
 //
-// WIRING IT UP LATER
-//   signIn()  -> replace the localStorage write with the auth provider's
-//                session call; keep the same redirect.
-//   loadAccount() -> replace SAMPLE with the API response.
-// The password field is deliberately never read, stored, or transmitted, so
-// nobody can type a real credential into a form that would only pretend to
-// use it.
+// The session itself is an HttpOnly cookie set by the server, which this file
+// deliberately cannot read — that is the point of HttpOnly. The localStorage
+// flag below mirrors it for one job only: deciding whether the header says
+// "Sign In" or "Account". It grants nothing. Every endpoint re-checks the
+// cookie server-side, so a forged flag gets an empty page and a 401.
+//
+// Still sample data: the affiliate/partner panel. There is no backend for
+// referrals yet, and it is marked as such in the UI.
 (function () {
   var SESSION = 'glow-session';
 
@@ -18,10 +16,25 @@
   function write(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   function drop(k) { try { localStorage.removeItem(k); } catch (e) {} }
 
+  // UI hint only — see the note above.
   function session() {
     var raw = read(SESSION);
     if (!raw) return null;
     try { return JSON.parse(raw); } catch (e) { return null; }
+  }
+
+  function api(path, body) {
+    return fetch(path, {
+      method: body ? 'POST' : 'GET',
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: 'same-origin',
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (data) {
+        if (!r.ok) throw new Error(data.error || 'Something went wrong.');
+        return data;
+      });
+    });
   }
 
   // depth-aware link, same reasoning as the age gate: this file is shared and
@@ -33,25 +46,9 @@
     return depth > 0 ? new Array(depth + 1).join('../') : '';
   }
 
-  /* ================= sample account =================
-     Points work like a coffee-shop card: 10 per dollar spent, redeemable at
-     fixed tiers. Kept as plain data so swapping in a real API response means
-     changing one object, not the rendering below. */
+  /* The referral figures below are still sample data — there is no referral
+     backend yet. Orders, points and tracking are real and come from /api/me. */
   var SAMPLE = {
-    name: 'Researcher',
-    tier: 'Standard',
-    points: 1240,
-    lifetime: 3180,
-    orders: [
-      { id: 'GR-4417', date: '2026-07-24', status: 'Delivered', total: 159.30,
-        items: [{ name: 'BPC-157', variant: '5mg', qty: 2, lot: 'B7-2291' }] },
-      { id: 'GR-4382', date: '2026-07-09', status: 'In transit', track: '7749 1183 2205',
-        items: [{ name: 'Semaglutide', variant: '5mg', qty: 1, lot: 'S4-1180' },
-                { name: 'Selank', variant: '5mg', qty: 1, lot: 'K2-0774' }] },
-      { id: 'GR-4310', date: '2026-06-18', status: 'Delivered', total: 214.20,
-        items: [{ name: 'GLP3-RT', variant: '10mg', qty: 1, lot: 'G9-3364' },
-                { name: 'TB-500', variant: '5mg', qty: 1, lot: 'T5-2210' }] },
-    ],
     referral: { code: 'GLOW-R4417', rate: 10, clicks: 84, signups: 11, orders: 6, earned: 128.40, pending: 42.10 },
   };
 
@@ -64,6 +61,7 @@
   var money = function (n) { return '$' + n.toFixed(2); };
   var when = function (iso) {
     var d = new Date(iso + 'T00:00:00');
+    if (isNaN(d.getTime())) return '';
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
@@ -103,17 +101,41 @@
         agreeField.hidden = mode !== 'up';
         agreeBox.required = mode === 'up';
         submit.textContent = mode === 'up' ? 'Create account' : 'Sign in';
+
+        // tell the password manager which one it is looking at, and only show
+        // the length rule where it applies
+        var pass = document.getElementById('siPassword');
+        var hint = document.getElementById('siPassHint');
+        pass.setAttribute('autocomplete', mode === 'up' ? 'new-password' : 'current-password');
+        if (hint) hint.hidden = mode !== 'up';
+        var m = document.getElementById('siMsg');
+        if (m) { m.hidden = true; m.textContent = ''; }
       });
     });
+
+    var msg = document.getElementById('siMsg');
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (mode === 'up' && !agreeBox.checked) { agreeBox.reportValidity(); return; }
+
       var email = document.getElementById('siEmail').value.trim();
+      var password = document.getElementById('siPassword').value;
       var name = mode === 'up' ? document.getElementById('siName').value.trim() : '';
-      // note what is NOT here: the password is never read off the form
-      write(SESSION, JSON.stringify({ email: email, name: name || SAMPLE.name }));
-      location.href = dest;
+
+      submit.disabled = true;
+      if (msg) { msg.hidden = false; msg.textContent = mode === 'up' ? 'Creating your account…' : 'Signing in…'; }
+
+      api('/api/auth', { action: mode === 'up' ? 'signup' : 'login', email: email, password: password, name: name })
+        .then(function (user) {
+          // mirrors the real cookie for the header label only
+          write(SESSION, JSON.stringify({ email: user.email, name: user.name }));
+          location.href = dest;
+        })
+        .catch(function (err) {
+          submit.disabled = false;
+          if (msg) { msg.hidden = false; msg.textContent = err.message; }
+        });
     });
   }
 
@@ -123,16 +145,37 @@
     if (!shell) return;
 
     var s = session();
+    // The flag is only a hint; /api/me is what actually decides. Redirect early
+    // when it is absent purely to avoid a pointless request.
     if (!s) { location.replace(root() + 'signin.html'); return; }
 
-    var data = SAMPLE;
-    document.getElementById('acWho').textContent = s.name || data.name;
+    document.getElementById('acWho').textContent = s.name || 'Researcher';
     document.getElementById('acEmail').textContent = s.email || '—';
 
-    renderOverview(data);
-    renderOrders(data);
-    renderRewards(data);
-    renderAffiliate(data);
+    document.getElementById('acOrders').innerHTML = '<p class="ac-msg">Loading your orders…</p>';
+
+    api('/api/me')
+      .then(function (data) {
+        document.getElementById('acWho').textContent = data.name || 'Researcher';
+        document.getElementById('acEmail').textContent = data.email || '—';
+        write(SESSION, JSON.stringify({ email: data.email, name: data.name }));
+
+        renderOverview(data);
+        renderOrders(data);
+        renderRewards(data);
+      })
+      .catch(function (err) {
+        // the cookie is gone or was never valid — the flag lied, so clear it
+        if (/not signed in/i.test(err.message)) {
+          drop(SESSION);
+          location.replace(root() + 'signin.html');
+          return;
+        }
+        document.getElementById('acOrders').innerHTML =
+          '<p class="ac-msg">' + err.message + '</p>';
+      });
+
+    renderAffiliate(SAMPLE);
 
     // panel switching
     var navBtns = document.querySelectorAll('.ac-nav-btn');
@@ -156,7 +199,10 @@
 
     document.getElementById('acSignOut').addEventListener('click', function () {
       drop(SESSION);
-      location.href = root() + 'index.html';
+      // clear the real session too — dropping the local flag only changes the
+      // header label, it does not sign anyone out
+      var go = function () { location.href = root() + 'index.html'; };
+      api('/api/logout').then(go, go);
     });
   }
 
@@ -178,30 +224,49 @@
     }
   }
 
+  // anything interpolated below comes from the store, so escape it rather than
+  // trusting that a product or status string never contains a bracket
+  function esc(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   function renderOrders(d) {
-    document.getElementById('acOrders').innerHTML = d.orders.map(function (o) {
-      var lots = o.items.map(function (i) {
-        return '<li><span>' + i.name + ' · ' + i.variant + ' × ' + i.qty + '</span>' +
-               '<code>Lot ' + i.lot + '</code></li>';
+    var box = document.getElementById('acOrders');
+
+    if (!d.orders.length) {
+      box.innerHTML = '<p class="ac-msg">No orders yet. Anything you order will show up here ' +
+        'with its tracking as soon as it ships.</p>';
+      return;
+    }
+
+    box.innerHTML = d.orders.map(function (o) {
+      var lines = o.items.map(function (i) {
+        return '<li><span>' + esc(i.name) + (i.qty > 1 ? ' × ' + i.qty : '') + '</span></li>';
       }).join('');
-      var right = o.status === 'In transit'
+
+      // tracking replaces the total once there is a number to click; before
+      // that the total is the more useful thing to show
+      var right = o.track
         ? '<a class="ac-track" href="https://www.fedex.com/fedextrack/?trknbr=' +
-          o.track.replace(/\s/g, '') + '" target="_blank" rel="noopener">Track ' +
+          esc(o.track.replace(/\s/g, '')) + '" target="_blank" rel="noopener">Track ' +
           '<span aria-hidden="true">&rarr;</span></a>'
         : '<span class="ac-total">' + money(o.total) + '</span>';
+
       return '' +
         '<article class="ac-order">' +
           '<header class="ac-order-head">' +
             '<div>' +
-              '<span class="ac-order-id">' + o.id + '</span>' +
+              '<span class="ac-order-id">#' + esc(o.id) + '</span>' +
               '<span class="ac-order-date">' + when(o.date) + '</span>' +
             '</div>' +
-            '<span class="ac-status ac-status--' + o.status.toLowerCase().replace(/\s/g, '-') + '">' +
-              o.status + '</span>' +
+            '<span class="ac-status ac-status--' + esc(o.status.toLowerCase().replace(/\s/g, '-')) + '">' +
+              esc(o.status) + '</span>' +
           '</header>' +
-          '<ul class="ac-order-items">' + lots + '</ul>' +
+          '<ul class="ac-order-items">' + lines + '</ul>' +
           '<footer class="ac-order-foot">' +
-            '<span class="ac-order-coa">COA available for every lot above</span>' + right +
+            '<span class="ac-order-coa">COA available for every lot shipped</span>' + right +
           '</footer>' +
         '</article>';
     }).join('');
@@ -209,7 +274,9 @@
 
   function renderRewards(d) {
     document.getElementById('acRewardBalance').textContent = d.points.toLocaleString();
-    document.getElementById('acRewards').innerHTML = REWARDS.map(function (r) {
+    var box = document.getElementById('acRewards');
+
+    box.innerHTML = REWARDS.map(function (r, i) {
       var ready = d.points >= r.cost;
       return '' +
         '<div class="ac-reward' + (ready ? ' is-ready' : '') + '">' +
@@ -218,11 +285,29 @@
             '<span class="ac-reward-cost">' + r.cost.toLocaleString() + ' points</span>' +
           '</div>' +
           '<button type="button" class="btn ' + (ready ? 'btn-primary' : 'btn-outline') + ' ac-reward-btn"' +
-            (ready ? '' : ' disabled') + '>' +
+            (ready ? ' data-reward="' + i + '"' : ' disabled') + '>' +
             (ready ? 'Redeem' : (r.cost - d.points).toLocaleString() + ' to go') +
           '</button>' +
         '</div>';
     }).join('');
+
+    // Automatic redemption is not built — it needs a coupon applied at
+    // checkout. Rather than leave a button that silently does nothing, it
+    // hands over the one thing support needs to do it by hand.
+    box.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-reward]');
+      if (!btn) return;
+      var r = REWARDS[+btn.dataset.reward];
+      var note = document.getElementById('acRedeemNote');
+      if (!note) return;
+      note.hidden = false;
+      note.innerHTML = 'To claim <strong>' + r.label + '</strong>, email ' +
+        '<a href="mailto:support@glowresearch.shop?subject=' +
+        encodeURIComponent('Redeem ' + r.cost + ' points — ' + r.label) +
+        '">support@glowresearch.shop</a> and we will apply it to your next order. ' +
+        'Redeeming from this page is not automatic yet.';
+      note.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
   }
 
   /* ================= affiliate =================

@@ -70,6 +70,17 @@
   .si-agree a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
 
   .si-submit{ width:100%; margin-top: 10px; padding: 15px 24px; }
+  .si-submit[disabled]{ opacity:.5; cursor:not-allowed; }
+
+  .si-hint{ display:block; margin-top:6px; font-size:.78rem; color:#8a8a86; }
+  .si-hint[hidden]{ display:none; }
+
+  /* one slot for both "working on it" and "that did not work" — they never
+     appear at the same time, and a single live region is what a screen reader
+     wants to hear */
+  .si-msg{ margin: 14px 0 0; font-size:.86rem; line-height:1.5; color:#55554f; text-align:center; }
+  .si-msg[hidden]{ display:none; }
+
   .si-alt{ margin: 18px 0 0; text-align:center; font-size:.88rem; color:#8a8a86; }
   .si-alt a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
 
@@ -160,22 +171,24 @@
       </div>
       <div class="si-field">
         <label for="siPassword">Password</label>
-        <input type="password" id="siPassword" required autocomplete="current-password" placeholder="••••••••" />
+        <input type="password" id="siPassword" required minlength="8" autocomplete="current-password" placeholder="••••••••" />
+        <span class="si-hint" id="siPassHint" hidden>At least 8 characters.</span>
       </div>
       <label class="si-agree" id="siAgreeField" hidden>
         <input type="checkbox" id="siAgree" />
         <span>I am 21 or older and I agree to the <a href="ruo-agreement.html">RUO Agreement</a> and <a href="terms.html">Terms of Service</a>.</span>
       </label>
       <button type="submit" class="btn btn-primary si-submit" id="siSubmit">Sign in</button>
+      <p class="si-msg" id="siMsg" hidden role="status" aria-live="polite"></p>
     </form>
 
     <p class="si-alt">Ordering at volume? <a href="wholesale.html">Apply for a wholesale account</a>.</p>
 
     <p class="si-note">
-      <strong>Accounts are not live yet.</strong> This screen is the finished design,
-      waiting on the authentication provider — the same way checkout is waiting on the
-      payment processor. Nothing you type is verified, stored, or sent anywhere, and the
-      password field is never read. The dashboard behind it shows sample data.
+      <strong>Payment is not connected yet.</strong> Accounts, orders and order tracking
+      are live — if you have ordered before, signing up with the same email picks up that
+      history. Checkout still cannot take a card, so orders are recorded and we follow up
+      to collect payment.
     </p>
   </div>
 </main>

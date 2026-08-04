@@ -356,6 +356,18 @@
                   <input type="checkbox" name="news" />
                   <span>Email me when compounds restock or new ones land.</span>
                 </label>
+                <!-- The order creates a customer record either way; this only
+                     decides whether they can sign in to it straight away.
+                     Skipping it is not a dead end — signing up later with the
+                     same email picks up this order and its points. -->
+                <label class="co-check" id="coMakeAcctRow">
+                  <input type="checkbox" id="coMakeAcct" />
+                  <span>Create an account to track this order and earn points.</span>
+                </label>
+                <div class="co-field full" id="coPassField" hidden>
+                  <label for="coPass">Password <span class="req">*</span></label>
+                  <input type="password" id="coPass" minlength="8" autocomplete="new-password" placeholder="At least 8 characters" />
+                </div>
               </div>
             </div>
           </section>

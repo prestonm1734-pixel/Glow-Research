@@ -74,8 +74,21 @@
     font-family:'JetBrains Mono', monospace; font-size:.6rem; letter-spacing:.1em; text-transform:uppercase;
     padding: 5px 9px; white-space:nowrap;
   }
+  /* the base carries a visible default so a status we have not styled yet —
+     WooCommerce and the fulfilment partner can both introduce one — still
+     reads as a badge rather than as loose text */
+  .ac-status{ background: rgba(0,0,0,.07); color:#45453f; }
   .ac-status--delivered{ background: rgba(0,0,0,.07); color:#45453f; }
-  .ac-status--in-transit{ background:#0a0a0a; color:#fff; }
+  .ac-status--in-transit,
+  .ac-status--processing{ background:#0a0a0a; color:#fff; }
+  .ac-status--awaiting-payment,
+  .ac-status--on-hold{ background:transparent; color:#8a8a86; box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
+  .ac-status--cancelled,
+  .ac-status--refunded,
+  .ac-status--failed{ background: rgba(0,0,0,.04); color:#8a8a86; text-decoration:line-through; }
+
+  /* loading / empty / error states for panels fed by the API */
+  .ac-msg{ margin:0; padding: 22px 0; color:#8a8a86; font-size:.92rem; }
   .ac-order-items{ list-style:none; margin:0 0 14px; padding:0; border-top:1px solid rgba(0,0,0,.1); }
   .ac-order-items li{
     display:flex; justify-content:space-between; align-items:baseline; gap:14px;
@@ -108,6 +121,8 @@
 
   .ac-note{ margin: 18px 0 0; padding: 15px 17px; border:1px solid rgba(0,0,0,.16); font-size:.83rem; line-height:1.6; color:#55554f; }
   .ac-note strong{ color:#0a0a0a; font-weight:600; }
+  .ac-note[hidden]{ display:none; }
+  .ac-note a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
 
   /* ---------- hover / motion ----------
      The order and reward rows are cards the eye tracks down a list, so they
@@ -252,7 +267,7 @@
       <div>
         <section class="ac-panel" data-panel="overview" role="tabpanel">
           <h2>Overview</h2>
-          <p class="ac-panel-sub">Your points, orders and lot documentation in one place.</p>
+          <p class="ac-panel-sub">Your points, orders and tracking in one place.</p>
 
           <div class="ac-stats">
             <div class="ac-stat"><b id="acPoints">0</b><span>Points balance</span></div>
@@ -269,16 +284,16 @@
           <div class="ac-card">
             <h2>Certificates</h2>
             <p class="ac-panel-sub" style="margin-bottom:0">
-              Every lot you have ordered is listed under Orders with its lot number, so a
-              certificate can be matched back to the vial on your bench — including for
-              batches that have since sold out.
+              Every batch we ship is third-party tested. Email the order number on any
+              order below and we will send the certificate of analysis for the exact lot
+              in that shipment — including batches that have since sold out.
             </p>
           </div>
         </section>
 
         <section class="ac-panel" data-panel="orders" role="tabpanel" hidden>
           <h2>Orders &amp; tracking</h2>
-          <p class="ac-panel-sub">Lot numbers are listed per item so they can be recorded alongside your results.</p>
+          <p class="ac-panel-sub">Every order you place, with tracking as soon as it ships.</p>
           <div id="acOrders"></div>
         </section>
 
@@ -289,7 +304,9 @@
             <div class="ac-stat"><b id="acRewardBalance">0</b><span>Points available</span></div>
           </div>
           <div id="acRewards"></div>
+          <p class="ac-note" id="acRedeemNote" hidden></p>
           <p class="ac-note">
+            Points are earned on every order that is not cancelled or refunded, at 10 per $1.
             Rewards apply to the order subtotal and stack with volume pricing. One reward per order.
           </p>
         </section>
@@ -308,15 +325,15 @@
           <p class="ac-panel-sub">Contact and shipping information held against this account.</p>
           <div class="ac-card">
             <p class="ac-bar-note">
-              Email, password, saved addresses and notification preferences will be editable
-              here once accounts are live. To change anything in the meantime, email
+              Editing your email, password, saved addresses and notification preferences from
+              this page is not built yet. To change any of them, email
               <a href="mailto:support@glowresearch.shop" style="color:#0a0a0a;text-decoration:underline;text-underline-offset:3px">support@glowresearch.shop</a>.
             </p>
           </div>
           <p class="ac-note">
-            <strong>Sample data.</strong> Orders, points and referral figures on this page are
-            placeholders so the screens could be designed ahead of the backend. Nothing here
-            reflects a real account yet.
+            <strong>Partner figures are still placeholders.</strong> Your orders, tracking and
+            points are real. The referral stats under Partner are sample numbers until the
+            referral tracking is built.
           </p>
         </section>
       </div>

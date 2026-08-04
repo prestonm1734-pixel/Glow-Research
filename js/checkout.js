@@ -189,6 +189,38 @@
     });
   }
 
+  /* ---------- optional account ---------- */
+
+  // Returns the sentence to append to the confirmation. Never throws: the
+  // order is already placed by the time this runs, so the worst case is
+  // telling them the account part did not take.
+  async function createAccount(email, password, shipAddr) {
+    try {
+      const resp = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          action: 'signup',
+          email,
+          password,
+          name: [shipAddr.firstName, shipAddr.lastName].filter(Boolean).join(' '),
+        }),
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) return 'Your account could not be created: ' + (data.error || 'please try from the sign-in page.');
+
+      // mirrors the session cookie so the header reads "Account"
+      try {
+        localStorage.setItem('glow-session', JSON.stringify({ email: data.email, name: data.name }));
+      } catch (e) { /* private mode: the cookie still works */ }
+
+      return 'Your account is ready — this order is already in it.';
+    } catch (e) {
+      return 'Your account could not be created right now; you can sign up later with this email.';
+    }
+  }
+
   /* ---------- wire up ---------- */
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -216,6 +248,12 @@
       $('coBilling').querySelectorAll('input,select').forEach(f => {
         if (f.dataset.req) f.required = e.target.checked;
       });
+    });
+
+    // optional account creation: the password field only exists once asked for
+    $('coMakeAcct').addEventListener('change', e => {
+      $('coPassField').hidden = !e.target.checked;
+      $('coPass').required = e.target.checked;
     });
 
     $('coPromoBtn').addEventListener('click', () => {
@@ -270,10 +308,17 @@
 
         if (!resp.ok) throw new Error(data.error || 'Could not place the order.');
 
-        $('coPlacedMsg').textContent =
-          'Order #' + data.orderNumber + ' received. Payment is not connected yet, so no card was charged — ' +
-          'we will follow up to collect payment.' +
+        let msg = 'Order #' + data.orderNumber + ' received. Payment is not connected yet, ' +
+          'so no card was charged — we will follow up to collect payment.' +
           (ref ? ' Referral ' + ref + ' has been credited on this order.' : '');
+
+        // The order is placed and must not be undone by a signup problem, so
+        // this runs after it and only ever adds to the message.
+        if ($('coMakeAcct').checked) {
+          msg += ' ' + await createAccount($('coEmail').value, $('coPass').value, shipAddr);
+        }
+
+        $('coPlacedMsg').textContent = msg;
         if (window.GlowCart) window.GlowCart.clear();
       } catch (err) {
         $('coPlacedMsg').textContent = err.message || 'Something went wrong placing the order. Please try again.';
