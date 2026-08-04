@@ -1135,7 +1135,8 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   font-size:.82rem; font-weight:600; color:#6e6e73;
 }
 .bl-meta{
-  display:block; margin-top: 14px; font-size:.88rem; color:#86868b;
+  /* #86868b is 3.6:1 on the card — under the bar, on the date line */
+  display:block; margin-top: 14px; font-size:.88rem; color:#6e6e73;
 }
 .bl-more{
   display:inline-flex; align-items:center; gap:7px; margin-top:18px;
@@ -1780,8 +1781,8 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
 /* the account panels reuse the sign-in field styling */
 .ac-page .si-field{ margin-bottom:16px; }
 .ac-page .si-field label{
-  display:block; margin-bottom:8px; font-family:'JetBrains Mono', monospace;
-  font-size:.66rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#8a8a86;
+  display:block; margin-bottom:8px;
+  font-size:.88rem; font-weight:500; letter-spacing:0; text-transform:none; color:#6e6e73;
 }
 .ac-page .si-field input, .ac-page .si-field select{
   width:100%; padding:13px 15px; border-radius:0;

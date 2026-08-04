@@ -282,6 +282,7 @@
           '<span aria-hidden="true">&rarr;</span></a>'
         : '<span class="ac-total">' + money(o.total) + '</span>';
 
+      var status = o.status || 'Order placed';
       return '' +
         '<article class="ac-order">' +
           '<header class="ac-order-head">' +
@@ -289,8 +290,12 @@
               '<span class="ac-order-id">#' + esc(o.id) + '</span>' +
               '<span class="ac-order-date">' + when(o.date) + '</span>' +
             '</div>' +
-            '<span class="ac-status ac-status--' + esc(o.status.toLowerCase().replace(/\s/g, '-')) + '">' +
-              esc(o.status) + '</span>' +
+            // An order with no status throws here and takes the whole orders
+            // panel down with it, so the customer sees a raw JS error where
+            // their order history should be. One missing field is not worth
+            // that, so it falls back to a neutral label.
+            '<span class="ac-status ac-status--' + esc(status.toLowerCase().replace(/\s/g, '-')) + '">' +
+              esc(status) + '</span>' +
           '</header>' +
           '<ul class="ac-order-items">' + lines + '</ul>' +
           '<footer class="ac-order-foot">' +

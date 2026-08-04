@@ -24,11 +24,10 @@
 
   .ac-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom: 30px; }
   .ac-eyebrow{
-    display:block; margin-bottom: 10px; font-family:'JetBrains Mono', monospace;
-    font-size:.7rem; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#8a8a86;
+    display:block; margin-bottom: 10px; font-size:0.88rem; font-weight:500; letter-spacing:0; text-transform:none; color:#6e6e73;
   }
   .ac-head h1{ font-size: clamp(1.8rem, 3.6vw, 2.5rem); letter-spacing:-.035em; margin:0; }
-  .ac-head-meta{ font-family:'JetBrains Mono', monospace; font-size:.78rem; color:#8a8a86; text-align:right; }
+  .ac-head-meta{ font-size:.88rem; color:#6e6e73; text-align:right; }
   .ac-head-meta button{
     display:block; margin-left:auto; margin-top:6px; background:none; border:none; padding:0;
     font:inherit; color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; cursor:pointer;
@@ -58,7 +57,7 @@
   .ac-stats{ display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap:1px; background: rgba(0,0,0,.16); border:1px solid rgba(0,0,0,.16); margin-bottom:16px; }
   .ac-stat{ background:#fff; padding: 18px; }
   .ac-stat b{ display:block; font-family:'Space Grotesk',sans-serif; font-size:1.7rem; font-weight:700; letter-spacing:-.03em; }
-  .ac-stat span{ display:block; margin-top:4px; font-family:'JetBrains Mono', monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:#8a8a86; }
+  .ac-stat span{ display:block; margin-top:4px; font-size:0.88rem; letter-spacing:0; text-transform:none; color:#6e6e73; }
   .ac-stat-note{ display:block; margin-top:7px; font-style:normal; font-size:.82rem; color:#45453f; }
 
   .ac-bar{ height:6px; background: rgba(0,0,0,.1); margin: 4px 0 10px; }
@@ -70,10 +69,10 @@
   .ac-order + .ac-order{ margin-top:14px; }
   .ac-order-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:14px; }
   .ac-order-id{ display:block; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem; }
-  .ac-order-date{ display:block; margin-top:3px; font-size:.8rem; color:#8a8a86; }
+  .ac-order-date{ display:block; margin-top:3px; font-size:.8rem; color:#6e6e73; }
   .ac-status{
-    font-family:'JetBrains Mono', monospace; font-size:.6rem; letter-spacing:.1em; text-transform:uppercase;
-    padding: 5px 9px; white-space:nowrap;
+    font-size:.82rem; font-weight:500; letter-spacing:0; text-transform:none;
+    padding: 5px 10px; white-space:nowrap;
   }
   /* the base carries a visible default so a status we have not styled yet —
      WooCommerce and the fulfilment partner can both introduce one — still
@@ -83,21 +82,21 @@
   .ac-status--in-transit,
   .ac-status--processing{ background:#0a0a0a; color:#fff; }
   .ac-status--awaiting-payment,
-  .ac-status--on-hold{ background:transparent; color:#8a8a86; box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
+  .ac-status--on-hold{ background:transparent; color:#6e6e73; box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
   .ac-status--cancelled,
   .ac-status--refunded,
-  .ac-status--failed{ background: rgba(0,0,0,.04); color:#8a8a86; text-decoration:line-through; }
+  .ac-status--failed{ background: rgba(0,0,0,.04); color:#6e6e73; text-decoration:line-through; }
 
   /* loading / empty / error states for panels fed by the API */
-  .ac-msg{ margin:0; padding: 22px 0; color:#8a8a86; font-size:.92rem; }
+  .ac-msg{ margin:0; padding: 22px 0; color:#6e6e73; font-size:.92rem; }
   .ac-order-items{ list-style:none; margin:0 0 14px; padding:0; border-top:1px solid rgba(0,0,0,.1); }
   .ac-order-items li{
     display:flex; justify-content:space-between; align-items:baseline; gap:14px;
     padding: 9px 0; border-bottom:1px solid rgba(0,0,0,.07); font-size:.9rem;
   }
-  .ac-order-items code{ font-family:'JetBrains Mono', monospace; font-size:.76rem; color:#8a8a86; }
+  .ac-order-items code{ font-family:'JetBrains Mono', monospace; font-size:.76rem; color:#6e6e73; }
   .ac-order-foot{ display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; }
-  .ac-order-coa{ font-size:.8rem; color:#8a8a86; }
+  .ac-order-coa{ font-size:.8rem; color:#6e6e73; }
   .ac-total{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem; }
   .ac-track{ font-weight:700; font-size:.9rem; text-decoration:underline; text-underline-offset:3px; }
 
@@ -107,7 +106,7 @@
   .ac-reward + .ac-reward{ margin-top:12px; }
   .ac-reward.is-ready{ border-color:#0a0a0a; }
   .ac-reward-label{ display:block; font-weight:700; font-size:1rem; }
-  .ac-reward-cost{ display:block; margin-top:3px; font-family:'JetBrains Mono', monospace; font-size:.72rem; color:#8a8a86; }
+  .ac-reward-cost{ display:block; margin-top:3px; font-size:.85rem; color:#6e6e73; }
   .ac-reward-btn{ padding: 10px 18px; font-size:.85rem; }
   .ac-reward-btn[disabled]{ opacity:.45; cursor:not-allowed; }
 
@@ -166,12 +165,12 @@
        with nothing to suggest they were there. Wrap instead, so every tab is
        on screen — same gapless grid as .ac-stats. */
     .ac-nav{
-      display:grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
-      gap:1px; background: rgba(0,0,0,.16); border:1px solid rgba(0,0,0,.16);
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+    gap:1px; background: rgba(0,0,0,.16); border:1px solid rgba(0,0,0,.16);
     }
     .ac-nav-btn{
-      border:none; background:#fff; text-align:center; padding: 13px 10px;
-      font-size:.86rem;
+    border:none; background:#fff; text-align:center; padding: 13px 10px;
+    font-size:.86rem;
     }
     .ac-nav-btn.is-on{ background:#0a0a0a; color:#fff; }
     /* these grids are two columns here, so an odd number of cells leaves the
