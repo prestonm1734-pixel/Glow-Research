@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>document.documentElement.classList.add('js');</script>
+<title>Order confirmed | Glow Research</title>
+<meta name="description" content="Your Glow Research order has been received." />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  /* One column, generous air, thin rules instead of boxes — the whole page
+     is one continuous read rather than a stack of bordered cards. */
+  .ty-page{ background:#fff; color:#0a0a0a; padding: 70px 0 100px; }
+  @media (max-width: 760px){ .ty-page{ padding: 46px 0 70px; } }
+
+  .ty-wrap{ max-width: 560px; margin: 0 auto; text-align:center; }
+
+  .ty-mark{
+    width:52px; height:52px; border-radius:50%; background:#0a0a0a; color:#fff;
+    display:flex; align-items:center; justify-content:center; margin: 0 auto 26px;
+  }
+  .ty-wrap h1{
+    font-family:'Fraunces', serif; font-size: clamp(1.9rem, 5vw, 2.6rem); font-weight:600;
+    letter-spacing:-.02em; line-height:1.1; margin:0 0 10px;
+  }
+  .ty-lede{ margin:0 0 6px; font-size:1rem; line-height:1.6; color:#55554f; }
+  .ty-lede strong{ color:#0a0a0a; }
+  .ty-num{
+    font-family:'JetBrains Mono', monospace; font-size:.82rem; letter-spacing:.02em;
+    color:#8a8a86; margin: 0 0 48px;
+  }
+
+  /* left-aligned from here down — centering paragraphs of detail fights
+     readability, the hero above is the only part that wants centring */
+  .ty-body{ text-align:left; }
+
+  .ty-section{ padding: 30px 0; border-top:1px solid rgba(0,0,0,.1); }
+  .ty-section:first-child{ border-top:0; padding-top:0; }
+  .ty-section h2{
+    font-family:'Space Grotesk',sans-serif; font-size:.7rem; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; color:#8a8a86; margin:0 0 16px;
+  }
+
+  .ty-items{ list-style:none; margin:0; padding:0; }
+  .ty-items li{
+    display:flex; justify-content:space-between; align-items:baseline; gap:16px;
+    padding: 9px 0; font-size:.94rem;
+  }
+  .ty-items .ty-item-qty{ color:#8a8a86; font-size:.85rem; }
+  .ty-items .ty-item-price{ font-variant-numeric: tabular-nums; white-space:nowrap; }
+
+  .ty-totals{ margin-top: 10px; padding-top:10px; border-top:1px solid rgba(0,0,0,.1); }
+  .ty-totals div{ display:flex; justify-content:space-between; gap:16px; padding:5px 0; font-size:.92rem; color:#55554f; }
+  .ty-totals .ty-grand{
+    color:#0a0a0a; margin-top:5px; padding-top:11px; border-top:1px solid rgba(0,0,0,.1);
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem;
+  }
+
+  .ty-addr{ font-size:.94rem; line-height:1.7; color:#55554f; }
+  .ty-addr strong{ display:block; color:#0a0a0a; font-weight:600; margin-bottom:2px; }
+
+  .ty-status{
+    display:inline-block; margin-top:2px; font-size:.86rem; color:#55554f;
+  }
+
+  /* what happens next: plain lines, no numerals or connecting rule — the
+     order alone (payment, pack, ship) already reads as a sequence */
+  .ty-steps{ list-style:none; margin:0; padding:0; }
+  .ty-steps li + li{ margin-top:16px; }
+  .ty-steps b{ display:block; font-size:.94rem; font-weight:600; margin-bottom:2px; }
+  .ty-steps span{ display:block; font-size:.88rem; line-height:1.6; color:#65655f; }
+
+  .ty-note{ font-size:.84rem; line-height:1.6; color:#8a8a86; }
+  .ty-note strong{ color:#55554f; font-weight:600; }
+  .ty-note + .ty-note{ margin-top:8px; }
+
+  .ty-actions{ margin-top:34px; text-align:center; }
+  .ty-actions .btn{ padding: 14px 30px; }
+  /* .btn-primary is the pale chip meant for dark sections (see style.css);
+     on white it reads as barely-there, the same problem checkout's
+     .co-page override exists to fix. Same fix, this page's scope. */
+  .ty-page .btn-primary{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+  .ty-page .btn-primary:hover{ background:#2a2a28; color:#fff; border-color:#2a2a28; }
+
+  .ty-secondary{
+    display:block; margin-top:16px; font-size:.88rem; color:#8a8a86;
+    text-decoration:underline; text-underline-offset:3px;
+  }
+  .ty-secondary:hover{ color:#0a0a0a; }
+
+  /* the sitewide focus ring is white, for dark sections; on this white page
+     that is invisible to keyboard users, so it needs the same ink ring
+     style.css already gives .co-page and its siblings */
+  .ty-page :focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 3px; }
+
+  /* landed here without an order in hand */
+  .ty-none{ text-align:center; padding: 40px 0 20px; }
+  .ty-none h1{ margin-bottom:12px; }
+  .ty-none p{ color:#55554f; line-height:1.65; margin:0 auto 26px; max-width:46ch; }
+</style>
+</head>
+<body>
+
+<div class="ticker">
+  <div class="ticker-track">
+    <span>Laboratory &amp; Research Use Only</span><span>✦</span>
+    <span>Third-Party Lab Tested</span><span>✦</span>
+    <span>COA on Every Batch</span><span>✦</span>
+    <span>Free Shipping Over $400</span><span>✦</span>
+    <span>Laboratory &amp; Research Use Only</span><span>✦</span>
+    <span>Third-Party Lab Tested</span><span>✦</span>
+    <span>COA on Every Batch</span><span>✦</span>
+    <span>Free Shipping Over $400</span><span>✦</span>
+  </div>
+</div>
+
+<header class="site-header" id="siteHeader">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo" aria-label="Glow Research home">Glow<span class="spark">✦</span></a>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="peptides.html">Products</a>
+      <a href="shipping.html">Shipping</a>
+      <a href="wholesale.html">Wholesale</a>
+      <a href="about.html">About Us</a>
+      <div class="nav-group">
+        <button type="button" class="nav-group-btn" aria-expanded="false" aria-controls="navResources">
+          Resources
+          <svg class="nav-caret" width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5 8 10.5 12 6.5"/></svg>
+        </button>
+        <div class="nav-menu" id="navResources" hidden>
+          <a href="blog.html">Research Blog</a>
+          <a href="affiliate.html">Partner Program</a>
+          <a href="contact.html">Contact Us</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="nav-icon-btn" id="searchToggle" aria-label="Search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+      <a href="signin.html" class="nav-icon-btn nav-signin">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        <span class="nav-signin-label">Sign In</span>
+      </a>
+      <button class="nav-icon-btn nav-cart" aria-label="Cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+        <span class="nav-cart-badge" data-count="0">0</span>
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="ty-page">
+  <div class="container">
+
+    <!-- Landing here directly, with no order just placed. Not an error — a
+         bookmark or a back-button will do it — so it points somewhere useful
+         instead of showing an empty receipt. -->
+    <div class="ty-wrap ty-none" id="tyNone" hidden>
+      <h1>No recent order to show.</h1>
+      <p>
+        This page shows the confirmation for an order you have just placed. If you are
+        looking for an earlier one, it is in your account with its tracking.
+      </p>
+      <div class="ty-actions" style="justify-content:center">
+        <a href="account.html#orders" class="btn btn-primary">View your orders <span aria-hidden="true">&rarr;</span></a>
+        <a href="peptides.html" class="btn btn-outline">Browse the catalog</a>
+      </div>
+    </div>
+
+    <div class="ty-wrap" id="tyShell" hidden>
+      <div class="ty-mark" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+
+      <h1>Thank you<span id="tyName"></span>.</h1>
+      <p class="ty-lede" id="tyLede">
+        Your order is in. A confirmation has been recorded against
+        <strong id="tyEmail">your email</strong>.
+      </p>
+      <p class="ty-num">
+        Order <span id="tyNumber">—</span> &middot; <span id="tyDate">—</span> &middot;
+        <span class="ty-status" id="tyStatus">Awaiting payment</span>
+      </p>
+
+      <div class="ty-body">
+        <div class="ty-section">
+          <h2>What you ordered</h2>
+          <ul class="ty-items" id="tyItems"></ul>
+          <div class="ty-totals" id="tyTotals"></div>
+        </div>
+
+        <div class="ty-section">
+          <h2>Shipping to</h2>
+          <p class="ty-addr" id="tyAddr">—</p>
+        </div>
+
+        <div class="ty-section">
+          <h2>What happens next</h2>
+          <ol class="ty-steps">
+            <li>
+              <b>We confirm payment</b>
+              <span id="tyStepPay">
+                Card payment is not connected on the site yet, so we will contact you at the
+                email above to take payment before anything ships.
+              </span>
+            </li>
+            <li>
+              <b>Your order is picked and packed</b>
+              <span>
+                Vials are pulled from cold storage and packed in an unmarked, insulated box.
+              </span>
+            </li>
+            <li>
+              <b>It ships with tracking</b>
+              <span>
+                A tracking number appears against this order the moment it is issued.
+              </span>
+            </li>
+          </ol>
+        </div>
+
+        <div class="ty-section">
+          <p class="ty-note" id="tyAccountNote" hidden></p>
+          <p class="ty-note">
+            <strong>Research use only.</strong> Not for human or animal consumption. No
+            dosing or administration guidance is provided with this order.
+          </p>
+        </div>
+      </div>
+
+      <div class="ty-actions">
+        <a href="account.html#orders" class="btn btn-primary" id="tyOrdersBtn">Track this order</a>
+        <a href="peptides.html" class="ty-secondary">Continue browsing</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo">Glow<span class="spark">✦</span></a>
+        <div class="footer-legal">
+          <strong>Glow Nutrition LLC</strong>
+          <span>10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States</span>
+          <span>&copy; <span id="stubYear"></span> Glow Research. All rights reserved.</span>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="peptides.html">All Peptides</a>
+        <a href="wholesale.html">Wholesale</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="about.html">About Us</a>
+        <a href="blog.html">Research Blog</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="contact.html">Contact</a>
+        <a href="shipping.html">Shipping</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="ruo-agreement.html">RUO Agreement</a>
+        <a href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <h5>Research Use Only Disclaimer</h5>
+      <p>
+        All products are sold for research use only (RUO). Not for human or animal
+        consumption. These statements have not been evaluated by the FDA. Products are
+        not intended to diagnose, treat, cure, or prevent any disease.
+      </p>
+    </div>
+
+    <div class="footer-bottom">
+      <p>Not for human consumption. For laboratory research use only.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('stubYear').textContent = new Date().getFullYear();
+  const hamburger = document.getElementById('hamburger');
+  const mainNav = document.getElementById('mainNav');
+  hamburger.addEventListener('click', () => {
+    mainNav.classList.toggle('open');
+    hamburger.classList.toggle('open');
+  });
+  mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mainNav.classList.remove('open')));
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => {
+    header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
+  });
+</script>
+<script src="js/products-data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/search.js"></script>
+<script src="js/cart-modal.js"></script>
+<script src="js/thank-you.js"></script>
+<script src="js/account.js"></script>
+</body>
+</html>

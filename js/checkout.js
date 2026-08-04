@@ -191,9 +191,9 @@
 
   /* ---------- optional account ---------- */
 
-  // Returns the sentence to append to the confirmation. Never throws: the
-  // order is already placed by the time this runs, so the worst case is
-  // telling them the account part did not take.
+  // Returns { ok, message } for the confirmation page. Never throws: the order
+  // is already placed by the time this runs, so the worst case is telling them
+  // the account part did not take.
   async function createAccount(email, password, shipAddr) {
     try {
       const resp = await fetch('/api/auth', {
@@ -208,16 +208,19 @@
         }),
       });
       const data = await resp.json().catch(() => ({}));
-      if (!resp.ok) return 'Your account could not be created: ' + (data.error || 'please try from the sign-in page.');
+      if (!resp.ok) {
+        return { ok: false, message: 'Your account could not be created: ' +
+          (data.error || 'please try from the sign-in page.') };
+      }
 
       // mirrors the session cookie so the header reads "Account"
       try {
         localStorage.setItem('glow-session', JSON.stringify({ email: data.email, name: data.name }));
       } catch (e) { /* private mode: the cookie still works */ }
 
-      return 'Your account is ready — this order is already in it.';
+      return { ok: true, message: 'Your account is ready, and this order is already in it.' };
     } catch (e) {
-      return 'Your account could not be created right now; you can sign up later with this email.';
+      return { ok: false, message: 'Your account could not be created right now; you can sign up later with this email.' };
     }
   }
 
@@ -308,18 +311,37 @@
 
         if (!resp.ok) throw new Error(data.error || 'Could not place the order.');
 
-        let msg = 'Order #' + data.orderNumber + ' received. Payment is not connected yet, ' +
-          'so no card was charged — we will follow up to collect payment.' +
-          (ref ? ' Referral ' + ref + ' has been credited on this order.' : '');
-
         // The order is placed and must not be undone by a signup problem, so
-        // this runs after it and only ever adds to the message.
+        // this runs after it and only ever annotates the confirmation.
+        let accountMessage = '';
+        let hasAccount = !!(window.localStorage && localStorage.getItem('glow-session'));
         if ($('coMakeAcct').checked) {
-          msg += ' ' + await createAccount($('coEmail').value, $('coPass').value, shipAddr);
+          const result = await createAccount($('coEmail').value, $('coPass').value, shipAddr);
+          accountMessage = result.message;
+          hasAccount = hasAccount || result.ok;
         }
 
-        $('coPlacedMsg').textContent = msg;
+        // handed to the confirmation page rather than passed in the URL, so an
+        // order number is never enough on its own to pull up someone's receipt
+        try {
+          sessionStorage.setItem('glow-last-order', JSON.stringify({
+            number: data.orderNumber,
+            date: new Date().toISOString(),
+            email: $('coEmail').value,
+            name: [shipAddr.firstName, shipAddr.lastName].filter(Boolean).join(' '),
+            items,
+            shipping: shipAddr,
+            shippingLabel: opt.label,
+            shippingCost: shippingCost(sub),
+            referral: ref,
+            accountMessage,
+            hasAccount,
+          }));
+        } catch (e) { /* private mode: the fallback message below still shows */ }
+
         if (window.GlowCart) window.GlowCart.clear();
+        location.href = 'thank-you.html';
+        return;
       } catch (err) {
         $('coPlacedMsg').textContent = err.message || 'Something went wrong placing the order. Please try again.';
         if (submitBtn) submitBtn.disabled = false;
