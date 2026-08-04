@@ -264,10 +264,16 @@
     toast();
   }
 
+  function clear() {
+    items = [];
+    save();
+    render();
+  }
+
   // items() hands back copies so callers (the checkout page) cannot mutate
   // cart state behind our back
   window.GlowCart = {
-    add, open, close, count, subtotal,
+    add, open, close, count, subtotal, clear,
     items: () => items.map(i => Object.assign({}, i)),
     savings,
     FREE_SHIPPING_AT,

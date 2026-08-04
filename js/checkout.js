@@ -224,15 +224,61 @@
         : 'Enter a code first.';
     });
 
-    $('coForm').addEventListener('submit', e => {
+    $('coForm').addEventListener('submit', async e => {
       e.preventDefault();
+
+      const items = window.GlowCart ? window.GlowCart.items() : [];
+      if (!items.length) return;
+
       // the referral code rides along with the order so the backend can credit
       // it. Attribution is decided here, at the point of sale, not later.
       const ref = window.GlowReferral ? window.GlowReferral.code() : null;
-      $('coPlacedMsg').textContent =
-        'Details captured. Payment is not connected yet, so no order was placed and no card was charged.' +
-        (ref ? ' Referral ' + ref + ' would be credited on this order.' : '');
+      const opt = SHIPPING.find(s => s.id === shipId) || SHIPPING[0];
+      const sub = items.reduce((n, i) => n + i.unitSale * i.qty, 0);
+
+      const shipAddr = {
+        firstName: $('coFirst').value, lastName: $('coLast').value,
+        address1: $('coAddr').value, address2: $('coAddr2').value,
+        city: $('coCity').value, state: $('coState').value, zip: $('coZip').value,
+      };
+      const diffBilling = $('coDiffAddr').checked;
+      const billAddr = diffBilling ? {
+        firstName: $('coBFirst').value, lastName: $('coBLast').value,
+        address1: $('coBAddr').value, city: $('coBCity').value,
+        state: $('coBState').value, zip: $('coBZip').value,
+      } : null;
+
+      const submitBtn = $('coForm').querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+      $('coPlacedMsg').textContent = 'Placing your order…';
       $('coPlacedMsg').scrollIntoView({ block: 'center', behavior: 'smooth' });
+
+      try {
+        const resp = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customer: { email: $('coEmail').value, phone: $('coPhone').value },
+            shipping: shipAddr,
+            billing: billAddr,
+            items,
+            shippingMethod: { id: opt.id, label: opt.label, cost: shippingCost(sub) },
+            referral: ref,
+          }),
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) throw new Error(data.error || 'Could not place the order.');
+
+        $('coPlacedMsg').textContent =
+          'Order #' + data.orderNumber + ' received. Payment is not connected yet, so no card was charged — ' +
+          'we will follow up to collect payment.' +
+          (ref ? ' Referral ' + ref + ' has been credited on this order.' : '');
+        if (window.GlowCart) window.GlowCart.clear();
+      } catch (err) {
+        $('coPlacedMsg').textContent = err.message || 'Something went wrong placing the order. Please try again.';
+        if (submitBtn) submitBtn.disabled = false;
+      }
     });
   });
 })();
