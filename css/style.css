@@ -1479,49 +1479,47 @@ body.search-locked{ overflow:hidden; }
   width:36px; height:4px; border-radius:0; background: rgba(0,0,0,0.15);
   margin: 12px auto 4px; flex-shrink:0;
 }
-.qa-head{ display:flex; align-items:center; gap:16px; padding: 16px 24px 18px; flex-shrink:0; }
-.qa-thumb{
-  width:56px; height:56px; border-radius:0; flex-shrink:0;
-  background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
-  border:1px solid rgba(0,0,0,0.08);
-  display:flex; align-items:center; justify-content:center; overflow:hidden;
+.qa-head{
+  display:flex; align-items:flex-start; gap:16px;
+  padding: 20px 24px 22px; flex-shrink:0;
 }
-.qa-thumb .vial{ width:18px; height:36px; box-shadow:none; }
 .qa-head-copy{ flex:1; min-width:0; }
-.qa-name{ font-size:1.15rem; margin:0 0 2px; }
-.qa-price-range{ font-family:'JetBrains Mono', monospace; font-size:0.85rem; color:#8a8a86; margin:0; }
+.qa-name{ font-size:1.45rem; letter-spacing:-.025em; margin:0 0 3px; }
+.qa-sub{ font-size:0.95rem; color:#6e6e73; margin:0; }
 .qa-close{
-  flex-shrink:0; width:36px; height:36px; border-radius:0;
-  border:1px solid rgba(0,0,0,0.12); background:transparent; color:#0a0a0a;
-  display:flex; align-items:center; justify-content:center; cursor:pointer;
-  transition: border-color .15s ease, background .15s ease;
-}
-.qa-close:hover{ border-color:#0a0a0a; background: rgba(0,0,0,0.04); }
-.qa-label{
-  font-family:'JetBrains Mono', monospace; font-size:0.68rem; font-weight:700;
-  letter-spacing:.1em; text-transform:uppercase; color:#a3a3a1;
-  padding: 0 24px 10px; margin:0;
-}
-.qa-rows{ overflow-y:auto; border-top: 1px solid rgba(0,0,0,0.07); }
-.qa-row{
-  display:flex; align-items:center; justify-content:space-between; gap:14px;
-  padding: 16px 24px;
-  border-bottom: 1px solid rgba(0,0,0,0.07);
-}
-.qa-row-label{ font-weight:700; font-size:0.98rem; }
-.qa-row-right{ display:flex; align-items:center; gap:14px; }
-.qa-row-price{ font-family:'JetBrains Mono', monospace; font-size:0.9rem; white-space:nowrap; }
-.qa-row-was{ color:#a3a3a1; text-decoration: line-through; margin-right:6px; }
-.qa-row-now{ color:#0a0a0a; font-weight:600; }
-.qa-row-add{
   flex-shrink:0; width:34px; height:34px; border-radius:0;
-  border:1px solid rgba(0,0,0,0.18); background:transparent; color:#0a0a0a;
-  font-size:1.1rem; line-height:1; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  transition: border-color .15s ease, background .15s ease, color .15s ease;
+  border:none; background:transparent; color:#6e6e73;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition: color .15s ease;
 }
-.qa-row-add:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; }
-.qa-row-add.added{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; }
+.qa-close:hover{ color:#0a0a0a; }
+
+.qa-rows{ overflow-y:auto; border-top: 1px solid rgba(0,0,0,0.09); }
+/* the row itself is the control, so the target is the full width of the
+   sheet rather than a 34px square at the end of it */
+.qa-row{
+  width:100%; display:flex; align-items:center; gap:16px;
+  padding: 18px 24px; border:none; border-bottom: 1px solid rgba(0,0,0,0.09);
+  background:#fff; color:#0a0a0a; font-family:inherit; text-align:left;
+  cursor:pointer; transition: background .15s ease;
+}
+.qa-row:last-child{ border-bottom:none; }
+.qa-row:hover{ background:#f5f5f7; }
+.qa-row:active{ background:#ebebef; }
+.qa-row-label{ flex:1; min-width:0; font-weight:600; font-size:1.08rem; }
+.qa-row-price{ display:flex; align-items:baseline; gap:9px; white-space:nowrap; font-size:1rem; }
+.qa-row-was{ color:#a1a1a6; text-decoration: line-through; font-size:0.92rem; }
+.qa-row-now{ color:#0a0a0a; font-weight:600; }
+.qa-row-mark{
+  flex-shrink:0; width:20px; height:20px; position:relative; color:#86868b;
+  transition: color .15s ease;
+}
+.qa-row:hover .qa-row-mark{ color:#0a0a0a; }
+.qa-row-mark svg{ position:absolute; inset:0; margin:auto; transition: opacity .18s ease; }
+.qa-tick{ opacity:0; }
+.qa-row.added .qa-plus{ opacity:0; }
+.qa-row.added .qa-row-mark{ color:#0a0a0a; }
+.qa-row.added .qa-tick{ opacity:1; }
 @media (max-width:640px){
   .qa-sheet{ max-width:none; max-height: 86vh; }
 }
