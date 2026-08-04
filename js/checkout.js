@@ -58,7 +58,6 @@
 
     $('coItems').innerHTML = items.map(i => {
       const onSale = i.unitOriginal > i.unitSale;
-      const off = bulkSavingPct(i.unitOriginal, i.unitSale);
       return `
         <div class="co-item">
           <span class="co-thumb">${productThumb(i.name)}</span>
@@ -69,7 +68,6 @@
           <div class="co-item-price">
             ${onSale ? `<span class="co-was">${money(i.unitOriginal * i.qty)}</span>` : ''}
             <span class="co-now">${money(i.unitSale * i.qty)}</span>
-            ${off ? `<span class="co-off">Save ${off}%</span>` : ''}
           </div>
         </div>`;
     }).join('');
@@ -100,36 +98,6 @@
       saveRow.hidden = true;
     }
 
-    renderUpsell(items);
-  }
-
-  /* ---------- "complete your order" ---------- */
-
-  function renderUpsell(items) {
-    const box = $('coUpsell');
-    if (typeof GLOW_PRODUCTS === 'undefined') { box.hidden = true; return; }
-    const inCart = new Set(items.map(i => i.name));
-    const pick = GLOW_PRODUCTS.find(p => !inCart.has(p.name));
-    if (!pick) { box.hidden = true; return; }
-
-    box.hidden = false;
-    $('coUpsellBody').innerHTML = `
-      <span class="co-thumb">${productThumb(pick.name)}</span>
-      <div class="co-item-main">
-        <p class="co-item-name">${pick.name}</p>
-        <p class="co-item-meta">${pick.tag} &middot; ${pick.size}</p>
-      </div>
-      <div class="co-upsell-right">
-        ${onSaleNow() ? `<s class="co-was">${money(pick.price)}</s>` : ''}
-        <span class="co-now">${money(salePrice(pick.price))}</span>
-        <button type="button" class="co-add-btn" id="coAdd">Add</button>
-      </div>`;
-    $('coAdd').addEventListener('click', () => {
-      window.GlowCart.add({
-        name: pick.name, variant: '1 vial',
-        unitOriginal: pick.price, unitSale: salePrice(pick.price),
-      });
-    });
   }
 
   /* ---------- payment methods ---------- */
@@ -245,18 +213,17 @@
       window.GlowCart.open();
     });
 
-    // billing address block, revealed only when it differs from shipping
-    $('coDiffAddr').addEventListener('change', e => {
-      $('coBilling').hidden = !e.target.checked;
-      $('coBilling').querySelectorAll('input,select').forEach(f => {
-        if (f.dataset.req) f.required = e.target.checked;
-      });
-    });
-
     // optional account creation: the password field only exists once asked for
     $('coMakeAcct').addEventListener('change', e => {
       $('coPassField').hidden = !e.target.checked;
       $('coPass').required = e.target.checked;
+    });
+
+    $('coPromoToggle').addEventListener('click', () => {
+      const box = $('coPromoBox');
+      box.hidden = !box.hidden;
+      $('coPromoToggle').setAttribute('aria-expanded', String(!box.hidden));
+      if (!box.hidden) $('coPromo').focus();
     });
 
     $('coPromoBtn').addEventListener('click', () => {
@@ -282,12 +249,10 @@
         address1: $('coAddr').value, address2: $('coAddr2').value,
         city: $('coCity').value, state: $('coState').value, zip: $('coZip').value,
       };
-      const diffBilling = $('coDiffAddr').checked;
-      const billAddr = diffBilling ? {
-        firstName: $('coBFirst').value, lastName: $('coBLast').value,
-        address1: $('coBAddr').value, city: $('coBCity').value,
-        state: $('coBState').value, zip: $('coBZip').value,
-      } : null;
+      // Billing is the shipping address. A card whose billing address differs
+      // is handled by the processor's own AVS step, not by six more fields
+      // everybody has to scroll past.
+      const billAddr = null;
 
       const submitBtn = $('coForm').querySelector('button[type="submit"]');
       if (submitBtn) submitBtn.disabled = true;
