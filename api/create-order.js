@@ -21,12 +21,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required order details.' });
   }
 
-  // Custom line items (no WooCommerce product_id yet) — still recorded on the
-  // order for fulfillment, just not linked to WooCommerce inventory.
-  const line_items = items.map(i => ({
-    name: [i.name, i.variant].filter(Boolean).join(' — '),
-    quantity: i.qty,
-    subtotal: (i.unitSale * i.qty).toFixed(2),
+  // WooCommerce's line_items require a real product_id/sku, which we don't
+  // have yet — the SKU list is coming from the fulfillment partner. fee_lines
+  // need no product reference and still record name/qty/price per cart line,
+  // fully visible on the order. Swap these to real line_items once SKUs land.
+  const fee_lines = items.map(i => ({
+    name: [i.name, i.variant, i.qty > 1 ? `x${i.qty}` : null].filter(Boolean).join(' — '),
     total: (i.unitSale * i.qty).toFixed(2),
   }));
 
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
     status: 'pending', // awaiting payment — flips to processing once a payment processor is wired in
     billing: addr(billing || shipping),
     shipping: addr(shipping),
-    line_items,
+    fee_lines,
     shipping_lines,
     customer_note: notes || '',
     meta_data: referral ? [{ key: 'referral_code', value: referral }] : [],
