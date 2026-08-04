@@ -33,49 +33,59 @@
     font:inherit; color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; cursor:pointer;
   }
 
-  /* sidebar + panel, collapsing to a scrolling tab strip on narrow screens */
-  .ac-shell{ display:grid; grid-template-columns: 210px minmax(0,1fr); gap: clamp(24px, 3vw, 40px); align-items:start; }
-  .ac-nav{ display:flex; flex-direction:column; border:1px solid rgba(0,0,0,.16); }
+  /* sidebar + panel, collapsing to a wrapping tab strip on narrow screens.
+     Boxes and hairline-grid tricks are gone throughout this page in favour
+     of the same language as checkout and the interior pages: plain type,
+     generous space, and a hairline only where one thing genuinely ends and
+     the next begins, never a box around something just to mark it as a
+     unit. */
+  .ac-shell{ display:grid; grid-template-columns: 200px minmax(0,1fr); gap: clamp(32px, 4vw, 56px); align-items:start; }
+  .ac-nav{ display:flex; flex-direction:column; gap:2px; }
   .ac-nav-btn{
-    padding: 13px 16px; text-align:left; background:transparent; border:none;
-    border-bottom:1px solid rgba(0,0,0,.1);
-    font-family:'Inter',sans-serif; font-size:.92rem; font-weight:600; color:#45453f;
-    cursor:pointer; transition: background .2s ease, color .2s ease;
+    padding: 11px 14px; text-align:left; background:transparent; border:none;
+    font-family:'Inter',sans-serif; font-size:.96rem; font-weight:500; color:#45453f;
+    cursor:pointer; transition: background .18s ease, color .18s ease;
   }
-  .ac-nav-btn:last-child{ border-bottom:none; }
-  .ac-nav-btn:hover{ background: rgba(0,0,0,.04); color:#0a0a0a; }
-  .ac-nav-btn.is-on{ background:#0a0a0a; color:#fff; }
+  .ac-nav-btn:hover{ background:#f5f5f7; color:#0a0a0a; }
+  .ac-nav-btn.is-on{ background:#f5f5f7; color:#0a0a0a; font-weight:700; }
 
   .ac-panel[hidden]{ display:none; }
-  .ac-panel h2{ font-size:1.25rem; letter-spacing:-.02em; margin:0 0 4px; }
-  .ac-panel-sub{ margin:0 0 22px; font-size:.92rem; color:#55554f; }
+  .ac-panel h2{ font-size:1.4rem; letter-spacing:-.025em; margin:0 0 5px; }
+  .ac-panel-sub{ margin:0 0 30px; font-size:.96rem; color:#6e6e73; }
 
-  .ac-card{ border:1px solid rgba(0,0,0,.16); padding: clamp(18px, 2.4vw, 26px); }
-  .ac-card + .ac-card{ margin-top: 16px; }
+  /* a section within a panel, "Next reward", "Certificates", the details
+     help text, is set off by the rule above it, not a box around it */
+  .ac-card{ border:none; border-top:1px solid rgba(0,0,0,.11); padding: 24px 0 0; }
+  .ac-card > h2{ font-size:1.05rem; margin:0 0 12px; }
+  .ac-card + .ac-card{ margin-top: 28px; }
 
-  /* points */
-  .ac-stats{ display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap:1px; background: rgba(0,0,0,.16); border:1px solid rgba(0,0,0,.16); margin-bottom:16px; }
-  .ac-stat{ background:#fff; padding: 18px; }
-  .ac-stat b{ display:block; font-family:'Space Grotesk',sans-serif; font-size:1.7rem; font-weight:700; letter-spacing:-.03em; }
-  .ac-stat span{ display:block; margin-top:4px; font-size:0.88rem; letter-spacing:0; text-transform:none; color:#6e6e73; }
-  .ac-stat-note{ display:block; margin-top:7px; font-style:normal; font-size:.82rem; color:#45453f; }
+  /* points: a plain row of figures, same pattern as the shipping/wholesale
+     stat rows. The numeral itself is what should read first, not a grid of
+     little bordered cells around it */
+  .ac-stats{ display:flex; flex-wrap:wrap; gap: clamp(32px, 5vw, 56px); margin-bottom:26px; }
+  .ac-stat{ padding:0; }
+  .ac-stat b{ display:block; font-family:'Space Grotesk',sans-serif; font-size:2.1rem; font-weight:500; letter-spacing:-.02em; }
+  .ac-stat span{ display:block; margin-top:5px; font-size:0.92rem; color:#6e6e73; }
+  .ac-stat-note{ display:block; margin-top:7px; font-style:normal; font-size:.84rem; color:#45453f; }
 
-  .ac-bar{ height:6px; background: rgba(0,0,0,.1); margin: 4px 0 10px; }
+  .ac-bar{ height:6px; background: rgba(0,0,0,.09); margin: 6px 0 10px; }
   .ac-bar i{ display:block; height:100%; background:#0a0a0a; transition: width .6s cubic-bezier(.2,.8,.2,1); }
-  .ac-bar-note{ margin:0; font-size:.86rem; color:#55554f; }
+  .ac-bar-note{ margin:0; font-size:.9rem; color:#55554f; }
 
-  /* orders */
-  .ac-order{ border:1px solid rgba(0,0,0,.16); padding: 18px 20px; }
-  .ac-order + .ac-order{ margin-top:14px; }
+  /* orders: a plain list, each row set off by the hairline beneath it, the
+     same pattern the checkout order summary already uses, rather than a
+     bordered card per order */
+  #acOrders{ border-top:1px solid rgba(0,0,0,.11); }
+  .ac-order{ padding: 26px 0; border-bottom:1px solid rgba(0,0,0,.11); }
   .ac-order-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:14px; }
-  .ac-order-id{ display:block; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem; }
-  .ac-order-date{ display:block; margin-top:3px; font-size:.8rem; color:#6e6e73; }
+  .ac-order-id{ display:block; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:1.15rem; }
+  .ac-order-date{ display:block; margin-top:3px; font-size:.85rem; color:#6e6e73; }
   .ac-status{
     font-size:.82rem; font-weight:500; letter-spacing:0; text-transform:none;
     padding: 5px 10px; white-space:nowrap;
   }
-  /* the base carries a visible default so a status we have not styled yet —
-     WooCommerce and the fulfilment partner can both introduce one — still
+  /* the base carries a visible default so a status we have not styled yet,
+     WooCommerce and the fulfilment partner can both introduce one, still
      reads as a badge rather than as loose text */
   .ac-status{ background: rgba(0,0,0,.07); color:#45453f; }
   .ac-status--delivered{ background: rgba(0,0,0,.07); color:#45453f; }
@@ -89,66 +99,53 @@
 
   /* loading / empty / error states for panels fed by the API */
   .ac-msg{ margin:0; padding: 22px 0; color:#6e6e73; font-size:.92rem; }
-  .ac-order-items{ list-style:none; margin:0 0 14px; padding:0; border-top:1px solid rgba(0,0,0,.1); }
+  .ac-order-items{ list-style:none; margin:0 0 16px; padding:0; }
   .ac-order-items li{
     display:flex; justify-content:space-between; align-items:baseline; gap:14px;
-    padding: 9px 0; border-bottom:1px solid rgba(0,0,0,.07); font-size:.9rem;
+    padding: 5px 0; font-size:.94rem; color:#45453f;
   }
-  .ac-order-items code{ font-family:'JetBrains Mono', monospace; font-size:.76rem; color:#6e6e73; }
   .ac-order-foot{ display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; }
-  .ac-order-coa{ font-size:.8rem; color:#6e6e73; }
-  .ac-total{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem; }
-  .ac-track{ font-weight:700; font-size:.9rem; text-decoration:underline; text-underline-offset:3px; }
-  /* a number with no confirmed carrier is not a link — nothing to click,
+  .ac-order-coa{ font-size:.84rem; color:#6e6e73; }
+  .ac-total{ font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:1.05rem; }
+  .ac-track{ font-weight:600; font-size:.94rem; text-decoration:underline; text-underline-offset:3px; }
+  /* a number with no confirmed carrier is not a link, nothing to click,
      just the plainest possible statement of the number itself */
-  .ac-track-num{ font-weight:600; font-size:.88rem; color:#45453f; }
+  .ac-track-num{ font-weight:600; font-size:.9rem; color:#45453f; }
 
-  /* rewards */
-  .ac-reward{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
-    border:1px solid rgba(0,0,0,.16); padding: 16px 18px; }
-  .ac-reward + .ac-reward{ margin-top:12px; }
-  .ac-reward.is-ready{ border-color:#0a0a0a; }
-  .ac-reward-label{ display:block; font-weight:700; font-size:1rem; }
-  .ac-reward-cost{ display:block; margin-top:3px; font-size:.85rem; color:#6e6e73; }
-  .ac-reward-btn{ padding: 10px 18px; font-size:.85rem; }
+  /* rewards: same hairline-list treatment as orders */
+  .ac-reward{
+    display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+    padding: 18px 0; border-bottom:1px solid rgba(0,0,0,.11);
+  }
+  .ac-reward:last-child{ border-bottom:none; }
+  .ac-reward-label{ display:block; font-weight:600; font-size:1.02rem; }
+  .ac-reward-cost{ display:block; margin-top:3px; font-size:.88rem; color:#6e6e73; }
+  .ac-reward-btn{ padding: 10px 18px; font-size:.88rem; }
   .ac-reward-btn[disabled]{ opacity:.45; cursor:not-allowed; }
 
   /* affiliate */
-  .ac-ref-row{ display:flex; gap:10px; margin: 6px 0 18px; flex-wrap:wrap; }
+  .ac-ref-row{ display:flex; gap:10px; margin: 8px 0 20px; flex-wrap:wrap; }
   .ac-ref-row input{
     flex:1; min-width: 200px; padding: 13px 15px; border-radius:0;
-    border:1px solid rgba(0,0,0,.22); background:#fafafa; color:#0a0a0a;
+    border:1px solid rgba(0,0,0,.18); background:#fafafa; color:#0a0a0a;
     font-family:'JetBrains Mono', monospace; font-size:.84rem;
   }
-  .ac-ref-row .btn{ padding: 13px 20px; font-size:.85rem; }
+  .ac-ref-row .btn{ padding: 13px 20px; font-size:.88rem; }
 
-  .ac-note{ margin: 18px 0 0; padding: 15px 17px; border:1px solid rgba(0,0,0,.16); font-size:.83rem; line-height:1.6; color:#55554f; }
+  /* a callout gets a rule down its side rather than a box around it, the
+     same amount of visual weight as a border, without closing off a shape */
+  .ac-note{ margin: 20px 0 0; padding: 2px 0 2px 16px; border-left:2px solid rgba(0,0,0,.16); font-size:.88rem; line-height:1.65; color:#55554f; }
   .ac-note strong{ color:#0a0a0a; font-weight:600; }
   .ac-note[hidden]{ display:none; }
   .ac-note a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
 
-  /* ---------- hover / motion ----------
-     The order and reward rows are cards the eye tracks down a list, so they
-     get the same edge-darkening the catalog tiles use rather than sitting
-     inert. Everything here is covered by the global reduced-motion block. */
-  .ac-order, .ac-reward{ transition: border-color .25s ease, box-shadow .25s ease; }
-  .ac-order:hover, .ac-reward:hover{
-    border-color: rgba(0,0,0,.42);
-    box-shadow: 0 10px 26px -18px rgba(0,0,0,.5);
-  }
-  /* a redeemable reward already carries a solid black edge — the generic
-     hover above would have lightened it, reading as going backwards */
-  .ac-reward.is-ready:hover{
-    border-color:#0a0a0a;
-    box-shadow: 0 10px 26px -16px rgba(0,0,0,.6);
-  }
-
+  /* ---------- hover / motion ---------- */
   .ac-track{ transition: opacity .2s ease; }
   .ac-track span{ display:inline-block; transition: transform .32s var(--lp-ease); }
   .ac-track:hover span{ transform: translateX(4px); }
 
   .ac-ref-row input{ transition: border-color .18s ease, background .18s ease; }
-  .ac-ref-row input:hover{ border-color: rgba(0,0,0,.45); }
+  .ac-ref-row input:hover{ border-color: rgba(0,0,0,.4); }
   .ac-ref-row input:focus{ outline:none; border-color:#0a0a0a; background:#fff; }
 
   .ac-head-meta button{ transition: opacity .2s ease; }
@@ -165,22 +162,10 @@
   @media (max-width: 760px){
     .ac-shell{ grid-template-columns: 1fr; }
     /* A horizontal scroll strip hid Affiliate and Details off the right edge
-       with nothing to suggest they were there. Wrap instead, so every tab is
-       on screen — same gapless grid as .ac-stats. */
-    .ac-nav{
-    display:grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
-    gap:1px; background: rgba(0,0,0,.16); border:1px solid rgba(0,0,0,.16);
-    }
-    .ac-nav-btn{
-    border:none; background:#fff; text-align:center; padding: 13px 10px;
-    font-size:.86rem;
-    }
-    .ac-nav-btn.is-on{ background:#0a0a0a; color:#fff; }
-    /* these grids are two columns here, so an odd number of cells leaves the
-       container's background showing through as an empty grey box — let the
-       last one span instead */
-    .ac-nav-btn:last-child:nth-child(odd),
-    .ac-stats > :last-child:nth-child(odd){ grid-column: 1 / -1; }
+       with nothing to suggest they were there. A wrapping row keeps every
+       tab on screen; no more grid-of-cells border trick to carry over. */
+    .ac-nav{ flex-direction:row; flex-wrap:wrap; gap:6px; }
+    .ac-nav-btn{ padding: 9px 14px; font-size:.9rem; }
     .ac-head-meta{ text-align:left; }
     .ac-head-meta button{ margin-left:0; }
   }

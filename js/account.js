@@ -386,7 +386,7 @@
     sub.textContent = 'Earn commission referring qualified research buyers. Applications are reviewed by hand.';
     body.innerHTML = '' +
       '<div class="ac-card">' +
-        '<div class="ac-stats" style="margin-bottom:18px">' +
+        '<div class="ac-stats">' +
           '<div class="ac-stat"><b>10%</b><span>Starting commission</span></div>' +
           '<div class="ac-stat"><b>60 days</b><span>Attribution window</span></div>' +
           '<div class="ac-stat"><b>Monthly</b><span>Payouts</span></div>' +
