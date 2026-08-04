@@ -83,6 +83,8 @@
 
     var tabs = document.querySelectorAll('.si-tab');
     var nameField = document.getElementById('siNameField');
+    var agreeField = document.getElementById('siAgreeField');
+    var agreeBox = document.getElementById('siAgree');
     var submit = document.getElementById('siSubmit');
     var mode = 'in';
 
@@ -96,12 +98,17 @@
         });
         nameField.hidden = mode !== 'up';
         document.getElementById('siName').required = mode === 'up';
+        // only account creation needs the RUO/Terms acknowledgement — signing
+        // back in to an existing account already accepted it once
+        agreeField.hidden = mode !== 'up';
+        agreeBox.required = mode === 'up';
         submit.textContent = mode === 'up' ? 'Create account' : 'Sign in';
       });
     });
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (mode === 'up' && !agreeBox.checked) { agreeBox.reportValidity(); return; }
       var email = document.getElementById('siEmail').value.trim();
       var name = mode === 'up' ? document.getElementById('siName').value.trim() : '';
       // note what is NOT here: the password is never read off the form

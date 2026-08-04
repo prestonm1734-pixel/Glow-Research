@@ -59,6 +59,16 @@
   .si-field input:focus{ outline:none; border-color:#0a0a0a; }
   .si-field input:focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 2px; }
 
+  /* same shape as the affiliate apply checkbox on the account page, so
+     the "acknowledge and agree" pattern reads the same wherever it shows up */
+  .si-agree{
+    display:flex; align-items:flex-start; gap:10px; margin-bottom: 18px;
+    font-size:.86rem; line-height:1.5; color:#55554f; cursor:pointer;
+  }
+  .si-agree[hidden]{ display:none; }
+  .si-agree input{ margin-top:3px; flex-shrink:0; accent-color:#0a0a0a; }
+  .si-agree a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
+
   .si-submit{ width:100%; margin-top: 10px; padding: 15px 24px; }
   .si-alt{ margin: 18px 0 0; text-align:center; font-size:.88rem; color:#8a8a86; }
   .si-alt a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
@@ -152,6 +162,10 @@
         <label for="siPassword">Password</label>
         <input type="password" id="siPassword" required autocomplete="current-password" placeholder="••••••••" />
       </div>
+      <label class="si-agree" id="siAgreeField" hidden>
+        <input type="checkbox" id="siAgree" />
+        <span>I am 21 or older and I agree to the <a href="ruo-agreement.html">RUO Agreement</a> and <a href="terms.html">Terms of Service</a>.</span>
+      </label>
       <button type="submit" class="btn btn-primary si-submit" id="siSubmit">Sign in</button>
     </form>
 
@@ -193,6 +207,7 @@
         <a href="contact.html">Contact</a>
         <a href="shipping.html">Shipping</a>
         <a href="terms.html">Terms of Service</a>
+        <a href="ruo-agreement.html">RUO Agreement</a>
         <a href="#">Privacy Policy</a>
       </div>
     </div>
