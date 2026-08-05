@@ -145,15 +145,28 @@
     if (forgotBtn) {
       forgotBtn.addEventListener('click', function () {
         var note = document.getElementById('siForgotNote');
-        var link = document.getElementById('siForgotMail');
-        var email = document.getElementById('siEmail').value.trim();
-        if (link) {
-          link.href = 'mailto:support@glowresearch.shop?subject=' +
-            encodeURIComponent('Password reset') + '&body=' +
-            encodeURIComponent('Please reset the password on my account.' +
-              (email ? '\n\nAccount email: ' + email : ''));
+        var emailField = document.getElementById('siEmail');
+        var email = emailField.value.trim();
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          note.hidden = false;
+          note.textContent = 'Enter your account email above first, then click "Forgot password?" again.';
+          emailField.focus();
+          return;
         }
-        note.hidden = !note.hidden;
+
+        forgotBtn.disabled = true;
+        note.hidden = false;
+        note.textContent = 'Sending a reset link…';
+
+        api('/api/forgot-password', { email: email })
+          .then(function (data) {
+            note.textContent = data.message || 'If that email has an account, a reset link is on its way.';
+          })
+          .catch(function (err) {
+            note.textContent = err.message || 'Could not send a reset link right now. Email support@glowresearch.shop instead.';
+          })
+          .then(function () { forgotBtn.disabled = false; });
       });
     }
 
@@ -179,6 +192,69 @@
         .catch(function (err) {
           submit.disabled = false;
           if (msg) { msg.hidden = false; msg.textContent = err.message; }
+        });
+    });
+  }
+
+  /* ================= reset-password page ================= */
+  function initResetPassword() {
+    var form = document.getElementById('rpForm');
+    if (!form) return;
+
+    var params = new URLSearchParams(location.search);
+    var email = (params.get('email') || '').trim();
+    var token = params.get('token') || '';
+
+    var emailField = document.getElementById('rpEmail');
+    var passField = document.getElementById('rpPassword');
+    var pass2Field = document.getElementById('rpPassword2');
+    var submit = document.getElementById('rpSubmit');
+    var msg = document.getElementById('rpMsg');
+
+    if (email) emailField.value = email;
+
+    // no token in the URL means this was opened directly, not from an
+    // emailed link — there is nothing to submit
+    if (!email || !token) {
+      passField.disabled = true;
+      pass2Field.disabled = true;
+      submit.disabled = true;
+      msg.hidden = false;
+      msg.classList.add('is-error');
+      msg.textContent = 'This link is missing its reset token. Request a new one from the sign-in page.';
+      return;
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      msg.classList.remove('is-error');
+
+      if (passField.value.length < 8) {
+        msg.hidden = false;
+        msg.classList.add('is-error');
+        msg.textContent = 'Password must be at least 8 characters.';
+        return;
+      }
+      if (passField.value !== pass2Field.value) {
+        msg.hidden = false;
+        msg.classList.add('is-error');
+        msg.textContent = 'Passwords do not match.';
+        return;
+      }
+
+      submit.disabled = true;
+      msg.hidden = false;
+      msg.textContent = 'Setting your new password…';
+
+      api('/api/reset-password', { email: email, token: token, password: passField.value })
+        .then(function (user) {
+          write(SESSION, JSON.stringify({ email: user.email, name: user.name }));
+          location.href = root() + 'account.html';
+        })
+        .catch(function (err) {
+          submit.disabled = false;
+          msg.classList.add('is-error');
+          msg.textContent = err.message;
         });
     });
   }
@@ -516,7 +592,7 @@
     if (label && s) label.textContent = 'Account';
   }
 
-  function boot() { initHeaderLink(); initSignIn(); initAccount(); }
+  function boot() { initHeaderLink(); initSignIn(); initResetPassword(); initAccount(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })();
