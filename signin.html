@@ -185,14 +185,14 @@
         <input type="password" id="siPassword" required minlength="8" autocomplete="current-password" placeholder="••••••••" />
         <span class="si-hint" id="siPassHint" hidden>At least 8 characters.</span>
         <!-- Sign-in mode only — a new account has no old password to forget. -->
-        <button type="button" class="si-forgot" id="siForgot">Forgot password?</button>
+        <button type="button" class="si-forgot" id="siForgot" aria-busy="false"><span class="btn-label"><span>Forgot password?</span></span></button>
         <p class="si-forgot-note" id="siForgotNote" hidden></p>
       </div>
       <label class="si-agree" id="siAgreeField" hidden>
         <input type="checkbox" id="siAgree" />
         <span>I am 21 or older and I agree to the <a href="ruo-agreement.html">RUO Agreement</a> and <a href="terms.html">Terms of Service</a>.</span>
       </label>
-      <button type="submit" class="btn btn-primary si-submit" id="siSubmit">Sign in</button>
+      <button type="submit" class="btn btn-primary si-submit" id="siSubmit" aria-busy="false"><span class="btn-label"><span>Sign in</span></span></button>
       <p class="si-msg" id="siMsg" hidden role="status" aria-live="polite"></p>
     </form>
 

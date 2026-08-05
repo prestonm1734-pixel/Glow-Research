@@ -74,6 +74,31 @@
     return '$' + pointsValue(points).toLocaleString();
   }
 
+  /* ring-of-eight-ticks spinner for any button that submits to the network —
+     see .btn-label / .btn-spin in css/style.css */
+  var SPIN_TICKS = 8;
+  function spinHtml() {
+    var ticks = '';
+    for (var i = 0; i < SPIN_TICKS; i++) {
+      var angle = i * (360 / SPIN_TICKS);
+      var delay = (i * (0.8 / SPIN_TICKS)).toFixed(3);
+      ticks += '<i style="transform:rotate(' + angle + 'deg) translate(0,-5px);animation-delay:-' + delay + 's"></i>';
+    }
+    return '<span class="btn-spin" aria-hidden="true">' + ticks + '</span>';
+  }
+  function setBtnBusy(btn, label, busy) {
+    if (!btn) return;
+    var labelEl = btn.querySelector('.btn-label');
+    if (!labelEl) { btn.disabled = !!busy; return; }
+    labelEl.style.opacity = '0';
+    setTimeout(function () {
+      labelEl.innerHTML = (busy ? spinHtml() : '') + '<span>' + label + '</span>';
+      labelEl.style.opacity = '1';
+    }, 120);
+    btn.disabled = !!busy;
+    btn.setAttribute('aria-busy', busy ? 'true' : 'false');
+  }
+
   var money = function (n) { return '$' + n.toFixed(2); };
   var when = function (iso) {
     var d = new Date(iso + 'T00:00:00');
@@ -123,7 +148,7 @@
         // back in to an existing account already accepted it once
         agreeField.hidden = mode !== 'up';
         agreeBox.required = mode === 'up';
-        submit.textContent = mode === 'up' ? 'Create account' : 'Sign in';
+        setBtnBusy(submit, mode === 'up' ? 'Create account' : 'Sign in', false);
 
         // tell the password manager which one it is looking at, and only show
         // the length rule where it applies
@@ -155,18 +180,19 @@
           return;
         }
 
-        forgotBtn.disabled = true;
-        note.hidden = false;
-        note.textContent = 'Sending a reset link…';
+        setBtnBusy(forgotBtn, 'Sending…', true);
+        note.hidden = true;
 
         api('/api/forgot-password', { email: email })
           .then(function (data) {
+            note.hidden = false;
             note.textContent = data.message || 'If that email has an account, a reset link is on its way.';
           })
           .catch(function (err) {
+            note.hidden = false;
             note.textContent = err.message || 'Could not send a reset link right now. Email support@glowresearch.shop instead.';
           })
-          .then(function () { forgotBtn.disabled = false; });
+          .then(function () { setBtnBusy(forgotBtn, 'Forgot password?', false); });
       });
     }
 
@@ -180,8 +206,8 @@
       var password = document.getElementById('siPassword').value;
       var name = mode === 'up' ? document.getElementById('siName').value.trim() : '';
 
-      submit.disabled = true;
-      if (msg) { msg.hidden = false; msg.textContent = mode === 'up' ? 'Creating your account…' : 'Signing in…'; }
+      setBtnBusy(submit, mode === 'up' ? 'Creating account…' : 'Signing in…', true);
+      if (msg) { msg.hidden = true; msg.textContent = ''; }
 
       api('/api/auth', { action: mode === 'up' ? 'signup' : 'login', email: email, password: password, name: name })
         .then(function (user) {
@@ -190,7 +216,7 @@
           location.href = dest;
         })
         .catch(function (err) {
-          submit.disabled = false;
+          setBtnBusy(submit, mode === 'up' ? 'Create account' : 'Sign in', false);
           if (msg) { msg.hidden = false; msg.textContent = err.message; }
         });
     });
@@ -242,9 +268,8 @@
         return;
       }
 
-      submit.disabled = true;
-      msg.hidden = false;
-      msg.textContent = 'Setting your new password…';
+      setBtnBusy(submit, 'Setting password…', true);
+      msg.hidden = true;
 
       api('/api/reset-password', { email: email, token: token, password: passField.value })
         .then(function (user) {
@@ -252,7 +277,8 @@
           location.href = root() + 'account.html';
         })
         .catch(function (err) {
-          submit.disabled = false;
+          setBtnBusy(submit, 'Set new password', false);
+          msg.hidden = false;
           msg.classList.add('is-error');
           msg.textContent = err.message;
         });

@@ -132,6 +132,26 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .btn-ghost:hover{ background: rgba(255,255,255,0.12); }
 .btn-lg{ padding: 15.5px 29px; font-size: 1rem; }
 
+/* ---------- async button state ----------
+   Shared across any form submit that hits the network (sign in, forgot
+   password, reset password, wholesale apply): the label crossfades to a
+   spinner instead of a bare disabled button, so a request that takes a
+   moment reads as "working" rather than "stuck". Same ring-of-eight-ticks
+   mark iOS/macOS use, not a spinning arc. */
+.btn-label{ display:inline-flex; align-items:center; gap:9px; transition: opacity .12s ease; }
+.btn[disabled],
+button[disabled].si-forgot{ cursor: progress; }
+.btn-spin{ position:relative; width:15px; height:15px; flex-shrink:0; }
+.btn-spin i{
+  position:absolute; top:50%; left:50%; width:2px; height:5px;
+  margin:-2.5px 0 0 -1px; border-radius:1px; background:currentColor;
+  animation: btnTick .8s linear infinite;
+}
+@keyframes btnTick{ 0%{ opacity:1; } 100%{ opacity:.15; } }
+@media (prefers-reduced-motion: reduce){
+  .btn-spin i{ animation: none; opacity:.55; }
+}
+
 /* press feedback — short duration so the push reads as a click, not a slide */
 .btn:active{ transform: translateY(1px) scale(.988); transition-duration: .06s; }
 

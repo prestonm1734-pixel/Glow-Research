@@ -274,7 +274,7 @@
         <textarea id="wsCompounds" name="compounds" placeholder="BPC-157, TB-500, Semaglutide. Note any custom fill sizes here." required></textarea>
       </div>
       <div class="ws-submit">
-        <button type="submit" class="btn btn-primary">Submit application <span class="lp-arrow" aria-hidden="true">&rarr;</span></button>
+        <button type="submit" class="btn btn-primary" id="wsSubmitBtn" aria-busy="false"><span class="btn-label"><span>Submit application</span></span> <span class="lp-arrow" aria-hidden="true">&rarr;</span></button>
       </div>
     </form>
 
@@ -382,6 +382,29 @@
     if (!form || !done) return;
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const submitBtn = form.querySelector('button[type="submit"]');
+    const submitLabel = submitBtn.querySelector('.btn-label');
+    const submitArrow = submitBtn.querySelector('.lp-arrow');
+
+    // ring-of-eight-ticks spinner, same mark as checkout's place-order button
+    function spinHtml() {
+      let ticks = '';
+      for (let i = 0; i < 8; i++) {
+        const angle = i * 45;
+        const delay = (i * 0.1).toFixed(3);
+        ticks += `<i style="transform:rotate(${angle}deg) translate(0,-5px);animation-delay:-${delay}s"></i>`;
+      }
+      return `<span class="btn-spin" aria-hidden="true">${ticks}</span>`;
+    }
+    function setBusy(busy) {
+      submitLabel.style.opacity = '0';
+      setTimeout(() => {
+        submitLabel.innerHTML = (busy ? spinHtml() : '') + '<span>' + (busy ? 'Sending…' : 'Submit application') + '</span>';
+        submitLabel.style.opacity = '1';
+      }, 120);
+      submitBtn.disabled = busy;
+      submitBtn.setAttribute('aria-busy', busy ? 'true' : 'false');
+      if (submitArrow) submitArrow.style.display = busy ? 'none' : '';
+    }
 
     function show() {
       form.hidden = true;
@@ -395,7 +418,7 @@
     form.addEventListener('submit', async e => {
       e.preventDefault();
       error.hidden = true;
-      submitBtn.disabled = true;
+      setBusy(true);
 
       try {
         const resp = await fetch('/api/wholesale-apply', {
@@ -420,7 +443,7 @@
         error.hidden = false;
         error.textContent = err.message;
       } finally {
-        submitBtn.disabled = false;
+        setBusy(false);
       }
     });
   })();
