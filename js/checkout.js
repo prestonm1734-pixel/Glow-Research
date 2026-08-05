@@ -8,7 +8,7 @@
      and keep them in step with the shipping page. */
   const SHIPPING = [
     { id: '2day', label: 'FedEx 2-Day Express', note: 'Arrives in 2 business days', cost: 12.95, freeOver: 400 },
-    { id: 'overnight', label: 'FedEx Overnight', note: 'Next business day, order before 2:00 PM EST', cost: 39.95, freeOver: null },
+    { id: 'overnight', label: 'FedEx Overnight', note: 'Next business day, order before 2:00 PM PST', cost: 39.95, freeOver: null },
   ];
 
   /* Card only for now. Add entries here to offer more (bank transfer, crypto);

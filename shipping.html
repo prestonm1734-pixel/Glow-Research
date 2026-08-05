@@ -8,7 +8,7 @@
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
 <title>Shipping | Glow Research</title>
-<meta name="description" content="Order before 2:00 PM EST and it ships the same business day on 2-day FedEx Express. Free over $400. All 50 states." />
+<meta name="description" content="Order before 2:00 PM PST and it ships the same business day on 2-day FedEx Express. Free over $400. All 50 states." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -100,14 +100,14 @@
     <span class="lp-eyebrow">Shipping &amp; Fulfillment</span>
     <h1>It ships today.<br /><span class="outline">Fast, every time.</span></h1>
     <p class="lp-lede">
-      Order by 2:00 PM EST on a weekday and it leaves the same afternoon, cold,
+      Order by 2:00 PM PST on a weekday and it leaves the same afternoon
       on 2-day FedEx.
     </p>
     <p class="lp-hero-note">
       <span class="lp-dot" aria-hidden="true"></span>
       <!-- the static claim is the no-JS fallback; the script swaps in the live
            countdown against today's cutoff -->
-      <span id="shipClock">Ordered before <strong>2:00 PM EST</strong>, it ships the same business day.</span>
+      <span id="shipClock">Ordered before <strong>2:00 PM PST</strong>, it ships the same business day.</span>
     </p>
     <div class="lp-actions">
       <a href="peptides.html" class="btn btn-primary btn-lg">Shop Peptides <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
@@ -274,7 +274,7 @@
   })();
 
   /* Live dispatch cutoff. The page claims "it ships today", so say whether
-     that is still true right now. All arithmetic runs on New York wall-clock
+     that is still true right now. All arithmetic runs on Pacific wall-clock
      parts, which sidesteps the DST offset entirely. */
   (function () {
     const el = document.getElementById('shipClock');
@@ -284,7 +284,7 @@
     function nyParts(date) {
       const out = {};
       new Intl.DateTimeFormat('en-US', {
-        timeZone: 'America/New_York', hour12: false,
+        timeZone: 'America/Los_Angeles', hour12: false,
         weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit',
       }).formatToParts(date).forEach(p => { out[p.type] = p.value; });
       return out;
@@ -294,7 +294,7 @@
       for (let i = 1; i <= 7; i++) {
         const d = new Date(Date.now() + i * 86400000);
         const name = new Intl.DateTimeFormat('en-US', {
-          timeZone: 'America/New_York', weekday: 'long',
+          timeZone: 'America/Los_Angeles', weekday: 'long',
         }).format(d);
         if (name !== 'Saturday' && name !== 'Sunday') return name;
       }

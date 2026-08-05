@@ -9,7 +9,7 @@
   const $ = id => document.getElementById(id);
   const money = n => '$' + n.toFixed(2);
 
-  const CUTOFF_HOUR = 14;        // 2:00 PM EST, same claim as the shipping page
+  const CUTOFF_HOUR = 14;        // 2:00 PM PST, same claim as the shipping page
   const TRANSIT_DAYS = 2;        // FedEx 2-Day Express
 
   const CAT_LABEL = {
@@ -31,14 +31,14 @@
   }
 
   /* ================= delivery estimate =================
-     Everything is computed from New York wall-clock parts, then anchored to
+     Everything is computed from Pacific wall-clock parts, then anchored to
      UTC noon before any day arithmetic. Anchoring at noon means adding whole
      days can never land on a DST seam and silently shift the date by one. */
 
   function nyParts(date) {
     const out = {};
     new Intl.DateTimeFormat('en-US', {
-      timeZone: 'America/New_York', hour12: false,
+      timeZone: 'America/Los_Angeles', hour12: false,
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit', second: '2-digit',
     }).formatToParts(date).forEach(p => { out[p.type] = p.value; });
