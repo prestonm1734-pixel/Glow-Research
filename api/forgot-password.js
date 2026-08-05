@@ -7,6 +7,7 @@
 // found") lets anyone check which addresses have signed up here.
 
 import { wc, wcConfig, findCustomerByEmail, readBody, isEmail } from './_lib.js';
+import { emailShell, heading, paragraph, fine, button, esc } from './_email.js';
 import crypto from 'node:crypto';
 
 const TOKEN_META = 'glow_reset_token';
@@ -68,11 +69,8 @@ export default async function handler(req, res) {
           from,
           to: cleanEmail,
           subject: 'Reset your Glow Research password',
-          html: `
-            <p>Someone asked to reset the password on this Glow Research account.</p>
-            <p><a href="${link}">Set a new password</a></p>
-            <p>This link expires in 1 hour. If you did not request this, you can ignore this email.</p>
-          `,
+          text: resetText(link),
+          html: resetHtml(link),
         }),
       });
 
@@ -88,4 +86,47 @@ export default async function handler(req, res) {
   }
 
   return res.status(200).json(GENERIC_OK);
+}
+
+/* ---------- the email ----------
+   A reset email is read in a hurry and half of them are read on a phone, so
+   there is one action and nothing competing with it. The raw URL is repeated
+   below the button because clients mangle buttons often enough, and the
+   "didn't ask for this" line says the password has not changed yet — that is
+   the thing someone reading an unexpected reset email actually wants to know. */
+
+function resetHtml(link) {
+  return emailShell({
+    preheader: 'Set a new password. This link expires in one hour.',
+    footerNote: 'You are receiving this because a password reset was requested for this email address at glowresearch.shop.',
+    sections: [
+      heading('Reset your password.') +
+      paragraph('Someone asked to reset the password on the Glow Research account for this email address. Use the button below to set a new one.') +
+      button(link, 'Set a new password') +
+      paragraph('<span style="color:#6e6e73;">Or paste this link into your browser:</span><br>' +
+        `<a href="${esc(link)}" style="color:#0a0a0a;word-break:break-all;font-size:13px;">${esc(link)}</a>`, { last: true }),
+
+      fine('<strong style="color:#0a0a0a;">This link expires in one hour</strong> and can only be used once.') +
+      fine('If you did not ask for this, you can ignore this email — your password has not changed, and the link stops working on its own.'),
+    ],
+  });
+}
+
+function resetText(link) {
+  return [
+    'Reset your password.',
+    '',
+    'Someone asked to reset the password on the Glow Research account for this',
+    'email address. Open the link below to set a new one:',
+    '',
+    link,
+    '',
+    'This link expires in one hour and can only be used once.',
+    '',
+    'If you did not ask for this, you can ignore this email — your password has',
+    'not changed, and the link stops working on its own.',
+    '',
+    'Glow Nutrition LLC',
+    '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
+  ].join('\n');
 }

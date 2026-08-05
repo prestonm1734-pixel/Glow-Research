@@ -6,12 +6,9 @@
 // goes out.
 
 import { readBody, isEmail } from './_lib.js';
+import { emailShell, heading, paragraph, eyebrow, fine, esc } from './_email.js';
 
 const WHOLESALE_TO = 'wholesale@glowresearch.shop';
-
-function esc(v) {
-  return String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -107,11 +104,7 @@ export default async function handler(req, res) {
    Three jobs: prove it arrived, say exactly when they hear back, and put the
    terms that could otherwise kill a deal late (prepayment, no private label,
    US only) in front of them now. Echoing their own numbers back also lets
-   them catch a typo in the volume or compound list before we quote it.
-
-   Inline styles and a system font stack because email clients strip <style>
-   blocks and will not load webfonts; light surface because Gmail's dark mode
-   inverts backgrounds and a near-black design comes out muddy. */
+   them catch a typo in the volume or compound list before we quote it. */
 
 const FINE_PRINT = [
   'Wholesale orders are invoiced and paid in full before we place them — there are no net terms yet.',
@@ -127,28 +120,15 @@ function applicantHtml(a) {
       <td style="padding:7px 0;font-size:14px;color:#0a0a0a;vertical-align:top;">${value}</td>
     </tr>`;
 
-  return `
-<div style="margin:0;padding:0;background:#f5f5f7;">
-  <div style="max-width:560px;margin:0 auto;padding:40px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
-
-    <div style="font-size:21px;font-weight:700;letter-spacing:-.02em;color:#0a0a0a;padding-bottom:26px;">Glow&#10022;</div>
-
-    <div style="background:#ffffff;padding:34px 32px;">
-      <h1 style="margin:0 0 14px;font-size:23px;line-height:1.15;letter-spacing:-.03em;font-weight:600;color:#0a0a0a;">Application received.</h1>
-
-      <p style="margin:0 0 18px;font-size:15px;line-height:1.62;color:#45453f;">
-        Thanks, ${esc(a.name)} — this is an automatic confirmation that your wholesale
-        application for ${esc(a.company)} came through.
-      </p>
-
-      <p style="margin:0 0 26px;font-size:15px;line-height:1.62;color:#45453f;">
-        <strong style="color:#0a0a0a;">A real person replies within one business day</strong>
-        with a priced tier sheet for your volume. No portal and no sales call — everything
-        from here happens over email, and you can just reply to this message.
-      </p>
-
-      <div style="border-top:1px solid #e4e4e7;padding-top:20px;">
-        <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#86868b;padding-bottom:10px;">What you sent us</div>
+  return emailShell({
+    preheader: 'The wholesale desk replies within one business day.',
+    footerNote: 'You are receiving this because a wholesale application was submitted with this email address at glowresearch.shop.',
+    sections: [
+      heading('Application received.') +
+      paragraph(`Thanks, ${esc(a.name)} — this is an automatic confirmation that your wholesale application for ${esc(a.company)} came through.`) +
+      paragraph('<strong style="color:#0a0a0a;">A real person replies within one business day</strong> with a priced tier sheet for your volume. No portal and no sales call — everything from here happens over email, and you can just reply to this message.') +
+      `<div style="border-top:1px solid #e4e4e7;padding-top:20px;">
+        ${eyebrow('What you sent us')}
         <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
           ${row('Contact', esc(a.name))}
           ${row('Company', esc(a.company))}
@@ -159,23 +139,11 @@ function applicantHtml(a) {
         <p style="margin:16px 0 0;font-size:13px;line-height:1.55;color:#86868b;">
           Something wrong above? Reply to this email with the correction — no need to apply again.
         </p>
-      </div>
-    </div>
+      </div>`,
 
-    <div style="background:#ffffff;border-top:1px solid #e4e4e7;padding:24px 32px;">
-      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#86868b;padding-bottom:12px;">Worth knowing up front</div>
-      ${FINE_PRINT.map(line => `
-        <p style="margin:0 0 9px;font-size:13px;line-height:1.55;color:#55554f;">${line}</p>`).join('')}
-    </div>
-
-    <div style="padding:22px 4px 0;font-size:12px;line-height:1.6;color:#86868b;">
-      <strong style="color:#55554f;">Glow Nutrition LLC</strong><br>
-      10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States<br>
-      <span style="color:#a1a1a6;">You are receiving this because a wholesale application was submitted with this email address at glowresearch.shop.</span>
-    </div>
-
-  </div>
-</div>`;
+      eyebrow('Worth knowing up front') + FINE_PRINT.map(fine).join(''),
+    ],
+  });
 }
 
 function applicantText(a) {
