@@ -19,10 +19,14 @@ export default async function handler(req, res) {
   }
 
   const body = readBody(req);
-  const { customer, shipping, billing, items, shippingMethod, referral, notes } = body;
+  const { customer, shipping, billing, items, shippingMethod, referral, notes, termsAccepted } = body;
 
   if (!customer || !isEmail(customer.email) || !shipping || !Array.isArray(items) || !items.length) {
     return res.status(400).json({ error: 'Missing required order details.' });
+  }
+
+  if (termsAccepted !== true) {
+    return res.status(400).json({ error: 'The RUO agreement and Terms of Sale must be accepted to place an order.' });
   }
 
   const email = customer.email.trim().toLowerCase();
@@ -66,7 +70,11 @@ export default async function handler(req, res) {
         fee_lines,
         shipping_lines,
         customer_note: notes || '',
-        meta_data: referral ? [{ key: 'referral_code', value: referral }] : [],
+        meta_data: [
+          ...(referral ? [{ key: 'referral_code', value: referral }] : []),
+          { key: 'ruo_terms_accepted', value: 'yes' },
+          { key: 'ruo_terms_accepted_at', value: new Date().toISOString() },
+        ],
       }),
     });
 

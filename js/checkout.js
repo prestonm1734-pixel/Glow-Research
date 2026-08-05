@@ -307,6 +307,14 @@
       const items = window.GlowCart ? window.GlowCart.items() : [];
       if (!items.length) return;
 
+      // The checkbox is `required`, so this only fires if a browser lets the
+      // form submit anyway — belt-and-suspenders before the network round trip.
+      if (!$('coTerms').checked) {
+        $('coPlacedMsg').textContent = 'Please confirm the research-use agreement before placing your order.';
+        $('coPlacedMsg').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        return;
+      }
+
       // the referral code rides along with the order so the backend can credit
       // it. Attribution is decided here, at the point of sale, not later.
       const ref = window.GlowReferral ? window.GlowReferral.code() : null;
@@ -339,6 +347,7 @@
             items,
             shippingMethod: { id: opt.id, label: opt.label, cost: shippingCost(sub) },
             referral: ref,
+            termsAccepted: true,
           }),
         });
         const data = await resp.json();
