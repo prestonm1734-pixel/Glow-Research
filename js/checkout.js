@@ -333,7 +333,7 @@
           headers: { 'Content-Type': 'application/json' },
           credentials: 'same-origin',
           body: JSON.stringify({
-            customer: { email: $('coEmail').value, phone: $('coPhone').value },
+            customer: { email: $('coEmail').value },
             shipping: shipAddr,
             billing: billAddr,
             items,
