@@ -6,7 +6,10 @@ import {
   wc, wcConfig, findCustomerByEmail, metaValue, hashPassword,
   makeToken, sessionCookie, readBody, isEmail,
 } from './_lib.js';
+import { emailShell, heading, paragraph, eyebrow, fine, button, esc } from './_email.js';
 import crypto from 'node:crypto';
+
+const SUPPORT = 'support@glowresearch.shop';
 
 const PW_META = 'glow_password';
 const TOKEN_META = 'glow_reset_token';
@@ -62,6 +65,15 @@ export default async function handler(req, res) {
       }),
     });
 
+    // Tell them their password changed. Deliberately after the write and
+    // deliberately not fatal: the password is already changed by this point,
+    // so a mail failure must not report the reset as failed and send them
+    // round again with a token that no longer exists.
+    // Awaited rather than left running: once the response is sent the function
+    // can be frozen mid-flight, and a security notice that only sometimes
+    // arrives is worse than useless. It never throws.
+    await notifyChanged(updated.email);
+
     res.setHeader('Set-Cookie', sessionCookie(makeToken(updated.id, updated.email)));
     return res.status(200).json({
       email: updated.email,
@@ -70,4 +82,83 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(502).json({ error: err.message || 'Could not reach the store.' });
   }
+}
+
+/* ---------- "your password was changed" ----------
+   The one email that catches a takeover. Whoever completed the reset holds
+   the inbox the link went to, so this cannot stop them — what it does is put
+   a timestamped record in front of the real owner while the trail is still
+   warm, which is the difference between noticing today and noticing at the
+   next order.
+
+   Swallows every failure: by the time this runs the password is already
+   changed, and the caller must not be told otherwise. */
+async function notifyChanged(email) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error('reset-password: RESEND_API_KEY is not set, no change notice sent.');
+    return;
+  }
+
+  const when = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles',
+    dateStyle: 'long',
+    timeStyle: 'short',
+  }).format(new Date()) + ' PT';
+
+  try {
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        from: process.env.RESEND_FROM_EMAIL || 'Glow Research <onboarding@resend.dev>',
+        to: email,
+        reply_to: SUPPORT,
+        subject: 'Your Glow Research password was changed',
+        text: changedText(email, when),
+        html: changedHtml(email, when),
+      }),
+    });
+    if (!resp.ok) {
+      const errBody = await resp.json().catch(() => null);
+      console.error('reset-password: change notice rejected.', resp.status, errBody);
+    }
+  } catch (e) {
+    console.error('reset-password: change notice failed.', e);
+  }
+}
+
+function changedHtml(email, when) {
+  return emailShell({
+    preheader: `Changed ${when}. If this was not you, contact us right away.`,
+    footerNote: 'You are receiving this because the password on this Glow Research account was changed.',
+    sections: [
+      heading('Your password was changed.') +
+      paragraph(`The password on the Glow Research account for <strong style="color:#0a0a0a;">${esc(email)}</strong> was reset and is now active.`) +
+      paragraph(`<span style="color:#6e6e73;">Changed ${esc(when)}</span>`, { last: true }),
+
+      eyebrow('If this was not you') +
+      fine('Someone else may have access to this email address or to the account. Contact us right away and we will lock it down.') +
+      button(`mailto:${SUPPORT}?subject=${encodeURIComponent('I did not change my password')}`, 'Contact support') +
+      fine(`Or email <a href="mailto:${SUPPORT}" style="color:#0a0a0a;">${SUPPORT}</a> directly.`),
+    ],
+  });
+}
+
+function changedText(email, when) {
+  return [
+    'Your password was changed.',
+    '',
+    `The password on the Glow Research account for ${email} was reset and is`,
+    'now active.',
+    '',
+    `Changed ${when}`,
+    '',
+    'IF THIS WAS NOT YOU',
+    'Someone else may have access to this email address or to the account.',
+    `Contact us right away at ${SUPPORT} and we will lock it down.`,
+    '',
+    'Glow Nutrition LLC',
+    '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
+  ].join('\n');
 }
