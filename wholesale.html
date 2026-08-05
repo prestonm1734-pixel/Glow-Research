@@ -24,7 +24,7 @@
     color: var(--text-dim);
   }
   /* square, like every other input on the site */
-  .ws-field input, .ws-field select, .ws-field textarea{
+  .ws-field input, .ws-field textarea{
     width:100%; padding: 14px 16px; border-radius: 0;
     border:1px solid var(--border); background: var(--surface); color: var(--text);
     font-family:inherit; font-size:1rem;
@@ -32,26 +32,15 @@
   }
   .ws-field textarea{ resize:vertical; min-height: 96px; }
   .ws-field input::placeholder, .ws-field textarea::placeholder{ color:#5a5a58; }
-  .ws-field input:hover, .ws-field select:hover, .ws-field textarea:hover{ border-color: rgba(255,255,255,.32); }
-  .ws-field input:focus, .ws-field select:focus, .ws-field textarea:focus{
+  .ws-field input:hover, .ws-field textarea:hover{ border-color: rgba(255,255,255,.32); }
+  .ws-field input:focus, .ws-field textarea:focus{
     outline:none; border-color:#fff; background: var(--surface-2);
   }
   /* the rule above drops the outline for the mouse case, where the brightened
      border is enough. A keyboard user needs the ring back. */
-  .ws-field input:focus-visible, .ws-field select:focus-visible, .ws-field textarea:focus-visible{
+  .ws-field input:focus-visible, .ws-field textarea:focus-visible{
     outline: 2px solid #fff; outline-offset: 2px;
   }
-  /* appearance:none removed the native arrow and nothing replaced it, so the
-     volume field looked like a text input. A real element rather than a
-     background image, so it can turn when the menu takes focus. */
-  .ws-field select{ appearance:none; cursor:pointer; padding-right: 44px; }
-  .ws-selwrap{ position:relative; }
-  .ws-chev{
-    position:absolute; right:16px; top:50%; transform: translateY(-50%);
-    pointer-events:none; color: var(--text-dimmer);
-    transition: transform .32s var(--lp-ease), color .2s ease;
-  }
-  .ws-selwrap:focus-within .ws-chev{ transform: translateY(-50%) rotate(180deg); color:#fff; }
   /* the label leans in with its field */
   .ws-field:focus-within label{ color:#fff; }
 
@@ -256,18 +245,8 @@
         <input type="email" id="wsEmail" name="email" placeholder="jane@lab.com" required />
       </div>
       <div class="ws-field">
-        <label for="wsVolume">Expected monthly volume</label>
-        <div class="ws-selwrap">
-          <select id="wsVolume" name="volume" required>
-            <option value="">Select a range</option>
-            <option>25 to 49 vials (25% off)</option>
-            <option>50 to 99 vials (35% off)</option>
-            <option>100 to 249 vials (40% off)</option>
-            <option>250 to 499 vials (45% off)</option>
-            <option>500 or more vials (custom quote)</option>
-          </select>
-          <svg class="ws-chev" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5 8 10.5 12 6.5"/></svg>
-        </div>
+        <label for="wsVolume">Expected monthly volume (vials)</label>
+        <input type="number" id="wsVolume" name="volume" placeholder="e.g. 40" min="25" step="1" required />
       </div>
       <div class="ws-field">
         <label for="wsCompounds">Compounds of interest</label>

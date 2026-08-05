@@ -59,7 +59,7 @@ export default async function handler(req, res) {
           <p><strong>Contact:</strong> ${esc(name)}</p>
           <p><strong>Company:</strong> ${esc(company)}</p>
           <p><strong>Email:</strong> ${esc(email)}</p>
-          <p><strong>Expected monthly volume:</strong> ${esc(volume)}</p>
+          <p><strong>Expected monthly volume:</strong> ${esc(volume)} vials</p>
           <p><strong>Compounds of interest:</strong><br>${esc(compounds).replace(/\n/g, '<br>')}</p>
         `,
       }),
