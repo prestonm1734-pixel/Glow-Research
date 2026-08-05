@@ -5,9 +5,6 @@
   const toggle = document.getElementById('searchToggle');
   if (!toggle || typeof GLOW_PRODUCTS === 'undefined') return;
 
-  const navPeptidesLink = document.querySelector('#mainNav a[href$="peptides.html"]');
-  const CATALOG_HREF = navPeptidesLink ? navPeptidesLink.getAttribute('href') : 'peptides.html';
-
   let overlay, input, results, lastFocused;
 
   function build() {
@@ -39,8 +36,9 @@
   }
 
   function row(p) {
+    const href = pageHref(`product.html?p=${productSlug(p.name)}`);
     return `
-      <a class="search-row" href="${CATALOG_HREF}">
+      <a class="search-row" href="${href}">
         <span class="search-thumb">${productThumb(p.name)}</span>
         <span class="search-row-copy">
           <span class="search-row-name">${p.name}</span>
