@@ -23,6 +23,62 @@
   .ty-mark{
     width:52px; height:52px; border-radius:50%; background:#0a0a0a; color:#fff;
     display:flex; align-items:center; justify-content:center; margin: 0 auto 26px;
+    position:relative;
+  }
+
+  /* ---------- the arrival ----------
+     An order is the one moment on this site worth a beat of theatre, so the
+     page assembles itself instead of appearing finished. The mark settles
+     first and draws its tick, then the words rise under it in sequence.
+
+     Everything is opt-out rather than opt-in: without scripting, or with
+     reduced motion asked for, the final state is what renders. The hidden
+     state only ever applies while .js is set and .is-in has not landed yet. */
+
+  /* the ring that pulses outward once, like a tap landing */
+  .ty-mark::after{
+    content:''; position:absolute; inset:0; border-radius:50%;
+    border:2px solid #0a0a0a; opacity:0;
+  }
+
+  .js #tyShell .ty-mark{ transform: scale(.5); opacity:0; }
+  .js #tyShell .ty-mark svg .ty-tick{ stroke-dasharray:1; stroke-dashoffset:1; }
+  .js #tyShell .ty-rise{ opacity:0; transform: translateY(14px); }
+
+  /* the spring: overshoots a touch, then settles. Short enough that it reads
+     as confidence rather than a loading state. */
+  #tyShell.is-in .ty-mark{
+    opacity:1; transform: scale(1);
+    transition: transform .62s cubic-bezier(.2,1.5,.4,1), opacity .3s ease;
+  }
+  #tyShell.is-in .ty-mark::after{ animation: tyPulse .9s cubic-bezier(.2,.7,.3,1) .18s 1; }
+  #tyShell.is-in .ty-mark svg .ty-tick{
+    stroke-dashoffset:0;
+    transition: stroke-dashoffset .42s cubic-bezier(.65,0,.35,1) .26s;
+  }
+  #tyShell.is-in .ty-rise{
+    opacity:1; transform:none;
+    transition: opacity .5s ease, transform .62s cubic-bezier(.16,1,.3,1);
+  }
+  /* each line follows the one above it by a beat */
+  #tyShell.is-in .ty-rise-1{ transition-delay:.30s; }
+  #tyShell.is-in .ty-rise-2{ transition-delay:.38s; }
+  #tyShell.is-in .ty-rise-3{ transition-delay:.46s; }
+  #tyShell.is-in .ty-rise-4{ transition-delay:.56s; }
+
+  @keyframes tyPulse{
+    0%{ opacity:.5; transform: scale(1); }
+    100%{ opacity:0; transform: scale(1.85); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .js #tyShell .ty-mark,
+    .js #tyShell .ty-rise{ opacity:1; transform:none; }
+    .js #tyShell .ty-mark svg .ty-tick{ stroke-dashoffset:0; }
+    #tyShell.is-in .ty-mark,
+    #tyShell.is-in .ty-rise,
+    #tyShell.is-in .ty-mark svg .ty-tick{ transition:none; }
+    #tyShell.is-in .ty-mark::after{ animation:none; }
   }
   .ty-wrap h1{
     font-family:'Fraunces', serif; font-size: clamp(1.9rem, 5vw, 2.6rem); font-weight:600;
@@ -176,20 +232,20 @@
 
     <div class="ty-wrap" id="tyShell" hidden>
       <div class="ty-mark" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path class="ty-tick" pathLength="1" d="M20 6L9 17l-5-5"/></svg>
       </div>
 
-      <h1>Thank you<span id="tyName"></span>.</h1>
-      <p class="ty-lede" id="tyLede">
+      <h1 class="ty-rise ty-rise-1">Thank you<span id="tyName"></span>.</h1>
+      <p class="ty-lede ty-rise ty-rise-2" id="tyLede">
         Your order is in. A confirmation has been recorded against
         <strong id="tyEmail">your email</strong>.
       </p>
-      <p class="ty-num">
-        Order <span id="tyNumber">—</span> &middot; <span id="tyDate">—</span> &middot;
+      <p class="ty-num ty-rise ty-rise-3">
+        Order <span id="tyNumber">&middot;</span> &middot; <span id="tyDate">&middot;</span> &middot;
         <span class="ty-status" id="tyStatus">Awaiting payment</span>
       </p>
 
-      <div class="ty-body">
+      <div class="ty-body ty-rise ty-rise-4">
         <div class="ty-section">
           <h2>What you ordered</h2>
           <ul class="ty-items" id="tyItems"></ul>

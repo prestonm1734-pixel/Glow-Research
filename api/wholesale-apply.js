@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     const resp = await send({
       to: WHOLESALE_TO,
       reply_to: email,
-      subject: `Wholesale application — ${company}`,
+      subject: `Wholesale application: ${company}`,
       html: `
         <p><strong>Contact:</strong> ${esc(name)}</p>
         <p><strong>Company:</strong> ${esc(company)}</p>
@@ -81,7 +81,7 @@ export default async function handler(req, res) {
       const ack = await send({
         to: email,
         reply_to: WHOLESALE_TO,
-        subject: 'We have your wholesale application — Glow Research',
+        subject: 'We have your wholesale application',
         text: applicantText({ name, company, email, volume, compounds }),
         html: applicantHtml({ name, company, email, volume, compounds }),
       });
@@ -107,7 +107,7 @@ export default async function handler(req, res) {
    them catch a typo in the volume or compound list before we quote it. */
 
 const FINE_PRINT = [
-  'Wholesale orders are invoiced and paid in full before we place them — there are no net terms yet.',
+  'Wholesale orders are invoiced and paid in full before we place them. There are no net terms yet.',
   'Ships in standard Glow Research vials. We do not offer private-label or custom branding.',
   'For qualified researchers and institutions inside the United States.',
   'All products are sold strictly for in-vitro laboratory research use.',
@@ -125,9 +125,9 @@ function applicantHtml(a) {
     footerNote: 'You are receiving this because a wholesale application was submitted with this email address at glowresearch.shop.',
     sections: [
       heading('Application received.') +
-      paragraph(`Thanks, ${esc(a.name)} — this is an automatic confirmation that your wholesale application for ${esc(a.company)} came through.`) +
-      paragraph('<strong style="color:#0a0a0a;">A real person replies within one business day</strong> with a priced tier sheet for your volume. No portal and no sales call — everything from here happens over email, and you can just reply to this message.') +
-      `<div style="border-top:1px solid #e4e4e7;padding-top:20px;">
+      paragraph(`Thanks, ${esc(a.name)}. This is an automatic confirmation that your wholesale application for ${esc(a.company)} came through.`) +
+      paragraph('<strong style="color:#0a0a0a;">A real person replies within one business day</strong> with a priced tier sheet for your volume. No portal and no sales call. Everything from here happens over email, and you can reply to this message.') +
+      `<div style="border-top:1px solid #ebebed;padding-top:20px;">
         ${eyebrow('What you sent us')}
         <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
           ${row('Contact', esc(a.name))}
@@ -137,7 +137,7 @@ function applicantHtml(a) {
           ${row('Compounds', esc(a.compounds).replace(/\n/g, '<br>'))}
         </table>
         <p style="margin:16px 0 0;font-size:13px;line-height:1.55;color:#86868b;">
-          Something wrong above? Reply to this email with the correction — no need to apply again.
+          Something wrong above? Reply to this email with the correction. No need to apply again.
         </p>
       </div>`,
 
@@ -150,11 +150,11 @@ function applicantText(a) {
   return [
     'Application received.',
     '',
-    `Thanks, ${a.name} — this is an automatic confirmation that your wholesale`,
+    `Thanks, ${a.name}. This is an automatic confirmation that your wholesale`,
     `application for ${a.company} came through.`,
     '',
     'A real person replies within one business day with a priced tier sheet for',
-    'your volume. No portal and no sales call — everything from here happens over',
+    'your volume. No portal and no sales call. Everything from here happens over',
     'email, and you can just reply to this message.',
     '',
     'WHAT YOU SENT US',
@@ -164,7 +164,7 @@ function applicantText(a) {
     `  Monthly volume: ${a.volume} vials`,
     `  Compounds:      ${a.compounds.replace(/\n/g, '\n                  ')}`,
     '',
-    'Something wrong above? Reply to this email with the correction — no need to',
+    'Something wrong above? Reply to this email with the correction. No need to',
     'apply again.',
     '',
     'WORTH KNOWING UP FRONT',

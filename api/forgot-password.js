@@ -107,7 +107,7 @@ function resetHtml(link) {
         `<a href="${esc(link)}" style="color:#0a0a0a;word-break:break-all;font-size:13px;">${esc(link)}</a>`, { last: true }),
 
       fine('<strong style="color:#0a0a0a;">This link expires in one hour</strong> and can only be used once.') +
-      fine('If you did not ask for this, you can ignore this email — your password has not changed, and the link stops working on its own.'),
+      fine('If you did not ask for this, you can ignore this email. Your password has not changed, and the link stops working on its own.'),
     ],
   });
 }
@@ -123,7 +123,7 @@ function resetText(link) {
     '',
     'This link expires in one hour and can only be used once.',
     '',
-    'If you did not ask for this, you can ignore this email — your password has',
+    'If you did not ask for this, you can ignore this email. Your password has',
     'not changed, and the link stops working on its own.',
     '',
     'Glow Research',

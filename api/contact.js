@@ -42,7 +42,7 @@ export default async function handler(req, res) {
   const delivered = await sendEmail({
     to: SUPPORT,
     replyTo: email,
-    subject: `Contact form — ${name}${reference ? ` (${reference})` : ''}`,
+    subject: `Contact form: ${name}${reference ? ` (${reference})` : ''}`,
     text: deskText(m),
     html: deskHtml(m),
   });
@@ -56,7 +56,7 @@ export default async function handler(req, res) {
   await sendEmail({
     to: email,
     replyTo: SUPPORT,
-    subject: 'We have your message — Glow Research',
+    subject: 'We have your message',
     text: ackText(m),
     html: ackHtml(m),
   });
@@ -78,7 +78,7 @@ function deskHtml(m) {
         <a href="mailto:${esc(m.email)}" style="color:#0a0a0a;">${esc(m.email)}</a>
         ${m.reference ? `<br><span style="color:#6e6e73;">Ref: ${esc(m.reference)}</span>` : ''}
       </p>` +
-      `<div style="border-top:1px solid #e4e4e7;padding-top:18px;">
+      `<div style="border-top:1px solid #ebebed;padding-top:18px;">
         <p style="margin:0;font-size:15px;line-height:1.62;color:#45453f;">${asHtml(m.message)}</p>
       </div>`,
     ],
@@ -87,7 +87,7 @@ function deskHtml(m) {
 
 function deskText(m) {
   return [
-    `Contact form — ${m.name}`,
+    `Contact form: ${m.name}`,
     `  ${m.email}`,
     ...(m.reference ? [`  Ref: ${m.reference}`] : []),
     '',
@@ -104,7 +104,7 @@ function ackHtml(m) {
     footerNote: 'You are receiving this because a message was sent from this email address at glowresearch.shop.',
     sections: [
       heading('We have your message.') +
-      paragraph(`Thanks, ${esc(m.name)} — this is an automatic confirmation that it reached us.`) +
+      paragraph(`Thanks, ${esc(m.name)}. This is an automatic confirmation that it reached us.`) +
       paragraph('<strong style="color:#0a0a0a;">A person replies within one business day</strong>, straight to this address. You can reply to this email to add anything you left out.', { last: true }),
 
       eyebrow('What you sent') +
@@ -112,9 +112,9 @@ function ackHtml(m) {
       `<p style="margin:0;font-size:14px;line-height:1.62;color:#45453f;">${asHtml(m.message)}</p>`,
 
       eyebrow('Faster answers') +
-      fine('Order or shipping question? Have your order number handy — it is on your confirmation email.') +
-      fine('Chasing a certificate of analysis? Include the lot number from the vial.') +
-      fine('Wholesale or bulk pricing? The <a href="https://glowresearch.shop/wholesale.html" style="color:#0a0a0a;">wholesale page</a> has the application form and answers most of it.'),
+      fine('<strong style="color:#0a0a0a;">Order or shipping.</strong> Have your order number handy. It is on your confirmation email.') +
+      fine('<strong style="color:#0a0a0a;">Certificates of analysis.</strong> Include the lot number from the vial.') +
+      fine('<strong style="color:#0a0a0a;">Wholesale and bulk.</strong> The <a href="https://glowresearch.shop/wholesale.html" style="color:#0a0a0a;">wholesale page</a> has the application form and answers most of it.'),
     ],
   });
 }
@@ -123,7 +123,7 @@ function ackText(m) {
   return [
     'We have your message.',
     '',
-    `Thanks, ${m.name} — this is an automatic confirmation that it reached us.`,
+    `Thanks, ${m.name}. This is an automatic confirmation that it reached us.`,
     '',
     'A person replies within one business day, straight to this address. You can',
     'reply to this email to add anything you left out.',
@@ -133,11 +133,11 @@ function ackText(m) {
     m.message.replace(/^/gm, '  '),
     '',
     'FASTER ANSWERS',
-    '  - Order or shipping question? Have your order number handy — it is on',
-    '    your confirmation email.',
-    '  - Chasing a certificate of analysis? Include the lot number from the vial.',
-    '  - Wholesale or bulk pricing? The wholesale page has the application form',
-    '    and answers most of it.',
+    '  - Order or shipping. Have your order number handy. It is on your',
+    '    confirmation email.',
+    '  - Certificates of analysis. Include the lot number from the vial.',
+    '  - Wholesale and bulk. The wholesale page has the application form and',
+    '    answers most of it.',
     '',
     'Glow Research',
     '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',

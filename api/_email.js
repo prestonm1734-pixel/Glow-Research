@@ -61,19 +61,19 @@ export function esc(v) {
    person is receiving it. */
 export function emailShell({ preheader = '', sections = [], footerNote = '' }) {
   const bands = sections.map((html, i) => `
-    <div style="background:#ffffff;padding:${i === 0 ? '34px' : '24px'} 32px;${i > 0 ? 'border-top:1px solid #e4e4e7;' : ''}">
+    <div style="background:#ffffff;padding:${i === 0 ? '40px' : '30px'} 36px;${i > 0 ? 'border-top:1px solid #ebebed;' : ''}">
       ${html}
     </div>`).join('');
 
   return `
 <div style="margin:0;padding:0;background:#f5f5f7;">
   ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;height:0;width:0;">${preheader}</div>` : ''}
-  <div style="max-width:560px;margin:0 auto;padding:40px 20px;font-family:${FONT};">
+  <div style="max-width:560px;margin:0 auto;padding:44px 20px;font-family:${FONT};">
 
-    <div style="font-size:21px;font-weight:700;letter-spacing:-.02em;color:#0a0a0a;padding-bottom:26px;">Glow&#10022;</div>
+    <div style="font-size:21px;font-weight:700;letter-spacing:-.02em;color:#0a0a0a;padding-bottom:30px;">Glow&#10022;</div>
     ${bands}
 
-    <div style="padding:22px 4px 0;font-size:12px;line-height:1.6;color:#86868b;">
+    <div style="padding:26px 4px 0;font-size:12px;line-height:1.65;color:#8e8e93;">
       <strong style="color:#55554f;">${COMPANY}</strong><br>
       ${ADDRESS}
       ${footerNote ? `<br><span style="color:#a1a1a6;">${footerNote}</span>` : ''}
@@ -84,19 +84,19 @@ export function emailShell({ preheader = '', sections = [], footerNote = '' }) {
 }
 
 export function heading(text) {
-  return `<h1 style="margin:0 0 14px;font-size:23px;line-height:1.15;letter-spacing:-.03em;font-weight:600;color:#0a0a0a;">${text}</h1>`;
+  return `<h1 style="margin:0 0 16px;font-size:26px;line-height:1.18;letter-spacing:-.022em;font-weight:600;color:#0a0a0a;">${text}</h1>`;
 }
 
 export function paragraph(html, { last = false } = {}) {
-  return `<p style="margin:0 0 ${last ? '0' : '18px'};font-size:15px;line-height:1.62;color:#45453f;">${html}</p>`;
+  return `<p style="margin:0 0 ${last ? '0' : '20px'};font-size:15px;line-height:1.68;color:#45453f;">${html}</p>`;
 }
 
 export function eyebrow(text) {
-  return `<div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#86868b;padding-bottom:10px;">${text}</div>`;
+  return `<div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#8e8e93;padding-bottom:12px;">${text}</div>`;
 }
 
 export function fine(html) {
-  return `<p style="margin:0 0 9px;font-size:13px;line-height:1.55;color:#55554f;">${html}</p>`;
+  return `<p style="margin:0 0 11px;font-size:13.5px;line-height:1.6;color:#55554f;">${html}</p>`;
 }
 
 /* Square and black, same as the primary button on the sign-in page this links
@@ -104,9 +104,9 @@ export function fine(html) {
    renders through Word, which drops padding on anchors. */
 export function button(href, label) {
   return `
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 22px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 24px;">
       <tr><td style="background:#0a0a0a;">
-        <a href="${esc(href)}" style="display:inline-block;padding:15px 30px;font-family:${FONT};font-size:15px;font-weight:700;line-height:1;color:#ffffff;text-decoration:none;">${label}</a>
+        <a href="${esc(href)}" style="display:inline-block;padding:16px 32px;font-family:${FONT};font-size:15px;font-weight:600;line-height:1;color:#ffffff;text-decoration:none;">${label}</a>
       </td></tr>
     </table>`;
 }

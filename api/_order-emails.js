@@ -30,7 +30,7 @@ function itemsHtml(order) {
   const rows = lines(order).map(i => `
     <tr>
       <td style="padding:8px 16px 8px 0;font-size:14px;color:#0a0a0a;vertical-align:top;">
-        ${esc(i.name)}${i.qty > 1 ? `<span style="color:#6e6e73;"> &times;${i.qty}</span>` : ''}
+        ${esc(i.name)}${i.qty > 1 ? `<span style="color:#6e6e73;"> ×${i.qty}</span>` : ''}
       </td>
       <td style="padding:8px 0;font-size:14px;color:#0a0a0a;text-align:right;white-space:nowrap;vertical-align:top;">${money(i.total)}</td>
     </tr>`).join('');
@@ -38,7 +38,7 @@ function itemsHtml(order) {
   return `
     <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
       ${rows}
-      <tr><td colspan="2" style="padding:6px 0 0;border-top:1px solid #e4e4e7;"></td></tr>
+      <tr><td colspan="2" style="padding:6px 0 0;border-top:1px solid #ebebed;"></td></tr>
       <tr>
         <td style="padding:8px 16px 8px 0;font-size:15px;font-weight:700;color:#0a0a0a;">Total</td>
         <td style="padding:8px 0;font-size:15px;font-weight:700;color:#0a0a0a;text-align:right;white-space:nowrap;">${money(order.total)}</td>
@@ -48,7 +48,7 @@ function itemsHtml(order) {
 
 function itemsText(order) {
   return [
-    ...lines(order).map(i => `  ${i.name}${i.qty > 1 ? ' x' + i.qty : ''}   ${money(i.total)}`),
+    ...lines(order).map(i => `  ${i.name}${i.qty > 1 ? ' ×' + i.qty : ''}   ${money(i.total)}`),
     `  Total: ${money(order.total)}`,
   ];
 }
@@ -125,7 +125,7 @@ function completed({ order, track }) {
   ].join('\n');
 
   return {
-    subject: `Order ${num} has shipped — Glow Research`,
+    subject: `Order ${num} has shipped`,
     html: emailShell({
       preheader: track && track.number ? `Tracking: ${track.number}` : 'Tracking follows shortly.',
       footerNote,
@@ -139,7 +139,7 @@ function completed({ order, track }) {
 function processing({ order }) {
   const num = order.number;
   return {
-    subject: `Order ${num} is being packed — Glow Research`,
+    subject: `Order ${num} is being packed`,
     html: emailShell({
       preheader: 'Payment cleared. We are packing it now.',
       footerNote,
@@ -174,7 +174,7 @@ function processing({ order }) {
 function onHold({ order }) {
   const num = order.number;
   return {
-    subject: `Order ${num} is on hold — Glow Research`,
+    subject: `Order ${num} is on hold`,
     html: emailShell({
       preheader: 'We have paused it and will be in touch shortly.',
       footerNote,
@@ -207,7 +207,7 @@ function onHold({ order }) {
 function cancelled({ order }) {
   const num = order.number;
   return {
-    subject: `Order ${num} was cancelled — Glow Research`,
+    subject: `Order ${num} was cancelled`,
     html: emailShell({
       preheader: 'Nothing shipped, and you have not been charged.',
       footerNote,
@@ -243,14 +243,14 @@ function cancelled({ order }) {
 function refunded({ order }) {
   const num = order.number;
   return {
-    subject: `Refund issued for order ${num} — Glow Research`,
+    subject: `Refund issued for order ${num}`,
     html: emailShell({
       preheader: `${money(order.total)} is on its way back to you.`,
       footerNote,
       sections: [
         heading('Your refund is on its way.') +
         paragraph(`We have refunded <strong style="color:#0a0a0a;">${money(order.total)}</strong> against order <strong style="color:#0a0a0a;">${esc(num)}</strong>.`) +
-        paragraph('Refunds go back to the card you paid with. Most banks post it within five to ten business days — the timing is theirs, not ours.', { last: true }),
+        paragraph('Refunds go back to the card you paid with. Most banks post it within five to ten business days. That timing is theirs, not ours.', { last: true }),
 
         eyebrow('What was refunded') + itemsHtml(order),
       ],
@@ -261,7 +261,7 @@ function refunded({ order }) {
       `We have refunded ${money(order.total)} against order ${num}.`,
       '',
       'Refunds go back to the card you paid with. Most banks post it within five',
-      'to ten business days — the timing is theirs, not ours.',
+      'to ten business days. That timing is theirs, not ours.',
       '',
       'WHAT WAS REFUNDED',
       ...itemsText(order),
@@ -276,7 +276,7 @@ function refunded({ order }) {
 function failed({ order }) {
   const num = order.number;
   return {
-    subject: `Payment did not go through on order ${num} — Glow Research`,
+    subject: `Payment did not go through on order ${num}`,
     html: emailShell({
       preheader: 'Nothing was charged and nothing has shipped.',
       footerNote,

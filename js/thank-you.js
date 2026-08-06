@@ -23,6 +23,13 @@
   if (!order || !order.number) { none.hidden = false; return; }
   shell.hidden = false;
 
+  // Two frames after unhiding: one for the browser to lay the shell out, one
+  // for the hidden start values to be the computed style. Setting the class in
+  // the same frame gives the transitions no start state and they jump.
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () { shell.classList.add('is-in'); });
+  });
+
   var money = function (n) { return '$' + Number(n || 0).toFixed(2); };
 
   function esc(v) {

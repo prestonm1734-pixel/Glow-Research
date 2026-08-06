@@ -42,7 +42,7 @@ export default async function handler(req, res) {
   // need no product reference and still record name/qty/price per cart line,
   // fully visible on the order. Swap these to real line_items once SKUs land.
   const fee_lines = items.map(i => ({
-    name: [i.name, i.variant, i.qty > 1 ? `x${i.qty}` : null].filter(Boolean).join(' — '),
+    name: [i.name, i.variant, i.qty > 1 ? `×${i.qty}` : null].filter(Boolean).join(' '),
     total: (i.unitSale * i.qty).toFixed(2),
   }));
 
@@ -93,14 +93,14 @@ export default async function handler(req, res) {
       sendEmail({
         to: email,
         replyTo: SUPPORT,
-        subject: `Order ${data.number} confirmed — Glow Research`,
+        subject: `Order ${data.number} confirmed`,
         text: orderText(order),
         html: orderHtml(order),
       }),
       sendEmail({
         to: ADMIN_TO,
         replyTo: email,
-        subject: `New order ${data.number} — ${money(orderTotal(order))}`,
+        subject: `New order ${data.number} for ${money(orderTotal(order))}`,
         text: adminText(order),
         html: adminHtml(order),
       }),
@@ -179,12 +179,12 @@ function itemsTable(o) {
       ${o.items.map(i => `
         <tr>
           <td style="padding:9px 16px 9px 0;font-size:14px;color:#0a0a0a;vertical-align:top;">
-            ${esc(i.name)}${i.variant ? `<span style="color:#6e6e73;"> — ${esc(i.variant)}</span>` : ''}
+            ${esc(i.name)}${i.variant ? `<span style="color:#6e6e73;"> ${esc(i.variant)}</span>` : ''}
             ${i.qty > 1 ? `<span style="color:#6e6e73;"> &times;${i.qty}</span>` : ''}
           </td>
           <td style="padding:9px 0;font-size:14px;color:#0a0a0a;text-align:right;vertical-align:top;white-space:nowrap;">${money(i.unitSale * i.qty)}</td>
         </tr>`).join('')}
-      <tr><td colspan="2" style="padding:6px 0 0;border-top:1px solid #e4e4e7;"></td></tr>
+      <tr><td colspan="2" style="padding:6px 0 0;border-top:1px solid #ebebed;"></td></tr>
       ${line('Subtotal', money(sub))}
       ${line(o.shippingMethod ? esc(o.shippingMethod.label) : 'Shipping', ship ? money(ship) : 'Free')}
       ${line('Total', money(sub + ship), true)}
@@ -197,7 +197,7 @@ function orderHtml(o) {
     footerNote: 'You are receiving this because an order was placed with this email address at glowresearch.shop.',
     sections: [
       heading('Order confirmed.') +
-      paragraph(`Thanks — we have your order and your payment of <strong style="color:#0a0a0a;">${money(orderTotal(o))}</strong>. Its number is <strong style="color:#0a0a0a;">${esc(o.number)}</strong>; quote that in any reply and we will find it straight away.`) +
+      paragraph(`Thank you. We have your order and your payment of <strong style="color:#0a0a0a;">${money(orderTotal(o))}</strong>. Its number is <strong style="color:#0a0a0a;">${esc(o.number)}</strong>. Quote that in any reply and we will find it straight away.`) +
       paragraph('You will get a second email with tracking the moment your box leaves the building.', { last: true }),
 
       eyebrow('What you ordered') + itemsTable(o),
@@ -207,7 +207,7 @@ function orderHtml(o) {
       (o.shippingMethod ? `<p style="margin:12px 0 0;font-size:13px;color:#6e6e73;">${esc(o.shippingMethod.label)}</p>` : ''),
 
       eyebrow('What happens next') +
-      fine('<strong style="color:#0a0a0a;">1.</strong> Your vials are pulled, sealed, and packed in a plain, unmarked box — the same afternoon if you ordered before 2:00 PM PT on a weekday.') +
+      fine('<strong style="color:#0a0a0a;">1.</strong> Your vials are pulled, sealed, and packed in a plain, unmarked box. Orders placed before 2:00 PM PT on a weekday go out the same afternoon.') +
       fine('<strong style="color:#0a0a0a;">2.</strong> It goes out on 2-day FedEx with tracking.') +
       fine('<strong style="color:#0a0a0a;">3.</strong> The tracking number appears against this order in your account the moment it is issued.') +
       `<p style="margin:16px 0 0;font-size:12px;line-height:1.55;color:#86868b;">
@@ -224,14 +224,14 @@ function orderText(o) {
   return [
     'Order confirmed.',
     '',
-    `Thanks — we have your order and your payment of ${money(sub + ship)}. Its number`,
-    `is ${o.number}; quote that in any reply and we will find it straight away.`,
+    `Thank you. We have your order and your payment of ${money(sub + ship)}.`,
+    `Its number is ${o.number}. Quote that in any reply and we will find it straight away.`,
     '',
     'You will get a second email with tracking the moment your box leaves the',
     'building.',
     '',
     'WHAT YOU ORDERED',
-    ...o.items.map(i => `  ${i.name}${i.variant ? ' — ' + i.variant : ''}${i.qty > 1 ? ' x' + i.qty : ''}   ${money(i.unitSale * i.qty)}`),
+    ...o.items.map(i => `  ${i.name}${i.variant ? ' ' + i.variant : ''}${i.qty > 1 ? ' ×' + i.qty : ''}   ${money(i.unitSale * i.qty)}`),
     `  Subtotal: ${money(sub)}`,
     `  ${o.shippingMethod ? o.shippingMethod.label : 'Shipping'}: ${ship ? money(ship) : 'Free'}`,
     `  Total: ${money(sub + ship)}`,
@@ -240,8 +240,8 @@ function orderText(o) {
     ...addressLines(o.shipping).map(l => '  ' + l),
     '',
     'WHAT HAPPENS NEXT',
-    '  1. Your vials are pulled, sealed, and packed in a plain, unmarked box —',
-    '     the same afternoon if you ordered before 2:00 PM PT on a weekday.',
+    '  1. Your vials are pulled, sealed, and packed in a plain, unmarked box.',
+    '     Orders placed before 2:00 PM PT on a weekday go out the same afternoon.',
     '  2. It goes out on 2-day FedEx with tracking.',
     '  3. The tracking number appears against this order in your account the',
     '     moment it is issued.',
@@ -258,10 +258,10 @@ function orderText(o) {
    away rather than a copy-paste out of wp-admin. */
 function adminHtml(o) {
   return emailShell({
-    preheader: `${money(orderTotal(o))} — ${esc(o.shipping.firstName || '')} ${esc(o.shipping.lastName || '')}`.trim(),
+    preheader: `${money(orderTotal(o))} from ${esc(o.shipping.firstName || '')} ${esc(o.shipping.lastName || '')}`.trim(),
     sections: [
       heading(`New order ${esc(o.number)}.`) +
-      paragraph(`<strong style="color:#0a0a0a;">${money(orderTotal(o))}</strong> — paid. Reply to this email to reach the customer directly.`, { last: true }),
+      paragraph(`<strong style="color:#0a0a0a;">${money(orderTotal(o))}</strong>, paid. Reply to this email to reach the customer directly.`, { last: true }),
 
       eyebrow('Customer') +
       `<p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#0a0a0a;">
@@ -276,14 +276,14 @@ function adminHtml(o) {
 
 function adminText(o) {
   return [
-    `New order ${o.number} — ${money(orderTotal(o))} (paid)`,
+    `New order ${o.number} for ${money(orderTotal(o))} (paid)`,
     '',
     'CUSTOMER',
     ...addressLines(o.shipping).map(l => '  ' + l),
     `  ${o.email}`,
     '',
     'ITEMS',
-    ...o.items.map(i => `  ${i.name}${i.variant ? ' — ' + i.variant : ''}${i.qty > 1 ? ' x' + i.qty : ''}   ${money(i.unitSale * i.qty)}`),
+    ...o.items.map(i => `  ${i.name}${i.variant ? ' ' + i.variant : ''}${i.qty > 1 ? ' ×' + i.qty : ''}   ${money(i.unitSale * i.qty)}`),
     `  Total: ${money(orderTotal(o))}`,
     ...(o.notes ? ['', 'NOTE', '  ' + o.notes.replace(/\n/g, '\n  ')] : []),
   ].join('\n');

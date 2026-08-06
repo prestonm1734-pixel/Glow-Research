@@ -116,9 +116,9 @@ async function welcome(customer) {
         button(link, 'Go to your account'),
 
         eyebrow("What's in it") +
-        fine('<strong style="color:#0a0a0a;">Every order in one place</strong> — including anything you bought as a guest with this email.') +
-        fine(`<strong style="color:#0a0a0a;">Live tracking</strong> — the carrier's number appears against an order the moment it is issued.`) +
-        fine(`<strong style="color:#0a0a0a;">Points</strong> — ${POINTS_PER_DOLLAR} per $1 spent, redeemed at ${POINTS_PER_DOLLAR_REDEEMED} points per $1 off a future order.`),
+        fine('<strong style="color:#0a0a0a;">Every order in one place.</strong> That includes anything you bought as a guest with this email.') +
+        fine(`<strong style="color:#0a0a0a;">Live tracking.</strong> The carrier's number appears against an order the moment it is issued.`) +
+        fine(`<strong style="color:#0a0a0a;">Points.</strong> ${POINTS_PER_DOLLAR} for every $1 spent, redeemed at ${POINTS_PER_DOLLAR_REDEEMED} points per $1 off a future order.`),
       ],
     }),
     text: [
@@ -133,7 +133,7 @@ async function welcome(customer) {
       '    with this email.',
       "  - Live tracking: the carrier's number appears against an order the",
       '    moment it is issued.',
-      `  - Points: ${POINTS_PER_DOLLAR} per $1 spent, redeemed at ${POINTS_PER_DOLLAR_REDEEMED} points per $1 off a future order.`,
+      `  - Points: ${POINTS_PER_DOLLAR} for every $1 spent, redeemed at ${POINTS_PER_DOLLAR_REDEEMED} points per $1 off a future order.`,
       '',
       'Glow Research',
       '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
