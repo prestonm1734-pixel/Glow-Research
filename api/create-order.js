@@ -18,6 +18,14 @@ import {
 const ADMIN_TO = 'preston@glowresearch.shop';
 const SUPPORT = 'support@glowresearch.shop';
 
+// Carrier email-to-SMS gateway: free, no third-party SMS account needed, but
+// it is genuinely just an email the carrier converts to a text on their end.
+// Carriers are increasingly aggressive about filtering that, so delivery is
+// best-effort, not guaranteed the way a real SMS API would be. If it turns
+// out to be unreliable in practice, swap this one address for a Twilio call
+// without touching anything else.
+const ADMIN_SMS_TO = '6195925152@txt.att.net';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -85,9 +93,9 @@ export default async function handler(req, res) {
     });
 
     // Awaited, because the function can be frozen the moment the response is
-    // sent. Neither send can throw, and neither is allowed to fail the order:
-    // the order exists in WooCommerce by this point, and telling the shopper
-    // otherwise would have them place it twice.
+    // sent. None of the three sends can throw, and none is allowed to fail
+    // the order: it exists in WooCommerce by this point, and telling the
+    // shopper otherwise would have them place it twice.
     const order = { number: data.number, email, items, shippingMethod, shipping, notes };
     await Promise.all([
       sendEmail({
@@ -104,6 +112,7 @@ export default async function handler(req, res) {
         text: adminText(order),
         html: adminHtml(order),
       }),
+      sendAdminText(order),
     ]);
 
     return res.status(200).json({ orderId: data.id, orderNumber: data.number });
@@ -287,4 +296,18 @@ function adminText(o) {
     `  Total: ${money(orderTotal(o))}`,
     ...(o.notes ? ['', 'NOTE', '  ' + o.notes.replace(/\n/g, '\n  ')] : []),
   ].join('\n');
+}
+
+/* Carrier email-to-SMS gateway. Body only, no HTML, no subject line, because
+   most gateways either drop the subject or fold it into the body as an extra
+   line, and a long body gets silently truncated or split into several texts.
+   One line: order number, amount, buyer name. Everything else is a reply-tap
+   away in the two emails that just went out. */
+function sendAdminText(o) {
+  const name = [o.shipping.firstName, o.shipping.lastName].filter(Boolean).join(' ') || o.email;
+  return sendEmail({
+    to: ADMIN_SMS_TO,
+    subject: 'Glow order',
+    text: `Glow order ${o.number}: ${money(orderTotal(o))} from ${name}`,
+  });
 }
