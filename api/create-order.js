@@ -249,7 +249,7 @@ function orderText(o) {
     'Research use only. Not for human or animal consumption. No dosing or',
     'administration guidance is provided with this order.',
     '',
-    'Glow Nutrition LLC',
+    'Glow Research',
     '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
   ].join('\n');
 }

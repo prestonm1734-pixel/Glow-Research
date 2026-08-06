@@ -9,7 +9,7 @@
 
 const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
 
-export const COMPANY = 'Glow Nutrition LLC';
+export const COMPANY = 'Glow Research';
 export const ADDRESS = '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States';
 
 export const money = n => '$' + Number(n || 0).toFixed(2);

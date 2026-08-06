@@ -158,7 +158,7 @@ function changedText(email, when) {
     'Someone else may have access to this email address or to the account.',
     `Contact us right away at ${SUPPORT} and we will lock it down.`,
     '',
-    'Glow Nutrition LLC',
+    'Glow Research',
     '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
   ].join('\n');
 }

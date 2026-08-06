@@ -170,7 +170,7 @@ function applicantText(a) {
     'WORTH KNOWING UP FRONT',
     ...FINE_PRINT.map(line => `  - ${line}`),
     '',
-    'Glow Nutrition LLC',
+    'Glow Research',
     '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
     '',
     'You are receiving this because a wholesale application was submitted with',
