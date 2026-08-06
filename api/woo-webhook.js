@@ -50,12 +50,22 @@ export default async function handler(req, res) {
   }
 
   const raw = await rawBody(req);
+  const sig = req.headers['x-wc-webhook-signature'];
+
+  // Saving a webhook makes WooCommerce ping the URL, and it refuses to
+  // activate unless that ping gets a 200. The ping is deliberately unlike a
+  // real delivery: no signature header, and a form-encoded `webhook_id=<n>`
+  // body rather than JSON. Acknowledging exactly that shape — and nothing
+  // else — costs nothing, because the ping carries no order and this does no
+  // work on it. Anything with data still has to be signed.
+  if (!sig && /^webhook_id=\d+$/.test(raw.toString('utf8').trim())) {
+    return res.status(200).json({ ok: true, ping: true });
+  }
 
   // Unsigned or wrongly signed means it did not come from our store. Anyone
   // who could forge this could email our customers, so there is no lenient
-  // path here — including the ping WooCommerce sends when you save a webhook,
-  // which is signed like everything else.
-  if (!signatureValid(raw, req.headers['x-wc-webhook-signature'], secret)) {
+  // path here.
+  if (!signatureValid(raw, sig, secret)) {
     console.error('woo-webhook: bad or missing signature.');
     return res.status(401).json({ error: 'Invalid signature.' });
   }
