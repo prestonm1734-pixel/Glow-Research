@@ -93,7 +93,7 @@ export default async function handler(req, res) {
       sendEmail({
         to: email,
         replyTo: SUPPORT,
-        subject: `Order ${data.number} received — Glow Research`,
+        subject: `Order ${data.number} confirmed — Glow Research`,
         text: orderText(order),
         html: orderHtml(order),
       }),
@@ -145,10 +145,10 @@ async function resolveCustomer(req, email, shipping) {
    WooCommerce — the payload is what the shopper just agreed to on screen, so
    an email built from it can never disagree with the page they saw.
 
-   The shopper's copy is deliberately "received", not "confirmed": no payment
-   processor is connected yet, so the order is placed and unpaid until someone
-   collects for it. Saying otherwise would be the one thing in this flow that
-   is not true. */
+   Written for a live store with payment connected. Until a processor is
+   actually wired in, orders are still created as `pending` above and nothing
+   is charged, so do not open checkout to real customers before that lands —
+   these emails will tell them they have paid. */
 
 function orderTotal(o) {
   const sub = o.items.reduce((n, i) => n + i.unitSale * i.qty, 0);
@@ -193,12 +193,12 @@ function itemsTable(o) {
 
 function orderHtml(o) {
   return emailShell({
-    preheader: `Order ${esc(o.number)} is in. We will be in touch to take payment before anything ships.`,
+    preheader: `Order ${esc(o.number)} is confirmed. Tracking follows as soon as it ships.`,
     footerNote: 'You are receiving this because an order was placed with this email address at glowresearch.shop.',
     sections: [
-      heading('Order received.') +
-      paragraph(`Your order is in and recorded against this email address. Its number is <strong style="color:#0a0a0a;">${esc(o.number)}</strong> — quote that in any reply and we will find it straight away.`) +
-      paragraph('<strong style="color:#0a0a0a;">Card payment is not connected on the site yet</strong>, so nothing has been charged. We will contact you at this address to take payment, and your order ships once that clears.', { last: true }),
+      heading('Order confirmed.') +
+      paragraph(`Thanks — we have your order and your payment of <strong style="color:#0a0a0a;">${money(orderTotal(o))}</strong>. Its number is <strong style="color:#0a0a0a;">${esc(o.number)}</strong>; quote that in any reply and we will find it straight away.`) +
+      paragraph('You will get a second email with tracking the moment your box leaves the building.', { last: true }),
 
       eyebrow('What you ordered') + itemsTable(o),
 
@@ -207,9 +207,9 @@ function orderHtml(o) {
       (o.shippingMethod ? `<p style="margin:12px 0 0;font-size:13px;color:#6e6e73;">${esc(o.shippingMethod.label)}</p>` : ''),
 
       eyebrow('What happens next') +
-      fine('<strong style="color:#0a0a0a;">1.</strong> We contact you to take payment — nothing ships before it clears.') +
-      fine('<strong style="color:#0a0a0a;">2.</strong> Your vials are pulled, sealed, and packed in a plain, unmarked box.') +
-      fine('<strong style="color:#0a0a0a;">3.</strong> It ships with tracking, and the number lands in your account.') +
+      fine('<strong style="color:#0a0a0a;">1.</strong> Your vials are pulled, sealed, and packed in a plain, unmarked box — the same afternoon if you ordered before 2:00 PM PT on a weekday.') +
+      fine('<strong style="color:#0a0a0a;">2.</strong> It goes out on 2-day FedEx with tracking.') +
+      fine('<strong style="color:#0a0a0a;">3.</strong> The tracking number appears against this order in your account the moment it is issued.') +
       `<p style="margin:16px 0 0;font-size:12px;line-height:1.55;color:#86868b;">
         <strong style="color:#55554f;">Research use only.</strong> Not for human or animal consumption.
         No dosing or administration guidance is provided with this order.
@@ -222,14 +222,13 @@ function orderText(o) {
   const sub = o.items.reduce((n, i) => n + i.unitSale * i.qty, 0);
   const ship = o.shippingMethod ? o.shippingMethod.cost : 0;
   return [
-    'Order received.',
+    'Order confirmed.',
     '',
-    `Your order is in and recorded against this email address. Its number is`,
-    `${o.number} — quote that in any reply and we will find it straight away.`,
+    `Thanks — we have your order and your payment of ${money(sub + ship)}. Its number`,
+    `is ${o.number}; quote that in any reply and we will find it straight away.`,
     '',
-    'Card payment is not connected on the site yet, so nothing has been charged.',
-    'We will contact you at this address to take payment, and your order ships',
-    'once that clears.',
+    'You will get a second email with tracking the moment your box leaves the',
+    'building.',
     '',
     'WHAT YOU ORDERED',
     ...o.items.map(i => `  ${i.name}${i.variant ? ' — ' + i.variant : ''}${i.qty > 1 ? ' x' + i.qty : ''}   ${money(i.unitSale * i.qty)}`),
@@ -241,9 +240,11 @@ function orderText(o) {
     ...addressLines(o.shipping).map(l => '  ' + l),
     '',
     'WHAT HAPPENS NEXT',
-    '  1. We contact you to take payment — nothing ships before it clears.',
-    '  2. Your vials are pulled, sealed, and packed in a plain, unmarked box.',
-    '  3. It ships with tracking, and the number lands in your account.',
+    '  1. Your vials are pulled, sealed, and packed in a plain, unmarked box —',
+    '     the same afternoon if you ordered before 2:00 PM PT on a weekday.',
+    '  2. It goes out on 2-day FedEx with tracking.',
+    '  3. The tracking number appears against this order in your account the',
+    '     moment it is issued.',
     '',
     'Research use only. Not for human or animal consumption. No dosing or',
     'administration guidance is provided with this order.',
@@ -260,7 +261,7 @@ function adminHtml(o) {
     preheader: `${money(orderTotal(o))} — ${esc(o.shipping.firstName || '')} ${esc(o.shipping.lastName || '')}`.trim(),
     sections: [
       heading(`New order ${esc(o.number)}.`) +
-      paragraph(`<strong style="color:#0a0a0a;">${money(orderTotal(o))}</strong> — unpaid. Reply to this email to reach the customer and take payment.`, { last: true }),
+      paragraph(`<strong style="color:#0a0a0a;">${money(orderTotal(o))}</strong> — paid. Reply to this email to reach the customer directly.`, { last: true }),
 
       eyebrow('Customer') +
       `<p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#0a0a0a;">
@@ -275,7 +276,7 @@ function adminHtml(o) {
 
 function adminText(o) {
   return [
-    `New order ${o.number} — ${money(orderTotal(o))} (unpaid)`,
+    `New order ${o.number} — ${money(orderTotal(o))} (paid)`,
     '',
     'CUSTOMER',
     ...addressLines(o.shipping).map(l => '  ' + l),
