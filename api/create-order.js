@@ -11,6 +11,12 @@
 import {
   wc, currentSession, findCustomerByEmail, readBody, isEmail,
 } from './_lib.js';
+import {
+  emailShell, heading, paragraph, eyebrow, fine, esc, sendEmail, money,
+} from './_email.js';
+
+const ADMIN_TO = 'preston@glowresearch.shop';
+const SUPPORT = 'support@glowresearch.shop';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -78,6 +84,28 @@ export default async function handler(req, res) {
       }),
     });
 
+    // Awaited, because the function can be frozen the moment the response is
+    // sent. Neither send can throw, and neither is allowed to fail the order:
+    // the order exists in WooCommerce by this point, and telling the shopper
+    // otherwise would have them place it twice.
+    const order = { number: data.number, email, items, shippingMethod, shipping, notes };
+    await Promise.all([
+      sendEmail({
+        to: email,
+        replyTo: SUPPORT,
+        subject: `Order ${data.number} received — Glow Research`,
+        text: orderText(order),
+        html: orderHtml(order),
+      }),
+      sendEmail({
+        to: ADMIN_TO,
+        replyTo: email,
+        subject: `New order ${data.number} — ${money(orderTotal(order))}`,
+        text: adminText(order),
+        html: adminHtml(order),
+      }),
+    ]);
+
     return res.status(200).json({ orderId: data.id, orderNumber: data.number });
   } catch (err) {
     return res.status(502).json({ error: err.message || 'Could not reach the store backend.' });
@@ -109,4 +137,153 @@ async function resolveCustomer(req, email, shipping) {
   } catch (e) {
     return 0;
   }
+}
+
+/* ================== the emails ==================
+   Two go out per order: a confirmation to the shopper and an alert to the
+   desk. Both are built from the checkout payload rather than re-read from
+   WooCommerce — the payload is what the shopper just agreed to on screen, so
+   an email built from it can never disagree with the page they saw.
+
+   The shopper's copy is deliberately "received", not "confirmed": no payment
+   processor is connected yet, so the order is placed and unpaid until someone
+   collects for it. Saying otherwise would be the one thing in this flow that
+   is not true. */
+
+function orderTotal(o) {
+  const sub = o.items.reduce((n, i) => n + i.unitSale * i.qty, 0);
+  return sub + (o.shippingMethod ? o.shippingMethod.cost : 0);
+}
+
+function addressLines(s) {
+  return [
+    [s.firstName, s.lastName].filter(Boolean).join(' '),
+    s.address1,
+    s.address2,
+    [s.city, s.state, s.zip].filter(Boolean).join(', '),
+  ].filter(Boolean);
+}
+
+function itemsTable(o) {
+  const sub = o.items.reduce((n, i) => n + i.unitSale * i.qty, 0);
+  const ship = o.shippingMethod ? o.shippingMethod.cost : 0;
+
+  const line = (label, value, strong) => `
+    <tr>
+      <td style="padding:7px 16px 7px 0;font-size:${strong ? '15' : '13'}px;color:${strong ? '#0a0a0a' : '#6e6e73'};${strong ? 'font-weight:700;' : ''}">${label}</td>
+      <td style="padding:7px 0;font-size:${strong ? '15' : '13'}px;color:#0a0a0a;text-align:right;white-space:nowrap;${strong ? 'font-weight:700;' : ''}">${value}</td>
+    </tr>`;
+
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
+      ${o.items.map(i => `
+        <tr>
+          <td style="padding:9px 16px 9px 0;font-size:14px;color:#0a0a0a;vertical-align:top;">
+            ${esc(i.name)}${i.variant ? `<span style="color:#6e6e73;"> — ${esc(i.variant)}</span>` : ''}
+            ${i.qty > 1 ? `<span style="color:#6e6e73;"> &times;${i.qty}</span>` : ''}
+          </td>
+          <td style="padding:9px 0;font-size:14px;color:#0a0a0a;text-align:right;vertical-align:top;white-space:nowrap;">${money(i.unitSale * i.qty)}</td>
+        </tr>`).join('')}
+      <tr><td colspan="2" style="padding:6px 0 0;border-top:1px solid #e4e4e7;"></td></tr>
+      ${line('Subtotal', money(sub))}
+      ${line(o.shippingMethod ? esc(o.shippingMethod.label) : 'Shipping', ship ? money(ship) : 'Free')}
+      ${line('Total', money(sub + ship), true)}
+    </table>`;
+}
+
+function orderHtml(o) {
+  return emailShell({
+    preheader: `Order ${esc(o.number)} is in. We will be in touch to take payment before anything ships.`,
+    footerNote: 'You are receiving this because an order was placed with this email address at glowresearch.shop.',
+    sections: [
+      heading('Order received.') +
+      paragraph(`Your order is in and recorded against this email address. Its number is <strong style="color:#0a0a0a;">${esc(o.number)}</strong> — quote that in any reply and we will find it straight away.`) +
+      paragraph('<strong style="color:#0a0a0a;">Card payment is not connected on the site yet</strong>, so nothing has been charged. We will contact you at this address to take payment, and your order ships once that clears.', { last: true }),
+
+      eyebrow('What you ordered') + itemsTable(o),
+
+      eyebrow('Shipping to') +
+      `<p style="margin:0;font-size:14px;line-height:1.6;color:#0a0a0a;">${addressLines(o.shipping).map(esc).join('<br>')}</p>` +
+      (o.shippingMethod ? `<p style="margin:12px 0 0;font-size:13px;color:#6e6e73;">${esc(o.shippingMethod.label)}</p>` : ''),
+
+      eyebrow('What happens next') +
+      fine('<strong style="color:#0a0a0a;">1.</strong> We contact you to take payment — nothing ships before it clears.') +
+      fine('<strong style="color:#0a0a0a;">2.</strong> Your vials are pulled, sealed, and packed in a plain, unmarked box.') +
+      fine('<strong style="color:#0a0a0a;">3.</strong> It ships with tracking, and the number lands in your account.') +
+      `<p style="margin:16px 0 0;font-size:12px;line-height:1.55;color:#86868b;">
+        <strong style="color:#55554f;">Research use only.</strong> Not for human or animal consumption.
+        No dosing or administration guidance is provided with this order.
+      </p>`,
+    ],
+  });
+}
+
+function orderText(o) {
+  const sub = o.items.reduce((n, i) => n + i.unitSale * i.qty, 0);
+  const ship = o.shippingMethod ? o.shippingMethod.cost : 0;
+  return [
+    'Order received.',
+    '',
+    `Your order is in and recorded against this email address. Its number is`,
+    `${o.number} — quote that in any reply and we will find it straight away.`,
+    '',
+    'Card payment is not connected on the site yet, so nothing has been charged.',
+    'We will contact you at this address to take payment, and your order ships',
+    'once that clears.',
+    '',
+    'WHAT YOU ORDERED',
+    ...o.items.map(i => `  ${i.name}${i.variant ? ' — ' + i.variant : ''}${i.qty > 1 ? ' x' + i.qty : ''}   ${money(i.unitSale * i.qty)}`),
+    `  Subtotal: ${money(sub)}`,
+    `  ${o.shippingMethod ? o.shippingMethod.label : 'Shipping'}: ${ship ? money(ship) : 'Free'}`,
+    `  Total: ${money(sub + ship)}`,
+    '',
+    'SHIPPING TO',
+    ...addressLines(o.shipping).map(l => '  ' + l),
+    '',
+    'WHAT HAPPENS NEXT',
+    '  1. We contact you to take payment — nothing ships before it clears.',
+    '  2. Your vials are pulled, sealed, and packed in a plain, unmarked box.',
+    '  3. It ships with tracking, and the number lands in your account.',
+    '',
+    'Research use only. Not for human or animal consumption. No dosing or',
+    'administration guidance is provided with this order.',
+    '',
+    'Glow Nutrition LLC',
+    '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
+  ].join('\n');
+}
+
+/* Desk copy. Reply-to is the shopper, so collecting payment is one reply
+   away rather than a copy-paste out of wp-admin. */
+function adminHtml(o) {
+  return emailShell({
+    preheader: `${money(orderTotal(o))} — ${esc(o.shipping.firstName || '')} ${esc(o.shipping.lastName || '')}`.trim(),
+    sections: [
+      heading(`New order ${esc(o.number)}.`) +
+      paragraph(`<strong style="color:#0a0a0a;">${money(orderTotal(o))}</strong> — unpaid. Reply to this email to reach the customer and take payment.`, { last: true }),
+
+      eyebrow('Customer') +
+      `<p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#0a0a0a;">
+        ${addressLines(o.shipping).map(esc).join('<br>')}<br>
+        <a href="mailto:${esc(o.email)}" style="color:#0a0a0a;">${esc(o.email)}</a>
+      </p>` +
+      itemsTable(o) +
+      (o.notes ? `<p style="margin:16px 0 0;font-size:13px;line-height:1.55;color:#55554f;"><strong style="color:#0a0a0a;">Note:</strong> ${esc(o.notes).replace(/\n/g, '<br>')}</p>` : ''),
+    ],
+  });
+}
+
+function adminText(o) {
+  return [
+    `New order ${o.number} — ${money(orderTotal(o))} (unpaid)`,
+    '',
+    'CUSTOMER',
+    ...addressLines(o.shipping).map(l => '  ' + l),
+    `  ${o.email}`,
+    '',
+    'ITEMS',
+    ...o.items.map(i => `  ${i.name}${i.variant ? ' — ' + i.variant : ''}${i.qty > 1 ? ' x' + i.qty : ''}   ${money(i.unitSale * i.qty)}`),
+    `  Total: ${money(orderTotal(o))}`,
+    ...(o.notes ? ['', 'NOTE', '  ' + o.notes.replace(/\n/g, '\n  ')] : []),
+  ].join('\n');
 }

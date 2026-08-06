@@ -12,6 +12,41 @@ const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-s
 export const COMPANY = 'Glow Nutrition LLC';
 export const ADDRESS = '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States';
 
+export const money = n => '$' + Number(n || 0).toFixed(2);
+
+/* Single send path for every transactional email. Never throws and never
+   reports upward: each caller runs after the thing the email is *about* has
+   already happened (order created, password changed), so a mail failure must
+   not turn a completed action into a reported one. Returns whether it went. */
+export async function sendEmail({ to, replyTo, subject, text, html }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error(`sendEmail: RESEND_API_KEY is not set — "${subject}" not sent.`);
+    return false;
+  }
+  try {
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        from: process.env.RESEND_FROM_EMAIL || 'Glow Research <onboarding@resend.dev>',
+        to,
+        ...(replyTo ? { reply_to: replyTo } : {}),
+        subject, text, html,
+      }),
+    });
+    if (!resp.ok) {
+      const errBody = await resp.json().catch(() => null);
+      console.error(`sendEmail: Resend rejected "${subject}".`, resp.status, errBody);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error(`sendEmail: "${subject}" failed.`, e);
+    return false;
+  }
+}
+
 export function esc(v) {
   return String(v == null ? '' : v)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
