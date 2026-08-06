@@ -197,3 +197,73 @@ export function readBody(req) {
 export function isEmail(v) {
   return typeof v === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 }
+
+/* ============================ tracking ============================ */
+
+// Advanced Shipment Tracking (and AST Pro) register a dedicated REST
+// endpoint per order, and it resolves the carrier's real tracking URL for
+// us — a predefined provider's own link, or whatever custom link the
+// fulfillment partner set. That is strictly better than the meta-scraping
+// fallback below, which only ever had a bare number and no way to know
+// which carrier it belonged to (a page that then had to guess FedEx and
+// was wrong every time it wasn't FedEx).
+//
+// wcOptional() never throws: if the plugin is not installed, or a call
+// happens to fail, this resolves to null and the order falls back to the
+// meta scan rather than taking the whole account page down.
+export async function trackingFromAST(orderId) {
+  const items = await wcOptional(`/wp-json/wc-shipment-tracking/v3/orders/${orderId}/shipment-trackings`);
+  const list = Array.isArray(items) ? items : [];
+  if (!list.length) return null;
+  const t = list[list.length - 1]; // most recently added shipment
+  if (!t || !t.tracking_number) return null;
+  return {
+    number: String(t.tracking_number),
+    provider: t.tracking_provider || t.custom_tracking_provider || null,
+    link: t.tracking_link || t.custom_tracking_link || null,
+  };
+}
+
+// Fallback for stores without AST: some plugins (or a manual entry) leave a
+// bare tracking number in order meta with no way to know the carrier, so
+// this can offer a number but never a trustworthy link.
+const TRACKING_META_KEYS = [
+  '_tracking_number', 'tracking_number',
+  '_wc_shipment_tracking_number', '_aftership_tracking_number',
+];
+
+export function trackingFromMeta(order) {
+  const meta = order.meta_data || [];
+
+  for (const key of TRACKING_META_KEYS) {
+    const hit = meta.find(m => m.key === key);
+    if (hit && hit.value) return { number: String(hit.value), provider: null, link: null };
+  }
+
+  // AST also writes this same array into order meta; reachable here without
+  // a second request if the REST API ever returns it, though in practice
+  // trackingFromAST() above is what surfaces it.
+  const items = meta.find(m => m.key === '_wc_shipment_tracking_items');
+  if (items && Array.isArray(items.value) && items.value.length) {
+    const first = items.value[0];
+    if (first && first.tracking_number) {
+      return {
+        number: String(first.tracking_number),
+        provider: first.tracking_provider || first.custom_tracking_provider || null,
+        link: first.tracking_link || first.custom_tracking_link || null,
+      };
+    }
+  }
+  return null;
+}
+
+// WooCommerce statuses are lowercase slugs; the account UI shows prose.
+export const STATUS_LABELS = {
+  pending: 'Awaiting payment',
+  'on-hold': 'On hold',
+  processing: 'Processing',
+  completed: 'Delivered',
+  cancelled: 'Cancelled',
+  refunded: 'Refunded',
+  failed: 'Failed',
+};

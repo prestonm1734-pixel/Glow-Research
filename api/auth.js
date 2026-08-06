@@ -9,7 +9,9 @@
 import {
   wc, wcConfig, findCustomerByEmail, metaValue, hashPassword, verifyPassword,
   makeToken, sessionCookie, readBody, isEmail,
+  POINTS_PER_DOLLAR, POINTS_PER_DOLLAR_REDEEMED,
 } from './_lib.js';
+import { emailShell, heading, paragraph, eyebrow, fine, button, esc, sendEmail } from './_email.js';
 
 const PW_META = 'glow_password';
 
@@ -75,6 +77,7 @@ async function signUp(res, email, password, name) {
         meta_data: [{ key: PW_META, value: hash }],
       }),
     });
+    await welcome(updated);
     return finish(res, updated);
   }
 
@@ -88,7 +91,54 @@ async function signUp(res, email, password, name) {
       meta_data: [{ key: PW_META, value: hash }],
     }),
   });
+  await welcome(created);
   return finish(res, created);
+}
+
+/* Sent on sign-up only, never on sign-in. Awaited because the function can be
+   frozen once the response goes out, but it cannot fail the sign-up: the
+   account exists by now, and an error here would send them round again into
+   the "an account already exists" wall. */
+async function welcome(customer) {
+  const name = (customer.first_name || '').trim();
+  const link = 'https://glowresearch.shop/account.html';
+
+  await sendEmail({
+    to: customer.email,
+    replyTo: 'support@glowresearch.shop',
+    subject: 'Your Glow Research account is ready',
+    html: emailShell({
+      preheader: 'Order history, live tracking, and points on every order.',
+      footerNote: 'You are receiving this because an account was created with this email address at glowresearch.shop.',
+      sections: [
+        heading('Your account is ready.') +
+        paragraph(`${name ? esc(name) + ', your' : 'Your'} account is set up and signed in on this address.`) +
+        button(link, 'Go to your account'),
+
+        eyebrow("What's in it") +
+        fine('<strong style="color:#0a0a0a;">Every order in one place</strong> — including anything you bought as a guest with this email.') +
+        fine(`<strong style="color:#0a0a0a;">Live tracking</strong> — the carrier's number appears against an order the moment it is issued.`) +
+        fine(`<strong style="color:#0a0a0a;">Points</strong> — ${POINTS_PER_DOLLAR} per $1 spent, redeemed at ${POINTS_PER_DOLLAR_REDEEMED} points per $1 off a future order.`),
+      ],
+    }),
+    text: [
+      'Your account is ready.',
+      '',
+      `${name ? name + ', your' : 'Your'} account is set up and signed in on this address.`,
+      '',
+      link,
+      '',
+      "WHAT'S IN IT",
+      '  - Every order in one place, including anything you bought as a guest',
+      '    with this email.',
+      "  - Live tracking: the carrier's number appears against an order the",
+      '    moment it is issued.',
+      `  - Points: ${POINTS_PER_DOLLAR} per $1 spent, redeemed at ${POINTS_PER_DOLLAR_REDEEMED} points per $1 off a future order.`,
+      '',
+      'Glow Research',
+      '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
+    ].join('\n'),
+  });
 }
 
 async function signIn(res, email, password) {
