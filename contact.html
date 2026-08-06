@@ -67,6 +67,62 @@
 
   .ct-mail-btn{ margin-top: 26px; }
 
+  /* ---------- the form ----------
+     Same square fields as the sign-in page, on the same white surface. The
+     card above still hands over the address for anyone who would rather use
+     their own mail client; this is for everyone who would not. */
+  .ct-form-wrap{ max-width: 640px; margin-top: clamp(28px, 4vw, 40px); }
+  .ct-form-wrap h2{
+    font-size: clamp(1.4rem, 2.6vw, 1.9rem); letter-spacing:-.035em; margin:0 0 8px; color:#0a0a0a;
+  }
+  .ct-form-sub{ margin:0 0 26px; font-size:.98rem; line-height:1.6; color:#55554f; }
+
+  .ct-field{ margin-bottom: 16px; }
+  .ct-field label{
+    display:block; margin-bottom:8px; font-size:.88rem; font-weight:500; color:#6e6e73;
+  }
+  .ct-field .ct-opt{ color:#a1a1a6; }
+  .ct-field input, .ct-field textarea{
+    width:100%; padding: 14px 16px; border-radius:0;
+    border:1px solid rgba(0,0,0,.22); background:#fff; color:#0a0a0a;
+    font-family:inherit; font-size:1rem;
+    transition: border-color .18s ease;
+  }
+  .ct-field textarea{ resize:vertical; min-height: 132px; line-height:1.6; }
+  .ct-field input::placeholder, .ct-field textarea::placeholder{ color:#a1a1a6; }
+  .ct-field input:hover, .ct-field textarea:hover{ border-color: rgba(0,0,0,.45); }
+  .ct-field input:focus, .ct-field textarea:focus{ outline:none; border-color:#0a0a0a; }
+  .ct-field input:focus-visible, .ct-field textarea:focus-visible{ outline:2px solid #0a0a0a; outline-offset:2px; }
+  .ct-field:focus-within label{ color:#0a0a0a; }
+
+  /* honeypot: off-canvas rather than display:none, since some bots skip
+     anything that is not rendered */
+  .ct-hp{
+    position:absolute; left:-9999px; width:1px; height:1px;
+    overflow:hidden; opacity:0; pointer-events:none;
+  }
+
+  .ct-submit{ margin-top: 22px; }
+  .ct-submit .btn[disabled]{ cursor: progress; }
+  .ct-error{
+    margin: 16px 0 0; padding: 12px 14px; background:#fdeceb;
+    font-size:.9rem; line-height:1.55; color:#b3261e;
+  }
+  .ct-error[hidden]{ display:none; }
+
+  /* the confirmation that replaces the form, same swap the wholesale page uses */
+  .ct-form.is-gone{ opacity:0; transform: translateY(-6px); transition: opacity .28s ease, transform .28s ease; }
+  .ct-done{ border:2px solid #0a0a0a; padding: clamp(28px, 4vw, 40px); }
+  .ct-done[hidden]{ display:none; }
+  .ct-done h3{ font-size: clamp(1.3rem, 2.4vw, 1.7rem); letter-spacing:-.035em; margin:0 0 10px; color:#0a0a0a; }
+  .ct-done p{ margin:0; font-size:1rem; line-height:1.62; color:#55554f; }
+  .js .ct-done > *{ opacity:0; transform: translateY(10px); transition: opacity .5s ease, transform .5s ease; }
+  .ct-done.is-in > *{ opacity:1; transform:none; }
+  .ct-done.is-in p{ transition-delay:.12s; }
+  @media (prefers-reduced-motion: reduce){
+    .ct-form.is-gone, .js .ct-done > *{ transition:none; }
+  }
+
   .ct-addr{ margin-top: clamp(28px, 4vw, 40px); max-width: 640px; font-size:.9rem; line-height:1.7; color:#6e6e73; }
   .ct-addr strong{ color:#55554f; font-weight:600; }
 </style>
@@ -159,8 +215,50 @@
       </div>
     </div>
 
+    <div class="ct-form-wrap">
+      <h2>Or write to us here.</h2>
+      <p class="ct-form-sub">
+        Goes to the same inbox. We reply to the address you give us, within one business day.
+      </p>
+
+      <form class="ct-form" id="ctForm" novalidate>
+        <div class="ct-field">
+          <label for="ctName">Your name</label>
+          <input type="text" id="ctName" name="name" placeholder="Dr. Jane Okafor" required />
+        </div>
+        <div class="ct-field">
+          <label for="ctEmail">Email</label>
+          <input type="email" id="ctEmail" name="email" placeholder="jane@lab.com" required autocomplete="email" />
+        </div>
+        <div class="ct-field">
+          <label for="ctRef">Order or lot number <span class="ct-opt">(optional)</span></label>
+          <input type="text" id="ctRef" name="reference" placeholder="e.g. 4471, or lot BP5-2409" />
+        </div>
+        <div class="ct-field">
+          <label for="ctMessage">How can we help?</label>
+          <textarea id="ctMessage" name="message" placeholder="Tell us what you need and we will sort it out." required maxlength="5000"></textarea>
+        </div>
+
+        <!-- bots fill every field they find; people never see this one -->
+        <div class="ct-hp" aria-hidden="true">
+          <label for="ctWebsite">Leave this empty</label>
+          <input type="text" id="ctWebsite" name="website" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div class="ct-submit">
+          <button type="submit" class="btn btn-primary" id="ctSubmit" aria-busy="false"><span class="btn-label"><span>Send message</span></span> <span class="lp-arrow" aria-hidden="true">&rarr;</span></button>
+        </div>
+        <p class="ct-error" id="ctError" role="alert" hidden></p>
+      </form>
+
+      <div class="ct-done" id="ctDone" hidden role="status">
+        <h3>Message sent.</h3>
+        <p>A confirmation is on its way to your inbox, and a person replies within one business day.</p>
+      </div>
+    </div>
+
     <p class="ct-addr">
-      <strong>Glow Nutrition LLC</strong><br />
+      <strong>Glow Research</strong><br />
       10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States
     </p>
   </div>
@@ -229,6 +327,95 @@
   window.addEventListener('scroll', () => {
     header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
   });
+
+  /* ---------- contact form ----------
+     Swaps the form for a confirmation rather than appending a line under the
+     button: the form has done its job by then, and leaving it filled in
+     invites a second send of the same message. */
+  (function () {
+    const form = document.getElementById('ctForm');
+    const done = document.getElementById('ctDone');
+    const error = document.getElementById('ctError');
+    if (!form || !done) return;
+
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const btn = document.getElementById('ctSubmit');
+    const label = btn.querySelector('.btn-label');
+    const arrow = btn.querySelector('.lp-arrow');
+
+    function spinHtml() {
+      let ticks = '';
+      for (let i = 0; i < 8; i++) {
+        ticks += `<i style="transform:rotate(${i * 45}deg) translate(0,-5px);animation-delay:-${(i * 0.1).toFixed(3)}s"></i>`;
+      }
+      return `<span class="btn-spin" aria-hidden="true">${ticks}</span>`;
+    }
+    function setBusy(busy) {
+      label.style.opacity = '0';
+      setTimeout(() => {
+        label.innerHTML = (busy ? spinHtml() : '') + '<span>' + (busy ? 'Sending…' : 'Send message') + '</span>';
+        label.style.opacity = '1';
+      }, 120);
+      btn.disabled = busy;
+      btn.setAttribute('aria-busy', busy ? 'true' : 'false');
+      if (arrow) arrow.style.display = busy ? 'none' : '';
+    }
+
+    function show() {
+      form.hidden = true;
+      done.hidden = false;
+      if (still) { done.classList.add('is-in'); return; }
+      requestAnimationFrame(() => requestAnimationFrame(() => done.classList.add('is-in')));
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      error.hidden = true;
+
+      const name = document.getElementById('ctName').value.trim();
+      const email = document.getElementById('ctEmail').value.trim();
+      const message = document.getElementById('ctMessage').value.trim();
+
+      // checked here as well as server-side, so a missed field costs a glance
+      // rather than a round trip
+      if (!name || !email || !message) {
+        error.hidden = false;
+        error.textContent = 'Add your name, email, and a message.';
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        error.hidden = false;
+        error.textContent = 'That email address does not look right.';
+        document.getElementById('ctEmail').focus();
+        return;
+      }
+
+      setBusy(true);
+      try {
+        const resp = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name, email, message,
+            reference: document.getElementById('ctRef').value.trim(),
+            website: document.getElementById('ctWebsite').value,
+          }),
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(data.error || 'Could not send your message.');
+
+        form.reset();
+        if (still) { show(); return; }
+        form.classList.add('is-gone');
+        setTimeout(show, 300);
+      } catch (err) {
+        error.hidden = false;
+        error.textContent = err.message;
+      } finally {
+        setBusy(false);
+      }
+    });
+  })();
 </script>
 <script src="js/products-data.js"></script>
 <script src="js/cart.js"></script>
