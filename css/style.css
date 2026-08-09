@@ -406,19 +406,18 @@ button[disabled].si-forgot{ cursor: progress; }
    line wider than the column. */
 .hero-br{ display:none; }
 @media (min-width: 680px){ .hero-br{ display:inline; } }
-/* Three short claims, not one sentence — a compact stacked list rather
-   than a paragraph that has to be parsed. Bolder than the paragraph
-   default (400) but a shade dimmer than the headline's full white:
-   confident supporting copy, not body text. No marker — the line break
-   alone is enough separation at three short items. */
+/* Back to a flowing paragraph, but not at the plain-paragraph default
+   (400 weight, --text-dim): semibold at a shade lighter than the headline's
+   full white reads as confident supporting copy rather than body text.
+   Line-height opened up a touch over the site's 1.65 default, since bold
+   text at a tight leading looks cramped next to the headline above it. */
 .hero-sub{
-  display:flex; flex-direction:column; gap:7px;
-  font-size: 1.05rem; font-weight: 600; color: #c7c7c4;
-  max-width: 460px;
+  font-size: 1.05rem; font-weight: 600; color: #c7c7c4; line-height: 1.62;
+  max-width: 500px;
   margin: 0 0 32px;
 }
 @media (max-width: 560px){
-  .hero-sub{ font-size: 0.98rem; gap: 6px; }
+  .hero-sub{ font-size: 0.98rem; }
 }
 /* hero rhythm runs on an 8px scale end to end: eyebrow 16 → title 24 →
    sub 32 → cta 24 → rule → stats 24. The gaps were previously 20/20/30/30/22,
