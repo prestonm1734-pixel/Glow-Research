@@ -146,6 +146,16 @@
     box.href = href;
     box.classList.remove('is-static');
     box.removeAttribute('tabindex');
+    // The markup ships with the "on request" wording, since that is the only
+    // route that works while no certificate is hosted. A real href means there
+    // is a document to open, so the box can promise one.
+    const bEl = box.querySelector('b');
+    const smallEl = box.querySelector('small');
+    if (bEl) bEl.textContent = 'View certificate of analysis';
+    if (smallEl) {
+      smallEl.textContent =
+        'HPLC purity and mass-spec identity, matched to the lot number on your vial';
+    }
     // a certificate is a document, not a step in the buying flow, so it
     // opens alongside the page rather than replacing it
     box.target = '_blank';

@@ -7,22 +7,46 @@
      needs the observer to show it, so without scripting the page must
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
-<title>About Us | Glow Research</title>
-<meta name="description" content="Glow Research is a US-based supplier of research peptides for laboratory use only. We do not manufacture; we partner with a US-based, cGMP-aligned facility and third-party test every lot." />
+<title>About Glow Research | Research Peptide Supplier in San Diego</title>
+<meta name="description" content="Glow Research is a San Diego, California supplier of research peptides and research-use-only compounds. A retailer, not a manufacturer: we work with a U.S. manufacturing partner." />
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://glowresearch.shop/about.html" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
-<meta property="og:title" content="About Us" />
-<meta property="og:description" content="Glow Research is a US-based supplier of research peptides for laboratory use only. We do not manufacture; we partner with a US-based, cGMP-aligned facility and third-party test every lot." />
+<meta property="og:title" content="About Glow Research" />
+<meta property="og:description" content="Glow Research is a San Diego, California supplier of research peptides and research-use-only compounds. A retailer, not a manufacturer: we work with a U.S. manufacturing partner." />
 <meta property="og:url" content="https://glowresearch.shop/about.html" />
 <meta property="og:image" content="https://glowresearch.shop/assets/vial-trio-black.jpg" />
 <meta property="og:image:width" content="1672" />
 <meta property="og:image:height" content="941" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="About Us" />
-<meta name="twitter:description" content="Glow Research is a US-based supplier of research peptides for laboratory use only. We do not manufacture; we partner with a US-based, cGMP-aligned facility and third-party test every lot." />
+<meta name="twitter:title" content="About Glow Research" />
+<meta name="twitter:description" content="Glow Research is a San Diego, California supplier of research peptides and research-use-only compounds. A retailer, not a manufacturer: we work with a U.S. manufacturing partner." />
 <meta name="twitter:image" content="https://glowresearch.shop/assets/vial-trio-black.jpg" />
+<!--
+  The Organization entity itself is declared once, on the homepage — Google asks
+  for organization-level markup on a single page rather than repeated sitewide,
+  and duplicating it here would just be two copies to keep in step. This page
+  points at that entity instead: `about` says "this page is the description of
+  that Organization", which is what makes About the entity's home in prose.
+
+  No BreadcrumbList: this page renders no visible breadcrumb trail, and a
+  two-level Home -> About marks up nothing a reader can see.
+-->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "@id": "https://glowresearch.shop/about.html#webpage",
+  "url": "https://glowresearch.shop/about.html",
+  "name": "About Glow Research",
+  "description": "Glow Research is a San Diego, California supplier of research peptides and research-use-only compounds. A retailer, not a manufacturer: we work with a U.S. manufacturing partner.",
+  "inLanguage": "en-US",
+  "isPartOf": { "@id": "https://glowresearch.shop/#website" },
+  "about": { "@id": "https://glowresearch.shop/#organization" },
+  "publisher": { "@id": "https://glowresearch.shop/#organization" }
+}
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -187,11 +211,12 @@
     <div class="ab-hero-grid">
       <div class="ab-hero-copy">
         <span class="ab-eyebrow">About</span>
-        <h1>A US-based supplier, built for research buyers.</h1>
+        <h1>A San Diego supplier, built for research buyers.</h1>
         <p class="ab-lede">
-          Glow Research supplies high-purity research peptides to laboratories,
-          institutions, and qualified researchers across the United States. Everything
-          we sell is intended for in-vitro laboratory research use only.
+          Glow Research is a San Diego, California supplier of research peptides and
+          research-use-only compounds. We sell to laboratories, institutions, and
+          qualified researchers in all 50 states, and everything we ship is intended
+          for in-vitro laboratory research only.
         </p>
       </div>
 
@@ -208,8 +233,9 @@
     <div class="ab-callout">
       <p>
         We are not a manufacturer, and we do not pretend to be one. We are a
-        US-based retailer that partners with a domestic, cGMP-aligned production
-        facility, and we third-party test what we sell.
+        California retailer working with a U.S. manufacturing partner &mdash; a
+        domestic, cGMP-aligned production facility &mdash; and an independent
+        third-party laboratory.
       </p>
     </div>
   </div>
@@ -229,7 +255,7 @@
           third-party laboratory. Orders are picked, packed, and dispatched by a
           third-party fulfilment partner. We do not manufacture, compound,
           repackage, or test anything ourselves, and we do not operate a
-          laboratory or a warehouse. Our role is sourcing, qualifying the
+          laboratory or a warehouse. Our role is peptide sourcing: qualifying the
           suppliers behind each lot, and putting their documentation in front of
           you.
         </p>
@@ -251,18 +277,25 @@
         </p>
         <p>
           It also means we are not reconciling documentation across jurisdictions
-          when you need a certificate for a specific batch.
+          when you need a certificate for a specific batch, and that dispatch is
+          measured in hours rather than customs windows: orders placed before
+          2:00&nbsp;PM PST leave the same business day on 2-day FedEx Express.
         </p>
       </div>
 
       <div class="ab-block">
         <h2>Verification, not adjectives</h2>
         <p>
-          Every lot is tested by an independent third-party laboratory. Every
-          vial carries a lot number with a scannable barcode that maps to its
-          certificate of analysis, and the same certificate is linked directly
-          from that compound's product page. If you want to see a lot's COA
-          before you order rather than after, email us and we will send it.
+          Every lot is tested by an independent third-party laboratory, and every
+          vial carries the lot number its certificate of analysis is issued
+          against. If you want to read a lot's COA before you order rather than
+          after, email us and we will send it.
+        </p>
+        <p>
+          We are not linking certificates from the product pages until every
+          compound in the catalog has one to link to. Batch documentation you have
+          to take on faith is not documentation, and a page that promises a
+          certificate it cannot produce is worse than a page that says nothing.
         </p>
         <p>
           Purity claims that are not attached to a document are marketing. We try
@@ -273,9 +306,9 @@
       <div class="ab-block">
         <h2>Research use, enforced</h2>
         <p>
-          Our products are not drugs, supplements, foods, or cosmetics. They are
-          not for human or animal consumption, and we do not sell to anyone
-          purchasing for personal use.
+          Our products are research compounds. They are not drugs, supplements,
+          foods, or cosmetics, they are not for human or animal consumption, and
+          we do not sell to anyone purchasing for personal use.
         </p>
         <p>
           We operate under the applicable federal, state, and local requirements
@@ -309,6 +342,10 @@
       <div class="ab-fact">
         <dt>Fulfilment</dt>
         <dd>Third-party partner, US-based climate-controlled facility</dd>
+      </div>
+      <div class="ab-fact">
+        <dt>Dispatch</dt>
+        <dd>Same business day before 2:00 PM PST, 2-day FedEx Express to all 50 states</dd>
       </div>
       <div class="ab-fact">
         <dt>Sold to</dt>

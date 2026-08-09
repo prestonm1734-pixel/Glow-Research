@@ -520,9 +520,13 @@
             <path d="M6 2h8l4 4v16H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
             <path d="M14 2v5h4M9 12h6M9 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
+          <!-- Wording assumes NO hosted certificate, because that is the state
+               today and it is also what a crawler and the generated static page
+               see. js/product.js swaps it to the "view" wording only once a real
+               href exists — honest by default, upgraded when it can be. -->
           <span>
-            <b>View certificate of analysis</b>
-            <small>HPLC purity and mass-spec identity, matched to the lot number and barcode on your vial</small>
+            <b>Certificate of analysis on request</b>
+            <small>Email support@glowresearch.shop with the lot number on your vial and we will send the COA for that batch</small>
           </span>
           <svg class="pd-coa-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

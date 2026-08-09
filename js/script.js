@@ -41,7 +41,11 @@ renderProducts('all');
 const faqs = [
   { q: 'Are Glow Research peptides intended for human consumption?', a: 'No. All products sold by Glow Research are strictly for laboratory and in-vitro research use only. They are not drugs, supplements, foods, or cosmetics. They have not been evaluated or approved by the FDA for any use, and they are not intended to diagnose, treat, cure, or prevent any disease. They are not for human or animal use of any kind.' },
   { q: 'Why are Glow Research peptides priced the way they are?', a: 'Our pricing reflects what goes into every lot at the facilities behind it: US-based production held to cGMP-aligned quality practices, and independent third-party lab testing on every lot. Peptides priced well below market are almost always cutting one of those corners, and we would rather hold the standard than the lowest price.' },
-  { q: 'Where do I find a lot’s COA?', a: 'Two places. Every product page links directly to its current lot’s certificate, and every vial carries a lot number with a scannable barcode that matches it — so you can verify what’s in your hand against the document, not just what was posted online. Want it before you order rather than after? Email support@glowresearch.shop with the compound and quantity. Certificates are issued by the independent laboratory that performed the analysis, not by us.' },
+  // Deliberately does not say certificates are linked from product pages: they
+  // are not yet. COA_URL in js/products-data.js is empty and no product carries
+  // its own `coa`, so that answer was disprovable in one click. Restore the
+  // "linked from the product page" route here once certificates are hosted.
+  { q: 'Where do I find a lot’s COA?', a: 'Email support@glowresearch.shop with the compound and lot number, or the order number if you have already bought, and we will send the certificate for that exact batch — including batches that have since sold out. Every vial carries the lot number its certificate is issued against, so you can check what is in your hand against the document. Certificates are issued by the independent laboratory that performed the analysis, not by us.' },
   { q: 'How fast do orders ship?', a: 'Orders placed before 2PM PST are dispatched the same business day from our fulfilment partner’s US-based, climate-controlled facility, with tracking provided within 24 hours.' },
   { q: 'Do you ship internationally?', a: 'No. Orders are shipped within the United States only, to verified research institutions and qualified buyers.' },
 ];

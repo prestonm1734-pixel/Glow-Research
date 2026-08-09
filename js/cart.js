@@ -144,7 +144,7 @@
       body.innerHTML = `
         <div class="cart-empty">
           <p class="cart-empty-t">Your cart is empty.</p>
-          <p class="cart-empty-d">Every batch ships cold, with documentation behind it.</p>
+          <p class="cart-empty-d">Every order ships cold, with a lot COA on request.</p>
           <a href="${catalogHref()}" class="btn btn-primary">Browse the catalog <span aria-hidden="true">&rarr;</span></a>
         </div>
       `;
@@ -169,7 +169,7 @@
       </a>
       <ul class="cart-trust">
         <li>Unmarked packaging</li>
-        <li>Lot-matched COA</li>
+        <li>COA on request</li>
       </ul>
     `;
 
