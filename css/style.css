@@ -400,12 +400,10 @@ button[disabled].si-forgot{ cursor: progress; }
   margin-bottom: 24px;
   letter-spacing: -0.03em;
 }
-/* Pin the headline to "Lab-Tested" / "Research Peptides." Left to wrap on its
-   own it breaks after "Research", which orphans "Peptides." on its own line.
-   Dropped on narrow screens, where the forced break would push the second
-   line wider than the column. */
-.hero-br{ display:none; }
-@media (min-width: 680px){ .hero-br{ display:inline; } }
+/* No forced break: "RESEARCH WITHOUT UNCERTAINTY." is wider than the copy
+   column at every size the clamp produces, so it wraps to one word per line
+   on its own. A <br> anywhere in it changed nothing on desktop and had to be
+   suppressed on mobile, so it was doing no work. */
 .hero-sub{
   font-size: 1.08rem;
   max-width: 500px;
