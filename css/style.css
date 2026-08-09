@@ -400,10 +400,16 @@ button[disabled].si-forgot{ cursor: progress; }
   margin-bottom: 24px;
   letter-spacing: -0.03em;
 }
-/* No forced break: "RESEARCH WITHOUT UNCERTAINTY." is wider than the copy
-   column at every size the clamp produces, so it wraps to one word per line
-   on its own. A <br> anywhere in it changed nothing on desktop and had to be
-   suppressed on mobile, so it was doing no work. */
+/* Pin the headline to "RESEARCH" / "WITHOUT UNCERTAINTY." at full size.
+   "WITHOUT UNCERTAINTY." is ~898px at the 4.1rem cap, wider than the 700px
+   copy column, so the title is let out of that cap rather than the type
+   being shrunk to fit it. Below 900px the break is dropped and the headline
+   falls back to wrapping inside the column. */
+.hero-br{ display:none; }
+@media (min-width: 900px){
+  .hero-br{ display:inline; }
+  .hero-title{ width: max-content; max-width: min(92vw, 1000px); }
+}
 .hero-sub{
   font-size: 1.08rem;
   max-width: 500px;
