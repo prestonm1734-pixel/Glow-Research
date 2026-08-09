@@ -400,12 +400,10 @@ button[disabled].si-forgot{ cursor: progress; }
   margin-bottom: 24px;
   letter-spacing: -0.03em;
 }
-/* Pin the headline to "Lab-Tested" / "Research Peptides." Left to wrap on its
-   own it breaks after "Research", which orphans "Peptides." on its own line.
-   Dropped on narrow screens, where the forced break would push the second
-   line wider than the column. */
-.hero-br{ display:none; }
-@media (min-width: 680px){ .hero-br{ display:inline; } }
+/* Pin the headline to "Trusted" / "Research Peptides." at every width,
+   phone included. Left to wrap on its own it breaks after "Research"
+   instead, orphaning "Peptides." on its own line. */
+.hero-br{ display:inline; }
 /* Back to a flowing paragraph, but not at the plain-paragraph default
    (400 weight, --text-dim): semibold at a shade lighter than the headline's
    full white reads as confident supporting copy rather than body text.
