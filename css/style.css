@@ -406,10 +406,24 @@ button[disabled].si-forgot{ cursor: progress; }
    line wider than the column. */
 .hero-br{ display:none; }
 @media (min-width: 680px){ .hero-br{ display:inline; } }
+/* Three short claims, not one sentence — a compact stacked list rather
+   than a paragraph that has to be parsed. Every line gets the same small
+   mark, so nothing reads as an orphan the way a first-line-with-no-bullet
+   did. Bolder than the paragraph default (400) but a shade dimmer than the
+   headline's full white: confident supporting copy, not body text. */
 .hero-sub{
-  font-size: 1.08rem;
-  max-width: 500px;
+  display:flex; flex-direction:column; gap:7px;
+  font-size: 1.05rem; font-weight: 600; color: #c7c7c4;
+  max-width: 460px;
   margin: 0 0 32px;
+}
+.hero-sub-item{ display:flex; align-items:baseline; gap:11px; }
+.hero-sub-item::before{
+  content: '\2726'; flex-shrink:0; font-size: 0.62em;
+  color: var(--text-dimmer); position:relative; top:-0.05em;
+}
+@media (max-width: 560px){
+  .hero-sub{ font-size: 0.98rem; gap: 6px; }
 }
 /* hero rhythm runs on an 8px scale end to end: eyebrow 16 → title 24 →
    sub 32 → cta 24 → rule → stats 24. The gaps were previously 20/20/30/30/22,
