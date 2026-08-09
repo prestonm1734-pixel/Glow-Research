@@ -394,22 +394,19 @@ button[disabled].si-forgot{ cursor: progress; }
 
 /* the hero line — solid, bold, full white, largest size on the page */
 .hero-title{
-  font-size: clamp(2.4rem, 5vw, 4.1rem);
+  font-size: clamp(2.2rem, 4.4vw, 3.5rem);
   font-weight: 700;
   color: var(--text);
   margin-bottom: 24px;
   letter-spacing: -0.03em;
 }
-/* Pin the headline to "RESEARCH" / "WITHOUT UNCERTAINTY." at full size.
-   "WITHOUT UNCERTAINTY." is ~898px at the 4.1rem cap, wider than the 700px
-   copy column, so the title is let out of that cap rather than the type
-   being shrunk to fit it. Below 900px the break is dropped and the headline
-   falls back to wrapping inside the column. */
+/* Pin the headline to "Research" / "Without Uncertainty." Title case is a
+   good deal narrower than caps: at the 3.5rem cap the second line is ~659px,
+   inside the 700px copy column, so the title needs no escape from that cap
+   the way the all-caps setting did. Dropped below 680px, where the forced
+   line would outrun the column. */
 .hero-br{ display:none; }
-@media (min-width: 900px){
-  .hero-br{ display:inline; }
-  .hero-title{ width: max-content; max-width: min(92vw, 1000px); }
-}
+@media (min-width: 680px){ .hero-br{ display:inline; } }
 .hero-sub{
   font-size: 1.08rem;
   max-width: 500px;
