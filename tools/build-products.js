@@ -157,8 +157,12 @@ function buildProduct(p, donor) {
   // Matches what js/product.js sets on load, so the title does not change
   // under the reader between the static page and hydration.
   const title = `${p.name} ${s.mg} | Glow Research`;
-  const desc = `${p.name}, ${p.purity} purity, ${s.mg} per vial. ` +
-    `Third-party tested, lot-matched COA. For laboratory research use only.`;
+  // Kept in step with the runtime description in js/product.js. Neither
+  // mentions a lot-matched COA while COA_URL is empty and no certificate is
+  // hosted — see the note there. Add the purity figure back once a published
+  // certificate stands behind it.
+  const desc = `${p.name}, ${s.mg} per vial. ` +
+    `Research-grade peptide for laboratory and in-vitro research use only.`;
   const ogImage = p.image ? `${SITE}/${p.image}` : `${SITE}/assets/vial-trio-black.jpg`;
 
   let html = donor;

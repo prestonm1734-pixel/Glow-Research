@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Glow Research">
+  <title>Glow Research</title>
+  <!--
+    Square brand mark for Organization structured data, social cards and app
+    icons. Deliberately drawn as paths rather than set in type: Fraunces is a
+    webfont, so any build box or renderer without it would silently substitute
+    a different face and the mark would stop being the mark. Paths render the
+    same everywhere and at any size.
+
+    The spark is the same four-pointed star the site already uses as its
+    favicon and in the wordmark (Glow✦). Colours are --bg and --text from
+    css/style.css, so the tile matches the site exactly.
+  -->
+  <rect width="512" height="512" rx="112" fill="#0a0a0a"/>
+  <!--
+    Each arm runs tip -> tip as a cubic with BOTH control points parked on the
+    centre (256,256). That is what makes the deep concave waist of ✦.
+    A single quadratic per arm does not work here: its midpoint is
+    (P0 + 2C + P2)/4, so the two tips drag the edge outward and the mark
+    fattens into a rounded diamond however close the control gets to centre.
+    The cubic midpoint, (P0 + 3C1 + 3C2 + P3)/8, is weighted 6/8 toward the
+    controls, so moving them is how the waist gets tuned.
+
+    Controls sit 16px off centre along each arm's bisector, putting the waist
+    at ~27% of the arm length. Parking them exactly on the centre gives a
+    prettier, sharper star that thins to hairlines and disappears at favicon
+    size, which is the one thing a logo cannot do.
+  -->
+  <path d="M256 82
+           C 272 240, 272 240, 430 256
+           C 272 272, 272 272, 256 430
+           C 240 272, 240 272, 82 256
+           C 240 240, 240 240, 256 82 Z"
+        fill="#f7f7f5"/>
+</svg>

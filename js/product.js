@@ -251,7 +251,10 @@
     const desc = document.querySelector('meta[name="description"]');
     if (desc) {
       desc.setAttribute('content',
-        `${product.name}, ${product.purity} purity, ${s.mg} per vial. Third-party tested, lot-matched COA. For laboratory research use only.`);
+        // No "lot-matched COA" here until certificates are actually published
+        // — see COA_URL in js/products-data.js. Describing a document the site
+        // cannot produce is the one claim worth being strict about.
+        `${product.name}, ${s.mg} per vial. Research-grade peptide for laboratory and in-vitro research use only.`);
     }
 
     renderTiers();

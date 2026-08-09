@@ -8,19 +8,20 @@
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
 <title>Glow Research — Research-Grade Peptides</title>
-<meta name="description" content="Glow Research supplies third-party tested, research-grade peptides for laboratory and in-vitro research use only." />
+<meta name="description" content="Glow Research supplies research-grade peptides for laboratory and in-vitro research use only. US manufacturing partner, same-day dispatch, free shipping over $400." />
+<meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://glowresearch.shop/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
 <meta property="og:title" content="Glow Research — Research-Grade Peptides" />
-<meta property="og:description" content="Glow Research supplies third-party tested, research-grade peptides for laboratory and in-vitro research use only." />
+<meta property="og:description" content="Glow Research supplies research-grade peptides for laboratory and in-vitro research use only. US manufacturing partner, same-day dispatch, free shipping over $400." />
 <meta property="og:url" content="https://glowresearch.shop/" />
 <meta property="og:image" content="https://glowresearch.shop/assets/vial-trio-black.jpg" />
 <meta property="og:image:width" content="1672" />
 <meta property="og:image:height" content="941" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Glow Research — Research-Grade Peptides" />
-<meta name="twitter:description" content="Glow Research supplies third-party tested, research-grade peptides for laboratory and in-vitro research use only." />
+<meta name="twitter:description" content="Glow Research supplies research-grade peptides for laboratory and in-vitro research use only. US manufacturing partner, same-day dispatch, free shipping over $400." />
 <meta name="twitter:image" content="https://glowresearch.shop/assets/vial-trio-black.jpg" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,9 +32,12 @@
      data (Article publisher, Product brand/seller) refers back to the @id below
      rather than restating the organisation, so there is a single description of
      who Glow Research is.
-     No `logo` and no `sameAs`: there is no logo image asset in the repo and no
-     social profiles to point at. Both are worth adding once those exist —
-     `logo` in particular is what Google uses for the knowledge panel. -->
+     `logo` is the square brand mark in assets/ — PNG rather than the SVG
+     beside it, because Google's logo support for SVG is patchy and this is
+     the image a knowledge panel would use.
+     Still no `sameAs`: there are no official social profiles yet. Add them
+     here the moment they are finalised — it is the property that ties this
+     entity to Glow's accounts elsewhere. -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -44,6 +48,12 @@
       "name": "Glow Research",
       "legalName": "Glow Nutrition LLC",
       "url": "https://glowresearch.shop/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://glowresearch.shop/assets/glow-logo-512.png",
+        "width": 512,
+        "height": 512
+      },
       "image": "https://glowresearch.shop/assets/vial-trio-black.jpg",
       "description": "US-based supplier of research-grade peptides for in-vitro laboratory research use only.",
       "address": {
@@ -86,12 +96,12 @@
   <div class="marquee-track">
     <span>FOR LABORATORY &amp; RESEARCH USE ONLY</span><i class="star-bullet">✦</i>
     <span>THIRD-PARTY LAB TESTED</span><i class="star-bullet">✦</i>
-    <span>COA ON EVERY BATCH</span><i class="star-bullet">✦</i>
+    <span>U.S. MANUFACTURING PARTNER</span><i class="star-bullet">✦</i>
     <span>FREE SHIPPING OVER $400</span><i class="star-bullet">✦</i>
     <span>SAME-DAY SHIPPING</span><i class="star-bullet">✦</i>
     <span>FOR LABORATORY &amp; RESEARCH USE ONLY</span><i class="star-bullet">✦</i>
     <span>THIRD-PARTY LAB TESTED</span><i class="star-bullet">✦</i>
-    <span>COA ON EVERY BATCH</span><i class="star-bullet">✦</i>
+    <span>U.S. MANUFACTURING PARTNER</span><i class="star-bullet">✦</i>
     <span>FREE SHIPPING OVER $400</span><i class="star-bullet">✦</i>
     <span>SAME-DAY SHIPPING</span><i class="star-bullet">✦</i>
   </div>
@@ -183,18 +193,25 @@
         <a href="peptides.html" class="btn btn-primary btn-lg">Shop Peptides <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
       </div>
 
+      <!-- Every figure here has to be one we can point at something for. The
+           previous "99.7% Avg. Purity" and "150+ Batches Tested" had no source
+           behind them and no certificate published anywhere to check them
+           against, so they came out. These three are dispatch and delivery
+           policy, all three already stated on shipping.html. Do not add a
+           purity or batch figure back until there are COAs on the site that
+           substantiate it. -->
       <div class="hero-stats reveal">
         <div class="stat">
-          <span class="stat-num" data-count="99.7">0</span><span class="stat-suffix">%</span>
-          <p>Avg. Purity</p>
-        </div>
-        <div class="stat">
-          <span class="stat-num" data-count="150">0</span><span class="stat-suffix">+</span>
-          <p>Batches Tested</p>
-        </div>
-        <div class="stat">
           <span class="stat-num" data-count="24">0</span><span class="stat-suffix">h</span>
-          <p>Shipping</p>
+          <p>Dispatch</p>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-count="2">0</span><span class="stat-suffix">-Day</span>
+          <p>FedEx Transit</p>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-count="50">0</span><span class="stat-suffix"></span>
+          <p>States Shipped</p>
         </div>
       </div>
     </div>
