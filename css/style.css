@@ -434,6 +434,11 @@ button[disabled].si-forgot{ cursor: progress; }
   background: var(--grad-main); -webkit-background-clip:text; background-clip:text; color:transparent;
 }
 .stat p{ margin:4px 0 0; font-size: 0.76rem; color: var(--text-dimmer); text-transform: uppercase; letter-spacing:.06em; }
+/* A stat whose headline is a word, not a number ("Nationwide"). It keeps the
+   gradient and weight of .stat-num but drops a step in size, because a whole
+   word set at the numeral size crowds the other two out of the row on narrow
+   screens. js/script.js skips .stat-text when it runs the count-up. */
+.stat-num.stat-text{ font-size: 1.5rem; letter-spacing:-.01em; }
 
 /* ---- hero showpiece: oversized product visual, bleeding into the frame ---- */
 /* wide trio shot, anchored bottom-right and oversized so it bleeds off the

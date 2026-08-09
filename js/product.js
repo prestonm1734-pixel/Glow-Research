@@ -148,14 +148,12 @@
     box.removeAttribute('tabindex');
     // The markup ships with the "on request" wording, since that is the only
     // route that works while no certificate is hosted. A real href means there
-    // is a document to open, so the box can promise one.
+    // is a document to open, so the box can promise one. Both strings come from
+    // COA_COPY so this matches the cart, FAQ and account area.
     const bEl = box.querySelector('b');
     const smallEl = box.querySelector('small');
-    if (bEl) bEl.textContent = 'View certificate of analysis';
-    if (smallEl) {
-      smallEl.textContent =
-        'HPLC purity and mass-spec identity, matched to the lot number on your vial';
-    }
+    if (bEl) bEl.textContent = COA_COPY.boxTitle;
+    if (smallEl) smallEl.textContent = COA_COPY.boxSub;
     // a certificate is a document, not a step in the buying flow, so it
     // opens alongside the page rather than replacing it
     box.target = '_blank';
@@ -261,10 +259,11 @@
     const desc = document.querySelector('meta[name="description"]');
     if (desc) {
       desc.setAttribute('content',
-        // No "lot-matched COA" here until certificates are actually published
-        // — see COA_URL in js/products-data.js. Describing a document the site
-        // cannot produce is the one claim worth being strict about.
-        `${product.name}, ${s.mg} per vial. Research-grade peptide for laboratory and in-vitro research use only.`);
+        // Says the lot is third-party tested, which is true, but does not
+        // promise a certificate the site can serve — COA_URL is empty, so the
+        // document is available by email, not by link. Kept identical to the
+        // build-time description in tools/build-products.js.
+        `${product.name}, ${s.mg} per vial. Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only.`);
     }
 
     renderTiers();

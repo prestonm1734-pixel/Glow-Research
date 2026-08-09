@@ -10,6 +10,13 @@
 // is the one the catalog grid, search and quick-add all quote, so it doubles as
 // the product's headline size/price (see the normalise pass below).
 //
+// `purity` is a PLACEHOLDER on every product below. The values are stand-ins
+// for layout, not measured figures, and the supplier import overwrites them
+// with the real release data. Only two things read them — the fine print on the
+// drawn vial and the `additionalProperty` in the Product schema — so replacing
+// the strings in place is the whole job; no other file needs touching. Do not
+// quote any of these numbers in marketing copy until the import has run.
+//
 // `coa` is optional: a URL to that compound's own certificate of analysis.
 // It is what "View certificate of analysis" on the product page opens. A
 // product without one falls back to COA_URL below.
@@ -24,6 +31,54 @@
 // Left empty the box stays put and simply is not clickable, which is better
 // than sending a buyer to a dead link.
 const COA_URL = '';
+
+// ---------------------------------------------------------------------------
+// Are certificates hosted and linked per batch yet?
+//
+// Every lot IS third-party tested and DOES have a batch-specific certificate —
+// that is how the business runs. What is not true yet is that this site hosts
+// them, so the only route that works today is asking us for one. This flag is
+// what the certificate wording across the site keys off, so the two states are
+// a constant rather than seven copies of the same sentence.
+//
+// Flip it to true in the same change that fills COA_URL (or per-product `coa`)
+// and every surface upgrades from "email us for the COA" to a direct
+// batch-specific link at once.
+//
+// Kept separate from PRODUCT_PAGES_LIVE below on purpose: certificates and the
+// generated product pages both arrive with the supplier import, but they do not
+// have to go live in the same deploy.
+const COAS_PUBLISHED = false;
+
+// The certificate copy, in one place. Both branches describe the same
+// operation — third-party tested lots, a certificate per batch — and differ
+// only in how the reader gets hold of the document.
+const COA_COPY = COAS_PUBLISHED ? {
+  // trust lists and other tight spaces
+  short: 'Batch-matched COA',
+  // the box on the product page
+  boxTitle: 'View certificate of analysis',
+  boxSub: 'HPLC purity and mass-spec identity, matched to the lot number on your vial',
+  // footer of each order in the account area
+  orderNote: 'Batch COA linked on every order',
+  // homepage FAQ answer
+  faq: 'Two places. Every product page links directly to its current lot’s certificate, ' +
+       'and every vial carries the lot number that certificate is issued against, so you can ' +
+       'check what is in your hand against the document rather than just what was posted online. ' +
+       'Want a certificate for a batch you already have? Email support@glowresearch.shop with the ' +
+       'lot number. Certificates are issued by the independent laboratory that performed the ' +
+       'analysis, not by us.',
+} : {
+  short: 'COA on request',
+  boxTitle: 'Certificate of analysis on request',
+  boxSub: 'Email support@glowresearch.shop with the lot number on your vial and we will send the COA for that batch',
+  orderNote: 'Lot COA available on request',
+  faq: 'Email support@glowresearch.shop with the compound and lot number, or the order number if ' +
+       'you have already bought, and we will send the certificate for that exact batch — including ' +
+       'batches that have since sold out. Every vial carries the lot number its certificate is ' +
+       'issued against, so you can check what is in your hand against the document. Certificates ' +
+       'are issued by the independent laboratory that performed the analysis, not by us.',
+};
 
 const GLOW_PRODUCTS = [
   { name: 'BPC-157', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', badge:'Best Seller',
@@ -219,9 +274,9 @@ function findProductBySlug(slug) {
 // tools/build-products.js generates a real static page per product at
 // /peptides/<slug>/ — its own URL, its own content in the served markup, its
 // own Product schema. None of that is live yet: the real catalog, prices,
-// images and COAs are still to be imported, and nine crawlable pages of
-// placeholder data claiming lot-matched certificates — while COA_URL above is
-// still empty and not one certificate is hosted — is worse than no pages.
+// images and COAs are still to be imported, and nine crawlable pages carrying
+// placeholder prices and placeholder purity figures are worse than no pages.
+// Nothing here is broken — the generator is finished. What is missing is data.
 //
 // Until then every link stays on product.html?p=<slug>, which renders the same
 // product from the same catalog.
@@ -352,5 +407,7 @@ if (typeof module !== 'undefined' && module.exports) {
     SITEWIDE_DISCOUNT,
     QTY_TIERS,
     PRODUCT_PAGES_LIVE,
+    COAS_PUBLISHED,
+    COA_COPY,
   };
 }

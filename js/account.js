@@ -439,12 +439,10 @@
           '</header>' +
           '<ul class="ac-order-items">' + lines + '</ul>' +
           '<footer class="ac-order-foot">' +
-            // "available on request" is the route About describes and the one
-            // that actually works today: COA_URL is empty and no product carries
-            // its own `coa`, so there is nothing to link to yet. Promising a
-            // certificate for every lot shipped is a guarantee no hosted
-            // document currently backs.
-            '<span class="ac-order-coa">Lot COA available on request</span>' + right +
+            // Wording comes from COA_COPY in js/products-data.js so this and
+            // the cart, FAQ and product page cannot drift apart. It upgrades to
+            // a per-batch link automatically when COAS_PUBLISHED flips.
+            '<span class="ac-order-coa">' + esc(COA_COPY.orderNote) + '</span>' + right +
           '</footer>' +
         '</article>';
     }).join('');

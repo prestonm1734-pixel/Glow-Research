@@ -44,8 +44,8 @@ const PRODUCT_PAGES_LIVE = false;
 
 **These pages are currently held.** The real catalog, prices, images and COAs
 have not been imported yet, and publishing nine crawlable pages of placeholder
-data — claiming lot-matched certificates while `COA_URL` is still empty and no
-certificate is hosted anywhere — would be worse than publishing none.
+data would be worse than publishing none. Nothing here is broken — the
+generator is finished and tested. What is missing is the data.
 
 While it is `false`:
 
@@ -61,14 +61,56 @@ sitemap and the generator can never disagree.
 
 1. Import the real catalog into `js/products-data.js`, keeping the existing
    shape (`name`, `cat`, `tag`, `purity`, `sizes[]`, `blurb`, `about[]`,
-   `research[]`) — `cart.js`, `search.js` and `product.js` all read it.
-2. Fill `COA_URL`, or a per-product `coa`, so the certificate box goes live.
-3. Replace the hardcoded `availability: InStock` in `build-products.js` with
+   `research[]`) — `cart.js`, `search.js` and `product.js` all read it. The
+   `purity` strings currently in the file are placeholders; the import
+   overwrites them with the supplier's measured figures. Nothing reads them
+   except the vial fine print and the `Product` schema, so replacing the values
+   in place is enough — no other file needs touching.
+2. Host the certificates and fill `COA_URL`, or a per-product `coa`.
+3. Set `COAS_PUBLISHED = true` (see below) so the certificate wording across
+   the site upgrades from "on request" to direct batch links.
+4. Replace the hardcoded `availability: InStock` in `build-products.js` with
    real stock once the catalog carries it.
-4. Add `sku` to the `Product` schema once the fulfilment partner supplies them.
-5. Set `PRODUCT_PAGES_LIVE = true`, run `node tools/build.js`, and commit
+5. Add `sku` to the `Product` schema once the fulfilment partner supplies them.
+6. Set `PRODUCT_PAGES_LIVE = true`, run `node tools/build.js`, and commit
    `peptides/**` along with the updated `sitemap.xml`.
-6. Submit the sitemap in Search Console.
+7. Check the generated pages — prices, sizes, purity, images, certificate links
+   — before anything is submitted for indexing.
+8. Submit the sitemap in Search Console.
+
+### The certificate switch
+
+```js
+// js/products-data.js
+const COAS_PUBLISHED = false;
+```
+
+Separate from `PRODUCT_PAGES_LIVE` on purpose: certificates and the generated
+product pages both arrive with the supplier import, but they do not have to go
+live in the same deploy.
+
+Every lot **is** third-party tested and every batch **does** have a certificate
+— that is how the business runs, and the site says so. What is not true yet is
+that this site *hosts* them, so the only route that works today is asking us.
+`COA_COPY` beside the flag holds both versions of that wording, and the four
+places that render it read from there:
+
+| Surface | Source |
+|---|---|
+| Homepage FAQ | `COA_COPY.faq` — `js/script.js` |
+| Cart trust list | `COA_COPY.short` — `js/cart.js` |
+| Account order footer | `COA_COPY.orderNote` — `js/account.js` |
+| Product page COA box | `COA_COPY.boxTitle` / `.boxSub` — `js/product.js` |
+
+The product page's static markup ships with the "on request" wording, so what a
+crawler sees (and what `build-products.js` bakes into each generated page) is
+accurate without running scripts; `renderCoa()` upgrades it only when a real
+href exists.
+
+Flipping `COAS_PUBLISHED` moves all four at once. Prose that mentions
+certificates — the About page and the three blog articles — is written to stay
+true either way, so it needs no edit; if you want those pointing at direct
+links too, they are the only hand edits left.
 
 ## `build-sitemap.js`
 

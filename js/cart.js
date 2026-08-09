@@ -169,7 +169,7 @@
       </a>
       <ul class="cart-trust">
         <li>Unmarked packaging</li>
-        <li>COA on request</li>
+        <li>${COA_COPY.short}</li>
       </ul>
     `;
 

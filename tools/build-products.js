@@ -157,12 +157,13 @@ function buildProduct(p, donor) {
   // Matches what js/product.js sets on load, so the title does not change
   // under the reader between the static page and hydration.
   const title = `${p.name} ${s.mg} | Glow Research`;
-  // Kept in step with the runtime description in js/product.js. Neither
-  // mentions a lot-matched COA while COA_URL is empty and no certificate is
-  // hosted — see the note there. Add the purity figure back once a published
-  // certificate stands behind it.
+  // Kept identical to the runtime description in js/product.js, so the served
+  // page and the hydrated one agree. Says the lot is third-party tested, which
+  // is true, without promising a certificate the site cannot yet serve — see
+  // COAS_PUBLISHED in js/products-data.js. Add the purity figure here once the
+  // supplier's measured values have replaced the placeholders.
   const desc = `${p.name}, ${s.mg} per vial. ` +
-    `Research-grade peptide for laboratory and in-vitro research use only.`;
+    `Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only.`;
   const ogImage = p.image ? `${SITE}/${p.image}` : `${SITE}/assets/vial-trio-black.jpg`;
 
   let html = donor;
@@ -243,9 +244,9 @@ function buildProduct(p, donor) {
 /* ---------- run ---------- */
 
 // Held deliberately, not broken. The generator below is complete and tested;
-// what is missing is the data. Writing nine pages of placeholder catalog —
-// claiming lot-matched certificates while no certificate is hosted — and
-// letting them be crawled is the thing this guard exists to prevent.
+// what is missing is the data. Writing nine pages of placeholder prices and
+// placeholder purity figures and letting them be crawled is the thing this
+// guard exists to prevent.
 if (!PRODUCT_PAGES_LIVE) {
   console.log(
     'Product pages are held: PRODUCT_PAGES_LIVE is false in js/products-data.js.\n' +
