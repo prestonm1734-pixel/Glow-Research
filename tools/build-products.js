@@ -1,0 +1,285 @@
+#!/usr/bin/env node
+// ===================== Glow Research — product page build =====================
+//
+//   node tools/build-products.js
+//
+// Generates one real, crawlable static page per compound. Until now every
+// product lived at product.html?p=<slug> and was drawn entirely by
+// js/product.js after load, so all nine shared a single indexable URL whose
+// served markup said "Product name" and "$0". This gives each compound its own
+// URL with its own content already in the HTML.
+//
+// Inputs:
+//   js/products-data.js   the catalog — the same file the browser loads, read
+//                         here through the CommonJS guard at the foot of it
+//   product.html          "shell donor": the whole page is used as the
+//                         template, so nav, footer, styles and scripts stay in
+//                         one place and a change there propagates on rebuild
+//
+// Outputs:
+//   peptides/<slug>/index.html   -> clean /peptides/<slug>/ URLs
+//
+// The generated page still loads js/product.js and hydrates exactly as before
+// — the size picker, bulk tiers and delivery estimate are all still live. The
+// baked-in markup is what a crawler (and the first paint) sees; hydration
+// replaces it with the identical content plus its event handlers. The slug is
+// carried on <body data-product-slug> rather than the query string.
+
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = path.join(__dirname, '..');
+const SITE = 'https://glowresearch.shop';
+const SHELL_DONOR = 'product.html';
+const OUT_DIR = 'peptides';
+
+const {
+  GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, PRODUCT_PAGES_LIVE,
+} = require(path.join(ROOT, 'js/products-data.js'));
+
+// Mirrors CAT_LABEL in js/product.js. Kept in step by the assertion below
+// rather than by memory: a new category added to the catalog without a label
+// here fails the build instead of shipping a page whose breadcrumb reads
+// "metabolic".
+const CAT_LABEL = {
+  growth: 'Growth Hormone Secretagogues',
+  recovery: 'Recovery Peptides',
+  metabolic: 'Metabolic Research',
+  cognitive: 'Cognitive Research',
+};
+
+/* ---------- helpers ---------- */
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+const money = n => '$' + n.toFixed(2);
+
+// Same contract as slice() in tools/build-blog.js: if the donor markup moves,
+// fail loudly at build time rather than emit a page with a hole in it.
+function required(html, re, label) {
+  if (!re.test(html)) {
+    throw new Error(
+      `Could not find ${label} in ${SHELL_DONOR}. ` +
+      `If the markup changed, update the pattern in tools/build-products.js.`
+    );
+  }
+  return html;
+}
+
+// Fill an element that the donor leaves empty: <div id="x"></div>
+function fillEmpty(html, id, content) {
+  const re = new RegExp(`(id="${id}"[^>]*>)(</)`);
+  required(html, re, `empty element #${id}`);
+  return html.replace(re, `$1${content}$2`);
+}
+
+// Replace the placeholder text inside an element: <h1 id="x">Product name</h1>
+function setText(html, id, text) {
+  const re = new RegExp(`(id="${id}"[^>]*>)[^<]*(<)`);
+  required(html, re, `text placeholder #${id}`);
+  return html.replace(re, `$1${text}$2`);
+}
+
+// Prefix root-relative URLs so they resolve from peptides/<slug>/.
+// Identical in behaviour to rewriteDepth() in tools/build-blog.js.
+function rewriteDepth(html, depth) {
+  if (depth === 0) return html;
+  const prefix = '../'.repeat(depth);
+  return html.replace(/(href|src)="([^"]*)"/g, (whole, attr, url) => {
+    if (/^(https?:)?\/\//.test(url)) return whole;          // absolute
+    if (/^(#|mailto:|tel:|data:)/.test(url)) return whole;  // in-page / non-navigational
+    return `${attr}="${prefix}${url}"`;
+  });
+}
+
+/* ---------- structured data ---------- */
+
+function productJsonLd(p, url) {
+  // One Offer per mg. `price` is what the buyer is actually charged — the
+  // sitewide markdown is applied — because structured data that quotes the
+  // list price while checkout charges less is a mismatch Google flags.
+  const offers = p.sizes.map(s => ({
+    '@type': 'Offer',
+    name: `${p.name} ${s.mg}`,
+    url,
+    price: (onSaleNow() ? salePrice(s.price) : s.price).toFixed(2),
+    priceCurrency: 'USD',
+    // No inventory system yet: the catalog carries no stock field and the buy
+    // box is always enabled. Drive this off real stock once the import lands.
+    availability: 'https://schema.org/InStock',
+    seller: { '@id': `${SITE}/#organization` },
+  }));
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    '@id': `${url}#product`,
+    name: p.name,
+    description: p.blurb,
+    category: CAT_LABEL[p.cat],
+    url,
+    brand: { '@type': 'Brand', name: 'Glow Research' },
+    // Purity is the one measured attribute the catalog carries. No
+    // aggregateRating and no review: there are no reviews, and inventing them
+    // is exactly the kind of thing that earns a manual action.
+    additionalProperty: [{
+      '@type': 'PropertyValue',
+      name: 'Purity',
+      value: p.purity,
+    }],
+    offers,
+  };
+}
+
+function breadcrumbJsonLd(p, url) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+      { '@type': 'ListItem', position: 2, name: 'Products', item: `${SITE}/peptides.html` },
+      { '@type': 'ListItem', position: 3, name: CAT_LABEL[p.cat], item: `${SITE}/peptides.html?cat=${p.cat}` },
+      { '@type': 'ListItem', position: 4, name: p.name, item: url },
+    ],
+  };
+}
+
+/* ---------- page assembly ---------- */
+
+function buildProduct(p, donor) {
+  const slug = productSlug(p.name);
+  const url = `${SITE}/${OUT_DIR}/${slug}/`;
+  const s = p.sizes[0];
+
+  // Matches what js/product.js sets on load, so the title does not change
+  // under the reader between the static page and hydration.
+  const title = `${p.name} ${s.mg} | Glow Research`;
+  const desc = `${p.name}, ${p.purity} purity, ${s.mg} per vial. ` +
+    `Third-party tested, lot-matched COA. For laboratory research use only.`;
+  const ogImage = p.image ? `${SITE}/${p.image}` : `${SITE}/assets/vial-trio-black.jpg`;
+
+  let html = donor;
+
+  /* --- head --- */
+  html = required(html, /<title>[\s\S]*?<\/title>/, '<title>')
+    .replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`);
+
+  html = html.replace(
+    /<meta name="description" content="[^"]*"\s*\/?>/,
+    `<meta name="description" content="${esc(desc)}" />`
+  );
+
+  // The donor carries generic og:title/description and no canonical (it cannot
+  // have a static one — it serves every product). Retarget them per product.
+  html = html
+    .replace(/<meta property="og:title" content="[^"]*"\s*\/?>/,
+      `<meta property="og:title" content="${esc(p.name)} ${esc(s.mg)}" />`)
+    .replace(/<meta property="og:description" content="[^"]*"\s*\/?>/,
+      `<meta property="og:description" content="${esc(desc)}" />`)
+    .replace(/<meta name="twitter:title" content="[^"]*"\s*\/?>/,
+      `<meta name="twitter:title" content="${esc(p.name)} ${esc(s.mg)}" />`)
+    .replace(/<meta name="twitter:description" content="[^"]*"\s*\/?>/,
+      `<meta name="twitter:description" content="${esc(desc)}" />`)
+    .replace(/<meta property="og:image" content="[^"]*"\s*\/?>/,
+      `<meta property="og:image" content="${ogImage}" />`)
+    .replace(/<meta name="twitter:image" content="[^"]*"\s*\/?>/,
+      `<meta name="twitter:image" content="${ogImage}" />`)
+    .replace(/<meta property="og:type" content="[^"]*"\s*\/?>/,
+      `<meta property="og:type" content="product" />`);
+
+  const headExtra = `<link rel="canonical" href="${url}" />
+<meta property="og:url" content="${url}" />
+<script type="application/ld+json">${JSON.stringify(productJsonLd(p, url))}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd(p, url))}</script>`;
+  html = required(html, /<\/head>/, '</head>').replace('</head>', headExtra + '\n</head>');
+
+  /* --- slug, baked in so the page needs no query string --- */
+  html = required(html, /<body>/, '<body>')
+    .replace('<body>', `<body data-product-slug="${slug}">`);
+
+  /* --- content a crawler must see without running scripts --- */
+  html = setText(html, 'pdCrumbCat', esc(CAT_LABEL[p.cat]));
+  html = html.replace(
+    /(id="pdCrumbCat"\s+)href="[^"]*"/,
+    `$1href="peptides.html?cat=${p.cat}"`
+  );
+  html = setText(html, 'pdCrumbName', esc(p.name));
+  html = setText(html, 'pdTag', esc(p.tag));
+  html = setText(html, 'pdName', esc(p.name));
+  html = setText(html, 'pdVialName', esc(p.name));
+  html = setText(html, 'pdVialMg', esc(s.mg.toUpperCase()));
+  html = fillEmpty(html, 'pdVialFine',
+    `${esc(p.purity)} Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.shop`);
+
+  // Not setText: on sale the price is markup (a struck-through list price
+  // beside the marked-down one), and setText stops at the first "<".
+  const priceHtml = onSaleNow()
+    ? `<s class="pd-price-was">${money(s.price)}</s>${money(salePrice(s.price))}`
+    : money(s.price);
+  const priceRe = /(id="pdPrice"[^>]*>)[\s\S]*?(<\/span>)/;
+  required(html, priceRe, 'price placeholder #pdPrice');
+  html = html.replace(priceRe, `$1${priceHtml}$2`);
+
+  html = fillEmpty(html, 'pdSizes', p.sizes.map((sz, i) =>
+    `<button type="button" class="pd-size${i === 0 ? ' is-active' : ''}" data-i="${i}">${esc(sz.mg)}</button>`
+  ).join(''));
+
+  html = setText(html, 'pdAboutH', `About ${esc(p.name)}`);
+  html = setText(html, 'pdResearchH', `${esc(p.name)} research`);
+  html = fillEmpty(html, 'pdAbout', (p.about || []).map(t => `<p>${t}</p>`).join(''));
+  html = fillEmpty(html, 'pdResearch', (p.research || []).map(a =>
+    `<div class="pd-area"><h3>${a.t}</h3><p>${a.d}</p></div>`).join(''));
+
+  return rewriteDepth(html, 2);
+}
+
+/* ---------- run ---------- */
+
+// Held deliberately, not broken. The generator below is complete and tested;
+// what is missing is the data. Writing nine pages of placeholder catalog —
+// claiming lot-matched certificates while no certificate is hosted — and
+// letting them be crawled is the thing this guard exists to prevent.
+if (!PRODUCT_PAGES_LIVE) {
+  console.log(
+    'Product pages are held: PRODUCT_PAGES_LIVE is false in js/products-data.js.\n' +
+    '\n' +
+    'Nothing was written. The catalog, prices, images and COAs are still to be\n' +
+    'imported, and until they are, every product link on the site stays on\n' +
+    'product.html?p=<slug>, which serves the same product from the same data.\n' +
+    '\n' +
+    'To launch: import the real catalog, fill COA_URL (or a per-product `coa`),\n' +
+    'set PRODUCT_PAGES_LIVE = true, re-run this build, and commit peptides/**.'
+  );
+  // Still refresh the sitemap: the flag governs it too, so this keeps the
+  // committed sitemap honest whichever build was run last.
+  console.log(`\n  sitemap.xml (${require('./build-sitemap.js').write()} URLs)`);
+  process.exit(0);
+}
+
+const donor = fs.readFileSync(path.join(ROOT, SHELL_DONOR), 'utf8');
+
+const unlabelled = [...new Set(GLOW_PRODUCTS.map(p => p.cat))].filter(c => !CAT_LABEL[c]);
+if (unlabelled.length) {
+  throw new Error(
+    `No CAT_LABEL for category "${unlabelled.join('", "')}". ` +
+    `Add it to tools/build-products.js and js/product.js.`
+  );
+}
+
+let written = 0;
+for (const p of GLOW_PRODUCTS) {
+  const slug = productSlug(p.name);
+  const dir = path.join(ROOT, OUT_DIR, slug);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'index.html'), buildProduct(p, donor));
+  console.log(`  ${OUT_DIR}/${slug}/index.html`);
+  written++;
+}
+
+// Shared with tools/build-blog.js — see the note there.
+console.log(`  sitemap.xml (${require('./build-sitemap.js').write()} URLs)`);
+
+console.log(`\nBuilt ${written} product page(s).`);

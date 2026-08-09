@@ -3,6 +3,16 @@
 //
 //   node tools/build-blog.js
 //
+// !! The committed blog pages have diverged from what this script produces.
+// !! They have been hand-edited since they were last generated: each post
+// !! carries its own drawn cover illustration rather than the procedural
+// !! lattice below, the contents rail has been removed, and the nav calls the
+// !! section "Research Blog" where setActiveNav() still looks for "Blog" (so
+// !! the active state is no longer applied). Running this replaces all of
+// !! that. Always read `git diff blog/` before committing a rebuild, and
+// !! reconcile the generator with the committed pages before relying on it
+// !! again. tools/build.js deliberately does not call this script.
+//
 // Generates real, crawlable static HTML for every post — no client-side
 // rendering, because search engines index static markup immediately and
 // reliably, which is the entire reason this section exists.
@@ -84,6 +94,10 @@ function displayDate(iso) {
 
 const HEAD_COMMON = `<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- set before first paint: every scroll-reveal below starts hidden and
+     needs the observer to show it, so without scripting the page must
+     opt out of hiding rather than opt in to showing -->
+<script>document.documentElement.classList.add('js');</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -160,6 +174,11 @@ ${HEAD_COMMON}
 ${head}
 </head>
 <body>
+
+<!-- first-visit age / RUO gate. Loaded here, not with the other
+     scripts at the foot of the page, so the overlay is in the DOM
+     before anything behind it paints. -->
+<script src="js/age-gate.js"></script>
 
 ${shell}
 
@@ -542,23 +561,6 @@ ${rowsHtml}
   return page({ head, body, depth: 0 });
 }
 
-/* ---------- sitemap ---------- */
-
-function buildSitemap() {
-  const staticPages = [
-    ['', '1.0'], ['peptides.html', '0.9'], ['blog.html', '0.8'], ['about.html', '0.6'], ['contact.html', '0.5'],
-    ['shipping.html', '0.6'], ['wholesale.html', '0.6'],
-  ];
-  const today = new Date().toISOString().slice(0, 10);
-  const urls = [
-    ...staticPages.map(([p, pri]) =>
-      `  <url>\n    <loc>${SITE}/${p}</loc>\n    <lastmod>${today}</lastmod>\n    <priority>${pri}</priority>\n  </url>`),
-    ...posts.map(p =>
-      `  <url>\n    <loc>${SITE}/blog/${p.slug}/</loc>\n    <lastmod>${p.date}</lastmod>\n    <priority>0.7</priority>\n  </url>`),
-  ];
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`;
-}
-
 /* ---------- run ---------- */
 
 let written = 0;
@@ -573,7 +575,9 @@ for (const post of posts) {
 fs.writeFileSync(path.join(ROOT, 'blog.html'), buildIndex());
 console.log('  blog.html');
 
-fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), buildSitemap());
-console.log('  sitemap.xml');
+// Shared with tools/build-products.js, and covers every page on the site —
+// static, product and post — so running this build alone still leaves a
+// complete sitemap rather than one missing the products.
+console.log(`  sitemap.xml (${require('./build-sitemap.js').write()} URLs)`);
 
 console.log(`\nBuilt ${written} post(s).`);

@@ -213,6 +213,32 @@ function findProductBySlug(slug) {
   return GLOW_PRODUCTS.find(p => productSlug(p.name) === slug);
 }
 
+// ---------------------------------------------------------------------------
+// Launch switch for the per-compound pages.
+//
+// tools/build-products.js generates a real static page per product at
+// /peptides/<slug>/ — its own URL, its own content in the served markup, its
+// own Product schema. None of that is live yet: the real catalog, prices,
+// images and COAs are still to be imported, and nine crawlable pages of
+// placeholder data claiming lot-matched certificates — while COA_URL above is
+// still empty and not one certificate is hosted — is worse than no pages.
+//
+// Until then every link stays on product.html?p=<slug>, which renders the same
+// product from the same catalog.
+//
+// To launch: import the real catalog, fill COA_URL (or a per-product `coa`),
+// set this to true, then run `node tools/build.js` and commit peptides/**.
+// This single constant is read by the browser and by both build scripts, so
+// the site, the sitemap and the generator can never disagree about it.
+const PRODUCT_PAGES_LIVE = false;
+
+// Where a product card points — the one chokepoint every link goes through,
+// so flipping the constant above moves the whole site at once.
+function productHref(p) {
+  const slug = productSlug(p.name);
+  return pageHref(PRODUCT_PAGES_LIVE ? `peptides/${slug}/` : `product.html?p=${slug}`);
+}
+
 // Blog articles live two directories deep, so a bare "product.html" would
 // 404 from there. Lift the nav's already-depthed link rather than tracking
 // depth separately (same trick js/cart.js uses).
@@ -262,7 +288,7 @@ function renderProductGrid(gridEl, filter, opts) {
 
   if (opts.limit) list = list.slice(0, opts.limit);
   list.forEach((p, i) => {
-    const href = pageHref(`product.html?p=${productSlug(p.name)}`);
+    const href = productHref(p);
     const card = document.createElement('div');
     card.className = 'product-card reveal';
     card.style.transitionDelay = `${(i % 3) * 60}ms`;
@@ -302,4 +328,29 @@ function renderProductGrid(gridEl, filter, opts) {
 
     if (opts.observeReveal) opts.observeReveal(card);
   });
+}
+
+// This file is a plain browser script — everything above is a global, loaded
+// with <script src>. The guard below additionally lets Node read the catalog,
+// which is how tools/build-products.js generates a static page per compound
+// from the same source the site renders from. In a browser `module` is
+// undefined and this is a no-op.
+//
+// Only data and pure helpers are exported. Anything that touches `document`
+// (pageHref, productThumb, renderProductGrid) is browser-only by nature and
+// deliberately left out.
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    GLOW_PRODUCTS,
+    productSlug,
+    findProductBySlug,
+    getProductVariants,
+    salePrice,
+    fmtPrice,
+    onSaleNow,
+    bulkSavingPct,
+    SITEWIDE_DISCOUNT,
+    QTY_TIERS,
+    PRODUCT_PAGES_LIVE,
+  };
 }

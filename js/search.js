@@ -36,7 +36,7 @@
   }
 
   function row(p) {
-    const href = pageHref(`product.html?p=${productSlug(p.name)}`);
+    const href = productHref(p);
     return `
       <a class="search-row" href="${href}">
         <span class="search-thumb">${productThumb(p.name)}</span>

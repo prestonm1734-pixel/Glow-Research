@@ -68,11 +68,20 @@ starts working the moment a post uses it.
 
 ```bash
 node tools/build-blog.js
+git diff blog/          # read this before committing — see the warning below
 ```
 
 This regenerates `blog/<slug>/index.html` for every post, plus `blog.html` and
 `sitemap.xml`. Commit the generated files along with your source — the site is
 served as static HTML, so unbuilt changes won't appear.
+
+> **The committed blog pages have diverged from what the build produces.** They
+> have been hand-edited since they were last generated: each post carries its
+> own drawn cover illustration rather than the generated lattice, the contents
+> rail has been removed, and the nav label changed from "Blog" to "Research
+> Blog" (which `setActiveNav()` no longer matches). A rebuild silently replaces
+> all of that, so always read the diff first. Reconciling the generator with the
+> committed pages is an outstanding job — see `tools/README.md`.
 
 ---
 
@@ -85,7 +94,10 @@ served as static HTML, so unbuilt changes won't appear.
 - **Cover artwork.** Each post gets a unique generated lattice image derived
   from its slug — no image files to make. Same slug always yields the same art.
 - **Related posts** at the foot of each article.
-- **The sitemap**, including new URLs for search engines.
+- **The sitemap**, including new URLs for search engines. It is written by
+  `tools/build-sitemap.js` now, shared with the product build, and covers every
+  page on the site rather than just the blog — so running any build leaves a
+  complete one.
 
 ## Things that don't
 
