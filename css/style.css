@@ -122,6 +122,12 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   color: var(--text);
   box-shadow: 0 0 32px 2px rgba(255,255,255,.3);
 }
+/* the hero's second CTA is deliberately the quiet option, so its hover is a
+   plain lighten, not the glow the outline button gets elsewhere */
+.hero-cta .btn-outline:hover{
+  background: rgba(255,255,255,0.14);
+  box-shadow: none;
+}
 .btn-ghost{
   background: rgba(255,255,255,0.06);
   border: 1px solid var(--border);
