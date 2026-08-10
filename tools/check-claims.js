@@ -24,7 +24,8 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const {
-  GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock, avgPurity,
+  GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
+  avgPurity, BATCHES_TESTED,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -149,25 +150,17 @@ console.log('\nhero figures');
     purity === avgPurity(),
     'index.html and avgPurity() disagree: edit the catalog, not the hero');
 
-  // The hero names the analysis by method. Those methods have to be the ones
-  // the process page describes, or the homepage is advertising a test that is
-  // not run. Pinned in both directions: the hero cannot name a method the
-  // process page drops, and the process page cannot quietly change what the
-  // laboratory does while the homepage keeps promising the old thing.
-  const proc = read('process.html');
-  ok('the hero names the analysis performed',
-    /HPLC \+ MS<\/span>\s*<p>Every Batch<\/p>/.test(home));
-  ok('HPLC is what the process page says measures purity',
-    /HPLC for purity/.test(proc));
-  ok('mass spectrometry is what the process page says confirms identity',
-    /mass spectrometry for identity/.test(proc));
+  const batches = statFor('Batches Tested');
+  ok('the hero states a batch count', batches !== null);
+  ok(`stated batch count ${batches} is BATCHES_TESTED ${BATCHES_TESTED}`,
+    Number(batches) === BATCHES_TESTED,
+    'index.html and products-data.js disagree');
 
-  // A tally has no source in this system: nothing counts lots. If one is ever
-  // put back in the hero it needs a constant behind it and a check of its own,
-  // the way the purity figure has avgPurity(). Re-adding the copy alone fails.
-  ok('no unsourced batch tally in the hero',
-    !/Batches Tested/i.test(home),
-    'a batch count needs a value in products-data.js and a check here');
+  // Stated as a floor, so the copy stays true as the real number climbs past
+  // it. Without the "+" the site would be claiming an exact count it does not
+  // hold, which is the failure this whole section exists to prevent.
+  ok('the batch count is stated as a floor, not an exact figure',
+    /data-count="150">0<\/span><span class="stat-suffix">\+<\/span>/.test(home));
 }
 
 /* ---------------------------------------------------------------------------

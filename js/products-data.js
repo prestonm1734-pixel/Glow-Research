@@ -234,13 +234,14 @@ function avgPurity() {
   return (ps.reduce((a, b) => a + b, 0) / ps.length).toFixed(1);
 }
 
-// The hero used to carry a batch tally beside the purity figure. There is
-// deliberately no BATCHES_TESTED constant here: nothing in this system counts
-// lots, so the number could not be derived and could not self-correct, which
-// made it the one claim on the site that quietly went stale unless somebody
-// remembered it. The hero names the two analytical methods instead, and those
-// are true for as long as the testing is. If a real batch ledger ever lands,
-// count from it and derive the figure the way avgPurity() is derived.
+// Batches tested to date. Unlike every other figure on the site this one has
+// no source in the system: nothing here counts lots, so it cannot be derived
+// and it cannot self-correct. It is a hand-maintained number, stated as a
+// floor ("150+") for that reason, and it is the one claim on the site that
+// depends on somebody updating it. Raise it only against the fulfilment
+// partner's actual lot records, never as an estimate. If a real batch ledger
+// ever lands, derive this the way avgPurity() is derived and delete the note.
+const BATCHES_TESTED = 150;
 
 // Sort comparators for the catalog's sort control. Keyed so the <option>
 // values and the sorting logic can't drift apart. 'featured' is deliberately
@@ -453,6 +454,7 @@ if (typeof module !== 'undefined' && module.exports) {
     sizeInStock,
     productInStock,
     avgPurity,
+    BATCHES_TESTED,
     bulkSavingPct,
     SITEWIDE_DISCOUNT,
     QTY_TIERS,
