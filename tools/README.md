@@ -35,6 +35,9 @@ It currently checks that:
   computed in Pacific time, which is what the copy claims
 - availability is derived from the catalog everywhere it is asserted, and
   nothing hardcodes `InStock`
+- the homepage hero's "99.7% avg. purity" equals `avgPurity()` over the
+  catalog, and its "150+" equals `BATCHES_TESTED`. Both figures live in the
+  served markup so a crawler sees them, which is exactly why they need pinning
 - no page promises a certificate while `COAS_PUBLISHED` is false
 - no fabricated ratings or reviews appear in structured data
 - every product carries every field the site reads, so a lossy supplier import

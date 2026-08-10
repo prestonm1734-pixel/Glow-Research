@@ -440,11 +440,29 @@ button[disabled].si-forgot{ cursor: progress; }
   background: var(--grad-main); -webkit-background-clip:text; background-clip:text; color:transparent;
 }
 .stat p{ margin:4px 0 0; font-size: 0.76rem; color: var(--text-dimmer); text-transform: uppercase; letter-spacing:.06em; }
-/* A stat whose headline is a word, not a number ("Nationwide"). It keeps the
-   gradient and weight of .stat-num but drops a step in size, because a whole
-   word set at the numeral size crowds the other two out of the row on narrow
-   screens. js/script.js skips .stat-text when it runs the count-up. */
+/* Escape hatch for a stat whose headline is a word rather than a number. Keeps
+   the gradient and weight but drops a size, because a whole word set at the
+   numeral size crowds the other two out of the row. js/script.js skips it when
+   it runs the count-up: there is nothing to count. */
 .stat-num.stat-text{ font-size: 1.5rem; letter-spacing:-.01em; }
+
+/* Below 640px the three figures have to hold one row: wrapped, a lone stat on
+   a second line reads as an afterthought rather than part of the set. Three
+   equal columns instead of content-width flex, so they divide the space rather
+   than overflow it, and the label drops to a size that keeps each one on a
+   single line at 360px. Labels stay short for the same reason. */
+@media (max-width: 640px){
+  .hero-stats{
+    display:grid; grid-template-columns: repeat(3, 1fr);
+    gap: 0 12px; flex-wrap:nowrap;
+  }
+  .stat-num, .stat-suffix{ font-size: 1.6rem; letter-spacing:-.02em; }
+  .stat p{ font-size: 0.62rem; letter-spacing:.04em; white-space:nowrap; }
+}
+@media (max-width: 380px){
+  .stat-num, .stat-suffix{ font-size: 1.42rem; }
+  .stat p{ font-size: 0.58rem; letter-spacing:.02em; }
+}
 
 /* ---- hero showpiece: oversized product visual, bleeding into the frame ---- */
 /* wide trio shot, anchored bottom-right and oversized so it bleeds off the
@@ -859,7 +877,8 @@ button[disabled].si-forgot{ cursor: progress; }
   .product-badge.status{ right: 9px; }
 
   .hero{ padding: 48px 0 56px; }
-  .hero-stats{ gap: 32px; }
+  /* .hero-stats spacing is set with its own layout up at .hero-stats, so the
+     row's grid and its gap stay in one place rather than half here */
   /* the three link columns are short enough now to sit side by side rather
      than stacking into one long list — the brand block takes its own row */
   .footer-top{ grid-template-columns: repeat(3, 1fr); }

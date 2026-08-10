@@ -212,28 +212,30 @@
         <a href="process.html" class="btn btn-outline btn-lg">See Our Process</a>
       </div>
 
-      <!-- Every figure here is dispatch and delivery policy, stated identically
-           on shipping.html. The old "99.7% Avg. Purity" and "150+ Batches
-           Tested" came out because they were figures rather than policy: they
-           need the supplier's real numbers behind them. Put a purity or batch
-           figure back only with the imported data, not an estimate.
+      <!-- The quality layer: two evidence figures, then one delivery figure.
+           All three sit in the served markup rather than being written by
+           script, so a crawler and a reader see the same numbers.
 
-           "Nationwide" replaced a "50 / States Shipped" counter, which read as
-           a count of states already shipped to rather than the coverage we
-           offer. .stat-text opts it out of the count-up animation in
-           js/script.js — there is no number to count. -->
+           They are not free-typed. tools/check-claims.js pins 99.7 to
+           avgPurity() over the catalog and 150 to BATCHES_TESTED, both in
+           js/products-data.js, and fails the build if either drifts. Editing a
+           number here alone is caught; the figure changes when the data does.
+
+           The 2PM PST cutoff is not repeated here on purpose: the paragraph
+           directly above already states it, and a hero that says the same
+           thing twice reads as having only one thing to say. -->
       <div class="hero-stats reveal">
         <div class="stat">
-          <span class="stat-num" data-count="2">0</span><span class="stat-suffix">PM PST</span>
-          <p>Same-Day Shipping Cutoff</p>
+          <span class="stat-num" data-count="99.7">0</span><span class="stat-suffix">%</span>
+          <p>Avg. Purity</p>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-count="150">0</span><span class="stat-suffix">+</span>
+          <p>Batches Tested</p>
         </div>
         <div class="stat">
           <span class="stat-num" data-count="2">0</span><span class="stat-suffix">-Day</span>
           <p>FedEx Transit</p>
-        </div>
-        <div class="stat">
-          <span class="stat-num stat-text">Nationwide</span>
-          <p>U.S. Shipping</p>
         </div>
       </div>
     </div>

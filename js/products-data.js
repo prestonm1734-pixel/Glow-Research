@@ -217,6 +217,32 @@ GLOW_PRODUCTS.forEach(p => {
 const sizeInStock = s => s.stock !== false;
 const productInStock = p => p.sizes.some(sizeInStock);
 
+// ---------------------------------------------------------------------------
+// The two quality figures in the homepage hero.
+//
+// Average purity is computed from the catalog rather than typed into the hero,
+// so it cannot survive a change to the products it summarises. Add a compound,
+// or let the supplier import overwrite the purity strings, and the headline
+// figure moves with them. tools/check-claims.js pins the number in index.html
+// to this function, so the served markup and the data cannot drift.
+//
+// One decimal, because that is the precision the certificates report.
+// NOTE: `purity` is still placeholder data (see the header of this file), so
+// this figure is only as true as those stand-ins until the import runs.
+function avgPurity() {
+  const ps = GLOW_PRODUCTS.map(p => parseFloat(p.purity));
+  return (ps.reduce((a, b) => a + b, 0) / ps.length).toFixed(1);
+}
+
+// Batches tested to date. Unlike every other figure on the site this one has
+// no source in the system: nothing here counts lots, so it cannot be derived
+// and it cannot self-correct. It is a hand-maintained number, stated as a
+// floor ("150+") for that reason, and it is the one claim on the site that
+// depends on somebody updating it. Raise it only against the fulfilment
+// partner's actual lot records, never as an estimate. If a real batch ledger
+// ever lands, derive this the way avgPurity() is derived and delete the note.
+const BATCHES_TESTED = 150;
+
 // Sort comparators for the catalog's sort control. Keyed so the <option>
 // values and the sorting logic can't drift apart. 'featured' is deliberately
 // absent — no comparator means the curated GLOW_PRODUCTS order stands.
@@ -427,6 +453,8 @@ if (typeof module !== 'undefined' && module.exports) {
     onSaleNow,
     sizeInStock,
     productInStock,
+    avgPurity,
+    BATCHES_TESTED,
     bulkSavingPct,
     SITEWIDE_DISCOUNT,
     QTY_TIERS,

@@ -25,6 +25,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
+  avgPurity, BATCHES_TESTED,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -122,6 +123,44 @@ console.log('\nstock');
   const bad = GLOW_PRODUCTS.filter(p => p.sizes.some(sizeInStock) && !sizeInStock(p.sizes[0]));
   ok('no card quotes a price for a sold-out size', bad.length === 0,
     bad.map(p => p.name).join(', '));
+}
+
+/* ---------------------------------------------------------------------------
+ * 3b. The hero's quality figures. These were removed once already for being
+ *     typed straight into the markup with nothing behind them. They are back
+ *     because they now have somewhere to come from, and this is the check that
+ *     keeps that true: the number a visitor reads must equal the number the
+ *     data produces, or the build fails.
+ * ------------------------------------------------------------------------- */
+console.log('\nhero figures');
+{
+  const home = read('index.html');
+  const statFor = label => {
+    // The <p> label identifies the stat; the count it animates to is the claim.
+    // The gap must not swallow another data-count, or every lookup returns the
+    // first figure in the row and the check passes on the wrong number.
+    const m = home.match(
+      new RegExp(`data-count="([\\d.]+)"(?:(?!data-count)[\\s\\S]){0,220}?<p>${label}</p>`));
+    return m && m[1];
+  };
+
+  const purity = statFor('Avg\\. Purity');
+  ok('the hero states an average purity', purity !== null);
+  ok(`stated purity ${purity} is the catalog average ${avgPurity()}`,
+    purity === avgPurity(),
+    'index.html and avgPurity() disagree: edit the catalog, not the hero');
+
+  const batches = statFor('Batches Tested');
+  ok('the hero states a batch count', batches !== null);
+  ok(`stated batch count ${batches} is BATCHES_TESTED ${BATCHES_TESTED}`,
+    Number(batches) === BATCHES_TESTED,
+    'index.html and products-data.js disagree');
+
+  // Stated as a floor, so the copy stays true as the real number climbs past
+  // it. Without the "+" the site would be claiming an exact count it does not
+  // hold, which is the failure this whole section exists to prevent.
+  ok('the batch count is stated as a floor, not an exact figure',
+    /data-count="150">0<\/span><span class="stat-suffix">\+<\/span>/.test(home));
 }
 
 /* ---------------------------------------------------------------------------
