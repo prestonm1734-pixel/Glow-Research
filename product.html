@@ -189,6 +189,20 @@
   /* the selected chip is already black, so the border hover above is a no-op
      on it — it needs to move the fill instead */
   .pd-size.is-active:hover{ background:#333330; border-color:#333330; }
+  /* Out of stock stays selectable — you can still read its price and see we
+     carry it. The strike says why the buy box is closed without a badge. */
+  .pd-size.is-out{
+    border-color: rgba(0,0,0,.25); color:#8a8a86; text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+  }
+  .pd-size.is-out:hover{ border-color: rgba(0,0,0,.4); background:transparent; }
+  .pd-size.is-out.is-active{ background:#8a8a86; border-color:#8a8a86; color:#fff; }
+  .pd-size.is-out.is-active:hover{ background:#8a8a86; border-color:#8a8a86; }
+
+  .pd-add:disabled{
+    background:#e8e8e6; border-color:#e8e8e6; color:#8a8a86;
+    cursor:not-allowed; transform:none; box-shadow:none;
+  }
 
   .pd-price{
     font-family:'Space Grotesk',sans-serif; font-size: 1.7rem; font-weight:800; color:#0a0a0a;

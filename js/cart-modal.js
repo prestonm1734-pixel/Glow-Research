@@ -42,15 +42,20 @@
   // tappable is a small target next to a large dead one.
   function row(product, size) {
     const sale = salePrice(size.price);
+    const out = !sizeInStock(size);
     const el = document.createElement('button');
     el.type = 'button';
-    el.className = 'qa-row';
-    el.setAttribute('aria-label', `Add ${size.mg} of ${product.name} to cart, ${fmtPrice(sale)}`);
+    el.className = 'qa-row' + (out ? ' is-out' : '');
+    el.disabled = out;
+    el.setAttribute('aria-label', out
+      ? `${size.mg} of ${product.name} is out of stock`
+      : `Add ${size.mg} of ${product.name} to cart, ${fmtPrice(sale)}`);
     el.innerHTML = `
       <span class="qa-row-label">${size.mg}</span>
       <span class="qa-row-price">
+        ${out ? '<span class="qa-row-out">Out of stock</span>' : `
         ${onSaleNow() ? `<span class="qa-row-was">${fmtPrice(size.price)}</span>` : ''}
-        <span class="qa-row-now">${fmtPrice(sale)}</span>
+        <span class="qa-row-now">${fmtPrice(sale)}</span>`}
       </span>
       <span class="qa-row-mark" aria-hidden="true">
         <svg class="qa-plus" width="17" height="17" viewBox="0 0 24 24" fill="none">

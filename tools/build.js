@@ -24,3 +24,8 @@ for (const script of ['build-products.js']) {
   console.log(`\n${script}`);
   execFileSync(process.execPath, [path.join(__dirname, script)], { stdio: 'inherit' });
 }
+
+// Last, and it exits non-zero: a build that leaves the site claiming something
+// the code does not enforce has not succeeded. See PRINCIPLES.md.
+console.log('\ncheck-claims.js');
+execFileSync(process.execPath, [path.join(__dirname, 'check-claims.js')], { stdio: 'inherit' });

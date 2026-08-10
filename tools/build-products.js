@@ -35,6 +35,7 @@ const OUT_DIR = 'peptides';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, PRODUCT_PAGES_LIVE,
+  sizeInStock, productInStock,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 // Mirrors CAT_LABEL in js/product.js. Kept in step by the assertion below
@@ -107,9 +108,12 @@ function productJsonLd(p, url) {
     url,
     price: (onSaleNow() ? salePrice(s.price) : s.price).toFixed(2),
     priceCurrency: 'USD',
-    // No inventory system yet: the catalog carries no stock field and the buy
-    // box is always enabled. Drive this off real stock once the import lands.
-    availability: 'https://schema.org/InStock',
+    // Read from the catalog, same field the buy box reads. Google surfaces
+    // this in shopping results, so a hardcoded InStock is a promise made to
+    // someone who never visited the page.
+    availability: sizeInStock(s)
+      ? 'https://schema.org/InStock'
+      : 'https://schema.org/OutOfStock',
     seller: { '@id': `${SITE}/#organization` },
   }));
 
@@ -229,8 +233,21 @@ function buildProduct(p, donor) {
   html = html.replace(priceRe, `$1${priceHtml}$2`);
 
   html = fillEmpty(html, 'pdSizes', p.sizes.map((sz, i) =>
-    `<button type="button" class="pd-size${i === 0 ? ' is-active' : ''}" data-i="${i}">${esc(sz.mg)}</button>`
+    `<button type="button" class="pd-size${i === 0 ? ' is-active' : ''}` +
+    `${sizeInStock(sz) ? '' : ' is-out'}" data-i="${i}">${esc(sz.mg)}</button>`
   ).join(''));
+
+  // Bake the stock state rather than leaving it to hydration: this is what a
+  // crawler indexes and what someone with JS off is looking at, and an enabled
+  // "Add to cart" on a sold-out vial is the exact promise we must not make.
+  if (!sizeInStock(s)) {
+    const addRe = /(id="pdAddBtn"[^>]*)(>)(?:(?!<\/button>)[\s\S])*/;
+    required(html, addRe, 'add button #pdAddBtn');
+    html = html.replace(addRe, '$1 disabled$2Out of stock');
+    html = setText(html, 'pdCutoff', 'Out of stock');
+    html = setText(html, 'pdArrival',
+      'Email support@glowresearch.shop and we will tell you when the next lot is released.');
+  }
 
   html = setText(html, 'pdAboutH', `About ${esc(p.name)}`);
   html = setText(html, 'pdResearchH', `${esc(p.name)} research`);

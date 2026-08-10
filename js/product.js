@@ -22,6 +22,8 @@
   let product = null;
   let sizeIndex = 0;
   let qty = 1;
+  // set by renderDelivery() so picking a different mg re-reads its stock
+  let refreshDelivery = null;
 
   const size = () => product.sizes[sizeIndex];
 
@@ -40,7 +42,7 @@
      UTC noon before any day arithmetic. Anchoring at noon means adding whole
      days can never land on a DST seam and silently shift the date by one. */
 
-  function nyParts(date) {
+  function pacificParts(date) {
     const out = {};
     new Intl.DateTimeFormat('en-US', {
       timeZone: 'America/Los_Angeles', hour12: false,
@@ -67,7 +69,7 @@
   }).format(d);
 
   function deliveryEstimate() {
-    const p = nyParts(new Date());
+    const p = pacificParts(new Date());
     const today = anchor(p);
     const secondsIn = (+p.hour % 24) * 3600 + (+p.minute) * 60 + (+p.second);
 
@@ -79,12 +81,21 @@
     return { shipsToday, arrivalDate: addBusinessDays(shipDate, TRANSIT_DAYS) };
   }
 
+  // Dispatch and delivery are only claims we can make about something we can
+  // actually send. An out-of-stock size gets the honest line and a next step
+  // instead of an arrival date that would be invented.
   function renderDelivery() {
     const cutEl = $('pdCutoff');
     const arrEl = $('pdArrival');
     if (!cutEl || !arrEl) return;
 
     function tick() {
+      if (!sizeInStock(size())) {
+        cutEl.innerHTML = '<strong>Out of stock</strong>';
+        arrEl.innerHTML = 'Email <a href="mailto:support@glowresearch.shop">support@glowresearch.shop</a> ' +
+          'and we will tell you when the next lot is released.';
+        return;
+      }
       const e = deliveryEstimate();
       cutEl.innerHTML = e.shipsToday
         ? 'In stock &mdash; <strong>ships today</strong>'
@@ -92,6 +103,7 @@
       arrEl.innerHTML = `Estimated delivery <strong>${fmtDay(e.arrivalDate)}</strong>`;
     }
 
+    refreshDelivery = tick;
     tick();
     setInterval(tick, 60000);
   }
@@ -229,9 +241,14 @@
 
   function renderSizes(p) {
     const wrap = $('pdSizes');
-    wrap.innerHTML = p.sizes.map((s, i) =>
-      `<button type="button" class="pd-size${i === sizeIndex ? ' is-active' : ''}" data-i="${i}">${s.mg}</button>`
-    ).join('');
+    // An unavailable mg stays on the page and stays pickable: hiding it makes
+    // the customer wonder whether we sell it at all. Saying so answers that.
+    wrap.innerHTML = p.sizes.map((s, i) => {
+      const out = !sizeInStock(s);
+      return `<button type="button" class="pd-size${i === sizeIndex ? ' is-active' : ''}` +
+        `${out ? ' is-out' : ''}" data-i="${i}"` +
+        `${out ? ' aria-label="' + s.mg + ' — out of stock"' : ''}>${s.mg}</button>`;
+    }).join('');
 
     wrap.querySelectorAll('.pd-size').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -266,7 +283,21 @@
         `${product.name}, ${s.mg} per vial. Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only.`);
     }
 
+    renderStock();
     renderTiers();
+  }
+
+  // The buy box never offers something we cannot ship. Both the button and the
+  // dispatch line are driven off the same catalog field, so they cannot end up
+  // disagreeing with each other.
+  function renderStock() {
+    const ok = sizeInStock(size());
+    const btn = $('pdAddBtn');
+    if (btn) {
+      btn.disabled = !ok;
+      btn.textContent = ok ? 'Add to cart' : 'Out of stock';
+    }
+    if (refreshDelivery) refreshDelivery();
   }
 
   /* ================= quantity + add ================= */
@@ -292,6 +323,7 @@
     // the cart lines up as unitSale × qty, so a plain vial goes in as a unit
     const addCurrent = () => {
       const s = size();
+      if (!sizeInStock(s)) return;   // the button is disabled too; this is the backstop
       window.GlowCart.add({
         name: product.name,
         variant: s.mg,

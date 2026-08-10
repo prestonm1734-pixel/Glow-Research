@@ -200,6 +200,23 @@ GLOW_PRODUCTS.forEach(p => {
   p.price = p.sizes[0].price;
 });
 
+// ---------------------------------------------------------------------------
+// Stock. Absent means sellable: every size above is available today, and
+// writing `stock: true` eighteen times would be noise. The point is not the
+// default — it is that availability is now a value the catalog holds rather
+// than a sentence four files assert on their own.
+//
+// Before this, "In stock" was hardcoded in the buy box and `InStock` was
+// hardcoded in the Product schema, so the site was structurally incapable of
+// telling the truth if the truth changed: the only way to stop selling
+// something was to remember to edit two files, and nothing would have caught
+// it if you forgot. Now setting `stock: false` on any size takes the buy box,
+// the mg button, the quick-add row, the card and the schema with it.
+//
+// The supplier import writes real per-SKU availability into `sizes[].stock`.
+const sizeInStock = s => s.stock !== false;
+const productInStock = p => p.sizes.some(sizeInStock);
+
 // Sort comparators for the catalog's sort control. Keyed so the <option>
 // values and the sorting logic can't drift apart. 'featured' is deliberately
 // absent — no comparator means the curated GLOW_PRODUCTS order stands.
@@ -344,13 +361,16 @@ function renderProductGrid(gridEl, filter, opts) {
   if (opts.limit) list = list.slice(0, opts.limit);
   list.forEach((p, i) => {
     const href = productHref(p);
+    const stocked = productInStock(p);
     const card = document.createElement('div');
     card.className = 'product-card reveal';
     card.style.transitionDelay = `${(i % 3) * 60}ms`;
     card.innerHTML = `
       <a class="product-visual${p.image ? ' has-photo' : ''}" href="${href}">
         <span class="product-badge cat">${p.cat}</span>
-        ${p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
+        ${!stocked
+          ? '<span class="product-badge status is-out">Out of stock</span>'
+          : p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
         ${p.image
           ? `<img class="product-photo" src="${pageHref(p.image)}" alt="${p.name} vial" loading="lazy" />`
           : '<div class="vial"></div>'}
@@ -362,7 +382,9 @@ function renderProductGrid(gridEl, filter, opts) {
           ${onSaleNow() ? `<s class="price-was">${fmtPrice(p.price)}</s>` : ''}
           ${fmtPrice(salePrice(p.price))} <span>/ vial</span>
         </span>
-        <button class="add-btn" aria-label="Add ${p.name} to research order">Add to Cart</button>
+        <button class="add-btn" ${stocked
+          ? `aria-label="Add ${p.name} to research order">Add to Cart`
+          : `disabled aria-label="${p.name} is out of stock">Out of Stock`}</button>
       </div>
     `;
     gridEl.appendChild(card);
@@ -403,6 +425,8 @@ if (typeof module !== 'undefined' && module.exports) {
     salePrice,
     fmtPrice,
     onSaleNow,
+    sizeInStock,
+    productInStock,
     bulkSavingPct,
     SITEWIDE_DISCOUNT,
     QTY_TIERS,

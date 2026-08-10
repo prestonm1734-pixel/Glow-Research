@@ -7,18 +7,42 @@ the output, the change doesn't ship.
 No dependencies to install. Everything here is plain Node.
 
 ```bash
-node tools/build.js          # the usual one: products (when live) + sitemap
+node tools/build.js          # the usual one: products (when live) + sitemap + audit
 node tools/build-products.js # one page per compound
 node tools/build-sitemap.js  # sitemap.xml on its own
+node tools/check-claims.js   # promise audit — run before every commit
 node tools/build-blog.js     # blog — read the warning below first
 ```
 
 ## `build.js`
 
 The everyday entry point. Runs `build-products.js`, which refreshes
-`sitemap.xml` on its way through.
+`sitemap.xml` on its way through, then `check-claims.js`.
 
 It deliberately does **not** run `build-blog.js` — see below.
+
+## `check-claims.js`
+
+The guard. Cross-checks what the site *says* against what the code *enforces*,
+and exits non-zero when they disagree — so a broken promise fails the build
+instead of reaching a customer. See [PRINCIPLES.md](../PRINCIPLES.md).
+
+It currently checks that:
+
+- the free-shipping threshold in the marquee equals `FREE_SHIPPING_AT` in
+  `cart.js` **and** `freeOver` in `checkout.js` — three places, one number
+- every stated dispatch cutoff equals `CUTOFF_HOUR`, and the estimate is
+  computed in Pacific time, which is what the copy claims
+- availability is derived from the catalog everywhere it is asserted, and
+  nothing hardcodes `InStock`
+- no page promises a certificate while `COAS_PUBLISHED` is false
+- no fabricated ratings or reviews appear in structured data
+- every product carries every field the site reads — a lossy supplier import
+  fails here rather than rendering an empty tab
+- every sitemap URL exists on disk, and held product URLs are not listed
+
+**Adding a claim to the site? Add its check here in the same commit.** That is
+the whole point: the list grows as the promises do.
 
 ## `build-products.js`
 
@@ -69,8 +93,11 @@ sitemap and the generator can never disagree.
 2. Host the certificates and fill `COA_URL`, or a per-product `coa`.
 3. Set `COAS_PUBLISHED = true` (see below) so the certificate wording across
    the site upgrades from "on request" to direct batch links.
-4. Replace the hardcoded `availability: InStock` in `build-products.js` with
-   real stock once the catalog carries it.
+4. Write real per-SKU availability into `sizes[].stock`. Nothing else to
+   change: the buy box, the mg picker, the quick-add sheet, the catalog card
+   and the `Product` schema all read it through `sizeInStock()` /
+   `productInStock()`. Absent means sellable, so an import that carries no
+   stock field behaves exactly as the site does today.
 5. Add `sku` to the `Product` schema once the fulfilment partner supplies them.
 6. Set `PRODUCT_PAGES_LIVE = true`, run `node tools/build.js`, and commit
    `peptides/**` along with the updated `sitemap.xml`.

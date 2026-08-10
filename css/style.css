@@ -693,6 +693,9 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 .product-badge.cat{ left:0; background: rgba(10,10,10,0.72); color:#fff; }
 .product-badge.status{ right:0; background:#0a0a0a; color:#fff; }
+/* Out of stock replaces the promo badge rather than sitting beside it —
+   two badges on one card is the clutter the badge was meant to cut through. */
+.product-badge.status.is-out{ background:#8a8a86; color:#fff; }
 .product-footer{ background:#0a0a0a; color:#fff; padding: 20px 22px 22px; position:relative; }
 /* fades out at each edge instead of a hard-edged rule, so it reads as a
    seam rather than a box border. Used both at the top of the footer (where
@@ -730,6 +733,12 @@ button[disabled].si-forgot{ cursor: progress; }
   transform: translateY(-2px); box-shadow: 0 8px 18px -8px rgba(0,0,0,.6);
 }
 .add-btn.added{ background:#0a0a0a; color:#fff; border-color: rgba(255,255,255,.5); }
+/* the card footer is black, so a disabled button reads as recessed rather
+   than greyed — it must not still look like the primary action */
+.add-btn:disabled{
+  background:transparent; color:#8a8a86; border-color:#3a3a38;
+  cursor:not-allowed; transform:none; box-shadow:none;
+}
 
 
 /* ---------- faq ---------- */
@@ -1540,6 +1549,14 @@ body.search-locked{ overflow:hidden; }
 .qa-row-label{ flex:1; min-width:0; font-weight:600; font-size:1.08rem; }
 .qa-row-price{ display:flex; align-items:baseline; gap:9px; white-space:nowrap; font-size:1rem; }
 .qa-row-was{ color:#a1a1a6; text-decoration: line-through; font-size:0.92rem; }
+.qa-row-out{
+  font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em; color:#8a8a86;
+}
+.qa-row.is-out{ cursor:not-allowed; }
+.qa-row.is-out .qa-row-label{ color:#8a8a86; text-decoration: line-through; }
+.qa-row.is-out:hover{ background:#fff; }
+.qa-row.is-out .qa-row-mark{ opacity:0; }
 .qa-row-now{ color:#0a0a0a; font-weight:600; }
 .qa-row-mark{
   flex-shrink:0; width:20px; height:20px; position:relative; color:#86868b;
