@@ -31,6 +31,10 @@ trying to produce *"I just use Glow."*
 
 They bind design and engineering equally.
 
+**These are published**, verbatim, on [about.html](about.html) — a customer can
+hold us to a rule they can read. `tools/check-claims.js` fails the build if the
+page and this file disagree, so edit them together.
+
 **1. Never create uncertainty we can remove.**
 If information can be made clearer, make it clearer.
 

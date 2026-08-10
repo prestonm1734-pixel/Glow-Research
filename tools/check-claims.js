@@ -142,6 +142,39 @@ if (!COAS_PUBLISHED) {
 }
 
 /* ---------------------------------------------------------------------------
+ * 4b. The published principles. about.html prints the five non-negotiables so
+ *     a customer can hold us to a rule they can read. That makes PRINCIPLES.md
+ *     and the page two copies of one thing, which is the drift this file
+ *     exists to prevent: edit the doctrine without editing the page and the
+ *     site is quoting a rule we no longer keep.
+ * ------------------------------------------------------------------------- */
+console.log('\npublished principles');
+{
+  const canonical = [...read('PRINCIPLES.md').matchAll(/^\*\*\d\.\s*(.+?)\*\*$/gm)].map(m => m[1]);
+  const published = [...read('about.html').matchAll(/<h3>([^<]+)<\/h3>/g)].map(m => m[1]);
+  ok('PRINCIPLES.md still states five', canonical.length === 5, `${canonical.length} found`);
+  ok('about.html publishes the same five, in the same order',
+    canonical.length === 5 && canonical.join(' | ') === published.join(' | '),
+    `md: ${canonical.join(' | ')}\n          page: ${published.join(' | ')}`);
+
+  // the North Star and the pinned line are quoted on the page too. Both are
+  // blockquotes in the markdown, so strip the "> " gutter and the bold marks
+  // before comparing — the sentence is the thing that has to match, not the
+  // formatting around it.
+  const plain = s => s.replace(/^\s*>\s?/gm, '').replace(/\*\*/g, '').replace(/\s+/g, ' ');
+  const about = plain(read('about.html'));
+  const doctrine = plain(read('PRINCIPLES.md'));
+  [
+    'Would this make an existing Glow customer more likely or less likely to ever need another supplier?',
+    'Never let growth turn Glow into the company we built Glow to replace.',
+  ].forEach(line => {
+    ok(`quoted verbatim: "${line.slice(0, 42)}…"`,
+      about.includes(line) && doctrine.includes(line),
+      `page ${about.includes(line)}, doctrine ${doctrine.includes(line)}`);
+  });
+}
+
+/* ---------------------------------------------------------------------------
  * 5. Structured data. Inventing reviews or ratings is the fastest way to a
  *    manual action, and it is the exact thing PRINCIPLES.md forbids.
  * ------------------------------------------------------------------------- */
