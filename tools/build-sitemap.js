@@ -26,6 +26,7 @@ const STATIC_PAGES = [
   ['', '1.0'],
   ['peptides.html', '0.9'],
   ['blog.html', '0.8'],
+  ['process.html', '0.7'],
   ['about.html', '0.6'],
   ['shipping.html', '0.6'],
   ['wholesale.html', '0.6'],
