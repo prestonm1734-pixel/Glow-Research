@@ -75,7 +75,7 @@ console.log('\nfree shipping threshold');
  * 2. Dispatch cutoff. The product page computes "ships today" from
  *    CUTOFF_HOUR; the marquee, hero and shipping page state it in words. If
  *    someone tunes the constant without touching the copy, the site promises
- *    same-day dispatch on an order it has already decided to hold.
+ *    same-day shipping on an order it has already decided to hold.
  * ------------------------------------------------------------------------- */
 console.log('\ndispatch cutoff');
 {
