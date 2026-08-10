@@ -212,14 +212,19 @@
         <a href="process.html" class="btn btn-outline btn-lg">See Our Process</a>
       </div>
 
-      <!-- The quality layer: two evidence figures, then one delivery figure.
+      <!-- The quality layer: what is in the vial, how we know, when it lands.
            All three sit in the served markup rather than being written by
            script, so a crawler and a reader see the same numbers.
 
-           They are not free-typed. tools/check-claims.js pins 99.7 to
-           avgPurity() over the catalog and 150 to BATCHES_TESTED, both in
-           js/products-data.js, and fails the build if either drifts. Editing a
-           number here alone is caught; the figure changes when the data does.
+           None of it is free-typed. tools/check-claims.js pins 99.7 to
+           avgPurity() over the catalog, and pins the two named methods to the
+           testing process.html describes, so the homepage cannot end up
+           advertising an analysis we do not run.
+
+           The middle slot held a batch tally before. It came out because it
+           was the one figure here with no source in the system: nothing counts
+           lots, so it could only ever be right until it quietly wasn't. The
+           methods are permanently true and need nobody to remember them.
 
            The 2PM PST cutoff is not repeated here on purpose: the paragraph
            directly above already states it, and a hero that says the same
@@ -230,8 +235,8 @@
           <p>Avg. Purity</p>
         </div>
         <div class="stat">
-          <span class="stat-num" data-count="150">0</span><span class="stat-suffix">+</span>
-          <p>Batches Tested</p>
+          <span class="stat-num stat-text">HPLC + MS</span>
+          <p>Every Batch</p>
         </div>
         <div class="stat">
           <span class="stat-num" data-count="2">0</span><span class="stat-suffix">-Day</span>

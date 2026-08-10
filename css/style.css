@@ -447,21 +447,26 @@ button[disabled].si-forgot{ cursor: progress; }
 .stat-num.stat-text{ font-size: 1.5rem; letter-spacing:-.01em; }
 
 /* Below 640px the three figures have to hold one row: wrapped, a lone stat on
-   a second line reads as an afterthought rather than part of the set. Three
-   equal columns instead of content-width flex, so they divide the space rather
-   than overflow it, and the label drops to a size that keeps each one on a
-   single line at 360px. Labels stay short for the same reason. */
+   a second line reads as an afterthought rather than part of the set. Columns
+   are content-width rather than equal thirds, because the three are unequal by
+   nature ("HPLC + MS" needs roughly twice the room of "2-Day") and splitting
+   the width evenly would squeeze the widest one while the narrow ones sat in
+   whitespace. space-between then holds the row edge to edge. Labels stay short
+   for the same reason: each has to survive on one line at 360px. */
 @media (max-width: 640px){
   .hero-stats{
-    display:grid; grid-template-columns: repeat(3, 1fr);
-    gap: 0 12px; flex-wrap:nowrap;
+    display:grid; grid-template-columns: repeat(3, auto);
+    justify-content: space-between; gap: 0 10px; flex-wrap:nowrap;
   }
   .stat-num, .stat-suffix{ font-size: 1.6rem; letter-spacing:-.02em; }
+  /* keeps the same step down from the numerals it has on desktop (1.5/1.9) */
+  .stat-num.stat-text{ font-size: 1.26rem; }
   .stat p{ font-size: 0.62rem; letter-spacing:.04em; white-space:nowrap; }
 }
 @media (max-width: 380px){
   .stat-num, .stat-suffix{ font-size: 1.42rem; }
-  .stat p{ font-size: 0.58rem; letter-spacing:.02em; }
+  .stat-num.stat-text{ font-size: 1.12rem; }
+  .stat p{ font-size: 0.56rem; letter-spacing:.02em; }
 }
 
 /* ---- hero showpiece: oversized product visual, bleeding into the frame ---- */

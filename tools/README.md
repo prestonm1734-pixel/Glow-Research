@@ -36,8 +36,10 @@ It currently checks that:
 - availability is derived from the catalog everywhere it is asserted, and
   nothing hardcodes `InStock`
 - the homepage hero's "99.7% avg. purity" equals `avgPurity()` over the
-  catalog, and its "150+" equals `BATCHES_TESTED`. Both figures live in the
-  served markup so a crawler sees them, which is exactly why they need pinning
+  catalog, and the two analytical methods it names are the ones `process.html`
+  describes. The hero lives in the served markup so a crawler sees it, which is
+  exactly why it needs pinning. A batch tally in the hero fails outright: it
+  has no source in the system, so it would only be right until it wasn't
 - no page promises a certificate while `COAS_PUBLISHED` is false
 - no fabricated ratings or reviews appear in structured data
 - every product carries every field the site reads, so a lossy supplier import
