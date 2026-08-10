@@ -98,8 +98,8 @@
       }
       const e = deliveryEstimate();
       cutEl.innerHTML = e.shipsToday
-        ? 'In stock &mdash; <strong>ships today</strong>'
-        : 'In stock &mdash; <strong>ships next business day</strong>';
+        ? 'In stock, <strong>ships today</strong>'
+        : 'In stock, <strong>ships next business day</strong>';
       arrEl.innerHTML = `Estimated delivery <strong>${fmtDay(e.arrivalDate)}</strong>`;
     }
 
@@ -247,7 +247,7 @@
       const out = !sizeInStock(s);
       return `<button type="button" class="pd-size${i === sizeIndex ? ' is-active' : ''}` +
         `${out ? ' is-out' : ''}" data-i="${i}"` +
-        `${out ? ' aria-label="' + s.mg + ' — out of stock"' : ''}>${s.mg}</button>`;
+        `${out ? ' aria-label="' + s.mg + ', out of stock"' : ''}>${s.mg}</button>`;
     }).join('');
 
     wrap.querySelectorAll('.pd-size').forEach(btn => {

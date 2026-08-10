@@ -31,7 +31,7 @@ trying to produce *"I just use Glow."*
 
 They bind design and engineering equally.
 
-**These are published**, verbatim, on [about.html](about.html) — a customer can
+**These are published**, verbatim, on [about.html](about.html). A customer can
 hold us to a rule they can read. `tools/check-claims.js` fails the build if the
 page and this file disagree, so edit them together.
 
@@ -40,7 +40,7 @@ If information can be made clearer, make it clearer.
 
 **2. Never claim more than we can prove.**
 Design and engineering must support factual, substantiated research-use
-claims — not hype.
+claims, not hype.
 
 **3. Consistency is part of the product.**
 Order #10 and order #100,000 should feel like they came from the same company.
@@ -58,20 +58,20 @@ less dependable is suspect.
 
 **Design for confidence, not decoration.** The premium black/white
 institutional aesthetic stays. Every element should make Glow feel clear, calm,
-credible and established — not flashy or hype-driven.
+credible and established, not flashy or hype-driven.
 
 The site must visually communicate:
 
-- **Clarity** — no clutter, no confusing hierarchy, no excessive badges.
-- **Proof** — testing and documentation are obvious and easy to reach wherever
+- **Clarity:** no clutter, no confusing hierarchy, no excessive badges.
+- **Proof:** testing and documentation are obvious and easy to reach wherever
   they apply.
-- **Consistency** — every product page follows the same structure, terminology,
+- **Consistency:** every product page follows the same structure, terminology,
   spacing, information hierarchy and evidence presentation.
-- **Calm confidence** — no fake urgency, no screaming discounts, no
+- **Calm confidence:** no fake urgency, no screaming discounts, no
   casino-style countdowns, nothing that makes the business feel temporary.
-- **Predictability** — the customer always knows what happens next: ordering,
+- **Predictability:** the customer always knows what happens next: ordering,
   fulfillment, shipping, support.
-- **Institutional permanence** — the site should feel like Glow will still be
+- **Institutional permanence:** the site should feel like Glow will still be
   here in ten years.
 
 ### The design test

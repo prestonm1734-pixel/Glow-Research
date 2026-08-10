@@ -483,7 +483,7 @@
       note.hidden = false;
       note.innerHTML = 'To claim <strong>' + r.label + '</strong>, email ' +
         '<a href="mailto:support@glowresearch.shop?subject=' +
-        encodeURIComponent('Redeem ' + r.cost + ' points — ' + r.label) +
+        encodeURIComponent('Redeem ' + r.cost + ' points: ' + r.label) +
         '">support@glowresearch.shop</a> and we will apply it to your next order. ' +
         'Redeeming from this page is not automatic yet.';
       note.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -569,7 +569,7 @@
         'and dashboard appear here once you are approved.</p>' +
       '</div>' +
       '<p class="ac-note"><strong>Sample flow.</strong> Applications are not being received ' +
-      'automatically yet — email support@glowresearch.shop and we will set you up.</p>';
+      'automatically yet. Email support@glowresearch.shop and we will set you up.</p>';
   }
 
   function affApproved(d, body, sub) {

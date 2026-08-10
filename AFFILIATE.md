@@ -1,7 +1,7 @@
-# Affiliate programme — how it actually works
+# Affiliate programme, how it actually works
 
 Two halves. The browser half is built and live in this repo. The server half is
-not, and cannot be — everything that decides who gets paid has to sit somewhere
+not, and cannot be, everything that decides who gets paid has to sit somewhere
 the affiliate can't edit.
 
 ## What's built here
@@ -15,7 +15,7 @@ the affiliate can't edit.
 | Affiliate dashboard | `account.html` | Link, copy button, clicks / sign-ups / orders / paid / pending |
 
 Try it: load `/?ref=GLOW-TEST123`, note the param disappears, then go to checkout
-and submit — the code is named in the confirmation.
+and submit, the code is named in the confirmation.
 
 ## What has to be server-side
 
@@ -26,7 +26,7 @@ is to say "this visitor arrived via CODE"; everything downstream is the server's
 1. **Validate the code.** `referral.js` only checks the *shape* (`^[A-Z0-9][A-Z0-9-]{2,31}$`).
    Whether the code belongs to an approved affiliate is a database lookup.
 2. **Record the order.** On order creation, store `affiliate_code`, order id,
-   subtotal, and timestamp. Commission is on **subtotal only** — never shipping
+   subtotal, and timestamp. Commission is on **subtotal only**, never shipping
    or tax, or you pay commission on FedEx.
 3. **Hold, then approve.** Commission sits `pending` for 30 days after delivery,
    then flips to `approved`. Refund or chargeback → reverse it.
@@ -36,11 +36,11 @@ is to say "this visitor arrived via CODE"; everything downstream is the server's
 
 ## Fraud rules worth enforcing on day one
 
-- **Self-referral** — match affiliate email/address against the order.
-- **Cookie stuffing** — a code that fires with no click-through.
-- **Brand bidding** — check paid search for your own name periodically.
-- **Coupon-site leakage** — codes appearing where you didn't put them.
-- **Claims violations** — the one that matters most here. An affiliate writing
+- **Self-referral:** match affiliate email/address against the order.
+- **Cookie stuffing:** a code that fires with no click-through.
+- **Brand bidding:** check paid search for your own name periodically.
+- **Coupon-site leakage:** codes appearing where you didn't put them.
+- **Claims violations:** the one that matters most here. An affiliate writing
   "cures X" in your name is the exposure the FDA warning letters describe, made
   by someone you're paying. Review placements before approving, and again on any
   material change.
@@ -56,7 +56,7 @@ forms and a support queue.
 | **Refersion** | Shopify/Woo, handles payouts and 1099s. Monthly fee. |
 | **Tapfiliate / GoAffPro** | Cheaper, lighter, thinner fraud tooling. |
 
-Whichever you pick, `js/referral.js` can usually be dropped — most platforms
+Whichever you pick, `js/referral.js` can usually be dropped, most platforms
 ship their own click tracker. Keep it only if you want attribution to survive
 independently of the vendor. If you do keep it, make sure both aren't recording
 the same click twice.

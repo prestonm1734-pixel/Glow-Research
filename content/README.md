@@ -1,6 +1,6 @@
 # Publishing a blog post
 
-Three steps. No build tools to install — just Node.
+Three steps. No build tools to install, just Node.
 
 ## 1. Write the article body
 
@@ -9,7 +9,7 @@ Create `content/posts/<slug>.html`. This is a **fragment**, not a full page: no
 
 ```html
 <p class="lede">
-  Opening paragraph. Rendered larger than body text — use it to state what the
+  Opening paragraph. Rendered larger than body text, use it to state what the
   article covers.
 </p>
 
@@ -35,7 +35,7 @@ Notes:
   anything below that.
 - The contents rail only appears when an article has **3 or more `<h2>`s**.
   Fewer than that and the article renders full-width.
-- Links to other pages are written **root-relative** — `href="coa.html"`,
+- Links to other pages are written **root-relative**, `href="coa.html"`,
   `href="peptides.html"`. The build rewrites them to work from the article's
   nested URL. Don't write `../../coa.html`.
 - The research-use-only disclaimer is appended to every article automatically.
@@ -43,7 +43,7 @@ Notes:
 
 ## 2. Register it
 
-Add an entry to the top of the array in `content/posts.js` (newest first — the
+Add an entry to the top of the array in `content/posts.js` (newest first, the
 first entry becomes the featured lead story on the listing page):
 
 ```js
@@ -52,7 +52,7 @@ first entry becomes the featured lead story on the listing page):
   title: 'My New Article',
   description:
     'One or two sentences. This is the Google result snippet and the ' +
-    'listing summary — aim for ~155 characters.',
+    'listing summary, aim for ~155 characters.',
   category: 'News',              // free text; new categories appear on their own
   date: '2026-08-04',            // YYYY-MM-DD
   readingTime: 6,                // minutes, your estimate
@@ -60,7 +60,7 @@ first entry becomes the featured lead story on the listing page):
 },
 ```
 
-`category` is not a fixed list. Type anything — the listing page derives its
+`category` is not a fixed list. Type anything, the listing page derives its
 topic filter from whatever categories exist across the posts, so a new one
 starts working the moment a post uses it.
 
@@ -68,11 +68,11 @@ starts working the moment a post uses it.
 
 ```bash
 node tools/build-blog.js
-git diff blog/          # read this before committing — see the warning below
+git diff blog/          # read this before committing, see the warning below
 ```
 
 This regenerates `blog/<slug>/index.html` for every post, plus `blog.html` and
-`sitemap.xml`. Commit the generated files along with your source — the site is
+`sitemap.xml`. Commit the generated files along with your source, the site is
 served as static HTML, so unbuilt changes won't appear.
 
 > **The committed blog pages have diverged from what the build produces.** They
@@ -81,7 +81,7 @@ served as static HTML, so unbuilt changes won't appear.
 > rail has been removed, and the nav label changed from "Blog" to "Research
 > Blog" (which `setActiveNav()` no longer matches). A rebuild silently replaces
 > all of that, so always read the diff first. Reconciling the generator with the
-> committed pages is an outstanding job — see `tools/README.md`.
+> committed pages is an outstanding job, see `tools/README.md`.
 
 ---
 
@@ -92,18 +92,18 @@ served as static HTML, so unbuilt changes won't appear.
   useful.
 - **The article count** in the masthead.
 - **Cover artwork.** Each post gets a unique generated lattice image derived
-  from its slug — no image files to make. Same slug always yields the same art.
+  from its slug, no image files to make. Same slug always yields the same art.
 - **Related posts** at the foot of each article.
 - **The sitemap**, including new URLs for search engines. It is written by
   `tools/build-sitemap.js` now, shared with the product build, and covers every
-  page on the site rather than just the blog — so running any build leaves a
+  page on the site rather than just the blog, so running any build leaves a
   complete one.
 
 ## Things that don't
 
 - `SITE` at the top of `tools/build-blog.js` is hardcoded to
   `https://glowresearch.shop`. If the domain changes, update it there and in
-  `robots.txt`, then rebuild — canonical URLs, Open Graph tags, and the sitemap
+  `robots.txt`, then rebuild, canonical URLs, Open Graph tags, and the sitemap
   all derive from it.
 - The header and footer are lifted from `peptides.html` at build time. Edit the
   nav there and rerun the build to push it to every article.

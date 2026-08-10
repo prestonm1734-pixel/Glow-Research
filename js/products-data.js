@@ -74,7 +74,7 @@ const COA_COPY = COAS_PUBLISHED ? {
   boxSub: 'Email support@glowresearch.shop with the lot number on your vial and we will send the COA for that batch',
   orderNote: 'Lot COA available on request',
   faq: 'Email support@glowresearch.shop with the compound and lot number, or the order number if ' +
-       'you have already bought, and we will send the certificate for that exact batch — including ' +
+       'you have already bought, and we will send the certificate for that exact batch, including ' +
        'batches that have since sold out. Every vial carries the lot number its certificate is ' +
        'issued against, so you can check what is in your hand against the document. Certificates ' +
        'are issued by the independent laboratory that performed the analysis, not by us.',

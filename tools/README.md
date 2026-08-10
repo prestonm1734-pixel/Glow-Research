@@ -1,7 +1,7 @@
 # Build scripts
 
 The site is static HTML served straight from the repo, so **generated files are
-committed**. Nothing builds on deploy — if you don't run the build and commit
+committed**. Nothing builds on deploy. If you don't run the build and commit
 the output, the change doesn't ship.
 
 No dependencies to install. Everything here is plain Node.
@@ -10,8 +10,8 @@ No dependencies to install. Everything here is plain Node.
 node tools/build.js          # the usual one: products (when live) + sitemap + audit
 node tools/build-products.js # one page per compound
 node tools/build-sitemap.js  # sitemap.xml on its own
-node tools/check-claims.js   # promise audit — run before every commit
-node tools/build-blog.js     # blog — read the warning below first
+node tools/check-claims.js   # promise audit, run before every commit
+node tools/build-blog.js     # blog, read the warning below first
 ```
 
 ## `build.js`
@@ -19,25 +19,25 @@ node tools/build-blog.js     # blog — read the warning below first
 The everyday entry point. Runs `build-products.js`, which refreshes
 `sitemap.xml` on its way through, then `check-claims.js`.
 
-It deliberately does **not** run `build-blog.js` — see below.
+It deliberately does **not** run `build-blog.js`. See below.
 
 ## `check-claims.js`
 
 The guard. Cross-checks what the site *says* against what the code *enforces*,
-and exits non-zero when they disagree — so a broken promise fails the build
+and exits non-zero when they disagree, so a broken promise fails the build
 instead of reaching a customer. See [PRINCIPLES.md](../PRINCIPLES.md).
 
 It currently checks that:
 
 - the free-shipping threshold in the marquee equals `FREE_SHIPPING_AT` in
-  `cart.js` **and** `freeOver` in `checkout.js` — three places, one number
+  `cart.js` **and** `freeOver` in `checkout.js`. Three places, one number
 - every stated dispatch cutoff equals `CUTOFF_HOUR`, and the estimate is
   computed in Pacific time, which is what the copy claims
 - availability is derived from the catalog everywhere it is asserted, and
   nothing hardcodes `InStock`
 - no page promises a certificate while `COAS_PUBLISHED` is false
 - no fabricated ratings or reviews appear in structured data
-- every product carries every field the site reads — a lossy supplier import
+- every product carries every field the site reads, so a lossy supplier import
   fails here rather than rendering an empty tab
 - every sitemap URL exists on disk, and held product URLs are not listed
 
@@ -48,8 +48,8 @@ the whole point: the list grows as the promises do.
 
 Generates one real, crawlable page per compound at `peptides/<slug>/index.html`.
 
-Reads the catalog from `js/products-data.js` — the same file the browser loads,
-through the CommonJS guard at the foot of it — and lifts the whole of
+Reads the catalog from `js/products-data.js`, the same file the browser loads,
+through the CommonJS guard at the foot of it, and lifts the whole of
 `product.html` as its template, so nav, footer, styles and scripts stay in one
 place.
 
@@ -68,7 +68,7 @@ const PRODUCT_PAGES_LIVE = false;
 
 **These pages are currently held.** The real catalog, prices, images and COAs
 have not been imported yet, and publishing nine crawlable pages of placeholder
-data would be worse than publishing none. Nothing here is broken — the
+data would be worse than publishing none. Nothing here is broken. The
 generator is finished and tested. What is missing is the data.
 
 While it is `false`:
@@ -85,11 +85,11 @@ sitemap and the generator can never disagree.
 
 1. Import the real catalog into `js/products-data.js`, keeping the existing
    shape (`name`, `cat`, `tag`, `purity`, `sizes[]`, `blurb`, `about[]`,
-   `research[]`) — `cart.js`, `search.js` and `product.js` all read it. The
+   `research[]`), which `cart.js`, `search.js` and `product.js` all read. The
    `purity` strings currently in the file are placeholders; the import
    overwrites them with the supplier's measured figures. Nothing reads them
    except the vial fine print and the `Product` schema, so replacing the values
-   in place is enough — no other file needs touching.
+   in place is enough. No other file needs touching.
 2. Host the certificates and fill `COA_URL`, or a per-product `coa`.
 3. Set `COAS_PUBLISHED = true` (see below) so the certificate wording across
    the site upgrades from "on request" to direct batch links.
@@ -101,8 +101,8 @@ sitemap and the generator can never disagree.
 5. Add `sku` to the `Product` schema once the fulfilment partner supplies them.
 6. Set `PRODUCT_PAGES_LIVE = true`, run `node tools/build.js`, and commit
    `peptides/**` along with the updated `sitemap.xml`.
-7. Check the generated pages — prices, sizes, purity, images, certificate links
-   — before anything is submitted for indexing.
+7. Check the generated pages (prices, sizes, purity, images, certificate
+   links) before anything is submitted for indexing.
 8. Submit the sitemap in Search Console.
 
 ### The certificate switch
@@ -116,27 +116,26 @@ Separate from `PRODUCT_PAGES_LIVE` on purpose: certificates and the generated
 product pages both arrive with the supplier import, but they do not have to go
 live in the same deploy.
 
-Every lot **is** third-party tested and every batch **does** have a certificate
-— that is how the business runs, and the site says so. What is not true yet is
+Every lot **is** third-party tested and every batch **does** have a certificate.
+That is how the business runs, and the site says so. What is not true yet is
 that this site *hosts* them, so the only route that works today is asking us.
 `COA_COPY` beside the flag holds both versions of that wording, and the four
 places that render it read from there:
 
 | Surface | Source |
 |---|---|
-| Homepage FAQ | `COA_COPY.faq` — `js/script.js` |
-| Cart trust list | `COA_COPY.short` — `js/cart.js` |
-| Account order footer | `COA_COPY.orderNote` — `js/account.js` |
-| Product page COA box | `COA_COPY.boxTitle` / `.boxSub` — `js/product.js` |
+| Homepage FAQ | `COA_COPY.faq`, `js/script.js` |
+| Cart trust list | `COA_COPY.short`, `js/cart.js` |
+| Account order footer | `COA_COPY.orderNote`, `js/account.js` |
+| Product page COA box | `COA_COPY.boxTitle` / `.boxSub`, `js/product.js` |
 
 The product page's static markup ships with the "on request" wording, so what a
 crawler sees (and what `build-products.js` bakes into each generated page) is
 accurate without running scripts; `renderCoa()` upgrades it only when a real
 href exists.
 
-Flipping `COAS_PUBLISHED` moves all four at once. Prose that mentions
-certificates — the About page and the three blog articles — is written to stay
-true either way, so it needs no edit; if you want those pointing at direct
+Flipping `COAS_PUBLISHED` moves all four at once. Prose that mentions certificates (the
+About page and the three blog articles) is written to stay true either way, so it needs no edit; if you want those pointing at direct
 links too, they are the only hand edits left.
 
 ## `build-sitemap.js`
@@ -148,7 +147,7 @@ It used to live inside the blog build and was generated from the blog build's
 own list of pages, which meant every rebuild silently dropped `terms.html`,
 `privacy.html` and `ruo-agreement.html`, and it never knew about products.
 
-Static pages are listed in `STATIC_PAGES` and checked against the filesystem —
+Static pages are listed in `STATIC_PAGES` and checked against the filesystem, so
 a page that gets renamed or deleted fails the build instead of leaving a 404
 advertised to search engines. Add new pages there.
 
@@ -176,4 +175,4 @@ rebuilds `blog.html`. Publishing workflow is in `content/README.md`.
 
 `SITE` is hardcoded at the top of `build-products.js`, `build-sitemap.js` and
 `build-blog.js`. If the domain changes, update all three plus `robots.txt`, then
-rebuild — canonicals, Open Graph URLs and the sitemap all derive from it.
+rebuild, canonicals, Open Graph URLs and the sitemap all derive from it.

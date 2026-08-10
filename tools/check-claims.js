@@ -175,6 +175,43 @@ console.log('\npublished principles');
 }
 
 /* ---------------------------------------------------------------------------
+ * 4c. House style: no em dashes in customer-facing copy. They are a house
+ *     preference, and once a page is written they are easy to reintroduce
+ *     without noticing, so the rule is enforced rather than remembered.
+ *
+ *     A bare em dash standing alone in an element is exempt: that is the null
+ *     indicator on the account and thank-you pages ("no value yet"), not prose.
+ * ------------------------------------------------------------------------- */
+console.log('\nhouse style');
+{
+  const strip = s => s
+    .replace(/<style>[\s\S]*?<\/style>/g, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<script[\s\S]*?<\/script>/g, '')
+    // the null-value glyph: >—< or >&mdash;< with nothing else inside
+    .replace(/>\s*(—|&mdash;)\s*</g, '><');
+
+  const bad = pages.filter(f => /—|&mdash;/.test(strip(read(f))));
+  ok('no em dashes in page copy', bad.length === 0, bad.join(', '));
+
+  // scripts that render copy: comments are a different register and are exempt
+  const jsCopy = ['js/account.js', 'js/age-gate.js', 'js/cart.js', 'js/cart-modal.js',
+                  'js/checkout.js', 'js/product.js', 'js/products-data.js',
+                  'js/script.js', 'js/search.js', 'js/thank-you.js'];
+  const badJs = jsCopy.filter(f => {
+    const body = read(f)
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '')
+      .replace(/\s+\/\/\s.*$/gm, '')
+      .replace(/\|\|\s*'—'/g, '');   // the same null indicator, in JS
+    return /—|&mdash;/.test(body);
+  });
+  ok('no em dashes in rendered strings', badJs.length === 0, badJs.join(', '));
+
+  ok('no em dashes in PRINCIPLES.md', !/—/.test(read('PRINCIPLES.md')));
+}
+
+/* ---------------------------------------------------------------------------
  * 5. Structured data. Inventing reviews or ratings is the fastest way to a
  *    manual action, and it is the exact thing PRINCIPLES.md forbids.
  * ------------------------------------------------------------------------- */
