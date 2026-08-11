@@ -107,6 +107,8 @@ const COA_COPY = COAS_PUBLISHED ? {
   // link is drawn.
   panelNote: 'Issued against this lot number by the laboratory that ran the analysis',
   panelLink: 'View report',
+  // the Certificate row of the documentation record
+  docLine: 'Batch-specific, issued by the analysing laboratory and linked from this page',
   // homepage FAQ answer
   faq: 'Two places. Every product page links directly to its current lot’s certificate, ' +
        'and every vial carries the lot number that certificate is issued against, so you can ' +
@@ -121,6 +123,7 @@ const COA_COPY = COAS_PUBLISHED ? {
   orderNote: 'Lot COA available on request',
   panelNote: 'Certificate on request: email support@glowresearch.shop with the lot number on your vial',
   panelLink: '',
+  docLine: 'Batch-specific, issued by the analysing laboratory. Email support@glowresearch.shop with the lot number for a copy',
   faq: 'Email support@glowresearch.shop with the compound and lot number, or the order number if ' +
        'you have already bought, and we will send the certificate for that exact batch, including ' +
        'batches that have since sold out. Every vial carries the lot number its certificate is ' +
@@ -326,6 +329,21 @@ const ANALYSIS_LONG = 'HPLC for purity, mass spectrometry for identity';
 const SOURCE_SHORT = 'U.S. manufacturing partner';
 const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices';
 
+// The tests nobody runs on these lots, named out loud.
+//
+// ANALYSIS_LONG is the complete list of what is performed, which means every
+// other analysis a buyer might assume is included is absent. Left unsaid, an
+// absence reads as a pass: a page that talks at length about testing and never
+// mentions endotoxin invites the reader to fill the gap in our favour. So the
+// FAQ answers the question by name, and it builds the answer from this array
+// rather than from a sentence someone typed, so the day one of these is
+// actually run the honest version is one line: delete it here.
+//
+// check-claims.js holds the two halves apart. Nothing in this array may appear
+// in ANALYSIS_SHORT, ANALYSIS_LONG, or the testing copy on process.html, so
+// "we do not test for X" cannot survive X being added to what we say we test.
+const ANALYSIS_NOT_RUN = ['endotoxin', 'sterility'];
+
 // ---------------------------------------------------------------------------
 // The identity line: the sentence under the product name in the buy box.
 //
@@ -365,14 +383,45 @@ function identityLine(p, size) {
 // bakes both the markup and the FAQPage schema into index.html. Editing the
 // array and rebuilding is the whole workflow; check-claims.js fails the build
 // if the served markup and this array disagree.
+//
+// The middle six questions are the verification trail, in the order someone
+// actually walks it: is it tested, what did the test measure, what was not
+// measured, where is the document, how do I know the document is real, and
+// where is the lot number that ties the document to the vial in my hand. That
+// ordering is the point. Verifiability is the whole proposition, and a
+// proposition that only appears as an adjective on a product card is a slogan.
+// Answers are plain text: faqHtml() escapes them and build-faq.js puts the same
+// strings in the FAQPage schema, so there is no markup to get out of step.
+//
+// Two rules these answers are held to, both enforced in check-claims.js:
+// nothing here may name an analysis that ANALYSIS_LONG does not back, and
+// nothing here may quote a number. Purity figures in this catalog are still
+// placeholder, and a threshold repeated in an FAQ ("research grade is 98%+",
+// "endotoxin under 0.25 EU/mL") turns a lot-specific measurement into a
+// standard we would then be promising on every lot forever. The certificate
+// reports numbers. This page explains how to go read them.
 const FAQS = [
   {
     q: 'Are Glow Research peptides intended for human consumption?',
     a: 'No. All products sold by Glow Research are strictly for laboratory and in-vitro research use only. They are not drugs, supplements, foods, or cosmetics. They have not been evaluated or approved by the FDA for any use, and they are not intended to diagnose, treat, cure, or prevent any disease. They are not for human or animal use of any kind.',
   },
   {
-    q: 'Why are Glow Research peptides priced the way they are?',
-    a: 'Our pricing reflects what goes into every lot at the facilities behind it: US-based production held to cGMP-aligned quality practices, and independent third-party lab testing on every lot. Peptides priced well below market are almost always cutting one of those corners, and we would rather hold the standard than the lowest price.',
+    q: 'Is every lot tested by an independent laboratory?',
+    a: 'Yes, and by a laboratory with no stake in the result. Every production lot is analysed before it is released for sale, and the certificate is issued by the laboratory that ran the analysis rather than by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory. Testing is lot-specific, so a certificate covers the exact batch it was issued against and not the compound in general.',
+  },
+  {
+    // Derived from ANALYSIS_LONG rather than restated, so the FAQ cannot end up
+    // describing a third analysis the laboratory never ran. check-claims.js
+    // requires this answer to contain that string verbatim.
+    q: 'What does the testing actually measure?',
+    a: `${ANALYSIS_LONG}. Those answer two different questions and neither one covers for the other. Purity is what proportion of the material is the target peptide rather than truncated sequences, residual reagent or salt. Identity is whether the peptide in the vial is the sequence you ordered at all. A single number with no method beside it tells you neither, which is why the certificate reports the method, the result and the lot together.`,
+  },
+  {
+    // Question and answer are both built from ANALYSIS_NOT_RUN. Saying "no" by
+    // name is worth more than staying quiet: the reader who came here already
+    // had the question, and an unanswered one gets answered optimistically.
+    q: `Do you test for ${joinWords(ANALYSIS_NOT_RUN, 'or')}?`,
+    a: `No. Neither is run on these lots, and we would rather say so than let the silence read as a pass. They are also not the same test and one does not imply the other: an endotoxin result says nothing about whether a vial is sterile, and a sterile vial can still carry endotoxin. What is run is ${lowerFirst(ANALYSIS_LONG)}, and that is the whole list. These are lyophilized powders supplied for laboratory and in-vitro research, not sterile preparations, and nothing on this site clears them for use in or on a living subject.`,
   },
   {
     // Answer comes from COA_COPY, which keys off COAS_PUBLISHED. While
@@ -381,6 +430,22 @@ const FAQS = [
     id: 'faqCoa',
     q: 'Where do I find a lot\u2019s COA?',
     a: COA_COPY.faq,
+  },
+  {
+    q: 'How do I know a certificate is genuine?',
+    a: 'Check it against the laboratory, not against us. A certificate names the laboratory that performed the analysis, carries that laboratory\u2019s own report reference and the date the analysis was run, and is issued against one lot number. Match that lot number to the one printed on your vial, then take the report reference to the issuing laboratory if you want it confirmed at source. We do not issue certificates, and that is the part that makes them worth checking: a document we could produce on our own would prove nothing.',
+  },
+  {
+    q: 'Where is the lot number on my vial?',
+    a: 'Printed on the vial label. It is the number the certificate for that batch is issued against, so it is what you quote when you ask us for the certificate, and what you match the certificate against once you have it. If the label is obscured or you are not sure which field you are reading, email support@glowresearch.shop with your order number and we will tell you which lot shipped against that order.',
+  },
+  {
+    q: 'How recent are the laboratory results?',
+    a: 'As recent as the lot. Each production lot is analysed before it is released, and the certificate carries the date that analysis was performed, so the result belongs to the material in your vial rather than to an earlier run of the same compound. We do not quote a rolling window such as tested within the last twelve months, because a window describes the paperwork rather than the vial. A lot that has not been retested since it was made is not a gap, provided the certificate you are holding is the one issued for it.',
+  },
+  {
+    q: 'Why are Glow Research peptides priced the way they are?',
+    a: 'Our pricing reflects what goes into every lot at the facilities behind it: US-based production held to cGMP-aligned quality practices, and independent third-party lab testing on every lot. Peptides priced well below market are almost always cutting one of those corners, and we would rather hold the standard than the lowest price.',
   },
   {
     // The cutoff is read, not typed. It is stated in four other places and
@@ -393,6 +458,20 @@ const FAQS = [
     a: 'No. Orders are shipped within the United States only, to verified research institutions and qualified buyers.',
   },
 ];
+
+// "endotoxin, sterility" as "endotoxin or sterility". Small, but it keeps the
+// question above readable while still being generated from the array, which is
+// what stops the two from disagreeing about how many tests we skip.
+function joinWords(list, conj) {
+  if (list.length < 2) return list[0] || '';
+  return `${list.slice(0, -1).join(', ')} ${conj} ${list[list.length - 1]}`;
+}
+
+// ANALYSIS_LONG starts a sentence in most of its uses and is capitalised for
+// that. Mid-sentence it is not, and the acronym has to survive the change.
+function lowerFirst(s) {
+  return /^[A-Z]{2,}/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1);
+}
 
 // One renderer for the browser and the build, so the served markup and the
 // behaviour attached to it can never describe different questions.
@@ -836,6 +915,7 @@ if (typeof module !== 'undefined' && module.exports) {
     TRANSIT_DAYS,
     ANALYSIS_SHORT,
     ANALYSIS_LONG,
+    ANALYSIS_NOT_RUN,
     SOURCE_SHORT,
     SOURCE_LONG,
     identityLine,

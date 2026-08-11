@@ -26,7 +26,7 @@ const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, CUTOFF_LABEL, CUTOFF_LABEL_SHORT,
-  ANALYSIS_SHORT, ANALYSIS_LONG, SOURCE_LONG, evidenceRows, evidenceHtml,
+  ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG, evidenceRows, evidenceHtml,
   identityLine, FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
 } = require(path.join(ROOT, 'js/products-data.js'));
@@ -643,10 +643,15 @@ console.log('\nlocation');
 
 /* ---------------------------------------------------------------------------
  * 7c. The homepage FAQ. It is generated from FAQS by tools/build-faq.js into
- *     both the markup and a FAQPage block, which means two copies of the same
- *     five answers in a file nobody rebuilds by habit. Same contract as the
- *     evidence panel: the served page has to equal what the code renders, and
- *     when it does not, this prints the markup to paste.
+ *     both the markup and a FAQPage block, which means two copies of every
+ *     answer in a file nobody rebuilds by habit. Same contract as the evidence
+ *     panel: the served page has to equal what the code renders, and when it
+ *     does not, this prints the markup to paste.
+ *
+ *     The FAQ is also where the verification trail is explained end to end, so
+ *     it is the densest concentration of checkable claims on the site and the
+ *     easiest place for one to go stale. The second block below holds those
+ *     answers to the same data every other surface reads.
  * ------------------------------------------------------------------------- */
 console.log('\nhomepage FAQ');
 {
@@ -694,6 +699,118 @@ console.log('\nhomepage FAQ');
   ok('the certificate answer is the current COA_COPY state',
     served.includes(COA_COPY.faq.replace(/&/g, '&amp;')) || served.includes(COA_COPY.faq),
     'COAS_PUBLISHED changed without running `node tools/build-faq.js`');
+}
+
+console.log('\nwhat the FAQ is allowed to say about testing');
+{
+  const answers = FAQS.map(f => f.a).join('\n');
+  const questions = FAQS.map(f => f.q).join('\n');
+
+  // The answer that explains the analysis is built from ANALYSIS_LONG, so it
+  // cannot describe an instrument the evidence panel and process.html do not.
+  // It has to lead with it, not merely contain it somewhere: a later answer
+  // quotes the same constant, and matching anywhere in the FAQ would let this
+  // one be retyped while the check still passed on the other one's copy.
+  ok('the FAQ explains the analysis in the catalog’s own words',
+    FAQS.some(f => f.a.startsWith(ANALYSIS_LONG)),
+    `no answer opens with "${ANALYSIS_LONG}"`);
+
+  // And no answer may name an instrument ANALYSIS_LONG does not. "LC-MS" reads
+  // like shorthand for the same two runs and is a different measurement; the
+  // rest are analyses a peptide COA can carry that these lots are not given.
+  const methods = ['hplc', 'uplc', 'lc-ms', 'gc-ms', 'nmr', 'mass spectrometry',
+    'lal', 'karl fischer', 'amino acid analysis', 'elemental analysis'];
+  const backing = `${ANALYSIS_SHORT} ${ANALYSIS_LONG}`.toLowerCase();
+  const invented = methods.filter(m =>
+    answers.toLowerCase().includes(m) && !backing.includes(m));
+  ok('the FAQ names no analysis the laboratory does not run',
+    invented.length === 0, `unbacked: ${invented.join(', ')}`);
+
+  // The denial and the claim are two halves of one statement. If a test moves
+  // from "not run" to "run", ANALYSIS_LONG grows and this fails until the array
+  // is updated, which is the only way "we do not test for X" stops being said
+  // on the same page that says we do.
+  const contradicted = ANALYSIS_NOT_RUN.filter(t =>
+    `${ANALYSIS_SHORT} ${ANALYSIS_LONG}`.toLowerCase().includes(t.toLowerCase()));
+  ok('nothing is listed as both run and not run',
+    contradicted.length === 0,
+    `${contradicted.join(', ')} appears in what we say is tested. ` +
+    'Remove it from ANALYSIS_NOT_RUN in js/products-data.js.');
+
+  const unnamed = ANALYSIS_NOT_RUN.filter(t =>
+    !questions.toLowerCase().includes(t.toLowerCase()));
+  ok('every test we skip is named in the question, not left to be inferred',
+    unnamed.length === 0, `not asked about: ${unnamed.join(', ')}`);
+
+  // That answer explains why an endotoxin result and a sterility result do not
+  // substitute for each other. It is written about those two specifically, so
+  // it stops being accurate if the pair it describes changes.
+  const pairing = /endotoxin result says nothing about whether a vial is sterile/i;
+  ok('the endotoxin and sterility answer still describes the pair it names',
+    !pairing.test(answers) ||
+      (ANALYSIS_NOT_RUN.includes('endotoxin') && ANALYSIS_NOT_RUN.includes('sterility')),
+    'the answer distinguishes endotoxin from sterility but ANALYSIS_NOT_RUN no longer lists both');
+
+  // No page may claim we run one of them. The FAQ asks the question and answers
+  // no, and the COA blog post explains what an endotoxin line means on someone
+  // else's certificate, which are both fine; a first-person claim is not.
+  const claims = /\b(?:we|glow)\b[^.]{0,80}?\b(?:tests?|tested|testing|screens?|screened|assays?|assayed)\b[^.]{0,80}?\b(?:endotoxin|sterilit)/i;
+  const claiming = pages.filter(f => claims.test(read(f)));
+  ok('no page claims a test that is not run', claiming.length === 0,
+    claiming.join(', '));
+
+  // The correction that matters most on an RUO catalog: a figure quoted in an
+  // FAQ is read as a standard every lot meets, not as one lot's measurement.
+  // "Research grade means 98%+" and "endotoxin below 0.25 EU/mL" are promises
+  // about material nobody has run yet. The certificate carries the numbers and
+  // the FAQ says where to find it. Purity in this catalog is still placeholder
+  // besides, so an FAQ quoting one would be quoting a stand-in.
+  const withPct = FAQS.filter(f => /\d\s*%/.test(f.a));
+  ok('no answer states a purity figure', withPct.length === 0,
+    withPct.map(f => f.q).join(' | '));
+  const withUnits = FAQS.filter(f => /\bEU\s*\/\s*m[lg]\b/i.test(f.a));
+  ok('no answer states an endotoxin limit', withUnits.length === 0,
+    withUnits.map(f => f.q).join(' | '));
+}
+
+/* ---------------------------------------------------------------------------
+ * 7c-ii. COA_COPY has two branches and one is always unreachable. A key added
+ *        to the published half and forgotten on the held half reads as
+ *        "undefined" on the day the flag flips, which is the worst possible
+ *        day to find out. Both halves are parsed out of the source and held to
+ *        the same key set, and every COA_COPY.<key> the codebase reads has to
+ *        be in it.
+ * ------------------------------------------------------------------------- */
+console.log('\ncertificate copy');
+{
+  const src = read('js/products-data.js');
+  const block = src.match(/const COA_COPY = COAS_PUBLISHED \? \{([\s\S]*?)\n\} : \{([\s\S]*?)\n\};/);
+  ok('both branches of COA_COPY are readable', block !== null,
+    'the declaration in js/products-data.js no longer matches the pattern in this check');
+
+  if (block) {
+    const keys = s => (s.match(/^\s{2}(\w+):/gm) || []).map(k => k.trim().replace(':', ''));
+    const published = keys(block[1]);
+    const held = keys(block[2]);
+
+    const onlyPublished = published.filter(k => !held.includes(k));
+    const onlyHeld = held.filter(k => !published.includes(k));
+    ok('the two branches define the same keys',
+      onlyPublished.length === 0 && onlyHeld.length === 0,
+      [onlyPublished.length && `only in the published branch: ${onlyPublished.join(', ')}`,
+       onlyHeld.length && `only in the held branch: ${onlyHeld.join(', ')}`]
+        .filter(Boolean).join('; '));
+
+    const wanted = [...new Set(
+      pages.concat(['js/products-data.js', 'js/script.js', 'js/product.js', 'js/cart.js',
+                    'js/account.js', 'tools/build-llms.js'])
+        .flatMap(f => (read(f).match(/COA_COPY\.(\w+)/g) || []))
+        .map(m => m.split('.')[1])
+    )];
+    const missing = wanted.filter(k => !published.includes(k) || !held.includes(k));
+    ok(`all ${wanted.length} keys the site reads exist in both branches`,
+      missing.length === 0, `undefined in one or both branches: ${missing.join(', ')}`);
+  }
 }
 
 /* ---------------------------------------------------------------------------
