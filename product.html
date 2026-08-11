@@ -278,16 +278,22 @@
 
   /* the vials themselves — overlapped so three still fit a narrow card */
   .pd-tier-vials{
-    display:flex; align-items:flex-end; justify-content:center;
+    display:flex; align-items:center; justify-content:center;
     height: 86px; margin-bottom: 10px;
   }
+  /* Sized by width, not height. A real product photo is a square frame with
+     its own margin baked in (the vial inside is nowhere near 1254x1254), so
+     height:100% scaled it to the container's full height and, on a square
+     image, its full width too — three of those is wider than the card. A
+     fixed width keeps it inside the box no matter what shape the source photo
+     is, at the cost of not filling the row's height on a narrower vial. */
   .pd-tier-vials img{
-    height:100%; width:auto; object-fit:contain; mix-blend-mode: multiply;
+    width: 58px; height:86px; object-fit:contain; mix-blend-mode: multiply;
   }
   .pd-tier-vials .vial{ width:22px; height:44px; box-shadow:none; }
   /* photos carry their own whitespace, so they overlap; the drawn vial is a
      bare 22px shape and would merge into one block, so it gets a real gap */
-  .pd-tier-vials img + img{ margin-left:-10px; }
+  .pd-tier-vials img + img{ margin-left:-16px; }
   .pd-tier-vials .vial + .vial{ margin-left:4px; }
 
   /* The vial count is the heading of the card, so it is set like one rather
@@ -486,10 +492,11 @@
     .gs-grid{ grid-template-columns: 1fr; }
     .gs-cell{ padding: 20px 20px 22px; }
     .pd-add{ width:100%; flex-basis:100%; }
-    /* three vials in a ~83px card: at the desktop size the strip needs 118px
-       and spills out the side, so it scales down and overlaps harder */
+    /* three vials in a narrower card: scale the fixed width down too, or the
+       desktop size (58px x 3, overlapped) still overruns a ~110px interior. */
     .pd-tier-vials{ height: 54px; margin-bottom: 8px; }
-    .pd-tier-vials img + img{ margin-left:-14px; }
+    .pd-tier-vials img{ width: 38px; height:54px; }
+    .pd-tier-vials img + img{ margin-left:-12px; }
   }
 </style>
 <script type="application/ld+json">
