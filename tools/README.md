@@ -50,6 +50,12 @@ It currently checks that:
   "cGMP-aligned" hedge on the manufacturing claim, every row still carries the
   note that qualifies it, and no page anywhere prints a lot number the catalog
   does not hold
+- no listing copy names an outcome where it should name a mechanism. Pathways,
+  receptors, binding behaviour and assays are things a laboratory measures;
+  healing, recovery, improvement, treatment and dosing are things a product is
+  being sold to deliver, and every one of these sentences sits beside an Add to
+  cart button. Covers `blurb`, `about[]` and `research[]`, and caps the blurb at
+  the two lines the buy box has room for
 - no page promises a certificate while `COAS_PUBLISHED` is false
 - no fabricated ratings or reviews appear in structured data
 - every product carries every field the site reads, so a lossy supplier import

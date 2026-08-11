@@ -2,9 +2,22 @@
 // Used by both the homepage catalog preview (index.html) and the full
 // catalog page (peptides.html) so the product list only lives in one place.
 
-// `blurb` describes what each compound *is* and how it is studied. It must stay
-// structural and in-vitro framed: no dosing, no human outcome claims, nothing
-// that would read as therapeutic guidance on a research-use-only listing.
+// `blurb` describes what each compound *is* and how it is studied, in two short
+// sentences. It must stay structural and in-vitro framed: no dosing, no human
+// outcome claims, nothing that would read as therapeutic guidance on a
+// research-use-only listing.
+//
+// The distinction that matters, and the one check-claims.js now enforces rather
+// than trusting this comment: name the *mechanism*, never the *outcome*.
+// "angiogenic signalling" is a pathway a laboratory measures. "tissue repair" is
+// a benefit, and on a page with a Add to cart button a regulator reads it as a
+// claim that this product delivers one. Receptors, pathways, assays and binding
+// behaviour are safe ground. Healing, recovery, improvement and treatment are
+// not, however carefully the sentence around them is framed.
+//
+// It is also the one line under the product name in the buy box and the
+// `description` in each generated page's Product schema, so it is short by
+// requirement, not by taste: two lines is the budget.
 //
 // `sizes` is the mg picker on the product page, cheapest first. The first entry
 // is the one the catalog grid, search and quick-add all quote, so it doubles as
@@ -92,7 +105,7 @@ const COA_COPY = COAS_PUBLISHED ? {
 const GLOW_PRODUCTS = [
   { name: 'BPC-157', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', badge:'Best Seller',
     sizes: [{ mg: '5mg', price: 59 }, { mg: '10mg', price: 99 }],
-    blurb: 'A synthetic pentadecapeptide sequence derived from a protein found in gastric juice. Used in laboratory work examining tissue repair and angiogenic signalling pathways.',
+    blurb: 'A synthetic pentadecapeptide derived from a protein found in gastric juice. Studied in vitro for angiogenic signalling.',
     about: [
       'BPC-157 is a synthetic pentadecapeptide: a fifteen amino acid sequence corresponding to a partial fragment of body protection compound, a protein identified in gastric juice. It is supplied lyophilized.',
       'The sequence is notable in laboratory work for holding up in aqueous and acidic conditions, which is part of why it appears so often in in-vitro and preclinical model systems.'
@@ -104,7 +117,7 @@ const GLOW_PRODUCTS = [
     ] },
   { name: 'TB-500', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.6%', badge:null,
     sizes: [{ mg: '5mg', price: 64 }, { mg: '10mg', price: 109 }],
-    blurb: 'A synthetic fragment of thymosin beta-4, the actin-binding regulatory protein. Studied in vitro for cell migration and cytoskeletal dynamics.',
+    blurb: 'A synthetic fragment of thymosin beta-4, the actin-binding protein. Studied in vitro for cytoskeletal dynamics.',
     about: [
       'TB-500 is a synthetic peptide corresponding to the actin-binding region of thymosin beta-4, a regulatory protein present in most mammalian cells. It is that fragment, not the whole protein.',
       'Because the sequence carries the actin-binding motif, it is used as a tool for probing cytoskeletal behaviour rather than as a stand-in for the full protein.'
@@ -116,7 +129,7 @@ const GLOW_PRODUCTS = [
     ] },
   { name: 'Ipamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.9%', badge:'Popular',
     sizes: [{ mg: '5mg', price: 54 }, { mg: '10mg', price: 92 }],
-    blurb: 'A selective pentapeptide growth hormone secretagogue. Investigated in research settings for its binding behaviour at the ghrelin receptor.',
+    blurb: 'A selective pentapeptide growth hormone secretagogue. Studied for its binding behaviour at the ghrelin receptor.',
     about: [
       'Ipamorelin is a synthetic pentapeptide and a selective agonist at the growth hormone secretagogue receptor, GHS-R1a, the receptor the endogenous ligand ghrelin acts on.',
       'Its value in research is selectivity. In preclinical models it drives growth hormone release with comparatively little effect on ACTH, cortisol or prolactin, which makes it a cleaner probe of the pathway than earlier secretagogues.'
@@ -128,7 +141,7 @@ const GLOW_PRODUCTS = [
     ] },
   { name: 'CJC-1295', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.7%', badge:null,
     sizes: [{ mg: '5mg', price: 69 }, { mg: '10mg', price: 118 }],
-    blurb: 'A synthetic analogue of growth hormone releasing hormone. Used in receptor binding and pulsatile signalling studies.',
+    blurb: 'A synthetic analogue of growth hormone releasing hormone. Used in receptor binding and signalling studies.',
     about: [
       'CJC-1295 is a synthetic analogue of growth hormone releasing hormone, built on the first 29 amino acids of GHRH with substitutions that resist enzymatic breakdown.',
       'This is the form without drug affinity complex. It clears considerably faster than the DAC version, which matters when timing is part of the experimental design.'
@@ -140,7 +153,7 @@ const GLOW_PRODUCTS = [
     ] },
   { name: 'Semaglutide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.5%', badge:'Trending',
     sizes: [{ mg: '5mg', price: 89 }, { mg: '10mg', price: 152 }],
-    blurb: 'A GLP-1 receptor agonist analogue supplied for laboratory investigation of incretin receptor signalling and metabolic pathway research.',
+    blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
     about: [
       'Semaglutide is a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
       'Those two modifications are why it behaves so differently from native GLP-1 across a time course, and usually why it is the chosen comparator.'
@@ -165,7 +178,7 @@ const GLOW_PRODUCTS = [
     ] },
   { name: 'Selank', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.6%', badge:null,
     sizes: [{ mg: '5mg', price: 58 }, { mg: '10mg', price: 99 }],
-    blurb: 'A synthetic heptapeptide based on the endogenous tetrapeptide tuftsin. Studied in preclinical models of neuropeptide regulation.',
+    blurb: 'A synthetic heptapeptide based on the tetrapeptide tuftsin. Studied in preclinical models of neuropeptide regulation.',
     about: [
       'Selank is a synthetic heptapeptide: the endogenous tetrapeptide tuftsin extended with a Pro-Gly-Pro sequence that slows enzymatic degradation.',
       'That tail is the reason it is usable as a research tool at all, since unmodified tuftsin is cleared far too quickly to work with.'
@@ -177,7 +190,7 @@ const GLOW_PRODUCTS = [
     ] },
   { name: 'Semax', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.7%', badge:'New',
     sizes: [{ mg: '5mg', price: 58 }, { mg: '10mg', price: 99 }],
-    blurb: 'A synthetic peptide derived from the ACTH(4-10) fragment. Investigated in laboratory research on neurotrophic signalling.',
+    blurb: 'A synthetic peptide derived from the ACTH(4-10) fragment. Investigated in research on neurotrophic signalling.',
     about: [
       'Semax is a synthetic peptide derived from the ACTH(4-10) fragment, carrying the same Pro-Gly-Pro stabilising extension used in Selank. It has no corticotropic activity of its own.',
       'That separation is the point: it lets the fragment be studied without the hormonal activity of the full ACTH molecule.'
@@ -189,7 +202,7 @@ const GLOW_PRODUCTS = [
     ] },
   { name: 'GHK-Cu', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', badge:null,
     sizes: [{ mg: '50mg', price: 74 }, { mg: '100mg', price: 126 }],
-    blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for its role in extracellular matrix remodelling.',
+    blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
     about: [
       'GHK-Cu is the tripeptide glycyl-L-histidyl-L-lysine complexed with copper(II). The tripeptide occurs naturally in plasma and binds copper with high affinity, and it is the complex rather than the bare peptide that most research uses.',
       'It ships as the copper complex, which is blue. That colour is a useful handling cue: it tells you the copper is still coordinated.'

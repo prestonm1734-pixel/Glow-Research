@@ -326,6 +326,64 @@ console.log('\nthe Glow Standard panel');
 }
 
 /* ---------------------------------------------------------------------------
+ * 3e. Listing copy. Everything the catalog says about a compound has to
+ *     describe the molecule and the laboratory work, never a result someone
+ *     might get from it. The rule was written at the head of products-data.js
+ *     and enforced by nobody, which is the exact shape of failure this file
+ *     exists for: BPC-157's blurb said "used in laboratory work examining
+ *     tissue repair", and no amount of "used in laboratory work examining"
+ *     around a benefit makes it stop being a benefit.
+ *
+ *     Name the mechanism, never the outcome. A pathway, a receptor, a binding
+ *     behaviour or an assay is a thing a laboratory measures. Healing,
+ *     recovery, improvement, treatment and prevention are things a product is
+ *     being sold to deliver, and this catalog has an Add to cart button
+ *     beside every one of these sentences.
+ * ------------------------------------------------------------------------- */
+console.log('\nlisting copy');
+{
+  const OUTCOME = new RegExp([
+    'heal(s|ing|ed)?', 'repair(s|ing|ed)?', 'recover(y|s|ed|ing)?',
+    'treat(s|ing|ment|ments)?', 'cur(e|es|ing)', 'prevent(s|ing|ion|ative)?',
+    'therap(y|ies|eutic)', 'remed(y|ies)', 'weight loss', 'fat loss',
+    'muscle (growth|gain|mass)', 'anti[- ]?aging', 'rejuvenat\\w*',
+    'boost(s|ing|ed)?', 'enhanc\\w*', 'improv\\w*', 'restor\\w*', 'revers\\w*',
+    'relief', 'benefit(s|ial)?', 'efficacy', 'effective',
+    'dos(e|es|age|ing)', 'mg/kg', 'patient(s)?', 'side[- ]effect(s)?',
+  ].map(w => `\\b${w}\\b`).join('|'), 'gi');
+
+  // The blurb is the line under the product name in the buy box and the
+  // `description` in every generated page's Product schema, so it is read by a
+  // buyer at the moment of deciding and by Google. about[] and research[] are
+  // clean today; checking them too is free and keeps them that way.
+  const bad = [];
+  GLOW_PRODUCTS.forEach(p => {
+    const fields = { blurb: p.blurb };
+    (p.about || []).forEach((t, i) => { fields[`about[${i}]`] = t; });
+    (p.research || []).forEach((a, i) => { fields[`research[${i}]`] = `${a.t} ${a.d}`; });
+    Object.entries(fields).forEach(([k, v]) => {
+      const hits = [...new Set((v.match(OUTCOME) || []).map(h => h.toLowerCase()))];
+      if (hits.length) bad.push(`${p.name}.${k}: "${hits.join('", "')}"`);
+    });
+  });
+  ok('no listing copy names an outcome instead of a mechanism',
+    bad.length === 0, bad.join('\n          '));
+
+  // Two lines under the product name is the budget. Past that the buy box
+  // starts reading like a description and the price gets pushed down the page.
+  const BLURB_MAX = 130;
+  const long = GLOW_PRODUCTS.filter(p => p.blurb.length > BLURB_MAX);
+  ok(`every blurb fits the buy box (${BLURB_MAX} chars)`, long.length === 0,
+    long.map(p => `${p.name} is ${p.blurb.length}`).join(', '));
+
+  // Two sentences: what it is, how it is studied. A blurb that stops after the
+  // first has told a buyer nothing about why we stock it.
+  const oneLiner = GLOW_PRODUCTS.filter(p => (p.blurb.match(/\.\s|\.$/g) || []).length < 2);
+  ok('every blurb says both what it is and how it is studied',
+    oneLiner.length === 0, oneLiner.map(p => p.name).join(', '));
+}
+
+/* ---------------------------------------------------------------------------
  * 4. Certificates. Every batch is third-party tested either way — that claim
  *    stays. What COAS_PUBLISHED gates is whether we say the document is a
  *    click away. While it is false, nothing may imply a hosted certificate.
