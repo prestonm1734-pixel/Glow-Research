@@ -80,9 +80,12 @@ through the CommonJS guard at the foot of it, and lifts the whole of
 `product.html` as its template, so nav, footer, styles and scripts stay in one
 place.
 
-Each page gets its own `<title>`, description, canonical, Open Graph tags, and
-`Product` + `Offer` + `BreadcrumbList` JSON-LD, with the product name, price,
-sizes, description and research notes already in the served markup. The page
+Each page gets its own `<title>`, canonical, Open Graph tags, and
+`Product` + `Offer` + `BreadcrumbList` JSON-LD. The Product schema uses
+`about[0]` (the first paragraph of the compound's description, shown collapsed
+in the About accordion) rather than the catalog's mechanism-only `blurb`. The
+result is a simple above-fold buy box, with full per-compound context available
+below in the collapsed accordions and in the schema for crawlers. The page
 still loads `js/product.js` and hydrates as before; the slug rides on
 `<body data-product-slug>` instead of a query string.
 

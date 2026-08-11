@@ -235,6 +235,13 @@ console.log('\nthe Glow Standard panel');
     /id="pdIdentity"/.test(pd) &&
     /identityLine\(product, s\)/.test(read('js/product.js')) &&
     /identityLine\(p, s\)/.test(read('tools/build-products.js')));
+
+  // The Product schema uses about[0], the first paragraph of the compound's
+  // description, not the catalog's summary blurb. It is a real per-compound
+  // explanation of what the compound is and how it is studied, the full depth
+  // that someone landing from a search engine deserves to see.
+  ok('the Product schema uses the full description, not the summary',
+    /description: p\.about\[0\]/.test(read('tools/build-products.js')));
   ok('the panel is rendered from the catalog, not from its own markup',
     /evidenceHtml\(/.test(read('js/product.js')) &&
     /evidenceHtml\(/.test(read('tools/build-products.js')),
@@ -369,13 +376,15 @@ console.log('\nlisting copy');
   ok('no listing copy names an outcome instead of a mechanism',
     bad.length === 0, bad.join('\n          '));
 
-  // `blurb` is the Product schema description on every generated page. It is
-  // never displayed, which is exactly why it needs checking: nobody would
-  // notice it drifting. A summary that runs long has stopped being a summary,
-  // and Google truncates it anyway.
+  // `blurb` is the catalog's mechanism-only summary, never displayed on the page
+  // or in the schema. It is a five-field source-of-truth check — if the rules
+  // in products-data.js slip, something the audit is supposed to catch gets
+  // softer. So it is length-capped not for display but to keep the rule
+  // observable: a blurb that spirals to four sentences stops being a summary
+  // and starts being a description that happened to not drift from about[0].
   const BLURB_MAX = 130;
   const long = GLOW_PRODUCTS.filter(p => p.blurb.length > BLURB_MAX);
-  ok(`every schema description stays a summary (${BLURB_MAX} chars)`, long.length === 0,
+  ok(`every blurb stays within the summary budget (${BLURB_MAX} chars)`, long.length === 0,
     long.map(p => `${p.name} is ${p.blurb.length}`).join(', '));
 
   // Two sentences: what it is, how it is studied. A blurb that stops after the

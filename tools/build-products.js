@@ -131,7 +131,7 @@ function productJsonLd(p, url) {
     '@type': 'Product',
     '@id': `${url}#product`,
     name: p.name,
-    description: p.blurb,
+    description: p.about[0],
     category: CAT_LABEL[p.cat],
     url,
     brand: { '@type': 'Brand', name: 'Glow Research' },
