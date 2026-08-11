@@ -25,8 +25,8 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
-  avgPurity, BATCHES_TESTED, TRANSIT_DAYS,
-  ANALYSIS_SHORT, ANALYSIS_LONG, SOURCE_LONG, evidenceHtml,
+  avgPurity, BATCHES_TESTED, TRANSIT_DAYS, CUTOFF_LABEL, CUTOFF_LABEL_SHORT,
+  ANALYSIS_SHORT, ANALYSIS_LONG, SOURCE_LONG, evidenceRows, evidenceHtml,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -104,9 +104,15 @@ console.log('\ndispatch cutoff');
   });
   ok(`every stated cutoff is ${stated} PST`, wrong.length === 0, wrong.join(', '));
 
-  // The words a customer reads are built from the hour, not typed beside it.
-  ok('the cutoff wording is derived from the hour',
-    /const CUTOFF_LABEL\s*=\s*\n?\s*`\$\{CUTOFF_HOUR/.test(read('js/products-data.js')));
+  // The words a customer reads are checked against the hour rather than against
+  // the source that builds them: however the two labels get written, they have
+  // to come out saying the time the code actually enforces.
+  ok(`CUTOFF_LABEL reads "${CUTOFF_LABEL}"`,
+    CUTOFF_LABEL === `${h12}:00 ${meridiem} PST`,
+    `expected "${h12}:00 ${meridiem} PST"`);
+  ok(`CUTOFF_LABEL_SHORT reads "${CUTOFF_LABEL_SHORT}"`,
+    CUTOFF_LABEL_SHORT === `${h12} ${meridiem} PST`,
+    `expected "${h12} ${meridiem} PST"`);
   ok('the product page reads the shared cutoff, not its own copy',
     !/const CUTOFF_HOUR/.test(read('js/product.js')) && /CUTOFF_HOUR/.test(read('js/product.js')));
 
@@ -245,12 +251,14 @@ console.log('\nthe Glow Standard panel');
     'product.html has drifted from evidenceHtml(). Replace the contents of\n' +
     '          <dl id="pdEvidence"> with:\n' + evidenceHtml({}));
 
-  // The panel says "HPLC · Mass spec" in four words. process.html says it in a
-  // sentence. The short form must not name an analysis the long one does not.
+  // The Verify row names the analyses in three words. process.html names them
+  // in a sentence. The short form must not name one the long one does not:
+  // "LC-MS" is a different instrument from "HPLC, and separately mass
+  // spectrometry", and a data cell is where that substitution goes unnoticed.
   ok('the process page states the analysis the panel summarises',
     read('process.html').includes(ANALYSIS_LONG),
     `process.html does not contain "${ANALYSIS_LONG}"`);
-  const named = ANALYSIS_SHORT.split('·').map(s => s.trim().toLowerCase());
+  const named = ANALYSIS_SHORT.split(/[+·,]/).map(s => s.trim().toLowerCase());
   const unbacked = named.filter(m => !ANALYSIS_LONG.toLowerCase().includes(m));
   ok('the panel names no analysis the laboratory does not run',
     unbacked.length === 0, `unbacked: ${unbacked.join(', ')}`);
@@ -264,6 +272,25 @@ console.log('\nthe Glow Standard panel');
     /\bGMP[\s-]?(certified|approved|compliant)\b/i.test(read(f)));
   ok('no page upgrades that to a GMP certification', overclaims.length === 0,
     overclaims.join(', '));
+
+  // "Lot-matched batch documentation" is true of how the business runs, and it
+  // is silent on the question a buyer is actually asking: can I have it. While
+  // certificates are held, only the note answers that, so the note is the part
+  // that must not go missing. A four-row panel is exactly where a sub-line gets
+  // deleted for looking untidy.
+  const rows = evidenceRows({});
+  const doc = rows.find(r => r.key === 'document');
+  ok('the panel has a document row', Boolean(doc));
+  if (!COAS_PUBLISHED) {
+    ok('the document row says how to actually get the certificate',
+      Boolean(doc) && /on request/i.test(doc.note) && /support@glowresearch\.shop/.test(doc.note),
+      `note reads: "${doc && doc.note}"`);
+    ok('and offers no link, because there is nothing to open',
+      Boolean(doc) && !doc.link);
+  }
+  ok('every row carries a note',
+    rows.every(r => r.note && r.note.trim().length > 0),
+    rows.filter(r => !r.note).map(r => r.key).join(', '));
 
   // A lot number is the one value on the panel a reader can check against the
   // vial in their hand, which makes an invented one the worst thing the page

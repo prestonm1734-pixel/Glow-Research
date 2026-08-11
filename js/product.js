@@ -220,7 +220,7 @@
     // the same test renderCoa() uses. No href, no link: a row that says "view
     // report" and does nothing is the uncertainty this panel exists to remove.
     const href = p.coa || (typeof COA_URL === 'string' ? COA_URL : '');
-    const cell = grid.querySelector('[data-row="analysis"] dd');
+    const cell = grid.querySelector('[data-row="document"] dd');
     if (href && COA_COPY.panelLink && cell) {
       const a = document.createElement('a');
       a.className = 'gs-report';
@@ -248,9 +248,8 @@
   }
 
   /* ================= description & research =================
-     A real tablist: arrow keys move between tabs, Home/End jump to the
-     ends, and only the selected tab is in the tab order, so a keyboard
-     user tabs past the control rather than through every tab in it. */
+     The accordions themselves are native <details> and need no script. This
+     only fills them, and names each one after the compound. */
 
   function renderInfo(p) {
     const about = $('pdAbout');
@@ -262,56 +261,6 @@
     about.innerHTML = (p.about || []).map(t => `<p>${t}</p>`).join('');
     research.innerHTML = (p.research || []).map(a =>
       `<div class="pd-area"><h3>${a.t}</h3><p>${a.d}</p></div>`).join('');
-  }
-
-  function wireTabs() {
-    // Read from the DOM rather than from a list of ids: adding a tab is then a
-    // markup change, and the control cannot end up wired to two of three.
-    const tabs = [...document.querySelectorAll('.pd-tabs .pd-tab')];
-    const panels = tabs.map(t => document.getElementById(t.getAttribute('aria-controls')));
-    const ink = $('pdTabInk');
-    if (!tabs.length || panels.some(p => !p) || !ink) return;
-
-    function moveInk(tab) {
-      ink.style.width = tab.offsetWidth + 'px';
-      ink.style.transform = `translateX(${tab.offsetLeft}px)`;
-    }
-
-    function select(i, focus) {
-      tabs.forEach((t, n) => {
-        const on = n === i;
-        t.classList.toggle('is-on', on);
-        t.setAttribute('aria-selected', on ? 'true' : 'false');
-        // only the selected tab stays tabbable, per the tablist pattern
-        t.tabIndex = on ? 0 : -1;
-        panels[n].hidden = !on;
-      });
-      moveInk(tabs[i]);
-      if (focus) tabs[i].focus();
-    }
-
-    tabs.forEach((tab, i) => {
-      tab.addEventListener('click', () => select(i));
-      tab.addEventListener('keydown', e => {
-        const last = tabs.length - 1;
-        let next = null;
-        if (e.key === 'ArrowRight') next = i === last ? 0 : i + 1;
-        else if (e.key === 'ArrowLeft') next = i === 0 ? last : i - 1;
-        else if (e.key === 'Home') next = 0;
-        else if (e.key === 'End') next = last;
-        if (next === null) return;
-        e.preventDefault();
-        select(next, true);
-      });
-    });
-
-    select(0);
-    // the bar is positioned in pixels, so it has to be re-measured when the
-    // tabs reflow or when the webfont finally swaps in and changes their width
-    addEventListener('resize', () => moveInk(tabs.find(t => t.classList.contains('is-on'))));
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(() => moveInk(tabs.find(t => t.classList.contains('is-on'))));
-    }
   }
 
   /* ================= mg picker ================= */
@@ -480,15 +429,21 @@
   // renderProductGrid marks every card ".reveal", which starts at opacity:0 and
   // waits for a scroll observer. This page has no scroll animations, so the
   // cards are shown outright instead.
+  // The row is "more from Glow", not "more in this category", so it draws from
+  // the whole catalog with siblings floated to the front. Filtering to the
+  // category strictly meant a compound in a thin one got a single lonely card
+  // under a heading promising the shop.
   function renderRelated(p) {
     const grid = $('pdRelatedGrid');
-    const pool = GLOW_PRODUCTS.filter(x => x.cat === p.cat && x.name !== p.name);
-    if (!pool.length) { $('pdRelatedSection').hidden = true; return; }
+    // Only the grid goes if there is somehow nothing to show. The section stays,
+    // because its "view the full catalog" link is the more useful of the two.
+    if (GLOW_PRODUCTS.length < 2) { grid.hidden = true; return; }
 
-    renderProductGrid(grid, p.cat, { limit: 5, observeReveal: el => el.classList.add('in') });
-    // renderProductGrid doesn't know to exclude the product we're already on
-    grid.querySelectorAll('.product-card').forEach(card => {
-      if (card.querySelector('h3').textContent === p.name) card.remove();
+    renderProductGrid(grid, 'all', {
+      limit: 4,
+      prefer: p.cat,
+      exclude: p.name,
+      observeReveal: el => el.classList.add('in'),
     });
   }
 
@@ -508,7 +463,6 @@
     renderEvidence(product);
     renderInfo(product);
     renderDoc(product);
-    wireTabs();
     renderSizes(product);
     renderSelection();
     wireBuy();

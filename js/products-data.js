@@ -21,7 +21,7 @@
 // It is what "View certificate of analysis" on the product page opens. A
 // product without one falls back to COA_URL below.
 //
-// `about` and `research` fill the tabs under the buy box. Same rule as
+// `about` and `research` fill the accordions under the buy box. Same rule as
 // `blurb`: composition and what laboratory work examines, never dosing,
 // outcomes, or a finding we cannot stand behind.
 
@@ -262,9 +262,13 @@ const BATCHES_TESTED = 150;
 // customer reads cannot come apart. check-claims.js pins every "<n> AM|PM PST"
 // on the site, and in the scripts that render copy, to CUTOFF_HOUR.
 const CUTOFF_HOUR = 14;
-const CUTOFF_LABEL =
-  `${CUTOFF_HOUR > 12 ? CUTOFF_HOUR - 12 : CUTOFF_HOUR}:00 ` +
-  `${CUTOFF_HOUR >= 12 ? 'PM' : 'AM'} PST`;
+const CUTOFF_H12 = CUTOFF_HOUR > 12 ? CUTOFF_HOUR - 12 : CUTOFF_HOUR;
+const CUTOFF_MERIDIEM = CUTOFF_HOUR >= 12 ? 'PM' : 'AM';
+const CUTOFF_LABEL = `${CUTOFF_H12}:00 ${CUTOFF_MERIDIEM} PST`;
+// The same time without the minutes, for the evidence panel, where the row is
+// three words and ":00" is noise. Derived from the same hour, so there is still
+// only one number to change.
+const CUTOFF_LABEL_SHORT = `${CUTOFF_H12} ${CUTOFF_MERIDIEM} PST`;
 
 // FedEx transit, in business days. Quoted by the delivery estimate on the
 // product page and by the dispatch row of the evidence panel. check-claims.js
@@ -278,7 +282,7 @@ const TRANSIT_DAYS = 2;
 // so the short form cannot quietly grow a third analysis the laboratory never
 // ran or drop the regulatory hedge on the manufacturing claim. check-claims.js
 // pins both long forms to the prose they summarise.
-const ANALYSIS_SHORT = 'HPLC · Mass spec';
+const ANALYSIS_SHORT = 'HPLC + mass spectrometry';
 const ANALYSIS_LONG = 'HPLC for purity, mass spectrometry for identity';
 const SOURCE_SHORT = 'U.S. manufacturing partner';
 const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices';
@@ -301,27 +305,22 @@ const analysedOn = iso => new Intl.DateTimeFormat('en-US', {
   timeZone: 'UTC', month: 'long', day: 'numeric', year: 'numeric',
 }).format(new Date(iso + 'T12:00:00Z'));
 
-// The evidence panel, as data. Each row is a label, the fact, and the sentence
-// that makes the fact checkable. `key` identifies the one row that cannot be
-// answered ahead of time: dispatch depends on the clock, so js/product.js
+// The evidence panel, as data: the four steps of the chain of custody, in the
+// order they happen. Each row is a label, the fact, and the sentence that makes
+// the fact checkable.
+//
+// The note is not decoration. "Lot-matched batch documentation" is true of how
+// the business runs and says nothing about whether this site will hand you the
+// document, which is the question a buyer is actually asking. The note is where
+// that gets answered, and it is the reason a row can state the operation
+// plainly without the page overpromising. Drop the notes and every row becomes
+// an adjective again.
+//
+// `key` identifies the one row that cannot be answered ahead of time: dispatch
+// depends on the clock and on whether this size is sellable, so js/product.js
 // rewrites it on load and every minute after.
 function evidenceRows(p) {
   return [
-    {
-      key: 'lot',
-      label: 'Current lot',
-      value: p.lot || '—',
-      note: p.lot
-        ? `Analysed ${analysedOn(p.tested)} by an independent laboratory`
-        : 'Assigned when your order is picked, and printed on the vial you receive',
-    },
-    {
-      key: 'analysis',
-      label: 'Independent analysis',
-      value: ANALYSIS_SHORT,
-      note: COA_COPY.panelNote,
-      link: COA_COPY.panelLink,
-    },
     {
       key: 'source',
       label: 'Source',
@@ -329,11 +328,24 @@ function evidenceRows(p) {
       note: SOURCE_LONG,
     },
     {
+      key: 'verify',
+      label: 'Verify',
+      value: ANALYSIS_SHORT,
+      note: 'Every lot analysed by a third-party laboratory with no stake in the result',
+    },
+    {
+      key: 'document',
+      label: 'Document',
+      value: 'Lot-matched batch documentation',
+      note: COA_COPY.panelNote,
+      link: COA_COPY.panelLink,
+    },
+    {
       // The standing rule, which is true at any hour. It is what a crawler
       // reads and what shows before scripts run; the live answer replaces it.
       key: 'dispatch',
       label: 'Dispatch',
-      value: `Same day before ${CUTOFF_LABEL}`,
+      value: `Same-business-day before ${CUTOFF_LABEL_SHORT}`,
       note: `FedEx ${TRANSIT_DAYS}-Day service, Monday to Friday`,
     },
   ];
@@ -502,10 +514,22 @@ function productThumb(name) {
 //   order in GLOW_PRODUCTS alone, which is what the homepage preview wants —
 //   its limit:8 slice is meant to be the featured eight, not the first eight
 //   alphabetically.
+// opts.exclude: a product name to leave out. The product page uses it so its
+//   own compound cannot appear in its own "more from Glow" row.
+// opts.prefer: a category key to float to the front without filtering the rest
+//   away. The product page wants siblings first but would rather show four
+//   cards from the wider catalog than one lonely card from a thin category.
 function renderProductGrid(gridEl, filter, opts) {
   opts = opts || {};
   gridEl.innerHTML = '';
   let list = filter === 'all' ? GLOW_PRODUCTS : GLOW_PRODUCTS.filter(p => p.cat === filter);
+  if (opts.exclude) list = list.filter(p => p.name !== opts.exclude);
+  // slice() first: a stable sort over a copy, so the curated order survives
+  // both here and for every other caller.
+  if (opts.prefer) {
+    list = list.slice().sort((a, b) =>
+      (b.cat === opts.prefer ? 1 : 0) - (a.cat === opts.prefer ? 1 : 0));
+  }
 
   // a category with nothing in it used to render a silently blank grid
   if (!list.length) {
@@ -594,6 +618,7 @@ if (typeof module !== 'undefined' && module.exports) {
     BATCHES_TESTED,
     CUTOFF_HOUR,
     CUTOFF_LABEL,
+    CUTOFF_LABEL_SHORT,
     TRANSIT_DAYS,
     ANALYSIS_SHORT,
     ANALYSIS_LONG,
