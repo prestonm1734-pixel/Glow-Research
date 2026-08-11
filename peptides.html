@@ -8,20 +8,20 @@
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
 <title>Full Catalog | Glow Research</title>
-<meta name="description" content="Browse the full Glow Research peptide catalog: growth, recovery, cognitive, and metabolic research compounds." />
+<meta name="description" content="Browse the full Glow Research peptide catalog: growth, tissue, cognitive, and metabolic research compounds." />
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://glowresearch.shop/peptides.html" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
 <meta property="og:title" content="Full Catalog" />
-<meta property="og:description" content="Browse the full Glow Research peptide catalog: growth, recovery, cognitive, and metabolic research compounds." />
+<meta property="og:description" content="Browse the full Glow Research peptide catalog: growth, tissue, cognitive, and metabolic research compounds." />
 <meta property="og:url" content="https://glowresearch.shop/peptides.html" />
 <meta property="og:image" content="https://glowresearch.shop/assets/vial-trio-black.jpg" />
 <meta property="og:image:width" content="1672" />
 <meta property="og:image:height" content="941" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Full Catalog" />
-<meta name="twitter:description" content="Browse the full Glow Research peptide catalog: growth, recovery, cognitive, and metabolic research compounds." />
+<meta name="twitter:description" content="Browse the full Glow Research peptide catalog: growth, tissue, cognitive, and metabolic research compounds." />
 <meta name="twitter:image" content="https://glowresearch.shop/assets/vial-trio-black.jpg" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -101,7 +101,7 @@
       <div class="filter-row" id="filterRow">
         <button class="chip active" data-filter="all">All</button>
         <button class="chip" data-filter="growth">Growth</button>
-        <button class="chip" data-filter="recovery">Recovery</button>
+        <button class="chip" data-filter="tissue">Tissue</button>
         <button class="chip" data-filter="cognitive">Cognitive</button>
         <button class="chip" data-filter="metabolic">Metabolic</button>
       </div>
@@ -210,7 +210,7 @@
 
   /* ---------- catalog grid + filters ---------- */
   /* category and sort narrow/order the same list rather than resetting each
-     other, so picking "Recovery" keeps whatever sort is selected */
+     other, so picking "Tissue" keeps whatever sort is selected */
   const grid = document.getElementById('productGrid');
   const sortSelect = document.getElementById('sortSelect');
   let activeFilter = 'all';
@@ -235,7 +235,7 @@
 
   sortSelect.addEventListener('change', renderProducts);
 
-  /* honour ?cat=growth|recovery|cognitive|metabolic from footer/nav links */
+  /* honour ?cat=growth|tissue|cognitive|metabolic from footer/nav links */
   const requestedCat = new URLSearchParams(window.location.search).get('cat');
   activeFilter = [...chips].find(c => c.dataset.filter === requestedCat) ? requestedCat : 'all';
   chips.forEach(c => {

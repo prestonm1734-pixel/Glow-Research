@@ -381,6 +381,43 @@ console.log('\nlisting copy');
   const oneLiner = GLOW_PRODUCTS.filter(p => (p.blurb.match(/\.\s|\.$/g) || []).length < 2);
   ok('every blurb says both what it is and how it is studied',
     oneLiner.length === 0, oneLiner.map(p => p.name).join(', '));
+
+  // The same rule applies to the taxonomy, and it is easier to break there:
+  // "Recovery Peptide" sat directly above the product name for a year and read
+  // as a category rather than as the promise it was. A category may name a
+  // research domain (Metabolic, Cognitive, Tissue) or a pharmacological class
+  // (Growth Hormone Secretagogue). It may not name what the buyer gets.
+  const labels = new Set(GLOW_PRODUCTS.flatMap(p => [p.tag, p.cat]));
+  [read('js/product.js'), read('tools/build-products.js')].forEach(src => {
+    const block = src.match(/CAT_LABEL = \{([\s\S]*?)\}/);
+    if (block) for (const m of block[1].matchAll(/'([^']+)'/g)) labels.add(m[1]);
+  });
+  const claimy = [...labels].filter(l => OUTCOME.test(l) && (OUTCOME.lastIndex = 0) === 0);
+  ok('no category or tag names an outcome', claimy.length === 0, claimy.join(', '));
+
+  // CAT_LABEL is written out in both js/product.js and tools/build-products.js,
+  // which is two copies of one mapping. build-products throws on a category
+  // with no label, but nothing noticed if the two spelled the same one
+  // differently, so the breadcrumb could say one thing before hydration and
+  // another after.
+  const catLabels = src => Object.fromEntries(
+    [...(src.match(/CAT_LABEL = \{([\s\S]*?)\};/) || [, ''])[1]
+      .matchAll(/(\w+):\s*'([^']+)'/g)].map(m => [m[1], m[2]]));
+  const runtime = catLabels(read('js/product.js'));
+  const build = catLabels(read('tools/build-products.js'));
+  ok('both CAT_LABEL maps agree',
+    JSON.stringify(runtime) === JSON.stringify(build),
+    `product.js ${JSON.stringify(runtime)}\n          build ${JSON.stringify(build)}`);
+
+  const unlabelled = [...new Set(GLOW_PRODUCTS.map(p => p.cat))].filter(c => !runtime[c]);
+  ok('every category in the catalog has a label', unlabelled.length === 0,
+    unlabelled.join(', '));
+
+  // And a filter chip, or the category exists but cannot be browsed to.
+  const chips = new Set([...read('peptides.html').matchAll(/data-filter="([^"]+)"/g)].map(m => m[1]));
+  const unbrowsable = [...new Set(GLOW_PRODUCTS.map(p => p.cat))].filter(c => !chips.has(c));
+  ok('every category has a filter chip on the catalog page',
+    unbrowsable.length === 0, unbrowsable.join(', '));
 }
 
 /* ---------------------------------------------------------------------------

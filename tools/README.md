@@ -54,8 +54,11 @@ It currently checks that:
   receptors, binding behaviour and assays are things a laboratory measures;
   healing, recovery, improvement, treatment and dosing are things a product is
   being sold to deliver, and every one of these sentences sits beside an Add to
-  cart button. Covers `blurb`, `about[]` and `research[]`, and caps the blurb at
-  the two lines the buy box has room for
+  cart button. Covers `blurb`, `about[]` and `research[]`, the category keys and
+  the tags, and caps the blurb at the two lines the buy box has room for
+- the two copies of `CAT_LABEL` agree, every category in the catalog has a label
+  and a filter chip, so a new category cannot ship unbrowsable or with a
+  breadcrumb that changes wording between the served page and the hydrated one
 - no page promises a certificate while `COAS_PUBLISHED` is false
 - no fabricated ratings or reviews appear in structured data
 - every product carries every field the site reads, so a lossy supplier import

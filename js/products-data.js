@@ -103,7 +103,7 @@ const COA_COPY = COAS_PUBLISHED ? {
 };
 
 const GLOW_PRODUCTS = [
-  { name: 'BPC-157', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', badge:'Best Seller',
+  { name: 'BPC-157', tag: 'Tissue Research', cat: 'tissue', purity: '99.8%', badge:'Best Seller',
     sizes: [{ mg: '5mg', price: 59 }, { mg: '10mg', price: 99 }],
     blurb: 'A synthetic pentadecapeptide derived from a protein found in gastric juice. Studied in vitro for angiogenic signalling.',
     about: [
@@ -115,7 +115,7 @@ const GLOW_PRODUCTS = [
       { t: 'Fibroblast migration', d: 'Used in scratch and outgrowth assays examining how tendon and ligament fibroblasts migrate and organise.' },
       { t: 'Gut epithelial models', d: 'Examined in gastrointestinal tissue models, reflecting the gastric origin of the parent protein.' }
     ] },
-  { name: 'TB-500', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.6%', badge:null,
+  { name: 'TB-500', tag: 'Tissue Research', cat: 'tissue', purity: '99.6%', badge:null,
     sizes: [{ mg: '5mg', price: 64 }, { mg: '10mg', price: 109 }],
     blurb: 'A synthetic fragment of thymosin beta-4, the actin-binding protein. Studied in vitro for cytoskeletal dynamics.',
     about: [
@@ -200,7 +200,7 @@ const GLOW_PRODUCTS = [
       { t: 'Melanocortin-independent activity', d: 'Studied for effects that do not depend on classical melanocortin receptor engagement.' },
       { t: 'Preclinical CNS models', d: 'Applied in laboratory research on neuronal survival and adaptation.' }
     ] },
-  { name: 'GHK-Cu', tag: 'Recovery Peptide', cat: 'recovery', purity: '99.8%', badge:null,
+  { name: 'GHK-Cu', tag: 'Tissue Research', cat: 'tissue', purity: '99.8%', badge:null,
     sizes: [{ mg: '50mg', price: 74 }, { mg: '100mg', price: 126 }],
     blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
     about: [

@@ -15,7 +15,7 @@
 
   const CAT_LABEL = {
     growth: 'Growth Hormone Secretagogues',
-    recovery: 'Recovery Peptides',
+    tissue: 'Tissue Research',
     metabolic: 'Metabolic Research',
     cognitive: 'Cognitive Research',
   };
