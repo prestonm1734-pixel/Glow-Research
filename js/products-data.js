@@ -34,7 +34,9 @@
 // It is what "View certificate of analysis" on the product page opens. A
 // product without one falls back to COA_URL below.
 //
-// `blurb` is also the one line under the product name in the buy box.
+// `blurb` is the Product schema `description` on each generated page. It is a
+// summary of `about[]`, not a second description that could contradict it. The
+// line under the product name in the buy box is identityLine(), built below.
 //
 // `about` and `research` fill the accordions under the buy box. Same rule as
 // `blurb`: composition and what laboratory work examines, never dosing,
@@ -299,6 +301,31 @@ const ANALYSIS_SHORT = 'HPLC + mass spectrometry';
 const ANALYSIS_LONG = 'HPLC for purity, mass spectrometry for identity';
 const SOURCE_SHORT = 'U.S. manufacturing partner';
 const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices';
+
+// ---------------------------------------------------------------------------
+// The identity line: the sentence under the product name in the buy box.
+//
+// What is in the vial and what it is for, with no claim of any kind in it. It
+// is derived rather than stored, so it cannot drift from the name, from the mg
+// the customer has actually selected, or from the fill form, and so the
+// research-use framing is restated on the one screen where someone is about to
+// buy rather than only in the footer.
+//
+// Everything that describes what the compound *does* now lives entirely in
+// `blurb` (the Product schema description) and in the accordions below the
+// panel. This line is deliberately not the place for it.
+//
+// PLACEHOLDER: every compound in the catalog is supplied as lyophilized powder
+// in a sealed vial, which is why the default answers all nine and writing it
+// out nine times would be noise. Nothing here measures it: the supplier import
+// confirms the fill form per product the same way it confirms purity, and a
+// product that arrives in solution sets `form` and the line follows.
+const DEFAULT_FORM = 'lyophilized';
+
+function identityLine(p, size) {
+  const mg = size && size.mg ? ` ${size.mg}` : '';
+  return `${p.name}${mg} ${p.form || DEFAULT_FORM} peptide for in vitro research.`;
+}
 
 // The evidence panel, as data: the four steps of the chain of custody, in the
 // order they happen. Each row is a label, the fact, and the sentence that makes
@@ -617,6 +644,8 @@ if (typeof module !== 'undefined' && module.exports) {
     ANALYSIS_LONG,
     SOURCE_SHORT,
     SOURCE_LONG,
+    identityLine,
+    DEFAULT_FORM,
     evidenceRows,
     evidenceHtml,
     bulkSavingPct,

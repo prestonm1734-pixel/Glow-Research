@@ -35,7 +35,7 @@ const OUT_DIR = 'peptides';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, PRODUCT_PAGES_LIVE,
-  sizeInStock, productInStock, evidenceHtml,
+  sizeInStock, productInStock, evidenceHtml, identityLine,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 // Mirrors CAT_LABEL in js/product.js. Kept in step by the assertion below
@@ -227,7 +227,7 @@ function buildProduct(p, donor) {
   html = setText(html, 'pdCrumbName', esc(p.name));
   html = setText(html, 'pdTag', esc(p.tag));
   html = setText(html, 'pdName', esc(p.name));
-  html = fillEmpty(html, 'pdBlurb', esc(p.blurb));
+  html = fillEmpty(html, 'pdIdentity', esc(identityLine(p, s)));
   html = setText(html, 'pdVialName', esc(p.name));
   html = setText(html, 'pdVialMg', esc(s.mg.toUpperCase()));
   html = fillEmpty(html, 'pdVialFine',

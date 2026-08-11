@@ -171,13 +171,13 @@
     display:block; font-family:'JetBrains Mono', monospace; margin-bottom:10px;
   }
   .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:800; margin: 0 0 8px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
-  /* a reading measure, not the full column: this is one sentence and it should
-     look like one, not like a paragraph the price is sitting on top of */
-  .pd-blurb{
+  /* one quiet line: this is a spec, not a pitch, so it sits back from the name
+     above it and the price below it rather than competing with either */
+  .pd-identity{
     max-width: 54ch; margin: 0 0 20px;
-    font-size: 1.02rem; line-height:1.6; color:#45453f;
+    font-size: 0.95rem; line-height:1.6; color:#55554f;
   }
-  .pd-blurb:empty{ display:none; }
+  .pd-identity:empty{ display:none; }
 
   .pd-label{
     font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:700; letter-spacing:.14em;
@@ -550,11 +550,11 @@
       <div class="pd-right">
         <span class="pd-tag" id="pdTag">Category</span>
         <h1 class="pd-name" id="pdName">Product name</h1>
-        <!-- The catalog card has always carried this line and the detail page
-             never did, so the one screen where someone decides to buy was the
-             one screen that did not say what the compound is. It is the same
-             `blurb` the card and the Product schema use. -->
-        <p class="pd-blurb" id="pdBlurb"></p>
+        <!-- What is in the vial and what it is for, and nothing else. Built by
+             identityLine() from the name, the selected mg and the fill form, so
+             it follows the size picker and cannot drift from any of the three.
+             What the compound *does* is in the accordions, not here. -->
+        <p class="pd-identity" id="pdIdentity"></p>
 
         <span class="pd-price" id="pdPrice">$0</span>
 

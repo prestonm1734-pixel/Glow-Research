@@ -150,7 +150,6 @@
   function renderHeader(p) {
     $('pdTag').textContent = p.tag;
     $('pdName').textContent = p.name;
-    $('pdBlurb').textContent = p.blurb;
     $('pdVialName').textContent = p.name;
 
     // a handful of products ship with a real product photo; everything else
@@ -288,6 +287,8 @@
     $('pdPrice').innerHTML = onSaleNow()
       ? `<s class="pd-price-was">${money(s.price)}</s>${money(salePrice(s.price))}`
       : money(s.price);
+    // follows the mg picker: the line names the vial actually selected
+    $('pdIdentity').textContent = identityLine(product, s);
     $('pdVialMg').textContent = s.mg.toUpperCase();
     $('pdVialFine').innerHTML =
       `${product.purity} Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.shop`;

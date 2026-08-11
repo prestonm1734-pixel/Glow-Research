@@ -27,6 +27,7 @@ const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, CUTOFF_LABEL, CUTOFF_LABEL_SHORT,
   ANALYSIS_SHORT, ANALYSIS_LONG, SOURCE_LONG, evidenceRows, evidenceHtml,
+  identityLine,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -228,13 +229,12 @@ console.log('\nthe Glow Standard panel');
   const pd = read('product.html');
 
   ok('the product page carries the panel', /id="pdEvidence"/.test(pd));
-  // The line under the product name is the compound's own `blurb`, the same
-  // string the catalog card and the Product schema use, rather than a second
-  // description that could describe it differently on the page you buy from.
-  ok('the buy box says what the compound is',
-    /id="pdBlurb"/.test(pd) &&
-    /pdBlurb'\)\.textContent = p\.blurb/.test(read('js/product.js')) &&
-    /'pdBlurb', esc\(p\.blurb\)/.test(read('tools/build-products.js')));
+  // The line under the product name is built by identityLine(), not stored, so
+  // it follows the mg picker and cannot contradict the name or the fill form.
+  ok('the buy box carries a derived identity line',
+    /id="pdIdentity"/.test(pd) &&
+    /identityLine\(product, s\)/.test(read('js/product.js')) &&
+    /identityLine\(p, s\)/.test(read('tools/build-products.js')));
   ok('the panel is rendered from the catalog, not from its own markup',
     /evidenceHtml\(/.test(read('js/product.js')) &&
     /evidenceHtml\(/.test(read('tools/build-products.js')),
@@ -369,11 +369,13 @@ console.log('\nlisting copy');
   ok('no listing copy names an outcome instead of a mechanism',
     bad.length === 0, bad.join('\n          '));
 
-  // Two lines under the product name is the budget. Past that the buy box
-  // starts reading like a description and the price gets pushed down the page.
+  // `blurb` is the Product schema description on every generated page. It is
+  // never displayed, which is exactly why it needs checking: nobody would
+  // notice it drifting. A summary that runs long has stopped being a summary,
+  // and Google truncates it anyway.
   const BLURB_MAX = 130;
   const long = GLOW_PRODUCTS.filter(p => p.blurb.length > BLURB_MAX);
-  ok(`every blurb fits the buy box (${BLURB_MAX} chars)`, long.length === 0,
+  ok(`every schema description stays a summary (${BLURB_MAX} chars)`, long.length === 0,
     long.map(p => `${p.name} is ${p.blurb.length}`).join(', '));
 
   // Two sentences: what it is, how it is studied. A blurb that stops after the
@@ -381,6 +383,24 @@ console.log('\nlisting copy');
   const oneLiner = GLOW_PRODUCTS.filter(p => (p.blurb.match(/\.\s|\.$/g) || []).length < 2);
   ok('every blurb says both what it is and how it is studied',
     oneLiner.length === 0, oneLiner.map(p => p.name).join(', '));
+
+  // The identity line is the most-read sentence on the product page and the
+  // only one a customer sees before deciding, so it is the last place a claim
+  // should ever appear. It states the vial and the intended use, nothing else.
+  const badLine = [];
+  GLOW_PRODUCTS.forEach(prod => prod.sizes.forEach(sz => {
+    const line = identityLine(prod, sz);
+    const hits = [...new Set((line.match(OUTCOME) || []).map(h => h.toLowerCase()))];
+    if (hits.length) badLine.push(`${prod.name} ${sz.mg}: "${hits.join('", "')}"`);
+    if (!line.startsWith(`${prod.name} ${sz.mg} `)) badLine.push(`${prod.name} ${sz.mg}: wrong vial`);
+    if (!/ for in vitro research\.$/.test(line)) badLine.push(`${prod.name} ${sz.mg}: no research-use framing`);
+  }));
+  ok('every identity line names the vial and the intended use, and nothing else',
+    badLine.length === 0, badLine.join('\n          '));
+
+  ok('the fill form is a catalog value, not a word typed into the sentence',
+    /\$\{p\.form \|\| DEFAULT_FORM\}/.test(read('js/products-data.js')),
+    'identityLine() must read the form from the product, so the import can correct it');
 
   // The same rule applies to the taxonomy, and it is easier to break there:
   // "Recovery Peptide" sat directly above the product name for a year and read
