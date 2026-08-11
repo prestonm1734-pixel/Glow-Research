@@ -18,7 +18,7 @@ benefit.
 ## The supply chain
 
 - Manufacturing: Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices. Performed by a manufacturing partner, not by Glow.
-- Testing: every lot is analysed by an independent third-party laboratory. HPLC for purity, mass spectrometry for identity.
+- Testing: every lot is analysed by an independent third-party laboratory. HPLC-UV for purity, LC-MS for identity, and endotoxin testing by LAL assay under USP chapter 85.
 - Certificates: COA on request. Certificate on request: email support@glowresearch.shop with the lot number on your vial
 - Fulfilment: US-based climate-controlled facility, stock held by lot.
 - Dispatch: orders placed before 2:00 PM PST on a business day ship the same
@@ -54,17 +54,9 @@ benefit.
 
 No. All products sold by Glow Research are strictly for laboratory and in-vitro research use only. They are not drugs, supplements, foods, or cosmetics. They have not been evaluated or approved by the FDA for any use, and they are not intended to diagnose, treat, cure, or prevent any disease. They are not for human or animal use of any kind.
 
-**Is every lot tested by an independent laboratory?**
+**Is every lot tested by an independent laboratory, and for what?**
 
-Yes, and by a laboratory with no stake in the result. Every production lot is analysed before it is released for sale, and the certificate is issued by the laboratory that ran the analysis rather than by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory. Testing is lot-specific, so a certificate covers the exact batch it was issued against and not the compound in general.
-
-**What does the testing actually measure?**
-
-HPLC for purity, mass spectrometry for identity. Those answer two different questions and neither one covers for the other. Purity is what proportion of the material is the target peptide rather than truncated sequences, residual reagent or salt. Identity is whether the peptide in the vial is the sequence you ordered at all. A single number with no method beside it tells you neither, which is why the certificate reports the method, the result and the lot together.
-
-**Do you test for endotoxin or sterility?**
-
-No. Neither is run on these lots, and we would rather say so than let the silence read as a pass. They are also not the same test and one does not imply the other: an endotoxin result says nothing about whether a vial is sterile, and a sterile vial can still carry endotoxin. What is run is HPLC for purity, mass spectrometry for identity, and that is the whole list. These are lyophilized powders supplied for laboratory and in-vitro research, not sterile preparations, and nothing on this site clears them for use in or on a living subject.
+HPLC-UV for purity, LC-MS for identity, and endotoxin testing by LAL assay under USP chapter 85. Yes, on every lot, before it is released for sale. Identity and purity are two different questions and neither covers the other: identity is whether the peptide in the vial is the sequence you ordered, purity is what proportion of the material is that sequence rather than truncated peptide, residual reagent or salt. The one thing we do not run is a sterility test, and a lot that screens negative for endotoxin has not been screened for sterility, so we say that plainly rather than let it go unmentioned. The certificate is issued by the laboratory that ran the analysis, not by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory.
 
 **Where do I find a lot’s COA?**
 
@@ -77,22 +69,6 @@ Check it against the laboratory, not against us. A certificate names the laborat
 **Where is the lot number on my vial?**
 
 Printed on the vial label. It is the number the certificate for that batch is issued against, so it is what you quote when you ask us for the certificate, and what you match the certificate against once you have it. If the label is obscured or you are not sure which field you are reading, email support@glowresearch.shop with your order number and we will tell you which lot shipped against that order.
-
-**How recent are the laboratory results?**
-
-As recent as the lot. Each production lot is analysed before it is released, and the certificate carries the date that analysis was performed, so the result belongs to the material in your vial rather than to an earlier run of the same compound. We do not quote a rolling window such as tested within the last twelve months, because a window describes the paperwork rather than the vial. A lot that has not been retested since it was made is not a gap, provided the certificate you are holding is the one issued for it.
-
-**Why are Glow Research peptides priced the way they are?**
-
-Our pricing reflects what goes into every lot at the facilities behind it: US-based production held to cGMP-aligned quality practices, and independent third-party lab testing on every lot. Peptides priced well below market are almost always cutting one of those corners, and we would rather hold the standard than the lowest price.
-
-**How fast do orders ship?**
-
-Orders placed before 2 PM PST are dispatched the same business day from our fulfilment partner’s US-based, climate-controlled facility, with tracking provided within 24 hours.
-
-**Do you ship internationally?**
-
-No. Orders are shipped within the United States only, to verified research institutions and qualified buyers.
 
 ## Pages
 

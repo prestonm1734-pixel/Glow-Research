@@ -737,25 +737,41 @@ console.log('\nwhat the FAQ is allowed to say about testing');
     `${contradicted.join(', ')} appears in what we say is tested. ` +
     'Remove it from ANALYSIS_NOT_RUN in js/products-data.js.');
 
-  const unnamed = ANALYSIS_NOT_RUN.filter(t =>
-    !questions.toLowerCase().includes(t.toLowerCase()));
-  ok('every test we skip is named in the question, not left to be inferred',
-    unnamed.length === 0, `not asked about: ${unnamed.join(', ')}`);
+  // Named somewhere in the FAQ, question or answer: the merged testing question
+  // states the gap in its answer rather than its own title now, so this checks
+  // the whole entry rather than just the question text. What matters is that
+  // it is said by name, not which field says it.
+  const wholeFaq = FAQS.map(f => `${f.q} ${f.a}`).join('\n').toLowerCase();
+  const unnamed = ANALYSIS_NOT_RUN.filter(t => !wholeFaq.includes(t.toLowerCase()));
+  ok('every test we skip is named, not left to be inferred',
+    unnamed.length === 0, `not mentioned anywhere in the FAQ: ${unnamed.join(', ')}`);
 
-  // That answer explains why an endotoxin result and a sterility result do not
-  // substitute for each other. It is written about those two specifically, so
-  // it stops being accurate if the pair it describes changes.
-  const pairing = /endotoxin result says nothing about whether a vial is sterile/i;
-  ok('the endotoxin and sterility answer still describes the pair it names',
-    !pairing.test(answers) ||
-      (ANALYSIS_NOT_RUN.includes('endotoxin') && ANALYSIS_NOT_RUN.includes('sterility')),
-    'the answer distinguishes endotoxin from sterility but ANALYSIS_NOT_RUN no longer lists both');
+  // The sentence explaining that an endotoxin pass does not cover sterility is
+  // only true to write while endotoxin is something we actually run and
+  // sterility is something we do not. If either half of that flips, the
+  // sentence needs rewriting, not just deleting.
+  const pairing = /screens? negative for endotoxin has not been screened for sterility/i;
+  if (pairing.test(answers)) {
+    ok('the endotoxin/sterility distinction still describes what is actually run',
+      !ANALYSIS_NOT_RUN.includes('endotoxin') && ANALYSIS_NOT_RUN.includes('sterility'),
+      'endotoxin and sterility have to be on opposite sides of ANALYSIS_NOT_RUN for this sentence to be true');
+  }
 
-  // No page may claim we run one of them. The FAQ asks the question and answers
-  // no, and the COA blog post explains what an endotoxin line means on someone
-  // else's certificate, which are both fine; a first-person claim is not.
-  const claims = /\b(?:we|glow)\b[^.]{0,80}?\b(?:tests?|tested|testing|screens?|screened|assays?|assayed)\b[^.]{0,80}?\b(?:endotoxin|sterilit)/i;
-  const claiming = pages.filter(f => claims.test(read(f)));
+  // No page may claim, in its own voice, to run a test this array says is not
+  // run. Built from ANALYSIS_NOT_RUN rather than a fixed word list, so a test
+  // moving in or out of that array changes what this forbids without a second
+  // edit here. The COA blog post explaining what an endotoxin line means on
+  // someone else's certificate is fine; "we test for" is not — and neither is
+  // the FAQ itself explaining that we do not, which is exactly the sentence
+  // this pattern would otherwise flag, so a match containing "not" is read as
+  // the honest denial it is rather than the claim this check exists to catch.
+  const claims = new RegExp(
+    `\\b(?:we|glow)\\b[^.]{0,80}?\\b(?:tests?|tested|testing|screens?|screened|assays?|assayed)\\b[^.]{0,80}?\\b(?:${ANALYSIS_NOT_RUN.join('|')})`,
+    'gi');
+  const claiming = pages.filter(f => {
+    const matches = read(f).match(claims) || [];
+    return matches.some(m => !/\bnot\b/i.test(m));
+  });
   ok('no page claims a test that is not run', claiming.length === 0,
     claiming.join(', '));
 

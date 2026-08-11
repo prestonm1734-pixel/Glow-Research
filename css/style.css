@@ -779,6 +779,12 @@ button[disabled].si-forgot{ cursor: progress; }
     display:grid; grid-template-columns: 1fr 1fr; column-gap: 56px;
     align-items:start;
   }
+  /* Below FAQ_SPLIT_AT, faqHtml() emits one .faq-col instead of two. Falling
+     back to the wide two-column grid in that case leaves the single column
+     stuck on the left with the whole right half of the section empty. */
+  .faq-list:has(> .faq-col:only-child){
+    max-width: 780px; grid-template-columns: 1fr;
+  }
 }
 .faq-item{ border-bottom: 1px solid var(--border); }
 .faq-q{

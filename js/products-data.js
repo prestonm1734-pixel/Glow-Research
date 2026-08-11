@@ -324,8 +324,8 @@ const TRANSIT_DAYS = 2;
 // so the short form cannot quietly grow a third analysis the laboratory never
 // ran or drop the regulatory hedge on the manufacturing claim. check-claims.js
 // pins both long forms to the prose they summarise.
-const ANALYSIS_SHORT = 'HPLC + mass spectrometry';
-const ANALYSIS_LONG = 'HPLC for purity, mass spectrometry for identity';
+const ANALYSIS_SHORT = 'HPLC-UV + LC-MS + endotoxin';
+const ANALYSIS_LONG = 'HPLC-UV for purity, LC-MS for identity, and endotoxin testing by LAL assay under USP chapter 85';
 const SOURCE_SHORT = 'U.S. manufacturing partner';
 const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices';
 
@@ -334,15 +334,21 @@ const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to 
 // ANALYSIS_LONG is the complete list of what is performed, which means every
 // other analysis a buyer might assume is included is absent. Left unsaid, an
 // absence reads as a pass: a page that talks at length about testing and never
-// mentions endotoxin invites the reader to fill the gap in our favour. So the
+// mentions sterility invites the reader to fill the gap in our favour. So the
 // FAQ answers the question by name, and it builds the answer from this array
 // rather than from a sentence someone typed, so the day one of these is
 // actually run the honest version is one line: delete it here.
 //
+// Endotoxin used to live in this array. It came out once the real certificate
+// format showed a LAL assay under USP <85> as a standard line, which means it
+// is run on every lot, not just this one's, and ANALYSIS_LONG above now says
+// so. This array is what is left after that: sterility, which the certificate
+// does not report and an endotoxin pass does not imply.
+//
 // check-claims.js holds the two halves apart. Nothing in this array may appear
 // in ANALYSIS_SHORT, ANALYSIS_LONG, or the testing copy on process.html, so
 // "we do not test for X" cannot survive X being added to what we say we test.
-const ANALYSIS_NOT_RUN = ['endotoxin', 'sterility'];
+const ANALYSIS_NOT_RUN = ['sterility'];
 
 // ---------------------------------------------------------------------------
 // The identity line: the sentence under the product name in the buy box.
@@ -384,12 +390,15 @@ function identityLine(p, size) {
 // array and rebuilding is the whole workflow; check-claims.js fails the build
 // if the served markup and this array disagree.
 //
-// The middle six questions are the verification trail, in the order someone
-// actually walks it: is it tested, what did the test measure, what was not
-// measured, where is the document, how do I know the document is real, and
-// where is the lot number that ties the document to the vial in my hand. That
-// ordering is the point. Verifiability is the whole proposition, and a
-// proposition that only appears as an adjective on a product card is a slogan.
+// This is the trust core only. Shipping speed, international policy, pricing
+// rationale and testing recency are all stated elsewhere on the site (the
+// evidence panel, shipping.html, the dispatch row) and repeating them here
+// just pushed the four questions someone actually needs answered before they
+// will trust a peptide supplier further down the page. What is left is short
+// on purpose: is it for research only, is it independently tested and for
+// what, where is the document, and how do you check the document is real. That
+// ordering is the point, human-consumption first because it is the one legal
+// line, then the verification trail in the order someone actually walks it.
 // Answers are plain text: faqHtml() escapes them and build-faq.js puts the same
 // strings in the FAQPage schema, so there is no markup to get out of step.
 //
@@ -406,22 +415,13 @@ const FAQS = [
     a: 'No. All products sold by Glow Research are strictly for laboratory and in-vitro research use only. They are not drugs, supplements, foods, or cosmetics. They have not been evaluated or approved by the FDA for any use, and they are not intended to diagnose, treat, cure, or prevent any disease. They are not for human or animal use of any kind.',
   },
   {
-    q: 'Is every lot tested by an independent laboratory?',
-    a: 'Yes, and by a laboratory with no stake in the result. Every production lot is analysed before it is released for sale, and the certificate is issued by the laboratory that ran the analysis rather than by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory. Testing is lot-specific, so a certificate covers the exact batch it was issued against and not the compound in general.',
-  },
-  {
-    // Derived from ANALYSIS_LONG rather than restated, so the FAQ cannot end up
-    // describing a third analysis the laboratory never ran. check-claims.js
-    // requires this answer to contain that string verbatim.
-    q: 'What does the testing actually measure?',
-    a: `${ANALYSIS_LONG}. Those answer two different questions and neither one covers for the other. Purity is what proportion of the material is the target peptide rather than truncated sequences, residual reagent or salt. Identity is whether the peptide in the vial is the sequence you ordered at all. A single number with no method beside it tells you neither, which is why the certificate reports the method, the result and the lot together.`,
-  },
-  {
-    // Question and answer are both built from ANALYSIS_NOT_RUN. Saying "no" by
-    // name is worth more than staying quiet: the reader who came here already
-    // had the question, and an unanswered one gets answered optimistically.
-    q: `Do you test for ${joinWords(ANALYSIS_NOT_RUN, 'or')}?`,
-    a: `No. Neither is run on these lots, and we would rather say so than let the silence read as a pass. They are also not the same test and one does not imply the other: an endotoxin result says nothing about whether a vial is sterile, and a sterile vial can still carry endotoxin. What is run is ${lowerFirst(ANALYSIS_LONG)}, and that is the whole list. These are lyophilized powders supplied for laboratory and in-vitro research, not sterile preparations, and nothing on this site clears them for use in or on a living subject.`,
+    // Derived from ANALYSIS_LONG and ANALYSIS_NOT_RUN rather than restated, so
+    // this cannot end up describing a test the laboratory does not run, or
+    // staying silent about one it does not. check-claims.js requires this
+    // answer to start with ANALYSIS_LONG verbatim and to name every entry in
+    // ANALYSIS_NOT_RUN somewhere in the FAQ.
+    q: 'Is every lot tested by an independent laboratory, and for what?',
+    a: `${ANALYSIS_LONG}. Yes, on every lot, before it is released for sale. Identity and purity are two different questions and neither covers the other: identity is whether the peptide in the vial is the sequence you ordered, purity is what proportion of the material is that sequence rather than truncated peptide, residual reagent or salt. The one thing we do not run is a sterility test, and a lot that screens negative for endotoxin has not been screened for sterility, so we say that plainly rather than let it go unmentioned. The certificate is issued by the laboratory that ran the analysis, not by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory.`,
   },
   {
     // Answer comes from COA_COPY, which keys off COAS_PUBLISHED. While
@@ -439,52 +439,26 @@ const FAQS = [
     q: 'Where is the lot number on my vial?',
     a: 'Printed on the vial label. It is the number the certificate for that batch is issued against, so it is what you quote when you ask us for the certificate, and what you match the certificate against once you have it. If the label is obscured or you are not sure which field you are reading, email support@glowresearch.shop with your order number and we will tell you which lot shipped against that order.',
   },
-  {
-    q: 'How recent are the laboratory results?',
-    a: 'As recent as the lot. Each production lot is analysed before it is released, and the certificate carries the date that analysis was performed, so the result belongs to the material in your vial rather than to an earlier run of the same compound. We do not quote a rolling window such as tested within the last twelve months, because a window describes the paperwork rather than the vial. A lot that has not been retested since it was made is not a gap, provided the certificate you are holding is the one issued for it.',
-  },
-  {
-    q: 'Why are Glow Research peptides priced the way they are?',
-    a: 'Our pricing reflects what goes into every lot at the facilities behind it: US-based production held to cGMP-aligned quality practices, and independent third-party lab testing on every lot. Peptides priced well below market are almost always cutting one of those corners, and we would rather hold the standard than the lowest price.',
-  },
-  {
-    // The cutoff is read, not typed. It is stated in four other places and
-    // every one of them derives from CUTOFF_HOUR.
-    q: 'How fast do orders ship?',
-    a: `Orders placed before ${CUTOFF_LABEL_SHORT} are dispatched the same business day from our fulfilment partner\u2019s US-based, climate-controlled facility, with tracking provided within 24 hours.`,
-  },
-  {
-    q: 'Do you ship internationally?',
-    a: 'No. Orders are shipped within the United States only, to verified research institutions and qualified buyers.',
-  },
 ];
-
-// "endotoxin, sterility" as "endotoxin or sterility". Small, but it keeps the
-// question above readable while still being generated from the array, which is
-// what stops the two from disagreeing about how many tests we skip.
-function joinWords(list, conj) {
-  if (list.length < 2) return list[0] || '';
-  return `${list.slice(0, -1).join(', ')} ${conj} ${list[list.length - 1]}`;
-}
-
-// ANALYSIS_LONG starts a sentence in most of its uses and is capitalised for
-// that. Mid-sentence it is not, and the acronym has to survive the change.
-function lowerFirst(s) {
-  return /^[A-Z]{2,}/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1);
-}
 
 // One renderer for the browser and the build, so the served markup and the
 // behaviour attached to it can never describe different questions.
 //
-// The list is split into two columns here rather than in CSS. A grid laid over
-// a flat list of items pairs them into rows, so opening one answer stretches
-// its row and leaves a hole the height of that answer beside it in the other
-// column. Two independent columns push only the items below them, and stacking
-// on mobile leaves the reading order the same as reading down each column on
-// desktop. The split is derived, so an added question rebalances itself.
+// Below FAQ_SPLIT_AT, one column: at five or six questions a second column
+// sits mostly empty beside a full one, which reads worse than a single short
+// list. At and above it, two. The list is split into two elements here rather
+// than in CSS. A grid laid over one flat list pairs items into rows, so
+// opening an answer stretches its row and leaves a hole the height of that
+// answer beside it in the other column; two independent columns push only the
+// items below them. Stacking on mobile keeps the reading order the same as
+// reading down each column on desktop. Both the split point and the split
+// itself are derived, so an added or removed question rebalances on its own.
+const FAQ_SPLIT_AT = 8;
 function faqHtml() {
-  const half = Math.ceil(FAQS.length / 2);
-  return [FAQS.slice(0, half), FAQS.slice(half)].map(col => `
+  const cols = FAQS.length >= FAQ_SPLIT_AT
+    ? [FAQS.slice(0, Math.ceil(FAQS.length / 2)), FAQS.slice(Math.ceil(FAQS.length / 2))]
+    : [FAQS];
+  return cols.map(col => `
       <div class="faq-col">${col.map(f => `
         <div class="faq-item">
           <button class="faq-q" type="button" aria-expanded="false">${escHtml(f.q)} <span class="icon" aria-hidden="true">+</span></button>
