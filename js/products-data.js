@@ -567,6 +567,8 @@ function productHref(p) {
 // 404 from there. Lift the nav's already-depthed link rather than tracking
 // depth separately (same trick js/cart.js uses).
 function pageHref(file) {
+  // The build runs from the repo root, where every path is already correct.
+  if (typeof document === 'undefined') return file;
   const link = document.querySelector('#mainNav a[href$="peptides.html"]');
   const prefix = link ? link.getAttribute('href').replace(/peptides\.html$/, '') : '';
   return prefix + file;
@@ -581,6 +583,37 @@ function productThumb(name) {
     return `<img class="thumb-photo" src="${pageHref(p.image)}" alt="" loading="lazy" />`;
   }
   return '<span class="vial"></span>';
+}
+
+// One product card, as markup. Shared by renderProductGrid below and by
+// tools/build-catalog.js, so what a crawler is served and what the browser
+// draws are the same cards rather than two implementations that agree today.
+function productCardHtml(p, i) {
+  const href = productHref(p);
+  const stocked = productInStock(p);
+  return `
+      <div class="product-card reveal" style="transition-delay:${(i % 3) * 60}ms">
+        <a class="product-visual${p.image ? ' has-photo' : ''}" href="${href}">
+          <span class="product-badge cat">${p.cat}</span>
+          ${!stocked
+            ? '<span class="product-badge status is-out">Out of stock</span>'
+            : p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
+          ${p.image
+            ? `<img class="product-photo" src="${pageHref(p.image)}" alt="${p.name} vial" loading="lazy" />`
+            : '<div class="vial"></div>'}
+        </a>
+        <div class="product-footer">
+          <h3><a href="${href}">${p.name}</a></h3>
+          <span class="card-divider" aria-hidden="true"></span>
+          <span class="price">
+            ${onSaleNow() ? `<s class="price-was">${fmtPrice(p.price)}</s>` : ''}
+            ${fmtPrice(salePrice(p.price))} <span>/ vial</span>
+          </span>
+          <button class="add-btn" ${stocked
+            ? `aria-label="Add ${p.name} to research order">Add to Cart`
+            : `disabled aria-label="${p.name} is out of stock">Out of Stock`}</button>
+        </div>
+      </div>`;
 }
 
 // gridEl: container to render into
@@ -623,35 +656,15 @@ function renderProductGrid(gridEl, filter, opts) {
   if (compare) list = list.slice().sort(compare);
 
   if (opts.limit) list = list.slice(0, opts.limit);
+
+  // Rendered as one string so the same function can produce the markup
+  // tools/build-catalog.js bakes into peptides.html. Behaviour is bound below,
+  // to cards that already exist, rather than arriving with them.
+  gridEl.innerHTML = list.map((p, i) => productCardHtml(p, i)).join('');
+
   list.forEach((p, i) => {
     const href = productHref(p);
-    const stocked = productInStock(p);
-    const card = document.createElement('div');
-    card.className = 'product-card reveal';
-    card.style.transitionDelay = `${(i % 3) * 60}ms`;
-    card.innerHTML = `
-      <a class="product-visual${p.image ? ' has-photo' : ''}" href="${href}">
-        <span class="product-badge cat">${p.cat}</span>
-        ${!stocked
-          ? '<span class="product-badge status is-out">Out of stock</span>'
-          : p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
-        ${p.image
-          ? `<img class="product-photo" src="${pageHref(p.image)}" alt="${p.name} vial" loading="lazy" />`
-          : '<div class="vial"></div>'}
-      </a>
-      <div class="product-footer">
-        <h3><a href="${href}">${p.name}</a></h3>
-        <span class="card-divider" aria-hidden="true"></span>
-        <span class="price">
-          ${onSaleNow() ? `<s class="price-was">${fmtPrice(p.price)}</s>` : ''}
-          ${fmtPrice(salePrice(p.price))} <span>/ vial</span>
-        </span>
-        <button class="add-btn" ${stocked
-          ? `aria-label="Add ${p.name} to research order">Add to Cart`
-          : `disabled aria-label="${p.name} is out of stock">Out of Stock`}</button>
-      </div>
-    `;
-    gridEl.appendChild(card);
+    const card = gridEl.children[i];
 
     // the whole card opens the product page; the button is the one exception,
     // and it opens the quick-add sheet instead — the size/quantity picker,
@@ -705,6 +718,8 @@ if (typeof module !== 'undefined' && module.exports) {
     DEFAULT_FORM,
     FAQS,
     faqHtml,
+    productCardHtml,
+    productHref,
     evidenceRows,
     evidenceHtml,
     bulkSavingPct,

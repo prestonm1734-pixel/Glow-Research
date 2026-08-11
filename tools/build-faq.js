@@ -64,7 +64,9 @@ function build() {
 
   const listRe = /(<div class="faq-list" id="faqList">)[\s\S]*?(<\/div>\s*<\/div>\s*<\/section>)/;
   required(html, listRe, '#faqList');
-  html = html.replace(listRe, `$1${faqHtml()}\n    $2`);
+  // Replacer function, not a replacement string: "$1" in an answer would
+  // otherwise be read as a backreference. See tools/build-products.js.
+  html = html.replace(listRe, (m, open, close) => `${open}${faqHtml()}\n    ${close}`);
 
   const block =
     `<script type="application/ld+json" id="${MARK}">\n` +

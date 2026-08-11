@@ -9,6 +9,8 @@ No dependencies to install. Everything here is plain Node.
 ```bash
 node tools/build.js          # the usual one: FAQ + products (when live) + sitemap + audit
 node tools/build-faq.js      # homepage FAQ markup + FAQPage schema
+node tools/build-catalog.js  # peptides.html grid + CollectionPage schema
+node tools/build-llms.js     # llms.txt
 node tools/build-products.js # one page per compound
 node tools/build-sitemap.js  # sitemap.xml on its own
 node tools/check-claims.js   # promise audit, run before every commit
@@ -17,8 +19,19 @@ node tools/build-blog.js     # blog, read the warning below first
 
 ## `build.js`
 
-The everyday entry point. Runs `build-faq.js`, then `build-products.js` (which
-refreshes `sitemap.xml` on its way through), then `check-claims.js`.
+The everyday entry point. Runs `build-faq.js`, `build-catalog.js`,
+`build-llms.js`, then `build-products.js` (which refreshes `sitemap.xml` on its
+way through), then `check-claims.js`.
+
+### One rule for all of them
+
+**Insert generated copy with a replacer function, never a replacement string.**
+`"$1"` in a replacement string is a backreference, and every price the site
+prints starts with a dollar sign. `fmtPrice()` emits `$116.10`, whose `$1` was
+being substituted with capture group 1. That shipped a catalog card reading
+`<div class="product-grid" id="productGrid">29` and would have shipped a
+GLP3-RT page reading `id="pdPrice">16.10`. `check-claims.js` now fails on the
+pattern anywhere in `tools/`.
 
 It deliberately does **not** run `build-blog.js`. See below.
 
@@ -81,6 +94,13 @@ It currently checks that:
   markup matches `faqHtml()`, the `FAQPage` schema matches `FAQS` question for
   question, the answers stay readable with JavaScript off, and the certificate
   answer is the current `COA_COPY` state
+- the catalog page names every compound in its served HTML and the grid matches
+  `productCardHtml()`; every indexable page carries structured data; every
+  JSON-LD block parses; the process page's `ItemList` describes the six steps
+  actually on the page; and `llms.txt` covers the whole catalog with the
+  research-use framing and the enforced cutoff
+- no build script inserts copy with a `$1` replacement string, and a price
+  beginning `$1` is run through the card renderer to prove it survives
 - no page promises a certificate while `COAS_PUBLISHED` is false
 - no fabricated ratings or reviews appear in structured data
 - every product carries every field the site reads, so a lossy supplier import
@@ -111,6 +131,28 @@ crawlable text.
 The COA answer reads from `COA_COPY`, so it flips with `COAS_PUBLISHED` like
 every other certificate surface. Rebuild after flipping the flag; the audit
 fails if you forget.
+
+## `build-catalog.js`
+
+Bakes the product grid into `peptides.html` from `productCardHtml()`, the same
+function `renderProductGrid()` uses, plus `CollectionPage` + `ItemList`
+structured data.
+
+The catalog page was 1,037 characters of text and named **none of the nine
+compounds**: the grid was drawn into an empty `<div>` on load, so the page whose
+whole job is to list what Glow sells listed nothing to anyone not running
+JavaScript. The filter and sort controls re-render through the same function, so
+hydration replaces the baked cards with identical ones that have handlers.
+
+## `build-llms.js`
+
+Writes `/llms.txt`, a markdown summary of the catalog, supply chain and FAQ for
+language models, generated from `js/products-data.js`.
+
+**Status: speculative.** `llms.txt` is a proposed convention and no major answer
+engine has confirmed reading one. It is here because it costs nothing. It is not
+a substitute for having the content in the HTML of the pages themselves, and if
+it is ever the only place something is stated, that is a bug.
 
 ## `build-products.js`
 

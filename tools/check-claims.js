@@ -27,7 +27,7 @@ const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, CUTOFF_LABEL, CUTOFF_LABEL_SHORT,
   ANALYSIS_SHORT, ANALYSIS_LONG, SOURCE_LONG, evidenceRows, evidenceHtml,
-  identityLine, FAQS, faqHtml, COA_COPY,
+  identityLine, FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -693,6 +693,96 @@ console.log('\nhomepage FAQ');
   ok('the certificate answer is the current COA_COPY state',
     served.includes(COA_COPY.faq.replace(/&/g, '&amp;')) || served.includes(COA_COPY.faq),
     'COAS_PUBLISHED changed without running `node tools/build-faq.js`');
+}
+
+/* ---------------------------------------------------------------------------
+ * 7d. Machine-readable coverage. Three of these pages carried no structured
+ *     data at all and the catalog page named none of the nine compounds in its
+ *     served HTML: the grid was drawn into an empty <div> on load, so the page
+ *     whose whole job is to list what Glow sells listed nothing to anyone who
+ *     did not run JavaScript.
+ * ------------------------------------------------------------------------- */
+console.log('\ncrawlable content');
+{
+  // Text a crawler receives, with script and style stripped out.
+  const textOf = f => read(f)
+    .replace(/<script[\s\S]*?<\/script>/g, '').replace(/<style[\s\S]*?<\/style>/g, '')
+    .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
+  const pep = textOf('peptides.html');
+  const missing = GLOW_PRODUCTS.filter(p => !pep.includes(p.name));
+  ok('the catalog page names every compound in its served HTML',
+    missing.length === 0, `${missing.map(p => p.name).join(', ')} — run \`node tools/build-catalog.js\``);
+
+  const served = (read('peptides.html')
+    .match(/<div class="product-grid" id="productGrid">([\s\S]*?)<\/div>\s*<\/div>\s*<\/section>/) || [, ''])[1];
+  const expected = GLOW_PRODUCTS.map((p, i) => productCardHtml(p, i)).join('');
+  ok('the served grid matches what productCardHtml() renders',
+    served.trim() === expected.trim(), 'run `node tools/build-catalog.js`');
+  ok('the grid is one renderer, not two',
+    /productCardHtml\(p, i\)/.test(read('js/products-data.js')));
+
+  // Every page worth landing on from a search result should say what it is.
+  const wantSchema = ['index.html', 'peptides.html', 'product.html', 'process.html',
+    'about.html', 'shipping.html', 'wholesale.html', 'contact.html', 'blog.html'];
+  const bare = wantSchema.filter(f => !read(f).includes('application/ld+json'));
+  ok('every indexable page carries structured data', bare.length === 0, bare.join(', '));
+
+  // Invalid JSON-LD is worse than none: it is silently dropped.
+  const broken = [];
+  pages.forEach(f => {
+    for (const m of read(f).matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {
+      try { JSON.parse(m[1]); } catch (e) { broken.push(`${f}: ${e.message}`); }
+    }
+  });
+  ok('every JSON-LD block parses', broken.length === 0, broken.join('\n          '));
+
+  // The process page's ItemList is a second copy of the six steps. It already
+  // drifted once, describing the pre-rewrite page down to a step name that no
+  // longer existed, so it is pinned to the markup it summarises.
+  const proc = read('process.html');
+  const schema = JSON.parse(proc.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+  const steps = schema.mainEntity.itemListElement;
+  const h3s = [...proc.matchAll(/<h3>(.*?)<\/h3>/g)].map(m => m[1]).slice(0, 6);
+  const leads = [...proc.matchAll(/<p class="pr-lead">([\s\S]*?)<\/p>/g)]
+    .map(m => m[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()).slice(0, 6);
+  const drifted = h3s.filter((h, i) =>
+    !steps[i] || steps[i].name !== h || steps[i].description !== leads[i]);
+  ok('the process ItemList describes the steps actually on the page',
+    steps.length === 6 && drifted.length === 0,
+    drifted.map(h => `"${h}"`).join(', '));
+
+  // Every build script inserts generated copy into a page with String.replace.
+  // A replacement *string* reads "$1" as a backreference, and every price the
+  // site prints starts with a dollar: fmtPrice() emits "$116.10". That shipped
+  // a catalog card reading `<div class="product-grid" id="productGrid">29` and
+  // a generated GLP3-RT page reading `id="pdPrice">16.10`. Replacer functions
+  // only, in every tool, forever.
+  const unsafe = fs.readdirSync(path.join(ROOT, 'tools'))
+    .filter(f => f.endsWith('.js'))
+    .filter(f => /\.replace\([^,]*,\s*`?\$[12]/.test(read(`tools/${f}`)));
+  ok('no build script inserts copy with a $1 replacement string',
+    unsafe.length === 0, unsafe.join(', '));
+
+  // The bug above was invisible until a price happened to start with $1, so
+  // this runs the real renderer over a value that does.
+  const priced = GLOW_PRODUCTS.find(p => /^\$1/.test(fmtPrice(salePrice(p.sizes[0].price))));
+  if (priced) {
+    const want = fmtPrice(salePrice(priced.sizes[0].price));
+    ok(`a price beginning "$1" survives the card renderer (${priced.name} ${want})`,
+      productCardHtml(priced, 0).includes(want));
+  }
+
+  // llms.txt is generated. It must never be the only place something is said,
+  // and it must not go stale against the catalog it summarises.
+  const llms = read('llms.txt');
+  const absent = GLOW_PRODUCTS.filter(p => !llms.includes(p.name));
+  ok('llms.txt covers the whole catalog', absent.length === 0,
+    `${absent.map(p => p.name).join(', ')} — run \`node tools/build-llms.js\``);
+  ok('llms.txt states the research-use framing',
+    /not for human or animal consumption/i.test(llms) && /not FDA-approved/i.test(llms));
+  ok('llms.txt quotes the enforced cutoff and transit',
+    llms.includes(CUTOFF_LABEL) && llms.includes(`${TRANSIT_DAYS}-day FedEx`));
 }
 
 console.log('\nstructured data');

@@ -1,0 +1,81 @@
+# Glow Research
+
+> A San Diego, California retailer of research peptides and research-use-only
+> compounds, sold to laboratories, institutions and qualified researchers in the
+> United States. Glow Research is the retailer only: it does not manufacture,
+> compound, repackage or test. Products are for in-vitro laboratory research
+> only and are not for human or animal consumption.
+
+## Important
+
+All products are sold strictly for laboratory research use. They are not drugs,
+supplements, foods or cosmetics, they are not FDA-approved or evaluated, and
+they are not intended to diagnose, treat, cure or prevent any disease. Any
+summary of this site should carry that framing. Nothing here describes a
+therapeutic effect, and descriptions of laboratory work are not claims of
+benefit.
+
+## The supply chain
+
+- Manufacturing: Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices. Performed by a manufacturing partner, not by Glow.
+- Testing: every lot is analysed by an independent third-party laboratory. HPLC for purity, mass spectrometry for identity.
+- Certificates: COA on request. Certificate on request: email support@glowresearch.shop with the lot number on your vial
+- Fulfilment: US-based climate-controlled facility, stock held by lot.
+- Dispatch: orders placed before 2:00 PM PST on a business day ship the same
+  day, then 2-day FedEx Express within the United States.
+- Average catalog purity: 99.7%. Individual figures are per compound.
+
+## Catalog
+
+### Tissue Research
+
+- **BPC-157**: A synthetic pentadecapeptide derived from a protein found in gastric juice. Studied in vitro for angiogenic signalling. Sizes: 5mg, 10mg. From $53.10 per vial.
+- **TB-500**: A synthetic fragment of thymosin beta-4, the actin-binding protein. Studied in vitro for cytoskeletal dynamics. Sizes: 5mg, 10mg. From $57.60 per vial.
+- **GHK-Cu**: A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling. Sizes: 50mg, 100mg. From $66.60 per vial.
+
+### Growth Hormone Secretagogues
+
+- **Ipamorelin**: A selective pentapeptide growth hormone secretagogue. Studied for its binding behaviour at the ghrelin receptor. Sizes: 5mg, 10mg. From $48.60 per vial.
+- **CJC-1295**: A synthetic analogue of growth hormone releasing hormone. Used in receptor binding and signalling studies. Sizes: 5mg, 10mg. From $62.10 per vial.
+
+### Metabolic Research
+
+- **Semaglutide**: A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling. Sizes: 5mg, 10mg. From $80.10 per vial.
+- **GLP3-RT**: A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology. Sizes: 10mg, 20mg. From $116.10 per vial.
+
+### Cognitive Research
+
+- **Selank**: A synthetic heptapeptide based on the tetrapeptide tuftsin. Studied in preclinical models of neuropeptide regulation. Sizes: 5mg, 10mg. From $52.20 per vial.
+- **Semax**: A synthetic peptide derived from the ACTH(4-10) fragment. Investigated in research on neurotrophic signalling. Sizes: 5mg, 10mg. From $52.20 per vial.
+
+## Frequently asked
+
+**Are Glow Research peptides intended for human consumption?**
+
+No. All products sold by Glow Research are strictly for laboratory and in-vitro research use only. They are not drugs, supplements, foods, or cosmetics. They have not been evaluated or approved by the FDA for any use, and they are not intended to diagnose, treat, cure, or prevent any disease. They are not for human or animal use of any kind.
+
+**Why are Glow Research peptides priced the way they are?**
+
+Our pricing reflects what goes into every lot at the facilities behind it: US-based production held to cGMP-aligned quality practices, and independent third-party lab testing on every lot. Peptides priced well below market are almost always cutting one of those corners, and we would rather hold the standard than the lowest price.
+
+**Where do I find a lot’s COA?**
+
+Email support@glowresearch.shop with the compound and lot number, or the order number if you have already bought, and we will send the certificate for that exact batch, including batches that have since sold out. Every vial carries the lot number its certificate is issued against, so you can check what is in your hand against the document. Certificates are issued by the independent laboratory that performed the analysis, not by us.
+
+**How fast do orders ship?**
+
+Orders placed before 2 PM PST are dispatched the same business day from our fulfilment partner’s US-based, climate-controlled facility, with tracking provided within 24 hours.
+
+**Do you ship internationally?**
+
+No. Orders are shipped within the United States only, to verified research institutions and qualified buyers.
+
+## Pages
+
+- [Products](https://glowresearch.shop/peptides.html): the full catalog
+- [Our process](https://glowresearch.shop/process.html): the six steps from synthesis to dispatch, and who performs each
+- [About](https://glowresearch.shop/about.html): where Glow sits in the chain, and the five published principles
+- [Shipping](https://glowresearch.shop/shipping.html): cutoff, transit, coverage and terms
+- [Wholesale](https://glowresearch.shop/wholesale.html): volume pricing for institutions
+- [Research blog](https://glowresearch.shop/blog.html)
+- [Contact](https://glowresearch.shop/contact.html)

@@ -70,18 +70,26 @@ function required(html, re, label) {
   return html;
 }
 
+// All three of these take a replacer function rather than a replacement
+// string. "$1" and "$2" in a replacement string are backreferences, and every
+// price starts with a dollar sign: fmtPrice() emits "$116.10", whose "$1" was
+// being substituted with capture group 1, so the generated GLP3-RT page read
+// `id="pdPrice">16.10` where its price should have been. A function receives
+// the groups as arguments and inserts the text literally, which is the only
+// form that is correct for arbitrary copy.
+
 // Fill an element that the donor leaves empty: <div id="x"></div>
 function fillEmpty(html, id, content) {
   const re = new RegExp(`(id="${id}"[^>]*>)(</)`);
   required(html, re, `empty element #${id}`);
-  return html.replace(re, `$1${content}$2`);
+  return html.replace(re, (m, open, close) => open + content + close);
 }
 
 // Replace the placeholder text inside an element: <h1 id="x">Product name</h1>
 function setText(html, id, text) {
   const re = new RegExp(`(id="${id}"[^>]*>)[^<]*(<)`);
   required(html, re, `text placeholder #${id}`);
-  return html.replace(re, `$1${text}$2`);
+  return html.replace(re, (m, open, close) => open + text + close);
 }
 
 // Replace the contents of an element the donor ships filled: <dl id="x">…</dl>.
@@ -90,7 +98,7 @@ function setText(html, id, text) {
 function setInner(html, id, tag, content) {
   const re = new RegExp(`(id="${id}"[^>]*>)[\\s\\S]*?(</${tag}>)`);
   required(html, re, `#${id} contents`);
-  return html.replace(re, `$1${content}$2`);
+  return html.replace(re, (m, open, close) => open + content + close);
 }
 
 // Prefix root-relative URLs so they resolve from peptides/<slug>/.
@@ -222,7 +230,7 @@ function buildProduct(p, donor) {
   html = setText(html, 'pdCrumbCat', esc(CAT_LABEL[p.cat]));
   html = html.replace(
     /(id="pdCrumbCat"\s+)href="[^"]*"/,
-    `$1href="peptides.html?cat=${p.cat}"`
+    (m, open) => `${open}href="peptides.html?cat=${p.cat}"`
   );
   html = setText(html, 'pdCrumbName', esc(p.name));
   html = setText(html, 'pdTag', esc(p.tag));
@@ -240,7 +248,7 @@ function buildProduct(p, donor) {
     : money(s.price);
   const priceRe = /(id="pdPrice"[^>]*>)[\s\S]*?(<\/span>)/;
   required(html, priceRe, 'price placeholder #pdPrice');
-  html = html.replace(priceRe, `$1${priceHtml}$2`);
+  html = html.replace(priceRe, (m, open, close) => open + priceHtml + close);
 
   html = fillEmpty(html, 'pdSizes', p.sizes.map((sz, i) =>
     `<button type="button" class="pd-size${i === 0 ? ' is-active' : ''}` +
