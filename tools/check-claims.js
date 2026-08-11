@@ -702,6 +702,113 @@ console.log('\nhomepage FAQ');
  *     whose whole job is to list what Glow sells listed nothing to anyone who
  *     did not run JavaScript.
  * ------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+ * 7e. One title and one description per page. Each was typed out four to six
+ *     times: <title> and og:title; meta description, og:description,
+ *     twitter:description, and on six pages a `description` in the structured
+ *     data too. Nothing compared them, and they had already stopped agreeing.
+ *     tools/page-meta.js holds the strings and tools/build-meta.js writes every
+ *     copy; this fails the build when a copy no longer matches the source.
+ * ------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+ * 7f. The About page's facts table. Ten rows of prose, three of which restate
+ *     values the catalog already holds. Two of those are pinned here.
+ *
+ *     The Testing row is the one that matters: it reads "COA on request",
+ *     which is COA_COPY.short in its held state, typed by hand. Flip
+ *     COAS_PUBLISHED and the cart, the FAQ, the account area, the product page
+ *     and the evidence panel all upgrade while this row keeps telling people
+ *     to email us. Same contract as the evidence panel in product.html: the
+ *     markup is a hand edit, and the audit is what stops it going stale.
+ * ------------------------------------------------------------------------- */
+console.log('\nAbout page facts');
+{
+  const rows = Object.fromEntries([...read('about.html')
+    .matchAll(/<dt>(.*?)<\/dt>\s*<dd>([\s\S]*?)<\/dd>/g)]
+    .map(m => [m[1].trim(), m[2].replace(/\s+/g, ' ').trim()]));
+
+  ok('the facts table is still there', Object.keys(rows).length >= 8,
+    `found ${Object.keys(rows).length} rows`);
+
+  ok(`the Testing row states the current certificate route ("${COA_COPY.short}")`,
+    (rows.Testing || '').includes(COA_COPY.short),
+    `reads "${rows.Testing}" — COAS_PUBLISHED changed without updating about.html`);
+
+  // The regulatory hedge, taken from SOURCE_LONG rather than restated, so
+  // softening or strengthening it in the catalog fails here until the page
+  // agrees. "operating to ..." is the part that carries the qualification.
+  const hedge = SOURCE_LONG.slice(SOURCE_LONG.indexOf('operating to'));
+  ok('the Manufacturing row keeps the hedge SOURCE_LONG carries',
+    (rows.Manufacturing || '').includes(hedge),
+    `expected "...${hedge}", got "${rows.Manufacturing}"`);
+
+  // Covered globally by the cutoff and transit scans, checked here too because
+  // this row is the compact restatement someone is most likely to hand-edit.
+  ok('the Dispatch row quotes the enforced cutoff and transit',
+    (rows.Dispatch || '').includes(CUTOFF_LABEL) &&
+    (rows.Dispatch || '').includes(`${TRANSIT_DAYS}-day FedEx`),
+    rows.Dispatch);
+}
+
+console.log('\npage metadata');
+{
+  const { PAGE_META } = require(path.join(ROOT, 'tools/page-meta.js'));
+  const attr = t => String(t).replace(/"/g, '&quot;');
+  const grab = (h, re) => { const m = h.match(re); return m && m[1] !== undefined ? m[1] : null; };
+
+  const drift = [];
+  Object.entries(PAGE_META).forEach(([file, meta]) => {
+    const h = read(file);
+    const want = {
+      '<title>': [grab(h, /<title>([\s\S]*?)<\/title>/), meta.title],
+      'description': [grab(h, /<meta name="description"\s+content="([^"]*)"/), attr(meta.desc)],
+      'og:title': [grab(h, /<meta property="og:title"\s+content="([^"]*)"/), attr(meta.name)],
+      'og:description': [grab(h, /<meta property="og:description"\s+content="([^"]*)"/), attr(meta.desc)],
+      'twitter:title': [grab(h, /<meta name="twitter:title"\s+content="([^"]*)"/), attr(meta.name)],
+      'twitter:description': [grab(h, /<meta name="twitter:description"\s+content="([^"]*)"/), attr(meta.desc)],
+    };
+    Object.entries(want).forEach(([label, [got, expected]]) => {
+      if (got !== expected) drift.push(`${file} ${label}`);
+    });
+
+    // og:url is the canonical, not a second URL to maintain.
+    const canon = grab(h, /<link rel="canonical" href="([^"]*)"/);
+    const ogUrl = grab(h, /<meta property="og:url"\s+content="([^"]*)"/);
+    if (canon && ogUrl !== canon) drift.push(`${file} og:url != canonical`);
+
+    // Structured data the page owns has to describe the same page.
+    for (const m of h.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+      let d; try { d = JSON.parse(m[1]); } catch (e) { continue; }
+      if (!/^(WebPage|CollectionPage|ContactPage|AboutPage)$/.test(d['@type'])) continue;
+      const plain = t => String(t).replace(/&amp;/g, '&');
+      if (d.name !== plain(meta.name)) drift.push(`${file} schema name`);
+      if (d.description !== plain(meta.desc)) drift.push(`${file} schema description`);
+    }
+  });
+  ok(`every copy of a title and description matches page-meta.js (${Object.keys(PAGE_META).length} pages)`,
+    drift.length === 0, `${drift.join(', ')}\n          run \`node tools/build-meta.js\``);
+
+  // A generator writing its own copy of a page description is the drift this
+  // section exists to stop, so the catalog build reads the same file.
+  ok('the catalog schema reads its description from page-meta.js',
+    /PAGE_META\[PAGE\]\.desc/.test(read('tools/build-catalog.js')));
+
+  // Search results truncate past roughly 160 characters, and a description
+  // that gets cut mid-sentence is a description nobody finished writing.
+  const longDesc = Object.entries(PAGE_META).filter(([, m]) => m.desc.length > 185);
+  ok('no description runs past what a search result will show',
+    longDesc.length === 0,
+    longDesc.map(([f, m]) => `${f} is ${m.desc.length}`).join(', '));
+
+  // Every indexable page should have an entry: a page added without one keeps
+  // whatever was typed into it and is never checked again.
+  const indexable = pages.filter(f => !f.includes('/') &&
+    !/<meta name="robots"[^>]*noindex/.test(read(f)));
+  const unlisted = indexable.filter(f => !PAGE_META[f]);
+  ok('every indexable page is listed in page-meta.js', unlisted.length === 0,
+    unlisted.join(', '));
+}
+
 console.log('\ncrawlable content');
 {
   // Text a crawler receives, with script and style stripped out.
@@ -722,10 +829,10 @@ console.log('\ncrawlable content');
   ok('the grid is one renderer, not two',
     /productCardHtml\(p, i\)/.test(read('js/products-data.js')));
 
-  // Every page worth landing on from a search result should say what it is.
-  const wantSchema = ['index.html', 'peptides.html', 'product.html', 'process.html',
-    'about.html', 'shipping.html', 'wholesale.html', 'contact.html', 'blog.html'];
-  const bare = wantSchema.filter(f => !read(f).includes('application/ld+json'));
+  // Every page worth landing on from a search result should say what it is,
+  // and the list is page-meta.js rather than a second list kept alongside it.
+  const { PAGE_META: META } = require(path.join(ROOT, 'tools/page-meta.js'));
+  const bare = Object.keys(META).filter(f => !read(f).includes('application/ld+json'));
   ok('every indexable page carries structured data', bare.length === 0, bare.join(', '));
 
   // Invalid JSON-LD is worse than none: it is silently dropped.

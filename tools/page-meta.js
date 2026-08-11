@@ -1,0 +1,107 @@
+// ===================== Glow Research — page metadata =====================
+//
+// One title and one description per hand-written page.
+//
+// Each of those two strings used to be typed out three or four times per page:
+// <title> and og:title; then meta description, og:description,
+// twitter:description, and for six pages a `description` in the JSON-LD too.
+// Nothing checked that the copies agreed, and they had already stopped: the
+// structured data added to peptides, shipping, wholesale, product and contact
+// described those pages differently from their own meta tags, on the same day
+// it was written.
+//
+// So the strings live here and tools/build-meta.js writes every copy from
+// them. Edit one line, run the build, and the page, the share card and the
+// structured data say the same thing. check-claims.js fails the build if any
+// copy drifts.
+//
+//   name   the page as a thing: used for og:title, twitter:title, and the
+//          `name` in structured data. No site suffix.
+//   title  the browser tab and the search result heading. Suffixed, because a
+//          result reading "Shipping" alone says nothing about whose.
+//   desc   one sentence or two, used verbatim by all four description
+//          surfaces. Under ~160 characters or a search result truncates it.
+//
+// Pages left out on purpose: account, checkout, signin, thank-you,
+// reset-password and 404 are noindex and never shared, so a share card and a
+// schema block would be maintenance with no reader. The generated product
+// pages are not here either: build-products.js derives their metadata from the
+// catalog, which is the same principle applied to data that already exists.
+
+const SUFFIX = 'Glow Research';
+const t = name => `${name} | ${SUFFIX}`;
+
+const PAGE_META = {
+  'index.html': {
+    name: 'Glow Research | Research-Grade Peptides',
+    title: 'Glow Research | Research-Grade Peptides',
+    desc: 'Glow Research supplies research-grade peptides for laboratory and in-vitro research use only. U.S. manufacturing partner, third-party tested lots, same-day shipping before 2PM PST.',
+  },
+  'peptides.html': {
+    name: 'Full Catalog',
+    title: t('Full Catalog'),
+    desc: 'Browse the full Glow Research peptide catalog: growth, tissue, cognitive, and metabolic research compounds. Every lot is tested by an independent third-party laboratory.',
+  },
+  'product.html': {
+    name: 'Product',
+    title: t('Product'),
+    desc: 'Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only. Size options, specifications, and same-day shipping before 2PM PST.',
+  },
+  'process.html': {
+    name: 'Our Process | From Source to Shipment',
+    title: t('Our Process'),
+    desc: 'How Glow research compounds move from our U.S. manufacturing partner through independent testing, batch documentation, controlled handling, and same-day shipping before 2:00 PM PST.',
+  },
+  'about.html': {
+    name: 'About Glow Research',
+    title: 'About Glow Research | Research Peptide Supplier in San Diego',
+    desc: 'Glow Research is a San Diego, California supplier of research peptides and research-use-only compounds. A retailer, not a manufacturer: we work with a U.S. manufacturing partner.',
+  },
+  'shipping.html': {
+    name: 'Shipping',
+    title: t('Shipping'),
+    desc: 'Order before 2:00 PM PST and it ships the same business day on 2-day FedEx Express. Free over $400. All 50 states.',
+  },
+  'wholesale.html': {
+    name: 'Wholesale',
+    title: t('Wholesale'),
+    desc: 'Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day.',
+  },
+  'contact.html': {
+    name: 'Contact Us',
+    title: t('Contact Us'),
+    desc: 'Reach the Glow Research team at support@glowresearch.shop for order status, wholesale applications, or general questions.',
+  },
+  'blog.html': {
+    name: 'Peptide Blog: News, Research &amp; Handling Guides',
+    title: t('Peptide Blog: News, Research &amp; Handling Guides'),
+    desc: "Peptide news, research, and practical guidance covering storage, reconstitution, certificates of analysis, quality standards, and what's changing across the research peptide industry.",
+  },
+  'calculator.html': {
+    name: 'Peptide Concentration Calculator',
+    title: t('Peptide Concentration Calculator'),
+    desc: 'Work out concentration from the mass in the vial and the diluent you add. For laboratory research use only.',
+  },
+  'affiliate.html': {
+    name: 'Partner Program',
+    title: t('Partner Program'),
+    desc: 'Earn commission referring qualified research buyers to Glow Research as a partner. 60-day attribution, monthly payouts, no therapeutic claims.',
+  },
+  'privacy.html': {
+    name: 'Privacy Policy',
+    title: t('Privacy Policy'),
+    desc: "How Glow Research collects, stores, and uses information: what's saved in your browser, what we don't track, and what changes once accounts and payment go live.",
+  },
+  'terms.html': {
+    name: 'Terms &amp; Conditions',
+    title: t('Terms &amp; Conditions'),
+    desc: 'Terms of service for Glow Research: eligibility, research-use-only sales, shipping, returns, and the retailer relationship with our fulfilment partner.',
+  },
+  'ruo-agreement.html': {
+    name: 'Research Use Only Agreement',
+    title: t('Research Use Only Agreement'),
+    desc: 'The Research Use Only agreement every Glow Research buyer accepts: no human or animal use, no dosing guidance, and buyer responsibility for lawful, qualified handling.',
+  },
+};
+
+module.exports = { PAGE_META, SUFFIX };

@@ -8,6 +8,7 @@ No dependencies to install. Everything here is plain Node.
 
 ```bash
 node tools/build.js          # the usual one: FAQ + products (when live) + sitemap + audit
+node tools/build-meta.js     # every copy of each page's title + description
 node tools/build-faq.js      # homepage FAQ markup + FAQPage schema
 node tools/build-catalog.js  # peptides.html grid + CollectionPage schema
 node tools/build-llms.js     # llms.txt
@@ -19,8 +20,8 @@ node tools/build-blog.js     # blog, read the warning below first
 
 ## `build.js`
 
-The everyday entry point. Runs `build-faq.js`, `build-catalog.js`,
-`build-llms.js`, then `build-products.js` (which refreshes `sitemap.xml` on its
+The everyday entry point. Runs `build-meta.js`, `build-faq.js`,
+`build-catalog.js`, `build-llms.js`, then `build-products.js` (which refreshes `sitemap.xml` on its
 way through), then `check-claims.js`.
 
 ### One rule for all of them
@@ -99,6 +100,13 @@ It currently checks that:
   JSON-LD block parses; the process page's `ItemList` describes the six steps
   actually on the page; and `llms.txt` covers the whole catalog with the
   research-use framing and the enforced cutoff
+- every copy of every page title and description matches `tools/page-meta.js`,
+  `og:url` equals the canonical, no description runs past what a search result
+  shows, and every indexable page has an entry
+- the About page's facts table agrees with the catalog: the Testing row states
+  the current `COA_COPY.short`, the Manufacturing row keeps the hedge
+  `SOURCE_LONG` carries, and the Dispatch row quotes `CUTOFF_LABEL` and
+  `TRANSIT_DAYS`
 - no build script inserts copy with a `$1` replacement string, and a price
   beginning `$1` is run through the card renderer to prove it survives
 - no page promises a certificate while `COAS_PUBLISHED` is false
@@ -131,6 +139,24 @@ crawlable text.
 The COA answer reads from `COA_COPY`, so it flips with `COAS_PUBLISHED` like
 every other certificate surface. Rebuild after flipping the flag; the audit
 fails if you forget.
+
+## `build-meta.js`
+
+Writes every copy of a page's title and description from the one entry in
+`tools/page-meta.js`: `<title>`, `meta description`, `og:title`,
+`og:description`, `og:url` (from the canonical), `twitter:title`,
+`twitter:description`, and the `name`/`description` of the page's own
+`WebPage`-family structured data. Four to six copies of two strings, written
+once.
+
+They had already drifted: the structured data added to peptides, shipping,
+wholesale, product and contact described those pages differently from their own
+meta tags, on the day it was written. Edit `page-meta.js`, run the build.
+
+It skips JSON-LD blocks carrying an `id=""` attribute, because those belong to a
+generator, and `build-catalog.js` reads `page-meta.js` for its description so
+there is still one source. Noindex pages have no entry: no share card, nothing
+to keep honest.
 
 ## `build-catalog.js`
 

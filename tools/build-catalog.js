@@ -36,6 +36,10 @@ const {
   GLOW_PRODUCTS, productCardHtml, productHref, salePrice, onSaleNow,
   sizeInStock, PRODUCT_PAGES_LIVE,
 } = require(path.join(ROOT, 'js/products-data.js'));
+// The page's name and description come from the one place every other copy of
+// them comes from, so this block cannot describe the catalog differently from
+// the catalog page's own meta tags.
+const { PAGE_META } = require(path.join(__dirname, 'page-meta.js'));
 
 function required(html, re, label) {
   if (!re.test(html)) {
@@ -53,10 +57,8 @@ function catalogJsonLd() {
     '@type': 'CollectionPage',
     '@id': `${SITE}/${PAGE}#webpage`,
     url: `${SITE}/${PAGE}`,
-    name: 'Research Peptides',
-    description:
-      'The full Glow Research catalog of research peptides and research-use-only ' +
-      'compounds. Every lot is tested by an independent third-party laboratory.',
+    name: PAGE_META[PAGE].name,
+    description: PAGE_META[PAGE].desc,
     isPartOf: { '@id': `${SITE}/#website` },
     about: { '@id': `${SITE}/#organization` },
     breadcrumb: {

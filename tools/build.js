@@ -20,7 +20,7 @@
 const { execFileSync } = require('node:child_process');
 const path = require('path');
 
-for (const script of ['build-faq.js', 'build-catalog.js', 'build-llms.js', 'build-products.js']) {
+for (const script of ['build-meta.js', 'build-faq.js', 'build-catalog.js', 'build-llms.js', 'build-products.js']) {
   console.log(`\n${script}`);
   execFileSync(process.execPath, [path.join(__dirname, script)], { stdio: 'inherit' });
 }
