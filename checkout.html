@@ -308,6 +308,17 @@
       <a href="peptides.html" class="btn btn-primary">Browse the catalog <span aria-hidden="true">&rarr;</span></a>
     </div>
 
+    <!-- No payment processor is wired in yet (PAYMENTS_LIVE in
+         js/products-data.js). Shown instead of the form so nobody fills out a
+         full order and address only to be told at submit that it did not go
+         through — and api/create-order.js refuses the order either way, so
+         this is the honest version of the same fact, not a separate rule. -->
+    <div class="co-empty" id="coNotLive" hidden>
+      <h2>We are not taking orders online just yet.</h2>
+      <p>Email <a href="mailto:support@glowresearch.shop">support@glowresearch.shop</a> with what you need and we will help you directly.</p>
+      <a href="peptides.html" class="btn btn-primary">Browse the catalog <span aria-hidden="true">&rarr;</span></a>
+    </div>
+
     <div id="coShell" hidden>
       <div class="co-headrow">
         <h1>Checkout</h1>

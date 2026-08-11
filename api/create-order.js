@@ -14,6 +14,7 @@ import {
 import {
   emailShell, heading, paragraph, eyebrow, fine, esc, sendEmail, money,
 } from './_email.js';
+import { PAYMENTS_LIVE } from '../js/products-data.js';
 
 const ADMIN_TO = 'preston@glowresearch.shop';
 const SUPPORT = 'support@glowresearch.shop';
@@ -30,6 +31,19 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // No payment processor is wired in yet — see PAYMENTS_LIVE in
+  // js/products-data.js. Below this point the handler creates a real
+  // WooCommerce order and emails the shopper that their payment was received,
+  // which would be false. js/checkout.js shows an honest state instead of the
+  // form for the same reason, but that is a client-side courtesy, not the
+  // gate: this check is what actually stops an order being created if it is
+  // ever bypassed, hit directly, or the client-side copy drifts.
+  if (!PAYMENTS_LIVE) {
+    return res.status(503).json({
+      error: 'We are not able to take orders online yet. Email support@glowresearch.shop and we will help you directly.',
+    });
   }
 
   const body = readBody(req);

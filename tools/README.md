@@ -109,6 +109,11 @@ It currently checks that:
   `TRANSIT_DAYS`
 - no build script inserts copy with a `$1` replacement string, and a price
   beginning `$1` is run through the card renderer to prove it survives
+- checkout cannot create an order or send a "payment received" email while
+  `PAYMENTS_LIVE` is false: `api/create-order.js` refuses before touching
+  WooCommerce, and the refusal runs before any WooCommerce call or email in the
+  file. `js/checkout.js` shows an honest state instead of the form for the same
+  reason, but that is a courtesy, not the gate
 - no page promises a certificate while `COAS_PUBLISHED` is false
 - no fabricated ratings or reviews appear in structured data
 - every product carries every field the site reads, so a lossy supplier import

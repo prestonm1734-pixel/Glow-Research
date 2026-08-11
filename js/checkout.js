@@ -43,6 +43,19 @@
     const items = window.GlowCart ? window.GlowCart.items() : [];
     const shell = $('coShell');
     const empty = $('coEmpty');
+    const notLive = $('coNotLive');
+
+    // Checked before the empty-cart state: whether there is anything to buy is
+    // moot if nothing can be bought yet. api/create-order.js enforces this too
+    // and is what actually matters — this only saves someone filling out a
+    // full order to be told at the end it did not go through.
+    if (typeof PAYMENTS_LIVE !== 'undefined' && !PAYMENTS_LIVE) {
+      shell.hidden = true;
+      empty.hidden = true;
+      notLive.hidden = false;
+      return;
+    }
+    notLive.hidden = true;
 
     if (!items.length) {
       shell.hidden = true;
@@ -306,6 +319,17 @@
 
       const items = window.GlowCart ? window.GlowCart.items() : [];
       if (!items.length) return;
+
+      // renderSummary() hides the form entirely while this is false, so
+      // reaching here means the form was already there when the page loaded
+      // (e.g. a cached page from before the flag flipped) — belt-and-suspenders
+      // before the network round trip. api/create-order.js refuses this too
+      // regardless, so nothing about correctness depends on this check.
+      if (typeof PAYMENTS_LIVE !== 'undefined' && !PAYMENTS_LIVE) {
+        $('coPlacedMsg').textContent = 'We are not able to take orders online yet. Email support@glowresearch.shop and we will help you directly.';
+        $('coPlacedMsg').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        return;
+      }
 
       // The checkbox is `required`, so this only fires if a browser lets the
       // form submit anyway — belt-and-suspenders before the network round trip.

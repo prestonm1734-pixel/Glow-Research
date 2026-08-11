@@ -903,6 +903,50 @@ console.log('\nstructured data');
  *    these fields. A supplier import that drops one should fail here, loudly,
  *    rather than render an empty tab to a customer.
  * ------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+ * 8b. Checkout cannot create a paid-sounding order without a payment
+ *     processor. This was found live: checkout.html was fully reachable with
+ *     nothing gating it, api/create-order.js created a real WooCommerce order
+ *     regardless, and the confirmation email told the shopper "we have your
+ *     payment of $X" when nothing had charged them. PAYMENTS_LIVE in
+ *     js/products-data.js is the fix, read on both sides. This checks that
+ *     the server-side gate is actually there, since that is the one that
+ *     matters — a client-side-only check is a suggestion a request can skip.
+ * ------------------------------------------------------------------------- */
+console.log('\ncheckout gate');
+{
+  const order = read('api/create-order.js');
+  ok('create-order.js imports PAYMENTS_LIVE from the catalog',
+    /import\s*\{[^}]*PAYMENTS_LIVE[^}]*\}\s*from\s*'\.\.\/js\/products-data\.js'/.test(order));
+  ok('create-order.js refuses to run while PAYMENTS_LIVE is false',
+    /if\s*\(!PAYMENTS_LIVE\)/.test(order));
+  // The refusal has to come before WooCommerce is touched and before an email
+  // is built, or the gate exists but does nothing.
+  const gateAt = order.indexOf('if (!PAYMENTS_LIVE)');
+  const firstWcCall = order.search(/\bwc\(/);
+  const firstEmail = order.indexOf('sendEmail(');
+  ok('the gate runs before any WooCommerce call or email is sent',
+    gateAt !== -1 && (firstWcCall === -1 || gateAt < firstWcCall) &&
+    (firstEmail === -1 || gateAt < firstEmail));
+
+  // Client side is the courtesy, not the gate, but it should exist and agree.
+  const coJs = read('js/checkout.js');
+  const coHtml = read('checkout.html');
+  ok('js/checkout.js shows an honest state instead of the form',
+    /PAYMENTS_LIVE/.test(coJs) && /coNotLive/.test(coJs));
+  ok('checkout.html carries the coNotLive element',
+    /id="coNotLive"/.test(coHtml));
+
+  // While it is false, the order-confirmation email must not exist to be sent
+  // — checked structurally above — but if PAYMENTS_LIVE is ever flipped back
+  // on, the emails still must not claim a payment the site cannot take. This
+  // guards the wording itself so a future re-read of this file does not need
+  // to rediscover why the check above exists.
+  ok('the confirmation email states a payment was received',
+    /have your order and your payment of/i.test(order),
+    'expected wording so PAYMENTS_LIVE stays the only thing gating it');
+}
+
 console.log('\ncatalog shape');
 {
   const required = ['name', 'tag', 'cat', 'purity', 'sizes', 'blurb', 'about', 'research'];

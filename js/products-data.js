@@ -67,6 +67,30 @@ const COA_URL = '';
 // have to go live in the same deploy.
 const COAS_PUBLISHED = false;
 
+// ---------------------------------------------------------------------------
+// Is a payment processor actually wired in yet?
+//
+// api/create-order.js creates the order in WooCommerce as `pending` regardless,
+// and nothing in this codebase collects a card number today — checkout mounts
+// a slot where the processor's own fields will go, but there is no processor.
+// Without this flag, the checkout page still worked end to end: it created a
+// real order and sent the shopper an email that says "we have your payment of
+// $X", which was never true. That is the exact failure PRINCIPLES.md exists to
+// catch, and it was reachable by anyone on the live site with nothing gating
+// it.
+//
+// Read on both sides: js/checkout.js shows an honest "not open yet" state
+// instead of the form, and api/create-order.js — the side that actually
+// matters, since a client-side gate alone is just a suggestion to a browser
+// that could skip it — refuses to create the order or send the confirmation
+// at all while this is false. Both read this one constant, via the same
+// CommonJS guard tools/*.js already uses, so there is one flag rather than a
+// client copy that could say "closed" while the server still opens.
+//
+// Flip it to true in the same change that wires a real processor into
+// checkout.html and api/create-order.js, not before.
+const PAYMENTS_LIVE = false;
+
 // The certificate copy, in one place. Both branches describe the same
 // operation — third-party tested lots, a certificate per batch — and differ
 // only in how the reader gets hold of the document.
@@ -728,5 +752,6 @@ if (typeof module !== 'undefined' && module.exports) {
     PRODUCT_PAGES_LIVE,
     COAS_PUBLISHED,
     COA_COPY,
+    PAYMENTS_LIVE,
   };
 }
