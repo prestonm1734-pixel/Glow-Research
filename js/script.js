@@ -37,40 +37,39 @@ function renderProducts(filter) {
 
 renderProducts('all');
 
-/* ---------- FAQ ---------- */
-const faqs = [
-  { q: 'Are Glow Research peptides intended for human consumption?', a: 'No. All products sold by Glow Research are strictly for laboratory and in-vitro research use only. They are not drugs, supplements, foods, or cosmetics. They have not been evaluated or approved by the FDA for any use, and they are not intended to diagnose, treat, cure, or prevent any disease. They are not for human or animal use of any kind.' },
-  { q: 'Why are Glow Research peptides priced the way they are?', a: 'Our pricing reflects what goes into every lot at the facilities behind it: US-based production held to cGMP-aligned quality practices, and independent third-party lab testing on every lot. Peptides priced well below market are almost always cutting one of those corners, and we would rather hold the standard than the lowest price.' },
-  // Answer comes from COA_COPY in js/products-data.js, which keys off
-  // COAS_PUBLISHED. While certificates are not hosted this offers the route
-  // that works — email us — and it upgrades itself to "linked from every
-  // product page" the moment they are, with no edit here.
-  { q: 'Where do I find a lot’s COA?', a: COA_COPY.faq },
-  { q: 'How fast do orders ship?', a: 'Orders placed before 2PM PST are dispatched the same business day from our fulfilment partner’s US-based, climate-controlled facility, with tracking provided within 24 hours.' },
-  { q: 'Do you ship internationally?', a: 'No. Orders are shipped within the United States only, to verified research institutions and qualified buyers.' },
-];
-const faqList = document.getElementById('faqList');
-faqs.forEach(f => {
-  const item = document.createElement('div');
-  item.className = 'faq-item';
-  item.innerHTML = `
-    <button class="faq-q">${f.q} <span class="icon">+</span></button>
-    <div class="faq-a"><p>${f.a}</p></div>
-  `;
+/* ---------- FAQ ----------
+   The questions and answers live in FAQS in js/products-data.js and are baked
+   into #faqList by tools/build-faq.js, so they are in the served HTML rather
+   than injected here. That is the whole point: a crawler that does not run
+   JavaScript, which is most of the ones feeding AI answer engines, used to get
+   an empty <div> where five answers should have been.
+
+   What is left here is behaviour, bound to markup that already exists. */
+document.querySelectorAll('.faq-item').forEach(item => {
   const btn = item.querySelector('.faq-q');
   const ans = item.querySelector('.faq-a');
+  if (!btn || !ans) return;
+
+  // The COA answer is the one that changes with COAS_PUBLISHED. The build bakes
+  // the current state, but the cart, account area and product page all render
+  // it at runtime, so this keeps the FAQ in step even if the flag is flipped
+  // without a rebuild. check-claims.js fails the build on that drift anyway.
+  const coa = ans.querySelector('#faqCoa');
+  if (coa && typeof COA_COPY !== 'undefined') coa.textContent = COA_COPY.faq;
+
   btn.addEventListener('click', () => {
     const isOpen = item.classList.contains('open');
     document.querySelectorAll('.faq-item').forEach(i => {
       i.classList.remove('open');
       i.querySelector('.faq-a').style.maxHeight = null;
+      i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
     });
     if (!isOpen) {
       item.classList.add('open');
       ans.style.maxHeight = ans.scrollHeight + 'px';
+      btn.setAttribute('aria-expanded', 'true');
     }
   });
-  faqList.appendChild(item);
 });
 
 /* ---------- newsletter ---------- */

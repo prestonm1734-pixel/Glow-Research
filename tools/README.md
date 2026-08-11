@@ -7,7 +7,8 @@ the output, the change doesn't ship.
 No dependencies to install. Everything here is plain Node.
 
 ```bash
-node tools/build.js          # the usual one: products (when live) + sitemap + audit
+node tools/build.js          # the usual one: FAQ + products (when live) + sitemap + audit
+node tools/build-faq.js      # homepage FAQ markup + FAQPage schema
 node tools/build-products.js # one page per compound
 node tools/build-sitemap.js  # sitemap.xml on its own
 node tools/check-claims.js   # promise audit, run before every commit
@@ -16,8 +17,8 @@ node tools/build-blog.js     # blog, read the warning below first
 
 ## `build.js`
 
-The everyday entry point. Runs `build-products.js`, which refreshes
-`sitemap.xml` on its way through, then `check-claims.js`.
+The everyday entry point. Runs `build-faq.js`, then `build-products.js` (which
+refreshes `sitemap.xml` on its way through), then `check-claims.js`.
 
 It deliberately does **not** run `build-blog.js`. See below.
 
@@ -76,6 +77,10 @@ It currently checks that:
   `Organization` schema matches the footer on every page. Added because
   shortening that page's lede dropped the state from the visible text in one
   edit while every `<head>` tag still carried it
+- the homepage FAQ is in the served markup rather than injected on load, the
+  markup matches `faqHtml()`, the `FAQPage` schema matches `FAQS` question for
+  question, the answers stay readable with JavaScript off, and the certificate
+  answer is the current `COA_COPY` state
 - no page promises a certificate while `COAS_PUBLISHED` is false
 - no fabricated ratings or reviews appear in structured data
 - every product carries every field the site reads, so a lossy supplier import
@@ -84,6 +89,28 @@ It currently checks that:
 
 **Adding a claim to the site? Add its check here in the same commit.** That is
 the whole point: the list grows as the promises do.
+
+## `build-faq.js`
+
+Bakes the homepage FAQ into `index.html`: the markup inside `<div id="faqList">`
+and a `FAQPage` block of structured data.
+
+The questions live in `FAQS` in `js/products-data.js`. Edit the array, run the
+build. `js/script.js` no longer creates the list, it binds the accordion to
+markup that is already there.
+
+It exists because the FAQ used to be an array in `js/script.js` injected into an
+empty `<div>` on load, so **none of it was in the served HTML**. Google renders
+JavaScript and would have got there eventually; the crawlers behind AI answer
+engines largely do not, and a question followed by a direct answer is the most
+quotable shape of content on a site. Five answers about human consumption,
+pricing, certificates and shipping were reaching nobody who asked an assistant
+any of those questions. The homepage went from 1,524 to 3,132 characters of
+crawlable text.
+
+The COA answer reads from `COA_COPY`, so it flips with `COAS_PUBLISHED` like
+every other certificate surface. Rebuild after flipping the flag; the audit
+fails if you forget.
 
 ## `build-products.js`
 

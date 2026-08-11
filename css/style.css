@@ -781,6 +781,11 @@ button[disabled].si-forgot{ cursor: progress; }
 .faq-q:hover .icon{ border-color: rgba(255,255,255,.5); background: rgba(255,255,255,.08); }
 .faq-item.open .faq-q .icon{ transform: rotate(45deg); background: var(--grad-main); border-color: transparent; color:#0a0a0a; }
 .faq-a{ max-height:0; overflow:hidden; transition: max-height .4s ease; }
+/* Collapsed only when there is script to open it again. The answers are in the
+   served markup either way, which is what a crawler needs, but a reader with no
+   JavaScript would otherwise get five questions and no way to reach an answer.
+   `js` is set on <html> by an inline script in the head, so there is no flash. */
+html:not(.js) .faq-a{ max-height: none; }
 .faq-a p{ padding: 0 4px 22px; font-size:0.92rem; }
 
 /* ---------- footer newsletter band ---------- */

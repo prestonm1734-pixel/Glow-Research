@@ -27,7 +27,7 @@ const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, CUTOFF_LABEL, CUTOFF_LABEL_SHORT,
   ANALYSIS_SHORT, ANALYSIS_LONG, SOURCE_LONG, evidenceRows, evidenceHtml,
-  identityLine,
+  identityLine, FAQS, faqHtml, COA_COPY,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -638,6 +638,61 @@ console.log('\nlocation');
   ok('every page footer states the same street address as the schema',
     street !== '' && mismatched.length === 0,
     street === '' ? 'no streetAddress in the schema' : `missing from ${mismatched.join(', ')}`);
+}
+
+/* ---------------------------------------------------------------------------
+ * 7c. The homepage FAQ. It is generated from FAQS by tools/build-faq.js into
+ *     both the markup and a FAQPage block, which means two copies of the same
+ *     five answers in a file nobody rebuilds by habit. Same contract as the
+ *     evidence panel: the served page has to equal what the code renders, and
+ *     when it does not, this prints the markup to paste.
+ * ------------------------------------------------------------------------- */
+console.log('\nhomepage FAQ');
+{
+  const home = read('index.html');
+
+  // The reason this was moved out of js/script.js in the first place.
+  const listed = (home.match(/class="faq-q"/g) || []).length;
+  ok(`all ${FAQS.length} answers are in the served HTML, not injected on load`,
+    listed === FAQS.length, `found ${listed} in the markup`);
+  ok('js/script.js binds the accordion rather than building it',
+    !/faqList\.appendChild/.test(read('js/script.js')));
+
+  const served = (home.match(/<div class="faq-list" id="faqList">([\s\S]*?)<\/div>\s*<\/div>\s*<\/section>/) || [, ''])[1];
+  ok('the served FAQ matches what faqHtml() renders',
+    served.trim() === faqHtml().trim(),
+    'run `node tools/build-faq.js`');
+
+  // The schema is what an answer engine reads; it must not describe a
+  // different FAQ from the one on the page.
+  let schema = null;
+  try {
+    schema = JSON.parse((home.match(/<script type="application\/ld\+json" id="faq-jsonld">([\s\S]*?)<\/script>/) || [, 'null'])[1]);
+  } catch (e) { /* left null, reported below */ }
+  ok('the page carries FAQPage structured data',
+    schema && schema['@type'] === 'FAQPage' && Array.isArray(schema.mainEntity));
+  if (schema && Array.isArray(schema.mainEntity)) {
+    const mismatched = FAQS.filter((f, i) => {
+      const e = schema.mainEntity[i];
+      return !e || e.name !== f.q || e.acceptedAnswer.text !== f.a;
+    });
+    ok('every question and answer in the schema matches the catalog',
+      schema.mainEntity.length === FAQS.length && mismatched.length === 0,
+      `run \`node tools/build-faq.js\`${mismatched.length ? `; drifted: ${mismatched.map(f => f.q).join(' | ')}` : ''}`);
+  }
+
+  // Having the copy in the markup is not the same as a person being able to
+  // read it: .faq-a is collapsed to max-height 0, so without the no-JS opt-out
+  // a reader with scripting off gets five questions and no answers.
+  ok('the answers are readable with no JavaScript',
+    /html:not\(\.js\) \.faq-a\{[^}]*max-height:\s*none/.test(read('css/style.css')));
+
+  // The COA answer keys off COAS_PUBLISHED like every other certificate
+  // surface, so a flag flip without a rebuild leaves the FAQ contradicting the
+  // cart and the product page.
+  ok('the certificate answer is the current COA_COPY state',
+    served.includes(COA_COPY.faq.replace(/&/g, '&amp;')) || served.includes(COA_COPY.faq),
+    'COAS_PUBLISHED changed without running `node tools/build-faq.js`');
 }
 
 console.log('\nstructured data');

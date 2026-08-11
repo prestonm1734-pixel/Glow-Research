@@ -94,6 +94,55 @@
   ]
 }
 </script>
+<script type="application/ld+json" id="faq-jsonld">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://glowresearch.shop/#faq",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Are Glow Research peptides intended for human consumption?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. All products sold by Glow Research are strictly for laboratory and in-vitro research use only. They are not drugs, supplements, foods, or cosmetics. They have not been evaluated or approved by the FDA for any use, and they are not intended to diagnose, treat, cure, or prevent any disease. They are not for human or animal use of any kind."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why are Glow Research peptides priced the way they are?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Our pricing reflects what goes into every lot at the facilities behind it: US-based production held to cGMP-aligned quality practices, and independent third-party lab testing on every lot. Peptides priced well below market are almost always cutting one of those corners, and we would rather hold the standard than the lowest price."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where do I find a lot’s COA?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Email support@glowresearch.shop with the compound and lot number, or the order number if you have already bought, and we will send the certificate for that exact batch, including batches that have since sold out. Every vial carries the lot number its certificate is issued against, so you can check what is in your hand against the document. Certificates are issued by the independent laboratory that performed the analysis, not by us."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How fast do orders ship?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Orders placed before 2 PM PST are dispatched the same business day from our fulfilment partner’s US-based, climate-controlled facility, with tracking provided within 24 hours."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you ship internationally?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Orders are shipped within the United States only, to verified research institutions and qualified buyers."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -274,7 +323,26 @@
     </div>
 
     <div class="faq-list" id="faqList">
-      <!-- injected -->
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false">Are Glow Research peptides intended for human consumption? <span class="icon" aria-hidden="true">+</span></button>
+        <div class="faq-a"><p>No. All products sold by Glow Research are strictly for laboratory and in-vitro research use only. They are not drugs, supplements, foods, or cosmetics. They have not been evaluated or approved by the FDA for any use, and they are not intended to diagnose, treat, cure, or prevent any disease. They are not for human or animal use of any kind.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false">Why are Glow Research peptides priced the way they are? <span class="icon" aria-hidden="true">+</span></button>
+        <div class="faq-a"><p>Our pricing reflects what goes into every lot at the facilities behind it: US-based production held to cGMP-aligned quality practices, and independent third-party lab testing on every lot. Peptides priced well below market are almost always cutting one of those corners, and we would rather hold the standard than the lowest price.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false">Where do I find a lot’s COA? <span class="icon" aria-hidden="true">+</span></button>
+        <div class="faq-a"><p id="faqCoa">Email support@glowresearch.shop with the compound and lot number, or the order number if you have already bought, and we will send the certificate for that exact batch, including batches that have since sold out. Every vial carries the lot number its certificate is issued against, so you can check what is in your hand against the document. Certificates are issued by the independent laboratory that performed the analysis, not by us.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false">How fast do orders ship? <span class="icon" aria-hidden="true">+</span></button>
+        <div class="faq-a"><p>Orders placed before 2 PM PST are dispatched the same business day from our fulfilment partner’s US-based, climate-controlled facility, with tracking provided within 24 hours.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false">Do you ship internationally? <span class="icon" aria-hidden="true">+</span></button>
+        <div class="faq-a"><p>No. Orders are shipped within the United States only, to verified research institutions and qualified buyers.</p></div>
+      </div>
     </div>
   </div>
 </section>

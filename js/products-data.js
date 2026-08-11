@@ -327,6 +327,63 @@ function identityLine(p, size) {
   return `${p.name}${mg} ${p.form || DEFAULT_FORM} peptide for in vitro research.`;
 }
 
+// ---------------------------------------------------------------------------
+// The homepage FAQ.
+//
+// It lived in js/script.js and was injected into an empty <div> on load, which
+// meant it did not exist for anyone who did not run JavaScript. That is most
+// of the crawlers that feed AI answer engines, and a FAQ is the single most
+// quotable thing on a site: a question followed by a direct answer. Five
+// answers about consumption, pricing, certificates and shipping were reaching
+// nobody who was asking.
+//
+// So it lives here, with the rest of the sitewide truth, and tools/build-faq.js
+// bakes both the markup and the FAQPage schema into index.html. Editing the
+// array and rebuilding is the whole workflow; check-claims.js fails the build
+// if the served markup and this array disagree.
+const FAQS = [
+  {
+    q: 'Are Glow Research peptides intended for human consumption?',
+    a: 'No. All products sold by Glow Research are strictly for laboratory and in-vitro research use only. They are not drugs, supplements, foods, or cosmetics. They have not been evaluated or approved by the FDA for any use, and they are not intended to diagnose, treat, cure, or prevent any disease. They are not for human or animal use of any kind.',
+  },
+  {
+    q: 'Why are Glow Research peptides priced the way they are?',
+    a: 'Our pricing reflects what goes into every lot at the facilities behind it: US-based production held to cGMP-aligned quality practices, and independent third-party lab testing on every lot. Peptides priced well below market are almost always cutting one of those corners, and we would rather hold the standard than the lowest price.',
+  },
+  {
+    // Answer comes from COA_COPY, which keys off COAS_PUBLISHED. While
+    // certificates are not hosted this offers the route that works, and it
+    // upgrades itself the moment they are, with no edit here.
+    id: 'faqCoa',
+    q: 'Where do I find a lot\u2019s COA?',
+    a: COA_COPY.faq,
+  },
+  {
+    // The cutoff is read, not typed. It is stated in four other places and
+    // every one of them derives from CUTOFF_HOUR.
+    q: 'How fast do orders ship?',
+    a: `Orders placed before ${CUTOFF_LABEL_SHORT} are dispatched the same business day from our fulfilment partner\u2019s US-based, climate-controlled facility, with tracking provided within 24 hours.`,
+  },
+  {
+    q: 'Do you ship internationally?',
+    a: 'No. Orders are shipped within the United States only, to verified research institutions and qualified buyers.',
+  },
+];
+
+// One renderer for the browser and the build, so the served markup and the
+// behaviour attached to it can never describe different questions.
+function faqHtml() {
+  return FAQS.map(f => `
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false">${escHtml(f.q)} <span class="icon" aria-hidden="true">+</span></button>
+        <div class="faq-a"><p${f.id ? ` id="${f.id}"` : ''}>${escHtml(f.a)}</p></div>
+      </div>`).join('');
+}
+
+function escHtml(t) {
+  return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 // The evidence panel, as data: the four steps of the chain of custody, in the
 // order they happen. Each row is a label, the fact, and the sentence that makes
 // the fact checkable.
@@ -646,6 +703,8 @@ if (typeof module !== 'undefined' && module.exports) {
     SOURCE_LONG,
     identityLine,
     DEFAULT_FORM,
+    FAQS,
+    faqHtml,
     evidenceRows,
     evidenceHtml,
     bulkSavingPct,
