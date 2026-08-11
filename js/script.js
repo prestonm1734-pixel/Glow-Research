@@ -72,6 +72,16 @@ document.querySelectorAll('.faq-item').forEach(item => {
   });
 });
 
+// The open height is a pixel value measured at the moment of the click, so any
+// resize that rewraps the answer leaves it clipped or padded out. That was
+// always true and is easy to hit now the list goes from two columns to one at
+// 860px: an answer opened wide is taller once the column halves. Re-measure the
+// open one rather than closing it out from under someone mid-read.
+window.addEventListener('resize', () => {
+  const open = document.querySelector('.faq-item.open .faq-a');
+  if (open) open.style.maxHeight = open.scrollHeight + 'px';
+});
+
 /* ---------- newsletter ---------- */
 document.getElementById('newsletterForm').addEventListener('submit', e => {
   e.preventDefault();

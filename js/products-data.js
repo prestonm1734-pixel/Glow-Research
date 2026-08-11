@@ -475,11 +475,21 @@ function lowerFirst(s) {
 
 // One renderer for the browser and the build, so the served markup and the
 // behaviour attached to it can never describe different questions.
+//
+// The list is split into two columns here rather than in CSS. A grid laid over
+// a flat list of items pairs them into rows, so opening one answer stretches
+// its row and leaves a hole the height of that answer beside it in the other
+// column. Two independent columns push only the items below them, and stacking
+// on mobile leaves the reading order the same as reading down each column on
+// desktop. The split is derived, so an added question rebalances itself.
 function faqHtml() {
-  return FAQS.map(f => `
-      <div class="faq-item">
-        <button class="faq-q" type="button" aria-expanded="false">${escHtml(f.q)} <span class="icon" aria-hidden="true">+</span></button>
-        <div class="faq-a"><p${f.id ? ` id="${f.id}"` : ''}>${escHtml(f.a)}</p></div>
+  const half = Math.ceil(FAQS.length / 2);
+  return [FAQS.slice(0, half), FAQS.slice(half)].map(col => `
+      <div class="faq-col">${col.map(f => `
+        <div class="faq-item">
+          <button class="faq-q" type="button" aria-expanded="false">${escHtml(f.q)} <span class="icon" aria-hidden="true">+</span></button>
+          <div class="faq-a"><p${f.id ? ` id="${f.id}"` : ''}>${escHtml(f.a)}</p></div>
+        </div>`).join('')}
       </div>`).join('');
 }
 

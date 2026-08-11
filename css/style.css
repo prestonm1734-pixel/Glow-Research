@@ -767,6 +767,19 @@ button[disabled].si-forgot{ cursor: progress; }
 
 /* ---------- faq ---------- */
 .faq-list{ max-width: 780px; margin: 0 auto; }
+/* Eleven questions in one column is a long scroll of nothing but headings, and
+   at desktop widths every row was a short question, a stretch of empty, then
+   the +. Two columns spend that empty space on the second half of the list.
+   The columns are real elements from faqHtml(), not a grid laid over one flat
+   list: paired into rows, an opened answer would leave a hole its own height
+   beside it. Below 860px they stack, which reads in the same order. */
+@media (min-width: 860px){
+  .faq-list{
+    max-width: 1040px;
+    display:grid; grid-template-columns: 1fr 1fr; column-gap: 56px;
+    align-items:start;
+  }
+}
 .faq-item{ border-bottom: 1px solid var(--border); }
 .faq-q{
   width:100%; text-align:left; background:none; border:none; color: var(--text);
