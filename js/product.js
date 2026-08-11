@@ -150,6 +150,7 @@
   function renderHeader(p) {
     $('pdTag').textContent = p.tag;
     $('pdName').textContent = p.name;
+    $('pdBlurb').textContent = p.blurb;
     $('pdVialName').textContent = p.name;
 
     // a handful of products ship with a real product photo; everything else
@@ -204,12 +205,11 @@
   }
 
   /* ================= the Glow Standard =================
-     The panel and the documentation tab are both drawn by evidenceHtml() /
-     docHtml() in js/products-data.js, which is the same code tools/build-
-     products.js runs at build time. Rendering here rather than trusting the
-     baked markup means one product page cannot end up showing another's record
-     after a navigation, and it is what fills the panel on product.html?p=<slug>,
-     which has no baked content at all. */
+     Drawn by evidenceHtml() in js/products-data.js, which is the same code
+     tools/build-products.js runs at build time. Rendering here rather than
+     trusting the baked markup means one product page cannot end up showing
+     another's record after a navigation, and it is what fills the panel on
+     product.html?p=<slug>, which has no baked content at all. */
 
   function renderEvidence(p) {
     const grid = $('pdEvidence');
@@ -239,12 +239,6 @@
     if (!cell) return;
     cell.querySelector('.gs-value').textContent = value;
     cell.querySelector('.gs-note').textContent = note;
-  }
-
-  function renderDoc(p) {
-    const list = $('pdDocList');
-    if (!list) return;
-    list.innerHTML = docHtml(p);
   }
 
   /* ================= description & research =================
@@ -462,7 +456,6 @@
     renderHeader(product);
     renderEvidence(product);
     renderInfo(product);
-    renderDoc(product);
     renderSizes(product);
     renderSelection();
     wireBuy();

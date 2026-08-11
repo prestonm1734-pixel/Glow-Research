@@ -171,6 +171,13 @@
     display:block; font-family:'JetBrains Mono', monospace; margin-bottom:10px;
   }
   .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:800; margin: 0 0 8px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
+  /* a reading measure, not the full column: this is one sentence and it should
+     look like one, not like a paragraph the price is sitting on top of */
+  .pd-blurb{
+    max-width: 54ch; margin: 0 0 20px;
+    font-size: 1.02rem; line-height:1.6; color:#45453f;
+  }
+  .pd-blurb:empty{ display:none; }
 
   .pd-label{
     font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:700; letter-spacing:.14em;
@@ -403,18 +410,6 @@
   }
   .gs-more:hover{ border-bottom-color:#0a0a0a; }
 
-  /* --- documentation tab --- */
-  .gs-doc{ max-width: 76ch; margin:0; border-top:1px solid rgba(0,0,0,.1); }
-  .gs-doc-row{
-    display:grid; grid-template-columns: minmax(140px, 200px) 1fr; gap: 6px 28px;
-    padding: 16px 0; border-bottom:1px solid rgba(0,0,0,.1);
-  }
-  .gs-doc-row dt{
-    font-family:'JetBrains Mono', monospace; font-size:.65rem; font-weight:600;
-    letter-spacing:.14em; text-transform:uppercase; color:#8a8a86; padding-top:4px;
-  }
-  .gs-doc-row dd{ margin:0; font-size:.98rem; line-height:1.6; color:#0a0a0a; }
-
   /* --- related --- */
   .pd-related h2{ margin-bottom: 28px; }
   .pd-related .gs-more{ margin-top: 34px; }
@@ -450,9 +445,6 @@
     .pd-standard{ padding: 48px 0 52px; }
     .gs-grid{ grid-template-columns: 1fr; }
     .gs-cell{ padding: 20px 20px 22px; }
-    /* the label column collapses above its value rather than squeezing the
-       value into what is left of a 320px line */
-    .gs-doc-row{ grid-template-columns: 1fr; gap: 7px; padding: 15px 0; }
     .pd-add{ width:100%; flex-basis:100%; }
     /* three vials in a ~83px card: at the desktop size the strip needs 118px
        and spills out the side, so it scales down and overlaps harder */
@@ -558,6 +550,11 @@
       <div class="pd-right">
         <span class="pd-tag" id="pdTag">Category</span>
         <h1 class="pd-name" id="pdName">Product name</h1>
+        <!-- The catalog card has always carried this line and the detail page
+             never did, so the one screen where someone decides to buy was the
+             one screen that did not say what the compound is. It is the same
+             `blurb` the card and the Product schema use. -->
+        <p class="pd-blurb" id="pdBlurb"></p>
 
         <span class="pd-price" id="pdPrice">$0</span>
 
@@ -637,8 +634,8 @@
         <div class="gs-cell" data-row="verify">
           <dt>Verify</dt>
           <dd>
-            <span class="gs-value">HPLC + mass spectrometry</span>
-            <span class="gs-note">Every lot analysed by a third-party laboratory with no stake in the result</span>
+            <span class="gs-value">—</span>
+            <span class="gs-note">HPLC + mass spectrometry, by a third-party laboratory with no stake in the result</span>
           </dd>
         </div>
         <div class="gs-cell" data-row="document">
@@ -667,30 +664,20 @@
     </div>
   </section>
 
-  <!-- ============ more from Glow ============
-       Deliberately above the product copy. Someone who has read the buy box and
-       the panel and not bought is usually looking for a different compound, not
-       for three more paragraphs about this one. -->
-  <section class="pd-section pd-related" id="pdRelatedSection">
-    <div class="container">
-      <h2>More from Glow</h2>
-      <div class="product-grid" id="pdRelatedGrid"></div>
-      <a class="gs-more" href="peptides.html">
-        View the full catalog <span aria-hidden="true">&rarr;</span>
-      </a>
-    </div>
-  </section>
-
   <!-- ============ product information ============
-       Was a tab strip, which forced three panels of prose between the buy box
-       and anything else. Native <details> instead: closed by default except the
-       overview, no JavaScript needed for the control, and the content stays in
-       the served markup for a crawler either way. -->
+       Two accordions, both closed, so this sits above the catalog row without
+       putting paragraphs between a reader and the next compound: collapsed, the
+       whole section is two hairline rows. What the compound *is* no longer lives
+       down here at all, it is the line under the product name.
+
+       Native <details> rather than a tab strip: no JavaScript needed for the
+       control, and the copy is in the served markup whether a panel is open or
+       not, so a crawler and a reader with scripting off both get all of it. -->
   <section class="pd-info">
     <div class="container">
       <h2 class="pd-info-h">Product information</h2>
 
-      <details class="pd-acc" open>
+      <details class="pd-acc">
         <summary>
           <span id="pdAboutH">About</span>
           <span class="pd-acc-mark" aria-hidden="true"></span>
@@ -719,24 +706,21 @@
         </div>
       </details>
 
-      <!-- The record, not the pitch. Filled from docRows() for the same reason
-           the panel above is: a field with nothing behind it renders the null
-           indicator rather than a value that reads as measured. -->
-      <details class="pd-acc">
-        <summary>
-          <span id="pdDocH">Documentation</span>
-          <span class="pd-acc-mark" aria-hidden="true"></span>
-        </summary>
-        <div class="pd-acc-body">
-          <dl class="gs-doc" id="pdDocList"></dl>
-          <p class="pd-ruo">
-            Purity is the figure reported by the independent laboratory for the lot on release.
-            Glow Research does not manufacture or test this compound: synthesis is performed by a
-            third-party facility and analysis by an independent laboratory, and the certificate is
-            issued by that laboratory rather than by us.
-          </p>
-        </div>
-      </details>
+    </div>
+  </section>
+
+  <!-- ============ more from Glow ============
+       Last, and reachable without reading anything: everything above it is
+       either the buy box, four rows of provenance, or two closed accordions.
+       Draws from the whole catalog with same-category compounds first, so the
+       heading is not writing a cheque a thin category cannot cash. -->
+  <section class="pd-section pd-related" id="pdRelatedSection">
+    <div class="container">
+      <h2>More from Glow</h2>
+      <div class="product-grid" id="pdRelatedGrid"></div>
+      <a class="gs-more" href="peptides.html">
+        View the full catalog <span aria-hidden="true">&rarr;</span>
+      </a>
     </div>
   </section>
 

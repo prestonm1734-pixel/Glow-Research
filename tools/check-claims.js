@@ -228,12 +228,17 @@ console.log('\nthe Glow Standard panel');
   const pd = read('product.html');
 
   ok('the product page carries the panel', /id="pdEvidence"/.test(pd));
+  // The line under the product name is the compound's own `blurb`, the same
+  // string the catalog card and the Product schema use, rather than a second
+  // description that could describe it differently on the page you buy from.
+  ok('the buy box says what the compound is',
+    /id="pdBlurb"/.test(pd) &&
+    /pdBlurb'\)\.textContent = p\.blurb/.test(read('js/product.js')) &&
+    /'pdBlurb', esc\(p\.blurb\)/.test(read('tools/build-products.js')));
   ok('the panel is rendered from the catalog, not from its own markup',
     /evidenceHtml\(/.test(read('js/product.js')) &&
     /evidenceHtml\(/.test(read('tools/build-products.js')),
     'js/product.js and tools/build-products.js must both render from evidenceHtml()');
-  ok('the documentation tab is too',
-    /docHtml\(/.test(read('js/product.js')) && /docHtml\(/.test(read('tools/build-products.js')));
 
   // The served markup is what a crawler reads and what shows before scripts
   // run, so it has to be the same rows the code produces. Compared as
@@ -273,6 +278,19 @@ console.log('\nthe Glow Standard panel');
   ok('no page upgrades that to a GMP certification', overclaims.length === 0,
     overclaims.join(', '));
 
+  // The Verify row states this compound's purity. It is the only per-product
+  // number on the panel, which makes it the only one that can be wrong about
+  // the vial in front of someone, so it has to be the catalog's figure and
+  // nothing else. Same rule as the hero average: edit the catalog, not the page.
+  const wrongPurity = GLOW_PRODUCTS.filter(prod => {
+    const row = evidenceRows(prod).find(r => r.key === 'verify');
+    return row.value !== `${prod.purity} purity`;
+  });
+  ok('the Verify row states the catalog purity for every compound',
+    wrongPurity.length === 0, wrongPurity.map(prod => prod.name).join(', '));
+  ok('a product with no purity yet shows the null indicator, not a number',
+    evidenceRows({}).find(r => r.key === 'verify').value === '—');
+
   // "Lot-matched batch documentation" is true of how the business runs, and it
   // is silent on the question a buyer is actually asking: can I have it. While
   // certificates are held, only the note answers that, so the note is the part
@@ -292,9 +310,10 @@ console.log('\nthe Glow Standard panel');
     rows.every(r => r.note && r.note.trim().length > 0),
     rows.filter(r => !r.note).map(r => r.key).join(', '));
 
-  // A lot number is the one value on the panel a reader can check against the
-  // vial in their hand, which makes an invented one the worst thing the page
-  // could print. Nothing may state a lot code the catalog does not carry.
+  // A lot number is the one thing a reader can check against the vial in their
+  // hand, which makes an invented one the worst thing this page could print.
+  // Nothing holds lot codes today, so this currently forbids all of them: the
+  // day the catalog carries real ones, they are the only ones allowed through.
   const held = new Set(GLOW_PRODUCTS.map(p => p.lot).filter(Boolean));
   const invented = [];
   pages.forEach(f => {
@@ -304,12 +323,6 @@ console.log('\nthe Glow Standard panel');
   });
   ok('no page prints a lot number the catalog does not hold', invented.length === 0,
     invented.join(', '));
-
-  // analysedOn() is called whenever `lot` is set, so an import that fills one
-  // field and not the other would render "Invalid Date" to a customer.
-  const halfRecords = GLOW_PRODUCTS.filter(p => Boolean(p.lot) !== Boolean(p.tested));
-  ok('every imported lot carries its analysis date', halfRecords.length === 0,
-    halfRecords.map(p => p.name).join(', '));
 }
 
 /* ---------------------------------------------------------------------------

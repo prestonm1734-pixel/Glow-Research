@@ -35,7 +35,7 @@ const OUT_DIR = 'peptides';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, PRODUCT_PAGES_LIVE,
-  sizeInStock, productInStock, evidenceHtml, docHtml,
+  sizeInStock, productInStock, evidenceHtml,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 // Mirrors CAT_LABEL in js/product.js. Kept in step by the assertion below
@@ -227,6 +227,7 @@ function buildProduct(p, donor) {
   html = setText(html, 'pdCrumbName', esc(p.name));
   html = setText(html, 'pdTag', esc(p.tag));
   html = setText(html, 'pdName', esc(p.name));
+  html = fillEmpty(html, 'pdBlurb', esc(p.blurb));
   html = setText(html, 'pdVialName', esc(p.name));
   html = setText(html, 'pdVialMg', esc(s.mg.toUpperCase()));
   html = fillEmpty(html, 'pdVialFine',
@@ -258,14 +259,12 @@ function buildProduct(p, donor) {
       'Email support@glowresearch.shop and we will tell you when the next lot is released.');
   }
 
-  // The evidence panel and the documentation tab, from the same two functions
-  // js/product.js calls on load. The donor's own markup is the correct answer
-  // for every product today (no lot is imported, so every panel reads the same),
-  // but baking it per product is what makes filling `lot` a data change rather
-  // than a markup change. The dispatch row keeps its standing-rule wording here:
-  // a build cannot know what time it will be read.
+  // The evidence panel, from the same function js/product.js calls on load. The
+  // Verify row carries this compound's own purity figure, so the panel really
+  // is per product rather than four constants repeated nine times. The dispatch
+  // row keeps its standing-rule wording: a build cannot know what time the page
+  // will be read, so js/product.js replaces that one on load.
   html = setInner(html, 'pdEvidence', 'dl', evidenceHtml(p));
-  html = setInner(html, 'pdDocList', 'dl', docHtml(p));
 
   html = setText(html, 'pdAboutH', `About ${esc(p.name)}`);
   html = setText(html, 'pdResearchH', `${esc(p.name)} research`);

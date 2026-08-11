@@ -45,9 +45,11 @@ It currently checks that:
   served markup so a crawler sees them, which is exactly why they need pinning
 - the product page's evidence panel is rendered from `evidenceHtml()` by both
   the browser and the build, its served markup still matches what that function
-  produces, it names no analysis `process.html` does not describe, it keeps the
-  "cGMP-aligned" hedge on the manufacturing claim, and no page anywhere prints a
-  lot number the catalog does not hold
+  produces, its Verify row states the catalog's purity for that compound, it
+  names no analysis `process.html` does not describe, it keeps the
+  "cGMP-aligned" hedge on the manufacturing claim, every row still carries the
+  note that qualifies it, and no page anywhere prints a lot number the catalog
+  does not hold
 - no page promises a certificate while `COAS_PUBLISHED` is false
 - no fabricated ratings or reviews appear in structured data
 - every product carries every field the site reads, so a lossy supplier import
@@ -106,24 +108,17 @@ sitemap and the generator can never disagree.
 2. Host the certificates and fill `COA_URL`, or a per-product `coa`.
 3. Set `COAS_PUBLISHED = true` (see below) so the certificate wording across
    the site upgrades from "on request" to direct batch links.
-4. Write `lot` (the code printed on the vial) and `tested` (ISO date of the
-   independent analysis) onto each product. That is what lights up the "current
-   lot" row of the evidence panel and the lot fields in the Documentation tab;
-   until they are set, both render the `—` null indicator and say when the
-   reader actually gets the number. Set both or neither: `analysedOn()` is
-   called whenever `lot` is present, and the audit fails on a half-filled
-   record rather than rendering "Invalid Date" to a customer.
-5. Write real per-SKU availability into `sizes[].stock`. Nothing else to
+4. Write real per-SKU availability into `sizes[].stock`. Nothing else to
    change: the buy box, the mg picker, the quick-add sheet, the catalog card
    and the `Product` schema all read it through `sizeInStock()` /
    `productInStock()`. Absent means sellable, so an import that carries no
    stock field behaves exactly as the site does today.
-6. Add `sku` to the `Product` schema once the fulfilment partner supplies them.
-7. Set `PRODUCT_PAGES_LIVE = true`, run `node tools/build.js`, and commit
+5. Add `sku` to the `Product` schema once the fulfilment partner supplies them.
+6. Set `PRODUCT_PAGES_LIVE = true`, run `node tools/build.js`, and commit
    `peptides/**` along with the updated `sitemap.xml`.
-8. Check the generated pages (prices, sizes, purity, images, certificate
+7. Check the generated pages (prices, sizes, purity, images, certificate
    links) before anything is submitted for indexing.
-9. Submit the sitemap in Search Console.
+8. Submit the sitemap in Search Console.
 
 ### The certificate switch
 
@@ -139,7 +134,7 @@ live in the same deploy.
 Every lot **is** third-party tested and every batch **does** have a certificate.
 That is how the business runs, and the site says so. What is not true yet is
 that this site *hosts* them, so the only route that works today is asking us.
-`COA_COPY` beside the flag holds both versions of that wording, and the four
+`COA_COPY` beside the flag holds both versions of that wording, and the five
 places that render it read from there:
 
 | Surface | Source |
@@ -148,8 +143,7 @@ places that render it read from there:
 | Cart trust list | `COA_COPY.short`, `js/cart.js` |
 | Account order footer | `COA_COPY.orderNote`, `js/account.js` |
 | Product page COA box | `COA_COPY.boxTitle` / `.boxSub`, `js/product.js` |
-| Evidence panel, analysis row | `COA_COPY.panelNote` / `.panelLink`, `js/products-data.js` |
-| Documentation tab | `COA_COPY.docLine`, `js/products-data.js` |
+| Evidence panel, Document row | `COA_COPY.panelNote` / `.panelLink`, `js/products-data.js` |
 
 The product page's static markup ships with the "on request" wording, so what a
 crawler sees (and what `build-products.js` bakes into each generated page) is

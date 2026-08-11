@@ -21,6 +21,8 @@
 // It is what "View certificate of analysis" on the product page opens. A
 // product without one falls back to COA_URL below.
 //
+// `blurb` is also the one line under the product name in the buy box.
+//
 // `about` and `research` fill the accordions under the buy box. Same rule as
 // `blurb`: composition and what laboratory work examines, never dosing,
 // outcomes, or a finding we cannot stand behind.
@@ -61,12 +63,11 @@ const COA_COPY = COAS_PUBLISHED ? {
   boxSub: 'HPLC purity and mass-spec identity, matched to the lot number on your vial',
   // footer of each order in the account area
   orderNote: 'Batch COA linked on every order',
-  // the analysis row of the evidence panel, and the same fact in the
-  // documentation tab. panelLink is the label on the row's link, and is empty
-  // in the other branch: there is nothing to open, so no link is drawn.
+  // the document row of the evidence panel. panelLink is the label on the row's
+  // link, and is empty in the other branch: there is nothing to open, so no
+  // link is drawn.
   panelNote: 'Issued against this lot number by the laboratory that ran the analysis',
   panelLink: 'View report',
-  docLine: 'Linked on this page, issued against the lot number on your vial',
   // homepage FAQ answer
   faq: 'Two places. Every product page links directly to its current lot’s certificate, ' +
        'and every vial carries the lot number that certificate is issued against, so you can ' +
@@ -81,7 +82,6 @@ const COA_COPY = COAS_PUBLISHED ? {
   orderNote: 'Lot COA available on request',
   panelNote: 'Certificate on request: email support@glowresearch.shop with the lot number on your vial',
   panelLink: '',
-  docLine: 'On request: email support@glowresearch.shop with the lot number on your vial',
   faq: 'Email support@glowresearch.shop with the compound and lot number, or the order number if ' +
        'you have already bought, and we will send the certificate for that exact batch, including ' +
        'batches that have since sold out. Every vial carries the lot number its certificate is ' +
@@ -287,24 +287,6 @@ const ANALYSIS_LONG = 'HPLC for purity, mass spectrometry for identity';
 const SOURCE_SHORT = 'U.S. manufacturing partner';
 const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices';
 
-// ---------------------------------------------------------------------------
-// The batch record behind a single vial.
-//
-// A product page that prints a lot number and a test date is only worth
-// building if those values come off the release paperwork. They are not
-// imported yet, so no product above carries `lot` or `tested`, and the panel
-// renders the null indicator plus the sentence that says when the reader
-// actually gets the number. That is a true answer to "which lot is this?" and a
-// made-up code would not be.
-//
-// The supplier import writes `lot` (the code printed on the vial) and `tested`
-// (ISO date of the independent analysis) onto each product. Filling them
-// upgrades the panel, the documentation tab and the generated pages at once,
-// with no markup edit anywhere.
-const analysedOn = iso => new Intl.DateTimeFormat('en-US', {
-  timeZone: 'UTC', month: 'long', day: 'numeric', year: 'numeric',
-}).format(new Date(iso + 'T12:00:00Z'));
-
 // The evidence panel, as data: the four steps of the chain of custody, in the
 // order they happen. Each row is a label, the fact, and the sentence that makes
 // the fact checkable.
@@ -328,10 +310,16 @@ function evidenceRows(p) {
       note: SOURCE_LONG,
     },
     {
+      // The value is the result, the note is how it was reached. Leading with
+      // the method made this row a description of the process, identical on all
+      // nine compounds; leading with the figure is what makes the heading above
+      // ("this vial") true rather than nearly true. `purity` is still
+      // placeholder data, flagged at the head of this file: it is derived here
+      // rather than typed into the panel precisely so the import corrects it.
       key: 'verify',
       label: 'Verify',
-      value: ANALYSIS_SHORT,
-      note: 'Every lot analysed by a third-party laboratory with no stake in the result',
+      value: (p.purity && `${p.purity} purity`) || '—',
+      note: `${ANALYSIS_SHORT}, by a third-party laboratory with no stake in the result`,
     },
     {
       key: 'document',
@@ -369,10 +357,10 @@ function docRows(p) {
   ];
 }
 
-// Both panels are drawn from the rows above as plain strings, with no DOM
-// access, so js/product.js renders them at runtime and tools/build-products.js
-// bakes the identical markup into each generated page. One template, so the
-// served HTML and the hydrated HTML cannot disagree.
+// The panel is drawn from the rows above as a plain string, with no DOM access,
+// so js/product.js renders it at runtime and tools/build-products.js bakes the
+// identical markup into each generated page. One template, so the served HTML
+// and the hydrated HTML cannot disagree.
 function evidenceHtml(p) {
   return evidenceRows(p).map(r => `
     <div class="gs-cell" data-row="${r.key}">
@@ -381,14 +369,6 @@ function evidenceHtml(p) {
         <span class="gs-value">${r.value}</span>
         <span class="gs-note">${r.note}</span>
       </dd>
-    </div>`).join('');
-}
-
-function docHtml(p) {
-  return docRows(p).map(r => `
-    <div class="gs-doc-row">
-      <dt>${r.label}</dt>
-      <dd>${r.value}</dd>
     </div>`).join('');
 }
 
@@ -625,9 +605,7 @@ if (typeof module !== 'undefined' && module.exports) {
     SOURCE_SHORT,
     SOURCE_LONG,
     evidenceRows,
-    docRows,
     evidenceHtml,
-    docHtml,
     bulkSavingPct,
     SITEWIDE_DISCOUNT,
     QTY_TIERS,
