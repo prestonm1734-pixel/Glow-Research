@@ -247,19 +247,35 @@
 
   /* --- buy more, pay less ---
      Cards rather than rows: each tier shows the vials you actually get, so
-     the quantity reads at a glance before any of the numbers do. */
+     the quantity reads at a glance before any of the numbers do.
+
+     Two by two rather than four across. Four tiers in the buy column would be
+     about 70px each, which is narrower than the vial art and leaves the
+     percentage wrapping. The 2x2 also matches how the choice is actually made:
+     one vial or a bundle, then which bundle. */
   .pd-bulk{ margin-top: 2px; padding-top: 18px; border-top:1px solid rgba(0,0,0,.1); }
-  .pd-tiers{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .pd-tiers{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .pd-tier{
     position:relative; background:#fafaf8; border:1.5px solid rgba(0,0,0,.14); cursor:pointer;
-    padding: 18px 10px 16px; display:flex; flex-direction:column; align-items:center; gap:2px;
+    padding: 18px 12px 16px; display:flex; flex-direction:column; align-items:center; gap:2px;
     color:#0a0a0a; text-align:center; font-family:inherit; width:100%;
+    transition: border-color .15s ease, background .15s ease;
   }
   .pd-tier:hover{ border-color:#0a0a0a; background:#f2f2f0; }
-  /* same problem as the active size chip: is-best already has the hover
-     border colour, so without a fill change it looks unclickable */
-  .pd-tier.is-best{ border-color:#0a0a0a; border-width:2px; background:#fff; }
-  .pd-tier.is-best:hover{ background:#f2f2f0; }
+  .pd-tier:focus-visible{ outline:2px solid #0a0a0a; outline-offset:2px; }
+
+  /* The selected tier. This is the one that has to be unmistakable, because
+     it is the page's answer to "what am I buying" — and unlike the old cards
+     it can be set by the stepper as well as by a press, so it has to read as
+     state rather than as the thing you last clicked. */
+  .pd-tier.is-active{
+    border-color:#0a0a0a; border-width:2px; background:#fff;
+    box-shadow: 0 0 0 3px rgba(10,10,10,.07);
+  }
+  .pd-tier.is-active:hover{ background:#fff; }
+  /* is-best is a label, not a selection: it only marks the biggest discount,
+     so it gets weight without the selected treatment. */
+  .pd-tier.is-best:not(.is-active){ border-color: rgba(0,0,0,.32); }
 
   /* the vials themselves — overlapped so three still fit a narrow card */
   .pd-tier-vials{
@@ -275,16 +291,41 @@
   .pd-tier-vials img + img{ margin-left:-10px; }
   .pd-tier-vials .vial + .vial{ margin-left:4px; }
 
+  /* The vial count is the heading of the card, so it is set like one rather
+     than in the mono label style the old three-across layout needed. */
   .pd-tier-qty{
-    font-size:.8rem; font-weight:700; color:#0a0a0a;
-    font-family:'JetBrains Mono', monospace; margin-bottom:2px;
+    font-family:'Space Grotesk', sans-serif; font-size:1.16rem; font-weight:800;
+    letter-spacing:-.02em; color:#0a0a0a; margin-bottom:5px;
   }
-  .pd-tier-price{ font-family:'Space Grotesk', sans-serif; font-size:1.2rem; font-weight:800; color:#0a0a0a; letter-spacing:-.02em; }
-  .pd-tier-was{ font-size:.78rem; color:#9a9a96; text-decoration: line-through; }
-  .pd-tier-per{ font-size:.74rem; color:#8a8a86; }
+  /* The discount is what the card is for, so it is the loud line. "Standard"
+     takes the same slot on the single vial so all four cards align. */
   .pd-tier-off{
-    margin-top:7px; font-size:.72rem; font-weight:700; color:#0a0a0a;
-    background:#ececea; padding: 4px 10px;
+    font-family:'JetBrains Mono', monospace; font-size:.76rem; font-weight:700;
+    letter-spacing:.06em; text-transform:uppercase; color:#0a0a0a;
+  }
+  .pd-tier-off.is-plain{ color:#8a8a86; font-weight:600; }
+  /* Per-vial is the comparable number across tiers, which is the whole reason
+     someone reads these cards side by side. */
+  .pd-tier-per{ margin-top:6px; font-size:.75rem; color:#8a8a86; }
+
+  /* The line under the headline price: per-vial rate, and which tier earned
+     it. Sits between the price and the size picker without competing.
+
+     When it is showing it takes over the price's gap rather than adding to it,
+     so the note reads as attached to the price above rather than floating
+     between two blocks. Where :has() is unsupported the price simply keeps its
+     own margin, which spaces things out slightly more — never crowds them. */
+  .pd-price-note{
+    margin: 0 0 22px; font-size:.82rem; color:#55554f; line-height:1.5;
+  }
+  .pd-price:has(+ .pd-price-note:not([hidden])){ margin-bottom: 7px; }
+  .pd-price-note[hidden]{ display:none; }
+  .pd-note-sep{ color:#b5b5b0; margin: 0 3px; }
+
+  /* Fine print under the tiers, explaining that any quantity earns the tier
+     it reaches. Someone who steps to 4 should not have to infer the rule. */
+  .pd-bulk-note{
+    margin: 11px 0 0; font-size:.78rem; line-height:1.55; color:#8a8a86;
   }
   /* a tab straddling the top border, like a ribbon on the winning card */
   .pd-tier-flag{
@@ -589,7 +630,13 @@
              What the compound *does* is in the accordions, not here. -->
         <p class="pd-identity" id="pdIdentity"></p>
 
+        <!-- The total for the mg and the quantity currently selected. Both
+             move it: the bulk tier is a function of quantity, so stepping from
+             2 vials to 3 changes the per-vial rate, not just the multiplier. -->
         <span class="pd-price" id="pdPrice">$0</span>
+        <!-- Per-vial rate, and which tier is earning it. Empty and hidden at a
+             quantity of one, where there is nothing to explain. -->
+        <p class="pd-price-note" id="pdPriceNote" hidden></p>
 
         <span class="pd-label">Size</span>
         <div class="pd-sizes" id="pdSizes"></div>
@@ -611,7 +658,11 @@
              section further down the page -->
         <div class="pd-bulk">
           <span class="pd-label">Buy more, pay less</span>
+          <!-- Quantity shortcuts, not products. Pressing one sets the quantity
+               above and reprices the buy box; nothing is added to the cart
+               until the Add to cart button is pressed. -->
           <div class="pd-tiers" id="pdTiers"></div>
+          <p class="pd-bulk-note">Any quantity gets the rate of the tier it reaches: four vials are priced at the three-vial rate.</p>
         </div>
 
         <a class="pd-coa" id="pdCoaLink">

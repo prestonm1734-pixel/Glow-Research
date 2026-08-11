@@ -278,15 +278,46 @@
     });
   }
 
+  // The headline price, for the mg AND the quantity currently selected. Both
+  // inputs matter: the bulk tier is a function of quantity, so stepping from
+  // 2 to 3 vials changes the per-vial price, not just the multiplier.
+  //
+  // Shows the line total, because that is the number being decided. The
+  // per-vial figure moves to the note underneath, where it is the useful
+  // comparison rather than the headline.
+  function renderPrice() {
+    const s = size();
+    const unit = unitPriceAt(s.price, qty);
+    const listTotal = round2(s.price * qty);
+    const total = round2(unit * qty);
+
+    $('pdPrice').innerHTML = listTotal > total
+      ? `<s class="pd-price-was">${money(listTotal)}</s>${money(total)}`
+      : money(total);
+
+    // One vial at list price is the plain case and needs no explaining. Past
+    // that, say the per-vial rate, and name the tier when one is earning it —
+    // someone on 4 vials should be told they are on the 3-vial rate rather
+    // than left to work out why the number moved.
+    const note = $('pdPriceNote');
+    if (!note) return;
+    const t = tierFor(qty);
+    if (qty === 1) {
+      note.textContent = '';
+      note.hidden = true;
+      return;
+    }
+    note.hidden = false;
+    note.innerHTML = t.off > 0
+      ? `${money(unit)} per vial <span class="pd-note-sep">·</span> ${Math.round(t.off * 100)}% bundle discount at ${t.qty}+`
+      : `${money(unit)} per vial`;
+  }
+
   // everything that changes when a different mg is picked
   function renderSelection() {
     const s = size();
 
-    // list price struck through beside the marked-down one; unitSale below has
-    // to agree with what is rendered here or the cart charges a different figure
-    $('pdPrice').innerHTML = onSaleNow()
-      ? `<s class="pd-price-was">${money(s.price)}</s>${money(salePrice(s.price))}`
-      : money(s.price);
+    renderPrice();
     // follows the mg picker: the line names the vial actually selected
     $('pdIdentity').textContent = identityLine(product, s);
     $('pdVialMg').textContent = s.mg.toUpperCase();
@@ -330,18 +361,26 @@
     setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1300);
   }
 
+  // Everything that depends on the quantity, in one place. The stepper and the
+  // tier cards both call this rather than each updating their own corner of
+  // the page, so the price, the note and the highlighted card can never
+  // describe different quantities.
+  function setQty(n) {
+    qty = Math.max(1, n);
+    $('pdQty').textContent = qty;
+    $('pdQtyDec').disabled = qty <= 1;
+    renderPrice();
+    markActiveTier();
+  }
+
   function wireBuy() {
-    const qtyEl = $('pdQty');
-    const draw = () => {
-      qtyEl.textContent = qty;
-      $('pdQtyDec').disabled = qty <= 1;
-    };
-    draw();
+    setQty(qty);
 
-    $('pdQtyDec').addEventListener('click', () => { qty = Math.max(1, qty - 1); draw(); });
-    $('pdQtyInc').addEventListener('click', () => { qty += 1; draw(); });
+    $('pdQtyDec').addEventListener('click', () => setQty(qty - 1));
+    $('pdQtyInc').addEventListener('click', () => setQty(qty + 1));
 
-    // the cart lines up as unitSale × qty, so a plain vial goes in as a unit
+    // the cart line is unitSale × qty, and unitSale is the tier-adjusted price
+    // the page just showed, so the cart charges what the buy box quoted
     const addCurrent = () => {
       const s = size();
       if (!sizeInStock(s)) return;   // the button is disabled too; this is the backstop
@@ -350,7 +389,7 @@
         variant: s.mg,
         qty,
         unitOriginal: s.price,
-        unitSale: salePrice(s.price),
+        unitSale: unitPriceAt(s.price, qty),
       });
     };
 
@@ -360,7 +399,24 @@
     });
   }
 
-  /* ================= stock up & save ================= */
+  /* ================= buy more, pay less =================
+     The cards are quantity shortcuts, not products. Pressing one sets the
+     quantity and reprices the buy box above; nothing goes in the cart until
+     the customer says so with the one button that adds to carts. Picking a
+     bundle and being taken straight to a cart is the behaviour that makes
+     people distrust a bundle picker, and it also made the stepper pointless. */
+
+  // Highlights the tier the current quantity is actually earning, which at 4
+  // vials is the 3-vial card. tierFor() decides, so the highlight and the
+  // price are answering the same question with the same function.
+  function markActiveTier() {
+    const active = tierFor(qty).qty;
+    document.querySelectorAll('#pdTiers .pd-tier').forEach(btn => {
+      const isOn = +btn.dataset.qty === active;
+      btn.classList.toggle('is-active', isOn);
+      btn.setAttribute('aria-pressed', String(isOn));
+    });
+  }
 
   function renderTiers() {
     const s = size();
@@ -373,36 +429,27 @@
       ? `<img src="${pageHref(product.image)}" alt="" loading="lazy" />`
       : '<span class="vial"></span>';
 
-    wrap.innerHTML = variants.map((v, i) => {
-      const onSale = v.original > v.sale;
-      const off = bulkSavingPct(v.original, v.sale);
-      const best = i === variants.length - 1;
+    wrap.innerHTML = variants.map(v => {
+      const best = v.off === Math.max(...variants.map(x => x.off));
+      // The advertised figure is the bundle tier itself, stated as configured.
+      // The sitewide markdown stacks on top, so the struck-through total shows
+      // a bigger saving than the badge: the badge under-promises, never over.
+      const pct = Math.round(v.off * 100);
       return `
-        <button type="button" class="pd-tier${best ? ' is-best' : ''}" data-i="${i}">
+        <button type="button" class="pd-tier${best ? ' is-best' : ''}" data-qty="${v.qty}" aria-pressed="false">
           ${best ? '<span class="pd-tier-flag">Best value</span>' : ''}
           <span class="pd-tier-vials">${vialArt.repeat(Math.min(v.qty, 3))}</span>
           <span class="pd-tier-qty">${v.label}</span>
-          <span class="pd-tier-price">${money(v.sale)}</span>
-          ${onSale ? `<span class="pd-tier-was">${money(v.original)}</span>` : ''}
-          <span class="pd-tier-per">${money(v.sale / v.qty)} / vial</span>
-          ${off ? `<span class="pd-tier-off">Save ${off}%</span>` : ''}
+          <span class="pd-tier-off${pct ? '' : ' is-plain'}">${pct ? `${pct}% off` : 'Standard'}</span>
+          <span class="pd-tier-per">${money(v.unitSale)} / vial</span>
         </button>`;
     }).join('');
 
     wrap.querySelectorAll('.pd-tier').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const v = variants[+btn.dataset.i];
-        // a bundle is one cart line at the bundle price, matching the quick-add sheet
-        window.GlowCart.add({
-          name: product.name,
-          variant: `${s.mg} · ${v.label}`,
-          unitOriginal: v.original,
-          unitSale: v.sale,
-        });
-        const priceEl = btn.querySelector('.pd-tier-price');
-        flash(priceEl, 'Added ✓');
-      });
+      btn.addEventListener('click', () => setQty(+btn.dataset.qty));
     });
+
+    markActiveTier();
   }
 
   /* ================= canonical =================

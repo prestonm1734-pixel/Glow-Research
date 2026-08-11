@@ -28,6 +28,7 @@ const {
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, CUTOFF_LABEL, CUTOFF_LABEL_SHORT,
   ANALYSIS_SHORT, ANALYSIS_LONG, SOURCE_LONG, evidenceRows, evidenceHtml,
   identityLine, FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
+  QTY_TIERS, tierFor, getProductVariants, unitPriceAt,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -913,6 +914,78 @@ console.log('\nstructured data');
  *     the server-side gate is actually there, since that is the one that
  *     matters — a client-side-only check is a suggestion a request can skip.
  * ------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+ * 8a. Bulk pricing. The tier cards and the quantity stepper are two controls
+ *     over one number, and the discount is a function of that number. Before
+ *     this, the cards were separate bundles that added themselves to the cart
+ *     on click: a stepper set to 4 charged full price next to a card offering
+ *     a discount for 3, and pressing a card put something in the cart without
+ *     being asked. Both are gone, and these checks are what keep them gone.
+ * ------------------------------------------------------------------------- */
+console.log('\nbulk pricing');
+{
+  // Thresholds ascend and start at a single vial, or tierFor() picks nonsense.
+  const qtys = QTY_TIERS.map(t => t.qty);
+  const offs = QTY_TIERS.map(t => t.off);
+  ok('tiers start at one vial and ascend',
+    qtys[0] === 1 && qtys.every((q, i) => i === 0 || q > qtys[i - 1]), qtys.join(', '));
+  ok('the discount rises with the quantity',
+    offs[0] === 0 && offs.every((o, i) => i === 0 || o > offs[i - 1]), offs.join(', '));
+  ok('no tier discounts more than half', offs.every(o => o < 0.5));
+
+  // The rule the customer is told in the fine print: any quantity gets the
+  // rate of the tier it reaches. Checked across every quantity up to well past
+  // the top tier, not just at the thresholds, because the gaps are the part
+  // that was broken.
+  const wrongTier = [];
+  for (let q = 1; q <= qtys[qtys.length - 1] + 5; q++) {
+    const expected = QTY_TIERS.filter(t => q >= t.qty).pop();
+    if (tierFor(q).qty !== expected.qty) wrongTier.push(`${q} -> ${tierFor(q).qty}, expected ${expected.qty}`);
+  }
+  ok('every quantity gets the rate of the tier it reaches',
+    wrongTier.length === 0, wrongTier.join('; '));
+
+  // The page states this rule in words. If the wording goes, a stepper that
+  // silently changes the per-vial price is unexplained.
+  const pd = read('product.html');
+  ok('the page explains that a quantity earns the tier it reaches',
+    /rate of the tier it reaches/i.test(pd));
+
+  // A tier press must set the quantity, never add to the cart. This is the
+  // behaviour regression that matters most: it spends the customer's money.
+  const pj = read('js/product.js');
+  const tierHandler = (pj.match(/wrap\.querySelectorAll\('\.pd-tier'\)[\s\S]*?\}\);/) || [''])[0];
+  ok('pressing a tier sets the quantity', /setQty\(\+btn\.dataset\.qty\)/.test(tierHandler));
+  ok('pressing a tier does not add to the cart',
+    !/GlowCart\.add/.test(tierHandler), 'a tier press must never touch the cart');
+
+  // One function prices the buy box, the cart line and the generated page.
+  ok('the buy box prices from unitPriceAt()', /unitPriceAt\(s\.price, qty\)/.test(pj));
+  ok('the cart line is charged the price the buy box quoted',
+    /unitSale: unitPriceAt\(s\.price, qty\)/.test(pj));
+  ok('the generated page bakes the same function',
+    /unitPriceAt\(s\.price, 1\)/.test(read('tools/build-products.js')));
+
+  // Every tier, on every size of every product, must cost less per vial than
+  // the one below it. A threshold or percentage edit that inverts that would
+  // advertise a discount that charges more.
+  const inverted = [];
+  GLOW_PRODUCTS.forEach(prod => prod.sizes.forEach(sz => {
+    const vs = getProductVariants(prod, sz.price);
+    vs.forEach((v, i) => {
+      if (i && v.unitSale >= vs[i - 1].unitSale) {
+        inverted.push(`${prod.name} ${sz.mg} ${v.label}`);
+      }
+      // and the struck-through list total must be a real list total
+      if (Math.round(v.qty * sz.price * 100) / 100 !== v.original) {
+        inverted.push(`${prod.name} ${sz.mg} ${v.label} list`);
+      }
+    });
+  }));
+  ok('each tier costs less per vial than the one below it',
+    inverted.length === 0, inverted.join(', '));
+}
+
 console.log('\ncheckout gate');
 {
   const order = read('api/create-order.js');

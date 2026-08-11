@@ -532,24 +532,78 @@ function bulkSavingPct(original, sale) {
   return pct > Math.round(SITEWIDE_DISCOUNT * 100) ? pct : 0;
 }
 
-// Mock bulk-quantity tiers for the quick-add modal. WooCommerce will supply
-// real variant IDs/pricing later; this just needs to look and feel right.
+// Bulk pricing. Each entry is a *threshold*, not a fixed bundle: `qty` is the
+// number of vials at which `off` starts applying.
+//
+// That distinction is the whole design. The discount is a function of how many
+// vials you are buying, so the tier cards and the quantity stepper cannot
+// disagree — the cards are shortcuts that set a quantity, and the quantity is
+// what prices the order. Somebody who steps up to four vials gets the
+// three-vial rate, because "3+ vials, 10% off" is what the card says and four
+// is three or more. The alternative, where the cards are separate products
+// with their own prices, means a stepper set to 4 quietly charges full price
+// next to a card advertising a discount for less product.
+//
+// PLACEHOLDER RATES. The thresholds and percentages are ours to set, but the
+// supplier import decides what margin actually supports them. Confirm before
+// launch; nothing else needs touching, since every price on the page is
+// derived from these four rows.
 const QTY_TIERS = [
-  { label: '1 vial', qty: 1, off: 0 },
-  { label: '2 vials', qty: 2, off: 0.08 },
-  { label: '3 vials', qty: 3, off: 0.15 },
+  { qty: 1, off: 0 },
+  { qty: 3, off: 0.10 },
+  { qty: 5, off: 0.15 },
+  { qty: 10, off: 0.20 },
 ];
 
-// unitPrice lets the product page price its tiers off whichever mg is selected;
-// callers that only know the product (the quick-add sheet) get the base size.
+// "3 vials" / "1 vial". Generated so a threshold change cannot leave a label
+// describing the old number.
+function tierLabel(qty) {
+  return `${qty} ${qty === 1 ? 'vial' : 'vials'}`;
+}
+
+// The tier a given quantity actually earns: the highest threshold at or below
+// it. This is the function that makes 4 vials cost the 3-vial rate, and it is
+// the only place that rule lives.
+function tierFor(qty) {
+  let hit = QTY_TIERS[0];
+  for (const t of QTY_TIERS) if (qty >= t.qty) hit = t;
+  return hit;
+}
+
+// The bulk discount alone, before the sitewide markdown. This is the figure the
+// tier cards advertise ("10% off"), so it is stated exactly as configured
+// rather than recomputed from a rounded price.
+function bulkOff(qty) {
+  return tierFor(qty).off;
+}
+
+// What one vial costs at this quantity. The sitewide markdown comes off first
+// and the bulk tier stacks on it, so a buyer at a tier saves more than the
+// tier advertises, never less.
+//
+// Rounded here, once, and the line total is this figure times the quantity.
+// Rounding the total instead would let "unit x qty" not equal the total the
+// cart charges, and the cart lines are built from exactly this number.
+function unitPriceAt(listUnit, qty) {
+  return round2(listUnit * (1 - SITEWIDE_DISCOUNT) * (1 - bulkOff(qty)));
+}
+
+// One row per tier, priced for whichever mg the product page has selected.
+// `unitPrice` lets the caller price off the selected size; callers that only
+// know the product get the base size.
 function getProductVariants(p, unitPrice) {
   const unit = unitPrice || p.price;
   return QTY_TIERS.map(t => {
-    const original = t.qty * unit;
-    // the sitewide markdown comes off first, then the bulk tier stacks on it,
-    // so `original` stays the true list price for the struck-through figure
-    const sale = round2(original * (1 - SITEWIDE_DISCOUNT) * (1 - t.off));
-    return { label: t.label, qty: t.qty, original, sale };
+    const original = round2(t.qty * unit);        // true list price, struck through
+    const unitSale = unitPriceAt(unit, t.qty);
+    return {
+      qty: t.qty,
+      off: t.off,
+      label: tierLabel(t.qty),
+      original,
+      unitSale,
+      sale: round2(unitSale * t.qty),
+    };
   });
 }
 
@@ -749,6 +803,10 @@ if (typeof module !== 'undefined' && module.exports) {
     bulkSavingPct,
     SITEWIDE_DISCOUNT,
     QTY_TIERS,
+    tierFor,
+    tierLabel,
+    bulkOff,
+    unitPriceAt,
     PRODUCT_PAGES_LIVE,
     COAS_PUBLISHED,
     COA_COPY,

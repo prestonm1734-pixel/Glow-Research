@@ -35,7 +35,7 @@ const OUT_DIR = 'peptides';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, PRODUCT_PAGES_LIVE,
-  sizeInStock, productInStock, evidenceHtml, identityLine,
+  sizeInStock, productInStock, evidenceHtml, identityLine, unitPriceAt,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 // Mirrors CAT_LABEL in js/product.js. Kept in step by the assertion below
@@ -243,8 +243,11 @@ function buildProduct(p, donor) {
 
   // Not setText: on sale the price is markup (a struck-through list price
   // beside the marked-down one), and setText stops at the first "<".
+  // unitPriceAt(price, 1) rather than salePrice(price): identical today, but
+  // it is the same function js/product.js reprices with, so the baked figure
+  // and the hydrated one cannot diverge if the pricing rules change.
   const priceHtml = onSaleNow()
-    ? `<s class="pd-price-was">${money(s.price)}</s>${money(salePrice(s.price))}`
+    ? `<s class="pd-price-was">${money(s.price)}</s>${money(unitPriceAt(s.price, 1))}`
     : money(s.price);
   const priceRe = /(id="pdPrice"[^>]*>)[\s\S]*?(<\/span>)/;
   required(html, priceRe, 'price placeholder #pdPrice');
