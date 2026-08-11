@@ -1885,3 +1885,37 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
   .nav-actions{ gap: 7px; }
   .nav-icon-btn{ padding: 9px; }
 }
+
+/* ---------- disclosure ("read details") ----------
+   One implementation, used by the process chain, the About page, Shipping and
+   Wholesale. Every one of those pages had the same problem: paragraphs that
+   are correct, worth keeping, and read by almost nobody on a phone. The
+   scannable line stays on the page; the paragraph moves in here.
+
+   Native <details>, so it needs no script and the copy sits in the served
+   markup whether the panel is open or shut. That matters more here than it
+   did on the product page: this is the text that carries the compliance
+   context and most of the page's indexable substance, so it has to be in the
+   HTML a crawler receives, not injected on click. Collapsing it is a reading
+   decision, not a loading one. */
+.disc{ margin-top: 14px; }
+.disc > summary{
+  display:inline-flex; align-items:center; gap: 9px;
+  cursor:pointer; list-style:none; padding: 4px 0;
+  font-family:'JetBrains Mono', monospace; font-size:.68rem; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; color:#8a8a86;
+  transition: color .18s ease;
+}
+.disc > summary::-webkit-details-marker{ display:none; }
+.disc > summary::marker{ content:''; }
+.disc > summary:hover{ color:#0a0a0a; }
+.disc > summary:focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 3px; }
+.disc[open] > summary{ color:#0a0a0a; }
+/* a plus that drops its upright stroke when the panel opens */
+.disc-mark{ position:relative; flex-shrink:0; width:9px; height:9px; }
+.disc-mark::before, .disc-mark::after{ content:''; position:absolute; background:currentColor; }
+.disc-mark::before{ top:4px; left:0; width:9px; height:1.5px; }
+.disc-mark::after{ left:4px; top:0; width:1.5px; height:9px; }
+.disc[open] .disc-mark::after{ display:none; }
+.disc-body{ padding: 12px 0 2px; }
+.disc-body > *:last-child{ margin-bottom: 0 !important; }

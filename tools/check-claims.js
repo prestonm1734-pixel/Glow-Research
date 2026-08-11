@@ -96,7 +96,12 @@ console.log('\ndispatch cutoff');
   const cutoffSources = pages.concat(
     ['js/product.js', 'js/products-data.js', 'js/cart.js', 'js/checkout.js']);
   cutoffSources.forEach(f => {
-    for (const m of read(f).matchAll(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\s*PST\b/gi)) {
+    // &nbsp; between the time and the meridiem is a typographic choice, not a
+    // different claim, but it is not whitespace to a regex. about.html reads
+    // "2:00&nbsp;PM PST" and was therefore invisible to this scan: the one
+    // page stating the cutoff in prose was the one page never checked.
+    const src = read(f).replace(/&nbsp;|&#160;| /g, ' ');
+    for (const m of src.matchAll(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\s*PST\b/gi)) {
       const [, h, mins, ap] = m;
       if (+h !== h12 || ap.toUpperCase() !== meridiem || (mins && mins !== '00')) {
         wrong.push(`${f}: "${m[0]}"`);
@@ -447,6 +452,66 @@ console.log('\nlisting copy');
   const unbrowsable = [...new Set(GLOW_PRODUCTS.map(p => p.cat))].filter(c => !chips.has(c));
   ok('every category has a filter chip on the catalog page',
     unbrowsable.length === 0, unbrowsable.join(', '));
+}
+
+/* ---------------------------------------------------------------------------
+ * 3f. Disclosures. The process, About, Shipping and Wholesale pages moved
+ *     their long copy behind "read details" so a phone gets a scannable page.
+ *     The copy was collapsed, not deleted, and the difference between those
+ *     two is the entire compliance and SEO argument for doing it this way.
+ *
+ *     Native <details> keeps the text in the served markup, so a crawler and a
+ *     reader with no JavaScript both still get it. The day someone "optimises"
+ *     this by fetching panel content on click, the RUO disclaimer, the final
+ *     sale term and the testing description quietly stop being on the page at
+ *     all. That is what this checks.
+ * ------------------------------------------------------------------------- */
+console.log('\ndisclosures');
+{
+  const discPages = ['process.html', 'about.html', 'shipping.html', 'wholesale.html'];
+  const empty = [];
+  const noSummary = [];
+  let total = 0;
+  discPages.forEach(f => {
+    const src = read(f);
+    for (const m of src.matchAll(/<details class="disc">([\s\S]*?)<\/details>/g)) {
+      total++;
+      const inner = m[1];
+      if (!/<summary>/.test(inner)) noSummary.push(f);
+      // The body has to carry real prose in the HTML itself, not an empty node
+      // waiting for a script to fill it.
+      const body = (inner.match(/<div class="disc-body">([\s\S]*?)<\/div>/) || [, ''])[1];
+      if (body.replace(/<[^>]+>/g, '').trim().length < 40) empty.push(f);
+    }
+  });
+  ok(`every disclosure ships its copy in the markup (${total} of them)`,
+    empty.length === 0, `script-filled or empty in: ${[...new Set(empty)].join(', ')}`);
+  ok('every disclosure has a summary to operate it',
+    noSummary.length === 0, [...new Set(noSummary)].join(', '));
+
+  // The point of the rebuild: a step is a heading, one sentence, and who did
+  // it. A paragraph creeping back into the visible half undoes it silently.
+  const proc = read('process.html');
+  const LEAD_MAX = 130;
+  const leads = [...proc.matchAll(/<p class="pr-lead">([\s\S]*?)<\/p>/g)]
+    .map(m => m[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim());
+  ok('the process chain still has six steps', leads.length === 6, `found ${leads.length}`);
+  const longLead = leads.filter(l => l.length > LEAD_MAX);
+  ok(`every step is one scannable line (${LEAD_MAX} chars)`, longLead.length === 0,
+    longLead.map(l => `${l.length}: "${l.slice(0, 50)}…"`).join('\n          '));
+  // "U.S." ends in a full stop without ending a sentence, and two of the six
+  // steps say it, so initialisms come out before the sentences are counted.
+  const multiSentence = leads.filter(l =>
+    ((l.replace(/\b(?:[A-Z]\.)+/g, '').match(/[.!?](\s|$)/g)) || []).length > 1);
+  ok('no step summary has grown a second sentence', multiSentence.length === 0,
+    multiSentence.join(' | '));
+
+  // Four of the six steps are performed by someone other than Glow. Saying so
+  // on every step is the honest half of this page, and it survives the rebuild.
+  const whos = (proc.match(/class="pr-who"/g) || []).length;
+  ok('every step still names who performs it', whos === 6, `found ${whos}`);
+  const discs = (proc.match(/<details class="disc">/g) || []).length;
+  ok('every step keeps its details behind a disclosure', discs >= 6, `found ${discs}`);
 }
 
 /* ---------------------------------------------------------------------------

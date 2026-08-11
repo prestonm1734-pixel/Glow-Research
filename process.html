@@ -109,9 +109,17 @@
   .pr-body p{ color: var(--text-dim); line-height:1.72; margin: 0 0 12px; max-width: 62ch; }
   .pr-body p:last-child{ margin-bottom:0; }
 
-  /* the one-line summary under each heading — the scannable version, for
-     someone reading only the bright text down the page */
-  .pr-lead{ color: var(--text) !important; font-weight:600; }
+  /* the one line under each heading. It is now the whole step for most
+     readers: the paragraph that used to sit here is behind "read details".
+     So it carries the full weight and gets the bright colour. */
+  .pr-lead{ color: var(--text) !important; font-weight:600; margin-bottom: 14px !important; }
+
+  /* the disclosure sits below the "performed by" chip, so a step reads
+     heading, sentence, who did it, and only then an offer of more */
+  .pr-step .disc{ margin-top: 12px; }
+  .pr-step .disc > summary{ color: var(--text-dimmer); }
+  .pr-step .disc > summary:hover, .pr-step .disc[open] > summary{ color: var(--text); }
+  .pr-step .disc-body p{ margin-bottom: 12px; }
 
   /* who actually performs the step. Stated on every step on purpose: the
      honest answer is not "Glow" for four of the six, and burying that would
@@ -256,16 +264,19 @@
           </svg>
         </div>
         <div class="pr-body">
-          <h3>U.S. manufacturing partner</h3>
-          <p class="pr-lead">Made in partnership with a U.S. manufacturer.</p>
-          <p>
-            Synthesis and fill happen at a US-based partner facility that operates
-            to cGMP-aligned quality practices. Keeping production domestic is what
-            makes the rest of this page possible: a shorter chain, fewer hands, and
-            a paper trail that stays inside one jurisdiction when you ask us to
-            trace a lot back.
-          </p>
+          <h3>U.S. Manufacturing Partner</h3>
+          <p class="pr-lead">Synthesized and filled at a U.S. partner facility operating to cGMP-aligned quality practices.</p>
           <span class="pr-who">Performed by <b>our manufacturing partner</b></span>
+          <details class="disc">
+            <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+            <div class="disc-body">
+              <p>
+                Keeping production domestic is what makes the rest of this page
+                possible: a shorter chain, fewer hands, and a paper trail that stays
+                inside one jurisdiction when you ask us to trace a lot back.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -280,15 +291,20 @@
           </svg>
         </div>
         <div class="pr-body">
-          <h3>Independent batch testing</h3>
-          <p class="pr-lead">Every lot is analysed by a third-party laboratory.</p>
-          <p>
-            HPLC for purity, mass spectrometry for identity, performed by a
-            laboratory with no stake in the result. The distinction that matters:
-            the lab issues the certificate, not us. We are not qualified to grade
-            our own inventory and we do not try to.
-          </p>
+          <h3>Independent Batch Testing</h3>
+          <p class="pr-lead">Each lot is analyzed by an independent laboratory using HPLC for purity and mass spectrometry for identity.</p>
           <span class="pr-who">Performed by <b>an independent laboratory</b></span>
+          <details class="disc">
+            <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+            <div class="disc-body">
+              <p>
+                HPLC for purity, mass spectrometry for identity, performed by a
+                laboratory with no stake in the result. The distinction that matters:
+                the lab issues the certificate, not us. We are not qualified to grade
+                our own inventory and we do not try to.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -303,25 +319,29 @@
           </svg>
         </div>
         <div class="pr-body">
-          <h3>Batch documentation</h3>
-          <p class="pr-lead">Results tied to the lot number on the vial in your hand.</p>
-          <p>
-            A certificate is only worth anything if you can match it to the vial in
-            front of you. Every batch has its own, issued against the lot number
-            printed on the label, not a representative document for the
-            compound in general, and not a screenshot of a good result from a
-            different run.
-          </p>
-          <!-- Wording comes from COA_COPY in js/products-data.js, which keys off
-               COAS_PUBLISHED, so this upgrades with the cart, FAQ, account area
-               and product page at once instead of drifting. The static text below
-               is the held state, which is what a crawler and a JS-off reader see. -->
-          <p id="prCoaCopy">
-            Email support@glowresearch.shop with the compound and lot number, or the
-            order number if you have already bought, and we will send the certificate
-            for that exact batch, including batches that have since sold out.
-          </p>
+          <h3>Batch Documentation</h3>
+          <p class="pr-lead">Each batch has documentation tied to the lot number printed on the vial.</p>
           <span class="pr-who">Issued by <b>the testing laboratory</b></span>
+          <details class="disc">
+            <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+            <div class="disc-body">
+              <p>
+                A certificate is only worth anything if you can match it to the vial in
+                front of you. Every batch has its own, issued against the lot number
+                printed on the label, not a representative document for the compound
+                in general, and not a screenshot of a good result from a different run.
+              </p>
+              <!-- Wording comes from COA_COPY in js/products-data.js, which keys off
+                   COAS_PUBLISHED, so this upgrades with the cart, FAQ, account area
+                   and product page at once instead of drifting. The static text is
+                   the held state, which is what a crawler and a JS-off reader see. -->
+              <p id="prCoaCopy">
+                Email support@glowresearch.shop with the compound and lot number, or the
+                order number if you have already bought, and we will send the certificate
+                for that exact batch, including batches that have since sold out.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -336,16 +356,20 @@
           </svg>
         </div>
         <div class="pr-body">
-          <h3>Controlled handling</h3>
-          <p class="pr-lead">Received, stored, and held by lot in a climate-controlled facility.</p>
-          <p>
-            Stock is received into a US-based, climate-controlled fulfillment
-            facility and held by lot, so the batch a vial belongs to is never in
-            question once it is on the shelf. Lyophilized material is stable, but
-            the reason we keep the chain domestic is that every hour it is not in a
-            controlled environment is an hour nobody can document.
-          </p>
+          <h3>Controlled Handling</h3>
+          <p class="pr-lead">Received, stored, and held by lot in a climate-controlled U.S. fulfillment facility.</p>
           <span class="pr-who">Performed by <b>our fulfillment partner</b></span>
+          <details class="disc">
+            <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+            <div class="disc-body">
+              <p>
+                Holding stock by lot is what keeps the batch a vial belongs to out of
+                question once it is on the shelf. Lyophilized material is stable, but
+                the reason we keep the chain domestic is that every hour it is not in
+                a controlled environment is an hour nobody can document.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -359,16 +383,20 @@
           </svg>
         </div>
         <div class="pr-body">
-          <h3>Order processing</h3>
-          <p class="pr-lead">Order in, lot assigned, documentation available against that lot.</p>
-          <p>
-            An order is picked against a specific lot, and that lot number travels
-            with the vial: it is on the label you receive, and it is what we look up
-            when you write in. That is the whole reason the number exists. Ask us
-            for the certificate on a lot you already have, months later, and there
-            is something to look up.
-          </p>
+          <h3>Order Processing</h3>
+          <p class="pr-lead">Each order is assigned to a specific lot so the vial and its documentation stay connected.</p>
           <span class="pr-who">Performed by <b>Glow, with our fulfillment partner</b></span>
+          <details class="disc">
+            <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+            <div class="disc-body">
+              <p>
+                That lot number travels with the vial: it is on the label you receive,
+                and it is what we look up when you write in. That is the whole reason
+                the number exists. Ask us for the certificate on a lot you already
+                have, months later, and there is something to look up.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -384,15 +412,21 @@
           </svg>
         </div>
         <div class="pr-body">
-          <h3>Same-day shipping</h3>
-          <p class="pr-lead">Ordered before 2:00&nbsp;PM PST on a weekday, it leaves that afternoon.</p>
-          <p>
-            Picked, sealed, and out the door before the FedEx cutoff, then 2-day
-            FedEx Express anywhere in the United States, Hawaii and Alaska included.
-            Tracking lands within 24 hours. Free over $400, and every order ships
-            the same way. There is no cheaper tier that skips ahead of yours.
-          </p>
+          <h3>Dispatch</h3>
+          <p class="pr-lead">Orders placed before 2:00 PM PST leave the same business day.</p>
           <span class="pr-who">Performed by <b>our fulfillment partner</b></span>
+          <details class="disc">
+            <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+            <div class="disc-body">
+              <p>
+                Picked, sealed, and out the door before the FedEx cutoff, then 2-day
+                FedEx Express anywhere in the United States, Hawaii and Alaska
+                included. Tracking lands within 24 hours. Free over $400, and every
+                order ships the same way. There is no cheaper tier that skips ahead
+                of yours.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -436,14 +470,19 @@
       </div>
     </dl>
 
-    <p class="lp-fine">
-      Glow Research is the retailer, and only the retailer. Our job is peptide
-      sourcing: qualifying the facilities behind each lot and putting their
-      documentation in front of you. Products are supplied for laboratory research
-      use only, to qualified buyers and verified institutions in the United States.
-      They are not FDA-approved or evaluated, and are not drugs, supplements,
-      foods, or cosmetics.
-    </p>
+    <p class="lp-fine">Glow Research is the retailer, and only the retailer. Our job is peptide sourcing.</p>
+    <details class="disc">
+      <summary>Read the full terms <span class="disc-mark" aria-hidden="true"></span></summary>
+      <div class="disc-body">
+        <p class="lp-fine">
+      Qualifying the facilities behind each lot and putting their documentation in
+      front of you. Products are supplied for laboratory research use only, to
+      qualified buyers and verified institutions in the United States. They are not
+      FDA-approved or evaluated, and are not drugs, supplements, foods, or
+      cosmetics.
+        </p>
+      </div>
+    </details>
 
     <div class="lp-actions">
       <a href="peptides.html" class="btn btn-primary btn-lg">Shop Peptides <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>

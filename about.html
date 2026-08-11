@@ -116,6 +116,8 @@
   }
   .ab-block p{ font-size:.98rem; line-height:1.7; color: var(--text-dim); margin:0; }
   .ab-block p + p{ margin-top: 12px; }
+  /* the one line that has to land if nobody opens anything */
+  .ab-lead{ color: var(--text) !important; font-weight:600; }
 
   /* the facts strip: short, checkable claims rather than adjectives */
   .ab-facts{ margin-top: clamp(46px, 6vw, 70px); border-top:1px solid var(--border); }
@@ -285,10 +287,8 @@
         <span class="ab-eyebrow">About</span>
         <h1>A San Diego supplier,<br /><span class="outline">built for research buyers.</span></h1>
         <p class="ab-lede">
-          Glow Research is a San Diego, California supplier of research peptides and
-          research-use-only compounds. We sell to laboratories, institutions, and
-          qualified researchers nationwide, and everything we ship is intended
-          for in-vitro laboratory research only.
+          Glow Research is a San Diego supplier of research peptides, selling to
+          laboratories, institutions, and qualified researchers nationwide.
         </p>
       </div>
 
@@ -304,10 +304,9 @@
 
     <div class="ab-callout">
       <p>
-        We are not a manufacturer, and we do not pretend to be one. We are a
-        California retailer. Production runs at a U.S. manufacturing partner, a
-        domestic cGMP-aligned facility, and analysis is done by an independent
-        third-party laboratory.
+        We are not a manufacturer, and we do not pretend to be one. Production runs
+        at a U.S. cGMP-aligned partner facility, and analysis is done by an
+        independent third-party laboratory.
       </p>
     </div>
   </div>
@@ -319,70 +318,83 @@
     <div class="ab-grid">
       <div class="ab-block">
         <h2>Where we sit in the chain</h2>
-        <p>
-          Most peptide sites are vague about this on purpose. We would rather be
-          direct: Glow Research is the retailer, and only the retailer. Synthesis
-          and fill happen at a US-based partner facility that operates to
-          cGMP-aligned quality practices. Analysis is performed by an independent
-          third-party laboratory. Orders are picked, packed, and dispatched by a
-          third-party fulfilment partner. We do not manufacture, compound,
-          repackage, or test anything ourselves, and we do not operate a
-          laboratory or a warehouse. Our role is peptide sourcing: qualifying the
-          suppliers behind each lot, and putting their documentation in front of
-          you.
-        </p>
-        <p>
-          That distinction matters when you are evaluating a supplier, because it
-          tells you exactly which claims are ours to make and which belong to the
-          facility behind the vial. The whole chain, step by step, is on
-          <a href="process.html">our process page</a>.
-        </p>
+        <p class="ab-lead">Glow Research is the retailer, and only the retailer. We do not manufacture, compound, repackage, or test.</p>
+        <details class="disc">
+          <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+          <div class="disc-body">
+            <p>
+              Most peptide sites are vague about this on purpose. Synthesis and fill
+              happen at a US-based partner facility that operates to cGMP-aligned
+              quality practices. Analysis is performed by an independent third-party
+              laboratory. Orders are picked, packed, and dispatched by a third-party
+              fulfilment partner. We do not operate a laboratory or a warehouse. Our
+              role is peptide sourcing: qualifying the suppliers behind each lot, and
+              putting their documentation in front of you.
+            </p>
+            <p>
+              That distinction matters when you are evaluating a supplier, because it
+              tells you exactly which claims are ours to make and which belong to the
+              facility behind the vial. The whole chain, step by step, is on
+              <a href="process.html">our process page</a>.
+            </p>
+          </div>
+        </details>
       </div>
 
       <div class="ab-block">
         <h2>Why the supply chain stays domestic</h2>
-        <p>
-          Production, fill, storage, and fulfilment all happen inside the United
-          States, at our partners&rsquo; facilities rather than ours. Keeping the
-          chain domestic means shorter transit, fewer temperature excursions in
-          transit, and a paper trail we can actually follow back to a specific lot
-          when a customer asks.
-        </p>
-        <p>
-          It also means we are not reconciling documentation across jurisdictions
-          when you need a certificate for a specific batch, and that dispatch is
-          measured in hours rather than customs windows: orders placed before
-          2:00&nbsp;PM PST get same-day shipping on 2-day FedEx Express.
-        </p>
+        <p class="ab-lead">Production, fill, storage, and fulfilment all happen inside the United States, at our partners&rsquo; facilities rather than ours.</p>
+        <details class="disc">
+          <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+          <div class="disc-body">
+            <p>
+              Keeping the chain domestic means shorter transit, fewer temperature
+              excursions in transit, and a paper trail we can actually follow back to
+              a specific lot when a customer asks.
+            </p>
+            <p>
+              It also means we are not reconciling documentation across jurisdictions
+              when you need a certificate for a specific batch, and that dispatch is
+              measured in hours rather than customs windows: orders placed before
+              2:00&nbsp;PM PST get same-day shipping on 2-day FedEx Express.
+            </p>
+          </div>
+        </details>
       </div>
 
       <div class="ab-block">
         <h2>Verification, not adjectives</h2>
-        <p>
-          Every lot is tested by an independent third-party laboratory, and every
-          batch has its own certificate of analysis: HPLC purity and mass-spec
-          identity, issued against the lot number printed on the vial.
-          Email us with a lot number, before you order or after, and we will send
-          the certificate for that exact batch.
-        </p>
-        <p>
-          Purity claims that are not attached to a document are marketing. We try
-          to keep ours attached to one.
-        </p>
+        <p class="ab-lead">Every lot is tested by an independent third-party laboratory, and every batch has its own certificate of analysis.</p>
+        <details class="disc">
+          <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+          <div class="disc-body">
+            <p>
+              HPLC purity and mass-spec identity, issued against the lot number printed
+              on the vial. Email us with a lot number, before you order or after, and
+              we will send the certificate for that exact batch.
+            </p>
+            <p>
+              Purity claims that are not attached to a document are marketing. We try
+              to keep ours attached to one.
+            </p>
+          </div>
+        </details>
       </div>
 
       <div class="ab-block">
         <h2>Research use, enforced</h2>
-        <p>
-          Our products are research compounds. They are not drugs, supplements,
-          foods, or cosmetics, they are not for human or animal consumption, and
-          we do not sell to anyone purchasing for personal use.
-        </p>
-        <p>
-          We operate under the applicable federal, state, and local requirements
-          for research chemical distribution, and we reserve the right to refuse
-          any order that falls outside a legitimate research context.
-        </p>
+        <p class="ab-lead">Research compounds only: not drugs, supplements, foods, or cosmetics, and never for human or animal consumption.</p>
+        <details class="disc">
+          <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+          <div class="disc-body">
+            <p>
+              We do not sell to anyone purchasing for personal use. We operate under
+              the applicable federal, state, and local requirements for research
+              chemical distribution, and we reserve the right to refuse any order that
+              falls outside a legitimate research context.
+            </p>
+          </div>
+        </details>
       </div>
     </div>
 
@@ -442,10 +454,9 @@
       <span class="ab-eyebrow">The standard</span>
       <h2>Five rules we do not trade away.</h2>
       <p>
-        Every supplier says it cares about quality. That is not a commitment,
-        because nothing about it can be checked. These are written down instead,
-        in the codebase that builds this site, and they settle arguments about
-        what ships and what does not.
+        Every supplier says it cares about quality. These five are written into
+        the codebase that builds this site, and they settle arguments about what
+        ships and what does not.
       </p>
     </div>
 
@@ -454,12 +465,17 @@
         <span class="ab-principle-n" aria-hidden="true">01</span>
         <div>
           <h3>Never create uncertainty we can remove.</h3>
-          <p>
-            If a customer would have to guess about stock, about a lot, about when
-            something ships or what happens next, that is a defect, and we treat
-            it as one. Ambiguity is not neutral. It is the
-            thing that sends someone back to comparing suppliers.
-          </p>
+          <details class="disc">
+            <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+            <div class="disc-body">
+    <p>
+                If a customer would have to guess about stock, about a lot, about when
+                something ships or what happens next, that is a defect, and we treat
+                it as one. Ambiguity is not neutral. It is the
+                thing that sends someone back to comparing suppliers.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -467,13 +483,18 @@
         <span class="ab-principle-n" aria-hidden="true">02</span>
         <div>
           <h3>Never claim more than we can prove.</h3>
-          <p>
-            Every factual statement on this site has to trace back to something
-            the business actually holds: a document, a measured figure, a policy
-            we follow. Where the evidence is not in hand yet, we say what is true
-            today and route you to the person who can send you the rest. We would
-            rather be quiet than impressive.
-          </p>
+          <details class="disc">
+            <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+            <div class="disc-body">
+    <p>
+                Every factual statement on this site has to trace back to something
+                the business actually holds: a document, a measured figure, a policy
+                we follow. Where the evidence is not in hand yet, we say what is true
+                today and route you to the person who can send you the rest. We would
+                rather be quiet than impressive.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -481,13 +502,18 @@
         <span class="ab-principle-n" aria-hidden="true">03</span>
         <div>
           <h3>Consistency is part of the product.</h3>
-          <p>
-            Order number ten and order number one hundred thousand should feel
-            like they came from the same company: the same terminology, the same
-            packaging, the same documentation, the same answer to the same
-            question. A supplier you have to re-evaluate on every order is a
-            supplier you are still shopping around.
-          </p>
+          <details class="disc">
+            <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+            <div class="disc-body">
+    <p>
+                Order number ten and order number one hundred thousand should feel
+                like they came from the same company: the same terminology, the same
+                packaging, the same documentation, the same answer to the same
+                question. A supplier you have to re-evaluate on every order is a
+                supplier you are still shopping around.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -495,12 +521,17 @@
         <span class="ab-principle-n" aria-hidden="true">04</span>
         <div>
           <h3>Problems should improve the system.</h3>
-          <p>
-            When something goes wrong, fixing the individual order is the minimum,
-            not the resolution. The failure has to change a process so the same
-            thing cannot reach the next customer. A complaint that produces an
-            apology and nothing else has been wasted.
-          </p>
+          <details class="disc">
+            <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+            <div class="disc-body">
+    <p>
+                When something goes wrong, fixing the individual order is the minimum,
+                not the resolution. The failure has to change a process so the same
+                thing cannot reach the next customer. A complaint that produces an
+                apology and nothing else has been wasted.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -508,12 +539,17 @@
         <span class="ab-principle-n" aria-hidden="true">05</span>
         <div>
           <h3>Growth cannot lower the Glow standard.</h3>
-          <p>
-            Anything that makes us faster or more profitable while making the
-            experience less dependable is treated as suspect, no matter what it
-            does to the numbers. Scale is not a reason for a supplier to get
-            worse, and it is the most common one.
-          </p>
+          <details class="disc">
+            <summary>Read details <span class="disc-mark" aria-hidden="true"></span></summary>
+            <div class="disc-body">
+    <p>
+                Anything that makes us faster or more profitable while making the
+                experience less dependable is treated as suspect, no matter what it
+                does to the numbers. Scale is not a reason for a supplier to get
+                worse, and it is the most common one.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -539,14 +575,21 @@
     </div>
 
     <p class="ab-ruo">
-      Glow Research makes no claims as to the safety or efficacy of any compound for
-      human use, and nothing on this site constitutes medical advice. Statements here
-      have not been evaluated by the Food and Drug Administration. By purchasing, you
-      certify that you are at least 21 years of age, that you are a qualified
-      professional or researcher, and that every product will be used solely for
-      laboratory research in accordance with all applicable laws.
       <strong>For laboratory research use only. Not for human or animal consumption.</strong>
     </p>
+    <details class="disc">
+      <summary>Read the full disclaimer <span class="disc-mark" aria-hidden="true"></span></summary>
+      <div class="disc-body">
+        <p class="ab-ruo">
+          Glow Research makes no claims as to the safety or efficacy of any compound for
+          human use, and nothing on this site constitutes medical advice. Statements here
+          have not been evaluated by the Food and Drug Administration. By purchasing, you
+          certify that you are at least 21 years of age, that you are a qualified
+          professional or researcher, and that every product will be used solely for
+          laboratory research in accordance with all applicable laws.
+        </p>
+      </div>
+    </details>
 
   </div>
 </section>

@@ -62,6 +62,15 @@ It currently checks that:
 - the two copies of `CAT_LABEL` agree, every category in the catalog has a label
   and a filter chip, so a new category cannot ship unbrowsable or with a
   breadcrumb that changes wording between the served page and the hydrated one
+- every "read details" disclosure ships its copy inside the served markup. The
+  process, About, Shipping and Wholesale pages collapse their long copy behind
+  native `<details>`, and the whole compliance and SEO case for doing it that
+  way is that the text is still *there*: the moment someone fetches panel
+  content on click instead, the RUO disclaimer, the final-sale term and the
+  testing description stop being on the page at all
+- the process chain still has six steps, each with one scannable sentence, a
+  disclosure, and the "performed by" label naming who does it. Four of the six
+  are not Glow, and saying so is the point of the page
 - no page promises a certificate while `COAS_PUBLISHED` is false
 - no fabricated ratings or reviews appear in structured data
 - every product carries every field the site reads, so a lossy supplier import
