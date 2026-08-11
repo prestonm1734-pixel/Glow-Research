@@ -25,7 +25,8 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
-  avgPurity, BATCHES_TESTED,
+  avgPurity, BATCHES_TESTED, TRANSIT_DAYS,
+  ANALYSIS_SHORT, ANALYSIS_LONG, SOURCE_LONG, evidenceHtml,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -80,15 +81,20 @@ console.log('\nfree shipping threshold');
  * ------------------------------------------------------------------------- */
 console.log('\ndispatch cutoff');
 {
-  const hour = constant('js/product.js', 'CUTOFF_HOUR');
-  ok('product.js declares CUTOFF_HOUR', hour !== null);
+  const hour = constant('js/products-data.js', 'CUTOFF_HOUR');
+  ok('products-data.js declares CUTOFF_HOUR', hour !== null);
   const h12 = hour > 12 ? hour - 12 : hour;
   const meridiem = hour >= 12 ? 'PM' : 'AM';
   const stated = `${h12}${meridiem}`;   // 14 -> "2PM"
 
-  // Any "<n>[:00] AM|PM PST" anywhere in the copy is a cutoff claim.
+  // Any "<n>[:00] AM|PM PST" anywhere in the copy is a cutoff claim. The
+  // scripts are scanned too, not just the pages: the product page states the
+  // cutoff in a string it renders at runtime, and a claim a customer reads is
+  // a claim whether it was typed into markup or into a template literal.
   const wrong = [];
-  pages.forEach(f => {
+  const cutoffSources = pages.concat(
+    ['js/product.js', 'js/products-data.js', 'js/cart.js', 'js/checkout.js']);
+  cutoffSources.forEach(f => {
     for (const m of read(f).matchAll(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\s*PST\b/gi)) {
       const [, h, mins, ap] = m;
       if (+h !== h12 || ap.toUpperCase() !== meridiem || (mins && mins !== '00')) {
@@ -97,6 +103,12 @@ console.log('\ndispatch cutoff');
     }
   });
   ok(`every stated cutoff is ${stated} PST`, wrong.length === 0, wrong.join(', '));
+
+  // The words a customer reads are built from the hour, not typed beside it.
+  ok('the cutoff wording is derived from the hour',
+    /const CUTOFF_LABEL\s*=\s*\n?\s*`\$\{CUTOFF_HOUR/.test(read('js/products-data.js')));
+  ok('the product page reads the shared cutoff, not its own copy',
+    !/const CUTOFF_HOUR/.test(read('js/product.js')) && /CUTOFF_HOUR/.test(read('js/product.js')));
 
   // The estimate must be computed in Pacific, since that is what the copy says.
   ok('the estimate is computed in Pacific time',
@@ -161,6 +173,116 @@ console.log('\nhero figures');
   // hold, which is the failure this whole section exists to prevent.
   ok('the batch count is stated as a floor, not an exact figure',
     /data-count="150">0<\/span><span class="stat-suffix">\+<\/span>/.test(home));
+
+  const transit = statFor('FedEx Transit');
+  ok('the hero states a transit time', transit !== null);
+  ok(`stated transit ${transit} days is TRANSIT_DAYS ${TRANSIT_DAYS}`,
+    Number(transit) === TRANSIT_DAYS,
+    'index.html and products-data.js disagree');
+}
+
+/* ---------------------------------------------------------------------------
+ * 3c. Transit time. Six pages quote the FedEx service in words, the product
+ *     page computes an arrival date from it, and the evidence panel prints it.
+ *     One number, seven readers. Change the service without changing the copy
+ *     and the site quotes a delivery date it will miss.
+ * ------------------------------------------------------------------------- */
+console.log('\ntransit time');
+{
+  const wrong = [];
+  pages.forEach(f => {
+    // Both orders appear in the copy: "FedEx 2-Day" and "2-day FedEx Express".
+    for (const m of read(f).matchAll(/FedEx\s+(\d+)-day|(\d+)-day\s+FedEx/gi)) {
+      const days = +(m[1] || m[2]);
+      if (days !== TRANSIT_DAYS) wrong.push(`${f}: "${m[0]}"`);
+    }
+  });
+  ok(`every stated FedEx service is ${TRANSIT_DAYS}-day`, wrong.length === 0, wrong.join(', '));
+
+  // shipping.html states it as a counted figure rather than in a sentence.
+  const ship = read('shipping.html').match(/data-count="(\d+)">\d+<\/span> days<\/b><span>FedEx Express transit/);
+  ok('the shipping page figure is the same number',
+    ship !== null && Number(ship[1]) === TRANSIT_DAYS,
+    ship ? `page says ${ship[1]}` : 'figure not found in shipping.html');
+
+  ok('the delivery estimate reads the shared constant, not its own copy',
+    !/const TRANSIT_DAYS/.test(read('js/product.js')) && /TRANSIT_DAYS/.test(read('js/product.js')));
+}
+
+/* ---------------------------------------------------------------------------
+ * 3d. The Glow Standard panel. This is the strongest claim surface on the site:
+ *     it tells a buyer that what they are reading is a record of the vial in
+ *     front of them. That is only worth saying if the panel is structurally
+ *     unable to state anything the catalog does not hold, which is what the
+ *     checks below enforce. The failure to prevent is a panel that keeps
+ *     reading like a record after the data behind a row has gone away.
+ * ------------------------------------------------------------------------- */
+console.log('\nthe Glow Standard panel');
+{
+  const pd = read('product.html');
+
+  ok('the product page carries the panel', /id="pdEvidence"/.test(pd));
+  ok('the panel is rendered from the catalog, not from its own markup',
+    /evidenceHtml\(/.test(read('js/product.js')) &&
+    /evidenceHtml\(/.test(read('tools/build-products.js')),
+    'js/product.js and tools/build-products.js must both render from evidenceHtml()');
+  ok('the documentation tab is too',
+    /docHtml\(/.test(read('js/product.js')) && /docHtml\(/.test(read('tools/build-products.js')));
+
+  // The served markup is what a crawler reads and what shows before scripts
+  // run, so it has to be the same rows the code produces. Compared as
+  // whitespace-normalised markup: the hand-written donor is indented
+  // differently from the generated string, and only the content has to match.
+  const norm = s => s.replace(/\s+/g, ' ').replace(/> </g, '><').trim();
+  // product.html is the donor every generated page is cut from, so it cannot
+  // regenerate itself the way peptides/<slug>/ does. Rather than leave that as
+  // a step someone has to remember after flipping COAS_PUBLISHED, the failure
+  // prints the markup to paste. Flipping the flag then stays a one-line change
+  // plus a paste the build hands you, not a hunt.
+  const baked = pd.match(/id="pdEvidence"[^>]*>([\s\S]*?)<\/dl>/);
+  ok('the served panel matches what the code renders',
+    baked !== null && norm(baked[1]) === norm(evidenceHtml({})),
+    'product.html has drifted from evidenceHtml(). Replace the contents of\n' +
+    '          <dl id="pdEvidence"> with:\n' + evidenceHtml({}));
+
+  // The panel says "HPLC · Mass spec" in four words. process.html says it in a
+  // sentence. The short form must not name an analysis the long one does not.
+  ok('the process page states the analysis the panel summarises',
+    read('process.html').includes(ANALYSIS_LONG),
+    `process.html does not contain "${ANALYSIS_LONG}"`);
+  const named = ANALYSIS_SHORT.split('·').map(s => s.trim().toLowerCase());
+  const unbacked = named.filter(m => !ANALYSIS_LONG.toLowerCase().includes(m));
+  ok('the panel names no analysis the laboratory does not run',
+    unbacked.length === 0, `unbacked: ${unbacked.join(', ')}`);
+
+  // The manufacturing claim is hedged everywhere it appears, deliberately. A
+  // four-word data cell is exactly where that hedge gets dropped by accident.
+  ok('the source row keeps the cGMP-aligned hedge',
+    /cGMP-aligned quality practices/.test(SOURCE_LONG) &&
+    read('process.html').includes('cGMP-aligned quality practices'));
+  const overclaims = pages.filter(f =>
+    /\bGMP[\s-]?(certified|approved|compliant)\b/i.test(read(f)));
+  ok('no page upgrades that to a GMP certification', overclaims.length === 0,
+    overclaims.join(', '));
+
+  // A lot number is the one value on the panel a reader can check against the
+  // vial in their hand, which makes an invented one the worst thing the page
+  // could print. Nothing may state a lot code the catalog does not carry.
+  const held = new Set(GLOW_PRODUCTS.map(p => p.lot).filter(Boolean));
+  const invented = [];
+  pages.forEach(f => {
+    for (const m of read(f).matchAll(/\bGR-[A-Z0-9]{2,}-[\d-]{3,}\b/g)) {
+      if (!held.has(m[0])) invented.push(`${f}: ${m[0]}`);
+    }
+  });
+  ok('no page prints a lot number the catalog does not hold', invented.length === 0,
+    invented.join(', '));
+
+  // analysedOn() is called whenever `lot` is set, so an import that fills one
+  // field and not the other would render "Invalid Date" to a customer.
+  const halfRecords = GLOW_PRODUCTS.filter(p => Boolean(p.lot) !== Boolean(p.tested));
+  ok('every imported lot carries its analysis date', halfRecords.length === 0,
+    halfRecords.map(p => p.name).join(', '));
 }
 
 /* ---------------------------------------------------------------------------

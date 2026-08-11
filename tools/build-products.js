@@ -35,7 +35,7 @@ const OUT_DIR = 'peptides';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, PRODUCT_PAGES_LIVE,
-  sizeInStock, productInStock,
+  sizeInStock, productInStock, evidenceHtml, docHtml,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 // Mirrors CAT_LABEL in js/product.js. Kept in step by the assertion below
@@ -82,6 +82,15 @@ function setText(html, id, text) {
   const re = new RegExp(`(id="${id}"[^>]*>)[^<]*(<)`);
   required(html, re, `text placeholder #${id}`);
   return html.replace(re, `$1${text}$2`);
+}
+
+// Replace the contents of an element the donor ships filled: <dl id="x">…</dl>.
+// Non-greedy to the first matching close tag, so it must not be used on an
+// element that nests another of the same tag.
+function setInner(html, id, tag, content) {
+  const re = new RegExp(`(id="${id}"[^>]*>)[\\s\\S]*?(</${tag}>)`);
+  required(html, re, `#${id} contents`);
+  return html.replace(re, `$1${content}$2`);
 }
 
 // Prefix root-relative URLs so they resolve from peptides/<slug>/.
@@ -248,6 +257,15 @@ function buildProduct(p, donor) {
     html = setText(html, 'pdArrival',
       'Email support@glowresearch.shop and we will tell you when the next lot is released.');
   }
+
+  // The evidence panel and the documentation tab, from the same two functions
+  // js/product.js calls on load. The donor's own markup is the correct answer
+  // for every product today (no lot is imported, so every panel reads the same),
+  // but baking it per product is what makes filling `lot` a data change rather
+  // than a markup change. The dispatch row keeps its standing-rule wording here:
+  // a build cannot know what time it will be read.
+  html = setInner(html, 'pdEvidence', 'dl', evidenceHtml(p));
+  html = setInner(html, 'pdDocList', 'dl', docHtml(p));
 
   html = setText(html, 'pdAboutH', `About ${esc(p.name)}`);
   html = setText(html, 'pdResearchH', `${esc(p.name)} research`);

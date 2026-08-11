@@ -372,6 +372,85 @@
     .pd-tab{ font-size:.68rem; letter-spacing:.1em; }
   }
 
+  /* ---------- the Glow Standard ----------
+     A record, not a trust badge. Mono labels, one fact per cell, hairlines
+     doing the separating instead of boxes: the cells sit white on the section's
+     grey and the 1px grid gap is the only rule drawn. Wrapping to two columns
+     and then one needs no extra border rules that way. */
+  .pd-standard{ background:#f7f7f5; border-top:1px solid rgba(0,0,0,.1); padding: 62px 0 66px; }
+  .gs-head{ margin-bottom: 28px; }
+  .gs-head h2{
+    font-size: clamp(1.3rem, 2.3vw, 1.8rem); font-weight:800; letter-spacing:-.025em;
+    margin:0; color:#0a0a0a; max-width: 30ch;
+  }
+  .gs-grid{
+    margin:0; display:grid; grid-template-columns: repeat(4, 1fr); gap:1px;
+    background: rgba(0,0,0,.13); border:1px solid rgba(0,0,0,.13);
+  }
+  .gs-cell{ background:#fff; padding: 24px 24px 26px; }
+  .gs-cell dt{
+    font-family:'JetBrains Mono', monospace; font-size:.63rem; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase; color:#8a8a86; margin-bottom:13px;
+  }
+  .gs-cell dd{ margin:0; }
+  .gs-value{
+    display:block; font-family:'Space Grotesk', sans-serif; font-size:1.02rem;
+    font-weight:700; letter-spacing:-.015em; line-height:1.3; color:#0a0a0a;
+  }
+  .gs-note{ display:block; margin-top:10px; font-size:.82rem; line-height:1.6; color:#6f6f6a; }
+  /* only drawn when a certificate is actually hosted — see renderEvidence() */
+  .gs-report{
+    display:inline-block; margin-top:12px; padding-bottom:3px;
+    font-family:'JetBrains Mono', monospace; font-size:.65rem; font-weight:600;
+    letter-spacing:.12em; text-transform:uppercase; color:#0a0a0a;
+    border-bottom:1px solid #0a0a0a;
+  }
+  .gs-report:hover{ color:#55554f; border-bottom-color:#55554f; }
+
+  .gs-more{
+    display:inline-flex; align-items:center; gap:9px; margin-top: 30px; padding-bottom:5px;
+    font-family:'JetBrains Mono', monospace; font-size:.69rem; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase; color:#0a0a0a;
+    border-bottom:1px solid rgba(0,0,0,.28);
+  }
+  .gs-more:hover{ border-bottom-color:#0a0a0a; }
+
+  /* --- documentation tab --- */
+  .gs-doc{ max-width: 76ch; margin:0; border-top:1px solid rgba(0,0,0,.1); }
+  .gs-doc-row{
+    display:grid; grid-template-columns: minmax(140px, 200px) 1fr; gap: 6px 28px;
+    padding: 16px 0; border-bottom:1px solid rgba(0,0,0,.1);
+  }
+  .gs-doc-row dt{
+    font-family:'JetBrains Mono', monospace; font-size:.65rem; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase; color:#8a8a86; padding-top:4px;
+  }
+  .gs-doc-row dd{ margin:0; font-size:.98rem; line-height:1.6; color:#0a0a0a; }
+
+  /* --- from source to shipment --- */
+  /* the panel links down to this, and the site header is sticky, so the jump
+     has to stop short of it or it lands on a covered heading */
+  .pd-chain{ scroll-margin-top: 84px; }
+  .pd-chain h2{ margin-bottom: 8px; }
+  .pd-chain-lead{ font-size:1rem; line-height:1.65; color:#55554f; margin: 0 0 32px; max-width: 62ch; }
+  .chain-grid{
+    list-style:none; margin:0; padding:0;
+    display:grid; grid-template-columns: repeat(4, 1fr); gap:1px;
+    background: rgba(0,0,0,.13); border:1px solid rgba(0,0,0,.13);
+  }
+  .chain-step{ background:#fff; padding: 26px 24px 24px; }
+  .chain-num{
+    display:block; font-family:'JetBrains Mono', monospace; font-size:.68rem;
+    font-weight:600; letter-spacing:.14em; color:#a8a8a4; margin-bottom: 15px;
+  }
+  .chain-step h3{ font-size:1.05rem; font-weight:800; letter-spacing:-.02em; margin: 0 0 8px; color:#0a0a0a; }
+  .chain-step p{ font-size:.9rem; line-height:1.6; color:#55554f; margin: 0 0 18px; }
+  .chain-who{
+    display:block; padding-top: 13px; border-top:1px solid rgba(0,0,0,.1);
+    font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:600;
+    letter-spacing:.11em; text-transform:uppercase; color:#8a8a86;
+  }
+
   /* --- related --- */
   .pd-related h2{ margin-bottom: 28px; }
 
@@ -397,9 +476,18 @@
     .pd-hero-grid{ grid-template-columns:1fr; gap: 36px; }
     /* stacked on mobile, so pinning the image would just cover the copy */
     .pd-visual{ position:static; height: clamp(300px, 78vw, 380px); padding: 6% 12%; }
+    /* four data cells at tablet width leave each one about 160px wide, which
+       breaks "U.S. manufacturing partner" onto three lines */
+    .gs-grid, .chain-grid{ grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 560px){
     .pd-hero{ padding: 36px 0 56px; }
+    .pd-standard{ padding: 48px 0 52px; }
+    .gs-grid, .chain-grid{ grid-template-columns: 1fr; }
+    .gs-cell{ padding: 20px 20px 22px; }
+    /* the label column collapses above its value rather than squeezing the
+       value into what is left of a 320px line */
+    .gs-doc-row{ grid-template-columns: 1fr; gap: 7px; padding: 15px 0; }
     .pd-add{ width:100%; flex-basis:100%; }
     /* three vials in a ~83px card: at the desktop size the strip needs 118px
        and spills out the side, so it scales down and overlaps harder */
@@ -470,8 +558,7 @@
 <nav class="pd-crumb" aria-label="Breadcrumb">
   <div class="container pd-crumb-inner">
     <a href="index.html">Home</a> /
-    <a href="peptides.html">Products</a>
-      <a href="process.html">Our Process</a> /
+    <a href="peptides.html">Products</a> /
     <a id="pdCrumbCat" href="peptides.html">Category</a> /
     <span id="pdCrumbName">Product</span>
   </div>
@@ -554,14 +641,72 @@
     </div>
   </section>
 
+  <!-- ============ the Glow Standard ============
+       Not a badge row. Every cell is a fact about this specific vial, rendered
+       from evidenceRows() in js/products-data.js, so the panel is structurally
+       incapable of asserting something the catalog does not hold. What is in
+       the markup below is the honest state today: no lot has been imported, so
+       that row carries the null indicator and says when the reader gets the
+       number instead. js/product.js redraws the same rows on load and keeps the
+       dispatch one current; tools/build-products.js bakes the per-product
+       version into each generated page. -->
+  <section class="pd-standard">
+    <div class="container">
+      <div class="gs-head">
+        <span class="pd-label">The Glow Standard</span>
+        <h2>Everything we know about this vial, in one place.</h2>
+      </div>
+
+      <dl class="gs-grid" id="pdEvidence">
+        <div class="gs-cell" data-row="lot">
+          <dt>Current lot</dt>
+          <dd>
+            <span class="gs-value">—</span>
+            <span class="gs-note">Assigned when your order is picked, and printed on the vial you receive</span>
+          </dd>
+        </div>
+        <div class="gs-cell" data-row="analysis">
+          <dt>Independent analysis</dt>
+          <dd>
+            <span class="gs-value">HPLC · Mass spec</span>
+            <span class="gs-note">Certificate on request: email support@glowresearch.shop with the lot number on your vial</span>
+          </dd>
+        </div>
+        <div class="gs-cell" data-row="source">
+          <dt>Source</dt>
+          <dd>
+            <span class="gs-value">U.S. manufacturing partner</span>
+            <span class="gs-note">Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices</span>
+          </dd>
+        </div>
+        <div class="gs-cell" data-row="dispatch">
+          <dt>Dispatch</dt>
+          <dd>
+            <span class="gs-value">Same day before 2:00 PM PST</span>
+            <span class="gs-note">FedEx 2-Day service, Monday to Friday</span>
+          </dd>
+        </div>
+      </dl>
+
+      <!-- the nearest useful thing, not the deepest: the four-step strip is
+           further down this page, and it is the one that links on to the full
+           process. Panel, summary, process page, in that order. -->
+      <a class="gs-more" href="#pdChain">
+        See how it gets from source to shipment <span aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+  </section>
+
   <!-- ============ description & research ============ -->
   <section class="pd-info">
     <div class="container">
       <div class="pd-tabs" role="tablist" aria-label="Product information">
         <button type="button" class="pd-tab is-on" role="tab" id="pdTabAbout"
-                aria-controls="pdPanelAbout" aria-selected="true">Description</button>
+                aria-controls="pdPanelAbout" aria-selected="true">Overview</button>
         <button type="button" class="pd-tab" role="tab" id="pdTabResearch"
                 aria-controls="pdPanelResearch" aria-selected="false" tabindex="-1">Research</button>
+        <button type="button" class="pd-tab" role="tab" id="pdTabDoc"
+                aria-controls="pdPanelDoc" aria-selected="false" tabindex="-1">Documentation</button>
         <span class="pd-tab-ink" id="pdTabInk" aria-hidden="true"></span>
       </div>
 
@@ -583,6 +728,62 @@
           <strong>For laboratory research use only. Not for human or animal consumption.</strong>
         </p>
       </div>
+
+      <!-- The record, not the pitch. Filled from docRows() for the same reason
+           the panel above is: a field with nothing behind it renders the null
+           indicator rather than a value that reads as measured. -->
+      <div class="pd-panel" role="tabpanel" id="pdPanelDoc" aria-labelledby="pdTabDoc" tabindex="0" hidden>
+        <h2 class="pd-panel-h" id="pdDocH">Documentation</h2>
+        <dl class="gs-doc" id="pdDocList"></dl>
+        <p class="pd-ruo">
+          Purity is the figure reported by the independent laboratory for the lot on release.
+          Glow Research does not manufacture or test this compound: synthesis is performed by a
+          third-party facility and analysis by an independent laboratory, and the certificate is
+          issued by that laboratory rather than by us.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ from source to shipment ============
+       The 30-second version of process.html, which carries the full six steps
+       and says who performs each one. Nothing new is claimed here: every line
+       below is a compression of a step already written out on that page. -->
+  <section class="pd-section pd-chain" id="pdChain">
+    <div class="container">
+      <h2>From source to shipment</h2>
+      <p class="pd-chain-lead">Four of the six steps are performed by someone other than us. We say which.</p>
+
+      <ol class="chain-grid">
+        <li class="chain-step">
+          <span class="chain-num">01</span>
+          <h3>Manufacture</h3>
+          <p>Synthesis and fill at a U.S. partner facility.</p>
+          <span class="chain-who">Our manufacturing partner</span>
+        </li>
+        <li class="chain-step">
+          <span class="chain-num">02</span>
+          <h3>Verify</h3>
+          <p>Purity by HPLC, identity by mass spectrometry.</p>
+          <span class="chain-who">An independent laboratory</span>
+        </li>
+        <li class="chain-step">
+          <span class="chain-num">03</span>
+          <h3>Document</h3>
+          <p>A certificate issued against the lot number on the vial.</p>
+          <span class="chain-who">An independent laboratory</span>
+        </li>
+        <li class="chain-step">
+          <span class="chain-num">04</span>
+          <h3>Dispatch</h3>
+          <p>Picked against a specific lot, out the same day before 2:00 PM PST.</p>
+          <span class="chain-who">Glow Research</span>
+        </li>
+      </ol>
+
+      <a class="gs-more" href="process.html">
+        See the full six-step process <span aria-hidden="true">&rarr;</span>
+      </a>
     </div>
   </section>
 

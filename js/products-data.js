@@ -61,6 +61,12 @@ const COA_COPY = COAS_PUBLISHED ? {
   boxSub: 'HPLC purity and mass-spec identity, matched to the lot number on your vial',
   // footer of each order in the account area
   orderNote: 'Batch COA linked on every order',
+  // the analysis row of the evidence panel, and the same fact in the
+  // documentation tab. panelLink is the label on the row's link, and is empty
+  // in the other branch: there is nothing to open, so no link is drawn.
+  panelNote: 'Issued against this lot number by the laboratory that ran the analysis',
+  panelLink: 'View report',
+  docLine: 'Linked on this page, issued against the lot number on your vial',
   // homepage FAQ answer
   faq: 'Two places. Every product page links directly to its current lot’s certificate, ' +
        'and every vial carries the lot number that certificate is issued against, so you can ' +
@@ -73,6 +79,9 @@ const COA_COPY = COAS_PUBLISHED ? {
   boxTitle: 'Certificate of analysis on request',
   boxSub: 'Email support@glowresearch.shop with the lot number on your vial and we will send the COA for that batch',
   orderNote: 'Lot COA available on request',
+  panelNote: 'Certificate on request: email support@glowresearch.shop with the lot number on your vial',
+  panelLink: '',
+  docLine: 'On request: email support@glowresearch.shop with the lot number on your vial',
   faq: 'Email support@glowresearch.shop with the compound and lot number, or the order number if ' +
        'you have already bought, and we will send the certificate for that exact batch, including ' +
        'batches that have since sold out. Every vial carries the lot number its certificate is ' +
@@ -242,6 +251,134 @@ function avgPurity() {
 // partner's actual lot records, never as an estimate. If a real batch ledger
 // ever lands, derive this the way avgPurity() is derived and delete the note.
 const BATCHES_TESTED = 150;
+
+// ---------------------------------------------------------------------------
+// Dispatch, in one place. CLAUDE.md's rule for this file: the catalog and every
+// sitewide constant. Both of these were previously owned by js/product.js,
+// which meant the evidence panel could only quote them by typing them out
+// again, and a string typed into a template is not a number the audit can pin.
+//
+// CUTOFF_LABEL is derived rather than written, so the hour and the words a
+// customer reads cannot come apart. check-claims.js pins every "<n> AM|PM PST"
+// on the site, and in the scripts that render copy, to CUTOFF_HOUR.
+const CUTOFF_HOUR = 14;
+const CUTOFF_LABEL =
+  `${CUTOFF_HOUR > 12 ? CUTOFF_HOUR - 12 : CUTOFF_HOUR}:00 ` +
+  `${CUTOFF_HOUR >= 12 ? 'PM' : 'AM'} PST`;
+
+// FedEx transit, in business days. Quoted by the delivery estimate on the
+// product page and by the dispatch row of the evidence panel. check-claims.js
+// pins every "FedEx <n>-Day" on the site to this number.
+const TRANSIT_DAYS = 2;
+
+// ---------------------------------------------------------------------------
+// What the site is allowed to say about how a lot is verified and where it is
+// made. Both claims are already made at length on process.html and about.html.
+// The evidence panel states them in four words, and it states them from here,
+// so the short form cannot quietly grow a third analysis the laboratory never
+// ran or drop the regulatory hedge on the manufacturing claim. check-claims.js
+// pins both long forms to the prose they summarise.
+const ANALYSIS_SHORT = 'HPLC · Mass spec';
+const ANALYSIS_LONG = 'HPLC for purity, mass spectrometry for identity';
+const SOURCE_SHORT = 'U.S. manufacturing partner';
+const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices';
+
+// ---------------------------------------------------------------------------
+// The batch record behind a single vial.
+//
+// A product page that prints a lot number and a test date is only worth
+// building if those values come off the release paperwork. They are not
+// imported yet, so no product above carries `lot` or `tested`, and the panel
+// renders the null indicator plus the sentence that says when the reader
+// actually gets the number. That is a true answer to "which lot is this?" and a
+// made-up code would not be.
+//
+// The supplier import writes `lot` (the code printed on the vial) and `tested`
+// (ISO date of the independent analysis) onto each product. Filling them
+// upgrades the panel, the documentation tab and the generated pages at once,
+// with no markup edit anywhere.
+const analysedOn = iso => new Intl.DateTimeFormat('en-US', {
+  timeZone: 'UTC', month: 'long', day: 'numeric', year: 'numeric',
+}).format(new Date(iso + 'T12:00:00Z'));
+
+// The evidence panel, as data. Each row is a label, the fact, and the sentence
+// that makes the fact checkable. `key` identifies the one row that cannot be
+// answered ahead of time: dispatch depends on the clock, so js/product.js
+// rewrites it on load and every minute after.
+function evidenceRows(p) {
+  return [
+    {
+      key: 'lot',
+      label: 'Current lot',
+      value: p.lot || '—',
+      note: p.lot
+        ? `Analysed ${analysedOn(p.tested)} by an independent laboratory`
+        : 'Assigned when your order is picked, and printed on the vial you receive',
+    },
+    {
+      key: 'analysis',
+      label: 'Independent analysis',
+      value: ANALYSIS_SHORT,
+      note: COA_COPY.panelNote,
+      link: COA_COPY.panelLink,
+    },
+    {
+      key: 'source',
+      label: 'Source',
+      value: SOURCE_SHORT,
+      note: SOURCE_LONG,
+    },
+    {
+      // The standing rule, which is true at any hour. It is what a crawler
+      // reads and what shows before scripts run; the live answer replaces it.
+      key: 'dispatch',
+      label: 'Dispatch',
+      value: `Same day before ${CUTOFF_LABEL}`,
+      note: `FedEx ${TRANSIT_DAYS}-Day service, Monday to Friday`,
+    },
+  ];
+}
+
+// The documentation tab: the same record, longer, plus the fields that belong
+// on a record rather than in a summary.
+function docRows(p) {
+  return [
+    { label: 'Compound', value: p.name },
+    { label: 'Stated purity', value: p.purity },
+    { label: 'Analysis', value: ANALYSIS_LONG },
+    { label: 'Certificate', value: COA_COPY.docLine },
+    { label: 'Current lot', value: p.lot || '—' },
+    { label: 'Lot analysed', value: (p.tested && analysedOn(p.tested)) || '—' },
+    { label: 'Manufacturing', value: SOURCE_LONG },
+    {
+      label: 'Intended use',
+      value: 'Laboratory and in-vitro research only. Not for human or animal consumption.',
+    },
+  ];
+}
+
+// Both panels are drawn from the rows above as plain strings, with no DOM
+// access, so js/product.js renders them at runtime and tools/build-products.js
+// bakes the identical markup into each generated page. One template, so the
+// served HTML and the hydrated HTML cannot disagree.
+function evidenceHtml(p) {
+  return evidenceRows(p).map(r => `
+    <div class="gs-cell" data-row="${r.key}">
+      <dt>${r.label}</dt>
+      <dd>
+        <span class="gs-value">${r.value}</span>
+        <span class="gs-note">${r.note}</span>
+      </dd>
+    </div>`).join('');
+}
+
+function docHtml(p) {
+  return docRows(p).map(r => `
+    <div class="gs-doc-row">
+      <dt>${r.label}</dt>
+      <dd>${r.value}</dd>
+    </div>`).join('');
+}
 
 // Sort comparators for the catalog's sort control. Keyed so the <option>
 // values and the sorting logic can't drift apart. 'featured' is deliberately
@@ -455,6 +592,17 @@ if (typeof module !== 'undefined' && module.exports) {
     productInStock,
     avgPurity,
     BATCHES_TESTED,
+    CUTOFF_HOUR,
+    CUTOFF_LABEL,
+    TRANSIT_DAYS,
+    ANALYSIS_SHORT,
+    ANALYSIS_LONG,
+    SOURCE_SHORT,
+    SOURCE_LONG,
+    evidenceRows,
+    docRows,
+    evidenceHtml,
+    docHtml,
     bulkSavingPct,
     SITEWIDE_DISCOUNT,
     QTY_TIERS,

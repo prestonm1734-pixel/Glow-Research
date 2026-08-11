@@ -9,8 +9,9 @@
   const $ = id => document.getElementById(id);
   const money = n => '$' + n.toFixed(2);
 
-  const CUTOFF_HOUR = 14;        // 2:00 PM PST, same claim as the shipping page
-  const TRANSIT_DAYS = 2;        // FedEx 2-Day Express
+  // CUTOFF_HOUR, CUTOFF_LABEL and TRANSIT_DAYS come from js/products-data.js.
+  // The evidence panel quotes all three, so they are sitewide constants rather
+  // than ones this file owns and the panel restates.
 
   const CAT_LABEL = {
     growth: 'Growth Hormone Secretagogues',
@@ -78,7 +79,25 @@
     const shipsToday = !isWeekend(today) && secondsIn < CUTOFF_HOUR * 3600;
     const shipDate = shipsToday ? today : addBusinessDays(today, 1);
 
-    return { shipsToday, arrivalDate: addBusinessDays(shipDate, TRANSIT_DAYS) };
+    return {
+      shipsToday,
+      // How long is left to make today's pickup. Only meaningful when
+      // shipsToday, and it is the whole point of showing a countdown at all:
+      // "same-day shipping" is a rule, "1h 12m" is an answer.
+      secondsLeft: CUTOFF_HOUR * 3600 - secondsIn,
+      arrivalDate: addBusinessDays(shipDate, TRANSIT_DAYS),
+    };
+  }
+
+  // Rounded down to the minute, because the tick below is a minute long: saying
+  // "2h 14m" and meaning "somewhere under that" is the safe direction to err.
+  function countdown(seconds) {
+    const mins = Math.floor(seconds / 60);
+    if (mins < 1) return 'less than a minute';
+    const hours = Math.floor(mins / 60);
+    return hours
+      ? `${hours}h ${String(mins % 60).padStart(2, '0')}m`
+      : `${mins}m`;
   }
 
   // Dispatch and delivery are only claims we can make about something we can
@@ -94,13 +113,25 @@
         cutEl.innerHTML = '<strong>Out of stock</strong>';
         arrEl.innerHTML = 'Email <a href="mailto:support@glowresearch.shop">support@glowresearch.shop</a> ' +
           'and we will tell you when the next lot is released.';
+        setDispatchRow('Out of stock',
+          'Email support@glowresearch.shop and we will tell you when the next lot is released');
         return;
       }
       const e = deliveryEstimate();
+      // The countdown is the certainty the rest of this page is built on: not
+      // "we ship fast", but how long is left to make today's pickup.
       cutEl.innerHTML = e.shipsToday
-        ? 'In stock, <strong>ships today</strong>'
+        ? `In stock, <strong>ships today</strong>. Order within <strong>${countdown(e.secondsLeft)}</strong>.`
         : 'In stock, <strong>ships next business day</strong>';
       arrEl.innerHTML = `Estimated delivery <strong>${fmtDay(e.arrivalDate)}</strong>`;
+
+      setDispatchRow(
+        e.shipsToday ? 'Ships today' : 'Ships next business day',
+        e.shipsToday
+          ? `Order within ${countdown(e.secondsLeft)} to make today's pickup. ` +
+            `Estimated delivery ${fmtDay(e.arrivalDate)}`
+          : `Cutoff is ${CUTOFF_LABEL}, Monday to Friday. Estimated delivery ${fmtDay(e.arrivalDate)}`
+      );
     }
 
     refreshDelivery = tick;
@@ -172,6 +203,50 @@
     box.rel = 'noopener';
   }
 
+  /* ================= the Glow Standard =================
+     The panel and the documentation tab are both drawn by evidenceHtml() /
+     docHtml() in js/products-data.js, which is the same code tools/build-
+     products.js runs at build time. Rendering here rather than trusting the
+     baked markup means one product page cannot end up showing another's record
+     after a navigation, and it is what fills the panel on product.html?p=<slug>,
+     which has no baked content at all. */
+
+  function renderEvidence(p) {
+    const grid = $('pdEvidence');
+    if (!grid) return;
+    grid.innerHTML = evidenceHtml(p);
+
+    // The certificate link is drawn only when there is a document to open, on
+    // the same test renderCoa() uses. No href, no link: a row that says "view
+    // report" and does nothing is the uncertainty this panel exists to remove.
+    const href = p.coa || (typeof COA_URL === 'string' ? COA_URL : '');
+    const cell = grid.querySelector('[data-row="analysis"] dd');
+    if (href && COA_COPY.panelLink && cell) {
+      const a = document.createElement('a');
+      a.className = 'gs-report';
+      a.href = href;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = `${COA_COPY.panelLink} →`;
+      cell.appendChild(a);
+    }
+  }
+
+  // Called every minute by renderDelivery(): the one row whose answer depends
+  // on the clock rather than on the catalog.
+  function setDispatchRow(value, note) {
+    const cell = document.querySelector('#pdEvidence [data-row="dispatch"] dd');
+    if (!cell) return;
+    cell.querySelector('.gs-value').textContent = value;
+    cell.querySelector('.gs-note').textContent = note;
+  }
+
+  function renderDoc(p) {
+    const list = $('pdDocList');
+    if (!list) return;
+    list.innerHTML = docHtml(p);
+  }
+
   /* ================= description & research =================
      A real tablist: arrow keys move between tabs, Home/End jump to the
      ends, and only the selected tab is in the tab order, so a keyboard
@@ -190,10 +265,12 @@
   }
 
   function wireTabs() {
-    const tabs = [$('pdTabAbout'), $('pdTabResearch')];
-    const panels = [$('pdPanelAbout'), $('pdPanelResearch')];
+    // Read from the DOM rather than from a list of ids: adding a tab is then a
+    // markup change, and the control cannot end up wired to two of three.
+    const tabs = [...document.querySelectorAll('.pd-tabs .pd-tab')];
+    const panels = tabs.map(t => document.getElementById(t.getAttribute('aria-controls')));
     const ink = $('pdTabInk');
-    if (tabs.some(t => !t) || !ink) return;
+    if (!tabs.length || panels.some(p => !p) || !ink) return;
 
     function moveInk(tab) {
       ink.style.width = tab.offsetWidth + 'px';
@@ -428,7 +505,9 @@
     setCanonical(product);
     renderBreadcrumb(product);
     renderHeader(product);
+    renderEvidence(product);
     renderInfo(product);
+    renderDoc(product);
     wireTabs();
     renderSizes(product);
     renderSelection();

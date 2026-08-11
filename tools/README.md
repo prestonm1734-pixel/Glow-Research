@@ -32,12 +32,22 @@ It currently checks that:
 - the free-shipping threshold in the marquee equals `FREE_SHIPPING_AT` in
   `cart.js` **and** `freeOver` in `checkout.js`. Three places, one number
 - every stated dispatch cutoff equals `CUTOFF_HOUR`, and the estimate is
-  computed in Pacific time, which is what the copy claims
+  computed in Pacific time, which is what the copy claims. The scripts are
+  scanned as well as the pages: the product page states the cutoff in a string
+  it renders at runtime, and a claim is a claim whichever file it was typed into
+- every stated FedEx service equals `TRANSIT_DAYS`, in both word orders the copy
+  uses ("FedEx 2-Day", "2-day FedEx Express") and as the counted figure on the
+  shipping page and in the homepage hero
 - availability is derived from the catalog everywhere it is asserted, and
   nothing hardcodes `InStock`
 - the homepage hero's "99.7% avg. purity" equals `avgPurity()` over the
   catalog, and its "150+" equals `BATCHES_TESTED`. Both figures live in the
   served markup so a crawler sees them, which is exactly why they need pinning
+- the product page's evidence panel is rendered from `evidenceHtml()` by both
+  the browser and the build, its served markup still matches what that function
+  produces, it names no analysis `process.html` does not describe, it keeps the
+  "cGMP-aligned" hedge on the manufacturing claim, and no page anywhere prints a
+  lot number the catalog does not hold
 - no page promises a certificate while `COAS_PUBLISHED` is false
 - no fabricated ratings or reviews appear in structured data
 - every product carries every field the site reads, so a lossy supplier import
@@ -96,17 +106,24 @@ sitemap and the generator can never disagree.
 2. Host the certificates and fill `COA_URL`, or a per-product `coa`.
 3. Set `COAS_PUBLISHED = true` (see below) so the certificate wording across
    the site upgrades from "on request" to direct batch links.
-4. Write real per-SKU availability into `sizes[].stock`. Nothing else to
+4. Write `lot` (the code printed on the vial) and `tested` (ISO date of the
+   independent analysis) onto each product. That is what lights up the "current
+   lot" row of the evidence panel and the lot fields in the Documentation tab;
+   until they are set, both render the `—` null indicator and say when the
+   reader actually gets the number. Set both or neither: `analysedOn()` is
+   called whenever `lot` is present, and the audit fails on a half-filled
+   record rather than rendering "Invalid Date" to a customer.
+5. Write real per-SKU availability into `sizes[].stock`. Nothing else to
    change: the buy box, the mg picker, the quick-add sheet, the catalog card
    and the `Product` schema all read it through `sizeInStock()` /
    `productInStock()`. Absent means sellable, so an import that carries no
    stock field behaves exactly as the site does today.
-5. Add `sku` to the `Product` schema once the fulfilment partner supplies them.
-6. Set `PRODUCT_PAGES_LIVE = true`, run `node tools/build.js`, and commit
+6. Add `sku` to the `Product` schema once the fulfilment partner supplies them.
+7. Set `PRODUCT_PAGES_LIVE = true`, run `node tools/build.js`, and commit
    `peptides/**` along with the updated `sitemap.xml`.
-7. Check the generated pages (prices, sizes, purity, images, certificate
+8. Check the generated pages (prices, sizes, purity, images, certificate
    links) before anything is submitted for indexing.
-8. Submit the sitemap in Search Console.
+9. Submit the sitemap in Search Console.
 
 ### The certificate switch
 
@@ -131,13 +148,21 @@ places that render it read from there:
 | Cart trust list | `COA_COPY.short`, `js/cart.js` |
 | Account order footer | `COA_COPY.orderNote`, `js/account.js` |
 | Product page COA box | `COA_COPY.boxTitle` / `.boxSub`, `js/product.js` |
+| Evidence panel, analysis row | `COA_COPY.panelNote` / `.panelLink`, `js/products-data.js` |
+| Documentation tab | `COA_COPY.docLine`, `js/products-data.js` |
 
 The product page's static markup ships with the "on request" wording, so what a
 crawler sees (and what `build-products.js` bakes into each generated page) is
 accurate without running scripts; `renderCoa()` upgrades it only when a real
 href exists.
 
-Flipping `COAS_PUBLISHED` moves all four at once. Prose that mentions certificates (the
+One hand edit comes with the flip: `product.html` is the donor every generated
+page is cut from, so it cannot regenerate its own evidence panel the way
+`peptides/<slug>/` does. `check-claims.js` catches the stale panel and prints
+the exact markup to paste into `<dl id="pdEvidence">`, so it is a copy out of
+the build output rather than something to work out.
+
+Flipping `COAS_PUBLISHED` moves the rest at once. Prose that mentions certificates (the
 About page and the three blog articles) is written to stay true either way, so it needs no edit; if you want those pointing at direct
 links too, they are the only hand edits left.
 
