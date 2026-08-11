@@ -71,6 +71,11 @@ It currently checks that:
 - the process chain still has six steps, each with one scannable sentence, a
   disclosure, and the "performed by" label naming who does it. Four of the six
   are not Glow, and saying so is the point of the page
+- the About page names San Diego **and** California in the copy a reader sees,
+  not only in the meta description and the schema, and the postal address in the
+  `Organization` schema matches the footer on every page. Added because
+  shortening that page's lede dropped the state from the visible text in one
+  edit while every `<head>` tag still carried it
 - no page promises a certificate while `COAS_PUBLISHED` is false
 - no fabricated ratings or reviews appear in structured data
 - every product carries every field the site reads, so a lossy supplier import

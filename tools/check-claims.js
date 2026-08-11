@@ -605,6 +605,41 @@ console.log('\nhouse style');
  * 5. Structured data. Inventing reviews or ratings is the fastest way to a
  *    manual action, and it is the exact thing PRINCIPLES.md forbids.
  * ------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+ * 7b. Where the company is. The About page is the page that ranks for "peptide
+ *     supplier San Diego", and the town and state have to be in the copy a
+ *     reader sees, not only in the meta description and the schema. This check
+ *     exists because shortening that page's lede dropped "California" from the
+ *     visible text in one edit while every <head> tag still said it, which is
+ *     the failure that looks fine in a diff and costs a local search result.
+ *
+ *     Body copy only: <head>, <script> and the footer address are stripped
+ *     before the search, so a postal address in the footer cannot stand in for
+ *     the page actually saying where the business is.
+ * ------------------------------------------------------------------------- */
+console.log('\nlocation');
+{
+  const ab = read('about.html');
+  const body = (ab.match(/<main[\s\S]*?<footer/) || [ab])[0]
+    .replace(/<script[\s\S]*?<\/script>/g, '');
+  ok('the About page says San Diego in its visible copy', /San Diego/.test(body));
+  ok('and names the state, which the schema and meta cannot do for it',
+    /California/.test(body));
+
+  // The address in the Organization schema is the one Google reconciles against
+  // a Business Profile, so it has to agree with the footer rather than be a
+  // second address nobody maintains.
+  const org = read('index.html');
+  ok('the Organization schema carries the postal address',
+    /"addressLocality":\s*"San Diego"/.test(org) && /"addressRegion":\s*"CA"/.test(org));
+  const street = (org.match(/"streetAddress":\s*"([^"]+)"/) || [, ''])[1];
+  const footerPages = pages.filter(f => read(f).includes('site-footer'));
+  const mismatched = footerPages.filter(f => !read(f).includes(street));
+  ok('every page footer states the same street address as the schema',
+    street !== '' && mismatched.length === 0,
+    street === '' ? 'no streetAddress in the schema' : `missing from ${mismatched.join(', ')}`);
+}
+
 console.log('\nstructured data');
 {
   const bad = pages.filter(f => /aggregateRating|"@type":\s*"Review"/.test(read(f)));
