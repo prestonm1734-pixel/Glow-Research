@@ -249,12 +249,11 @@
      Cards rather than rows: each tier shows the vials you actually get, so
      the quantity reads at a glance before any of the numbers do.
 
-     Two by two rather than four across. Four tiers in the buy column would be
-     about 70px each, which is narrower than the vial art and leaves the
-     percentage wrapping. The 2x2 also matches how the choice is actually made:
-     one vial or a bundle, then which bundle. */
+     Three across, because three is how many tiers get a card: one vial, or
+     one of two bundles. The ladder continues past them for anyone who steps
+     higher, and the note underneath says so in words. */
   .pd-bulk{ margin-top: 2px; padding-top: 18px; border-top:1px solid rgba(0,0,0,.1); }
-  .pd-tiers{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .pd-tiers{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .pd-tier{
     position:relative; background:#fafaf8; border:1.5px solid rgba(0,0,0,.14); cursor:pointer;
     padding: 18px 12px 16px; display:flex; flex-direction:column; align-items:center; gap:2px;
@@ -662,7 +661,7 @@
                above and reprices the buy box; nothing is added to the cart
                until the Add to cart button is pressed. -->
           <div class="pd-tiers" id="pdTiers"></div>
-          <p class="pd-bulk-note">Any quantity gets the rate of the tier it reaches: four vials are priced at the three-vial rate.</p>
+          <p class="pd-bulk-note" id="pdBulkNote">Any quantity gets the rate of the tier it reaches: 4 vials are priced at the 3-vial rate. It keeps going past 3 vials: 5 vials 15% off and 10 vials 20% off. 20% is the most on a single compound. Larger volumes are <a href="wholesale.html">wholesale</a>.</p>
         </div>
 
         <a class="pd-coa" id="pdCoaLink">

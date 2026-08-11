@@ -31,8 +31,24 @@
 
   const money = n => '$' + n.toFixed(2);
   const count = () => items.reduce((n, i) => n + i.qty, 0);
-  const subtotal = () => items.reduce((n, i) => n + i.unitSale * i.qty, 0);
-  const savings = () => items.reduce((n, i) => n + (i.unitOriginal - i.unitSale) * i.qty, 0);
+
+  // What a vial on this line costs right now, priced from the line's own
+  // quantity rather than from whatever was stored when it was added.
+  //
+  // This has to be derived. Bulk pricing is a function of quantity, and the
+  // quantity changes in three places after the line is created: the +/- in
+  // this drawer, and add() merging a second helping into an existing line. A
+  // stored unitSale is a snapshot of the moment it was added, so stepping a
+  // line from 2 to 5 kept charging the 2-vial rate, and adding 1 vial and then
+  // 2 more charged the 1-vial rate on all three. The customer reaching a tier
+  // and not being given it is the version of this that actually costs them
+  // money.
+  const lineUnit = i => (typeof unitPriceAt === 'function'
+    ? unitPriceAt(i.unitOriginal, i.qty)
+    : i.unitSale);
+
+  const subtotal = () => items.reduce((n, i) => n + lineUnit(i) * i.qty, 0);
+  const savings = () => items.reduce((n, i) => n + (i.unitOriginal - lineUnit(i)) * i.qty, 0);
 
   /* ---------- badge ---------- */
 
@@ -95,8 +111,9 @@
   }
 
   function rowHtml(item, i) {
-    const onSale = item.unitOriginal > item.unitSale;
-    const off = bulkSavingPct(item.unitOriginal, item.unitSale);
+    const unit = lineUnit(item);
+    const onSale = item.unitOriginal > unit;
+    const off = bulkSavingPct(item.unitOriginal, unit);
     return `
       <div class="cart-row" data-i="${i}">
         <span class="cart-thumb">${typeof productThumb === 'function' ? productThumb(item.name) : '<span class="vial"></span>'}</span>
@@ -121,7 +138,7 @@
             </div>
             <div class="cart-row-price">
               ${onSale ? `<span class="cart-was">${money(item.unitOriginal * item.qty)}</span>` : ''}
-              <span class="cart-now">${money(item.unitSale * item.qty)}</span>
+              <span class="cart-now">${money(unit * item.qty)}</span>
               ${off ? `<span class="cart-off">Save ${off}%</span>` : ''}
             </div>
           </div>
@@ -274,7 +291,10 @@
   // cart state behind our back
   window.GlowCart = {
     add, open, close, count, subtotal, clear,
-    items: () => items.map(i => Object.assign({}, i)),
+    // unitSale is overwritten with the price this line's quantity actually
+    // earns. js/checkout.js and api/create-order.js both total from it, so a
+    // stale stored figure here is what the customer would be charged.
+    items: () => items.map(i => Object.assign({}, i, { unitSale: lineUnit(i) })),
     savings,
     FREE_SHIPPING_AT,
   };

@@ -544,16 +544,32 @@ function bulkSavingPct(original, sale) {
 // with their own prices, means a stepper set to 4 quietly charges full price
 // next to a card advertising a discount for less product.
 //
+// `card: true` marks the thresholds that get a card on the product page. The
+// ladder is longer than the cards on purpose: three cards is the decision most
+// people are actually making, and a wall of six is a worse way to ask it. The
+// rates keep climbing for anyone who steps past the last card, and bulkNote()
+// states the rest in words so nothing is hidden — a discount you only find by
+// guessing a number is not an offer.
+//
+// 20% at ten vials is the ceiling for a single compound. Above that the answer
+// is wholesale, which starts at 25% for 25 vials a month, so the retail ladder
+// stops exactly where the wholesale one begins rather than overlapping it.
+//
 // PLACEHOLDER RATES. The thresholds and percentages are ours to set, but the
 // supplier import decides what margin actually supports them. Confirm before
-// launch; nothing else needs touching, since every price on the page is
-// derived from these four rows.
+// launch; nothing else needs touching, since every price on the site is
+// derived from these rows.
 const QTY_TIERS = [
-  { qty: 1, off: 0 },
-  { qty: 3, off: 0.10 },
+  { qty: 1, off: 0, card: true },
+  { qty: 2, off: 0.05, card: true },
+  { qty: 3, off: 0.10, card: true },
   { qty: 5, off: 0.15 },
   { qty: 10, off: 0.20 },
 ];
+
+// The most a single compound can be discounted before wholesale. Derived, so
+// adding a richer tier raises it here and in the copy at the same time.
+const BULK_MAX_OFF = Math.max(...QTY_TIERS.map(t => t.off));
 
 // "3 vials" / "1 vial". Generated so a threshold change cannot leave a label
 // describing the old number.
@@ -599,12 +615,42 @@ function getProductVariants(p, unitPrice) {
     return {
       qty: t.qty,
       off: t.off,
+      card: !!t.card,
       label: tierLabel(t.qty),
       original,
       unitSale,
       sale: round2(unitSale * t.qty),
     };
   });
+}
+
+// The fine print under the tier cards, written from the ladder rather than
+// typed beside it. Two things have to be said and neither can be allowed to go
+// stale: that a quantity between thresholds keeps the lower rate, and that the
+// rates carry on past the last card. Every number in the sentence is read from
+// QTY_TIERS, so changing a tier rewrites the copy.
+function bulkNote() {
+  const pct = t => `${Math.round(t.off * 100)}%`;
+  const cards = QTY_TIERS.filter(t => t.card);
+  const beyond = QTY_TIERS.filter(t => !t.card);
+  const top = QTY_TIERS[QTY_TIERS.length - 1];
+  const lastCard = cards[cards.length - 1];
+
+  // "4 vials are priced at the 3-vial rate" — the in-between case, named with
+  // a real number rather than described in the abstract.
+  const gap = `Any quantity gets the rate of the tier it reaches: ` +
+    `${lastCard.qty + 1} vials are priced at the ${lastCard.qty}-vial rate.`;
+
+  if (!beyond.length) return gap;
+
+  const more = beyond
+    .map(t => `${tierLabel(t.qty)} ${pct(t)} off`)
+    .join(', ')
+    .replace(/, ([^,]*)$/, ' and $1');
+
+  return `${gap} It keeps going past ${tierLabel(lastCard.qty)}: ${more}. ` +
+    `${pct(top)} is the most on a single compound. ` +
+    `Larger volumes are <a href="wholesale.html">wholesale</a>.`;
 }
 
 // URL-safe id for linking a card to its detail page: "BPC-157" -> "bpc-157"
@@ -803,6 +849,8 @@ if (typeof module !== 'undefined' && module.exports) {
     bulkSavingPct,
     SITEWIDE_DISCOUNT,
     QTY_TIERS,
+    BULK_MAX_OFF,
+    bulkNote,
     tierFor,
     tierLabel,
     bulkOff,

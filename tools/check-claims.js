@@ -28,7 +28,7 @@ const {
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, CUTOFF_LABEL, CUTOFF_LABEL_SHORT,
   ANALYSIS_SHORT, ANALYSIS_LONG, SOURCE_LONG, evidenceRows, evidenceHtml,
   identityLine, FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
-  QTY_TIERS, tierFor, getProductVariants, unitPriceAt,
+  QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -945,11 +945,39 @@ console.log('\nbulk pricing');
   ok('every quantity gets the rate of the tier it reaches',
     wrongTier.length === 0, wrongTier.join('; '));
 
-  // The page states this rule in words. If the wording goes, a stepper that
-  // silently changes the per-vial price is unexplained.
+  // 20% on one compound is the ceiling, and wholesale picks up above it. If a
+  // retail tier ever went past what wholesale opens at, the two ladders would
+  // be advertising against each other.
+  ok('the bulk ceiling is 20%', BULK_MAX_OFF === 0.20, `${BULK_MAX_OFF * 100}%`);
+  ok('wholesale still starts richer than the retail ceiling',
+    /(2[5-9]|[3-9][0-9])% off starting at/.test(read('wholesale.html')),
+    'wholesale.html must open above the retail bulk ceiling');
+
+  // Cards are a subset of the ladder, and they have to be the cheap end of it:
+  // cards for 1 and 10 with the middle hidden would be a worse offer presented
+  // as the whole one.
+  const cards = QTY_TIERS.filter(t => t.card);
+  ok('the cards are the lowest tiers, in order',
+    cards.length >= 2 && QTY_TIERS.slice(0, cards.length).every(t => t.card),
+    'card tiers must be the first rows of the ladder');
+
+  // The page states the rule and every rate past the last card. This is the
+  // one that stops the ladder growing a tier nobody is told about.
   const pd = read('product.html');
-  ok('the page explains that a quantity earns the tier it reaches',
-    /rate of the tier it reaches/i.test(pd));
+  const noteHtml = (pd.match(/id="pdBulkNote"[^>]*>([\s\S]*?)<\/p>/) || [, ''])[1].trim();
+  ok('the fine print under the tiers is the one bulkNote() writes',
+    noteHtml === bulkNote(),
+    `run this sentence into product.html:\n          ${bulkNote()}`);
+  ok('js/product.js renders the note from bulkNote()',
+    /pdBulkNote[\s\S]{0,120}bulkNote\(\)/.test(read('js/product.js')));
+
+  // Every rate that has no card must be named in the copy, or the only way to
+  // find it is to guess a quantity and watch the price move.
+  const unstated = QTY_TIERS.filter(t => !t.card)
+    .filter(t => !noteHtml.includes(`${Math.round(t.off * 100)}%`) ||
+                 !noteHtml.includes(tierLabel(t.qty)));
+  ok('every tier without a card is stated in words',
+    unstated.length === 0, unstated.map(t => tierLabel(t.qty)).join(', '));
 
   // A tier press must set the quantity, never add to the cart. This is the
   // behaviour regression that matters most: it spends the customer's money.
@@ -984,6 +1012,27 @@ console.log('\nbulk pricing');
   }));
   ok('each tier costs less per vial than the one below it',
     inverted.length === 0, inverted.join(', '));
+
+  /* The cart is the other place a quantity changes, and it was the hole this
+     model opened. unitSale used to be stored on the line when it was added,
+     so +/- in the drawer and add() merging into an existing line both moved
+     the quantity without moving the price: a line stepped from 2 to 5 kept
+     the 2-vial rate, and adding 1 then 2 more charged the 1-vial rate on all
+     three. Deriving it is the fix, and these keep it derived. */
+  const cart = read('js/cart.js');
+  ok('the cart prices each line from its own quantity',
+    /const lineUnit = i => \(typeof unitPriceAt/.test(cart));
+  ok('the cart subtotal uses the derived price',
+    /subtotal = \(\) => items\.reduce\(\(n, i\) => n \+ lineUnit\(i\)/.test(cart));
+  ok('the savings figure uses the derived price',
+    /savings = \(\) => items\.reduce\(\(n, i\) => n \+ \(i\.unitOriginal - lineUnit\(i\)\)/.test(cart));
+  // checkout.js and api/create-order.js both total from items(), so this is
+  // the number the customer is actually charged.
+  ok('items() hands out the derived price, not the stored one',
+    /items: \(\) => items\.map\(i => Object\.assign\(\{\}, i, \{ unitSale: lineUnit\(i\) \}\)\)/.test(cart));
+  ok('no cart total multiplies the stored unitSale',
+    !/\bi\.unitSale \* i\.qty/.test(cart) && !/item\.unitSale \* item\.qty/.test(cart),
+    'a stored unitSale is a snapshot of the quantity at the time it was added');
 }
 
 console.log('\ncheckout gate');

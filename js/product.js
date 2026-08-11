@@ -409,6 +409,11 @@
   // Highlights the tier the current quantity is actually earning, which at 4
   // vials is the 3-vial card. tierFor() decides, so the highlight and the
   // price are answering the same question with the same function.
+  //
+  // Past the last card the ladder carries on with no card to light up, and
+  // nothing is highlighted rather than the top card being left lit. Lighting
+  // "3 vials" while the buyer is on 5 and getting 15% would state the wrong
+  // rate on screen; the note under the price names the real one.
   function markActiveTier() {
     const active = tierFor(qty).qty;
     document.querySelectorAll('#pdTiers .pd-tier').forEach(btn => {
@@ -429,8 +434,17 @@
       ? `<img src="${pageHref(product.image)}" alt="" loading="lazy" />`
       : '<span class="vial"></span>';
 
-    wrap.innerHTML = variants.map(v => {
-      const best = v.off === Math.max(...variants.map(x => x.off));
+    // Only the tiers that get a card. The ladder is longer, and bulkNote()
+    // below states the rest, so the cards stay the three-way decision most
+    // people are making instead of a wall of six.
+    const cards = variants.filter(v => v.card);
+    const ladderTop = Math.max(...variants.map(x => x.off));
+
+    wrap.innerHTML = cards.map(v => {
+      // "Best value" only if this card really is the best the ladder offers.
+      // While the ladder runs past the cards no card earns the flag, and if
+      // the cards are ever extended to cover it, it comes back on its own.
+      const best = v.off === ladderTop;
       // The advertised figure is the bundle tier itself, stated as configured.
       // The sitewide markdown stacks on top, so the struck-through total shows
       // a bigger saving than the badge: the badge under-promises, never over.
@@ -448,6 +462,12 @@
     wrap.querySelectorAll('.pd-tier').forEach(btn => {
       btn.addEventListener('click', () => setQty(+btn.dataset.qty));
     });
+
+    // Written from the ladder, so the rates stated in words are the rates
+    // charged. The static copy in product.html is the same sentence and is
+    // pinned to this function by check-claims.js.
+    const note = $('pdBulkNote');
+    if (note) note.innerHTML = bulkNote();
 
     markActiveTier();
   }
