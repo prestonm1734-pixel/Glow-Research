@@ -81,13 +81,9 @@
   }
   /* A real product shot is photographed on white. Rather than float it on the
      dark stage as a card-in-a-card, the stage itself goes light and the photo
-     fills it edge to edge, so there is no frame around the vial. */
-  /* The render is shot on a flat #ebebeb studio backdrop, not pure white, so
-     multiplying it over the stage's gradient left a visibly darker square
-     floating inside the frame. Match the stage to the backdrop and let the
-     photo sit on it unblended — its edges then disappear entirely. */
-  .pd-visual.has-photo{ background:#ebebeb; padding: 3% 6%; }
-  .pd-visual.has-photo .pd-photo{ mix-blend-mode: normal; }
+     fills it edge to edge, so there is no frame around the vial — multiply
+     drops the shot's white backdrop out entirely against the stage's own
+     light gradient, rather than sitting on top of it as a visible rectangle. */
   /* the whole vial, always — the stage is sticky, so the image stays with you
      as the page scrolls rather than being cropped or panned */
   .pd-photo{

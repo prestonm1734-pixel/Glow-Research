@@ -1101,7 +1101,7 @@ function productCardHtml(p, i) {
   const name = single ? `${p.name} ${p.sizes[0].mg}` : p.name;
   return `
       <div class="product-card reveal" style="transition-delay:${(i % 3) * 60}ms">
-        <a class="product-visual${p.image ? ' has-photo' : ''}" href="${href}">
+        <a class="product-visual" href="${href}">
           <span class="product-badge cat">${p.cat}</span>
           ${!stocked
             ? '<span class="product-badge status is-out">Out of stock</span>'

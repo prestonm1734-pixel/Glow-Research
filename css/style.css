@@ -647,19 +647,14 @@ button[disabled].si-forgot{ cursor: progress; }
   position:relative; overflow:hidden;
   background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
 }
-/* A real product shot is photographed on white, which is already what
+/* Every product shot ships photographed on white, which is already what
    .product-visual fades to — so it drops straight in with no card or border
-   around it, and multiply drops the shot's white backdrop out entirely. */
+   around it, and multiply drops the shot's white backdrop out entirely
+   rather than sitting on top of the gradient as its own visible rectangle. */
 .product-photo{
   height:100%; width:100%; object-fit:contain; padding: 2% 0;
   mix-blend-mode: multiply;
 }
-/* …except when the shot carries its own studio backdrop rather than pure
-   white. Multiplying that over the tile's gradient prints a darker square
-   inside the frame, so the tile matches the backdrop and the photo lands
-   flat on it instead. */
-.product-visual.has-photo{ background:#ebebeb; }
-.product-visual.has-photo .product-photo{ mix-blend-mode: normal; }
 /* the small square thumb used by search, the cart drawer and checkout — they
    all share the same light gradient tile, so one rule covers all three */
 .thumb-photo{

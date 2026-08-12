@@ -174,12 +174,9 @@
       $('pdPhoto').alt = `${p.name}${s ? ' ' + s.mg : ''} vial`;
       $('pdPhoto').hidden = false;
       $('pdVialArt').hidden = true;
-      // the stage turns light so the shot's own white background disappears
-      document.querySelector('.pd-visual').classList.add('has-photo');
     } else {
       $('pdPhoto').hidden = true;
       $('pdVialArt').hidden = false;
-      document.querySelector('.pd-visual').classList.remove('has-photo');
     }
   }
 
