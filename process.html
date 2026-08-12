@@ -121,8 +121,13 @@
     padding-bottom: clamp(26px, 3.5vw, 48px);
   }
   .pr-hero > .container{ position:relative; z-index:1; }
-  /* One line under the title, so it reads balanced rather than ragged. */
-  .pr-hero .lp-lede{ text-wrap: balance; }
+  /* One line under the title, so it reads balanced rather than ragged.
+     Weight and colour match .hero-sub on the homepage: semibold a shade under
+     full white reads as supporting copy rather than body text, and the lift in
+     colour is what stops bold dim grey going muddy. */
+  .pr-hero .lp-lede{
+    text-wrap: balance; font-weight: 600; color: #c7c7c4;
+  }
 
   /* One soft blur behind the type, the same light the homepage hero sits in.
      Costs no height and stops the headline sitting on flat black. */
@@ -356,7 +361,9 @@
 </style>
 
 </head>
-<body>
+<!-- header-dark: this page is dark to the top, so the bar takes the page's
+     background instead of the catalog's. See "dark header" in css/style.css. -->
+<body class="header-dark">
 
 <!-- first-visit age / RUO gate. Loaded here, not with the other
      scripts at the foot of the page, so the overlay is in the DOM
