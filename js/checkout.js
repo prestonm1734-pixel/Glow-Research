@@ -39,6 +39,41 @@
     ? Stripe(STRIPE_PUBLISHABLE_KEY)
     : null;
 
+  // Matches .co-field's own input styling exactly (checkout.html) rather than
+  // Stripe's default rounded, blue-focused theme — the fields Stripe draws
+  // inside its iframe should read as the same form as the ones around them,
+  // not a widget dropped into it. Colours and radius are literals, not CSS
+  // custom properties: the iframe cannot read this page's stylesheet, so
+  // there is nothing to var() against.
+  const STRIPE_APPEARANCE = {
+    theme: 'flat',
+    variables: {
+      fontFamily: '"Inter", system-ui, sans-serif',
+      fontSizeBase: '16px',
+      colorText: '#0a0a0a',
+      colorTextPlaceholder: '#86868b',
+      colorDanger: '#b3261e',
+      borderRadius: '0px',
+      spacingUnit: '4px',
+    },
+    rules: {
+      '.Input': {
+        border: '1px solid rgba(0,0,0,0.22)',
+        padding: '12px 14px',
+        boxShadow: 'none',
+      },
+      '.Input:focus': {
+        border: '1px solid #0a0a0a',
+        boxShadow: 'inset 0 0 0 1px #0a0a0a',
+      },
+      '.Label': {
+        color: '#86868b',
+        fontSize: '.85rem',
+        marginBottom: '6px',
+      },
+    },
+  };
+
   /* ---------- state selects ---------- */
   function fillStates() {
     document.querySelectorAll('select[data-states]').forEach(sel => {
@@ -243,8 +278,17 @@
           // later confirmPayment() will charge — elements.fetchUpdates()
           // below is what keeps anything Stripe renders live (a wallet
           // button's on-screen amount, mainly) in step with it.
-          elements = stripeClient.elements({ clientSecret: data.clientSecret, appearance: { theme: 'stripe' } });
-          const el = elements.create('payment');
+          elements = stripeClient.elements({ clientSecret: data.clientSecret, appearance: STRIPE_APPEARANCE });
+          // Card only (the PaymentIntent was created with payment_method_types:
+          // ['card']), and no address/name/email fields: the checkout form
+          // already collects all three, further up this same page, so Stripe's
+          // own copies were the second billing-address form nobody asked for —
+          // the actual clutter, more than any colour or corner radius. The real
+          // shipping address still goes to Stripe at confirm time, in
+          // confirmParams below, so AVS still runs; it is just not re-typed.
+          const el = elements.create('payment', {
+            fields: { billingDetails: { name: 'never', email: 'never', address: 'never' } },
+          });
           el.mount('#coStripeElement');
           el.on('ready', () => {
             const loading = document.querySelector('.co-stripe-loading');
@@ -631,6 +675,26 @@
           confirmParams: {
             return_url: location.origin + location.pathname,
             receipt_email: payload.customer.email || undefined,
+            // The Payment Element was created with billingDetails all set to
+            // 'never' (see ensurePaymentIntent), so nothing was collected for
+            // this on screen — it has to be supplied here instead, from the
+            // shipping address already on the form, or AVS runs with nothing
+            // to check the card against at all rather than the address the
+            // shopper actually typed.
+            payment_method_data: {
+              billing_details: {
+                name: [shipAddr.firstName, shipAddr.lastName].filter(Boolean).join(' ') || undefined,
+                email: payload.customer.email || undefined,
+                address: {
+                  line1: shipAddr.address1 || undefined,
+                  line2: shipAddr.address2 || undefined,
+                  city: shipAddr.city || undefined,
+                  state: shipAddr.state || undefined,
+                  postal_code: shipAddr.zip || undefined,
+                  country: 'US',
+                },
+              },
+            },
           },
           redirect: 'if_required',
         });

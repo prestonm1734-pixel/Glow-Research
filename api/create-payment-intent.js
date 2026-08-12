@@ -80,7 +80,17 @@ export default async function handler(req, res) {
       intent = await stripe('/payment_intents', {
         amount,
         currency: 'usd',
-        automatic_payment_methods: { enabled: true },
+        // Explicit, not automatic_payment_methods: automatic would surface
+        // whatever is switched on in the Stripe Dashboard — wallets, buy-now-
+        // pay-later, bank debit — which is how the payment form ends up with
+        // a row of tabs nobody asked for. Card only, on purpose: it is the
+        // only method here that settles synchronously, which is what lets
+        // api/create-order.js treat "succeeded" as "safe to ship." Bank debit
+        // settles over several business days as `processing`, not
+        // `succeeded`, and nothing in this codebase currently reopens an
+        // order once a delayed payment like that finally clears — so it is
+        // left out rather than offered and quietly stuck.
+        payment_method_types: ['card'],
         receipt_email: metadata.order_email || undefined,
         metadata,
       });

@@ -1288,6 +1288,21 @@ console.log('\npayments');
   ok('js/checkout.js reads STRIPE_PUBLISHABLE_KEY rather than hardcoding a key of its own',
     /STRIPE_PUBLISHABLE_KEY/.test(coJs) && !/pk_(test|live)_/.test(coJs));
 
+  // Card only, by explicit choice: bank debit settles as `processing` for
+  // days rather than `succeeded` immediately, and api/create-order.js only
+  // ever treats `succeeded` as safe to ship against. automatic_payment_methods
+  // would hand that decision to whatever is switched on in the Stripe
+  // Dashboard instead of to this file, which is how a method with no
+  // fulfillment story behind it would end up offered on the checkout page.
+  // The negative check looks for automatic_payment_methods used as an actual
+  // object key (followed by its opening brace), not the bare words — the
+  // comment explaining why card-only was chosen instead necessarily mentions
+  // automatic_payment_methods by name, which a plain substring check would
+  // have tripped over.
+  ok('the PaymentIntent is created for card only, not automatic method detection',
+    /payment_method_types:\s*\['card'\]/.test(intentFn) &&
+    !/automatic_payment_methods\s*:\s*\{/.test(intentFn));
+
   // The one check that would matter most if it ever failed: a secret key
   // checked into anything the browser can fetch is a live credential handed
   // to every visitor. Scans every hand-written page and every browser-loaded

@@ -25,8 +25,25 @@ function flattenForm(obj, prefix = '', out = {}) {
   for (const [k, v] of Object.entries(obj)) {
     if (v === undefined || v === null) continue;
     const key = prefix ? `${prefix}[${k}]` : k;
-    if (typeof v === 'object' && !Array.isArray(v)) flattenForm(v, key, out);
-    else out[key] = v;
+    if (Array.isArray(v)) {
+      // Stripe reads an array as indexed keys — payment_method_types[0]=card
+      // — not a bare payment_method_types=card. URLSearchParams stringifies
+      // an array value with no brackets at all (String(['card']) === 'card'),
+      // which Stripe's parser does not recognise as the array field it is:
+      // it is silently ignored rather than rejected, so a caller that missed
+      // this would never see an error, only a request that quietly did not
+      // do what it asked. Handled once, here, so no other caller has to
+      // remember it.
+      v.forEach((item, i) => {
+        const itemKey = `${key}[${i}]`;
+        if (item && typeof item === 'object') flattenForm(item, itemKey, out);
+        else out[itemKey] = item;
+      });
+    } else if (typeof v === 'object') {
+      flattenForm(v, key, out);
+    } else {
+      out[key] = v;
+    }
   }
   return out;
 }
