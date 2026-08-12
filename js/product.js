@@ -7,7 +7,10 @@
 // the buy box, the bulk tiers and the spec table together.
 (function () {
   const $ = id => document.getElementById(id);
-  const money = n => '$' + n.toFixed(2);
+  // fmtPrice() (js/products-data.js) is the one place "$65, not $65.00" is
+  // decided — the catalog card and the cart already read it, so the buy box
+  // does too rather than keeping its own .toFixed(2) that always shows cents.
+  const money = fmtPrice;
 
   // CUTOFF_HOUR, CUTOFF_LABEL and TRANSIT_DAYS come from js/products-data.js.
   // The evidence panel quotes all three, so they are sitewide constants rather

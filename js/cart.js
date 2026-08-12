@@ -29,7 +29,8 @@
     try { localStorage.setItem(KEY, JSON.stringify(items)); } catch (e) { /* not fatal */ }
   }
 
-  const money = n => '$' + n.toFixed(2);
+  // fmtPrice() (js/products-data.js) is where "$65, not $65.00" is decided.
+  const money = fmtPrice;
   const count = () => items.reduce((n, i) => n + i.qty, 0);
 
   // What a vial on this line costs right now, priced from the line's own

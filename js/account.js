@@ -99,7 +99,8 @@
     btn.setAttribute('aria-busy', busy ? 'true' : 'false');
   }
 
-  var money = function (n) { return '$' + n.toFixed(2); };
+  // fmtPrice() (js/products-data.js) is where "$65, not $65.00" is decided.
+  var money = fmtPrice;
   var when = function (iso) {
     var d = new Date(iso + 'T00:00:00');
     if (isNaN(d.getTime())) return '';

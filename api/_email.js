@@ -7,12 +7,17 @@
 // inverts backgrounds — a near-black design in the site's own palette comes
 // out muddy there, so these lean on the light half of the brand instead.
 
+import { fmtPrice } from '../js/products-data.js';
+
 const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
 
 export const COMPANY = 'Glow Research';
 export const ADDRESS = '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States';
 
-export const money = n => '$' + Number(n || 0).toFixed(2);
+// fmtPrice() (js/products-data.js) is where "$65, not $65.00" is decided —
+// the same rule the site itself follows, so an order confirmation email
+// never states a price differently than the page the shopper just saw.
+export const money = n => fmtPrice(Number(n || 0));
 
 /* Single send path for every transactional email. Never throws and never
    reports upward: each caller runs after the thing the email is *about* has

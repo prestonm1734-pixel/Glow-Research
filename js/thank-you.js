@@ -30,7 +30,8 @@
     requestAnimationFrame(function () { shell.classList.add('is-in'); });
   });
 
-  var money = function (n) { return '$' + Number(n || 0).toFixed(2); };
+  // fmtPrice() (js/products-data.js) is where "$65, not $65.00" is decided.
+  var money = function (n) { return fmtPrice(Number(n || 0)); };
 
   function esc(v) {
     return String(v == null ? '' : v)
