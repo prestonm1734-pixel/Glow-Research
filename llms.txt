@@ -48,9 +48,9 @@ benefit.
 
 ### Metabolic Research
 
-- **Semaglutide**: A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling. Sizes: 5mg, 10mg. From $60 per vial.
-- **Tirzepatide**: A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology. Sizes: 10mg, 30mg. From $90 per vial.
-- **Retatrutide**: A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile. Sizes: 10mg, 30mg. From $105 per vial.
+- **GLP-1 (SM)**: A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling. Sizes: 5mg, 10mg. From $60 per vial.
+- **GLP-2 (TZ)**: A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology. Sizes: 10mg, 30mg. From $90 per vial.
+- **GLP-3 (RT)**: A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile. Sizes: 10mg, 30mg. From $105 per vial.
 - **Cagrilintide**: A long-acting amylin receptor agonist peptide. Studied for its binding behaviour at the amylin receptor complex. Sizes: 5mg. From $80 per vial.
 - **Cagrilintide / Semaglutide Blend**: A combined cagrilintide and semaglutide formulation. Supplied for research examining amylin and GLP-1 co-agonism in one vial. Sizes: 5/5mg. From $95 per vial.
 

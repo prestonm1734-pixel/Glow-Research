@@ -304,11 +304,11 @@ const GLOW_PRODUCTS = [
       { t: 'Binding protein interaction', d: 'Studied for reduced affinity to IGF-binding proteins relative to native IGF-1, and what that does to assay-window duration.' },
       { t: 'Cell proliferation models', d: 'Applied in culture models examining IGF-1 receptor-driven proliferative signalling.' }
     ] },
-  { name: 'Semaglutide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.5%', badge:'Popular',
+  { name: 'GLP-1 (SM)', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.5%', badge:'Popular',
     sizes: [{ mg: '5mg', price: 60, sku: 'GLO-SM5' }, { mg: '10mg', price: 80, sku: 'GLO-SM10' }],
     blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
     about: [
-      'Semaglutide is a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
+      'GLP-1 (SM) is Glow’s designation for semaglutide, a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
       'Those two modifications are why it behaves so differently from native GLP-1 across a time course, and usually why it is the chosen comparator.'
     ],
     research: [
@@ -316,11 +316,11 @@ const GLOW_PRODUCTS = [
       { t: 'Albumin binding', d: 'Studied for how the fatty acid chain alters distribution and persistence in model systems.' },
       { t: 'Metabolic pathway research', d: 'Applied in islet and hepatocyte culture models examining downstream incretin signalling.' }
     ] },
-  { name: 'Tirzepatide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', badge:'New',
+  { name: 'GLP-2 (TZ)', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', badge:'New',
     sizes: [{ mg: '10mg', price: 90, sku: 'GLO-T10' }, { mg: '30mg', price: 150, sku: 'GLO-T30' }],
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
     about: [
-      'Tirzepatide is a dual receptor co-agonist peptide, active at both the GIP and the GLP-1 receptor from a single molecule.',
+      'GLP-2 (TZ) is Glow’s designation for tirzepatide, a dual receptor co-agonist peptide, active at both the GIP and the GLP-1 receptor from a single molecule.',
       'Single-molecule co-agonists are studied precisely because the two receptors can be engaged at different relative potencies, which is difficult to reproduce by simply combining two separate agonists.'
     ],
     research: [
@@ -328,14 +328,14 @@ const GLOW_PRODUCTS = [
       { t: 'Biased signalling', d: 'Studied for the balance between G-protein coupling and beta-arrestin recruitment at each receptor.' },
       { t: 'Receptor crosstalk', d: 'Applied in models examining how engaging both receptors at once differs from either alone.' }
     ] },
-  { name: 'Retatrutide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', badge:'Trending',
+  { name: 'GLP-3 (RT)', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', badge:'Trending',
     sizes: [
       { mg: '10mg', price: 105, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg.webp' },
       { mg: '30mg', price: 200, sku: 'GLO-RT30', image: 'assets/products/retatrutide-30mg.webp' },
     ],
     blurb: 'A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile.',
     about: [
-      'Retatrutide is a synthetic peptide agonist active at three receptors from one molecule: the GIP receptor, the GLP-1 receptor and the glucagon receptor.',
+      'GLP-3 (RT) is Glow’s designation for retatrutide, a synthetic peptide agonist active at three receptors from one molecule: the GIP receptor, the GLP-1 receptor and the glucagon receptor.',
       'Engaging the glucagon receptor alongside the two incretin receptors is what separates it from earlier co-agonists, and is why it is studied as a distinct pharmacological class rather than a variant of existing GLP-1 or GIP agonists.'
     ],
     research: [
