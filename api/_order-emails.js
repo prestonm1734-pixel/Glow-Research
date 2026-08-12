@@ -18,7 +18,9 @@ const RUO_NOTE = `<p style="margin:16px 0 0;font-size:12px;line-height:1.55;colo
 
 /* WooCommerce sends the whole order, so the line items are already here — no
    second request to render what they bought. fee_lines is read alongside
-   line_items because the store is still on fee_lines until real SKUs land. */
+   line_items because create-order.js falls back to a fee_line for any cart
+   line whose SKU it cannot resolve against GLOW_PRODUCTS — a stale line for
+   a renamed or delisted product — rather than failing the whole order. */
 function lines(order) {
   return [
     ...(order.line_items || []).map(i => ({ name: i.name, qty: i.quantity, total: i.total })),

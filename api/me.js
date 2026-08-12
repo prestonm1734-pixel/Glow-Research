@@ -53,8 +53,9 @@ export default async function handler(req, res) {
           // all, with provider/link only when AST (or equivalent meta)
           // actually supplied them — never guessed.
           track,
-          // fee_lines today, line_items once real SKUs exist — read both so
-          // this keeps working through that switch without a second deploy.
+          // line_items for anything create-order.js could resolve a SKU for,
+          // fee_lines for the rare line it couldn't — read both so an order
+          // with a mix of the two still shows every item.
           items: [
             ...(o.line_items || []).map(i => ({ name: i.name, qty: i.quantity })),
             ...(o.fee_lines || []).map(f => ({ name: f.name, qty: 1 })),

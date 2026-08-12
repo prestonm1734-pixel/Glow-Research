@@ -14,7 +14,7 @@ import {
 import {
   emailShell, heading, paragraph, eyebrow, fine, esc, sendEmail, money,
 } from './_email.js';
-import { PAYMENTS_LIVE } from '../js/products-data.js';
+import { PAYMENTS_LIVE, GLOW_PRODUCTS } from '../js/products-data.js';
 
 const ADMIN_TO = 'preston@glowresearch.shop';
 const SUPPORT = 'support@glowresearch.shop';
@@ -59,14 +59,36 @@ export default async function handler(req, res) {
 
   const email = customer.email.trim().toLowerCase();
 
-  // WooCommerce's line_items require a real product_id/sku, which we don't
-  // have yet — the SKU list is coming from the fulfillment partner. fee_lines
-  // need no product reference and still record name/qty/price per cart line,
-  // fully visible on the order. Swap these to real line_items once SKUs land.
-  const fee_lines = items.map(i => ({
-    name: [i.name, i.variant, i.qty > 1 ? `×${i.qty}` : null].filter(Boolean).join(' '),
-    total: (i.unitSale * i.qty).toFixed(2),
-  }));
+  // WooCommerce line_items match by SKU (or product_id), against whatever
+  // WooCommerce actually has in its catalog — not against the cart payload,
+  // which a client could send anything in. The SKU itself comes from
+  // GLOW_PRODUCTS, the same catalog the site quoted the price from, rather
+  // than trusting one the client sent. A line that cannot be matched to a
+  // SKU — a stale cart line for a renamed or delisted product — falls back
+  // to a fee_line instead of failing the whole order, so a bad line never
+  // takes the rest of a real order down with it. Once every product in
+  // GLOW_PRODUCTS also exists in WooCommerce under the same SKU, every line
+  // resolves and fee_lines stays empty.
+  const skuFor = (name, variant) => {
+    const p = GLOW_PRODUCTS.find(p => p.name === name);
+    const size = p && p.sizes.find(s => s.mg === variant);
+    return size && size.sku;
+  };
+
+  const line_items = [];
+  const fee_lines = [];
+  items.forEach(i => {
+    const sku = skuFor(i.name, i.variant);
+    const total = (i.unitSale * i.qty).toFixed(2);
+    if (sku) {
+      line_items.push({ sku, quantity: i.qty, subtotal: total, total });
+    } else {
+      fee_lines.push({
+        name: [i.name, i.variant, i.qty > 1 ? `×${i.qty}` : null].filter(Boolean).join(' '),
+        total,
+      });
+    }
+  });
 
   const shipping_lines = shippingMethod
     ? [{ method_title: shippingMethod.label, method_id: shippingMethod.id, total: shippingMethod.cost.toFixed(2) }]
@@ -95,6 +117,7 @@ export default async function handler(req, res) {
         customer_id: customerId,
         billing: addr(billing || shipping),
         shipping: addr(shipping),
+        line_items,
         fee_lines,
         shipping_lines,
         customer_note: notes || '',
