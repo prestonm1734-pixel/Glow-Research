@@ -49,27 +49,37 @@
     theme: 'flat',
     variables: {
       fontFamily: '"Inter", system-ui, sans-serif',
-      fontSizeBase: '16px',
+      fontSizeBase: '15px',
       colorText: '#0a0a0a',
       colorTextPlaceholder: '#86868b',
       colorDanger: '#b3261e',
       borderRadius: '0px',
-      spacingUnit: '4px',
+      spacingUnit: '3px',
     },
     rules: {
+      // Filled, not outlined: a resting border on every field is a second
+      // grid of boxes laid over the card fields, which was most of what read
+      // as heavy. A flat grey fill reads as one soft surface instead, and the
+      // border only appears on the one field actually being typed into.
       '.Input': {
-        border: '1px solid rgba(0,0,0,0.22)',
-        padding: '12px 14px',
+        backgroundColor: '#f5f5f4',
+        border: '1px solid transparent',
+        padding: '11px 12px',
         boxShadow: 'none',
       },
       '.Input:focus': {
+        backgroundColor: '#fff',
         border: '1px solid #0a0a0a',
-        boxShadow: 'inset 0 0 0 1px #0a0a0a',
+        boxShadow: 'none',
+      },
+      '.Input--invalid': {
+        border: '1px solid #b3261e',
+        backgroundColor: '#fdf3f2',
       },
       '.Label': {
         color: '#86868b',
-        fontSize: '.85rem',
-        marginBottom: '6px',
+        fontSize: '.8rem',
+        marginBottom: '4px',
       },
     },
   };
@@ -177,20 +187,15 @@
     <p id="coStripeErr" class="co-stripe-err" hidden></p>`;
 
   function renderPayMethods() {
-    // One method is not a choice, so skip the radio entirely rather than show
-    // a single option the visitor cannot deselect.
+    // One method is not a choice, so there is nothing to label or select —
+    // the "Payment" <h2> already on the page says what this is, and a method
+    // name plus a static header bar above the card fields was saying it a
+    // second time. Once PAY_METHODS grows past one (crypto, most likely, per
+    // the plan), the radio branch below is what starts the picture the
+    // screenshots described: press a method, its own fields appear. Until
+    // then, this is just the fields, nothing above them.
     if (PAY_METHODS.length === 1) {
-      const m = PAY_METHODS[0];
-      $('coPay').innerHTML = `
-        <div class="co-pay co-pay-only">
-          <div class="co-pay-head is-on is-static">
-            <span class="co-ship-copy">
-              <span class="co-ship-label">${m.label}</span>
-              <span class="co-ship-note">${m.note}</span>
-            </span>
-          </div>
-          <div class="co-pay-body">${processorSlot()}</div>
-        </div>`;
+      $('coPay').innerHTML = processorSlot();
       return;
     }
 
