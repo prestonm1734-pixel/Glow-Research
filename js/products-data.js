@@ -890,7 +890,7 @@ const PRODUCT_SORTS = {
 // Every price the buyer sees runs through salePrice(); every cart line carries
 // the list price as unitOriginal and the marked-down one as unitSale, which is
 // what the cart and checkout already total against.
-const SITEWIDE_DISCOUNT = 0.20;
+const SITEWIDE_DISCOUNT = 0;
 
 const round2 = n => Math.round(n * 100) / 100;
 const salePrice = n => round2(n * (1 - SITEWIDE_DISCOUNT));
