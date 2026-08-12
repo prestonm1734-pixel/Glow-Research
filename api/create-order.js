@@ -10,11 +10,12 @@
 
 import {
   wc, currentSession, findCustomerByEmail, readBody, isEmail,
+  stripe, stripeGet, priceOrder,
 } from './_lib.js';
 import {
   emailShell, heading, paragraph, eyebrow, fine, esc, sendEmail, money,
 } from './_email.js';
-import { PAYMENTS_LIVE, GLOW_PRODUCTS } from '../js/products-data.js';
+import { PAYMENTS_LIVE } from '../js/products-data.js';
 
 const ADMIN_TO = 'preston@glowresearch.shop';
 const SUPPORT = 'support@glowresearch.shop';
@@ -33,13 +34,14 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // No payment processor is wired in yet — see PAYMENTS_LIVE in
-  // js/products-data.js. Below this point the handler creates a real
-  // WooCommerce order and emails the shopper that their payment was received,
-  // which would be false. js/checkout.js shows an honest state instead of the
-  // form for the same reason, but that is a client-side courtesy, not the
-  // gate: this check is what actually stops an order being created if it is
-  // ever bypassed, hit directly, or the client-side copy drifts.
+  // See PAYMENTS_LIVE in js/products-data.js. Below this point the handler
+  // creates a real WooCommerce order and emails the shopper that their
+  // payment was received, which is only true once a payment has actually
+  // been verified against Stripe further down. js/checkout.js shows an
+  // honest state instead of the form for the same reason, but that is a
+  // client-side courtesy, not the gate: this check is what actually stops an
+  // order being created if it is ever bypassed, hit directly, or the
+  // client-side copy drifts.
   if (!PAYMENTS_LIVE) {
     return res.status(503).json({
       error: 'We are not able to take orders online yet. Email support@glowresearch.shop and we will help you directly.',
@@ -47,7 +49,7 @@ export default async function handler(req, res) {
   }
 
   const body = readBody(req);
-  const { customer, shipping, billing, items, shippingMethod, referral, notes, termsAccepted } = body;
+  const { customer, shipping, billing, items, shippingMethod, referral, notes, termsAccepted, paymentIntentId } = body;
 
   if (!customer || !isEmail(customer.email) || !shipping || !Array.isArray(items) || !items.length) {
     return res.status(400).json({ error: 'Missing required order details.' });
@@ -57,42 +59,90 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'The RUO agreement and Terms of Sale must be accepted to place an order.' });
   }
 
+  if (typeof paymentIntentId !== 'string' || !paymentIntentId) {
+    return res.status(400).json({ error: 'Missing payment confirmation.' });
+  }
+
   const email = customer.email.trim().toLowerCase();
 
-  // WooCommerce line_items match by SKU (or product_id), against whatever
-  // WooCommerce actually has in its catalog — not against the cart payload,
-  // which a client could send anything in. The SKU itself comes from
-  // GLOW_PRODUCTS, the same catalog the site quoted the price from, rather
-  // than trusting one the client sent. A line that cannot be matched to a
-  // SKU — a stale cart line for a renamed or delisted product — falls back
-  // to a fee_line instead of failing the whole order, so a bad line never
-  // takes the rest of a real order down with it. Once every product in
-  // GLOW_PRODUCTS also exists in WooCommerce under the same SKU, every line
-  // resolves and fee_lines stays empty.
-  const skuFor = (name, variant) => {
-    const p = GLOW_PRODUCTS.find(p => p.name === name);
-    const size = p && p.sizes.find(s => s.mg === variant);
-    return size && size.sku;
-  };
+  // Priced fresh against the live catalog — never off i.unitSale, which is
+  // whatever the browser sent and is not evidence of anything. This is the
+  // same function api/create-payment-intent.js priced the PaymentIntent from,
+  // so the two are checked against each other just below rather than trusted
+  // independently.
+  let priced;
+  try {
+    priced = priceOrder(items, shippingMethod && shippingMethod.id);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
 
+  // The PaymentIntent is Stripe's record, not the browser's claim about it.
+  // confirmPayment() resolving without an error in js/checkout.js means the
+  // browser saw success; it does not mean the browser was telling the truth,
+  // so the order is not created on that alone. Re-fetching by ID and reading
+  // status directly from Stripe is the actual gate.
+  let intent;
+  try {
+    intent = await stripeGet(`/payment_intents/${paymentIntentId}`);
+  } catch (err) {
+    return res.status(502).json({ error: 'Could not verify payment with the processor.' });
+  }
+
+  if (intent.status !== 'succeeded') {
+    return res.status(402).json({ error: `Payment has not completed (status: ${intent.status}).` });
+  }
+
+  // The order that gets created has to be the order that was actually paid
+  // for. If the cart changed between the PaymentIntent being confirmed and
+  // this request — a second tab, a race, a tampered payload — the freshly
+  // priced total will not match what Stripe actually collected, and that is
+  // treated as a hard stop rather than an order priced from whichever number
+  // is more convenient.
+  const chargedCents = Math.round(priced.total * 100);
+  if (intent.amount_received !== chargedCents) {
+    return res.status(409).json({
+      error: 'The order total no longer matches the amount charged. Email support@glowresearch.shop with this reference: ' + paymentIntentId,
+    });
+  }
+
+  // Idempotency: a retried request (the browser resubmitting, the redirect-
+  // return path in js/checkout.js running twice) must not create a second
+  // WooCommerce order for one payment. Stripe's own metadata on the intent is
+  // where the first attempt would have recorded the order it made, checked
+  // before this attempt makes another.
+  const existingOrderId = (intent.metadata || {}).woo_order_id;
+  if (existingOrderId) {
+    return res.status(200).json({
+      orderId: Number(existingOrderId),
+      orderNumber: (intent.metadata || {}).woo_order_number || existingOrderId,
+    });
+  }
+
+  // WooCommerce line_items match by SKU, resolved and priced by priceOrder()
+  // above rather than trusted from the cart payload. A line that cannot be
+  // matched to a SKU — a stale cart line for a renamed or delisted product —
+  // would already have failed priceOrder() and returned 400 above, so by this
+  // point every line resolves and fee_lines is only ever a defensive fallback.
   const line_items = [];
   const fee_lines = [];
-  items.forEach(i => {
-    const sku = skuFor(i.name, i.variant);
-    const total = (i.unitSale * i.qty).toFixed(2);
-    if (sku) {
-      line_items.push({ sku, quantity: i.qty, subtotal: total, total });
+  priced.lines.forEach(l => {
+    const total = l.total.toFixed(2);
+    if (l.sku) {
+      line_items.push({ sku: l.sku, quantity: l.qty, subtotal: total, total });
     } else {
       fee_lines.push({
-        name: [i.name, i.variant, i.qty > 1 ? `×${i.qty}` : null].filter(Boolean).join(' '),
+        name: [l.name, l.variant, l.qty > 1 ? `×${l.qty}` : null].filter(Boolean).join(' '),
         total,
       });
     }
   });
 
-  const shipping_lines = shippingMethod
-    ? [{ method_title: shippingMethod.label, method_id: shippingMethod.id, total: shippingMethod.cost.toFixed(2) }]
-    : [];
+  const shipping_lines = [{
+    method_title: (shippingMethod && shippingMethod.label) || 'Shipping',
+    method_id: priced.shippingMethodId,
+    total: priced.shipping.toFixed(2),
+  }];
 
   const addr = a => ({
     first_name: a.firstName || '',
@@ -113,7 +163,7 @@ export default async function handler(req, res) {
     const data = await wc('/orders', {
       method: 'POST',
       body: JSON.stringify({
-        status: 'pending', // awaiting payment — flips to processing once a payment processor is wired in
+        status: 'processing', // paid — Stripe verified above, before this call is ever made
         customer_id: customerId,
         billing: addr(billing || shipping),
         shipping: addr(shipping),
@@ -125,15 +175,33 @@ export default async function handler(req, res) {
           ...(referral ? [{ key: 'referral_code', value: referral }] : []),
           { key: 'ruo_terms_accepted', value: 'yes' },
           { key: 'ruo_terms_accepted_at', value: new Date().toISOString() },
+          { key: 'stripe_payment_intent_id', value: paymentIntentId },
         ],
       }),
     });
+
+    // Best-effort, non-fatal: the WooCommerce order already exists by this
+    // point, and losing this write only weakens the idempotency check further
+    // up for a retry that (per Stripe) is now unlikely anyway, since the
+    // intent has moved past requires_payment_method. It must not undo an
+    // order that was already created and already paid for.
+    try {
+      await stripe(`/payment_intents/${paymentIntentId}`, {
+        metadata: { woo_order_id: String(data.id), woo_order_number: String(data.number) },
+      });
+    } catch (e) { /* see comment above */ }
+
+    // Priced from priced.lines, not the raw request body: the confirmation
+    // email states a payment was received, so the figures in it have to be
+    // the ones Stripe actually verified, not whatever the browser sent.
+    const emailItems = priced.lines.map(l => ({ name: l.name, variant: l.variant, qty: l.qty, unitSale: l.unitSale }));
+    const emailShipping = { id: priced.shippingMethodId, label: (shippingMethod && shippingMethod.label) || 'Shipping', cost: priced.shipping };
 
     // Awaited, because the function can be frozen the moment the response is
     // sent. None of the three sends can throw, and none is allowed to fail
     // the order: it exists in WooCommerce by this point, and telling the
     // shopper otherwise would have them place it twice.
-    const order = { number: data.number, email, items, shippingMethod, shipping, notes };
+    const order = { number: data.number, email, items: emailItems, shippingMethod: emailShipping, shipping, notes };
     await Promise.all([
       sendEmail({
         to: email,
@@ -187,14 +255,11 @@ async function resolveCustomer(req, email, shipping) {
 
 /* ================== the emails ==================
    Two go out per order: a confirmation to the shopper and an alert to the
-   desk. Both are built from the checkout payload rather than re-read from
-   WooCommerce — the payload is what the shopper just agreed to on screen, so
-   an email built from it can never disagree with the page they saw.
-
-   Written for a live store with payment connected. Until a processor is
-   actually wired in, orders are still created as `pending` above and nothing
-   is charged, so do not open checkout to real customers before that lands —
-   these emails will tell them they have paid. */
+   desk. Built from `priced` and the WooCommerce response, not re-read from
+   WooCommerce a second time — but also not the raw checkout payload anymore:
+   see emailItems/emailShipping above. The shopper is told they have paid, so
+   the figures have to be the ones Stripe verified, not whatever the browser
+   sent, even though in the ordinary case the two agree exactly. */
 
 function orderTotal(o) {
   const sub = o.items.reduce((n, i) => n + i.unitSale * i.qty, 0);

@@ -15,6 +15,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
+<link rel="preconnect" href="https://js.stripe.com">
+<!-- Not a dependency in the "js/ may import nothing" sense: this is loaded
+     live from Stripe's own CDN, on purpose. Stripe requires it, for PCI
+     compliance and their own fraud signals — self-hosting or bundling a copy
+     is against their terms and loses both. js/checkout.js is what actually
+     uses it, further down the page. -->
+<script src="https://js.stripe.com/v3/"></script>
 <style>
   /* ---------- checkout ----------
      Deliberately the quietest page on the site. Everywhere else earns
@@ -122,6 +129,16 @@
   .co-processor{ display:flex; gap:11px; align-items:flex-start; }
   .co-processor svg{ flex-shrink:0; margin-top:3px; color:#86868b; }
   .co-processor p{ margin:0; font-size:.88rem; color:#6e6e73; line-height:1.6; }
+
+  /* Stripe's Payment Element mounts into #coStripeElement and draws its own
+     fields inside an iframe — no colour or spacing rule here reaches inside
+     it, only the box it sits in. min-height holds the layout still while it
+     loads instead of the page jumping once the iframe paints. */
+  .co-stripe-el{ min-height: 44px; }
+  .co-stripe-loading{ font-size:.88rem; color:#86868b; }
+  .co-stripe-err{
+    margin-top:12px; font-size:.85rem; line-height:1.55; color:#b3261e;
+  }
 
   .co-terms{
     display:flex; align-items:flex-start; gap:11px; margin: 26px 0 0;

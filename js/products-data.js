@@ -89,7 +89,23 @@ const COAS_PUBLISHED = false;
 //
 // Flip it to true in the same change that wires a real processor into
 // checkout.html and api/create-order.js, not before.
-const PAYMENTS_LIVE = false;
+//
+// That change has landed: Stripe Elements mounts in js/checkout.js, and
+// api/create-order.js will not create a WooCommerce order without a Stripe
+// PaymentIntent it has independently verified as succeeded. See
+// STRIPE_PUBLISHABLE_KEY below and STRIPE_SECRET_KEY in Vercel's environment
+// variables — the secret key is never checked in and never reaches the
+// browser.
+const PAYMENTS_LIVE = true;
+
+// Publishable, not secret: this key can only create PaymentIntents that were
+// already priced server-side and confirm payment for them — it cannot move
+// money on its own, which is why Stripe's own docs say it is safe to ship in
+// client-side code. Read by js/checkout.js to construct `Stripe(...)`. Swap
+// for the live-mode key (starts pk_live_, not pk_test_) only once Stripe's
+// own dashboard is also switched out of test mode — the two must move
+// together or a live-looking checkout will silently take test-mode payments.
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51U3kUzQXS4Q4Ku0EIyOpARY8Rbi8ATyXYfgWKzWiDtykruMzQyfRIHxlolqwmic0AMY22nzM33NoYATjppOcOSRQ00WOWb9GxT';
 
 // The certificate copy, in one place. Both branches describe the same
 // operation — third-party tested lots, a certificate per batch — and differ
@@ -1314,5 +1330,7 @@ if (typeof module !== 'undefined' && module.exports) {
     COAS_PUBLISHED,
     COA_COPY,
     PAYMENTS_LIVE,
+    STRIPE_PUBLISHABLE_KEY,
+    round2,
   };
 }

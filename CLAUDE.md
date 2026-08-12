@@ -39,7 +39,7 @@ node tools/check-claims.js   # promise audit, run before every commit
 
 ## Launch flags
 
-Both live in `js/products-data.js` and are read by browser and build alike.
+All three live in `js/products-data.js` and are read by browser and build alike.
 
 - **`PRODUCT_PAGES_LIVE`:** gates the generated `peptides/<slug>/` pages. False
   until the supplier import lands. While false, catalog and search links point
@@ -47,8 +47,19 @@ Both live in `js/products-data.js` and are read by browser and build alike.
 - **`COAS_PUBLISHED`:** gates *certificate evidence*, not the testing claim.
   Every batch is third-party tested either way; the flag only decides whether
   the site links documents or routes to email. Four surfaces read `COA_COPY`.
+- **`PAYMENTS_LIVE`:** gates checkout end to end. `js/checkout.js` mounts a
+  Stripe Payment Element and `api/create-order.js` refuses to create a
+  WooCommerce order without a Stripe PaymentIntent it has independently
+  verified as `succeeded` — the client saying so is never enough. Both read
+  this one flag so a client-side "closed" state can't disagree with a server
+  that still opens. `STRIPE_PUBLISHABLE_KEY`, alongside it in the same file,
+  is safe to ship to the browser; the matching `STRIPE_SECRET_KEY` is a Vercel
+  environment variable and must never be checked in. `SHIPPING_RATES` in
+  `api/_lib.js` is the server-trusted copy of the `SHIPPING` table in
+  `js/checkout.js` — what Stripe actually charges is priced from the former,
+  never the latter, so the two must be changed together.
 
-Flipping either is a one-line change plus `node tools/build.js`.
+Flipping any of the three is a one-line change plus `node tools/build.js`.
 
 ## House style
 

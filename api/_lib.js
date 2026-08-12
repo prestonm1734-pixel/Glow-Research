@@ -6,6 +6,116 @@
 // toolchain for what the standard library already does correctly.
 
 import crypto from 'node:crypto';
+import { GLOW_PRODUCTS, unitPriceAt, round2 } from '../js/products-data.js';
+
+/* ============================ Stripe ============================ */
+// No SDK: the site has no package.json and installs nothing, so this talks to
+// Stripe's REST API with fetch, the same way wc() below talks to
+// WooCommerce's. Stripe's API takes form-encoded bodies, not JSON, and nests
+// objects as bracketed keys (metadata[order_email]=x) — flattenForm() does
+// that translation once so every caller can just pass a plain object.
+
+function stripeSecret() {
+  const s = process.env.STRIPE_SECRET_KEY;
+  if (!s) throw new Error('Stripe is not configured yet.');
+  return s;
+}
+
+function flattenForm(obj, prefix = '', out = {}) {
+  for (const [k, v] of Object.entries(obj)) {
+    if (v === undefined || v === null) continue;
+    const key = prefix ? `${prefix}[${k}]` : k;
+    if (typeof v === 'object' && !Array.isArray(v)) flattenForm(v, key, out);
+    else out[key] = v;
+  }
+  return out;
+}
+
+// POST — every write (create/update a PaymentIntent) goes through here.
+export async function stripe(path, body = {}) {
+  const res = await fetch(`https://api.stripe.com/v1${path}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${stripeSecret()}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams(flattenForm(body)).toString(),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    const err = new Error((data && data.error && data.error.message) || 'Stripe rejected the request.');
+    err.status = res.status;
+    err.code = data && data.error && data.error.code;
+    throw err;
+  }
+  return data;
+}
+
+// GET — used to independently verify a PaymentIntent's status server-side
+// before api/create-order.js trusts that a payment actually succeeded. A
+// client claiming success is not evidence; Stripe's own record of the intent
+// is, which is the entire reason this function exists as a separate call
+// rather than trusting whatever the browser hands back from confirmPayment().
+export async function stripeGet(path) {
+  const res = await fetch(`https://api.stripe.com/v1${path}`, {
+    headers: { Authorization: `Bearer ${stripeSecret()}` },
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    const err = new Error((data && data.error && data.error.message) || 'Stripe rejected the request.');
+    err.status = res.status;
+    err.code = data && data.error && data.error.code;
+    throw err;
+  }
+  return data;
+}
+
+/* ============================ order pricing ============================ */
+// Every dollar figure Stripe is asked to charge, and every dollar figure
+// WooCommerce is told an order is worth, is computed here — never read off
+// whatever the browser sent. A cart line names a product and a quantity;
+// what it costs is looked up fresh against the live catalog and priced with
+// the same unitPriceAt() the buy box itself uses, so a price cannot be edited
+// in devtools between "add to cart" and "pay."
+//
+// SHIPPING_RATES mirrors the SHIPPING table in js/checkout.js by hand. That
+// file drives what the checkout page displays; this is what actually gets
+// billed. They have to be kept in step deliberately — a browser choosing a
+// shipping method is a display choice, not something the server can take on
+// faith, so there is no way to derive one table from the other across the
+// browser/Node boundary without turning checkout.js into a second
+// products-data.js. Two rows, changed rarely: a drift here surfaces
+// immediately as a checkout that charges the wrong amount, not silently.
+export const SHIPPING_RATES = [
+  { id: '2day', cost: 12.95, freeOver: 400 },
+  { id: 'overnight', cost: 39.95, freeOver: null },
+];
+
+// Throws rather than returning an error object: every caller is about to
+// either charge a card or create an order, and both have to stop hard if the
+// cart cannot be priced, not proceed with a partial or zero total.
+export function priceOrder(items, shippingMethodId) {
+  if (!Array.isArray(items) || !items.length) {
+    throw new Error('The cart is empty.');
+  }
+
+  const lines = items.map(i => {
+    const p = GLOW_PRODUCTS.find(p => p.name === i.name);
+    const size = p && p.sizes.find(s => s.mg === i.variant);
+    if (!p || !size) {
+      throw new Error(`"${[i.name, i.variant].filter(Boolean).join(' ')}" is no longer in the catalog.`);
+    }
+    const qty = Math.max(1, Math.floor(Number(i.qty)) || 1);
+    const unitSale = unitPriceAt(size.price, qty);
+    return { name: p.name, variant: size.mg, sku: size.sku, qty, unitSale, total: round2(unitSale * qty) };
+  });
+
+  const subtotal = round2(lines.reduce((n, l) => n + l.total, 0));
+  const rate = SHIPPING_RATES.find(s => s.id === shippingMethodId) || SHIPPING_RATES[0];
+  const shipping = (rate.freeOver !== null && subtotal >= rate.freeOver) ? 0 : rate.cost;
+
+  return { lines, subtotal, shipping, total: round2(subtotal + shipping), shippingMethodId: rate.id };
+}
 
 /* ============================ WooCommerce ============================ */
 

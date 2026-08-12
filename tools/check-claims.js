@@ -1219,6 +1219,91 @@ console.log('\ncheckout gate');
     'expected wording so PAYMENTS_LIVE stays the only thing gating it');
 }
 
+console.log('\npayments');
+{
+  const order = read('api/create-order.js');
+  const intentFn = read('api/create-payment-intent.js');
+  const lib = read('api/_lib.js');
+  const coJs = read('js/checkout.js');
+  const coHtml = read('checkout.html');
+
+  ok('create-payment-intent.js gates on PAYMENTS_LIVE before creating a Stripe PaymentIntent',
+    /import\s*\{[^}]*PAYMENTS_LIVE[^}]*\}\s*from\s*'\.\.\/js\/products-data\.js'/.test(intentFn) &&
+    /if\s*\(!PAYMENTS_LIVE\)/.test(intentFn));
+
+  // The PaymentIntent has to be created before the gate can matter — same
+  // shape as the checkout-gate check above, applied to the other endpoint
+  // that can now spend money.
+  {
+    const gateAt = intentFn.indexOf('if (!PAYMENTS_LIVE)');
+    const firstStripeCall = intentFn.search(/\bstripe\(/);
+    ok('the gate in create-payment-intent.js runs before any Stripe call',
+      gateAt !== -1 && (firstStripeCall === -1 || gateAt < firstStripeCall));
+  }
+
+  ok('create-order.js requires a paymentIntentId before creating an order',
+    /paymentIntentId/.test(order) && /if\s*\(typeof paymentIntentId/.test(order));
+
+  ok('create-order.js verifies the PaymentIntent against Stripe, not the client’s word for it',
+    /stripeGet\(`\/payment_intents\//.test(order) &&
+    /intent\.status\s*!==\s*'succeeded'/.test(order));
+
+  // The check above confirms the read happens; this confirms it happens
+  // before WooCommerce is touched, the same ordering requirement as the
+  // PAYMENTS_LIVE gate itself — a verification that runs after the order
+  // already exists is not a verification.
+  {
+    const verifyAt = order.indexOf("stripeGet(`/payment_intents/");
+    const firstWcCall = order.search(/\bwc\(/);
+    ok('the Stripe verification runs before the WooCommerce order is created',
+      verifyAt !== -1 && firstWcCall !== -1 && verifyAt < firstWcCall);
+  }
+
+  ok('create-order.js checks the charged amount against a freshly priced total',
+    /priceOrder\(/.test(order) && /amount_received/.test(order));
+
+  // This is the check that would have caught the bug this whole feature
+  // replaced: WooCommerce line totals priced from whatever the browser sent
+  // (i.unitSale on the raw request body) rather than from the catalog.
+  // Scoped to the block that actually builds line_items/fee_lines, between
+  // its declaration and shipping_lines right after — not the whole file,
+  // because the email renderers further down legitimately read `.unitSale`
+  // off priced.lines (trusted, catalog-derived) under the same shorthand
+  // variable name. Checking the whole file would also trip on this very
+  // comment mentioning the literal it is watching for.
+  {
+    const start = order.indexOf('const line_items = [];');
+    const end = order.indexOf('const shipping_lines = ', start);
+    const block = (start !== -1 && end !== -1) ? order.slice(start, end) : order;
+    ok('create-order.js does not price line items from a client-sent unit price',
+      start !== -1 && end !== -1 && !/i\.unitSale/.test(block));
+  }
+
+  ok('api/_lib.js prices orders from the catalog, not from the request',
+    /GLOW_PRODUCTS\.find/.test(lib) && /unitPriceAt\(/.test(lib));
+
+  ok('js/checkout.js loads Stripe live from js.stripe.com, not a bundled copy',
+    /https:\/\/js\.stripe\.com\/v3\//.test(coHtml));
+
+  ok('js/checkout.js reads STRIPE_PUBLISHABLE_KEY rather than hardcoding a key of its own',
+    /STRIPE_PUBLISHABLE_KEY/.test(coJs) && !/pk_(test|live)_/.test(coJs));
+
+  // The one check that would matter most if it ever failed: a secret key
+  // checked into anything the browser can fetch is a live credential handed
+  // to every visitor. Scans every hand-written page and every browser-loaded
+  // script — not api/**, which runs server-side only and is where the real
+  // key belongs, read from process.env.STRIPE_SECRET_KEY.
+  {
+    const browserFiles = [
+      ...pages,
+      ...fs.readdirSync(path.join(ROOT, 'js')).filter(f => f.endsWith('.js')).map(f => `js/${f}`),
+    ];
+    const leaked = browserFiles.filter(f => /sk_(test|live)_/.test(read(f)));
+    ok('no Stripe secret key appears in any browser-served file',
+      leaked.length === 0, leaked.join(', '));
+  }
+}
+
 console.log('\ncatalog shape');
 {
   const required = ['name', 'tag', 'cat', 'purity', 'sizes', 'blurb', 'about', 'research'];

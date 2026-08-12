@@ -5,7 +5,10 @@
 (function () {
   /* ---------- config ----------
      PLACEHOLDER RATES. Replace with the real published rates before launch,
-     and keep them in step with the shipping page. */
+     and keep them in step with the shipping page — and with SHIPPING_RATES in
+     api/_lib.js, which is the copy that actually gets charged. This one only
+     drives what the page displays; changing a cost here without changing it
+     there means the page quotes one number and Stripe collects another. */
   const SHIPPING = [
     { id: '2day', label: 'FedEx 2-Day Express', note: 'Arrives in 2 business days', cost: 12.95, freeOver: 400 },
     { id: 'overnight', label: 'FedEx Overnight', note: 'Next business day, order before 2:00 PM PST', cost: 39.95, freeOver: null },
@@ -24,6 +27,17 @@
   const money = fmtPrice;
 
   const $ = id => document.getElementById(id);
+
+  // Stripe's own script (checkout.html loads it in <head>, ahead of this
+  // file) defines the global. Guarded the same way every PAYMENTS_LIVE check
+  // in this file is: a script that failed to load must not throw here and
+  // take the whole page down over it — renderSummary()'s coNotLive state is
+  // already what a visitor sees if payments are not actually live, this is
+  // only for the case where they are live but Stripe's script itself did
+  // not load.
+  const stripeClient = (typeof Stripe !== 'undefined' && typeof STRIPE_PUBLISHABLE_KEY !== 'undefined' && STRIPE_PUBLISHABLE_KEY)
+    ? Stripe(STRIPE_PUBLISHABLE_KEY)
+    : null;
 
   /* ---------- state selects ---------- */
   function fillStates() {
@@ -117,15 +131,15 @@
   /* ---------- payment methods ---------- */
 
   // where the processor mounts its own secure fields; we never render inputs
-  const processorSlot = `
-    <div class="co-processor">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <rect x="4" y="10" width="16" height="11" stroke="currentColor" stroke-width="2"/>
-        <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/>
-      </svg>
-      <p>Secure fields load here once the payment processor is connected. Card details
-         go straight to the processor and never touch this site.</p>
-    </div>`;
+  // Where Stripe mounts the Payment Element. #coStripeElement is the iframe's
+  // home; #coStripeErr is ours, for a card decline or a network hiccup —
+  // Stripe's own errors surface inside the element, this is for everything
+  // around it (the PaymentIntent call failing, confirmPayment() rejecting).
+  const processorSlot = () => `
+    <div id="coStripeElement" class="co-stripe-el">
+      <p class="co-stripe-loading">Loading secure payment fields…</p>
+    </div>
+    <p id="coStripeErr" class="co-stripe-err" hidden></p>`;
 
   function renderPayMethods() {
     // One method is not a choice, so skip the radio entirely rather than show
@@ -140,7 +154,7 @@
               <span class="co-ship-note">${m.note}</span>
             </span>
           </div>
-          <div class="co-pay-body">${processorSlot}</div>
+          <div class="co-pay-body">${processorSlot()}</div>
         </div>`;
       return;
     }
@@ -156,7 +170,7 @@
           </span>
         </label>
         <div class="co-pay-body" data-for="${m.id}" ${idx === 0 ? '' : 'hidden'}>
-          ${processorSlot().replace(/^\s*<div class="co-pay-body" >|<\/div>\s*$/g, '')}
+          ${processorSlot()}
         </div>
       </div>`).join('');
 
@@ -169,6 +183,220 @@
         b.hidden = b.dataset.for !== e.target.value;
       });
     });
+  }
+
+  /* ---------- Stripe ----------
+     One PaymentIntent per checkout session, created the first time there is
+     something to charge and updated in place — never recreated — whenever the
+     cart or the shipping method changes afterward. Recreating it would mean
+     remounting the Payment Element, which drops whatever the shopper has
+     already typed; updating the existing one keeps the mounted fields and
+     just changes what they will charge when confirmed.
+
+     api/create-payment-intent.js does the actual pricing, from the live
+     catalog, exactly as api/create-order.js will re-verify later — this file
+     never computes a total and sends it to be charged, only ever asks the
+     server what the total is. stripeClient itself is declared up near the
+     top of the file, next to where it is constructed. */
+  let elements = null;
+  let paymentIntentId = null;
+  let piInFlight = null; // in-flight promise, so a rapid shipping toggle cannot fire two overlapping requests
+
+  function stripeErr(msg) {
+    const el = $('coStripeErr');
+    if (!el) return;
+    el.hidden = !msg;
+    el.textContent = msg || '';
+  }
+
+  async function ensurePaymentIntent() {
+    const items = window.GlowCart ? window.GlowCart.items() : [];
+    if (!items.length) return;
+
+    // Serialized, not just tracked: a shipping toggle fired twice in quick
+    // succession must not let two requests race to set paymentIntentId, or
+    // the second response can overwrite it with an intent the first request
+    // never saw and update a stale one on the next call.
+    if (piInFlight) { try { await piInFlight; } catch (e) { /* handled where it was thrown */ } }
+
+    const run = (async () => {
+      try {
+        const resp = await fetch('/api/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({
+            items,
+            shippingMethodId: shipId,
+            email: $('coEmail') ? $('coEmail').value : '',
+            paymentIntentId,
+          }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Could not prepare payment.');
+
+        paymentIntentId = data.paymentIntentId;
+
+        if (!elements) {
+          // First time only: mounting is what makes the fields exist. After
+          // this, updates to the PaymentIntent's amount just change what a
+          // later confirmPayment() will charge — elements.fetchUpdates()
+          // below is what keeps anything Stripe renders live (a wallet
+          // button's on-screen amount, mainly) in step with it.
+          elements = stripeClient.elements({ clientSecret: data.clientSecret, appearance: { theme: 'stripe' } });
+          const el = elements.create('payment');
+          el.mount('#coStripeElement');
+          el.on('ready', () => {
+            const loading = document.querySelector('.co-stripe-loading');
+            if (loading) loading.remove();
+          });
+        } else {
+          await elements.fetchUpdates();
+        }
+        stripeErr('');
+      } catch (err) {
+        stripeErr(err.message || 'Could not load secure payment fields. Refresh the page to try again.');
+      }
+    })();
+
+    piInFlight = run;
+    try {
+      await run;
+    } finally {
+      if (piInFlight === run) piInFlight = null;
+    }
+  }
+
+  // The one place that calls api/create-order.js. Used by the normal submit
+  // path the moment confirmPayment() resolves without a redirect, and by
+  // resumeAfterRedirect() below when it does not — same request, same
+  // handling either way, because by this point a card has already been
+  // charged and the two paths must not diverge on what happens to that
+  // charge.
+  //
+  // accountCreds is only ever populated on the direct (non-redirect) path.
+  // The optional "create an account" checkbox needs a password, and a
+  // password is not something to park in sessionStorage on the chance a
+  // redirect happens — so a 3D Secure redirect quietly falls back to a guest
+  // order rather than persisting one in cleartext to survive the trip. That
+  // is a deliberate, narrow gap, not an oversight: the shopper can still make
+  // an account afterward with the same email.
+  async function finishOrder(payload, stripePaymentIntentId, submitBtn, accountCreds) {
+    setPlaceBtn(submitBtn, 'Placing your order…', true);
+    $('coPlacedMsg').textContent = '';
+
+    let data;
+    try {
+      const resp = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ ...payload, paymentIntentId: stripePaymentIntentId }),
+      });
+      data = await resp.json();
+      if (!resp.ok) throw new Error(data.error);
+    } catch (err) {
+      // The card has already been charged by this point. Reoffering "Place
+      // order" would invite a second attempt at an order that has nothing
+      // left to pay for, and confirmPayment() on an already-succeeded
+      // PaymentIntent does not behave like a normal retry — so this is a
+      // dead end on purpose, with the one reference that lets support find
+      // the payment even though no order exists for it yet.
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        const label = submitBtn.querySelector('.co-place-label');
+        if (label) label.innerHTML = '<span>Contact support</span>';
+      }
+      $('coPlacedMsg').textContent = err.message ||
+        `Your payment succeeded, but we could not finish placing the order. ` +
+        `Email support@glowresearch.shop with this reference: ${stripePaymentIntentId}`;
+      $('coPlacedMsg').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      return;
+    }
+
+    let accountMessage = '';
+    let accountExists = false;
+    let hasAccount = !!signedInUser || !!(window.localStorage && localStorage.getItem('glow-session'));
+    if (!signedInUser && accountCreds && accountCreds.makeAcct) {
+      setPlaceBtn(submitBtn, 'Setting up your account…', true);
+      const result = await createAccount(accountCreds.email, accountCreds.pass, payload.shipping);
+      accountMessage = result.message;
+      hasAccount = hasAccount || result.ok;
+      accountExists = !!result.exists;
+    }
+
+    // handed to the confirmation page rather than passed in the URL, so an
+    // order number is never enough on its own to pull up someone's receipt
+    try {
+      sessionStorage.setItem('glow-last-order', JSON.stringify({
+        number: data.orderNumber,
+        date: new Date().toISOString(),
+        email: payload.customer.email,
+        name: [payload.shipping.firstName, payload.shipping.lastName].filter(Boolean).join(' '),
+        items: payload.items,
+        shipping: payload.shipping,
+        shippingLabel: payload.shippingMethod.label,
+        shippingCost: payload.shippingMethod.cost,
+        referral: payload.referral,
+        accountMessage,
+        hasAccount,
+        accountExists,
+      }));
+      sessionStorage.removeItem('glow-pending-order');
+    } catch (e) { /* private mode: the fallback message on thank-you.html still shows */ }
+
+    if (window.GlowCart) window.GlowCart.clear();
+    location.href = 'thank-you.html';
+  }
+
+  // Runs on every load of this page. Only does anything when the URL carries
+  // Stripe's own return params, which only happens on the way back from a
+  // redirect-based confirmation (3D Secure, mainly) — the ordinary case,
+  // confirmPayment() resolving in place, never touches the URL at all.
+  // Returns true when it has fully handled the load (so the caller skips its
+  // normal PaymentIntent setup), false otherwise.
+  async function resumeAfterRedirect() {
+    const params = new URLSearchParams(location.search);
+    const clientSecret = params.get('payment_intent_client_secret');
+    if (!clientSecret || !stripeClient) return false;
+
+    // Stripped immediately, before anything async: a refresh of this page
+    // must not replay the same return params against a PaymentIntent that
+    // has already been resolved one way or the other.
+    history.replaceState(null, '', location.pathname);
+
+    let paymentIntent;
+    try {
+      ({ paymentIntent } = await stripeClient.retrievePaymentIntent(clientSecret));
+    } catch (err) {
+      stripeErr('Could not confirm your payment. Email support@glowresearch.shop if this persists.');
+      return true;
+    }
+
+    if (!paymentIntent || paymentIntent.status !== 'succeeded') {
+      $('coPlacedMsg').textContent = 'Payment was not completed. You can try again below.';
+      return false; // let the normal flow set up a fresh PaymentIntent to retry against
+    }
+
+    let pending = null;
+    try { pending = JSON.parse(sessionStorage.getItem('glow-pending-order') || 'null'); } catch (e) { /* fall through */ }
+
+    if (!pending) {
+      // The cart, the shipping address and the email typed in before the
+      // redirect lived only in this page's DOM and in sessionStorage, and
+      // both are gone if this is a fresh tab, private browsing, or storage
+      // was cleared mid-flow. The payment still went through; nothing here
+      // can safely guess what to bill it to, so this is an honest dead end
+      // rather than a silent failure or a guess.
+      $('coPlacedMsg').textContent =
+        `Your payment succeeded, but this page lost track of your order details. ` +
+        `Email support@glowresearch.shop with this reference and we will finish it by hand: ${paymentIntent.id}`;
+      $('coPlacedMsg').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      return true;
+    }
+
+    await finishOrder(pending, paymentIntent.id, null, null);
+    return true;
   }
 
   /* ---------- signed-in state ----------
@@ -276,19 +504,32 @@
 
   /* ---------- wire up ---------- */
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     fillStates();
     renderPayMethods();
     renderSummary();
     checkSession();
 
+    // A return trip from a 3D Secure redirect lands back on this exact page
+    // with Stripe's own query params attached. That has to be handled before
+    // anything else tries to prepare a fresh PaymentIntent for a checkout
+    // that, from the shopper's side, is already over.
+    const resumed = await resumeAfterRedirect();
+    if (!resumed && typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) {
+      ensurePaymentIntent();
+    }
+
     // the drawer can change the cart while this page is open
-    document.addEventListener('glow-cart-change', renderSummary);
+    document.addEventListener('glow-cart-change', () => {
+      renderSummary();
+      if (typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) ensurePaymentIntent();
+    });
 
     $('coShipOptions').addEventListener('change', e => {
       if (e.target.name !== 'shipmethod') return;
       shipId = e.target.value;
       renderSummary();
+      if (typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) ensurePaymentIntent();
     });
 
     $('coEditCart').addEventListener('click', e => {
@@ -357,77 +598,79 @@
       const billAddr = null;
 
       const submitBtn = $('coForm').querySelector('button[type="submit"]');
-      setPlaceBtn(submitBtn, 'Placing your order…', true);
+
+      if (!stripeClient || !elements) {
+        $('coPlacedMsg').textContent = 'Payment is not ready yet. Give it a moment and try again.';
+        $('coPlacedMsg').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        return;
+      }
+
+      setPlaceBtn(submitBtn, 'Confirming payment…', true);
       $('coPlacedMsg').textContent = '';
 
+      const payload = {
+        customer: { email: $('coEmail').value },
+        shipping: shipAddr,
+        billing: billAddr,
+        items,
+        shippingMethod: { id: opt.id, label: opt.label, cost: shippingCost(sub) },
+        referral: ref,
+        termsAccepted: true,
+      };
+
+      // Stashed before confirmPayment() runs, not after: a redirect-based
+      // confirmation (3D Secure) leaves this page entirely and comes back to
+      // a fresh load with none of the above still in memory.
+      // resumeAfterRedirect() reads this back out on the way back.
+      try { sessionStorage.setItem('glow-pending-order', JSON.stringify(payload)); } catch (e) { /* private mode — see resumeAfterRedirect's own fallback message */ }
+
+      let confirmResult;
       try {
-        const resp = await fetch('/api/create-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'same-origin',
-          body: JSON.stringify({
-            customer: { email: $('coEmail').value },
-            shipping: shipAddr,
-            billing: billAddr,
-            items,
-            shippingMethod: { id: opt.id, label: opt.label, cost: shippingCost(sub) },
-            referral: ref,
-            termsAccepted: true,
-          }),
+        confirmResult = await stripeClient.confirmPayment({
+          elements,
+          confirmParams: {
+            return_url: location.origin + location.pathname,
+            receipt_email: payload.customer.email || undefined,
+          },
+          redirect: 'if_required',
         });
-        const data = await resp.json();
-
-        if (!resp.ok) throw new Error(data.error || 'Could not place the order.');
-
-        // The order is placed and must not be undone by a signup problem, so
-        // this runs after it and only ever annotates the confirmation.
-        let accountMessage = '';
-        let accountExists = false;
-        // signedInUser comes from a real /api/me check at page load — the
-        // authoritative answer. The localStorage mirror is a fallback for
-        // the rare case that check itself could not complete.
-        let hasAccount = !!signedInUser || !!(window.localStorage && localStorage.getItem('glow-session'));
-        // Someone already signed in has nothing to sign up for — the
-        // checkbox is hidden for them, but guard here too rather than
-        // trust that it was never checked.
-        if (!signedInUser && $('coMakeAcct').checked) {
-          // a real second request, so it gets its own honest label rather
-          // than leaving "Placing your order…" up for a step it is not
-          // actually describing anymore
-          setPlaceBtn(submitBtn, 'Setting up your account…', true);
-          const result = await createAccount($('coEmail').value, $('coPass').value, shipAddr);
-          accountMessage = result.message;
-          hasAccount = hasAccount || result.ok;
-          accountExists = !!result.exists;
-        }
-
-        // handed to the confirmation page rather than passed in the URL, so an
-        // order number is never enough on its own to pull up someone's receipt
-        try {
-          sessionStorage.setItem('glow-last-order', JSON.stringify({
-            number: data.orderNumber,
-            date: new Date().toISOString(),
-            email: $('coEmail').value,
-            name: [shipAddr.firstName, shipAddr.lastName].filter(Boolean).join(' '),
-            items,
-            shipping: shipAddr,
-            shippingLabel: opt.label,
-            shippingCost: shippingCost(sub),
-            referral: ref,
-            accountMessage,
-            hasAccount,
-            accountExists,
-          }));
-        } catch (e) { /* private mode: the fallback message below still shows */ }
-
-        if (window.GlowCart) window.GlowCart.clear();
-        location.href = 'thank-you.html';
-        return;
       } catch (err) {
-        setPlaceBtn(submitBtn, 'Place order', false);
-        $('coPlacedMsg').textContent = err.message || 'Something went wrong placing the order. Please try again.';
-        $('coPlacedMsg').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        confirmResult = { error: { message: err.message || 'Could not reach the payment processor.' } };
       }
+
+      if (confirmResult.error) {
+        // No redirect happened and no charge went through — the ordinary
+        // shape of a declined card or an incomplete field. Safe to let them
+        // try again with the same mounted fields.
+        try { sessionStorage.removeItem('glow-pending-order'); } catch (e) {}
+        setPlaceBtn(submitBtn, 'Place order', false);
+        $('coPlacedMsg').textContent = confirmResult.error.message || 'Your payment could not be confirmed. Please try again.';
+        $('coPlacedMsg').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        return;
+      }
+
+      const { paymentIntent } = confirmResult;
+      if (!paymentIntent || paymentIntent.status !== 'succeeded') {
+        // Reachable for a payment method that settles asynchronously rather
+        // than a redirect or an immediate result — none of the card networks
+        // Payment Element offers here behave this way, so this is a backstop
+        // for a case this form should not actually produce, not a path
+        // someone is expected to hit.
+        setPlaceBtn(submitBtn, 'Place order', false);
+        $('coPlacedMsg').textContent = 'Your payment is still processing. Refresh this page in a moment.';
+        $('coPlacedMsg').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        return;
+      }
+
+      // signedInUser comes from a real /api/me check at page load — the
+      // authoritative answer. Someone already signed in has nothing to sign
+      // up for, and the checkbox is hidden for them, but this is read at the
+      // point accountCreds is built rather than trusted to have stayed hidden.
+      const accountCreds = (!signedInUser && $('coMakeAcct').checked)
+        ? { email: $('coEmail').value, pass: $('coPass').value, makeAcct: true }
+        : null;
+
+      await finishOrder(payload, paymentIntent.id, submitBtn, accountCreds);
     });
   });
 })();
