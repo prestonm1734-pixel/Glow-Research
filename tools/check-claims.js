@@ -29,6 +29,7 @@ const {
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG, evidenceRows, evidenceHtml,
   identityLine, FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
+  catFilterGroup,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -456,9 +457,12 @@ console.log('\nlisting copy');
   ok('every category in the catalog has a label', unlabelled.length === 0,
     unlabelled.join(', '));
 
-  // And a filter chip, or the category exists but cannot be browsed to.
+  // And a filter chip for its group (Peptides or Supplies), or the category
+  // exists but cannot be browsed to at all. The chip row groups the seven
+  // research categories under one "Peptides" chip rather than exposing each
+  // by name, so this checks catFilterGroup(cat) has a chip, not cat itself.
   const chips = new Set([...read('peptides.html').matchAll(/data-filter="([^"]+)"/g)].map(m => m[1]));
-  const unbrowsable = [...new Set(GLOW_PRODUCTS.map(p => p.cat))].filter(c => !chips.has(c));
+  const unbrowsable = [...new Set(GLOW_PRODUCTS.map(p => catFilterGroup(p.cat)))].filter(c => !chips.has(c));
   ok('every category has a filter chip on the catalog page',
     unbrowsable.length === 0, unbrowsable.join(', '));
 }

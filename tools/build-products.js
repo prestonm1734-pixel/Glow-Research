@@ -36,6 +36,7 @@ const OUT_DIR = 'peptides';
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, PRODUCT_PAGES_LIVE,
   sizeInStock, productInStock, evidenceHtml, identityLine, unitPriceAt,
+  catFilterGroup,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 // Mirrors CAT_LABEL in js/product.js. Kept in step by the assertion below
@@ -167,7 +168,7 @@ function breadcrumbJsonLd(p, url) {
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
       { '@type': 'ListItem', position: 2, name: 'Products', item: `${SITE}/peptides.html` },
-      { '@type': 'ListItem', position: 3, name: CAT_LABEL[p.cat], item: `${SITE}/peptides.html?cat=${p.cat}` },
+      { '@type': 'ListItem', position: 3, name: CAT_LABEL[p.cat], item: `${SITE}/peptides.html?cat=${catFilterGroup(p.cat)}` },
       { '@type': 'ListItem', position: 4, name: p.name, item: url },
     ],
   };
@@ -235,7 +236,7 @@ function buildProduct(p, donor) {
   html = setText(html, 'pdCrumbCat', esc(CAT_LABEL[p.cat]));
   html = html.replace(
     /(id="pdCrumbCat"\s+)href="[^"]*"/,
-    (m, open) => `${open}href="peptides.html?cat=${p.cat}"`
+    (m, open) => `${open}href="peptides.html?cat=${catFilterGroup(p.cat)}"`
   );
   html = setText(html, 'pdCrumbName', esc(p.name));
   html = setText(html, 'pdTag', esc(p.tag));

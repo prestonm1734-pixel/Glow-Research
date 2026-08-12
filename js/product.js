@@ -147,7 +147,7 @@
 
   function renderBreadcrumb(p) {
     $('pdCrumbCat').textContent = CAT_LABEL[p.cat] || p.cat;
-    $('pdCrumbCat').href = pageHref(`peptides.html?cat=${p.cat}`);
+    $('pdCrumbCat').href = pageHref(`peptides.html?cat=${catFilterGroup(p.cat)}`);
     $('pdCrumbName').textContent = p.name;
   }
 

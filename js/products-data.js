@@ -846,6 +846,16 @@ function evidenceHtml(p) {
     </div>`).join('');
 }
 
+// The catalog filter bar has two top-level chips, not eight: seven research
+// categories all read as "Peptides" to someone deciding what to browse, and
+// the only distinction that matters at that altitude is peptide vs. supply.
+// `cat` still carries the specific research category — the product page
+// breadcrumb and the schema still say "Metabolic Research" — this is only
+// which chip on peptides.html a product falls under.
+function catFilterGroup(cat) {
+  return cat === 'supplies' ? 'supplies' : 'peptides';
+}
+
 // Sort comparators for the catalog's sort control. Keyed so the <option>
 // values and the sorting logic can't drift apart. 'featured' is deliberately
 // absent — no comparator means the curated GLOW_PRODUCTS order stands.
@@ -1109,7 +1119,7 @@ function productCardHtml(p, i) {
 function renderProductGrid(gridEl, filter, opts) {
   opts = opts || {};
   gridEl.innerHTML = '';
-  let list = filter === 'all' ? GLOW_PRODUCTS : GLOW_PRODUCTS.filter(p => p.cat === filter);
+  let list = filter === 'all' ? GLOW_PRODUCTS : GLOW_PRODUCTS.filter(p => catFilterGroup(p.cat) === filter);
   if (opts.exclude) list = list.filter(p => p.name !== opts.exclude);
   // slice() first: a stable sort over a copy, so the curated order survives
   // both here and for every other caller.
@@ -1198,6 +1208,7 @@ if (typeof module !== 'undefined' && module.exports) {
     faqHtml,
     productCardHtml,
     productHref,
+    catFilterGroup,
     evidenceRows,
     evidenceHtml,
     bulkSavingPct,
