@@ -1102,8 +1102,7 @@ html:not(.js) .faq-a{ max-height: none; }
 .lp-section > .container > .lp-fine,
 .lp-section > .container > .ws-form,
 .lp-section > .container > .ws-done,
-.lp-section > .container > .pr-chain,
-.lp-section > .container > .pr-not{ text-align:left; }
+.lp-section > .container > .pr-chain{ text-align:left; }
 
 /* ---------- points ---------- */
 .lp-points{

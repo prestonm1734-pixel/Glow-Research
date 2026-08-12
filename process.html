@@ -197,37 +197,17 @@
   }
   .pr-meta .disc-body p:last-child{ margin-bottom: 0; }
 
+  /* The chain now ends the page, so the button follows it directly. It needs
+     more air than the shared 34px, or it reads as part of step six rather
+     than as what to do once the six are read. */
+  .pr-chain + .lp-actions{ margin-top: clamp(46px, 5.5vw, 68px); }
+
   @media (max-width: 720px){
     .pr-chain::before{ left: 19px; top: 20px; bottom: 20px; }
     .pr-step{ grid-template-columns: 40px minmax(0,1fr); }
     .pr-num{ width:40px; height:40px; font-size:.72rem; }
   }
 
-  /* ---------- what we do not do ----------
-     A supplier page that only lists strengths reads as marketing. This is the
-     same information from the other side, and it is the section that makes
-     the rest of the page credible.
-
-     It was a two-column grid of cells that each repeated the label "WE DO
-     NOT" above the actual line, so the page said those three words six times
-     and the reader had to find the sentence underneath each one. The heading
-     says it once and the rows are just the six things. */
-  .pr-not{
-    /* Same measure as the chain above: two content blocks, one column. */
-    list-style:none; margin: clamp(44px, 5vw, 60px) auto 0; padding: 0;
-    max-width: 660px; border-top: 1px solid var(--border);
-  }
-  .pr-not li{
-    position:relative; padding: 17px 0 17px 32px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text); line-height:1.5;
-    font-size: clamp(1rem, 1.3vw, 1.08rem);
-  }
-  /* A minus, because every line completes "Glow does not". */
-  .pr-not li::before{
-    content:''; position:absolute; left: 4px; top: 1.42em;
-    width:12px; height:1px; background: var(--text-dimmer);
-  }
 </style>
 
 </head>
@@ -456,35 +436,6 @@
       </li>
 
     </ol>
-  </div>
-</section>
-
-<section class="lp-section">
-  <div class="container">
-    <h2 class="lp-h2">What Glow does not do.</h2>
-
-    <ul class="pr-not reveal">
-      <li>Manufacture, synthesise, or fill anything</li>
-      <li>Run a laboratory, or test our own inventory</li>
-      <li>Issue certificates: the analysing laboratory does that</li>
-      <li>Operate a warehouse, or pack your order by hand</li>
-      <li>Repackage, relabel, or subdivide a lot after it arrives</li>
-      <li>Sell for human or animal use, in any quantity, to anyone</li>
-    </ul>
-
-    <p class="lp-fine">Glow Research is the retailer, and only the retailer.</p>
-    <details class="disc">
-      <summary>Read the full terms <span class="disc-mark" aria-hidden="true"></span></summary>
-      <div class="disc-body">
-        <p class="lp-fine">
-      Our job is peptide sourcing: qualifying the facilities behind each lot and
-      putting their documentation in front of you. Products are supplied for
-      laboratory research use only, to qualified buyers and verified institutions
-      in the United States. They are not FDA-approved or evaluated, and are not
-      drugs, supplements, foods, or cosmetics.
-        </p>
-      </div>
-    </details>
 
     <div class="lp-actions">
       <a href="peptides.html" class="btn btn-primary btn-lg">Shop Peptides <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
