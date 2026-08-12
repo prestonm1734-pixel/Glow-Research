@@ -129,15 +129,6 @@
     text-wrap: balance; font-weight: 600; color: #c7c7c4;
   }
 
-  /* One soft blur behind the type, the same light the homepage hero sits in.
-     Costs no height and stops the headline sitting on flat black. */
-  .pr-glow{
-    position:absolute; z-index:0; pointer-events:none;
-    left:50%; top: 4%; transform: translateX(-50%);
-    width: min(820px, 96vw); height: 460px; border-radius:50%;
-    background: #3a3a38; filter: blur(130px); opacity:.11;
-  }
-
   /* The chain follows the hero directly, so it does not also need the shared
      section's full top padding on top of the hero's bottom padding. */
   .pr-section{ padding-top: clamp(46px, 5vw, 72px); }
@@ -361,9 +352,7 @@
 </style>
 
 </head>
-<!-- header-dark: this page is dark to the top, so the bar takes the page's
-     background instead of the catalog's. See "dark header" in css/style.css. -->
-<body class="header-dark">
+<body>
 
 <!-- first-visit age / RUO gate. Loaded here, not with the other
      scripts at the foot of the page, so the overlay is in the DOM
@@ -434,7 +423,6 @@
      manufacture, and a title that says otherwise claims control over a
      facility we do not own. -->
 <section class="lp-hero pr-hero">
-  <div class="pr-glow" aria-hidden="true"></div>
   <div class="container">
     <h1>From source<br /><span class="outline">to shipment.</span></h1>
     <p class="lp-lede">

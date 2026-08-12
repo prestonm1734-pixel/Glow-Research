@@ -343,69 +343,6 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 .hamburger span{ width: 22px; height:2px; background: #0a0a0a; border-radius: 2px; transition: .3s; }
 
-/* ---------- dark header ----------
-   Opted into per page with `class="header-dark"` on <body>, because the header
-   is a sibling of <main> and cannot be reached from the page's own class.
-   Currently process.html only.
-
-   The bar is #ececea, which is right over the catalog and wrong over a dark
-   page: it reads as a light strip laid on top rather than the top of the page
-   you are looking at. This makes it var(--bg), the same value .lp-page uses,
-   so the two meet with nothing between them but the hairline.
-
-   The rules live here rather than inline on the page so the header stays in
-   one file, and so putting a second page on the dark variant is a class rather
-   than a copied block. Every declaration below is an inversion of one above:
-   nothing new is introduced, so the two variants cannot drift in behaviour. */
-.header-dark .site-header{
-  background: var(--bg);
-  border-bottom-color: rgba(255,255,255,0.1);
-  color: var(--text);
-}
-.header-dark .logo,
-.header-dark .spark{ color: var(--text); }
-
-.header-dark .main-nav a,
-.header-dark .nav-group-btn{ color: var(--text-dim); }
-.header-dark .main-nav a::after,
-.header-dark .nav-group-btn::after{ background: var(--text); }
-.header-dark .main-nav a:hover,
-.header-dark .main-nav a.active,
-.header-dark .nav-group-btn:hover,
-.header-dark .nav-group.is-active .nav-group-btn{ color: var(--text); }
-
-.header-dark .nav-icon-btn{
-  border-color: rgba(255,255,255,0.22); color: var(--text);
-}
-.header-dark .nav-icon-btn:hover{
-  border-color: var(--text); background: rgba(255,255,255,0.07);
-}
-/* Inverted, or a near-black badge on a near-black bar is invisible: the count
-   is the one thing in here that has to be readable at a glance. */
-.header-dark .nav-cart-badge{ background: var(--text); color: var(--bg); }
-.header-dark .hamburger span{ background: var(--text); }
-
-.header-dark .nav-menu{
-  background: var(--surface); border-color: rgba(255,255,255,.14);
-  box-shadow: 0 18px 40px -22px #000;
-}
-.header-dark .nav-menu a{ color: var(--text-dim); }
-.header-dark .nav-menu a:hover{ background: rgba(255,255,255,.06); color: var(--text); }
-.header-dark .nav-menu a.active{ color: var(--text); }
-.header-dark .main-nav.open{
-  background: var(--bg); border-bottom-color: rgba(255,255,255,0.1);
-}
-@media (max-width: 980px){
-  .header-dark .nav-menu{ background:none; border-left-color: rgba(255,255,255,.18); }
-}
-
-/* The shared focus ring in here is #0a0a0a, which on this variant is a black
-   ring on a black bar: a keyboard user would see nothing at all. Same reason
-   the light surfaces further up override the white one. */
-.header-dark .site-header :focus-visible,
-.header-dark .nav-group-btn:focus-visible{
-  outline: 2px solid #fff; outline-offset: 3px;
-}
 
 /* ---------- hero ---------- */
 .hero{
