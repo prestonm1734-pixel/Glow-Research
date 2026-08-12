@@ -999,7 +999,9 @@ console.log('\ncrawlable content');
   const proc = read('process.html');
   const schema = JSON.parse(proc.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   const steps = schema.mainEntity.itemListElement;
-  const h3s = [...proc.matchAll(/<h3>(.*?)<\/h3>/g)].map(m => m[1]).slice(0, 6);
+  // The step titles are h2 with the section heading above them gone, and the
+  // class is what keeps this off the page's other h2.
+  const h3s = [...proc.matchAll(/<h2 class="pr-t">(.*?)<\/h2>/g)].map(m => m[1]).slice(0, 6);
   const leads = [...proc.matchAll(/<p class="pr-lead">([\s\S]*?)<\/p>/g)]
     .map(m => m[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()).slice(0, 6);
   const drifted = h3s.filter((h, i) =>
