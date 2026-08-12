@@ -615,12 +615,21 @@ button[disabled].si-forgot{ cursor: progress; }
 /* squared off with a defined edge so each tile reads as an actual box on the
    page, matching the sharp-cornered language the buttons already use — the
    12px radius was rounding them into soft blobs */
+/* A grid row stretches every card in it to the height of the tallest one
+   (a two-line name from a longer product like a blend, most often) — that's
+   the grid, not this rule. Without flex-column here, only .product-visual's
+   fixed aspect-ratio and .product-footer's own content claimed any of that
+   extra height, leaving the difference as blank white .product-card
+   background below the black footer. flex + .product-footer{flex:1} below
+   gives that space to the footer instead, so the black block always reaches
+   the card's bottom edge. */
 .product-card{
   background:#fff;
   border: 1px solid rgba(0,0,0,0.16);
   border-radius: 0;
   overflow:hidden;
   position: relative;
+  display:flex; flex-direction:column;
   transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
 }
 .product-card:hover{
@@ -633,7 +642,7 @@ button[disabled].si-forgot{ cursor: progress; }
    the bottle ends up tiny. Keeping the tile roughly square gives the vial the
    height it needs to fill the frame. */
 .product-visual{
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1 / 1; flex-shrink:0;
   display:flex; align-items:center; justify-content:center;
   position:relative; overflow:hidden;
   background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
@@ -720,7 +729,10 @@ button[disabled].si-forgot{ cursor: progress; }
 /* Out of stock replaces the promo badge rather than sitting beside it —
    two badges on one card is the clutter the badge was meant to cut through. */
 .product-badge.status.is-out{ background:#8a8a86; color:#fff; }
-.product-footer{ background:#0a0a0a; color:#fff; padding: 20px 22px 22px; position:relative; }
+.product-footer{
+  background:#0a0a0a; color:#fff; padding: 20px 22px 22px; position:relative;
+  flex:1; display:flex; flex-direction:column;
+}
 /* fades out at each edge instead of a hard-edged rule, so it reads as a
    seam rather than a box border. Used both at the top of the footer (where
    the tag line used to sit) and between the name and the price. */
@@ -751,6 +763,10 @@ button[disabled].si-forgot{ cursor: progress; }
   background:#fff; color:#0a0a0a; font-family:'Inter', sans-serif; font-size:.85rem; font-weight:700;
   cursor:pointer; display:flex; align-items:center; justify-content:center;
   transition: background .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
+  /* footer is a flex column now, so a taller neighbour's title no longer
+     leaves this button floating above a gap of black — it stays put and the
+     gap (if any) opens up above the price instead, right below the divider */
+  margin-top:auto;
 }
 .add-btn:hover{
   background:#0a0a0a; color:#fff; border-color: rgba(255,255,255,.5);
