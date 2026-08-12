@@ -148,6 +148,53 @@
     `;
   }
 
+  /* ---------- accessory offer ----------
+     Shown under the line items, and only ever to somebody who already has
+     something in the cart to reconstitute: the empty state returns before this
+     is reached, which is the point. Nothing here is typed in. The size and the
+     price come from cartUpsell(), which reads the catalog row, so the drawer
+     cannot offer a price the product page disagrees with or a vial that is out
+     of stock.
+
+     It disappears for good once the water is in the cart. Keyed on the product
+     name rather than the exact size, so somebody who already added the 3mL
+     from the catalog is not asked to buy water a second time. A module that
+     keeps asking after the answer was yes is not an offer. */
+  function upsellHtml() {
+    if (typeof cartUpsell !== 'function') return '';
+    const u = cartUpsell();
+    if (!u || items.some(i => i.name === u.product.name)) return '';
+    const thumb = typeof productThumb === 'function'
+      ? productThumb(u.product.name) : '<span class="vial"></span>';
+    return `
+      <div class="cart-upsell">
+        <span class="cart-upsell-thumb">${thumb}</span>
+        <div class="cart-upsell-main">
+          <p class="cart-upsell-t">Don't forget ${u.product.name}</p>
+          <p class="cart-upsell-d">${u.size.mg} &middot; ${money(salePrice(u.size.price))}</p>
+        </div>
+        <button type="button" class="cart-upsell-add" data-act="upsell"
+                aria-label="Add ${u.product.name} ${u.size.mg} to cart">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+          Add
+        </button>
+      </div>
+    `;
+  }
+
+  function addUpsell() {
+    const u = cartUpsell();
+    if (!u) return;   // the button is only rendered when it resolves; this is the backstop
+    add({
+      name: u.product.name,
+      variant: u.size.mg,
+      unitOriginal: u.size.price,
+      unitSale: salePrice(u.size.price),
+    });
+  }
+
   function render() {
     renderBadge();
     // the checkout page mirrors the cart, so it needs to know when it moves
@@ -173,7 +220,8 @@
 
     foot.hidden = false;
     body.innerHTML = shippingHtml() +
-      '<div class="cart-rows">' + items.map(rowHtml).join('') + '</div>';
+      '<div class="cart-rows">' + items.map(rowHtml).join('') + '</div>' +
+      upsellHtml();
 
     const saved = savings();
     foot.innerHTML = `
@@ -208,6 +256,11 @@
   function onBodyClick(e) {
     const btn = e.target.closest('[data-act]');
     if (!btn) return;
+
+    // The accessory offer is not a line item. It has no row and no index, so
+    // it is answered before the lookup below, which would throw on it.
+    if (btn.dataset.act === 'upsell') { addUpsell(); return; }
+
     const row = btn.closest('.cart-row');
     const i = Number(row.dataset.i);
     const act = btn.dataset.act;
@@ -279,7 +332,12 @@
     });
     save();
     render();
-    toast();
+    // The toast exists to tell you something happened somewhere you cannot
+    // see, and to offer a way to go look. With the drawer already open you are
+    // looking at it: the row appears, the subtotal moves, the accessory offer
+    // takes itself down. A banner over the top of that saying "view cart" is
+    // covering the thing it is pointing at.
+    if (!overlay || !overlay.classList.contains('open')) toast();
   }
 
   function clear() {

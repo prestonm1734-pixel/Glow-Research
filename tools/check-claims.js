@@ -29,7 +29,7 @@ const {
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG, evidenceRows, evidenceHtml,
   identityLine, FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
-  catFilterGroup,
+  catFilterGroup, CART_UPSELL, cartUpsell, CAT_LABEL,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -431,31 +431,34 @@ console.log('\nlisting copy');
   // as a category rather than as the promise it was. A category may name a
   // research domain (Metabolic, Cognitive, Tissue) or a pharmacological class
   // (Growth Hormone Secretagogue). It may not name what the buyer gets.
-  const labels = new Set(GLOW_PRODUCTS.flatMap(p => [p.tag, p.cat]));
-  [read('js/product.js'), read('tools/build-products.js')].forEach(src => {
-    const block = src.match(/CAT_LABEL = \{([\s\S]*?)\}/);
-    if (block) for (const m of block[1].matchAll(/'([^']+)'/g)) labels.add(m[1]);
-  });
+  const labels = new Set(GLOW_PRODUCTS.flatMap(p => [p.tag, p.cat])
+    .concat(Object.values(CAT_LABEL)));
   const claimy = [...labels].filter(l => OUTCOME.test(l) && (OUTCOME.lastIndex = 0) === 0);
   ok('no category or tag names an outcome', claimy.length === 0, claimy.join(', '));
 
-  // CAT_LABEL is written out in both js/product.js and tools/build-products.js,
-  // which is two copies of one mapping. build-products throws on a category
-  // with no label, but nothing noticed if the two spelled the same one
-  // differently, so the breadcrumb could say one thing before hydration and
-  // another after.
-  const catLabels = src => Object.fromEntries(
-    [...(src.match(/CAT_LABEL = \{([\s\S]*?)\};/) || [, ''])[1]
-      .matchAll(/(\w+):\s*'([^']+)'/g)].map(m => [m[1], m[2]]));
-  const runtime = catLabels(read('js/product.js'));
-  const build = catLabels(read('tools/build-products.js'));
-  ok('both CAT_LABEL maps agree',
-    JSON.stringify(runtime) === JSON.stringify(build),
-    `product.js ${JSON.stringify(runtime)}\n          build ${JSON.stringify(build)}`);
-
-  const unlabelled = [...new Set(GLOW_PRODUCTS.map(p => p.cat))].filter(c => !runtime[c]);
+  // `cat` is a slug the code filters on. CAT_LABEL is where it becomes English:
+  // the product breadcrumb, the generated pages' Product schema, and the
+  // category headings in llms.txt.
+  //
+  // This used to compare two hand-kept copies of that map against each other,
+  // in js/product.js and tools/build-products.js. It never looked at the third,
+  // in tools/build-llms.js, so when the catalog gained four categories and two
+  // of the three copies were updated, llms.txt shipped four headings reading
+  // "### undefined" and every check here passed. A missing label does not
+  // throw, it renders the word undefined.
+  //
+  // There is one map now, in js/products-data.js, and these are its checks:
+  // that it covers the catalog, that no file has quietly started a fourth
+  // copy, and that nothing generated says undefined whatever the cause.
+  const unlabelled = [...new Set(GLOW_PRODUCTS.map(p => p.cat))].filter(c => !CAT_LABEL[c]);
   ok('every category in the catalog has a label', unlabelled.length === 0,
     unlabelled.join(', '));
+
+  const dupes = ['js/product.js', 'tools/build-products.js', 'tools/build-llms.js']
+    .filter(f => /const CAT_LABEL\s*=\s*\{/.test(read(f)));
+  ok('nothing keeps a second copy of the label map', dupes.length === 0, dupes.join(', '));
+
+  ok('llms.txt has no undefined headings', !/undefined/.test(read('llms.txt')));
 
   // And a filter chip for its group (Peptides or Supplies), or the category
   // exists but cannot be browsed to at all. The chip row groups the seven
@@ -1231,6 +1234,66 @@ console.log('\ncatalog shape');
   });
   ok(`all ${GLOW_PRODUCTS.length} products carry every field the site reads`,
     bad.length === 0, bad.join(', '));
+}
+
+/* ---------------------------------------------------------------------------
+ * 6b. The cart-drawer accessory offer. Its failure mode is silent in both
+ *     directions, which is why it is checked rather than trusted.
+ *
+ *     CART_UPSELL names a product and a size as strings. Rename either and
+ *     cartUpsell() returns null: no error, no broken page, the module simply
+ *     stops appearing in every cart on the site and nothing says so. That is
+ *     the kind of quiet regression that survives for months.
+ *
+ *     The other direction is worse. The drawer states a size and a price, so
+ *     both have to come out of the catalog row at render time. A hardcoded $15
+ *     in the drawer would keep saying $15 after the catalog moved, which is a
+ *     price the site quotes and does not honour.
+ * ------------------------------------------------------------------------- */
+console.log('\ncart upsell');
+{
+  const cart = read('js/cart.js');
+
+  if (CART_UPSELL === null) {
+    ok('the offer is switched off and the drawer does not render it',
+      !/cart-upsell/.test(cart) || /if \(!u/.test(cart));
+  } else {
+    // Resolved by hand rather than through cartUpsell(), because the two
+    // reasons it can return null need different severities. A name that
+    // matches nothing is a configuration error and fails the build. A size
+    // that is out of stock is an ordinary Tuesday: cartUpsell() returns null,
+    // the drawer shows nothing, and the site is telling the truth. Reported so
+    // the offer's absence is visible, not failed.
+    const product = GLOW_PRODUCTS.find(p => p.name === CART_UPSELL.name);
+    const size = product && product.sizes.find(s => s.mg === CART_UPSELL.mg);
+    ok('CART_UPSELL names a product and size the catalog holds', !!size,
+      `nothing in the catalog matches ${CART_UPSELL.name} ${CART_UPSELL.mg}`);
+
+    if (size) {
+      console.log(sizeInStock(size)
+        ? '  ok    the offered size is sellable'
+        : '  note  the offered size is out of stock, so no cart shows the offer');
+
+      // The one thing the drawer is not allowed to do is state its own figure.
+      ok('the drawer resolves the offer against the catalog', /cartUpsell\(\)/.test(cart));
+
+      // The line the customer reads, isolated from the aria-label beneath it,
+      // so a size interpolated only into the label cannot satisfy this.
+      const copy = (cart.match(/class="cart-upsell-d">(.*)$/m) || [, ''])[1];
+      ok('the visible line states the catalog size and the catalog price',
+        /\$\{u\.size\.mg\}/.test(copy) && /\$\{money\(salePrice\(u\.size\.price\)\)\}/.test(copy),
+        copy.trim() || 'no .cart-upsell-d line found');
+
+      ok('no price is typed into the offer',
+        !new RegExp(`\\$${size.price}\\b`).test(cart),
+        `found a literal $${size.price} in js/cart.js`);
+
+      // Offering water to somebody who already bought water is the whole
+      // reason this module has a hide condition, so the condition is pinned.
+      ok('the offer hides once that product is in the cart',
+        /items\.some\(i => i\.name === u\.product\.name\)/.test(cart));
+    }
+  }
 }
 
 /* ---------------------------------------------------------------------------

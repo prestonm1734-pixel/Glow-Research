@@ -513,7 +513,7 @@ const GLOW_PRODUCTS = [
     verifyValue: 'USP-grade water',
     verifyNote: 'Not run through the HPLC-UV/LC-MS/endotoxin panel described for the peptides above.',
     analysisNote: 'Not applicable. This is a reconstitution accessory, not an independently tested research peptide.',
-    sizes: [{ mg: '3ml', price: 9, sku: 'GLO-WA3' }, { mg: '10ml', price: 15, sku: 'GLO-WA10' }],
+    sizes: [{ mg: '3mL', price: 9, sku: 'GLO-WA3' }, { mg: '10mL', price: 15, sku: 'GLO-WA10' }],
     blurb: 'Sterile water for reconstituting lyophilized peptides. Preserved with 0.9% benzyl alcohol.',
     about: [
       'Bacteriostatic Water is sterile water for injection preserved with 0.9% benzyl alcohol, which is what allows repeated draws from the same vial rather than a single use.',
@@ -554,6 +554,61 @@ GLOW_PRODUCTS.forEach(p => {
 // The supplier import writes real per-SKU availability into `sizes[].stock`.
 const sizeInStock = s => s.stock !== false;
 const productInStock = p => p.sizes.some(sizeInStock);
+
+// ---------------------------------------------------------------------------
+// What each `cat` is called in front of a customer. `cat` is a slug the code
+// filters and sorts on; this is the only place it becomes English.
+//
+// It lives here because three surfaces need it and they used to each keep
+// their own copy: the product page breadcrumb, the generated pages' breadcrumb
+// and Product schema, and the category headings in llms.txt. Adding the
+// longevity, immune, neuro and supplies categories updated two of the three,
+// and the third silently wrote "### undefined" into the file the AI crawlers
+// read. That is what a duplicated map buys you, so there is now one.
+//
+// tools/check-claims.js fails the build on a category with no label here.
+const CAT_LABEL = {
+  growth: 'Growth Hormone Secretagogues',
+  tissue: 'Tissue Research',
+  metabolic: 'Metabolic Research',
+  cognitive: 'Cognitive Research',
+  longevity: 'Longevity Research',
+  immune: 'Immune Research',
+  neuro: 'Neuropeptide Research',
+  supplies: 'Laboratory Supplies',
+};
+
+// ---------------------------------------------------------------------------
+// The cart-drawer accessory offer.
+//
+// One product, one size, no picker. A diluent is needed to use what is already
+// in the cart, so the offer is genuinely useful rather than a second thing to
+// weigh, and the whole decision is one click. Offering both sizes would turn
+// that click into a choice, which is the thing this module is designed not to
+// ask for. The 3mL stays in the catalog for anyone who wants it.
+//
+// This names a product and a size. It deliberately does not carry a price:
+// the figure, and whether the size is sellable at all, are read out of the
+// catalog row at render time, so the drawer cannot quote a number the product
+// page contradicts. Set to null to take the offer down.
+const CART_UPSELL = { name: 'Bacteriostatic Water', mg: '10mL' };
+
+// Resolves the offer against the live catalog, or returns null when there is
+// nothing honest to show: no such product, no such size, or that size is out
+// of stock. Callers get a real row or nothing, so no surface has to re-derive
+// those conditions and none of them can get it half right.
+//
+// tools/check-claims.js fails the build if this stops resolving, because the
+// failure mode is silent: rename the product or the size and the module just
+// quietly disappears from every cart.
+function cartUpsell() {
+  if (!CART_UPSELL) return null;
+  const product = GLOW_PRODUCTS.find(p => p.name === CART_UPSELL.name);
+  if (!product) return null;
+  const size = product.sizes.find(s => s.mg === CART_UPSELL.mg);
+  if (!size || !sizeInStock(size)) return null;
+  return { product, size };
+}
 
 // ---------------------------------------------------------------------------
 // The two quality figures in the homepage hero.
@@ -1223,6 +1278,9 @@ if (typeof module !== 'undefined' && module.exports) {
     onSaleNow,
     sizeInStock,
     productInStock,
+    CAT_LABEL,
+    CART_UPSELL,
+    cartUpsell,
     avgPurity,
     BATCHES_TESTED,
     CUTOFF_HOUR,

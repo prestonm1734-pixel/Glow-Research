@@ -31,15 +31,8 @@ const OUT = 'llms.txt';
 const {
   GLOW_PRODUCTS, FAQS, productHref, salePrice, onSaleNow, fmtPrice,
   CUTOFF_LABEL, TRANSIT_DAYS, ANALYSIS_LONG, SOURCE_LONG, COA_COPY,
-  PRODUCT_PAGES_LIVE, avgPurity,
+  PRODUCT_PAGES_LIVE, avgPurity, CAT_LABEL,
 } = require(path.join(ROOT, 'js/products-data.js'));
-
-const CAT_LABEL = {
-  growth: 'Growth Hormone Secretagogues',
-  tissue: 'Tissue Research',
-  metabolic: 'Metabolic Research',
-  cognitive: 'Cognitive Research',
-};
 
 function build() {
   const byCat = {};

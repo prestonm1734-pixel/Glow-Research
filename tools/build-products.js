@@ -36,23 +36,8 @@ const OUT_DIR = 'peptides';
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, PRODUCT_PAGES_LIVE,
   sizeInStock, productInStock, evidenceHtml, identityLine, unitPriceAt,
-  catFilterGroup,
+  catFilterGroup, CAT_LABEL,
 } = require(path.join(ROOT, 'js/products-data.js'));
-
-// Mirrors CAT_LABEL in js/product.js. Kept in step by the assertion below
-// rather than by memory: a new category added to the catalog without a label
-// here fails the build instead of shipping a page whose breadcrumb reads
-// "metabolic".
-const CAT_LABEL = {
-  growth: 'Growth Hormone Secretagogues',
-  tissue: 'Tissue Research',
-  metabolic: 'Metabolic Research',
-  cognitive: 'Cognitive Research',
-  longevity: 'Longevity Research',
-  immune: 'Immune Research',
-  neuro: 'Neuropeptide Research',
-  supplies: 'Laboratory Supplies',
-};
 
 /* ---------- helpers ---------- */
 
@@ -317,11 +302,14 @@ if (!PRODUCT_PAGES_LIVE) {
 
 const donor = fs.readFileSync(path.join(ROOT, SHELL_DONOR), 'utf8');
 
+// A backstop for a standalone run of this script. tools/check-claims.js makes
+// the same assertion on every build, including while the pages are held, which
+// is the run that matters: this one is unreachable until they go live.
 const unlabelled = [...new Set(GLOW_PRODUCTS.map(p => p.cat))].filter(c => !CAT_LABEL[c]);
 if (unlabelled.length) {
   throw new Error(
     `No CAT_LABEL for category "${unlabelled.join('", "')}". ` +
-    `Add it to tools/build-products.js and js/product.js.`
+    `Add it to CAT_LABEL in js/products-data.js.`
   );
 }
 

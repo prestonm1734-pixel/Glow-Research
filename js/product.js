@@ -16,16 +16,7 @@
   // The evidence panel quotes all three, so they are sitewide constants rather
   // than ones this file owns and the panel restates.
 
-  const CAT_LABEL = {
-    growth: 'Growth Hormone Secretagogues',
-    tissue: 'Tissue Research',
-    metabolic: 'Metabolic Research',
-    cognitive: 'Cognitive Research',
-    longevity: 'Longevity Research',
-    immune: 'Immune Research',
-    neuro: 'Neuropeptide Research',
-    supplies: 'Laboratory Supplies',
-  };
+  // CAT_LABEL comes from js/products-data.js, loaded before this file.
 
   let product = null;
   let sizeIndex = 0;
