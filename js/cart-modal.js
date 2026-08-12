@@ -17,6 +17,7 @@
       <div class="qa-sheet" role="dialog" aria-modal="true" aria-label="Add to cart">
         <div class="qa-handle" aria-hidden="true"></div>
         <div class="qa-head">
+          <div class="qa-thumb" id="qaThumb" aria-hidden="true"></div>
           <div class="qa-head-copy">
             <h3 class="qa-name" id="qaName"></h3>
             <p class="qa-sub">Choose a size</p>
@@ -94,6 +95,11 @@
     lastFocused = document.activeElement;
 
     overlay.querySelector('#qaName').textContent = product.name;
+    // productThumb() is the same lookup the cart and checkout use, so this
+    // is the drawn vial glyph for almost everything today and a real photo
+    // the moment a product gets one — no separate image logic to keep in
+    // step with theirs.
+    overlay.querySelector('#qaThumb').innerHTML = productThumb(product.name);
 
     const rowsEl = overlay.querySelector('#qaRows');
     rowsEl.innerHTML = '';

@@ -1575,9 +1575,17 @@ body.search-locked{ overflow:hidden; }
 .qa-overlay.open .qa-sheet{ transform: scale(1); opacity:1; }
 .qa-handle{ display:none; }
 .qa-head{
-  display:flex; align-items:flex-start; gap:16px;
+  display:flex; align-items:flex-start; gap:14px;
   padding: 24px 24px 18px; flex-shrink:0;
 }
+.qa-thumb{
+  width:52px; height:52px; flex-shrink:0; border-radius:12px;
+  background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
+  border:1px solid rgba(0,0,0,0.08);
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.qa-thumb .vial{ width:16px; height:32px; box-shadow:none; }
+.qa-thumb .thumb-photo{ width:100%; height:100%; object-fit:cover; }
 .qa-head-copy{ flex:1; min-width:0; }
 .qa-name{ font-size:1.3rem; letter-spacing:-.025em; margin:0 0 3px; }
 .qa-sub{ font-size:0.92rem; color:#6e6e73; margin:0; }

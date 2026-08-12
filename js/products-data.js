@@ -1075,9 +1075,17 @@ function productThumb(name) {
 // One product card, as markup. Shared by renderProductGrid below and by
 // tools/build-catalog.js, so what a crawler is served and what the browser
 // draws are the same cards rather than two implementations that agree today.
+//
+// A product with more than one size has a decision left to make, so its
+// button says "Select Options" and opens the picker. A product with exactly
+// one has nothing left to choose, so the button says "Add to Cart" and does
+// exactly that with no picker in between — and since there is no picker to
+// show the size in, the card states it once, next to the name, instead.
 function productCardHtml(p, i) {
   const href = productHref(p);
   const stocked = productInStock(p);
+  const single = p.sizes.length === 1;
+  const name = single ? `${p.name} ${p.sizes[0].mg}` : p.name;
   return `
       <div class="product-card reveal" style="transition-delay:${(i % 3) * 60}ms">
         <a class="product-visual${p.image ? ' has-photo' : ''}" href="${href}">
@@ -1090,14 +1098,14 @@ function productCardHtml(p, i) {
             : '<div class="vial"></div>'}
         </a>
         <div class="product-footer">
-          <h3><a href="${href}">${p.name}</a></h3>
+          <h3><a href="${href}">${name}</a></h3>
           <span class="card-divider" aria-hidden="true"></span>
           <span class="price">
             ${onSaleNow() ? `<s class="price-was">${fmtPrice(p.price)}</s>` : ''}
             ${fmtPrice(salePrice(p.price))} <span>/ vial</span>
           </span>
           <button class="add-btn" ${stocked
-            ? `aria-label="Add ${p.name} to research order">Add to Cart`
+            ? `aria-label="${single ? `Add ${name} to research order` : `Choose a size of ${p.name}`}">${single ? 'Add to Cart' : 'Select Options'}`
             : `disabled aria-label="${p.name} is out of stock">Out of Stock`}</button>
         </div>
       </div>`;
@@ -1153,13 +1161,24 @@ function renderProductGrid(gridEl, filter, opts) {
     const href = productHref(p);
     const card = gridEl.children[i];
 
-    // the whole card opens the product page; the button is the one exception,
-    // and it opens the quick-add sheet instead — the size/quantity picker,
-    // so the cart is only ever touched from in there
+    // the whole card opens the product page; the button is the one exception.
+    // A product with a size to choose opens the quick-add sheet; a
+    // single-size product has nothing to pick, so the button adds it
+    // straight to the cart instead of opening a sheet with one row in it.
     const addBtn = card.querySelector('.add-btn');
     addBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (window.openQuickAdd) window.openQuickAdd(p);
+      if (p.sizes.length > 1) {
+        if (window.openQuickAdd) window.openQuickAdd(p);
+      } else if (window.GlowCart) {
+        const size = p.sizes[0];
+        window.GlowCart.add({
+          name: p.name,
+          variant: size.mg,
+          unitOriginal: size.price,
+          unitSale: salePrice(size.price),
+        });
+      }
     });
     card.addEventListener('click', (e) => {
       if (e.target.closest('a, button')) return;   // let real links/buttons behave normally
