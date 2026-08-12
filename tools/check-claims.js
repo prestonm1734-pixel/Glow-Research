@@ -295,11 +295,19 @@ console.log('\nthe Glow Standard panel');
   // number on the panel, which makes it the only one that can be wrong about
   // the vial in front of someone, so it has to be the catalog's figure and
   // nothing else. Same rule as the hero average: edit the catalog, not the page.
+  //
+  // `verifyValue` is the one deliberate exception: a product this panel does
+  // not truthfully describe as written (Bacteriostatic Water was never run
+  // through the peptide testing panel) states so explicitly rather than
+  // inheriting "<purity> purity" as if it had been. For those products this
+  // checks the row echoes verifyValue exactly, so the override itself cannot
+  // silently drift from what evidenceRows() renders.
   const wrongPurity = GLOW_PRODUCTS.filter(prod => {
     const row = evidenceRows(prod).find(r => r.key === 'verify');
-    return row.value !== `${prod.purity} purity`;
+    const want = prod.verifyValue || `${prod.purity} purity`;
+    return row.value !== want;
   });
-  ok('the Verify row states the catalog purity for every compound',
+  ok('the Verify row states the catalog purity for every compound, or its documented override',
     wrongPurity.length === 0, wrongPurity.map(prod => prod.name).join(', '));
   ok('a product with no purity yet shows the null indicator, not a number',
     evidenceRows({}).find(r => r.key === 'verify').value === '—');

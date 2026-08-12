@@ -491,6 +491,30 @@ const GLOW_PRODUCTS = [
       { t: 'Melanocortin-independent activity', d: 'Studied for effects that do not depend on classical melanocortin receptor engagement.' },
       { t: 'Preclinical CNS models', d: 'Applied in laboratory research on neuronal survival and adaptation.' }
     ] },
+  // Not a research peptide: a reconstitution accessory. It does not go through
+  // the HPLC-UV/LC-MS/endotoxin panel described for the compounds above, so it
+  // overrides the evidence-panel and documentation-tab claims rather than
+  // inheriting a testing story that was never run on it (see verifyValue,
+  // verifyNote and analysisNote below, read by evidenceRows()/docRows()).
+  // `kind` and `form` correct identityLine(), which otherwise calls every
+  // product a "lyophilized peptide" — this one is neither.
+  // Excluded from avgPurity(): "purity" here means USP water grade, not
+  // peptide potency, and averaging the two would misstate both.
+  { name: 'Bacteriostatic Water', tag: 'Laboratory Supply', cat: 'supplies', purity: 'USP grade', badge:null,
+    kind: 'diluent', form: 'sterile',
+    verifyValue: 'USP-grade water',
+    verifyNote: 'Not run through the HPLC-UV/LC-MS/endotoxin panel described for the peptides above.',
+    analysisNote: 'Not applicable. This is a reconstitution accessory, not an independently tested research peptide.',
+    sizes: [{ mg: '3ml', price: 5, sku: 'GLO-WA3' }, { mg: '10ml', price: 10, sku: 'GLO-WA10' }],
+    blurb: 'Sterile water for reconstituting lyophilized peptides. Preserved with 0.9% benzyl alcohol.',
+    about: [
+      'Bacteriostatic Water is sterile water for injection preserved with 0.9% benzyl alcohol, which is what allows repeated draws from the same vial rather than a single use.',
+      'It is a reconstitution accessory, not a research peptide: nothing here is tested against the HPLC-UV, LC-MS or endotoxin panel described for the compounds above.'
+    ],
+    research: [
+      { t: 'Reconstitution use', d: 'Used to bring a lyophilized peptide vial to a liquid concentration suitable for pipetting in a laboratory setting.' },
+      { t: 'Benzyl alcohol preservation', d: 'The 0.9% benzyl alcohol preservative is what makes a vial suitable for multiple draws rather than one.' }
+    ] },
 ];
 
 // Everything outside the product page still asks for a single p.size / p.price.
@@ -530,8 +554,13 @@ const productInStock = p => p.sizes.some(sizeInStock);
 // One decimal, because that is the precision the certificates report.
 // NOTE: `purity` is still placeholder data (see the header of this file), so
 // this figure is only as true as those stand-ins until the import runs.
+//
+// Excludes the 'supplies' category. Bacteriostatic Water's `purity` states a
+// USP water grade, not peptide potency, and it is not on the same panel the
+// average is built to summarise — folding it in would move a claim about
+// peptide purity with a number that was never measuring that.
 function avgPurity() {
-  const ps = GLOW_PRODUCTS.map(p => parseFloat(p.purity));
+  const ps = GLOW_PRODUCTS.filter(p => p.cat !== 'supplies').map(p => parseFloat(p.purity));
   return (ps.reduce((a, b) => a + b, 0) / ps.length).toFixed(1);
 }
 
@@ -756,10 +785,14 @@ function evidenceRows(p) {
       // ("this vial") true rather than nearly true. `purity` is still
       // placeholder data, flagged at the head of this file: it is derived here
       // rather than typed into the panel precisely so the import corrects it.
+      //
+      // verifyValue/verifyNote override for the rare product this panel does
+      // not describe truthfully as written — Bacteriostatic Water was never
+      // run through this panel, so it does not inherit a claim that it was.
       key: 'verify',
       label: 'Verify',
-      value: (p.purity && `${p.purity} purity`) || '—',
-      note: `${ANALYSIS_SHORT}, by a third-party laboratory with no stake in the result`,
+      value: p.verifyValue || (p.purity && `${p.purity} purity`) || '—',
+      note: p.verifyNote || `${ANALYSIS_SHORT}, by a third-party laboratory with no stake in the result`,
     },
     {
       key: 'document',
@@ -785,7 +818,8 @@ function docRows(p) {
   return [
     { label: 'Compound', value: p.name },
     { label: 'Stated purity', value: p.purity },
-    { label: 'Analysis', value: ANALYSIS_LONG },
+    // analysisNote overrides for the same reason as verifyNote above.
+    { label: 'Analysis', value: p.analysisNote || ANALYSIS_LONG },
     { label: 'Certificate', value: COA_COPY.docLine },
     { label: 'Current lot', value: p.lot || '—' },
     { label: 'Lot analysed', value: (p.tested && analysedOn(p.tested)) || '—' },

@@ -50,6 +50,7 @@ const CAT_LABEL = {
   longevity: 'Longevity Research',
   immune: 'Immune Research',
   neuro: 'Neuropeptide Research',
+  supplies: 'Laboratory Supplies',
 };
 
 /* ---------- helpers ---------- */
