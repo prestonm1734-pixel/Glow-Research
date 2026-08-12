@@ -47,6 +47,9 @@ const CAT_LABEL = {
   tissue: 'Tissue Research',
   metabolic: 'Metabolic Research',
   cognitive: 'Cognitive Research',
+  longevity: 'Longevity Research',
+  immune: 'Immune Research',
+  neuro: 'Neuropeptide Research',
 };
 
 /* ---------- helpers ---------- */
@@ -123,6 +126,7 @@ function productJsonLd(p, url) {
     '@type': 'Offer',
     name: `${p.name} ${s.mg}`,
     url,
+    sku: s.sku,
     price: (onSaleNow() ? salePrice(s.price) : s.price).toFixed(2),
     priceCurrency: 'USD',
     // Read from the catalog, same field the buy box reads. Google surfaces

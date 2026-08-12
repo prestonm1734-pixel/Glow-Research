@@ -18,6 +18,9 @@
     tissue: 'Tissue Research',
     metabolic: 'Metabolic Research',
     cognitive: 'Cognitive Research',
+    longevity: 'Longevity Research',
+    immune: 'Immune Research',
+    neuro: 'Neuropeptide Research',
   };
 
   let product = null;
