@@ -145,7 +145,10 @@ const COA_COPY = COAS_PUBLISHED ? {
 // confirmed against the supplier's specification.
 const GLOW_PRODUCTS = [
   { name: 'BPC-157', tag: 'Tissue Research', cat: 'tissue', purity: '99.8%', badge:'Best Seller',
-    sizes: [{ mg: '5mg', price: 11, sku: 'GLO-BC5' }, { mg: '10mg', price: 18, sku: 'GLO-BC10' }],
+    sizes: [
+      { mg: '5mg', price: 11, sku: 'GLO-BC5', image: 'assets/products/bpc-157-5mg.webp' },
+      { mg: '10mg', price: 18, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg.webp' },
+    ],
     blurb: 'A synthetic pentadecapeptide derived from a protein found in gastric juice. Studied in vitro for angiogenic signalling.',
     about: [
       'BPC-157 is a synthetic pentadecapeptide: a fifteen amino acid sequence corresponding to a partial fragment of body protection compound, a protein identified in gastric juice. It is supplied lyophilized.',
@@ -169,7 +172,10 @@ const GLOW_PRODUCTS = [
       { t: 'Vascular models', d: 'Studied alongside endothelial cultures examining the formation of new vessel structures.' }
     ] },
   { name: 'BPC-157 / TB-500 Blend', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
-    sizes: [{ mg: '10mg', price: 25, sku: 'GLO-BB10' }, { mg: '20mg', price: 35, sku: 'GLO-BB20' }],
+    sizes: [
+      { mg: '10mg', price: 25, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg.webp' },
+      { mg: '20mg', price: 35, sku: 'GLO-BB20' },
+    ],
     blurb: 'A combined BPC-157 and TB-500 formulation. Supplied for research using both peptides together in one vial.',
     about: [
       'This blend combines BPC-157 and TB-500 in a single vial (5/5 mg in the 10mg size, 10/10 mg in the 20mg size), formulated for laboratories that already run both peptides together rather than reconstituting them separately.',
@@ -312,7 +318,6 @@ const GLOW_PRODUCTS = [
     ] },
   { name: 'Tirzepatide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', badge:'New',
     sizes: [{ mg: '10mg', price: 25, sku: 'GLO-T10' }, { mg: '30mg', price: 55, sku: 'GLO-T30' }],
-    image: 'assets/products/glp3-rt-vial.webp',
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
     about: [
       'Tirzepatide is a dual receptor co-agonist peptide, active at both the GIP and the GLP-1 receptor from a single molecule.',
@@ -324,7 +329,10 @@ const GLOW_PRODUCTS = [
       { t: 'Receptor crosstalk', d: 'Applied in models examining how engaging both receptors at once differs from either alone.' }
     ] },
   { name: 'Retatrutide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', badge:'Trending',
-    sizes: [{ mg: '10mg', price: 30, sku: 'GLO-RT10' }, { mg: '30mg', price: 60, sku: 'GLO-RT30' }],
+    sizes: [
+      { mg: '10mg', price: 30, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg.webp' },
+      { mg: '30mg', price: 60, sku: 'GLO-RT30', image: 'assets/products/retatrutide-30mg.webp' },
+    ],
     blurb: 'A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile.',
     about: [
       'Retatrutide is a synthetic peptide agonist active at three receptors from one molecule: the GIP receptor, the GLP-1 receptor and the glucagon receptor.',
@@ -517,12 +525,17 @@ const GLOW_PRODUCTS = [
     ] },
 ];
 
-// Everything outside the product page still asks for a single p.size / p.price.
-// Derive them from the smallest size rather than repeating them in the literal,
-// so the "from" price on a card can never drift from the picker on the page.
+// Everything outside the product page still asks for a single p.size / p.price
+// / p.image. Derive them from the smallest size rather than repeating them in
+// the literal, so the "from" price (and photo) on a card can never drift from
+// the picker on the page. A product-level `image` some products still carry
+// as a plain default wins over a size's own — sizes[].image is for the case
+// where the label itself differs by mg (a 5mg vial shot separately from a
+// 10mg one), not the common case of one photo for the whole product.
 GLOW_PRODUCTS.forEach(p => {
   p.size = p.sizes[0].mg;
   p.price = p.sizes[0].price;
+  p.image = p.image || p.sizes[0].image;
 });
 
 // ---------------------------------------------------------------------------

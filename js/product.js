@@ -156,18 +156,31 @@
     $('pdName').textContent = p.name;
     $('pdVialName').textContent = p.name;
 
-    // a handful of products ship with a real product photo; everything else
-    // falls back to the illustrated CSS vial so the page never shows a gap
-    if (p.image) {
-      $('pdPhoto').src = p.image;
-      $('pdPhoto').alt = `${p.name} vial`;
+    renderPhoto(p, size());
+    renderCoa(p);
+  }
+
+  // A handful of products ship with a real product photo; everything else
+  // falls back to the illustrated CSS vial so the page never shows a gap.
+  // Some of those photos are shot per size, since the label itself prints a
+  // different mg — sizes[].image overrides the product's own p.image (already
+  // defaulted to the first size's photo in js/products-data.js), so switching
+  // the mg picker swaps the vial shown along with everything else that reads
+  // the selected size.
+  function renderPhoto(p, s) {
+    const img = (s && s.image) || p.image;
+    if (img) {
+      $('pdPhoto').src = img;
+      $('pdPhoto').alt = `${p.name}${s ? ' ' + s.mg : ''} vial`;
       $('pdPhoto').hidden = false;
       $('pdVialArt').hidden = true;
       // the stage turns light so the shot's own white background disappears
       document.querySelector('.pd-visual').classList.add('has-photo');
+    } else {
+      $('pdPhoto').hidden = true;
+      $('pdVialArt').hidden = false;
+      document.querySelector('.pd-visual').classList.remove('has-photo');
     }
-
-    renderCoa(p);
   }
 
   /* ================= certificate =================
@@ -322,6 +335,7 @@
     const s = size();
 
     renderPrice();
+    renderPhoto(product, s);
     // follows the mg picker: the line names the vial actually selected
     $('pdIdentity').textContent = identityLine(product, s);
     $('pdVialMg').textContent = s.mg.toUpperCase();
