@@ -112,67 +112,95 @@
 }
 </script>
 <style>
-  /* One line under the title, so it reads better balanced than ragged.
-     Scoped to this page by living in this block. */
-  .lp-hero .lp-lede{ text-wrap: balance; }
+  /* ---------- hero ----------
+     The page had no imagery at all, which is the whole reason it read as a
+     document rather than as part of this site. Every other surface here leads
+     with the product: the homepage bleeds the trio shot off its right edge
+     under a masked gradient, and that is the language this page is written in
+     too, composed differently so the two are not the same picture twice. Here
+     the copy sits above and the vials sit under it, wide, fading out on every
+     side into the black rather than sitting in a box. */
+  .pr-hero{ position:relative; overflow:hidden; padding-bottom: clamp(30px, 4vw, 54px); }
+  .pr-hero > .container{ position:relative; z-index:1; }
+  /* One line under the title, so it reads balanced rather than ragged. */
+  .pr-hero .lp-lede{ text-wrap: balance; }
+
+  /* mix-blend-mode: screen is the whole treatment, and it is the exact dual of
+     the multiply the product photos use against the light catalog surface.
+     The shot is lit on a pure black backdrop and the page is #0a0a0a, so laid
+     down normally it reads as a rectangle four levels darker than the section
+     it sits in: measured 0x04 inside against 0x0a outside, which is subtle per
+     pixel and unmistakable as an edge. Screening it against the page leaves
+     black contributing nothing at all, so the backdrop becomes the page
+     exactly and only the glass and the labels lift out of it. No mask, no
+     fade, no boundary to hide, at any viewport width.
+
+     Oversized past the container on purpose: the vials should feel like they
+     carry on past the frame rather than sit inside one. */
+  .pr-hero-img{
+    position:relative; z-index:0; display:block;
+    width: min(1220px, 112vw); max-width:none; height:auto;
+    margin: clamp(6px, 2.5vw, 30px) auto calc(-1 * clamp(20px, 5vw, 68px));
+    mix-blend-mode: screen;
+  }
+  /* The same soft light the homepage hero sits in, one blur instead of three:
+     flat black behind big type is what made this page feel unfinished. */
+  .pr-glow{
+    position:absolute; z-index:0; pointer-events:none;
+    left:50%; top: 30%; transform: translateX(-50%);
+    width: min(820px, 96vw); height: 520px; border-radius:50%;
+    background: #3a3a38; filter: blur(130px); opacity:.11;
+  }
 
   /* ---------- the chain ----------
-     Six steps, read top to bottom, numbered, on one continuous rail. The rail
-     is the page: it makes the six read as a chain of custody rather than six
-     selling points.
+     Six steps, read top to bottom. Each is a number, a title, one sentence,
+     who performed it, and an offer of more. Nothing else, and no section
+     heading or introduction above them: the steps are the content, so they are
+     the largest thing here.
 
-     There is no section heading above it and no paragraph introducing it. The
-     steps are the content, so they are the largest thing in the section, and
-     an eyebrow, a headline and a lede stacked on top of them only delayed
-     reading the thing they described. Each step is a number, a title, one
-     sentence, who performed it, and an offer of more. Nothing else.
+     The numbers used to be 46px hairline squares holding an 0.8rem glyph, which
+     is a wireframe marker, and they were the faintest thing on a page about
+     sequence. They are now set large and quiet, which is the whole treatment:
+     scale carries the order, so no box has to.
+
+     The rail is gone with them. A full-width rule above each step does the same
+     work of binding the six into one set, and it reaches the edges of the block
+     rather than threading a thin line through empty space.
 
      This page sits on the site's dark surface (.lp-page), so everything here
      is light-on-dark and takes its colours from the shared tokens. */
-  /* Narrow on purpose. The measure is set by the sentence, not by the
-     container: at the page's full width a one-line step became a short line
-     of text floating in the left third of an empty band. */
   .pr-chain{
     list-style:none; margin: 0 auto; padding: 0;
-    max-width: 660px; position:relative;
-  }
-  /* Drawn once on the list rather than six times on the steps: it is one line,
-     so it is one element. Inset top and bottom so it starts and ends inside
-     the first and last markers instead of running off into the padding. */
-  .pr-chain::before{
-    content:''; position:absolute; left: 23px; top: 24px; bottom: 24px;
-    width:1px; background: rgba(255,255,255,.13);
+    max-width: 880px;
   }
   .pr-step{
-    display:grid; grid-template-columns: 48px minmax(0,1fr);
-    gap: 0 clamp(22px, 3vw, 36px);
-    padding-bottom: clamp(44px, 5.5vw, 74px);
+    display:grid; grid-template-columns: clamp(72px, 8vw, 112px) minmax(0,1fr);
+    gap: 0 clamp(20px, 3vw, 40px);
+    padding: clamp(30px, 3.6vw, 46px) 0;
+    border-top: 1px solid var(--border);
   }
-  .pr-step:last-child{ padding-bottom: 0; }
+  .pr-step:last-child{ border-bottom: 1px solid var(--border); }
 
-  /* The marker sits on the rail and hides the line behind it, which is why it
-     carries an opaque background rather than a transparent one. */
   .pr-num{
-    position:relative; z-index:1;
-    width:46px; height:46px; display:flex; align-items:center; justify-content:center;
-    border:1px solid var(--border); background: var(--surface);
-    font-family:'JetBrains Mono', monospace; font-size:.8rem; font-weight:600;
-    letter-spacing:.04em; color: var(--text);
+    font-family:'Space Grotesk', sans-serif;
+    font-size: clamp(1.6rem, 2.9vw, 2.4rem); font-weight:400;
+    letter-spacing:-.03em; line-height:1; font-variant-numeric: tabular-nums;
+    color: rgba(255,255,255,.26);
   }
 
-  .pr-body{ padding-top: 2px; }
+  .pr-body{ padding-top: 1px; }
   /* h2, not h3: with the section heading gone these are the page's sections,
      and the heading outline should say so. */
   .pr-t{
     font-family:'Space Grotesk', sans-serif;
-    font-size: clamp(1.3rem, 2vw, 1.62rem); font-weight:600;
-    letter-spacing:-.025em; line-height:1.15; margin: 0 0 12px; color: var(--text);
+    font-size: clamp(1.34rem, 2.2vw, 1.78rem); font-weight:600;
+    letter-spacing:-.028em; line-height:1.14; margin: 0 0 12px; color: var(--text);
   }
   /* The whole step for most readers: everything else is behind the
      disclosure, so this line carries it and is sized to be read, not skimmed. */
   .pr-lead{
-    margin: 0; color: var(--text-dim);
-    font-size: clamp(1.02rem, 1.35vw, 1.13rem); line-height:1.6;
+    margin: 0; max-width: 56ch; color: var(--text-dim);
+    font-size: clamp(1.03rem, 1.35vw, 1.15rem); line-height:1.62;
   }
 
   /* Who actually performs the step. Stated on every step on purpose: the
@@ -181,7 +209,7 @@
      gave the least important line on the step the loudest treatment. */
   .pr-meta{
     display:flex; flex-wrap:wrap; align-items:baseline; gap: 2px 22px;
-    margin-top: 18px;
+    margin-top: 20px;
   }
   .pr-who{ font-size:.87rem; line-height:1.5; color: var(--text-dimmer); }
   .pr-who b{ color: var(--text-dim); font-weight:500; }
@@ -197,17 +225,18 @@
   }
   .pr-meta .disc-body p:last-child{ margin-bottom: 0; }
 
-  /* The chain now ends the page, so the button follows it directly. It needs
-     more air than the shared 34px, or it reads as part of step six rather
-     than as what to do once the six are read. */
+  /* The chain ends the page, so the button follows it directly. It needs more
+     air than the shared 34px, or it reads as part of step six rather than as
+     what to do once the six are read. */
   .pr-chain + .lp-actions{ margin-top: clamp(46px, 5.5vw, 68px); }
 
   @media (max-width: 720px){
-    .pr-chain::before{ left: 19px; top: 20px; bottom: 20px; }
-    .pr-step{ grid-template-columns: 40px minmax(0,1fr); }
-    .pr-num{ width:40px; height:40px; font-size:.72rem; }
+    /* The number moves above the title rather than shrinking into a column
+       too narrow to hold it: a 2.4rem numeral beside a wrapping heading on a
+       390px screen leaves the heading about twelve characters. */
+    .pr-step{ grid-template-columns: minmax(0,1fr); gap: 10px; }
+    .pr-num{ font-size: 1.15rem; }
   }
-
 </style>
 
 </head>
@@ -281,16 +310,26 @@
      The title is deliberately not "Our Manufacturing Process". Glow does not
      manufacture, and a title that says otherwise claims control over a
      facility we do not own. -->
-<section class="lp-hero">
+<section class="lp-hero pr-hero">
+  <div class="pr-glow" aria-hidden="true"></div>
   <div class="container">
     <h1>From source<br /><span class="outline">to shipment.</span></h1>
     <p class="lp-lede">
       Six steps. Four are performed by someone other than us, and we name them.
     </p>
   </div>
+  <!-- Decorative in the sense that it carries no information the copy does
+       not, but it is the product this page is about, so it is described. -->
+  <img class="pr-hero-img" src="assets/vial-trio-black.jpg" width="1672" height="941"
+       alt="Three Glow Research peptide vials, GLP3-RT, Tesamorelin and GHK-CU, on a black backdrop" />
 </section>
 
-<section class="lp-section tint">
+<!-- No .tint. The alternating band put a hard horizontal seam directly under
+     the vials, which is the one thing the screen blend above exists to avoid:
+     the shot has no edge of its own, so it should not be given one by the
+     section it ends in. The chain carries its own hairlines, so it does not
+     need a change of background to be separated from the hero. -->
+<section class="lp-section">
   <div class="container">
 
     <ol class="pr-chain reveal">
