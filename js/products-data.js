@@ -513,7 +513,7 @@ const GLOW_PRODUCTS = [
     verifyValue: 'USP-grade water',
     verifyNote: 'Not run through the HPLC-UV/LC-MS/endotoxin panel described for the peptides above.',
     analysisNote: 'Not applicable. This is a reconstitution accessory, not an independently tested research peptide.',
-    sizes: [{ mg: '3ml', price: 15, sku: 'GLO-WA3' }, { mg: '10ml', price: 25, sku: 'GLO-WA10' }],
+    sizes: [{ mg: '3ml', price: 9, sku: 'GLO-WA3' }, { mg: '10ml', price: 15, sku: 'GLO-WA10' }],
     blurb: 'Sterile water for reconstituting lyophilized peptides. Preserved with 0.9% benzyl alcohol.',
     about: [
       'Bacteriostatic Water is sterile water for injection preserved with 0.9% benzyl alcohol, which is what allows repeated draws from the same vial rather than a single use.',
