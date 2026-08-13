@@ -1398,6 +1398,49 @@ console.log('\ncatalog shape');
  *     in the drawer would keep saying $15 after the catalog moved, which is a
  *     price the site quotes and does not honour.
  * ------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+ * Catalog card prices. A card shows one figure for a product that may have
+ * two sizes, and that figure is the cheaper one. Bare, it reads as the price,
+ * so a $105 card could open onto a $200 size. "From" is what makes it a floor
+ * rather than a quote — which means the label has to appear on exactly the
+ * products that have a range, and the number under it has to be the actual
+ * bottom of that range. Both are checked against the catalog rather than
+ * against the card's own arithmetic.
+ * ------------------------------------------------------------------------- */
+console.log('\ncatalog card prices');
+{
+  const wrong = [];
+  GLOW_PRODUCTS.forEach((p, i) => {
+    const html = productCardHtml(p, i);
+    const sellable = p.sizes.filter(sizeInStock);
+    const priced = sellable.length ? sellable : p.sizes;
+    const floor = Math.min(...priced.map(s => s.price));
+    const isRange = new Set(priced.map(s => s.price)).size > 1;
+
+    if (html.includes('price-from') !== isRange) {
+      wrong.push(`${p.name}: ${isRange ? 'needs' : 'must not have'} a From label`);
+    }
+    // The rendered figure has to be the floor, not merely some catalog price.
+    // Anchored to the end of the .price span so the struck list price in the
+    // sale branch cannot satisfy it.
+    const shown = /([$][0-9.,]+)\s*<\/span>/.exec(html);
+    const want = fmtPrice(salePrice(floor));
+    if (!shown || shown[1] !== want) {
+      wrong.push(`${p.name}: card shows ${shown ? shown[1] : 'no price'}, cheapest sellable size is ${want}`);
+    }
+  });
+  ok(`every card prices from its cheapest sellable size (${GLOW_PRODUCTS.length} products)`,
+    wrong.length === 0, wrong.join('\n          '));
+
+  // The generated page has to carry what the function produces, or the served
+  // markup and the hydrated markup disagree about what a product costs.
+  const baked = read('peptides.html');
+  const expected = GLOW_PRODUCTS.filter((p, i) => productCardHtml(p, i).includes('price-from')).length;
+  ok('the baked catalog carries the same From labels',
+    (baked.match(/price-from/g) || []).length === expected,
+    `peptides.html has ${(baked.match(/price-from/g) || []).length}, expected ${expected} — run node tools/build.js`);
+}
+
 console.log('\ncart upsell');
 {
   const cart = read('js/cart.js');

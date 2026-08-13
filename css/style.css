@@ -702,6 +702,12 @@ button[disabled].si-forgot{ cursor: progress; }
   color:#fff; font-weight:600; letter-spacing:-.01em;
   font-variant-numeric: tabular-nums; margin-bottom:14px;
 }
+/* Sized and coloured to read as a qualifier on the number rather than part
+   of it, so the price is still the thing the eye lands on. */
+.price-from{
+  font-size: 0.72rem; font-weight:500; color:#8a8a86;
+  font-family:'Inter',sans-serif; letter-spacing:.01em;
+}
 /* the struck list price sits a step back from the live one — dimmer, lighter
    and a size down, so the eye lands on what you actually pay */
 .price-was{
@@ -868,6 +874,7 @@ html:not(.js) .faq-a{ max-height: none; }
   .product-card h3{ font-size: .92rem; margin: 3px 0 7px; }
   .card-divider{ margin: 2px 0 10px; }
   .price{ font-size: 1.18rem; margin-bottom: 10px; }
+  .price-from{ font-size: .66rem; }
   .add-btn{ height: 38px; font-size: .78rem; }
   /* Both badges cannot coexist on a half-width tile: "recovery" + "Best
      Seller" measures 139px against a 130px card at 320px, so they collide.
