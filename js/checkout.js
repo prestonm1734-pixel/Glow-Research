@@ -48,7 +48,7 @@
   const STRIPE_APPEARANCE = {
     theme: 'flat',
     variables: {
-      fontFamily: '"Inter", system-ui, sans-serif',
+      fontFamily: '"Sora", system-ui, sans-serif',
       fontSizeBase: '15px',
       colorText: '#0a0a0a',
       colorTextPlaceholder: '#86868b',

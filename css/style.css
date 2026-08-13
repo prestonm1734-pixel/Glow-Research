@@ -22,19 +22,11 @@
   --grad-alt: linear-gradient(120deg, #ffffff, #8a8a87);
 
   /* The display face: every page title, price, stat numeral and badge.
-     Named once because it was previously written out as 'Space Grotesk' in
-     thirty-odd places across the stylesheet and fourteen page-level <style>
-     blocks, so changing it meant finding all of them.
-
-     Helvetica Neue cannot be served: it is Monotype-licensed, is not on
-     Google Fonts, and self-hosting it needs a licence we do not hold. So this
-     is a system-first stack rather than a webfont. Apple platforms have the
-     real thing installed and use it. Helvetica catches the Linux desktops
-     where fontconfig aliases it to Nimbus Sans, a genuine Helvetica clone.
-     Inter sits ahead of Arial for everyone else because it is the closest
-     thing on the page to a neo-grotesque of this kind, and it is already
-     being downloaded for body copy, so the fallback costs no extra request. */
-  --font-display: 'Helvetica Neue', Helvetica, 'Inter', Arial, sans-serif;
+     Named once so changing it means changing one line, not the thirty-odd
+     places across the stylesheet and page-level <style> blocks that set it
+     directly. Sora is the fallback: it is already being downloaded for body
+     copy, so degrading to it before a system sans costs no extra request. */
+  --font-display: 'Space Grotesk', 'Sora', Arial, sans-serif;
 
   --radius: 20px;
   --radius-sm: 12px;
@@ -49,7 +41,7 @@ body{
   margin:0;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Sora', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -518,7 +510,7 @@ button[disabled].si-forgot{ cursor: progress; }
   appearance:none; -webkit-appearance:none;
   padding: 12px 40px 12px 16px; border-radius: 0;
   border:1px solid var(--border); background: transparent; color: var(--text);
-  font-family:'Inter', sans-serif; font-size:0.9rem; font-weight:600;
+  font-family:'Sora', sans-serif; font-size:0.9rem; font-weight:600;
   letter-spacing:-0.005em; cursor:pointer;
   transition: border-color .2s ease, background .2s ease;
 }
@@ -545,7 +537,7 @@ button[disabled].si-forgot{ cursor: progress; }
 .chip{
   padding: 12px 22px; border-radius: 0; border:1px solid var(--border);
   background: transparent; color: var(--text-dim);
-  font-family:'Inter', sans-serif; font-size:0.9rem; font-weight:600;
+  font-family:'Sora', sans-serif; font-size:0.9rem; font-weight:600;
   letter-spacing:-0.005em; cursor:pointer;
   transition: background .2s ease, color .2s ease, border-color .2s ease;
 }
@@ -733,7 +725,7 @@ button[disabled].si-forgot{ cursor: progress; }
    little life to it */
 .add-btn{
   width:100%; height:44px; border-radius:0; border:1px solid #fff;
-  background:#fff; color:#0a0a0a; font-family:'Inter', sans-serif; font-size:.85rem; font-weight:700;
+  background:#fff; color:#0a0a0a; font-family:'Sora', sans-serif; font-size:.85rem; font-weight:700;
   cursor:pointer; display:flex; align-items:center; justify-content:center;
   transition: background .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
   /* footer is a flex column now, so a taller neighbour's title no longer
@@ -825,7 +817,7 @@ html:not(.js) .faq-a{ max-height: none; }
 .site-footer .logo{ color: var(--text); }
 .site-footer .spark{ color: var(--text); }
 .footer-top{ display:grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; margin: 44px 0 50px; }
-.footer-col h4{ font-family:'Inter',sans-serif; font-size:0.8rem; text-transform:uppercase; letter-spacing:.08em; color: var(--text-dimmer); margin-bottom: 16px; }
+.footer-col h4{ font-family:'Sora',sans-serif; font-size:0.8rem; text-transform:uppercase; letter-spacing:.08em; color: var(--text-dimmer); margin-bottom: 16px; }
 .footer-col a{ display:block; font-size:0.9rem; color: var(--text-dim); margin-bottom: 12px; transition: color .2s; }
 .footer-col a:hover{ color: var(--pink-soft); }
 
@@ -833,7 +825,7 @@ html:not(.js) .faq-a{ max-height: none; }
   border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
   padding: 26px 0 30px; margin-bottom: 26px;
 }
-.disclaimer h5{ font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:.08em; font-size:0.78rem; color: var(--pink-soft); margin-bottom:12px; }
+.disclaimer h5{ font-family:'Sora',sans-serif; text-transform:uppercase; letter-spacing:.08em; font-size:0.78rem; color: var(--pink-soft); margin-bottom:12px; }
 .disclaimer p{ font-size: 0.78rem; line-height:1.8; color: var(--text-dimmer); }
 
 .footer-bottom{ display:flex; justify-content:center; flex-wrap:wrap; gap:8px; font-size:0.78rem; color: var(--text-dimmer); }
@@ -1004,7 +996,7 @@ html:not(.js) .faq-a{ max-height: none; }
    letter-spacing to fight the words apart */
 .lp-eyebrow, .lp-page .eyebrow{
   display:block; margin-bottom: 18px;
-  font-family:'Inter', system-ui, sans-serif; font-size:.98rem; font-weight:500;
+  font-family:'Sora', system-ui, sans-serif; font-size:.98rem; font-weight:500;
   letter-spacing:0; text-transform:none; color: var(--text-dim);
 }
 .lp-hero h1{
