@@ -67,6 +67,11 @@ const PAGE_META = {
     title: t('Wholesale'),
     desc: 'Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day.',
   },
+  'coa.html': {
+    name: 'Certificate of Analysis',
+    title: t('Certificate of Analysis'),
+    desc: 'Certificates of analysis for Glow Research peptides.',
+  },
   'contact.html': {
     name: 'Contact Us',
     title: t('Contact Us'),
