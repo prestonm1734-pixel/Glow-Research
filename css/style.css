@@ -382,7 +382,7 @@ button[disabled].si-forgot{ cursor: progress; }
   margin: 0 0 32px;
 }
 @media (max-width: 560px){
-  .hero-sub{ font-size: 0.8rem; }
+  .hero-sub{ font-size: 0.87rem; }
 }
 /* hero rhythm runs on an 8px scale end to end: eyebrow 16 → title 24 →
    sub 32 → cta 24 → rule → stats 24. The gaps were previously 20/20/30/30/22,
