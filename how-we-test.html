@@ -8,20 +8,20 @@
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
 <title>How We Test | Glow Research</title>
-<meta name="description" content="Every batch is tested by an independent certified laboratory: purity, identity, sterility, endotoxin and chemical contaminants. Five tests, every batch, no exceptions." />
+<meta name="description" content="Every lot is tested by an independent laboratory before it reaches our catalog. Seven checks: purity, identity, net content, endotoxin, appearance, heavy metals, and lot archival." />
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://glowresearch.shop/how-we-test.html" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
 <meta property="og:title" content="How We Test" />
-<meta property="og:description" content="Every batch is tested by an independent certified laboratory: purity, identity, sterility, endotoxin and chemical contaminants. Five tests, every batch, no exceptions." />
+<meta property="og:description" content="Every lot is tested by an independent laboratory before it reaches our catalog. Seven checks: purity, identity, net content, endotoxin, appearance, heavy metals, and lot archival." />
 <meta property="og:url" content="https://glowresearch.shop/how-we-test.html" />
 <meta property="og:image" content="https://glowresearch.shop/assets/molecule-black.jpg" />
 <meta property="og:image:width" content="740" />
 <meta property="og:image:height" content="415" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="How We Test" />
-<meta name="twitter:description" content="Every batch is tested by an independent certified laboratory: purity, identity, sterility, endotoxin and chemical contaminants. Five tests, every batch, no exceptions." />
+<meta name="twitter:description" content="Every lot is tested by an independent laboratory before it reaches our catalog. Seven checks: purity, identity, net content, endotoxin, appearance, heavy metals, and lot archival." />
 <meta name="twitter:image" content="https://glowresearch.shop/assets/molecule-black.jpg" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,7 +41,7 @@
   "@id": "https://glowresearch.shop/how-we-test.html#webpage",
   "url": "https://glowresearch.shop/how-we-test.html",
   "name": "How We Test",
-  "description": "Every batch is tested by an independent certified laboratory: purity, identity, sterility, endotoxin and chemical contaminants. Five tests, every batch, no exceptions.",
+  "description": "Every lot is tested by an independent laboratory before it reaches our catalog. Seven checks: purity, identity, net content, endotoxin, appearance, heavy metals, and lot archival.",
   "isPartOf": {
     "@id": "https://glowresearch.shop/#website"
   },
@@ -75,11 +75,18 @@
      read first, so it reads last and small. */
   .hw-hero{ padding-bottom: clamp(40px, 5vw, 64px); }
   .hw-hero-grid{
-    display:grid; grid-template-columns: 1.05fr .95fr;
-    gap: clamp(32px, 5vw, 64px); align-items:center;
+    display:grid; grid-template-columns: 1.3fr .7fr;
+    gap: clamp(28px, 4vw, 52px); align-items:center;
     text-align:left;
   }
-  .hw-hero-grid h1{ margin-left:0; margin-right:0; max-width: 12ch; }
+  /* The shared hero h1 sizes for a full-width single column; with a photo
+     taking part of the row, that size wrapped "Seven checks." onto two
+     lines by itself. A size down and a wider text column keep the
+     two-line rhythm the headline is written for. */
+  .hw-hero-grid h1{
+    margin-left:0; margin-right:0; max-width: 15ch;
+    font-size: clamp(2.2rem, 4.2vw, 3.7rem);
+  }
   .hw-hero-art{
     border:1px solid var(--border); overflow:hidden;
     aspect-ratio: 1536 / 1024; background:#000;
@@ -125,60 +132,38 @@
     .hw-figs{ gap: 24px 36px; }
   }
 
-  /* The rows follow the hero directly with no second heading above them —
-     the hero already said what this page is. */
+  /* The list follows the hero directly with a heading of its own this time —
+     seven items need one, five read as a continuation, seven read as a
+     second subject. */
   .hw-section{ padding-top: clamp(20px, 3vw, 36px); }
-
-  /* ---------- the five tests, as a spec sheet ----------
-     Five cards across a 1440 viewport left each one about 250px wide and
-     broke every sentence into three-word lines. Rows give the sentence its
-     full measure. But a plain list read as thin, so this leans further into
-     what it actually is: a documented test panel, not a numbered blurb list.
-     A column head labels Method and Analysis like a report would, the
-     numerals are set large and tabular so they read as line items, and a
-     hairline accent lights on the left edge as each row scrolls in — the
-     one piece of motion earned by five rows that otherwise sit still. */
-  .hw-rows{ border-top:1px solid var(--border-strong, var(--border)); }
-
-  .hw-table-head{
-    display:grid; grid-template-columns: 68px 230px 1fr;
-    gap: clamp(16px, 2.4vw, 34px);
-    padding: 0 0 12px; margin-top: 22px;
-    font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:.12em;
-    font-size:.66rem; font-weight:700; color: var(--text-dimmer);
+  .hw-head{ max-width: 60ch; margin-bottom: clamp(28px, 4vw, 42px); }
+  .hw-head h2{
+    font-family:'Space Grotesk', sans-serif; font-size: clamp(1.6rem, 3vw, 2.15rem);
+    font-weight:600; letter-spacing:-.02em; color: var(--text); margin: 6px 0 0;
   }
 
-  .hw-row{
-    position:relative;
-    display:grid; grid-template-columns: 68px 230px 1fr;
-    gap: clamp(16px, 2.4vw, 34px); align-items:start;
-    padding: clamp(22px, 2.6vw, 30px) 0 clamp(22px, 2.6vw, 30px) 18px;
-    margin-left: -18px;
+  /* ---------- the seven checks, as an icon list ----------
+     A five-column spec-sheet table read thin at seven rows: an icon square,
+     a bold name and one sentence carries better once there are more of them
+     to read. Icon first because a reader scanning down the list recognises
+     the shape of a method before the label registers. */
+  .hw-list{ border-top:1px solid var(--border); }
+  .hw-item{
+    display:grid; grid-template-columns: 52px 1fr;
+    gap: clamp(16px, 2.4vw, 26px); align-items:start;
+    padding: clamp(20px, 2.4vw, 26px) 0;
     border-bottom:1px solid var(--border);
-    border-left: 2px solid transparent;
-    transition: border-left-color .3s var(--lp-ease, ease);
   }
-  .hw-row:hover,
-  .hw-row:focus-within{ border-left-color: var(--pink-soft); }
-
-  .hw-num{
-    font-family:'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
-    font-size:1.3rem; font-weight:600; line-height:1;
-    color: var(--text-dimmer); letter-spacing:0; padding-top:2px;
+  .hw-icon{
+    display:flex; align-items:center; justify-content:center;
+    width:44px; height:44px; border:1px solid var(--border);
+    color: var(--text-dim); flex-shrink:0;
   }
-  .hw-method{
-    font-family:'JetBrains Mono', monospace; font-size:.92rem; font-weight:600;
-    letter-spacing:.01em; color: var(--text); display:block; margin-bottom:7px;
+  .hw-item h3{
+    font-family:'Space Grotesk', sans-serif; font-size:1.08rem; font-weight:600;
+    letter-spacing:-.01em; color: var(--text); margin: 0 0 6px;
   }
-  .hw-answers{
-    font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:.1em;
-    font-size:.62rem; font-weight:700; color: var(--pink-soft);
-  }
-  .hw-row h3{
-    font-family:'Space Grotesk', sans-serif; font-size:1.14rem; font-weight:600;
-    letter-spacing:-.01em; color: var(--text); margin: 0 0 8px;
-  }
-  .hw-row p{ font-size:.97rem; line-height:1.7; color: var(--text-dim); margin:0; max-width: 60ch; }
+  .hw-item p{ font-size:.96rem; line-height:1.65; color: var(--text-dim); margin:0; max-width: 62ch; }
 
   /* One button on its own does not need a full section's padding at both
      ends, which left it floating in an empty band. */
@@ -186,12 +171,9 @@
   .hw-cta .lp-actions{ margin:0; }
 
   @media (max-width: 900px){
-    /* the number joins the method line rather than taking a column of its own */
-    .hw-table-head{ grid-template-columns: 30px 1fr; }
-    .hw-table-head span:last-child{ display:none; }
-    .hw-row{ grid-template-columns: 30px 1fr; gap: 12px 14px; padding-left: 14px; margin-left: -14px; }
-    .hw-row > div:last-child{ grid-column: 2; }
-    .hw-num{ font-size:1.05rem; }
+    .hw-item{ grid-template-columns: 40px 1fr; gap: 14px; }
+    .hw-icon{ width:36px; height:36px; }
+    .hw-icon svg{ width:16px; height:16px; }
   }
 </style>
 
@@ -261,23 +243,23 @@
   <div class="container hw-hero-grid">
     <div>
       <span class="lp-eyebrow hw-eyebrow">Quality &amp; Testing</span>
-      <h1>Five tests.<br /><span class="outline">Every batch.</span></h1>
+      <h1>Seven checks.<br /><span class="outline">Every batch.</span></h1>
       <p class="hw-lede">
         Every lot is tested by an independent laboratory before it reaches
         our catalog.
       </p>
       <p class="hw-fine">
         <!-- One line on purpose: a wrap would break the verbatim match. -->
-        HPLC-UV for purity, LC-MS for identity, sterility testing, endotoxin testing by LAL assay under USP chapter 85, and chemical contaminant screening.
+        reverse-phase HPLC-UV for purity, LC-MS for identity, net peptide content, endotoxin testing by LAL assay under USP chapter 85, appearance and solubility inspection, heavy metals screening, and lot archival linking every batch to its certificate.
       </p>
       <!-- Three figures pulled straight from the paragraph above rather than
-           asserted new: the count of assays actually documented, and the two
-           named methods that cover four of the five. Nothing here says
-           anything the fine print does not already say. -->
+           asserted new: the count of checks actually documented, and two of
+           the named methods. Nothing here says anything the fine print does
+           not already say. -->
       <div class="hw-figs">
         <div class="hw-fig">
-          <span class="hw-fig-num">05</span>
-          <p>Independent assays</p>
+          <span class="hw-fig-num">07</span>
+          <p>Independent checks</p>
         </div>
         <div class="hw-fig">
           <span class="hw-fig-num">HPLC + LC-MS</span>
@@ -295,73 +277,79 @@
   </div>
 </section>
 
-<!-- Spec-sheet register, not consumer copy. A laboratory buyer already knows
-     what an endotoxin test is; the previous draft explained it to them anyway
-     ("what bacteria may have left behind"), which reads as retail, not
-     institutional. Each row keeps the same three-part shape -- method,
-     category, one-sentence result -- but the sentence now states what the
-     assay does rather than narrating it. -->
+<!-- Icon list, not a spec-sheet table: seven items read faster as an icon,
+     a bold name, and one sentence than as a five-column table would have
+     read at seven rows. Each sentence states what the check does, not what
+     it means for a reader to trust it -- a laboratory buyer already knows
+     what an endotoxin assay is. -->
 <section class="lp-section hw-section">
   <div class="container">
-    <div class="hw-rows">
-      <div class="hw-table-head reveal" aria-hidden="true">
-        <span></span>
-        <span>Method</span>
-        <span>Analysis</span>
-      </div>
-      <div class="hw-row reveal">
-        <span class="hw-num">01</span>
+    <div class="hw-head reveal">
+      <span class="lp-eyebrow">The Methods</span>
+      <h2>Seven checks on every lot.</h2>
+    </div>
+    <div class="hw-list">
+      <div class="hw-item reveal">
+        <span class="hw-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M11 20V4M18 20v-7" stroke-linecap="round"/></svg>
+        </span>
         <div>
-          <span class="hw-method">HPLC-UV</span>
-          <span class="hw-answers">Purity</span>
-        </div>
-        <div>
-          <h3>Purity Testing</h3>
-          <p>Quantifies peptide purity by high-performance liquid chromatography with UV detection.</p>
+          <h3>Reverse-Phase HPLC-UV</h3>
+          <p>Purity quantified against reference standards. The figure printed on every certificate.</p>
         </div>
       </div>
-      <div class="hw-row reveal" style="transition-delay:50ms">
-        <span class="hw-num">02</span>
+      <div class="hw-item reveal" style="transition-delay:40ms">
+        <span class="hw-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.6" fill="currentColor" stroke="none"/></svg>
+        </span>
         <div>
-          <span class="hw-method">LC-MS</span>
-          <span class="hw-answers">Identity</span>
-        </div>
-        <div>
-          <h3>Analytical Identification</h3>
-          <p>Confirms that the analyzed compound corresponds to its specified molecular identity.</p>
+          <h3>LC-MS</h3>
+          <p>Molecular identity confirmed by mass-to-charge analysis: the compound matches what the label claims.</p>
         </div>
       </div>
-      <div class="hw-row reveal" style="transition-delay:100ms">
-        <span class="hw-num">03</span>
+      <div class="hw-item reveal" style="transition-delay:80ms">
+        <span class="hw-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l9 9-9 9-9-9z"/></svg>
+        </span>
         <div>
-          <span class="hw-method">Sterility Assay</span>
-          <span class="hw-answers">Microbiological</span>
-        </div>
-        <div>
-          <h3>Microbiological Testing</h3>
-          <p>Evaluates the sample for microbial growth.</p>
+          <h3>Net Peptide Content</h3>
+          <p>The actual peptide mass in the vial, so dosing math starts from a real number, not a label.</p>
         </div>
       </div>
-      <div class="hw-row reveal" style="transition-delay:150ms">
-        <span class="hw-num">04</span>
+      <div class="hw-item reveal" style="transition-delay:120ms">
+        <span class="hw-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>
+        </span>
         <div>
-          <span class="hw-method">LAL Assay, USP &lt;85&gt;</span>
-          <span class="hw-answers">Endotoxin</span>
-        </div>
-        <div>
-          <h3>Bacterial Endotoxin Testing</h3>
-          <p>Quantifies bacterial endotoxin using the specified assay methodology.</p>
+          <h3>Endotoxin (LAL)</h3>
+          <p>Bacterial endotoxin screened against a defined threshold on every lot.</p>
         </div>
       </div>
-      <div class="hw-row reveal" style="transition-delay:200ms">
-        <span class="hw-num">05</span>
+      <div class="hw-item reveal" style="transition-delay:160ms">
+        <span class="hw-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        </span>
         <div>
-          <span class="hw-method">Chemical Screening</span>
-          <span class="hw-answers">Contaminants</span>
+          <h3>Appearance &amp; Solubility</h3>
+          <p>The lyophilate and its reconstitution behavior are inspected before a lot is released.</p>
         </div>
+      </div>
+      <div class="hw-item reveal" style="transition-delay:200ms">
+        <span class="hw-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16l-6 9v6l-4 2v-8L4 4z" stroke-linejoin="round"/></svg>
+        </span>
         <div>
-          <h3>Chemical Contaminant Screening</h3>
-          <p>Screens for residual chemical contaminants introduced during synthesis.</p>
+          <h3>Heavy Metals</h3>
+          <p>Trace elemental contaminants screened against safe limits.</p>
+        </div>
+      </div>
+      <div class="hw-item reveal" style="transition-delay:240ms">
+        <span class="hw-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h5" stroke-linecap="round"/></svg>
+        </span>
+        <div>
+          <h3>Lot Archival</h3>
+          <p>Every batch carries a unique lot ID linked to its certificate: the paperwork matches the vial in your hand.</p>
         </div>
       </div>
     </div>

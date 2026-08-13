@@ -50,7 +50,7 @@ const PAGE_META = {
   'how-we-test.html': {
     name: 'How We Test',
     title: t('How We Test'),
-    desc: 'Every batch is tested by an independent certified laboratory: purity, identity, sterility, endotoxin and chemical contaminants. Five tests, every batch, no exceptions.',
+    desc: 'Every lot is tested by an independent laboratory before it reaches our catalog. Seven checks: purity, identity, net content, endotoxin, appearance, heavy metals, and lot archival.',
   },
   'about.html': {
     name: 'About Glow Research',
