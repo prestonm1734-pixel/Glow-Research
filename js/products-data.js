@@ -753,8 +753,8 @@ const numberWord = n => NUMBER_WORDS[n] || String(n);
 // used to carry an eighth term the certificate does not report.
 const ANALYSIS_SHORT = ANALYSIS_TESTS.map(t => t.short).join(' + ');
 const ANALYSIS_LONG = 'reverse-phase HPLC-UV for purity, LC-MS for identity, net peptide content, sterility testing, endotoxin testing by LAL assay under USP chapter 85, appearance and solubility inspection, heavy metals screening, and lot archival linking every batch to its certificate';
-const SOURCE_SHORT = 'U.S. manufacturing partner';
-const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices';
+const SOURCE_SHORT = 'Manufacturing partner';
+const SOURCE_LONG = 'Synthesis and fill at a partner facility operating to cGMP-aligned quality practices';
 
 // The tests nobody runs on these lots, named out loud.
 //

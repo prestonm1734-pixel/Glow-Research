@@ -353,10 +353,6 @@ button[disabled].si-forgot{ cursor: progress; }
   font-size: 0.74rem; letter-spacing:.18em; text-transform:uppercase; font-weight:600;
   color: #ffffff; margin-bottom: 16px; position: relative; z-index: 1;
 }
-.usa-flag-icon{
-  width: 16px; height: 10.7px; flex-shrink: 0; border-radius: 1px;
-  color: #fff;
-}
 @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
 /* the hero line — solid, bold, full white, largest size on the page */

@@ -16,7 +16,7 @@ benefit.
 
 ## The supply chain
 
-- Manufacturing: Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices. Performed by a manufacturing partner, not by Glow.
+- Manufacturing: Synthesis and fill at a partner facility operating to cGMP-aligned quality practices. Performed by a manufacturing partner, not by Glow.
 - Testing: every lot is analysed by an independent third-party laboratory. reverse-phase HPLC-UV for purity, LC-MS for identity, net peptide content, sterility testing, endotoxin testing by LAL assay under USP chapter 85, appearance and solubility inspection, heavy metals screening, and lot archival linking every batch to its certificate.
 - Certificates: COA on request. Certificate on request: email support@glowresearch.shop with the lot number on your vial
 - Fulfilment: US-based climate-controlled facility, stock held by lot.

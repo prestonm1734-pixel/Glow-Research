@@ -35,7 +35,7 @@ const PAGE_META = {
   'index.html': {
     name: 'Glow Research | Research-Grade Peptides',
     title: 'Glow Research | Research-Grade Peptides',
-    desc: 'Glow Research supplies research-grade peptides for laboratory and in-vitro research use only. U.S. manufacturing partner, third-party tested lots, same-day shipping before 2PM PST.',
+    desc: 'Glow Research supplies research-grade peptides for laboratory and in-vitro research use only. Manufacturing partner, third-party tested lots, same-day shipping before 2PM PST.',
   },
   'peptides.html': {
     name: 'Full Catalog',
@@ -55,7 +55,7 @@ const PAGE_META = {
   'about.html': {
     name: 'About Glow Research',
     title: 'About Glow Research | Research Peptide Supplier',
-    desc: 'Glow Research supplies research peptides and research-use-only compounds to laboratories nationwide. A retailer, not a manufacturer: we work with a U.S. manufacturing partner.',
+    desc: 'Glow Research supplies research peptides and research-use-only compounds to laboratories nationwide. A retailer, not a manufacturer: we work with a manufacturing partner.',
   },
   'shipping.html': {
     name: 'Shipping',
