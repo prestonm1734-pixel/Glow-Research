@@ -162,38 +162,6 @@
   }
   .hw-row p{ font-size:.97rem; line-height:1.7; color: var(--text-dim); margin:0; max-width: 62ch; }
 
-  /* ---------- the split: what a certificate does not cover ----------
-     Image on one side, the absence named on the other. This is the section
-     the page exists to be trusted for, so it gets the same visual weight as
-     the analyses rather than a footnote at the bottom. */
-  .hw-split{
-    display:grid; grid-template-columns: .9fr 1.1fr; gap: clamp(24px, 4vw, 56px);
-    align-items:center;
-  }
-  .hw-split-art{
-    border:1px solid var(--border); overflow:hidden; aspect-ratio: 740 / 415; background:#000;
-  }
-  .hw-split-art img{
-    width:100%; height:100%; object-fit:cover; display:block;
-    filter: grayscale(1) contrast(1.05);
-  }
-  .hw-split h2{
-    font-family:'Space Grotesk', sans-serif; font-size: clamp(1.5rem, 3vw, 2.05rem);
-    font-weight:600; letter-spacing:-.02em; color: var(--text); margin: 0 0 18px;
-  }
-  .hw-split p{ font-size:1rem; line-height:1.75; color: var(--text-dim); margin: 0 0 1em; }
-  .hw-split p:last-child{ margin-bottom:0; }
-  .hw-split strong{ color: var(--text); font-weight:600; }
-
-  /* the one line the section is built around */
-  .hw-callout{
-    margin: 0 0 20px; padding: 18px 20px;
-    border-left: 2px solid var(--text-dimmer); background: var(--bg-2);
-    font-size:.97rem; line-height:1.7; color: var(--text-dim);
-  }
-  .hw-callout b{ color: var(--text); font-weight:600; }
-
-
   /* ---------- section headings shared by the new blocks ---------- */
   .hw-head{ max-width: 60ch; }
   .hw-head h2{
@@ -206,7 +174,6 @@
     .hw-hero > .container{ grid-template-columns: 1fr; }
     /* the instrument leads on a phone: it is the fastest read of the two */
     .hw-hero-art{ order:-1; }
-    .hw-split{ grid-template-columns: 1fr; }
     /* the number joins the method line rather than taking a column of its own */
     .hw-row{ grid-template-columns: 30px 1fr; gap: 12px 14px; }
     .hw-row > div:last-child{ grid-column: 2; }
@@ -370,37 +337,6 @@
           <p>Screens for chemicals left over from making the peptide, so what you get is the compound and nothing extra.</p>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- Who performs it, and why that is the part worth checking. -->
-<section class="lp-section tint">
-  <div class="container hw-split">
-    <div class="hw-split-art reveal">
-      <img src="assets/molecule-black.jpg" alt="" width="740" height="415" loading="lazy" />
-    </div>
-    <div class="reveal">
-      <span class="lp-eyebrow">Who runs it</span>
-      <h2>We do not test our own products.</h2>
-      <p class="hw-callout">
-        <b>A result we produced ourselves would prove nothing.</b> So we do not
-        produce one.
-      </p>
-      <p>
-        Glow does not manufacture, does not run a laboratory, and does not write
-        certificates. A certified independent laboratory does the testing and
-        signs the certificate.
-      </p>
-      <p>
-        Every certificate covers <strong>one batch</strong>, and that batch
-        number is printed on your vial. Match the two and you know the document
-        is about the vial in your hand, not a sample from last year.
-      </p>
-      <p>
-        Want it confirmed? Take the report number on the certificate to the
-        laboratory that issued it. Check it with them, not with us.
-      </p>
     </div>
   </div>
 </section>
