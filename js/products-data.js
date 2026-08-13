@@ -107,6 +107,22 @@ const PAYMENTS_LIVE = true;
 // together or a live-looking checkout will silently take test-mode payments.
 const STRIPE_PUBLISHABLE_KEY = 'pk_test_51U3kUzQXS4Q4Ku0EIyOpARY8Rbi8ATyXYfgWKzWiDtykruMzQyfRIHxlolqwmic0AMY22nzM33NoYATjppOcOSRQ00WOWb9GxT';
 
+// What the confirmation page says about payment, keyed off the same flag that
+// decides whether payment is actually taken. Hand-written copy here was the
+// exact failure this guards against: thank-you.html told shoppers "card
+// payment is not connected on the site yet, we will contact you to take
+// payment" on a page they could only reach by paying with a card. Both
+// branches now move with PAYMENTS_LIVE, so neither can outlive its flag.
+const PAYMENT_COPY = PAYMENTS_LIVE ? {
+  stepTitle: 'Payment confirmed',
+  stepBody: 'Your card was charged when you placed this order. Nothing further is owed, ' +
+            'and the receipt is in the confirmation email.',
+} : {
+  stepTitle: 'We confirm payment',
+  stepBody: 'Card payment is not connected on the site yet, so we will contact you at the ' +
+            'email above to take payment before anything ships.',
+};
+
 // The certificate copy, in one place. Both branches describe the same
 // operation — third-party tested lots, a certificate per batch — and differ
 // only in how the reader gets hold of the document.
@@ -1330,6 +1346,7 @@ if (typeof module !== 'undefined' && module.exports) {
     COAS_PUBLISHED,
     COA_COPY,
     PAYMENTS_LIVE,
+    PAYMENT_COPY,
     STRIPE_PUBLISHABLE_KEY,
     round2,
   };

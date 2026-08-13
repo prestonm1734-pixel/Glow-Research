@@ -10,7 +10,7 @@
 
 import {
   wc, currentSession, findCustomerByEmail, readBody, isEmail,
-  stripe, stripeGet, priceOrder,
+  stripe, stripeGet, priceOrder, STATUS_LABELS,
 } from './_lib.js';
 import {
   emailShell, heading, paragraph, eyebrow, fine, esc, sendEmail, money,
@@ -220,7 +220,14 @@ export default async function handler(req, res) {
       sendAdminText(order),
     ]);
 
-    return res.status(200).json({ orderId: data.id, orderNumber: data.number });
+    // The status is WooCommerce's own, mapped through the same STATUS_LABELS
+    // the account page reads, so the confirmation page states what the store
+    // actually recorded rather than a word hardcoded into thank-you.html.
+    return res.status(200).json({
+      orderId: data.id,
+      orderNumber: data.number,
+      status: STATUS_LABELS[data.status] || data.status || '',
+    });
   } catch (err) {
     return res.status(502).json({ error: err.message || 'Could not reach the store backend.' });
   }

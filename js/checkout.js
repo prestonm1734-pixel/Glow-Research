@@ -388,6 +388,10 @@
     try {
       sessionStorage.setItem('glow-last-order', JSON.stringify({
         number: data.orderNumber,
+        // WooCommerce's own status, already mapped to prose by the API. Absent
+        // on the idempotent path (a retry that found the order already made),
+        // where thank-you.js simply shows no status rather than guessing one.
+        status: data.status || '',
         date: new Date().toISOString(),
         email: payload.customer.email,
         name: [payload.shipping.firstName, payload.shipping.lastName].filter(Boolean).join(' '),

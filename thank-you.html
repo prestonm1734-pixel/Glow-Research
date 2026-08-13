@@ -88,7 +88,17 @@
   .ty-lede strong{ color:#0a0a0a; }
   .ty-num{
     font-family:'JetBrains Mono', monospace; font-size:.82rem; letter-spacing:.02em;
-    color:#8a8a86; margin: 0 0 48px;
+    color:#8a8a86; margin: 14px 0 48px;
+    display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;
+  }
+
+  /* The status is WooCommerce's word for where this order is, not ours, so it
+     is set apart from the number and date rather than reading as more of the
+     same grey meta text. */
+  .ty-status{
+    font-family:'Space Grotesk',sans-serif; font-size:.68rem; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase; color:#0a0a0a;
+    background:#f0efec; padding: 4px 10px; border-radius:999px;
   }
 
   /* left-aligned from here down — centering paragraphs of detail fights
@@ -101,6 +111,10 @@
     font-family:'Space Grotesk',sans-serif; font-size:.7rem; font-weight:700;
     letter-spacing:.1em; text-transform:uppercase; color:#8a8a86; margin:0 0 16px;
   }
+
+  /* The one block on this page that is a document rather than prose, so it
+     gets a surface of its own. Everything else stays flat text on white. */
+  .ty-receipt{ background:#faf9f7; padding: 18px 20px; }
 
   .ty-items{ list-style:none; margin:0; padding:0; }
   .ty-items li{
@@ -120,14 +134,26 @@
   .ty-addr{ font-size:.94rem; line-height:1.7; color:#55554f; }
   .ty-addr strong{ display:block; color:#0a0a0a; font-weight:600; margin-bottom:2px; }
 
-  .ty-status{
-    display:inline-block; margin-top:2px; font-size:.86rem; color:#55554f;
-  }
-
-  /* what happens next: plain lines, no numerals or connecting rule — the
-     order alone (payment, pack, ship) already reads as a sequence */
+  /* What happens next, drawn as the progress line it actually is. The first
+     node is filled because that step has already happened: the card cleared
+     before this page could load. The rest are hollow because they have not,
+     which is the whole point of showing state instead of a plain list. */
   .ty-steps{ list-style:none; margin:0; padding:0; }
-  .ty-steps li + li{ margin-top:16px; }
+  .ty-steps li{ position:relative; padding: 0 0 20px 30px; }
+  .ty-steps li:last-child{ padding-bottom:0; }
+  /* the connector, running from each node down to the one below it */
+  .ty-steps li::before{
+    content:''; position:absolute; left:6px; top:17px; bottom:0; width:1px;
+    background: rgba(0,0,0,.13);
+  }
+  .ty-steps li:last-child::before{ display:none; }
+  .ty-dot{
+    position:absolute; left:0; top:4px; box-sizing:border-box;
+    width:13px; height:13px; border-radius:50%;
+    border:1px solid rgba(0,0,0,.26); background:#fff;
+    display:flex; align-items:center; justify-content:center; color:#fff;
+  }
+  .ty-steps .is-done .ty-dot{ background:#0a0a0a; border-color:#0a0a0a; }
   .ty-steps b{ display:block; font-size:.94rem; font-weight:600; margin-bottom:2px; }
   .ty-steps span{ display:block; font-size:.88rem; line-height:1.6; color:#65655f; }
 
@@ -243,15 +269,20 @@
         <strong id="tyEmail">your email</strong>.
       </p>
       <p class="ty-num ty-rise ty-rise-3">
-        Order <span id="tyNumber">&middot;</span> &middot; <span id="tyDate">&middot;</span> &middot;
-        <span class="ty-status" id="tyStatus">Awaiting payment</span>
+        <span>Order <span id="tyNumber">&middot;</span> &middot; <span id="tyDate">&middot;</span></span>
+        <!-- Filled in by js/thank-you.js from the status WooCommerce recorded,
+             and left hidden when the API did not return one. Nothing about
+             where an order stands is hardcoded into this page. -->
+        <span class="ty-status" id="tyStatus" hidden></span>
       </p>
 
       <div class="ty-body ty-rise ty-rise-4">
         <div class="ty-section">
           <h2>What you ordered</h2>
-          <ul class="ty-items" id="tyItems"></ul>
-          <div class="ty-totals" id="tyTotals"></div>
+          <div class="ty-receipt">
+            <ul class="ty-items" id="tyItems"></ul>
+            <div class="ty-totals" id="tyTotals"></div>
+          </div>
         </div>
 
         <div class="ty-section">
@@ -262,20 +293,28 @@
         <div class="ty-section">
           <h2>What happens next</h2>
           <ol class="ty-steps">
-            <li>
-              <b>We confirm payment</b>
-              <span id="tyStepPay">
-                Card payment is not connected on the site yet, so we will contact you at the
-                email above to take payment before anything ships.
-              </span>
+            <!-- Both the heading and the body of this first step come from
+                 PAYMENT_COPY in js/products-data.js, which keys off
+                 PAYMENTS_LIVE. It is the one step whose truth changes with a
+                 flag, so it is the one step this page does not write itself.
+                 is-done is set by js/thank-you.js, and only while payments are
+                 live: with checkout closed the payment has not happened yet. -->
+            <li id="tyStepPay">
+              <i class="ty-dot" aria-hidden="true">
+                <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              </i>
+              <b id="tyStepPayTitle">&mdash;</b>
+              <span id="tyStepPayBody">&mdash;</span>
             </li>
             <li>
+              <i class="ty-dot" aria-hidden="true"></i>
               <b>Your order is picked and packed</b>
               <span>
                 Vials are pulled, sealed, and packed in a plain, unmarked box.
               </span>
             </li>
             <li>
+              <i class="ty-dot" aria-hidden="true"></i>
               <b>It ships with tracking</b>
               <span>
                 A tracking number appears against this order the moment it is issued.

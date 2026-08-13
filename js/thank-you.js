@@ -53,6 +53,25 @@
   set('tyNumber', '#' + order.number);
   set('tyEmail', order.email || 'your email');
 
+  // WooCommerce's own word for where this order stands, handed over by
+  // api/create-order.js. Absent on the idempotent path, and shown as nothing
+  // rather than as a guess: this page has no way to know a status the store
+  // did not tell it.
+  var statusEl = document.getElementById('tyStatus');
+  if (order.status) {
+    statusEl.hidden = false;
+    statusEl.textContent = order.status;
+  }
+
+  /* ---------- what happens next ----------
+     PAYMENT_COPY (js/products-data.js) keys off PAYMENTS_LIVE, so the payment
+     step describes what the checkout this order came through actually does.
+     The step is marked done only while payments are live, because that is the
+     only case where money has already changed hands by the time this renders. */
+  set('tyStepPayTitle', PAYMENT_COPY.stepTitle);
+  set('tyStepPayBody', PAYMENT_COPY.stepBody);
+  if (PAYMENTS_LIVE) document.getElementById('tyStepPay').classList.add('is-done');
+
   var d = order.date ? new Date(order.date) : new Date();
   set('tyDate', isNaN(d.getTime())
     ? ''

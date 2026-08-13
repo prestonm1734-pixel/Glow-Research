@@ -29,7 +29,7 @@ const {
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG, evidenceRows, evidenceHtml,
   identityLine, FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
-  catFilterGroup, CART_UPSELL, cartUpsell, CAT_LABEL,
+  catFilterGroup, CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -1302,6 +1302,39 @@ console.log('\npayments');
   ok('the PaymentIntent is created for card only, not automatic method detection',
     /payment_method_types:\s*\['card'\]/.test(intentFn) &&
     !/automatic_payment_methods\s*:\s*\{/.test(intentFn));
+
+  // The confirmation page is the one surface that describes a payment after
+  // the fact, and it got this wrong for real: it went on telling shoppers
+  // "card payment is not connected on the site yet, we will contact you to
+  // take payment" for as long as PAYMENTS_LIVE had been true, on a page they
+  // could only reach by paying with a card. Hand-written copy about payment
+  // state is the defect; these three checks make it one that cannot ship.
+  {
+    const tyHtml = read('thank-you.html');
+    const tyJs = read('js/thank-you.js');
+
+    ok('thank-you.html takes its payment step from PAYMENT_COPY rather than writing its own',
+      /PAYMENT_COPY\.stepTitle/.test(tyJs) && /PAYMENT_COPY\.stepBody/.test(tyJs) &&
+      /id="tyStepPayTitle"/.test(tyHtml) && /id="tyStepPayBody"/.test(tyHtml));
+
+    // PAYMENT_COPY only helps if the page has no second, hardcoded opinion
+    // about payment sitting beside it. Both literals below are ones the page
+    // actually carried.
+    ok('thank-you.html hardcodes no payment or order state of its own',
+      !/not connected on the site/i.test(tyHtml) && !/Awaiting payment/i.test(tyHtml));
+
+    ok('the confirmation page states the order status WooCommerce recorded',
+      /status:\s*STATUS_LABELS\[/.test(order) && /order\.status/.test(tyJs));
+  }
+
+  // And the copy PAYMENT_COPY hands over has to match the branch it came
+  // from: a live checkout cannot promise to collect payment later, and a
+  // closed one cannot claim a card was charged.
+  ok('PAYMENT_COPY describes the checkout that PAYMENTS_LIVE actually configures',
+    PAYMENTS_LIVE
+      ? !/take payment|not connected/i.test(PAYMENT_COPY.stepBody)
+      : !/was charged|has been charged/i.test(PAYMENT_COPY.stepBody),
+    PAYMENT_COPY.stepBody);
 
   // The one check that would matter most if it ever failed: a secret key
   // checked into anything the browser can fetch is a live credential handed
