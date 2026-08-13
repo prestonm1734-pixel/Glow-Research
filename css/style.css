@@ -87,6 +87,7 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   display: inline-flex; align-items:center; justify-content:center; gap:10px;
   padding: 16px 28px;
   border-radius: 0;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 1rem;
   border: 1.5px solid transparent;
