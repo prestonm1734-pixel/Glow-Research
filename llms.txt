@@ -28,53 +28,25 @@ benefit.
 
 ### Tissue Research
 
-- **BPC-157**: A synthetic pentadecapeptide derived from a protein found in gastric juice. Studied in vitro for angiogenic signalling. Sizes: 5mg, 10mg. From $50 per vial.
-- **TB-500**: A synthetic fragment of thymosin beta-4, the actin-binding protein. Studied in vitro for cytoskeletal dynamics. Sizes: 10mg. From $70 per vial.
-- **BPC-157 / TB-500 Blend**: A combined BPC-157 and TB-500 formulation. Supplied for research using both peptides together in one vial. Sizes: 10mg, 20mg. From $85 per vial.
+- **BPC-157**: A synthetic pentadecapeptide derived from a protein found in gastric juice. Studied in vitro for angiogenic signalling. Sizes: 10mg. From $65 per vial.
+- **BPC-157/TB-500**: A combined BPC-157 and TB-500 formulation. Supplied for research using both peptides together in one vial. Sizes: 20mg. From $125 per vial.
 - **GHK-Cu**: A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling. Sizes: 50mg. From $55 per vial.
-- **GLOW Blend**: A multi-peptide blend supplied as a single 70mg vial. Composition detail pending supplier confirmation. Sizes: 70mg. From $125 per vial.
-- **KLOW Blend**: A multi-peptide blend supplied as a single 80mg vial. Composition detail pending supplier confirmation. Sizes: 80mg. From $120 per vial.
+- **GLOW**: A multi-peptide blend supplied as a single 70mg vial. Composition detail pending supplier confirmation. Sizes: 70mg. From $125 per vial.
 
 ### Growth Hormone Secretagogues
 
-- **Ipamorelin**: A selective pentapeptide growth hormone secretagogue. Studied for its binding behaviour at the ghrelin receptor. Sizes: 5mg. From $55 per vial.
-- **CJC-1295 (with DAC)**: A synthetic growth hormone releasing hormone analogue carrying a drug affinity complex. Studied for extended receptor engagement. Sizes: 5mg. From $80 per vial.
-- **CJC-1295 (No DAC)**: A synthetic analogue of growth hormone releasing hormone without a drug affinity complex. Used in receptor binding studies. Sizes: 5mg. From $55 per vial.
-- **CJC-1295 (No DAC) / Ipamorelin Blend**: A combined CJC-1295 (No DAC) and Ipamorelin formulation. Supplied for research examining GHRH and ghrelin receptor co-agonism. Sizes: 5/5mg. From $90 per vial.
+- **CJC-1295 No DAC/Ipamorelin**: A combined CJC-1295 (No DAC) and Ipamorelin formulation. Supplied for research examining GHRH and ghrelin receptor co-agonism. Sizes: 5/5mg. From $90 per vial.
 - **Tesamorelin**: A synthetic growth hormone releasing hormone analogue with a stabilised N-terminus. Studied for pituitary receptor engagement. Sizes: 10mg. From $99 per vial.
-- **Sermorelin**: A synthetic fragment of growth hormone releasing hormone, the first 29 amino acids. Studied for pituitary receptor binding. Sizes: 5mg. From $50 per vial.
-- **IGF1-LR3**: A long-acting analogue of insulin-like growth factor 1. Studied for its binding behaviour at the IGF-1 receptor. Sizes: 1mg. From $105 per vial.
 
 ### Metabolic Research
 
-- **GLP-1 (SM)**: A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling. Sizes: 5mg, 10mg. From $60 per vial.
-- **GLP-2 (TZ)**: A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology. Sizes: 10mg, 30mg. From $90 per vial.
-- **GLP-3 (RT)**: A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile. Sizes: 10mg, 30mg. From $105 per vial.
-- **Cagrilintide**: A long-acting amylin receptor agonist peptide. Studied for its binding behaviour at the amylin receptor complex. Sizes: 5mg. From $80 per vial.
-- **Cagrilintide / Semaglutide Blend**: A combined cagrilintide and semaglutide formulation. Supplied for research examining amylin and GLP-1 co-agonism in one vial. Sizes: 5/5mg. From $95 per vial.
+- **GLP-1 (SM)**: A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling. Sizes: 10mg. From $80 per vial.
+- **GLP-2 (TR)**: A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology. Sizes: 10mg. From $90 per vial.
+- **GLP-3 (RT)**: A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile. Sizes: 10mg. From $105 per vial.
 
 ### Longevity Research
 
 - **MOTS-C**: A mitochondrial-derived peptide encoded within the mitochondrial genome. Studied for its role in metabolic signalling. Sizes: 10mg. From $75 per vial.
-- **Epithalon**: A synthetic tetrapeptide studied for interaction with telomerase gene expression. Investigated in cellular senescence models. Sizes: 10mg. From $55 per vial.
-- **NAD+**: Nicotinamide adenine dinucleotide, a coenzyme central to cellular redox reactions. Studied in mitochondrial signalling models. Sizes: 500mg. From $85 per vial.
-
-### Immune Research
-
-- **TA-1**: A synthetic peptide identical to thymosin alpha-1. Studied for interaction with toll-like receptor signalling. Sizes: 10mg. From $70 per vial.
-- **KPV**: A synthetic tripeptide fragment of alpha-MSH with no melanocortin receptor activity. Studied for immune signalling pathways. Sizes: 10mg. From $60 per vial.
-
-### Neuropeptide Research
-
-- **DSIP**: A nonapeptide first isolated during studies of slow-wave brain activity. Studied for neuropeptide signalling. Sizes: 5mg. From $50 per vial.
-- **Oxytocin**: A nonapeptide hormone synthesized in the hypothalamus. Studied for binding behaviour at the oxytocin receptor. Sizes: 5mg. From $55 per vial.
-- **Melanotan 2**: A synthetic cyclic analogue of alpha-MSH. Studied for its binding behaviour across melanocortin receptor subtypes. Sizes: 10mg. From $65 per vial.
-- **PT-141**: A synthetic melanocortin receptor agonist derived from Melanotan 2. Studied for selectivity at the MC4 receptor. Sizes: 10mg. From $55 per vial.
-
-### Cognitive Research
-
-- **Selank**: A synthetic heptapeptide based on the tetrapeptide tuftsin. Studied in preclinical models of neuropeptide regulation. Sizes: 5mg. From $45 per vial.
-- **Semax**: A synthetic peptide derived from the ACTH(4-10) fragment. Investigated in research on neurotrophic signalling. Sizes: 30mg. From $80 per vial.
 
 ## Frequently asked
 

@@ -175,10 +175,16 @@ const COA_COPY = COAS_PUBLISHED ? {
 // other blends below do ("Blend: X/Y - a/b MG"), so their `about` copy says
 // exactly that and nothing more: no ingredient list is stated until one is
 // confirmed against the supplier's specification.
+// ---------------------------------------------------------------------------
+// Launch catalog: exactly the ten SKUs the WooCommerce launch list carries.
+// Every other compound previously in this file (TB-500, GHK-Cu blends beyond
+// GLOW, the standalone secretagogues, the longevity/immune/neuro/cognitive
+// lines) is held back until it has its own launch SKU. Each entry below keeps
+// a single `sizes[]` row matching the one size the launch list states; add a
+// second size only once the supplier confirms a SKU for it.
 const GLOW_PRODUCTS = [
   { name: 'BPC-157', tag: null, cat: 'tissue', purity: '99.8%', badge:'Best Seller',
     sizes: [
-      { mg: '5mg', price: 50, sku: 'GLO-BC5', image: 'assets/products/bpc-157-5mg.webp' },
       { mg: '10mg', price: 65, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg.webp' },
     ],
     blurb: 'A synthetic pentadecapeptide derived from a protein found in gastric juice. Studied in vitro for angiogenic signalling.',
@@ -191,26 +197,13 @@ const GLOW_PRODUCTS = [
       { t: 'Fibroblast migration', d: 'Used in scratch and outgrowth assays examining how tendon and ligament fibroblasts migrate and organise.' },
       { t: 'Gut epithelial models', d: 'Examined in gastrointestinal tissue models, reflecting the gastric origin of the parent protein.' }
     ] },
-  { name: 'TB-500', tag: null, cat: 'tissue', purity: '99.6%', badge:null,
-    sizes: [{ mg: '10mg', price: 70, sku: 'GLO-BT10' }],
-    blurb: 'A synthetic fragment of thymosin beta-4, the actin-binding protein. Studied in vitro for cytoskeletal dynamics.',
-    about: [
-      'TB-500 is a synthetic peptide corresponding to the actin-binding region of thymosin beta-4, a regulatory protein present in most mammalian cells. It is that fragment, not the whole protein.',
-      'Because the sequence carries the actin-binding motif, it is used as a tool for probing cytoskeletal behaviour rather than as a stand-in for the full protein.'
-    ],
-    research: [
-      { t: 'Actin sequestration', d: 'Investigated for how it binds monomeric G-actin and shifts the balance between free monomer and polymerised filament.' },
-      { t: 'Cell migration', d: 'Applied in motility assays where cytoskeletal turnover governs how quickly cells cross a gap.' },
-      { t: 'Vascular models', d: 'Studied alongside endothelial cultures examining the formation of new vessel structures.' }
-    ] },
-  { name: 'BPC-157 / TB-500 Blend', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
+  { name: 'BPC-157/TB-500', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
     sizes: [
-      { mg: '10mg', price: 85, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg.webp' },
-      { mg: '20mg', price: 125, sku: 'GLO-BB20' },
+      { mg: '20mg', price: 125, sku: 'GLO-BB20', image: 'assets/products/bpc-157-tb-500-blend-10mg.webp' },
     ],
     blurb: 'A combined BPC-157 and TB-500 formulation. Supplied for research using both peptides together in one vial.',
     about: [
-      'This blend combines BPC-157 and TB-500 in a single vial (5/5 mg in the 10mg size, 10/10 mg in the 20mg size), formulated for laboratories that already run both peptides together rather than reconstituting them separately.',
+      'This blend combines BPC-157 and TB-500 in a single vial, 10/10 mg of each for 20mg total, formulated for laboratories that already run both peptides together rather than reconstituting them separately.',
       'BPC-157 and TB-500 act through different mechanisms, angiogenic signalling and actin-binding cytoskeletal dynamics respectively, so the blend is a co-formulation, not a new compound with its own mechanism.'
     ],
     research: [
@@ -230,7 +223,7 @@ const GLOW_PRODUCTS = [
       { t: 'Copper transport', d: 'Used as a model for how small peptides carry and deliver copper ions between compartments.' },
       { t: 'Antioxidant enzyme activity', d: 'Examined for interaction with copper-dependent enzyme systems.' }
     ] },
-  { name: 'GLOW Blend', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
+  { name: 'GLOW', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
     sizes: [{ mg: '70mg', price: 125, sku: 'GLO-BBG70' }],
     blurb: 'A multi-peptide blend supplied as a single 70mg vial. Composition detail pending supplier confirmation.',
     about: [
@@ -241,58 +234,11 @@ const GLOW_PRODUCTS = [
       { t: 'Co-formulation research', d: 'Used by laboratories studying multiple compounded peptides delivered from a single vial rather than several discrete kits.' },
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials when comparing blended and separately administered research protocols.' }
     ] },
-  { name: 'KLOW Blend', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
-    sizes: [{ mg: '80mg', price: 120, sku: 'GLO-KBT80' }],
-    blurb: 'A multi-peptide blend supplied as a single 80mg vial. Composition detail pending supplier confirmation.',
-    about: [
-      'KLOW is a compounded blend of multiple research peptides, supplied together in one 80mg vial rather than as separate compounds.',
-      'The exact component peptides and their individual mg amounts are not yet documented on this page. Confirm composition against the supplier’s specification before using it in a study that depends on a specific component.'
-    ],
-    research: [
-      { t: 'Co-formulation research', d: 'Used by laboratories studying multiple compounded peptides delivered from a single vial rather than several discrete kits.' },
-      { t: 'Comparative protocols', d: 'Applied alongside single-compound vials when comparing blended and separately administered research protocols.' }
-    ] },
-  { name: 'Ipamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.9%', badge:'Popular',
-    sizes: [{ mg: '5mg', price: 55, sku: 'GLO-IP5' }],
-    blurb: 'A selective pentapeptide growth hormone secretagogue. Studied for its binding behaviour at the ghrelin receptor.',
-    about: [
-      'Ipamorelin is a synthetic pentapeptide and a selective agonist at the growth hormone secretagogue receptor, GHS-R1a, the receptor the endogenous ligand ghrelin acts on.',
-      'Its value in research is selectivity. In preclinical models it drives growth hormone release with comparatively little effect on ACTH, cortisol or prolactin, which makes it a cleaner probe of the pathway than earlier secretagogues.'
-    ],
-    research: [
-      { t: 'Receptor selectivity', d: 'Used in binding and functional assays characterising activity at GHS-R1a against off-target endocrine receptors.' },
-      { t: 'Pulsatile secretion', d: 'Studied in models examining how growth hormone is released in pulses rather than continuously.' },
-      { t: 'Comparative pharmacology', d: 'Frequently run as the reference secretagogue when newer compounds are characterised.' }
-    ] },
-  { name: 'CJC-1295 (with DAC)', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.6%', badge:null,
-    sizes: [{ mg: '5mg', price: 80, sku: 'GLO-CD5' }],
-    blurb: 'A synthetic growth hormone releasing hormone analogue carrying a drug affinity complex. Studied for extended receptor engagement.',
-    about: [
-      'CJC-1295 with DAC is a synthetic analogue of growth hormone releasing hormone carrying a drug affinity complex, a maleimide group that binds covalently to circulating albumin.',
-      'That albumin linkage is what separates it from the no-DAC version: it clears far more slowly, which is the variable laboratories are studying when they compare the two forms across a time course.'
-    ],
-    research: [
-      { t: 'GHRH receptor binding', d: 'Used in receptor occupancy and activation assays at the pituitary GHRH receptor.' },
-      { t: 'Albumin conjugation kinetics', d: 'Studied for how covalent albumin binding extends circulating half-life relative to the unconjugated analogue.' },
-      { t: 'Sustained pulse studies', d: 'Applied in models examining growth hormone release over an extended time course rather than a single pulse.' }
-    ] },
-  { name: 'CJC-1295 (No DAC)', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.7%', badge:null,
-    sizes: [{ mg: '5mg', price: 55, sku: 'GLO-CND5' }],
-    blurb: 'A synthetic analogue of growth hormone releasing hormone without a drug affinity complex. Used in receptor binding studies.',
-    about: [
-      'CJC-1295 without DAC is a synthetic analogue of growth hormone releasing hormone, built on the first 29 amino acids of GHRH with substitutions that resist enzymatic breakdown.',
-      'It clears considerably faster than the DAC version, which matters when timing rather than duration is the variable an experiment is designed around.'
-    ],
-    research: [
-      { t: 'GHRH receptor binding', d: 'Used in receptor occupancy and activation assays at the pituitary GHRH receptor.' },
-      { t: 'Pulse amplitude', d: 'Studied for how a GHRH analogue changes the size of a secretory pulse rather than its frequency.' },
-      { t: 'Combination studies', d: 'Often paired with a ghrelin receptor secretagogue in preclinical work testing whether the two pathways are additive.' }
-    ] },
-  { name: 'CJC-1295 (No DAC) / Ipamorelin Blend', tag: 'Peptide Blend', cat: 'growth', purity: '99.0%', badge:null,
+  { name: 'CJC-1295 No DAC/Ipamorelin', tag: 'Peptide Blend', cat: 'growth', purity: '99.0%', badge:null,
     sizes: [{ mg: '5/5mg', price: 90, sku: 'GLO-CP10' }],
     blurb: 'A combined CJC-1295 (No DAC) and Ipamorelin formulation. Supplied for research examining GHRH and ghrelin receptor co-agonism.',
     about: [
-      'This blend combines CJC-1295 without DAC and Ipamorelin in a single vial, pairing a GHRH receptor analogue with a selective ghrelin receptor agonist.',
+      'This blend combines CJC-1295 without DAC and Ipamorelin in a single vial, 5/5 mg of each for 10mg total, pairing a GHRH receptor analogue with a selective ghrelin receptor agonist.',
       'The two peptides act on different receptors within the same growth hormone axis, which is why they are frequently studied together rather than as substitutes for one another.'
     ],
     research: [
@@ -312,32 +258,8 @@ const GLOW_PRODUCTS = [
       { t: 'DPP-4 resistance', d: 'Studied for resistance to enzymatic cleavage relative to native GHRH, and how that changes assay-window duration.' },
       { t: 'Comparative secretagogue pharmacology', d: 'Run as a reference GHRH analogue when newer compounds in the class are characterised.' }
     ] },
-  { name: 'Sermorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.3%', badge:null,
-    sizes: [{ mg: '5mg', price: 50, sku: 'GLO-SMO5' }],
-    blurb: 'A synthetic fragment of growth hormone releasing hormone, the first 29 amino acids. Studied for pituitary receptor binding.',
-    about: [
-      'Sermorelin is a synthetic peptide corresponding to the first 29 amino acids of native growth hormone releasing hormone, the shortest fragment shown to retain full activity at the GHRH receptor.',
-      'Because it carries no half-life-extending modification, it clears quickly in model systems, which makes it a useful baseline against which longer-acting GHRH analogues are compared.'
-    ],
-    research: [
-      { t: 'GHRH receptor binding', d: 'Used as the reference fragment in receptor occupancy and activation assays at the pituitary GHRH receptor.' },
-      { t: 'Pulse kinetics', d: 'Studied for its short functional window relative to modified GHRH analogues in time-course models.' },
-      { t: 'Comparative pharmacology', d: 'Run alongside CJC-1295 and Tesamorelin in studies characterising structural modifications to the GHRH sequence.' }
-    ] },
-  { name: 'IGF1-LR3', tag: null, cat: 'growth', purity: '99.1%', badge:null,
-    sizes: [{ mg: '1mg', price: 105, sku: 'GLO-IG1' }],
-    blurb: 'A long-acting analogue of insulin-like growth factor 1. Studied for its binding behaviour at the IGF-1 receptor.',
-    about: [
-      'IGF1-LR3 is a synthetic analogue of insulin-like growth factor 1, extended with an additional 13 amino acids at the N-terminus and carrying an arginine substitution at position 3 in place of glutamic acid.',
-      'Those two changes reduce binding to IGF-binding proteins, which is what gives the analogue a longer window of receptor availability in culture than native IGF-1.'
-    ],
-    research: [
-      { t: 'IGF-1 receptor binding', d: 'Used in receptor occupancy and downstream PI3K/Akt pathway assays at the IGF-1 receptor.' },
-      { t: 'Binding protein interaction', d: 'Studied for reduced affinity to IGF-binding proteins relative to native IGF-1, and what that does to assay-window duration.' },
-      { t: 'Cell proliferation models', d: 'Applied in culture models examining IGF-1 receptor-driven proliferative signalling.' }
-    ] },
   { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.5%', badge:'Popular',
-    sizes: [{ mg: '5mg', price: 60, sku: 'GLO-SM5' }, { mg: '10mg', price: 80, sku: 'GLO-SM10' }],
+    sizes: [{ mg: '10mg', price: 80, sku: 'GLO-SM10' }],
     blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
     about: [
       'GLP-1 (SM) is Glow’s designation for semaglutide, a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
@@ -348,11 +270,11 @@ const GLOW_PRODUCTS = [
       { t: 'Albumin binding', d: 'Studied for how the fatty acid chain alters distribution and persistence in model systems.' },
       { t: 'Metabolic pathway research', d: 'Applied in islet and hepatocyte culture models examining downstream incretin signalling.' }
     ] },
-  { name: 'GLP-2 (TZ)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'New',
-    sizes: [{ mg: '10mg', price: 90, sku: 'GLO-T10' }, { mg: '30mg', price: 150, sku: 'GLO-T30' }],
+  { name: 'GLP-2 (TR)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'New',
+    sizes: [{ mg: '10mg', price: 90, sku: 'GLO-T10' }],
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
     about: [
-      'GLP-2 (TZ) is Glow’s designation for tirzepatide, a dual receptor co-agonist peptide, active at both the GIP and the GLP-1 receptor from a single molecule.',
+      'GLP-2 (TR) is Glow’s designation for tirzepatide, a dual receptor co-agonist peptide, active at both the GIP and the GLP-1 receptor from a single molecule.',
       'Single-molecule co-agonists are studied precisely because the two receptors can be engaged at different relative potencies, which is difficult to reproduce by simply combining two separate agonists.'
     ],
     research: [
@@ -363,7 +285,6 @@ const GLOW_PRODUCTS = [
   { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'Trending',
     sizes: [
       { mg: '10mg', price: 105, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg.webp' },
-      { mg: '30mg', price: 200, sku: 'GLO-RT30', image: 'assets/products/retatrutide-30mg.webp' },
     ],
     blurb: 'A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile.',
     about: [
@@ -374,30 +295,6 @@ const GLOW_PRODUCTS = [
       { t: 'Triple receptor pharmacology', d: 'Used to characterise relative potency and selectivity across the GIP, GLP-1 and glucagon receptors from a single molecule.' },
       { t: 'Glucagon receptor signalling', d: 'Studied in hepatocyte and cAMP assays for activity at the glucagon receptor, a target the two-receptor co-agonists do not engage.' },
       { t: 'Comparative incretin pharmacology', d: 'Applied as a comparator when characterising newer multi-receptor agonists against single- and dual-receptor peptides.' }
-    ] },
-  { name: 'Cagrilintide', tag: null, cat: 'metabolic', purity: '99.3%', badge:null,
-    sizes: [{ mg: '5mg', price: 80, sku: 'GLO-CGL5' }],
-    blurb: 'A long-acting amylin receptor agonist peptide. Studied for its binding behaviour at the amylin receptor complex.',
-    about: [
-      'Cagrilintide is a synthetic analogue of human amylin, extended and acylated with a fatty diacid chain that promotes albumin binding, the same modification strategy used in long-acting GLP-1 analogues.',
-      'It acts at the amylin receptor, a complex formed from the calcitonin receptor and a receptor activity-modifying protein, distinct from the GLP-1 receptor pathway.'
-    ],
-    research: [
-      { t: 'Amylin receptor signalling', d: 'Used in binding and functional assays at the amylin receptor complex, distinguishing activity from calcitonin receptor engagement alone.' },
-      { t: 'Albumin binding kinetics', d: 'Studied for how the fatty diacid chain alters distribution and persistence in model systems, mirroring work done on acylated GLP-1 analogues.' },
-      { t: 'Co-agonism research', d: 'Frequently paired with a GLP-1 receptor agonist in preclinical work examining whether the amylin and incretin pathways are additive.' }
-    ] },
-  { name: 'Cagrilintide / Semaglutide Blend', tag: 'Peptide Blend', cat: 'metabolic', purity: '99.0%', badge:null,
-    sizes: [{ mg: '5/5mg', price: 95, sku: 'GLO-CS10' }],
-    blurb: 'A combined cagrilintide and semaglutide formulation. Supplied for research examining amylin and GLP-1 co-agonism in one vial.',
-    about: [
-      'This blend combines cagrilintide and semaglutide in a single vial, 5 mg of each, formulated for laboratories studying the two peptides together from one source rather than two separate vials.',
-      'The two compounds act at different receptors, the amylin receptor complex and the GLP-1 receptor, so the blend is a convenience format for co-administration research, not a new molecule.'
-    ],
-    research: [
-      { t: 'Combined receptor engagement', d: 'Used in models examining amylin and GLP-1 receptor activity from a single co-formulated sample.' },
-      { t: 'Formulation stability', d: 'Studied for how the two peptides behave when co-formulated versus reconstituted separately.' },
-      { t: 'Comparative co-agonism', d: 'Applied alongside single-compound vials to compare co-formulated and separately administered protocols.' }
     ] },
   { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.1%', badge:null,
     sizes: [{ mg: '10mg', price: 75, sku: 'GLO-MS10' }],
@@ -410,126 +307,6 @@ const GLOW_PRODUCTS = [
       { t: 'AMPK pathway signalling', d: 'Studied in cell models for activation of AMPK and downstream metabolic gene expression.' },
       { t: 'Nuclear translocation', d: 'Investigated for movement from mitochondria to the nucleus under metabolic stress conditions in culture.' },
       { t: 'Mitochondrial-derived peptide research', d: 'Used as a reference compound in the broader study of peptides encoded within the mitochondrial genome.' }
-    ] },
-  { name: 'Epithalon', tag: null, cat: 'longevity', purity: '99.4%', badge:null,
-    sizes: [{ mg: '10mg', price: 55, sku: 'GLO-ET10' }],
-    blurb: 'A synthetic tetrapeptide studied for interaction with telomerase gene expression. Investigated in cellular senescence models.',
-    about: [
-      'Epithalon is a synthetic tetrapeptide, Ala-Glu-Asp-Gly, based on epithalamin, a peptide preparation derived from the pineal gland.',
-      'It is studied primarily for its reported interaction with telomerase gene expression in cultured human cells, which is the specific finding that placed it in cellular senescence research.'
-    ],
-    research: [
-      { t: 'Telomerase gene expression', d: 'Studied in cultured human somatic cells for changes in telomerase (TERT) gene expression.' },
-      { t: 'Cellular senescence models', d: 'Used in models examining replicative senescence and population doubling in culture.' },
-      { t: 'Pineal peptide research', d: 'Investigated alongside other pineal-derived peptide preparations for regulatory signalling activity.' }
-    ] },
-  { name: 'NAD+', tag: null, cat: 'longevity', purity: '99.0%', badge:null, kind: 'compound',
-    sizes: [{ mg: '500mg', price: 85, sku: 'GLO-NJ500' }],
-    blurb: 'Nicotinamide adenine dinucleotide, a coenzyme central to cellular redox reactions. Studied in mitochondrial signalling models.',
-    about: [
-      'NAD+ is nicotinamide adenine dinucleotide, a coenzyme present in every living cell and central to redox reactions in glycolysis, the citric acid cycle and oxidative phosphorylation.',
-      'Beyond its role as an electron carrier, it is a required substrate for sirtuin enzymes and PARP proteins, which is the branch of its biology most metabolic and cellular research is focused on.'
-    ],
-    research: [
-      { t: 'Sirtuin substrate studies', d: 'Used in models examining NAD+ availability as a rate-limiting substrate for sirtuin deacetylase activity.' },
-      { t: 'Mitochondrial redox signalling', d: 'Studied for its role as an electron carrier in oxidative phosphorylation and mitochondrial function assays.' },
-      { t: 'PARP pathway research', d: 'Investigated for its consumption by PARP proteins in DNA damage response signalling.' }
-    ] },
-  { name: 'TA-1', tag: null, cat: 'immune', purity: '99.3%', badge:null,
-    sizes: [{ mg: '10mg', price: 70, sku: 'GLO-TA10' }],
-    blurb: 'A synthetic peptide identical to thymosin alpha-1. Studied for interaction with toll-like receptor signalling.',
-    about: [
-      'TA-1 is a synthetic 28 amino acid peptide identical in sequence to thymosin alpha-1, a peptide originally isolated from thymic tissue and involved in immune cell maturation.',
-      'It is studied for interaction with toll-like receptors on dendritic cells, a pathway that places it in innate immune signalling research rather than a single well-defined receptor the way many other peptides in this catalog are.'
-    ],
-    research: [
-      { t: 'Toll-like receptor signalling', d: 'Studied in dendritic cell models for interaction with TLR2 and TLR9 signalling pathways.' },
-      { t: 'T-cell maturation models', d: 'Used in lymphocyte culture models examining T-cell differentiation and maturation markers.' },
-      { t: 'Cytokine expression studies', d: 'Investigated for changes in cytokine gene expression following innate immune pathway activation.' }
-    ] },
-  { name: 'KPV', tag: null, cat: 'immune', purity: '99.2%', badge:null,
-    sizes: [{ mg: '10mg', price: 60, sku: 'GLO-KPV10' }],
-    blurb: 'A synthetic tripeptide fragment of alpha-MSH with no melanocortin receptor activity. Studied for immune signalling pathways.',
-    about: [
-      'KPV is the C-terminal tripeptide of alpha-melanocyte stimulating hormone, lysine-proline-valine, isolated from the parent hormone’s sequence.',
-      'It retains activity on certain inflammatory signalling pathways without binding melanocortin receptors, which is why it is studied as a separate research tool rather than as a fragment of alpha-MSH pharmacology.'
-    ],
-    research: [
-      { t: 'NF-κB pathway signalling', d: 'Studied in cell models for effects on NF-κB activation and downstream cytokine gene expression.' },
-      { t: 'Gut epithelial models', d: 'Examined in intestinal epithelial and gut inflammation model systems for pathway signalling.' },
-      { t: 'Melanocortin-independent activity', d: 'Investigated for pathway activity that does not depend on melanocortin receptor engagement, distinguishing it from alpha-MSH.' }
-    ] },
-  { name: 'DSIP', tag: null, cat: 'neuro', purity: '99.2%', badge:null,
-    sizes: [{ mg: '5mg', price: 50, sku: 'GLO-DSP5' }],
-    blurb: 'A nonapeptide first isolated during studies of slow-wave brain activity. Studied for neuropeptide signalling.',
-    about: [
-      'DSIP, delta sleep-inducing peptide, is a synthetic nonapeptide corresponding to a sequence first isolated from the cerebral venous blood of rabbits during studies of slow-wave brain activity.',
-      'Its receptor and mechanism are not fully characterised, which is why it continues to appear in neuropeptide screening work rather than in a settled pharmacological class.'
-    ],
-    research: [
-      { t: 'Neuropeptide screening', d: 'Studied in tissue and cell models alongside other short regulatory peptides as part of neuropeptide signalling research.' },
-      { t: 'Electrophysiological models', d: 'Used in preparations examining slow-wave electrical activity, reflecting the assay it was originally isolated from.' },
-      { t: 'HPA axis interaction', d: 'Investigated for interaction with corticotropin-releasing factor and related hypothalamic-pituitary-adrenal axis signalling.' }
-    ] },
-  { name: 'Oxytocin', tag: null, cat: 'neuro', purity: '99.3%', badge:null,
-    sizes: [{ mg: '5mg', price: 55, sku: 'GLO-OX5' }],
-    blurb: 'A nonapeptide hormone synthesized in the hypothalamus. Studied for binding behaviour at the oxytocin receptor.',
-    about: [
-      'Oxytocin is a nonapeptide hormone synthesized in the hypothalamus and released from the posterior pituitary, structurally related to vasopressin by a single amino acid difference.',
-      'Research use centres on its receptor, a class A G-protein coupled receptor expressed in both the central nervous system and peripheral tissue, which is why it appears in both neuroscience and peripheral signalling studies.'
-    ],
-    research: [
-      { t: 'Oxytocin receptor binding', d: 'Used in receptor binding and functional assays at the oxytocin receptor, a class A GPCR.' },
-      { t: 'Central nervous system signalling', d: 'Studied in neuronal models for downstream signalling following receptor activation.' },
-      { t: 'Comparative neuropeptide pharmacology', d: 'Run alongside vasopressin in studies distinguishing activity at the two closely related receptor systems.' }
-    ] },
-  { name: 'Melanotan 2', tag: null, cat: 'neuro', purity: '99.1%', badge:null,
-    sizes: [{ mg: '10mg', price: 65, sku: 'GLO-ML10' }],
-    blurb: 'A synthetic cyclic analogue of alpha-MSH. Studied for its binding behaviour across melanocortin receptor subtypes.',
-    about: [
-      'Melanotan 2 is a synthetic cyclic peptide analogue of alpha-melanocyte stimulating hormone, engineered with a lactam bridge that increases metabolic stability relative to the native hormone.',
-      'It is non-selective across the melanocortin receptor family, engaging MC1R, MC3R and MC4R, which is what makes it a common comparator when a more selective melanocortin agonist is characterised.'
-    ],
-    research: [
-      { t: 'Melanocortin receptor binding', d: 'Used in binding and functional assays across the MC1R, MC3R and MC4R receptor subtypes.' },
-      { t: 'Receptor selectivity comparisons', d: 'Run as the non-selective reference compound when characterising newer, receptor-selective melanocortin agonists.' },
-      { t: 'Cyclic peptide stability', d: 'Studied for how the lactam bridge modification affects structural stability relative to linear alpha-MSH.' }
-    ] },
-  { name: 'PT-141', tag: null, cat: 'neuro', purity: '99.2%', badge:null,
-    sizes: [{ mg: '10mg', price: 55, sku: 'GLO-P41' }],
-    blurb: 'A synthetic melanocortin receptor agonist derived from Melanotan 2. Studied for selectivity at the MC4 receptor.',
-    about: [
-      'PT-141, bremelanotide, is a synthetic peptide derived from Melanotan 2 by removing the C-terminal amino acid, a modification that shifts its receptor engagement toward MC4R relative to the parent compound.',
-      'That shift in selectivity is the specific research interest: it lets MC4R-driven signalling be studied with less confound from MC1R activity than the non-selective parent peptide provides.'
-    ],
-    research: [
-      { t: 'MC4R selectivity', d: 'Used in comparative binding assays to characterise selectivity for MC4R relative to Melanotan 2 and other melanocortin agonists.' },
-      { t: 'Structure-activity relationship', d: 'Studied as a case example of how a single terminal amino acid change alters melanocortin receptor selectivity.' },
-      { t: 'Central melanocortin signalling', d: 'Investigated in neuronal models for downstream signalling following MC4R activation.' }
-    ] },
-  { name: 'Selank', tag: null, cat: 'cognitive', purity: '99.6%', badge:null,
-    sizes: [{ mg: '5mg', price: 45, sku: 'GLO-SK5' }],
-    blurb: 'A synthetic heptapeptide based on the tetrapeptide tuftsin. Studied in preclinical models of neuropeptide regulation.',
-    about: [
-      'Selank is a synthetic heptapeptide: the endogenous tetrapeptide tuftsin extended with a Pro-Gly-Pro sequence that slows enzymatic degradation.',
-      'That tail is the reason it is usable as a research tool at all, since unmodified tuftsin is cleared far too quickly to work with.'
-    ],
-    research: [
-      { t: 'Neuropeptide regulation', d: 'Studied in preclinical models for interaction with endogenous regulatory peptide systems.' },
-      { t: 'Monoamine and GABAergic systems', d: 'Examined in tissue models for effects on neurotransmitter turnover.' },
-      { t: 'Expression studies', d: 'Used in work measuring changes in neurotrophic factor expression in brain tissue models.' }
-    ] },
-  { name: 'Semax', tag: null, cat: 'cognitive', purity: '99.7%', badge:null,
-    sizes: [{ mg: '30mg', price: 80, sku: 'GLO-XA30' }],
-    blurb: 'A synthetic peptide derived from the ACTH(4-10) fragment. Investigated in research on neurotrophic signalling.',
-    about: [
-      'Semax is a synthetic peptide derived from the ACTH(4-10) fragment, carrying the same Pro-Gly-Pro stabilising extension used in Selank. It has no corticotropic activity of its own.',
-      'That separation is the point: it lets the fragment be studied without the hormonal activity of the full ACTH molecule.'
-    ],
-    research: [
-      { t: 'Neurotrophic signalling', d: 'Investigated for changes in BDNF and its receptor TrkB in brain tissue models.' },
-      { t: 'Melanocortin-independent activity', d: 'Studied for effects that do not depend on classical melanocortin receptor engagement.' },
-      { t: 'Preclinical CNS models', d: 'Applied in laboratory research on neuronal survival and adaptation.' }
     ] },
 ];
 
@@ -579,10 +356,7 @@ const CAT_LABEL = {
   growth: 'Growth Hormone Secretagogues',
   tissue: 'Tissue Research',
   metabolic: 'Metabolic Research',
-  cognitive: 'Cognitive Research',
   longevity: 'Longevity Research',
-  immune: 'Immune Research',
-  neuro: 'Neuropeptide Research',
 };
 
 // ---------------------------------------------------------------------------
