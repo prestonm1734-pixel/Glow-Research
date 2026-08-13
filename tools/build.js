@@ -6,16 +6,10 @@
 // Runs the generators that are safe to run unattended, then refreshes the
 // sitemap. Reach for this after changing the catalog or a static page.
 //
-// build-blog.js is deliberately NOT run from here. The committed blog pages
-// have been hand-edited since they were generated — each carries its own drawn
-// cover illustration, the nav labels differ, and the contents rail was taken
-// out — so regenerating them silently replaces that work with the generator's
-// procedural output. Run it on its own, and only when you mean to:
-//
-//   node tools/build-blog.js && git diff blog/
-//
-// and read the diff before committing. Reconciling the generator with the
-// committed pages is a separate job; see the note at the top of that file.
+// This used to carry a warning that build-blog.js was deliberately excluded,
+// because the committed blog pages had been hand-edited past what the
+// generator emitted. The blog, its source and that generator are all gone, so
+// everything this script runs is now safe to run unattended.
 
 const { execFileSync } = require('node:child_process');
 const path = require('path');

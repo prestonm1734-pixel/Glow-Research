@@ -72,16 +72,6 @@ const PAGE_META = {
     title: t('Contact Us'),
     desc: 'Reach the Glow Research team at support@glowresearch.shop for order status, wholesale applications, or general questions.',
   },
-  'blog.html': {
-    name: 'Peptide Blog: News, Research &amp; Handling Guides',
-    title: t('Peptide Blog: News, Research &amp; Handling Guides'),
-    desc: "Peptide news, research, and practical guidance covering storage, reconstitution, certificates of analysis, quality standards, and what's changing across the research peptide industry.",
-  },
-  'calculator.html': {
-    name: 'Peptide Concentration Calculator',
-    title: t('Peptide Concentration Calculator'),
-    desc: 'Work out concentration from the mass in the vial and the diluent you add. For laboratory research use only.',
-  },
   'affiliate.html': {
     name: 'Partner Program',
     title: t('Partner Program'),

@@ -92,7 +92,6 @@ ${faq}
 - [About](${SITE}/about.html): where Glow sits in the chain, and the five published principles
 - [Shipping](${SITE}/shipping.html): cutoff, transit, coverage and terms
 - [Wholesale](${SITE}/wholesale.html): volume pricing for institutions
-- [Research blog](${SITE}/blog.html)
 - [Contact](${SITE}/contact.html)
 `;
 

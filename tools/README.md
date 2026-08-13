@@ -15,7 +15,6 @@ node tools/build-llms.js     # llms.txt
 node tools/build-products.js # one page per compound
 node tools/build-sitemap.js  # sitemap.xml on its own
 node tools/check-claims.js   # promise audit, run before every commit
-node tools/build-blog.js     # blog, read the warning below first
 ```
 
 ## `build.js`
@@ -33,8 +32,6 @@ being substituted with capture group 1. That shipped a catalog card reading
 `<div class="product-grid" id="productGrid">29` and would have shipped a
 GLP3-RT page reading `id="pdPrice">16.10`. `check-claims.js` now fails on the
 pattern anywhere in `tools/`.
-
-It deliberately does **not** run `build-blog.js`. See below.
 
 ## `check-claims.js`
 
@@ -286,18 +283,19 @@ page is cut from, so it cannot regenerate its own evidence panel the way
 the exact markup to paste into `<dl id="pdEvidence">`, so it is a copy out of
 the build output rather than something to work out.
 
-Flipping `COAS_PUBLISHED` moves the rest at once. Prose that mentions certificates (the
-About page and the three blog articles) is written to stay true either way, so it needs no edit; if you want those pointing at direct
-links too, they are the only hand edits left.
+Flipping `COAS_PUBLISHED` moves the rest at once. Prose that mentions certificates on the
+About page is written to stay true either way, so it needs no edit; if you want it pointing at a direct
+link too, that is the only hand edit left.
 
 ## `build-sitemap.js`
 
 The single writer for `sitemap.xml`, imported by the other builds so that
 running any of them leaves a **complete** sitemap.
 
-It used to live inside the blog build and was generated from the blog build's
-own list of pages, which meant every rebuild silently dropped `terms.html`,
-`privacy.html` and `ruo-agreement.html`, and it never knew about products.
+It used to live inside the blog build and be generated from that build's own
+list of pages, which meant every rebuild silently dropped `terms.html`,
+`privacy.html` and `ruo-agreement.html`, and it never knew about products. The
+blog is gone; this is the writer that outlived it.
 
 Static pages are listed in `STATIC_PAGES` and checked against the filesystem, so
 a page that gets renamed or deleted fails the build instead of leaving a 404
@@ -307,24 +305,8 @@ Deliberately excluded: `signin`, `account`, `checkout`, `thank-you`,
 `reset-password`, `404`. A sitemap is a list of pages worth landing on from a
 search result.
 
-## `build-blog.js`
-
-> **Read this before running it.** The committed blog pages have been
-> hand-edited since they were last generated: each post carries its own drawn
-> cover illustration rather than the procedural lattice the script produces,
-> the contents rail has been removed, and the nav calls the section "Research
-> Blog" where `setActiveNav()` still looks for "Blog", so the active state is
-> no longer applied. **Running this replaces all of that.**
->
-> If you do run it, read `git diff blog/` carefully before committing.
-> Reconciling the generator with the committed pages is an outstanding job.
-
-What it does when run: generates `blog/<slug>/index.html` per post from
-`content/posts.js` plus the body fragment in `content/posts/<slug>.html`, and
-rebuilds `blog.html`. Publishing workflow is in `content/README.md`.
-
 ## Changing the domain
 
-`SITE` is hardcoded at the top of `build-products.js`, `build-sitemap.js` and
-`build-blog.js`. If the domain changes, update all three plus `robots.txt`, then
+`SITE` is hardcoded at the top of `build-products.js` and `build-sitemap.js`.
+If the domain changes, update both plus `robots.txt`, then
 rebuild, canonicals, Open Graph URLs and the sitemap all derive from it.

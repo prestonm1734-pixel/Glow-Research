@@ -25,15 +25,14 @@ put the value in `js/products-data.js`, read it everywhere, and add a check.
 | `js/products-data.js` | The catalog and every sitewide constant. Shared by browser and Node (CommonJS guard at the bottom). Most single sources of truth live here. |
 | `js/product.js` | Product detail rendering. Hydrates generated pages in place. |
 | `js/cart.js`, `js/checkout.js` | Cart drawer and checkout. `FREE_SHIPPING_AT` and the shipping table are here. |
-| `tools/build.js` | Single entry point. Runs the blog and product builds, then the sitemap. |
+| `tools/build.js` | Single entry point. Runs the meta, FAQ, catalog, llms and product builds, then the sitemap. |
 | `tools/check-claims.js` | Guard: fails when copy and code disagree, or when the site claims something the data cannot support. |
-| `content/` | Blog source. See `content/README.md`. |
 | `tools/README.md` | What each build script does, and the launch flags. |
 
 ## Commands
 
 ```sh
-node tools/build.js          # blog + product pages + sitemap
+node tools/build.js          # all generators + sitemap
 node tools/check-claims.js   # promise audit, run before every commit
 ```
 

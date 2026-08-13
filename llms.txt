@@ -109,5 +109,4 @@ Printed on the vial label. It is the number the certificate for that batch is is
 - [About](https://glowresearch.shop/about.html): where Glow sits in the chain, and the five published principles
 - [Shipping](https://glowresearch.shop/shipping.html): cutoff, transit, coverage and terms
 - [Wholesale](https://glowresearch.shop/wholesale.html): volume pricing for institutions
-- [Research blog](https://glowresearch.shop/blog.html)
 - [Contact](https://glowresearch.shop/contact.html)

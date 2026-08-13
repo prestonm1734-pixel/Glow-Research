@@ -48,7 +48,7 @@ function esc(s) {
 
 const money = n => '$' + n.toFixed(2);
 
-// Same contract as slice() in tools/build-blog.js: if the donor markup moves,
+// Contract: if the donor markup moves,
 // fail loudly at build time rather than emit a page with a hole in it.
 function required(html, re, label) {
   if (!re.test(html)) {
@@ -92,7 +92,7 @@ function setInner(html, id, tag, content) {
 }
 
 // Prefix root-relative URLs so they resolve from peptides/<slug>/.
-// Identical in behaviour to rewriteDepth() in tools/build-blog.js.
+// Rewrites root-relative asset paths for pages nested a directory deep.
 function rewriteDepth(html, depth) {
   if (depth === 0) return html;
   const prefix = '../'.repeat(depth);
@@ -323,7 +323,7 @@ for (const p of GLOW_PRODUCTS) {
   written++;
 }
 
-// Shared with tools/build-blog.js — see the note there.
+// Kept here rather than in a shared module: this is its only caller now.
 console.log(`  sitemap.xml (${require('./build-sitemap.js').write()} URLs)`);
 
 console.log(`\nBuilt ${written} product page(s).`);

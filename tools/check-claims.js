@@ -40,12 +40,9 @@ function ok(label, cond, detail) {
   console.log(`  ${cond ? 'ok  ' : 'FAIL'}  ${label}${!cond && detail ? `\n          ${detail}` : ''}`);
 }
 
-// Every page a customer can land on. Blog posts carry the same marquee.
-const pages = fs.readdirSync(ROOT)
-  .filter(f => f.endsWith('.html'))
-  .concat(fs.readdirSync(path.join(ROOT, 'blog'), { withFileTypes: true })
-    .filter(d => d.isDirectory())
-    .map(d => `blog/${d.name}/index.html`));
+// Every page a customer can land on. This used to also walk blog/ for the
+// article pages; there is no blog any more.
+const pages = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'));
 
 // Pull a numeric literal out of a source file by its identifier.
 function constant(file, name) {
@@ -752,8 +749,8 @@ console.log('\nwhat the FAQ is allowed to say about testing');
   // No page may claim, in its own voice, to run a test this array says is not
   // run. Built from ANALYSIS_NOT_RUN rather than a fixed word list, so a test
   // moving in or out of that array changes what this forbids without a second
-  // edit here. The COA blog post explaining what an endotoxin line means on
-  // someone else's certificate is fine; "we test for" is not — and neither is
+  // edit here. Explaining what an endotoxin line means on someone else's
+  // certificate is fine; "we test for" is not — and neither is
   // the FAQ itself explaining that we do not, which is exactly the sentence
   // this pattern would otherwise flag, so a match containing "not" is read as
   // the honest denial it is rather than the claim this check exists to catch.
