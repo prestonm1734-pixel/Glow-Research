@@ -703,7 +703,84 @@ const TRANSIT_DAYS = 2;
 // so the short form cannot quietly grow a third analysis the laboratory never
 // ran or drop the regulatory hedge on the manufacturing claim. check-claims.js
 // pins both long forms to the prose they summarise.
-const ANALYSIS_SHORT = 'HPLC-UV + LC-MS + net peptide content + sterility + endotoxin + appearance and solubility + heavy metals + lot archival';
+// The analyses the laboratory reports per lot, as rows rather than a sentence.
+//
+// This array is where the count comes from. Before it existed, "eight checks"
+// was a word typed into how-we-test.html, "7x Third Party Tested" was a
+// different word typed into the homepage hero, and the certificate reports
+// seven. Three surfaces, three numbers, nothing holding them together. A count
+// nobody derives goes stale the first time the panel changes, so every page
+// now renders it from `.length` and check-claims.js fails the build if any of
+// them states a different one.
+//
+// Lot archival is deliberately not a row here. It is on every certificate and
+// ANALYSIS_LONG still names it, but it is a record, not an analysis: no
+// instrument runs and no result is measured. Counting it would buy one extra
+// test in the headline for free, which is the small, defensible, untrue kind
+// of claim PRINCIPLES.md exists to stop.
+//
+//   name    what the row is called on the certificate
+//   short   the term the evidence panel abbreviates to. Must appear in
+//           ANALYSIS_LONG, which check-claims.js enforces
+//   method  the instrument or assay, where we actually know it. Empty for the
+//           rows where the certificate names a result but not a technique:
+//           guessing one would be inventing a fact about someone else's lab
+//   plain   one sentence, no jargon, for how-we-test.html
+const ANALYSIS_TESTS = [
+  {
+    name: 'Purity',
+    short: 'HPLC-UV',
+    method: 'Reverse-phase HPLC-UV',
+    plain: 'How much of the powder is the peptide you ordered. This is the percentage printed on the certificate.',
+  },
+  {
+    name: 'Identity',
+    short: 'LC-MS',
+    method: 'LC-MS',
+    plain: 'Weighs the molecule to confirm it is the one on the label, not something close to it.',
+  },
+  {
+    name: 'Net peptide content',
+    short: 'net peptide content',
+    method: '',
+    plain: 'How many milligrams of actual peptide are in the vial once salt and water are taken out.',
+  },
+  {
+    name: 'Sterility',
+    short: 'sterility',
+    method: '',
+    plain: 'The lot is cultured to see whether anything grows. Nothing should.',
+  },
+  {
+    name: 'Endotoxin',
+    short: 'endotoxin',
+    method: 'LAL assay, USP chapter 85',
+    plain: 'Checks for bacterial toxin, which is left behind even after the bacteria themselves are gone.',
+  },
+  {
+    name: 'Appearance and solubility',
+    short: 'appearance and solubility',
+    method: '',
+    plain: 'The powder is looked at and dissolved. It should look right and go into solution cleanly.',
+  },
+  {
+    name: 'Heavy metals',
+    short: 'heavy metals',
+    method: '',
+    plain: 'Screens for lead, arsenic and the other metals that can carry over from manufacturing.',
+  },
+];
+
+// The number every page states, derived from the rows above so it cannot be
+// typed wrong. Spelled out as well as counted, because the pages say "Seven
+// tests" in a headline and "7x" in a subheading and both have to move together.
+const TESTS_PER_BATCH = ANALYSIS_TESTS.length;
+const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const numberWord = n => NUMBER_WORDS[n] || String(n);
+
+// Built from the rows, not typed alongside them: the panel's four-word summary
+// used to carry an eighth term the certificate does not report.
+const ANALYSIS_SHORT = ANALYSIS_TESTS.map(t => t.short).join(' + ');
 const ANALYSIS_LONG = 'reverse-phase HPLC-UV for purity, LC-MS for identity, net peptide content, sterility testing, endotoxin testing by LAL assay under USP chapter 85, appearance and solubility inspection, heavy metals screening, and lot archival linking every batch to its certificate';
 const SOURCE_SHORT = 'U.S. manufacturing partner';
 const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices';
@@ -718,12 +795,10 @@ const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to 
 // The array is empty, and has been repeatedly reduced rather than written.
 // Endotoxin came out when the certificate format showed a LAL assay under
 // USP <85> as a standard line. General contaminant screening came out when
-// the panel was rebuilt around the eight checks the laboratory actually
-// reports per lot: purity, identity, net peptide content, sterility,
-// endotoxin, appearance and solubility, heavy metals, and lot archival.
-// Sterility briefly dropped out of that rebuild and was put back in when
-// it was confirmed the lab still runs it on every lot alongside the other
-// seven; it is not a stand-in for any of them.
+// the panel was rebuilt around the analyses the laboratory actually reports
+// per lot, which are now the rows of ANALYSIS_TESTS above. Sterility briefly
+// dropped out of that rebuild and was put back in when it was confirmed the
+// lab still runs it on every lot; it is not a stand-in for any of the others.
 //
 // Empty is not the same as unchecked. check-claims.js still holds the two
 // halves apart: nothing in this array may appear in ANALYSIS_SHORT,
@@ -809,7 +884,7 @@ const FAQS = [
     // answer to start with ANALYSIS_LONG verbatim and to name every entry in
     // ANALYSIS_NOT_RUN somewhere in the FAQ.
     q: 'Is every lot tested by an independent laboratory, and for what?',
-    a: `${ANALYSIS_LONG}. Yes, on every lot, before it is released for sale. Identity and purity are two different questions and neither covers the other: identity is whether the peptide in the vial is the sequence you ordered, purity is what proportion of the material is that sequence rather than truncated peptide, residual reagent or salt. Net peptide content, sterility, endotoxin, appearance and solubility, and heavy metals are five more analyses, each answering something the other two do not. Lot archival is not a chemical test: it is the guarantee that the certificate you can pull up names the batch number printed on the vial in front of you, not a different lot's paperwork. The certificate is issued by the laboratory that ran the analysis, not by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory.`,
+    a: `${ANALYSIS_LONG}. Yes, on every lot, before it is released for sale. That is ${numberWord(TESTS_PER_BATCH)} separate analyses. Identity and purity are two different questions and neither covers the other: identity is whether the peptide in the vial is the sequence you ordered, purity is what proportion of the material is that sequence rather than truncated peptide, residual reagent or salt. Net peptide content, sterility, endotoxin, appearance and solubility, and heavy metals are ${numberWord(TESTS_PER_BATCH - 2)} more, each answering something the other two do not. Lot archival is counted as none of them: it is not a chemical test but a record, the guarantee that the certificate you can pull up names the batch number printed on the vial in front of you rather than a different lot's paperwork. The certificate is issued by the laboratory that ran the analysis, not by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory.`,
   },
   {
     // Answer comes from COA_COPY, which keys off COAS_PUBLISHED. While
@@ -1322,6 +1397,9 @@ if (typeof module !== 'undefined' && module.exports) {
     CUTOFF_LABEL,
     CUTOFF_LABEL_SHORT,
     TRANSIT_DAYS,
+    ANALYSIS_TESTS,
+    TESTS_PER_BATCH,
+    numberWord,
     ANALYSIS_SHORT,
     ANALYSIS_LONG,
     ANALYSIS_NOT_RUN,

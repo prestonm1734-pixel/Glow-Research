@@ -26,6 +26,7 @@ const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, CUTOFF_LABEL, CUTOFF_LABEL_SHORT,
+  ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG, evidenceRows, evidenceHtml,
   identityLine, FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
@@ -348,6 +349,94 @@ console.log('\nthe Glow Standard panel');
   });
   ok('no page prints a lot number the catalog does not hold', invented.length === 0,
     invented.join(', '));
+}
+
+/* ---------------------------------------------------------------------------
+ * 3d-ii. How many tests, stated the same way everywhere.
+ *
+ *     This was three numbers that disagreed. how-we-test.html headlined "Eight
+ *     checks", the homepage hero subheading said "7x Third Party Tested", and
+ *     the certificate reports seven rows. Each was a word typed into a page, so
+ *     nothing could notice, and the page a buyer reads to decide whether to
+ *     trust us was the one overstating the count.
+ *
+ *     ANALYSIS_TESTS in js/products-data.js is the count now. Everything below
+ *     pins a surface to it, so the number moves when the panel does.
+ * ------------------------------------------------------------------------- */
+console.log('\nhow many tests');
+{
+  ok(`the catalog holds the panel as rows, not a number (${TESTS_PER_BATCH})`,
+    Array.isArray(ANALYSIS_TESTS) && TESTS_PER_BATCH === ANALYSIS_TESTS.length &&
+    TESTS_PER_BATCH > 0);
+
+  // Lot archival is on the certificate and named in ANALYSIS_LONG, but it is a
+  // record rather than an analysis: no instrument runs and no result is
+  // measured. Counting it is how the headline got to eight, and nothing stops a
+  // future edit putting it back as a row except this.
+  ok('lot archival is a record, not one of the tests',
+    !ANALYSIS_TESTS.some(t => /archiv/i.test(t.name)) &&
+    /lot archival/i.test(ANALYSIS_LONG),
+    'archival belongs in ANALYSIS_LONG as a record, not in ANALYSIS_TESTS as a test');
+
+  // Every row's short term has to be findable in the long sentence, the same
+  // rule the panel summary is held to, so a row cannot name an analysis the
+  // rest of the site does not claim.
+  const rowUnbacked = ANALYSIS_TESTS.filter(t =>
+    !ANALYSIS_LONG.toLowerCase().includes(t.short.toLowerCase()));
+  ok('every test row is backed by the long form',
+    rowUnbacked.length === 0, `unbacked: ${rowUnbacked.map(t => t.name).join(', ')}`);
+
+  // A method is named only where we actually know one. An empty string is the
+  // honest state for the rows where the certificate reports a result without
+  // naming a technique; inventing one would be asserting a fact about someone
+  // else's laboratory.
+  const namedMethods = ANALYSIS_TESTS.filter(t => t.method);
+  ok(`${namedMethods.length} of ${TESTS_PER_BATCH} rows name a method, and no row invents one`,
+    ANALYSIS_TESTS.every(t => typeof t.method === 'string') &&
+    namedMethods.every(t => ANALYSIS_LONG.toLowerCase().includes(t.short.toLowerCase())));
+
+  // The page has to actually list them: named, in order, one numbered row each.
+  const hw = read('how-we-test.html');
+  const missingRow = ANALYSIS_TESTS.filter(t => !hw.includes(`<h3>${t.name}</h3>`));
+  ok(`how-we-test.html lists all ${TESTS_PER_BATCH} by name`,
+    missingRow.length === 0, `missing: ${missingRow.map(t => t.name).join(', ')}`);
+  const numerals = (hw.match(/class="hw-num"[^>]*>\s*(\d\d)\s*</g) || [])
+    .map(m => m.replace(/\D/g, '').slice(-2));
+  const wantNumerals = ANALYSIS_TESTS.map((_, i) => String(i + 1).padStart(2, '0'));
+  ok('the rows are numbered 01 upward with none skipped or repeated',
+    numerals.join(',') === wantNumerals.join(','),
+    `page has ${numerals.join(',') || '(none)'}, catalog wants ${wantNumerals.join(',')}`);
+
+  // The count in words, wherever any page says it. Catches the headline, the
+  // subhead under it, and anything written later that quietly disagrees.
+  const word = numberWord(TESTS_PER_BATCH);
+  const stripped = f => read(f)
+    .replace(/<style>[\s\S]*?<\/style>/g, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<script[\s\S]*?<\/script>/g, '');
+  const countRe = /\b(one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:separate\s+|independent\s+)?(?:tests|checks|analyses)\b/gi;
+  const wrongWord = [];
+  pages.forEach(f => {
+    for (const m of stripped(f).matchAll(countRe)) {
+      if (m[1].toLowerCase() !== word) wrongWord.push(`${f}: "${m[0].trim()}"`);
+    }
+  });
+  ok(`every page that counts the panel in words says "${word}"`,
+    wrongWord.length === 0, wrongWord.join('\n          '));
+
+  // The homepage states it as a numeral in the hero subheading, a different
+  // string in a different file, and that was the copy already disagreeing.
+  const homeCount = read('index.html').match(/(\d+)x Third Party Tested/i);
+  ok(`the homepage hero states ${TESTS_PER_BATCH}x, matching the panel`,
+    homeCount !== null && Number(homeCount[1]) === TESTS_PER_BATCH,
+    homeCount ? `hero says ${homeCount[1]}x` : 'no "<n>x Third Party Tested" in index.html');
+
+  // The summary the evidence panel prints is generated from the rows, so it
+  // cannot grow a term the certificate does not report. It carried "+ lot
+  // archival" as an eighth entry until the rows existed to derive it from.
+  ok('ANALYSIS_SHORT is derived from the rows, not typed beside them',
+    /ANALYSIS_TESTS\.map\(t => t\.short\)\.join/.test(read('js/products-data.js')) &&
+    ANALYSIS_SHORT.split('+').length === TESTS_PER_BATCH);
 }
 
 /* ---------------------------------------------------------------------------
