@@ -302,11 +302,11 @@ console.log('\nthe Glow Standard panel');
   // nothing else. Same rule as the hero average: edit the catalog, not the page.
   //
   // `verifyValue` is the one deliberate exception: a product this panel does
-  // not truthfully describe as written (Bacteriostatic Water was never run
-  // through the peptide testing panel) states so explicitly rather than
-  // inheriting "<purity> purity" as if it had been. For those products this
-  // checks the row echoes verifyValue exactly, so the override itself cannot
-  // silently drift from what evidenceRows() renders.
+  // not truthfully describe as written states so explicitly rather than
+  // inheriting "<purity> purity" as if it had been run through the peptide
+  // testing panel. For those products this checks the row echoes verifyValue
+  // exactly, so the override itself cannot silently drift from what
+  // evidenceRows() renders.
   const wrongPurity = GLOW_PRODUCTS.filter(prod => {
     const row = evidenceRows(prod).find(r => r.key === 'verify');
     const want = prod.verifyValue || `${prod.purity} purity`;
@@ -552,10 +552,10 @@ console.log('\nlisting copy');
 
   ok('llms.txt has no undefined headings', !/undefined/.test(read('llms.txt')));
 
-  // And a filter chip for its group (Peptides or Supplies), or the category
-  // exists but cannot be browsed to at all. The chip row groups the seven
-  // research categories under one "Peptides" chip rather than exposing each
-  // by name, so this checks catFilterGroup(cat) has a chip, not cat itself.
+  // And a filter chip for its group, or the category exists but cannot be
+  // browsed to at all. The chip row groups the seven research categories
+  // under one "Peptides" chip rather than exposing each by name, so this
+  // checks catFilterGroup(cat) has a chip, not cat itself.
   const chips = new Set([...read('peptides.html').matchAll(/data-filter="([^"]+)"/g)].map(m => m[1]));
   const unbrowsable = [...new Set(GLOW_PRODUCTS.map(p => catFilterGroup(p.cat)))].filter(c => !chips.has(c));
   ok('every category has a filter chip on the catalog page',

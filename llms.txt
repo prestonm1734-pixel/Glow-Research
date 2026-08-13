@@ -76,10 +76,6 @@ benefit.
 - **Selank**: A synthetic heptapeptide based on the tetrapeptide tuftsin. Studied in preclinical models of neuropeptide regulation. Sizes: 5mg. From $45 per vial.
 - **Semax**: A synthetic peptide derived from the ACTH(4-10) fragment. Investigated in research on neurotrophic signalling. Sizes: 30mg. From $80 per vial.
 
-### Laboratory Supplies
-
-- **Bacteriostatic Water**: Sterile water for reconstituting lyophilized peptides. Preserved with 0.9% benzyl alcohol. Sizes: 3mL, 10mL. From $9 per vial.
-
 ## Frequently asked
 
 **Are Glow Research peptides intended for human consumption?**
