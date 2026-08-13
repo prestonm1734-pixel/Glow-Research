@@ -703,8 +703,8 @@ const TRANSIT_DAYS = 2;
 // so the short form cannot quietly grow a third analysis the laboratory never
 // ran or drop the regulatory hedge on the manufacturing claim. check-claims.js
 // pins both long forms to the prose they summarise.
-const ANALYSIS_SHORT = 'HPLC-UV + LC-MS + net peptide content + endotoxin + appearance and solubility + heavy metals + lot archival';
-const ANALYSIS_LONG = 'reverse-phase HPLC-UV for purity, LC-MS for identity, net peptide content, endotoxin testing by LAL assay under USP chapter 85, appearance and solubility inspection, heavy metals screening, and lot archival linking every batch to its certificate';
+const ANALYSIS_SHORT = 'HPLC-UV + LC-MS + net peptide content + sterility + endotoxin + appearance and solubility + heavy metals + lot archival';
+const ANALYSIS_LONG = 'reverse-phase HPLC-UV for purity, LC-MS for identity, net peptide content, sterility testing, endotoxin testing by LAL assay under USP chapter 85, appearance and solubility inspection, heavy metals screening, and lot archival linking every batch to its certificate';
 const SOURCE_SHORT = 'U.S. manufacturing partner';
 const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices';
 
@@ -717,13 +717,13 @@ const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to 
 //
 // The array is empty, and has been repeatedly reduced rather than written.
 // Endotoxin came out when the certificate format showed a LAL assay under
-// USP <85> as a standard line. Sterility and general contaminant screening
-// came out again when the panel was rebuilt around the seven checks the
-// laboratory actually reports per lot: purity, identity, net peptide
-// content, endotoxin, appearance and solubility, heavy metals, and lot
-// archival. Sterility is not one of the seven and is not claimed anywhere
-// on the site as a result; if the laboratory adds it back to the
-// certificate, it belongs in ANALYSIS_LONG, not silently assumed.
+// USP <85> as a standard line. General contaminant screening came out when
+// the panel was rebuilt around the eight checks the laboratory actually
+// reports per lot: purity, identity, net peptide content, sterility,
+// endotoxin, appearance and solubility, heavy metals, and lot archival.
+// Sterility briefly dropped out of that rebuild and was put back in when
+// it was confirmed the lab still runs it on every lot alongside the other
+// seven; it is not a stand-in for any of them.
 //
 // Empty is not the same as unchecked. check-claims.js still holds the two
 // halves apart: nothing in this array may appear in ANALYSIS_SHORT,
@@ -809,7 +809,7 @@ const FAQS = [
     // answer to start with ANALYSIS_LONG verbatim and to name every entry in
     // ANALYSIS_NOT_RUN somewhere in the FAQ.
     q: 'Is every lot tested by an independent laboratory, and for what?',
-    a: `${ANALYSIS_LONG}. Yes, on every lot, before it is released for sale. Identity and purity are two different questions and neither covers the other: identity is whether the peptide in the vial is the sequence you ordered, purity is what proportion of the material is that sequence rather than truncated peptide, residual reagent or salt. Net peptide content, endotoxin, appearance and solubility, and heavy metals are four more analyses, each answering something the other two do not. Lot archival is not a chemical test: it is the guarantee that the certificate you can pull up names the batch number printed on the vial in front of you, not a different lot's paperwork. The certificate is issued by the laboratory that ran the analysis, not by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory.`,
+    a: `${ANALYSIS_LONG}. Yes, on every lot, before it is released for sale. Identity and purity are two different questions and neither covers the other: identity is whether the peptide in the vial is the sequence you ordered, purity is what proportion of the material is that sequence rather than truncated peptide, residual reagent or salt. Net peptide content, sterility, endotoxin, appearance and solubility, and heavy metals are five more analyses, each answering something the other two do not. Lot archival is not a chemical test: it is the guarantee that the certificate you can pull up names the batch number printed on the vial in front of you, not a different lot's paperwork. The certificate is issued by the laboratory that ran the analysis, not by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory.`,
   },
   {
     // Answer comes from COA_COPY, which keys off COAS_PUBLISHED. While

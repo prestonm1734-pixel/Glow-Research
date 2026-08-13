@@ -8,20 +8,20 @@
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
 <title>How We Test | Glow Research</title>
-<meta name="description" content="Every lot is tested by an independent laboratory before it reaches our catalog. Seven checks: purity, identity, net content, endotoxin, appearance, heavy metals, and lot archival." />
+<meta name="description" content="Every lot is tested by an independent laboratory before it reaches our catalog. Purity, identity, sterility, endotoxin, heavy metals and more, checked on every batch." />
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://glowresearch.shop/how-we-test.html" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
 <meta property="og:title" content="How We Test" />
-<meta property="og:description" content="Every lot is tested by an independent laboratory before it reaches our catalog. Seven checks: purity, identity, net content, endotoxin, appearance, heavy metals, and lot archival." />
+<meta property="og:description" content="Every lot is tested by an independent laboratory before it reaches our catalog. Purity, identity, sterility, endotoxin, heavy metals and more, checked on every batch." />
 <meta property="og:url" content="https://glowresearch.shop/how-we-test.html" />
 <meta property="og:image" content="https://glowresearch.shop/assets/molecule-black.jpg" />
 <meta property="og:image:width" content="740" />
 <meta property="og:image:height" content="415" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="How We Test" />
-<meta name="twitter:description" content="Every lot is tested by an independent laboratory before it reaches our catalog. Seven checks: purity, identity, net content, endotoxin, appearance, heavy metals, and lot archival." />
+<meta name="twitter:description" content="Every lot is tested by an independent laboratory before it reaches our catalog. Purity, identity, sterility, endotoxin, heavy metals and more, checked on every batch." />
 <meta name="twitter:image" content="https://glowresearch.shop/assets/molecule-black.jpg" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,7 +41,7 @@
   "@id": "https://glowresearch.shop/how-we-test.html#webpage",
   "url": "https://glowresearch.shop/how-we-test.html",
   "name": "How We Test",
-  "description": "Every lot is tested by an independent laboratory before it reaches our catalog. Seven checks: purity, identity, net content, endotoxin, appearance, heavy metals, and lot archival.",
+  "description": "Every lot is tested by an independent laboratory before it reaches our catalog. Purity, identity, sterility, endotoxin, heavy metals and more, checked on every batch.",
   "isPartOf": {
     "@id": "https://glowresearch.shop/#website"
   },
@@ -99,10 +99,16 @@
     margin: clamp(14px, 2vw, 18px) 0 0; max-width: 46ch;
     font-size: clamp(1.05rem, 1.8vw, 1.2rem); line-height:1.6; color: var(--text-dim);
   }
+  /* Off the visible page: the icon list below is where a reader learns what
+     the eight checks are. This exact sentence still has to exist somewhere
+     in the markup, because check-claims.js pins ANALYSIS_LONG in
+     js/products-data.js to the prose on this page verbatim, so a change to
+     one is caught against the other. Visually hidden rather than deleted
+     keeps that guarantee without stacking a second, denser list on top of
+     the one a reader actually sees. */
   .hw-fine{
-    margin: clamp(18px, 2.4vw, 26px) 0 0; max-width: 56ch;
-    font-family:'JetBrains Mono', monospace; font-size:.76rem; line-height:1.7;
-    color: var(--text-dimmer); letter-spacing:.01em;
+    position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
   }
   /* Sentence case, mono, spaced out: a label above the headline rather than
      a second headline of its own. */
@@ -243,14 +249,14 @@
   <div class="container hw-hero-grid">
     <div>
       <span class="lp-eyebrow hw-eyebrow">Quality &amp; Testing</span>
-      <h1>Seven checks.<br /><span class="outline">Every batch.</span></h1>
+      <h1>Eight checks.<br /><span class="outline">Every batch.</span></h1>
       <p class="hw-lede">
         Every lot is tested by an independent laboratory before it reaches
         our catalog.
       </p>
       <p class="hw-fine">
         <!-- One line on purpose: a wrap would break the verbatim match. -->
-        reverse-phase HPLC-UV for purity, LC-MS for identity, net peptide content, endotoxin testing by LAL assay under USP chapter 85, appearance and solubility inspection, heavy metals screening, and lot archival linking every batch to its certificate.
+        reverse-phase HPLC-UV for purity, LC-MS for identity, net peptide content, sterility testing, endotoxin testing by LAL assay under USP chapter 85, appearance and solubility inspection, heavy metals screening, and lot archival linking every batch to its certificate.
       </p>
       <!-- Three figures pulled straight from the paragraph above rather than
            asserted new: the count of checks actually documented, and two of
@@ -258,7 +264,7 @@
            not already say. -->
       <div class="hw-figs">
         <div class="hw-fig">
-          <span class="hw-fig-num">07</span>
+          <span class="hw-fig-num">08</span>
           <p>Independent checks</p>
         </div>
         <div class="hw-fig">
@@ -277,16 +283,16 @@
   </div>
 </section>
 
-<!-- Icon list, not a spec-sheet table: seven items read faster as an icon,
+<!-- Icon list, not a spec-sheet table: eight items read faster as an icon,
      a bold name, and one sentence than as a five-column table would have
-     read at seven rows. Each sentence states what the check does, not what
+     read at eight rows. Each sentence states what the check does, not what
      it means for a reader to trust it -- a laboratory buyer already knows
      what an endotoxin assay is. -->
 <section class="lp-section hw-section">
   <div class="container">
     <div class="hw-head reveal">
       <span class="lp-eyebrow">The Methods</span>
-      <h2>Seven checks on every lot.</h2>
+      <h2>Eight checks on every lot.</h2>
     </div>
     <div class="hw-list">
       <div class="hw-item reveal">
@@ -318,6 +324,15 @@
       </div>
       <div class="hw-item reveal" style="transition-delay:120ms">
         <span class="hw-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8" stroke-linecap="round"/></svg>
+        </span>
+        <div>
+          <h3>Sterility</h3>
+          <p>Screened for microbial growth. A clean result means nothing grew.</p>
+        </div>
+      </div>
+      <div class="hw-item reveal" style="transition-delay:160ms">
+        <span class="hw-icon" aria-hidden="true">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>
         </span>
         <div>
@@ -325,7 +340,7 @@
           <p>Bacterial endotoxin screened against a defined threshold on every lot.</p>
         </div>
       </div>
-      <div class="hw-item reveal" style="transition-delay:160ms">
+      <div class="hw-item reveal" style="transition-delay:200ms">
         <span class="hw-icon" aria-hidden="true">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
         </span>
@@ -334,7 +349,7 @@
           <p>The lyophilate and its reconstitution behavior are inspected before a lot is released.</p>
         </div>
       </div>
-      <div class="hw-item reveal" style="transition-delay:200ms">
+      <div class="hw-item reveal" style="transition-delay:240ms">
         <span class="hw-icon" aria-hidden="true">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16l-6 9v6l-4 2v-8L4 4z" stroke-linejoin="round"/></svg>
         </span>
@@ -343,7 +358,7 @@
           <p>Trace elemental contaminants screened against safe limits.</p>
         </div>
       </div>
-      <div class="hw-item reveal" style="transition-delay:240ms">
+      <div class="hw-item reveal" style="transition-delay:280ms">
         <span class="hw-icon" aria-hidden="true">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h5" stroke-linecap="round"/></svg>
         </span>
