@@ -58,7 +58,7 @@ It currently checks that:
 - the product page's evidence panel is rendered from `evidenceHtml()` by both
   the browser and the build, its served markup still matches what that function
   produces, its Verify row states the catalog's purity for that compound, it
-  names no analysis `process.html` does not describe, it keeps the
+  names no analysis `how-we-test.html` does not describe, it keeps the
   "cGMP-aligned" hedge on the manufacturing claim, every row still carries the
   note that qualifies it, and no page anywhere prints a lot number the catalog
   does not hold

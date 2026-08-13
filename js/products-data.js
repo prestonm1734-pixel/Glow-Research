@@ -698,13 +698,13 @@ const TRANSIT_DAYS = 2;
 
 // ---------------------------------------------------------------------------
 // What the site is allowed to say about how a lot is verified and where it is
-// made. Both claims are already made at length on process.html and about.html.
+// made. Both claims are already made at length on how-we-test.html and about.html.
 // The evidence panel states them in four words, and it states them from here,
 // so the short form cannot quietly grow a third analysis the laboratory never
 // ran or drop the regulatory hedge on the manufacturing claim. check-claims.js
 // pins both long forms to the prose they summarise.
-const ANALYSIS_SHORT = 'HPLC-UV + LC-MS + endotoxin';
-const ANALYSIS_LONG = 'HPLC-UV for purity, LC-MS for identity, and endotoxin testing by LAL assay under USP chapter 85';
+const ANALYSIS_SHORT = 'HPLC-UV + LC-MS + sterility + endotoxin + contaminant screening';
+const ANALYSIS_LONG = 'HPLC-UV for purity, LC-MS for identity, sterility testing, endotoxin testing by LAL assay under USP chapter 85, and chemical contaminant screening';
 const SOURCE_SHORT = 'U.S. manufacturing partner';
 const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices';
 
@@ -712,22 +712,21 @@ const SOURCE_LONG = 'Synthesis and fill at a U.S. partner facility operating to 
 //
 // ANALYSIS_LONG is the complete list of what is performed, which means every
 // other analysis a buyer might assume is included is absent. Left unsaid, an
-// absence reads as a pass: a page that talks at length about testing and never
-// mentions sterility invites the reader to fill the gap in our favour. So the
-// FAQ answers the question by name, and it builds the answer from this array
-// rather than from a sentence someone typed, so the day one of these is
-// actually run the honest version is one line: delete it here.
+// absence reads as a pass, so anything in this array is named by the FAQ, and
+// the FAQ builds that sentence from here rather than from prose someone typed.
 //
-// Endotoxin used to live in this array. It came out once the real certificate
-// format showed a LAL assay under USP <85> as a standard line, which means it
-// is run on every lot, not just this one's, and ANALYSIS_LONG above now says
-// so. This array is what is left after that: sterility, which the certificate
-// does not report and an endotoxin pass does not imply.
+// The array is empty, and has been twice reduced rather than written. Endotoxin
+// came out when the certificate format showed a LAL assay under USP <85> as a
+// standard line. Sterility came out when the laboratory confirmed it runs a
+// sterility test and a contaminant screen on every lot as well, which is what
+// ANALYSIS_LONG now says.
 //
-// check-claims.js holds the two halves apart. Nothing in this array may appear
-// in ANALYSIS_SHORT, ANALYSIS_LONG, or the testing copy on process.html, so
-// "we do not test for X" cannot survive X being added to what we say we test.
-const ANALYSIS_NOT_RUN = ['sterility'];
+// Empty is not the same as unchecked. check-claims.js still holds the two
+// halves apart: nothing in this array may appear in ANALYSIS_SHORT,
+// ANALYSIS_LONG, or the testing copy on how-we-test.html, so the day a test
+// moves back out of the certificate, adding it here is enough to make every
+// page that claims it fail.
+const ANALYSIS_NOT_RUN = [];
 
 // ---------------------------------------------------------------------------
 // The identity line: the sentence under the product name in the buy box.
@@ -806,7 +805,7 @@ const FAQS = [
     // answer to start with ANALYSIS_LONG verbatim and to name every entry in
     // ANALYSIS_NOT_RUN somewhere in the FAQ.
     q: 'Is every lot tested by an independent laboratory, and for what?',
-    a: `${ANALYSIS_LONG}. Yes, on every lot, before it is released for sale. Identity and purity are two different questions and neither covers the other: identity is whether the peptide in the vial is the sequence you ordered, purity is what proportion of the material is that sequence rather than truncated peptide, residual reagent or salt. The one thing we do not run is a sterility test, and a lot that screens negative for endotoxin has not been screened for sterility, so we say that plainly rather than let it go unmentioned. The certificate is issued by the laboratory that ran the analysis, not by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory.`,
+    a: `${ANALYSIS_LONG}. Yes, on every lot, before it is released for sale. Identity and purity are two different questions and neither covers the other: identity is whether the peptide in the vial is the sequence you ordered, purity is what proportion of the material is that sequence rather than truncated peptide, residual reagent or salt. Sterility, endotoxin and contaminant screening are three more, each answering something the other two do not. The certificate is issued by the laboratory that ran the analysis, not by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory.`,
   },
   {
     // Answer comes from COA_COPY, which keys off COAS_PUBLISHED. While

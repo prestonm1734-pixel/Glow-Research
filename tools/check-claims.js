@@ -267,13 +267,13 @@ console.log('\nthe Glow Standard panel');
     'product.html has drifted from evidenceHtml(). Replace the contents of\n' +
     '          <dl id="pdEvidence"> with:\n' + evidenceHtml({}));
 
-  // The Verify row names the analyses in three words. process.html names them
+  // The Verify row names the analyses in three words. how-we-test.html names them
   // in a sentence. The short form must not name one the long one does not:
   // "LC-MS" is a different instrument from "HPLC, and separately mass
   // spectrometry", and a data cell is where that substitution goes unnoticed.
   ok('the process page states the analysis the panel summarises',
-    read('process.html').includes(ANALYSIS_LONG),
-    `process.html does not contain "${ANALYSIS_LONG}"`);
+    read('how-we-test.html').includes(ANALYSIS_LONG),
+    `how-we-test.html does not contain "${ANALYSIS_LONG}"`);
   const named = ANALYSIS_SHORT.split(/[+·,]/).map(s => s.trim().toLowerCase());
   const unbacked = named.filter(m => !ANALYSIS_LONG.toLowerCase().includes(m));
   ok('the panel names no analysis the laboratory does not run',
@@ -283,7 +283,7 @@ console.log('\nthe Glow Standard panel');
   // four-word data cell is exactly where that hedge gets dropped by accident.
   ok('the source row keeps the cGMP-aligned hedge',
     /cGMP-aligned quality practices/.test(SOURCE_LONG) &&
-    read('process.html').includes('cGMP-aligned quality practices'));
+    read('how-we-test.html').includes('cGMP-aligned quality practices'));
   const overclaims = pages.filter(f =>
     /\bGMP[\s-]?(certified|approved|compliant)\b/i.test(read(f)));
   ok('no page upgrades that to a GMP certification', overclaims.length === 0,
@@ -481,7 +481,7 @@ console.log('\nlisting copy');
  * ------------------------------------------------------------------------- */
 console.log('\ndisclosures');
 {
-  const discPages = ['process.html', 'about.html', 'shipping.html', 'wholesale.html'];
+  const discPages = ['how-we-test.html', 'about.html', 'shipping.html', 'wholesale.html'];
   const empty = [];
   const noSummary = [];
   let total = 0;
@@ -504,7 +504,7 @@ console.log('\ndisclosures');
 
   // The point of the rebuild: a step is a heading, one sentence, and who did
   // it. A paragraph creeping back into the visible half undoes it silently.
-  const proc = read('process.html');
+  const proc = read('how-we-test.html');
   const LEAD_MAX = 130;
   const leads = [...proc.matchAll(/<p class="pr-lead">([\s\S]*?)<\/p>/g)]
     .map(m => m[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim());
@@ -696,7 +696,7 @@ console.log('\nwhat the FAQ is allowed to say about testing');
   const questions = FAQS.map(f => f.q).join('\n');
 
   // The answer that explains the analysis is built from ANALYSIS_LONG, so it
-  // cannot describe an instrument the evidence panel and process.html do not.
+  // cannot describe an instrument the evidence panel and how-we-test.html do not.
   // It has to lead with it, not merely contain it somewhere: a later answer
   // quotes the same constant, and matching anywhere in the FAQ would let this
   // one be retyped while the check still passed on the other one's copy.
@@ -754,15 +754,24 @@ console.log('\nwhat the FAQ is allowed to say about testing');
   // the FAQ itself explaining that we do not, which is exactly the sentence
   // this pattern would otherwise flag, so a match containing "not" is read as
   // the honest denial it is rather than the claim this check exists to catch.
-  const claims = new RegExp(
-    `\\b(?:we|glow)\\b[^.]{0,80}?\\b(?:tests?|tested|testing|screens?|screened|assays?|assayed)\\b[^.]{0,80}?\\b(?:${ANALYSIS_NOT_RUN.join('|')})`,
-    'gi');
-  const claiming = pages.filter(f => {
-    const matches = read(f).match(claims) || [];
-    return matches.some(m => !/\bnot\b/i.test(m));
-  });
-  ok('no page claims a test that is not run', claiming.length === 0,
-    claiming.join(', '));
+  // An empty array has to short-circuit. join('|') on [] is '', which turns the
+  // alternation into `(?:)` — a group matching the empty string — so the
+  // pattern degrades to "any sentence containing we/glow and a testing verb"
+  // and flags all eighteen pages. That is the check inverting itself the moment
+  // it has nothing to look for, which is precisely when it should be silent.
+  const claiming = ANALYSIS_NOT_RUN.length === 0 ? [] : (() => {
+    const claims = new RegExp(
+      `\\b(?:we|glow)\\b[^.]{0,80}?\\b(?:tests?|tested|testing|screens?|screened|assays?|assayed)\\b[^.]{0,80}?\\b(?:${ANALYSIS_NOT_RUN.join('|')})`,
+      'gi');
+    return pages.filter(f => {
+      const matches = read(f).match(claims) || [];
+      return matches.some(m => !/\bnot\b/i.test(m));
+    });
+  })();
+  ok(ANALYSIS_NOT_RUN.length === 0
+      ? 'no page claims a test that is not run (nothing is excluded)'
+      : 'no page claims a test that is not run',
+    claiming.length === 0, claiming.join(', '));
 
   // The correction that matters most on an RUO catalog: a figure quoted in an
   // FAQ is read as a standard every lot meets, not as one lot's measurement.
@@ -970,7 +979,7 @@ console.log('\ncrawlable content');
   // The process page's ItemList is a second copy of the six steps. It already
   // drifted once, describing the pre-rewrite page down to a step name that no
   // longer existed, so it is pinned to the markup it summarises.
-  const proc = read('process.html');
+  const proc = read('how-we-test.html');
   const schema = JSON.parse(proc.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   const steps = schema.mainEntity.itemListElement;
   // The step titles are h2 with the section heading above them gone, and the

@@ -25,7 +25,7 @@ const SITE = 'https://glowresearch.shop';
 const STATIC_PAGES = [
   ['', '1.0'],
   ['peptides.html', '0.9'],
-  ['process.html', '0.7'],
+  ['how-we-test.html', '0.7'],
   ['about.html', '0.6'],
   ['shipping.html', '0.6'],
   ['wholesale.html', '0.6'],

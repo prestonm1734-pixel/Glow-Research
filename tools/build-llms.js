@@ -88,7 +88,7 @@ ${faq}
 ## Pages
 
 - [Products](${SITE}/peptides.html): the full catalog
-- [Our process](${SITE}/process.html): the six steps from synthesis to dispatch, and who performs each
+- [Our process](${SITE}/how-we-test.html): the six steps from synthesis to dispatch, and who performs each
 - [About](${SITE}/about.html): where Glow sits in the chain, and the five published principles
 - [Shipping](${SITE}/shipping.html): cutoff, transit, coverage and terms
 - [Wholesale](${SITE}/wholesale.html): volume pricing for institutions

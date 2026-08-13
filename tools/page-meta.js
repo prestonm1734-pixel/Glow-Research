@@ -47,10 +47,10 @@ const PAGE_META = {
     title: t('Product'),
     desc: 'Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only. Size options, specifications, and same-day shipping before 2PM PST.',
   },
-  'process.html': {
-    name: 'Our Process | From Source to Shipment',
-    title: t('Our Process'),
-    desc: 'How Glow research compounds move from our U.S. manufacturing partner through independent testing, batch documentation, controlled handling, and same-day shipping before 2:00 PM PST.',
+  'how-we-test.html': {
+    name: 'How We Test',
+    title: t('How We Test'),
+    desc: 'Every batch is tested by an independent certified laboratory: purity, identity, sterility, endotoxin and chemical contaminants. Five tests, every batch, no exceptions.',
   },
   'about.html': {
     name: 'About Glow Research',

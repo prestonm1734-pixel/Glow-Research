@@ -17,7 +17,7 @@ benefit.
 ## The supply chain
 
 - Manufacturing: Synthesis and fill at a U.S. partner facility operating to cGMP-aligned quality practices. Performed by a manufacturing partner, not by Glow.
-- Testing: every lot is analysed by an independent third-party laboratory. HPLC-UV for purity, LC-MS for identity, and endotoxin testing by LAL assay under USP chapter 85.
+- Testing: every lot is analysed by an independent third-party laboratory. HPLC-UV for purity, LC-MS for identity, sterility testing, endotoxin testing by LAL assay under USP chapter 85, and chemical contaminant screening.
 - Certificates: COA on request. Certificate on request: email support@glowresearch.shop with the lot number on your vial
 - Fulfilment: US-based climate-controlled facility, stock held by lot.
 - Dispatch: orders placed before 2:00 PM PST on a business day ship the same
@@ -88,7 +88,7 @@ No. All products sold by Glow Research are strictly for laboratory and in-vitro 
 
 **Is every lot tested by an independent laboratory, and for what?**
 
-HPLC-UV for purity, LC-MS for identity, and endotoxin testing by LAL assay under USP chapter 85. Yes, on every lot, before it is released for sale. Identity and purity are two different questions and neither covers the other: identity is whether the peptide in the vial is the sequence you ordered, purity is what proportion of the material is that sequence rather than truncated peptide, residual reagent or salt. The one thing we do not run is a sterility test, and a lot that screens negative for endotoxin has not been screened for sterility, so we say that plainly rather than let it go unmentioned. The certificate is issued by the laboratory that ran the analysis, not by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory.
+HPLC-UV for purity, LC-MS for identity, sterility testing, endotoxin testing by LAL assay under USP chapter 85, and chemical contaminant screening. Yes, on every lot, before it is released for sale. Identity and purity are two different questions and neither covers the other: identity is whether the peptide in the vial is the sequence you ordered, purity is what proportion of the material is that sequence rather than truncated peptide, residual reagent or salt. Sterility, endotoxin and contaminant screening are three more, each answering something the other two do not. The certificate is issued by the laboratory that ran the analysis, not by us. Glow does not manufacture, does not operate a laboratory, and does not grade its own inventory.
 
 **Where do I find a lot’s COA?**
 
@@ -105,7 +105,7 @@ Printed on the vial label. It is the number the certificate for that batch is is
 ## Pages
 
 - [Products](https://glowresearch.shop/peptides.html): the full catalog
-- [Our process](https://glowresearch.shop/process.html): the six steps from synthesis to dispatch, and who performs each
+- [Our process](https://glowresearch.shop/how-we-test.html): the six steps from synthesis to dispatch, and who performs each
 - [About](https://glowresearch.shop/about.html): where Glow sits in the chain, and the five published principles
 - [Shipping](https://glowresearch.shop/shipping.html): cutoff, transit, coverage and terms
 - [Wholesale](https://glowresearch.shop/wholesale.html): volume pricing for institutions

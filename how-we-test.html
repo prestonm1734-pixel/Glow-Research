@@ -7,22 +7,22 @@
      needs the observer to show it, so without scripting the page must
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
-<title>Our Process | Glow Research</title>
-<meta name="description" content="How Glow research compounds move from our U.S. manufacturing partner through independent testing, batch documentation, controlled handling, and same-day shipping before 2:00 PM PST." />
+<title>How We Test | Glow Research</title>
+<meta name="description" content="Every batch is tested by an independent certified laboratory: purity, identity, sterility, endotoxin and chemical contaminants. Five tests, every batch, no exceptions." />
 <meta name="robots" content="index,follow" />
-<link rel="canonical" href="https://glowresearch.shop/process.html" />
+<link rel="canonical" href="https://glowresearch.shop/how-we-test.html" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
-<meta property="og:title" content="Our Process | From Source to Shipment" />
-<meta property="og:description" content="How Glow research compounds move from our U.S. manufacturing partner through independent testing, batch documentation, controlled handling, and same-day shipping before 2:00 PM PST." />
-<meta property="og:url" content="https://glowresearch.shop/process.html" />
-<meta property="og:image" content="https://glowresearch.shop/assets/vial-trio-black.jpg" />
-<meta property="og:image:width" content="1672" />
-<meta property="og:image:height" content="941" />
+<meta property="og:title" content="How We Test" />
+<meta property="og:description" content="Every batch is tested by an independent certified laboratory: purity, identity, sterility, endotoxin and chemical contaminants. Five tests, every batch, no exceptions." />
+<meta property="og:url" content="https://glowresearch.shop/how-we-test.html" />
+<meta property="og:image" content="https://glowresearch.shop/assets/molecule-black.jpg" />
+<meta property="og:image:width" content="740" />
+<meta property="og:image:height" content="415" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Our Process | From Source to Shipment" />
-<meta name="twitter:description" content="How Glow research compounds move from our U.S. manufacturing partner through independent testing, batch documentation, controlled handling, and same-day shipping before 2:00 PM PST." />
-<meta name="twitter:image" content="https://glowresearch.shop/assets/vial-trio-black.jpg" />
+<meta name="twitter:title" content="How We Test" />
+<meta name="twitter:description" content="Every batch is tested by an independent certified laboratory: purity, identity, sterility, endotoxin and chemical contaminants. Five tests, every batch, no exceptions." />
+<meta name="twitter:image" content="https://glowresearch.shop/assets/molecule-black.jpg" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,10 +38,10 @@
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "@id": "https://glowresearch.shop/process.html#webpage",
-  "url": "https://glowresearch.shop/process.html",
-  "name": "Our Process | From Source to Shipment",
-  "description": "How Glow research compounds move from our U.S. manufacturing partner through independent testing, batch documentation, controlled handling, and same-day shipping before 2:00 PM PST.",
+  "@id": "https://glowresearch.shop/how-we-test.html#webpage",
+  "url": "https://glowresearch.shop/how-we-test.html",
+  "name": "How We Test",
+  "description": "Every batch is tested by an independent certified laboratory: purity, identity, sterility, endotoxin and chemical contaminants. Five tests, every batch, no exceptions.",
   "isPartOf": {
     "@id": "https://glowresearch.shop/#website"
   },
@@ -60,8 +60,8 @@
       {
         "@type": "ListItem",
         "position": 2,
-        "name": "Our Process",
-        "item": "https://glowresearch.shop/process.html"
+        "name": "How We Test",
+        "item": "https://glowresearch.shop/how-we-test.html"
       }
     ]
   },
@@ -81,7 +81,7 @@
         "@type": "ListItem",
         "position": 2,
         "name": "Independent Testing",
-        "description": "Each lot is analyzed by an independent laboratory: identity by LC-MS, purity by HPLC-UV, and an endotoxin screen by LAL assay."
+        "description": "Every batch is tested by an independent certified laboratory for purity, identity, sterility, endotoxin and contaminants."
       },
       {
         "@type": "ListItem",
@@ -344,6 +344,129 @@
     .is-live .pr-step:nth-child(even) .pr-card{ transform: translateY(18px); }
     .is-live .pr-step.is-on .pr-card{ transform:none; }
   }
+
+  /* ---------- hero, with the instrument alongside ----------
+     Two columns rather than the bare title the chain page used, because this
+     page opens on a claim about measurement and a photograph of an instrument
+     is the fastest way to say which kind. The image is decorative and marked
+     so: it is stock, it is not our laboratory, and the copy two inches below
+     it says the laboratory is not ours. An empty alt keeps a screen reader
+     from being told about a photo that adds nothing it cannot already read. */
+  .hw-hero > .container{
+    display:grid; grid-template-columns: 1.3fr .7fr; gap: clamp(24px, 4vw, 52px);
+    align-items:center;
+    /* .lp-hero centres its children for the single-column heroes on every
+       other landing page. With a photograph beside the text, centred copy
+       leaves a ragged edge against the image and disagrees with the
+       left-aligned sections below it, so this hero reads left. */
+    text-align:left;
+  }
+  /* A size down from the shared hero, and a wider measure. The other landing
+     pages give the h1 the full container; here it has a photograph beside it,
+     so at the shared size each half of the line wrapped again and left "ours."
+     stranded on a line of its own. */
+  .hw-hero h1{
+    margin-left:0; margin-right:0; max-width: 26ch;
+    font-size: clamp(2.3rem, 4.2vw, 3.7rem);
+  }
+  .hw-hero-art{
+    position:relative; border:1px solid var(--border); overflow:hidden;
+    aspect-ratio: 509 / 339; background:#000;
+  }
+  .hw-hero-art img{
+    width:100%; height:100%; object-fit:cover; display:block;
+    /* the source is already near-black; this holds it there against the
+       page rather than letting a grey cast float off the background */
+    filter: grayscale(1) contrast(1.08);
+  }
+  .hw-lede{
+    margin: clamp(16px, 2vw, 22px) 0 0; max-width: 46ch;
+    font-size: clamp(1rem, 1.6vw, 1.1rem); line-height:1.7; color: var(--text-dim);
+  }
+
+  /* ---------- the three analyses ----------
+     The page's centre of gravity. Each card is one method, what it answers,
+     and the limit of what it can answer, because a test named without its
+     boundary is the half that gets over-read. Numbered like the chain below
+     so the two sections read as one hand. */
+  /* Five tests as rows, not columns. Five cards across a 1440 viewport left
+     each one about 250px wide and broke every sentence into three-word lines,
+     which is the opposite of reading plainly. A row gives the sentence its
+     full measure and puts the five method names in a single column the eye
+     can run straight down. */
+  .hw-rows{ margin-top: clamp(28px, 3.6vw, 42px); border-top:1px solid var(--border); }
+  .hw-row{
+    display:grid; grid-template-columns: 44px 210px 1fr;
+    gap: clamp(16px, 2.4vw, 34px); align-items:start;
+    padding: clamp(20px, 2.4vw, 28px) 0; border-bottom:1px solid var(--border);
+  }
+  .hw-num{
+    font-family:'JetBrains Mono', monospace; font-size:.72rem;
+    color: var(--text-dimmer); letter-spacing:.08em; padding-top:4px;
+  }
+  .hw-method{
+    font-family:'Space Grotesk', sans-serif; font-size:1.06rem; font-weight:600;
+    letter-spacing:-.01em; color: var(--text); display:block; margin-bottom:5px;
+  }
+  .hw-answers{
+    font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:.1em;
+    font-size:.62rem; font-weight:700; color: var(--pink-soft);
+  }
+  .hw-row h3{
+    font-family:'Space Grotesk', sans-serif; font-size:1.1rem; font-weight:600;
+    letter-spacing:-.01em; color: var(--text); margin: 0 0 8px;
+  }
+  .hw-row p{ font-size:.97rem; line-height:1.7; color: var(--text-dim); margin:0; max-width: 62ch; }
+
+  /* ---------- the split: what a certificate does not cover ----------
+     Image on one side, the absence named on the other. This is the section
+     the page exists to be trusted for, so it gets the same visual weight as
+     the analyses rather than a footnote at the bottom. */
+  .hw-split{
+    display:grid; grid-template-columns: .9fr 1.1fr; gap: clamp(24px, 4vw, 56px);
+    align-items:center;
+  }
+  .hw-split-art{
+    border:1px solid var(--border); overflow:hidden; aspect-ratio: 740 / 415; background:#000;
+  }
+  .hw-split-art img{
+    width:100%; height:100%; object-fit:cover; display:block;
+    filter: grayscale(1) contrast(1.05);
+  }
+  .hw-split h2{
+    font-family:'Space Grotesk', sans-serif; font-size: clamp(1.5rem, 3vw, 2.05rem);
+    font-weight:600; letter-spacing:-.02em; color: var(--text); margin: 0 0 18px;
+  }
+  .hw-split p{ font-size:1rem; line-height:1.75; color: var(--text-dim); margin: 0 0 1em; }
+  .hw-split p:last-child{ margin-bottom:0; }
+  .hw-split strong{ color: var(--text); font-weight:600; }
+
+  /* the one line the section is built around */
+  .hw-callout{
+    margin: 0 0 20px; padding: 18px 20px;
+    border-left: 2px solid var(--text-dimmer); background: var(--bg-2);
+    font-size:.97rem; line-height:1.7; color: var(--text-dim);
+  }
+  .hw-callout b{ color: var(--text); font-weight:600; }
+
+
+  /* ---------- section headings shared by the new blocks ---------- */
+  .hw-head{ max-width: 60ch; }
+  .hw-head h2{
+    font-family:'Space Grotesk', sans-serif; font-size: clamp(1.5rem, 3vw, 2.05rem);
+    font-weight:600; letter-spacing:-.02em; color: var(--text); margin: 0 0 14px;
+  }
+  .hw-head p{ font-size:1rem; line-height:1.75; color: var(--text-dim); margin:0; }
+
+  @media (max-width: 900px){
+    .hw-hero > .container{ grid-template-columns: 1fr; }
+    /* the instrument leads on a phone: it is the fastest read of the two */
+    .hw-hero-art{ order:-1; }
+    .hw-split{ grid-template-columns: 1fr; }
+    /* the number joins the method line rather than taking a column of its own */
+    .hw-row{ grid-template-columns: 30px 1fr; gap: 12px 14px; }
+    .hw-row > div:last-child{ grid-column: 2; }
+  }
 </style>
 
 </head>
@@ -406,18 +529,152 @@
      The title is deliberately not "Our Manufacturing Process". Glow does not
      manufacture, and a title that says otherwise claims control over a
      facility we do not own. -->
-<section class="lp-hero pr-hero">
+<section class="lp-hero pr-hero hw-hero">
   <div class="container">
-    <h1>From source<br /><span class="outline">to shipment.</span></h1>
+    <div>
+      <h1>Five tests.<br /><span class="outline">Every batch.</span></h1>
+      <p class="hw-lede">
+        Every batch is tested by an independent, certified laboratory before we
+        sell it. No exceptions. Here is what they check.
+      </p>
+    </div>
+    <!-- Decorative. Stock photography of an instrument, not a photograph of a
+         laboratory Glow operates, because Glow does not operate one. The alt
+         is empty rather than descriptive for the same reason: naming it
+         invites a reader to place it somewhere, and there is nowhere honest
+         to place it. The section below says whose laboratory it is. -->
+    <div class="hw-hero-art">
+      <img src="assets/microscope-black.jpg" alt="" width="509" height="339" loading="eager" />
+    </div>
   </div>
 </section>
 
-<!-- No .tint: the page is one continuous black. The chain carries its own
-     hairlines, so it does not need a change of background to be separated
-     from the hero, and an alternating band would put a hard seam right where
-     the reader is meant to carry straight on from the title into step one. -->
+<!-- The five tests, before the chain. The old page opened straight into six
+     steps of custody, of which testing was step two. Testing is the subject
+     now, so it leads.
+
+     One test per card, and each card answers one question in one sentence.
+     The long form of the same list is ANALYSIS_LONG in js/products-data.js,
+     which check-claims.js requires this page to carry verbatim, so the plain
+     version here and the formal version there cannot come apart. -->
+<section class="lp-section">
+  <div class="container">
+    <div class="hw-head reveal">
+      <span class="lp-eyebrow">What gets tested</span>
+      <h2>What each test is for.</h2>
+      <p>
+        <!-- One line on purpose: check-claims.js requires ANALYSIS_LONG from
+             js/products-data.js verbatim here, and a wrap would break the
+             match. Long line, one source of truth. -->
+        HPLC-UV for purity, LC-MS for identity, sterility testing, endotoxin testing by LAL assay under USP chapter 85, and chemical contaminant screening.
+      </p>
+    </div>
+
+    <div class="hw-rows">
+      <div class="hw-row reveal">
+        <span class="hw-num">01</span>
+        <div>
+          <span class="hw-method">HPLC</span>
+          <span class="hw-answers">Purity</span>
+        </div>
+        <div>
+          <h3>How much of it is the peptide</h3>
+          <p>Separates the powder into its parts and measures each one. Tells you what percentage is the peptide you ordered, and what is not.</p>
+        </div>
+      </div>
+      <div class="hw-row reveal" style="transition-delay:50ms">
+        <span class="hw-num">02</span>
+        <div>
+          <span class="hw-method">LC-MS</span>
+          <span class="hw-answers">Identity</span>
+        </div>
+        <div>
+          <h3>Whether it is the right peptide</h3>
+          <p>Weighs the molecule. Every peptide sequence has its own mass, so the result either matches the name on the label or it does not.</p>
+        </div>
+      </div>
+      <div class="hw-row reveal" style="transition-delay:100ms">
+        <span class="hw-num">03</span>
+        <div>
+          <span class="hw-method">Sterility</span>
+          <span class="hw-answers">Microbiological safety</span>
+        </div>
+        <div>
+          <h3>Whether anything is growing in it</h3>
+          <p>Checks the batch for living microorganisms. A clean result means nothing grew.</p>
+        </div>
+      </div>
+      <div class="hw-row reveal" style="transition-delay:150ms">
+        <span class="hw-num">04</span>
+        <div>
+          <span class="hw-method">Endotoxin</span>
+          <span class="hw-answers">Bacterial residue</span>
+        </div>
+        <div>
+          <h3>What bacteria may have left behind</h3>
+          <p>Bacteria leave fragments behind even after they die. The LAL assay, run under USP chapter 85, puts a number on how much is there.</p>
+        </div>
+      </div>
+      <div class="hw-row reveal" style="transition-delay:200ms">
+        <span class="hw-num">05</span>
+        <div>
+          <span class="hw-method">Contaminants</span>
+          <span class="hw-answers">Chemical screening</span>
+        </div>
+        <div>
+          <h3>What else ended up in the vial</h3>
+          <p>Screens for chemicals left over from making the peptide, so what you get is the compound and nothing extra.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Who performs it, and why that is the part worth checking. -->
+<section class="lp-section tint">
+  <div class="container hw-split">
+    <div class="hw-split-art reveal">
+      <img src="assets/molecule-black.jpg" alt="" width="740" height="415" loading="lazy" />
+    </div>
+    <div class="reveal">
+      <span class="lp-eyebrow">Who runs it</span>
+      <h2>We do not test our own products.</h2>
+      <p class="hw-callout">
+        <b>A result we produced ourselves would prove nothing.</b> So we do not
+        produce one.
+      </p>
+      <p>
+        Glow does not manufacture, does not run a laboratory, and does not write
+        certificates. A certified independent laboratory does the testing and
+        signs the certificate.
+      </p>
+      <p>
+        Every certificate covers <strong>one batch</strong>, and that batch
+        number is printed on your vial. Match the two and you know the document
+        is about the vial in your hand, not a sample from last year.
+      </p>
+      <p>
+        Want it confirmed? Take the report number on the certificate to the
+        laboratory that issued it. Check it with them, not with us.
+      </p>
+    </div>
+  </div>
+</section>
+
 <section class="lp-section pr-section">
   <div class="container">
+
+    <!-- The chain used to be the whole page and needed no heading, since the
+         title sat directly above it. With testing pulled out in front of it,
+         it is now the answer to "where does that happen", so it says so. -->
+    <div class="hw-head reveal" style="margin-bottom: clamp(30px, 4vw, 46px)">
+      <span class="lp-eyebrow">Where it happens</span>
+      <h2>Testing is step two of six.</h2>
+      <p>
+        The analysis above sits inside a longer chain, and four of its six
+        links are performed by someone other than us. Each one names who.
+      </p>
+    </div>
 
     <!-- The rail is a sibling of the list, not a child: only <li> may sit
          directly inside an <ol>. -->
@@ -462,7 +719,7 @@
         <div class="pr-card">
           <span class="pr-num">02</span>
           <h2 class="pr-t">Independent Testing</h2>
-          <p class="pr-lead">Each lot is analyzed by an independent laboratory: identity by LC-MS, purity by HPLC-UV, and an endotoxin screen by LAL assay.</p>
+          <p class="pr-lead">Every batch is tested by an independent certified laboratory for purity, identity, sterility, endotoxin and contaminants.</p>
           <div class="pr-meta">
             <span class="pr-who">Performed by <b>an independent laboratory</b></span>
             <details class="disc">
@@ -664,7 +921,7 @@
       <div class="footer-col">
         <h4>Company</h4>
         <a href="about.html">About Us</a>
-        <a href="process.html">Our Process</a>
+        <a href="how-we-test.html">How We Test</a>
         <a href="affiliate.html">Partner Program</a>
       </div>
       <div class="footer-col">
