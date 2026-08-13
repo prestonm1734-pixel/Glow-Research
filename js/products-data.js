@@ -1202,7 +1202,7 @@ function productCardHtml(p, i) {
           <span class="card-divider" aria-hidden="true"></span>
           <span class="price">
             ${onSaleNow() ? `<s class="price-was">${fmtPrice(p.price)}</s>` : ''}
-            ${fmtPrice(salePrice(p.price))} <span>/ vial</span>
+            ${fmtPrice(salePrice(p.price))}
           </span>
           <button class="add-btn" ${stocked
             ? `aria-label="${single ? `Add ${name} to research order` : `Choose a size of ${p.name}`}">${single ? 'Add to Cart' : 'Select Options'}`
