@@ -183,13 +183,26 @@
   }
 
   /* ---------- the certificate section ----------
-     Single column, not the two-up hero pattern: there is no certificate
-     photograph to sit beside the text, and inventing one would be showing
-     a reader a document that does not exist. The three facts underneath
-     the lede are the same three the hero fine print already states, set as
-     a short list instead of a sentence. */
+     Two columns like the hero: text on the left, the certificate template
+     on the right. The template is a blank form, not a filled-out example,
+     so the image illustrates structure rather than asserting a result --
+     see the markup comment above this section for why that distinction is
+     load-bearing here. The three facts underneath the lede are the same
+     three the hero fine print already states, set as a short list instead
+     of a sentence. */
   .hw-coa{ border-top:1px solid var(--border); }
-  .hw-coa-grid{ max-width: 60ch; }
+  .hw-coa-grid{
+    display:grid; grid-template-columns: 1fr .78fr;
+    gap: clamp(32px, 5vw, 64px); align-items:center;
+  }
+  .hw-coa-art{
+    border:1px solid var(--border); overflow:hidden; background:#000;
+  }
+  .hw-coa-art img{ width:100%; height:auto; display:block; }
+  @media (max-width: 900px){
+    .hw-coa-grid{ grid-template-columns: 1fr; }
+    .hw-coa-art{ order:-1; max-width: 420px; margin: 0 auto; }
+  }
   .hw-coa h2{
     font-family:'Space Grotesk', sans-serif; font-size: clamp(1.6rem, 3vw, 2.15rem);
     font-weight:600; letter-spacing:-.02em; color: var(--text); margin: 6px 0 0;
@@ -405,16 +418,19 @@
   </div>
 </section>
 
-<!-- What the certificate actually ties together, not a picture of one.
-     COAS_PUBLISHED is false: there is no hosted certificate to link to and
-     no COA_URL, so this section cannot promise a lookup the site cannot
-     serve. It states the same three facts every certificate carries and
-     routes the reader to support@glowresearch.shop, exactly like the
-     product page's own COA box does in this state. check-claims.js already
-     fails the build if any page implies a hosted certificate while
-     COAS_PUBLISHED is false; the guard below additionally pins this
-     section's own CTA text to COA_COPY so the day the flag flips, this
-     copy is caught if nobody updated it. -->
+<!-- What the certificate actually ties together, illustrated by its own
+     blank structure rather than a filled-out example. COAS_PUBLISHED is
+     false: there is no hosted certificate to link to and no COA_URL, so
+     this section cannot show or promise a real result. The image is a
+     template built from scratch for this page, every field a bare em dash,
+     the site's own established "no value yet" glyph (see js/products-data.js,
+     evidenceRows()). It is not a photograph of a real certificate and not
+     a filled-out example with invented numbers: nothing in it could be
+     mistaken for an actual test result. check-claims.js already fails the
+     build if any page implies a hosted certificate while COAS_PUBLISHED is
+     false; the guard below additionally pins this section's own CTA text
+     to COA_COPY so the day the flag flips, this copy is caught if nobody
+     updated it. -->
 <section class="lp-section hw-coa">
   <div class="container hw-coa-grid">
     <div>
@@ -423,7 +439,8 @@
       <p class="hw-coa-lede">
         A certificate is only useful if it is specific. Every Glow
         certificate ties a result to the lot number printed on your vial,
-        not to the product in general.
+        not to the product in general. This is the structure every one
+        follows.
       </p>
       <ul class="hw-coa-list">
         <li><strong>HPLC purity</strong> against reference standards</li>
@@ -434,6 +451,9 @@
         <a href="mailto:support@glowresearch.shop" class="btn btn-outline btn-lg">Request a certificate <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
         <span class="hw-coa-note">COA on request</span>
       </div>
+    </div>
+    <div class="hw-coa-art">
+      <img src="assets/coa-template.jpg" alt="Blank Glow Research certificate of analysis template, showing the fields and tests every certificate carries with no values filled in" width="985" height="1265" loading="lazy" />
     </div>
   </div>
 </section>
