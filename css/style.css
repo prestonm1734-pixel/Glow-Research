@@ -530,6 +530,24 @@ button[disabled].si-forgot{ cursor: progress; }
   .sort-select{ width:100%; }
 }
 
+.catalog-search{ position:relative; flex:1 1 auto; display:flex; align-items:center; }
+.catalog-search-icon{ position:absolute; left:14px; color: var(--text-dim); pointer-events:none; }
+.catalog-search-input{
+  width:100%; padding: 12px 16px 12px 40px; border-radius: 0;
+  border:1px solid var(--border); background: transparent; color: var(--text);
+  font-family:'Sora', sans-serif; font-size:0.9rem; font-weight:500;
+  transition: border-color .2s ease, background .2s ease;
+}
+.catalog-search-input::placeholder{ color: var(--text-dimmer); }
+.catalog-search-input:hover{ border-color: rgba(255,255,255,.32); }
+.catalog-search-input:focus{ outline:none; border-color:#fff; background: var(--surface-2); }
+.catalog-search-input:focus-visible{ outline: 2px solid #fff; outline-offset: 2px; }
+.section-light .catalog-search-icon{ color:#45453f; }
+.section-light .catalog-search-input{ border-color: rgba(0,0,0,0.22); color:#0a0a0a; }
+.section-light .catalog-search-input::placeholder{ color:#7a7a76; }
+.section-light .catalog-search-input:hover{ border-color:#0a0a0a; }
+.section-light .catalog-search-input:focus{ outline:none; border-color:#0a0a0a; background: rgba(0,0,0,.03); }
+
 .filter-row{ display:flex; gap: 10px; flex-wrap:wrap; margin-bottom: 36px; }
 /* squared boxes rather than pills — the site's buttons and product tiles are
    all sharp-cornered, so a rounded pill was the one soft shape left. The

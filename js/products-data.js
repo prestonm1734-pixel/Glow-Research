@@ -677,7 +677,7 @@ const TRANSIT_DAYS = 2;
 // The analyses the laboratory reports per lot, as rows rather than a sentence.
 //
 // This array is where the count comes from. Before it existed, "eight checks"
-// was a word typed into how-we-test.html, "7x Third Party Tested" was a
+// was a word typed into how-we-test.html, "7x Third-Party Tested" was a
 // different word typed into the homepage hero, and the certificate reports
 // seven. Three surfaces, three numbers, nothing holding them together. A count
 // nobody derives goes stale the first time the panel changes, so every page
@@ -1271,11 +1271,18 @@ function productCardHtml(p, i) {
 // opts.prefer: a category key to float to the front without filtering the rest
 //   away. The product page wants siblings first but would rather show four
 //   cards from the wider catalog than one lonely card from a thin category.
+// opts.query: a search string. Matched against the name only, case-
+//   insensitively, substring — the same rule js/search.js uses for the
+//   header search so typing "bpc" behaves the same wherever you type it.
 function renderProductGrid(gridEl, filter, opts) {
   opts = opts || {};
   gridEl.innerHTML = '';
   let list = filter === 'all' ? GLOW_PRODUCTS : GLOW_PRODUCTS.filter(p => catFilterGroup(p.cat) === filter);
   if (opts.exclude) list = list.filter(p => p.name !== opts.exclude);
+  if (opts.query) {
+    const q = opts.query.trim().toLowerCase();
+    if (q) list = list.filter(p => p.name.toLowerCase().includes(q));
+  }
   // slice() first: a stable sort over a copy, so the curated order survives
   // both here and for every other caller.
   if (opts.prefer) {
@@ -1283,11 +1290,13 @@ function renderProductGrid(gridEl, filter, opts) {
       (b.cat === opts.prefer ? 1 : 0) - (a.cat === opts.prefer ? 1 : 0));
   }
 
-  // a category with nothing in it used to render a silently blank grid
+  // a category (or search) with nothing in it used to render a silently blank grid
   if (!list.length) {
     const empty = document.createElement('p');
     empty.className = 'product-grid-empty';
-    empty.textContent = 'No compounds in this category yet.';
+    empty.textContent = opts.query
+      ? `No compounds match "${opts.query.trim()}".`
+      : 'No compounds in this category yet.';
     gridEl.appendChild(empty);
     return;
   }

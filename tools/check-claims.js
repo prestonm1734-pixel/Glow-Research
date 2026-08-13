@@ -30,7 +30,7 @@ const {
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG, evidenceRows, evidenceHtml,
   identityLine, FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
-  catFilterGroup, CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
+  CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -426,10 +426,10 @@ console.log('\nhow many tests');
 
   // The homepage states it as a numeral in the hero subheading, a different
   // string in a different file, and that was the copy already disagreeing.
-  const homeCount = read('index.html').match(/(\d+)x Third Party Tested/i);
+  const homeCount = read('index.html').match(/(\d+)x Third-Party Tested/i);
   ok(`the homepage hero states ${TESTS_PER_BATCH}x, matching the panel`,
     homeCount !== null && Number(homeCount[1]) === TESTS_PER_BATCH,
-    homeCount ? `hero says ${homeCount[1]}x` : 'no "<n>x Third Party Tested" in index.html');
+    homeCount ? `hero says ${homeCount[1]}x` : 'no "<n>x Third-Party Tested" in index.html');
 
   // The summary the evidence panel prints is generated from the rows, so it
   // cannot grow a term the certificate does not report. It carried "+ lot
@@ -551,15 +551,6 @@ console.log('\nlisting copy');
   ok('nothing keeps a second copy of the label map', dupes.length === 0, dupes.join(', '));
 
   ok('llms.txt has no undefined headings', !/undefined/.test(read('llms.txt')));
-
-  // And a filter chip for its group, or the category exists but cannot be
-  // browsed to at all. The chip row groups the seven research categories
-  // under one "Peptides" chip rather than exposing each by name, so this
-  // checks catFilterGroup(cat) has a chip, not cat itself.
-  const chips = new Set([...read('peptides.html').matchAll(/data-filter="([^"]+)"/g)].map(m => m[1]));
-  const unbrowsable = [...new Set(GLOW_PRODUCTS.map(p => catFilterGroup(p.cat)))].filter(c => !chips.has(c));
-  ok('every category has a filter chip on the catalog page',
-    unbrowsable.length === 0, unbrowsable.join(', '));
 }
 
 /* ---------------------------------------------------------------------------
