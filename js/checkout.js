@@ -291,6 +291,15 @@
           // the actual clutter, more than any colour or corner radius. The real
           // shipping address still goes to Stripe at confirm time, in
           // confirmParams below, so AVS still runs; it is just not re-typed.
+          // No `wallets` option, deliberately: the default is auto for both,
+          // which is what makes Apple Pay and Google Pay buttons appear on
+          // their own above the card fields when a visitor's browser actually
+          // has one configured. Apple Pay additionally needs its domain
+          // verified in the Stripe Dashboard (Settings > Payment methods >
+          // Apple Pay) before it can appear at all — that step happens on
+          // Stripe's side and in this repo (the verification file it issues),
+          // not in this options object, so there is nothing to set here for
+          // either wallet to start working.
           const el = elements.create('payment', {
             fields: { billingDetails: { name: 'never', email: 'never', address: 'never' } },
           });
