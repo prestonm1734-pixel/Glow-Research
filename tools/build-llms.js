@@ -53,9 +53,8 @@ function build() {
 
   const out = `# Glow Research
 
-> A San Diego, California retailer of research peptides and research-use-only
-> compounds, sold to laboratories, institutions and qualified researchers in the
-> United States. Glow Research is the retailer only: it does not manufacture,
+> A retailer of research peptides and research-use-only compounds, sold to
+> laboratories, institutions and qualified researchers in the United States. Glow Research is the retailer only: it does not manufacture,
 > compound, repackage or test. Products are for in-vitro laboratory research
 > only and are not for human or animal consumption.
 

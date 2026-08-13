@@ -1,6 +1,6 @@
 # Glow Research
 
-Static storefront for a San Diego research-peptide supplier. No framework, no
+Static storefront for a research-peptide supplier. No framework, no
 build step for the hand-written pages. Plain HTML, one stylesheet, vanilla JS
 modules in `js/`. Serverless handlers live in `api/`.
 

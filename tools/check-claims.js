@@ -622,36 +622,16 @@ console.log('\nhouse style');
  *    manual action, and it is the exact thing PRINCIPLES.md forbids.
  * ------------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------
- * 7b. Where the company is. The About page is the page that ranks for "peptide
- *     supplier San Diego", and the town and state have to be in the copy a
- *     reader sees, not only in the meta description and the schema. This check
- *     exists because shortening that page's lede dropped "California" from the
- *     visible text in one edit while every <head> tag still said it, which is
- *     the failure that looks fine in a diff and costs a local search result.
+ * 7b. Section 7b used to be the opposite check: the About page had to name the
+ *     town and the state in its visible copy, because the page ranked on it
+ *     and an edit had once dropped "California" from the body while every
+ *     <head> tag still carried it.
  *
- *     Body copy only: <head>, <script> and the footer address are stripped
- *     before the search, so a postal address in the footer cannot stand in for
- *     the page actually saying where the business is.
+ *     Where the company is is no longer published at all. That check would now
+ *     fail by design, so it is gone, and its inverse lives with the entity and
+ *     address section below, which is the one place enforcing what the site
+ *     does not say about itself.
  * ------------------------------------------------------------------------- */
-console.log('\nlocation');
-{
-  const ab = read('about.html');
-  const body = (ab.match(/<main[\s\S]*?<footer/) || [ab])[0]
-    .replace(/<script[\s\S]*?<\/script>/g, '');
-  ok('the About page says San Diego in its visible copy', /San Diego/.test(body));
-  ok('and names the state, which the schema and meta cannot do for it',
-    /California/.test(body));
-
-  // This used to also require every footer to repeat the schema's street
-  // address, on the reasoning that a second unmaintained address is worse
-  // than one. The address is gone from the site entirely now — see the
-  // "entity and address" section, which enforces its absence — so what is
-  // left to hold is the town and state, which the copy above still claims and
-  // the schema still has to back.
-  const org = read('index.html');
-  ok('the Organization schema places the company in the town the copy claims',
-    /"addressLocality":\s*"San Diego"/.test(org) && /"addressRegion":\s*"CA"/.test(org));
-}
 
 /* ---------------------------------------------------------------------------
  * 7c. The homepage FAQ. It is generated from FAQS by tools/build-faq.js into
@@ -1487,6 +1467,14 @@ console.log('\nentity and address');
 {
   const street = '10755 Scripps Poway Pkwy';
   const entity = 'Glow Nutrition';
+  // The town and the state go with them. This one needs care rather than a
+  // flat string scan: "California" is a legitimate word on two pages that are
+  // not saying where the business is — the shipping state dropdown in
+  // js/checkout.js has to offer it, and the governing-law clause in terms.html
+  // names it as the law the contract runs under, which is a choice of law and
+  // not a location. Both are excluded by file; everywhere else, a hit is the
+  // site disclosing where it operates from.
+  const placeExempt = new Set(['js/checkout.js', 'terms.html']);
   const scanned = [
     ...pages,
     ...fs.readdirSync(path.join(ROOT, 'js')).filter(f => f.endsWith('.js')).map(f => `js/${f}`),
@@ -1500,6 +1488,15 @@ console.log('\nentity and address');
   const withEntity = scanned.filter(f => read(f).includes(entity));
   ok('no page, script or handler names the registered entity',
     withEntity.length === 0, withEntity.join(', '));
+
+  const withTown = scanned.filter(f => read(f).includes('San Diego'));
+  ok('no page, script or handler names the town', withTown.length === 0, withTown.join(', '));
+
+  const withState = scanned
+    .filter(f => !placeExempt.has(f))
+    .filter(f => /California|"addressRegion"/.test(read(f)));
+  ok('and none names the state outside the state picker and the governing-law clause',
+    withState.length === 0, withState.join(', '));
 
   // The homepage Organization block is the one place a machine reads the
   // company's identity, so it gets checked as parsed data rather than as text.

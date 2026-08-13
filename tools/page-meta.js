@@ -54,8 +54,8 @@ const PAGE_META = {
   },
   'about.html': {
     name: 'About Glow Research',
-    title: 'About Glow Research | Research Peptide Supplier in San Diego',
-    desc: 'Glow Research is a San Diego, California supplier of research peptides and research-use-only compounds. A retailer, not a manufacturer: we work with a U.S. manufacturing partner.',
+    title: 'About Glow Research | Research Peptide Supplier',
+    desc: 'Glow Research supplies research peptides and research-use-only compounds to laboratories nationwide. A retailer, not a manufacturer: we work with a U.S. manufacturing partner.',
   },
   'shipping.html': {
     name: 'Shipping',

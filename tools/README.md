@@ -86,11 +86,12 @@ It currently checks that:
 - the process chain still has six steps, each with one scannable sentence, a
   disclosure, and the "performed by" label naming who does it. Four of the six
   are not Glow, and saying so is the point of the page
-- the About page names San Diego **and** California in the copy a reader sees,
-  not only in the meta description and the schema, and the postal address in the
-  `Organization` schema matches the footer on every page. Added because
-  shortening that page's lede dropped the state from the visible text in one
-  edit while every `<head>` tag still carried it
+- no page, browser script or serverless handler names the registered entity,
+  the street address, the town or the state, and the `Organization` block on
+  the homepage carries no `legalName` and no `streetAddress`. The state picker
+  in `js/checkout.js` and the governing-law clause in `terms.html` are exempt
+  by name: both need the word California for a reason that is not "this is
+  where we are"
 - the homepage FAQ is in the served markup rather than injected on load, the
   markup matches `faqHtml()`, the `FAQPage` schema matches `FAQS` question for
   question, the answers stay readable with JavaScript off, and the certificate

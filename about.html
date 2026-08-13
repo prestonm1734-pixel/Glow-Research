@@ -7,21 +7,21 @@
      needs the observer to show it, so without scripting the page must
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
-<title>About Glow Research | Research Peptide Supplier in San Diego</title>
-<meta name="description" content="Glow Research is a San Diego, California supplier of research peptides and research-use-only compounds. A retailer, not a manufacturer: we work with a U.S. manufacturing partner." />
+<title>About Glow Research | Research Peptide Supplier</title>
+<meta name="description" content="Glow Research supplies research peptides and research-use-only compounds to laboratories nationwide. A retailer, not a manufacturer: we work with a U.S. manufacturing partner." />
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://glowresearch.shop/about.html" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
 <meta property="og:title" content="About Glow Research" />
-<meta property="og:description" content="Glow Research is a San Diego, California supplier of research peptides and research-use-only compounds. A retailer, not a manufacturer: we work with a U.S. manufacturing partner." />
+<meta property="og:description" content="Glow Research supplies research peptides and research-use-only compounds to laboratories nationwide. A retailer, not a manufacturer: we work with a U.S. manufacturing partner." />
 <meta property="og:url" content="https://glowresearch.shop/about.html" />
 <meta property="og:image" content="https://glowresearch.shop/assets/vial-trio-black.jpg" />
 <meta property="og:image:width" content="1672" />
 <meta property="og:image:height" content="941" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="About Glow Research" />
-<meta name="twitter:description" content="Glow Research is a San Diego, California supplier of research peptides and research-use-only compounds. A retailer, not a manufacturer: we work with a U.S. manufacturing partner." />
+<meta name="twitter:description" content="Glow Research supplies research peptides and research-use-only compounds to laboratories nationwide. A retailer, not a manufacturer: we work with a U.S. manufacturing partner." />
 <meta name="twitter:image" content="https://glowresearch.shop/assets/vial-trio-black.jpg" />
 <!--
   The Organization entity itself is declared once, on the homepage — Google asks
@@ -40,7 +40,7 @@
   "@id": "https://glowresearch.shop/about.html#webpage",
   "url": "https://glowresearch.shop/about.html",
   "name": "About Glow Research",
-  "description": "Glow Research is a San Diego, California supplier of research peptides and research-use-only compounds. A retailer, not a manufacturer: we work with a U.S. manufacturing partner.",
+  "description": "Glow Research supplies research peptides and research-use-only compounds to laboratories nationwide. A retailer, not a manufacturer: we work with a U.S. manufacturing partner.",
   "inLanguage": "en-US",
   "isPartOf": {
     "@id": "https://glowresearch.shop/#website"
@@ -74,7 +74,7 @@
   .ab-hero h1{
     font-size: clamp(2.3rem, 5vw, 3.7rem); line-height:1.04; letter-spacing:-.035em;
     /* 22ch, not 18: the first line is a complete phrase and has to survive
-       as one — at 18ch it broke after "A San Diego" */
+       as one, and the cap is what keeps the break where the <br /> puts it */
     margin: 0 0 18px; color: var(--text); max-width: 22ch;
   }
   /* second line steps back, the same two-tone headline the process and
@@ -85,8 +85,8 @@
   /* copy left, flag top-right. The copy column leads, so the image is the
      narrower of the two and never pushes the headline into extra lines. */
   .ab-hero-grid{
-    /* 1.75fr, not 1.35: at the smaller ratio "A San Diego supplier," broke
-       after "Diego" and the headline came apart over four lines */
+    /* 1.75fr, not 1.35: at the smaller ratio the headline came apart over
+       four lines instead of the two it is written as */
     display:grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
     gap: clamp(28px, 4vw, 56px); align-items:center;
   }
@@ -291,10 +291,10 @@
     <div class="ab-hero-grid">
       <div class="ab-hero-copy">
         <span class="ab-eyebrow">About</span>
-        <h1>A San Diego supplier,<br /><span class="outline">built for research buyers.</span></h1>
+        <h1>A U.S. supplier,<br /><span class="outline">built for research buyers.</span></h1>
         <p class="ab-lede">
-          Glow Research is a San Diego, California supplier of research peptides,
-          selling to laboratories and qualified researchers nationwide.
+          Glow Research supplies research peptides to laboratories and qualified
+          researchers nationwide.
         </p>
       </div>
 
@@ -405,10 +405,6 @@
     </div>
 
     <dl class="ab-facts">
-      <div class="ab-fact">
-        <dt>Based in</dt>
-        <dd>San Diego, California</dd>
-      </div>
       <div class="ab-fact">
         <dt>Our role</dt>
         <dd>Retailer only. We do not manufacture, compound, repackage, or test</dd>
