@@ -68,77 +68,31 @@
 }
 </script>
 <style>
-  /* ---------- hero ----------
-     Title, then straight into the six steps. No lede and no product shot in
-     between: the chain says "six steps, four of them performed by someone
-     else" by drawing it, with each outside party named on its own node, so a
-     line of copy above saying the same thing was the page explaining itself
-     before showing itself. */
-  .pr-hero{
-    position:relative; overflow:hidden;
-    padding-bottom: clamp(26px, 3.5vw, 48px);
-  }
-  .pr-hero > .container{ position:relative; z-index:1; }
-
-  /* The chain follows the hero directly, so it does not also need the shared
-     section's full top padding on top of the hero's bottom padding. */
-  .pr-section{ padding-top: clamp(46px, 5vw, 72px); }
-
-  /* ---------- hero, with the instrument alongside ----------
-     Two columns rather than the bare title the chain page used, because this
-     page opens on a claim about measurement and a photograph of an instrument
-     is the fastest way to say which kind. The image is decorative and marked
-     so: it is stock, it is not our laboratory, and the copy two inches below
-     it says the laboratory is not ours. An empty alt keeps a screen reader
-     from being told about a photo that adds nothing it cannot already read. */
-  .hw-hero > .container{
-    display:grid; grid-template-columns: 1.3fr .7fr; gap: clamp(24px, 4vw, 52px);
-    align-items:center;
-    /* .lp-hero centres its children for the single-column heroes on every
-       other landing page. With a photograph beside the text, centred copy
-       leaves a ragged edge against the image and disagrees with the
-       left-aligned sections below it, so this hero reads left. */
-    text-align:left;
-  }
-  /* A size down from the shared hero, and a wider measure. The other landing
-     pages give the h1 the full container; here it has a photograph beside it,
-     so at the shared size each half of the line wrapped again and left "ours."
-     stranded on a line of its own. */
-  .hw-hero h1{
-    margin-left:0; margin-right:0; max-width: 26ch;
-    font-size: clamp(2.3rem, 4.2vw, 3.7rem);
-  }
-  .hw-hero-art{
-    position:relative; border:1px solid var(--border); overflow:hidden;
-    aspect-ratio: 509 / 339; background:#000;
-  }
-  .hw-hero-art img{
-    width:100%; height:100%; object-fit:cover; display:block;
-    /* the source is already near-black; this holds it there against the
-       page rather than letting a grey cast float off the background */
-    filter: grayscale(1) contrast(1.08);
-  }
-  /* One button on its own does not need a full section's padding at both
-     ends, which left it floating in an empty band. */
-  .hw-cta{ padding: clamp(38px, 4.5vw, 60px) 0 clamp(46px, 5.5vw, 74px); }
-  .hw-cta .lp-actions{ margin:0; }
-
+  /* One centred hero, no photograph: headline, one plain sentence, and the
+     formal instrument list underneath it in small, quiet type. The formal
+     line exists because check-claims.js requires ANALYSIS_LONG verbatim on
+     this page — it is not meant to be read first, so it reads last and small. */
+  .hw-hero{ padding-bottom: clamp(40px, 5vw, 64px); }
   .hw-lede{
-    margin: clamp(16px, 2vw, 22px) 0 0; max-width: 46ch;
-    font-size: clamp(1rem, 1.6vw, 1.1rem); line-height:1.7; color: var(--text-dim);
+    margin: clamp(14px, 2vw, 18px) auto 0; max-width: 46ch;
+    font-size: clamp(1.05rem, 1.8vw, 1.2rem); line-height:1.6; color: var(--text-dim);
+  }
+  .hw-fine{
+    margin: clamp(18px, 2.4vw, 26px) auto 0; max-width: 56ch;
+    font-family:'JetBrains Mono', monospace; font-size:.76rem; line-height:1.7;
+    color: var(--text-dimmer); letter-spacing:.01em;
   }
 
-  /* ---------- the three analyses ----------
-     The page's centre of gravity. Each card is one method, what it answers,
-     and the limit of what it can answer, because a test named without its
-     boundary is the half that gets over-read. Numbered like the chain below
-     so the two sections read as one hand. */
-  /* Five tests as rows, not columns. Five cards across a 1440 viewport left
-     each one about 250px wide and broke every sentence into three-word lines,
-     which is the opposite of reading plainly. A row gives the sentence its
+  /* The rows follow the hero directly with no second heading above them —
+     the hero already said what this page is. */
+  .hw-section{ padding-top: clamp(20px, 3vw, 36px); }
+
+  /* ---------- the five tests, as rows ----------
+     Five cards across a 1440 viewport left each one about 250px wide and
+     broke every sentence into three-word lines. A row gives the sentence its
      full measure and puts the five method names in a single column the eye
      can run straight down. */
-  .hw-rows{ margin-top: clamp(28px, 3.6vw, 42px); border-top:1px solid var(--border); }
+  .hw-rows{ border-top:1px solid var(--border); }
   .hw-row{
     display:grid; grid-template-columns: 44px 210px 1fr;
     gap: clamp(16px, 2.4vw, 34px); align-items:start;
@@ -162,18 +116,12 @@
   }
   .hw-row p{ font-size:.97rem; line-height:1.7; color: var(--text-dim); margin:0; max-width: 62ch; }
 
-  /* ---------- section headings shared by the new blocks ---------- */
-  .hw-head{ max-width: 60ch; }
-  .hw-head h2{
-    font-family:'Space Grotesk', sans-serif; font-size: clamp(1.5rem, 3vw, 2.05rem);
-    font-weight:600; letter-spacing:-.02em; color: var(--text); margin: 0 0 14px;
-  }
-  .hw-head p{ font-size:1rem; line-height:1.75; color: var(--text-dim); margin:0; }
+  /* One button on its own does not need a full section's padding at both
+     ends, which left it floating in an empty band. */
+  .hw-cta{ padding: clamp(38px, 4.5vw, 60px) 0 clamp(46px, 5.5vw, 74px); }
+  .hw-cta .lp-actions{ margin:0; }
 
   @media (max-width: 900px){
-    .hw-hero > .container{ grid-template-columns: 1fr; }
-    /* the instrument leads on a phone: it is the fastest read of the two */
-    .hw-hero-art{ order:-1; }
     /* the number joins the method line rather than taking a column of its own */
     .hw-row{ grid-template-columns: 30px 1fr; gap: 12px 14px; }
     .hw-row > div:last-child{ grid-column: 2; }
@@ -231,56 +179,28 @@
 
 <main class="lp-page">
 
-<!-- Two elements. The eyebrow repeated the nav label the reader just clicked,
-     the lede listed the six steps the six steps were about to list, and the
-     dot note added a second sentence to a page whose argument is that it does
-     not pad. What is left is the title and the one line worth reading first,
-     which is the one that says how much of this we do not do ourselves.
-
-     The title is deliberately not "Our Manufacturing Process". Glow does not
-     manufacture, and a title that says otherwise claims control over a
-     facility we do not own. -->
-<section class="lp-hero pr-hero hw-hero">
+<!-- One hero, centred like every other landing page on the site, no image.
+     Headline, one plain sentence, then the formal instrument list in small
+     type underneath it — check-claims.js requires ANALYSIS_LONG from
+     js/products-data.js verbatim on this page, so that line stays, just
+     quiet rather than staged as its own section. Straight into the five
+     rows after that: no second heading repeating what the hero just said. -->
+<section class="lp-hero hw-hero">
   <div class="container">
-    <div>
-      <h1>Five tests.<br /><span class="outline">Every batch.</span></h1>
-      <p class="hw-lede">
-        Every batch is tested by an independent, certified laboratory before we
-        sell it. No exceptions. Here is what they check.
-      </p>
-    </div>
-    <!-- Decorative. Stock photography of an instrument, not a photograph of a
-         laboratory Glow operates, because Glow does not operate one. The alt
-         is empty rather than descriptive for the same reason: naming it
-         invites a reader to place it somewhere, and there is nowhere honest
-         to place it. The section below says whose laboratory it is. -->
-    <div class="hw-hero-art">
-      <img src="assets/microscope-black.jpg" alt="" width="509" height="339" loading="eager" />
-    </div>
+    <h1>Five tests.<br /><span class="outline">Every batch.</span></h1>
+    <p class="hw-lede">
+      Every batch is tested by an independent, certified laboratory before we
+      sell it. No exceptions.
+    </p>
+    <p class="hw-fine">
+      <!-- One line on purpose: a wrap would break the verbatim match. -->
+      HPLC-UV for purity, LC-MS for identity, sterility testing, endotoxin testing by LAL assay under USP chapter 85, and chemical contaminant screening.
+    </p>
   </div>
 </section>
 
-<!-- The five tests, before the chain. The old page opened straight into six
-     steps of custody, of which testing was step two. Testing is the subject
-     now, so it leads.
-
-     One test per card, and each card answers one question in one sentence.
-     The long form of the same list is ANALYSIS_LONG in js/products-data.js,
-     which check-claims.js requires this page to carry verbatim, so the plain
-     version here and the formal version there cannot come apart. -->
-<section class="lp-section">
+<section class="lp-section hw-section">
   <div class="container">
-    <div class="hw-head reveal">
-      <span class="lp-eyebrow">What gets tested</span>
-      <h2>What each test is for.</h2>
-      <p>
-        <!-- One line on purpose: check-claims.js requires ANALYSIS_LONG from
-             js/products-data.js verbatim here, and a wrap would break the
-             match. Long line, one source of truth. -->
-        HPLC-UV for purity, LC-MS for identity, sterility testing, endotoxin testing by LAL assay under USP chapter 85, and chemical contaminant screening.
-      </p>
-    </div>
-
     <div class="hw-rows">
       <div class="hw-row reveal">
         <span class="hw-num">01</span>
