@@ -424,12 +424,12 @@ console.log('\nhow many tests');
   ok(`every page that counts the panel in words says "${word}"`,
     wrongWord.length === 0, wrongWord.join('\n          '));
 
-  // The homepage states it as a numeral in the hero subheading, a different
+  // wholesale.html states it as a numeral in a stat figure, a different
   // string in a different file, and that was the copy already disagreeing.
-  const homeCount = read('index.html').match(/(\d+)x Third-Party Tested/i);
-  ok(`the homepage hero states ${TESTS_PER_BATCH}x, matching the panel`,
-    homeCount !== null && Number(homeCount[1]) === TESTS_PER_BATCH,
-    homeCount ? `hero says ${homeCount[1]}x` : 'no "<n>x Third-Party Tested" in index.html');
+  const wholesaleCount = read('wholesale.html').match(/<b>(\d+)x<\/b><span>Third-party tested<\/span>/i);
+  ok(`wholesale.html states ${TESTS_PER_BATCH}x, matching the panel`,
+    wholesaleCount !== null && Number(wholesaleCount[1]) === TESTS_PER_BATCH,
+    wholesaleCount ? `wholesale.html says ${wholesaleCount[1]}x` : 'no "<n>x</b><span>Third-party tested" in wholesale.html');
 
   // The summary the evidence panel prints is generated from the rows, so it
   // cannot grow a term the certificate does not report. It carried "+ lot
