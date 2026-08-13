@@ -531,6 +531,13 @@ if (!COAS_PUBLISHED) {
     /const COA_URL\s*=\s*'[^']+'/.test(read('js/products-data.js')));
 }
 
+// how-we-test.html's certificate section states the current route by hand
+// (there is no template step for prose sections on this page), so it is
+// pinned here the same way the about.html Testing row is pinned above.
+ok(`how-we-test.html's certificate section states the current route ("${COA_COPY.short}")`,
+  read('how-we-test.html').includes(COA_COPY.short),
+  `COAS_PUBLISHED changed without updating the "hw-coa-note" span in how-we-test.html`);
+
 /* ---------------------------------------------------------------------------
  * 4b. The published principles. about.html prints the five non-negotiables so
  *     a customer can hold us to a rule they can read. That makes PRINCIPLES.md

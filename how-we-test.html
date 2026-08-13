@@ -181,6 +181,40 @@
     .hw-icon{ width:36px; height:36px; }
     .hw-icon svg{ width:16px; height:16px; }
   }
+
+  /* ---------- the certificate section ----------
+     Single column, not the two-up hero pattern: there is no certificate
+     photograph to sit beside the text, and inventing one would be showing
+     a reader a document that does not exist. The three facts underneath
+     the lede are the same three the hero fine print already states, set as
+     a short list instead of a sentence. */
+  .hw-coa{ border-top:1px solid var(--border); }
+  .hw-coa-grid{ max-width: 60ch; }
+  .hw-coa h2{
+    font-family:'Space Grotesk', sans-serif; font-size: clamp(1.6rem, 3vw, 2.15rem);
+    font-weight:600; letter-spacing:-.02em; color: var(--text); margin: 6px 0 0;
+  }
+  .hw-coa-lede{
+    margin: clamp(14px, 2vw, 18px) 0 0;
+    font-size: clamp(1rem, 1.6vw, 1.1rem); line-height:1.7; color: var(--text-dim);
+  }
+  .hw-coa-list{
+    list-style:none; margin: clamp(24px, 3vw, 32px) 0 0; padding:0;
+    border-top:1px solid var(--border);
+  }
+  .hw-coa-list li{
+    padding: 14px 0; border-bottom:1px solid var(--border);
+    font-size:.96rem; color: var(--text-dim);
+  }
+  .hw-coa-list strong{ color: var(--text); font-weight:600; }
+  .hw-coa-cta{
+    margin-top: clamp(26px, 3vw, 34px);
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .hw-coa-note{
+    font-family:'JetBrains Mono', monospace; font-size:.78rem;
+    letter-spacing:.04em; color: var(--text-dimmer);
+  }
 </style>
 
 </head>
@@ -366,6 +400,39 @@
           <h3>Lot Archival</h3>
           <p>Every batch carries a unique lot ID linked to its certificate: the paperwork matches the vial in your hand.</p>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- What the certificate actually ties together, not a picture of one.
+     COAS_PUBLISHED is false: there is no hosted certificate to link to and
+     no COA_URL, so this section cannot promise a lookup the site cannot
+     serve. It states the same three facts every certificate carries and
+     routes the reader to support@glowresearch.shop, exactly like the
+     product page's own COA box does in this state. check-claims.js already
+     fails the build if any page implies a hosted certificate while
+     COAS_PUBLISHED is false; the guard below additionally pins this
+     section's own CTA text to COA_COPY so the day the flag flips, this
+     copy is caught if nobody updated it. -->
+<section class="lp-section hw-coa">
+  <div class="container hw-coa-grid">
+    <div>
+      <span class="lp-eyebrow">On The Certificate</span>
+      <h2>Documented, not claimed.</h2>
+      <p class="hw-coa-lede">
+        A certificate is only useful if it is specific. Every Glow
+        certificate ties a result to the lot number printed on your vial,
+        not to the product in general.
+      </p>
+      <ul class="hw-coa-list">
+        <li><strong>HPLC purity</strong> against reference standards</li>
+        <li><strong>Mass-spec identity</strong>, sterility and endotoxin on every lot</li>
+        <li><strong>Unique lot ID</strong> printed on every certificate</li>
+      </ul>
+      <div class="hw-coa-cta">
+        <a href="mailto:support@glowresearch.shop" class="btn btn-outline btn-lg">Request a certificate <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+        <span class="hw-coa-note">COA on request</span>
       </div>
     </div>
   </div>
