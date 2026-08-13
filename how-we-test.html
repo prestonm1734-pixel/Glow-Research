@@ -87,34 +87,56 @@
      the hero already said what this page is. */
   .hw-section{ padding-top: clamp(20px, 3vw, 36px); }
 
-  /* ---------- the five tests, as rows ----------
+  /* ---------- the five tests, as a spec sheet ----------
      Five cards across a 1440 viewport left each one about 250px wide and
-     broke every sentence into three-word lines. A row gives the sentence its
-     full measure and puts the five method names in a single column the eye
-     can run straight down. */
-  .hw-rows{ border-top:1px solid var(--border); }
-  .hw-row{
-    display:grid; grid-template-columns: 44px 210px 1fr;
-    gap: clamp(16px, 2.4vw, 34px); align-items:start;
-    padding: clamp(20px, 2.4vw, 28px) 0; border-bottom:1px solid var(--border);
+     broke every sentence into three-word lines. Rows give the sentence its
+     full measure. But a plain list read as thin, so this leans further into
+     what it actually is: a documented test panel, not a numbered blurb list.
+     A column head labels Method and Analysis like a report would, the
+     numerals are set large and tabular so they read as line items, and a
+     hairline accent lights on the left edge as each row scrolls in — the
+     one piece of motion earned by five rows that otherwise sit still. */
+  .hw-rows{ border-top:1px solid var(--border-strong, var(--border)); }
+
+  .hw-table-head{
+    display:grid; grid-template-columns: 68px 230px 1fr;
+    gap: clamp(16px, 2.4vw, 34px);
+    padding: 0 0 12px; margin-top: 22px;
+    font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:.12em;
+    font-size:.66rem; font-weight:700; color: var(--text-dimmer);
   }
+
+  .hw-row{
+    position:relative;
+    display:grid; grid-template-columns: 68px 230px 1fr;
+    gap: clamp(16px, 2.4vw, 34px); align-items:start;
+    padding: clamp(22px, 2.6vw, 30px) 0 clamp(22px, 2.6vw, 30px) 18px;
+    margin-left: -18px;
+    border-bottom:1px solid var(--border);
+    border-left: 2px solid transparent;
+    transition: border-left-color .3s var(--lp-ease, ease);
+  }
+  .hw-row:hover,
+  .hw-row:focus-within{ border-left-color: var(--pink-soft); }
+
   .hw-num{
-    font-family:'JetBrains Mono', monospace; font-size:.72rem;
-    color: var(--text-dimmer); letter-spacing:.08em; padding-top:4px;
+    font-family:'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    font-size:1.3rem; font-weight:600; line-height:1;
+    color: var(--text-dimmer); letter-spacing:0; padding-top:2px;
   }
   .hw-method{
-    font-family:'Space Grotesk', sans-serif; font-size:1.06rem; font-weight:600;
-    letter-spacing:-.01em; color: var(--text); display:block; margin-bottom:5px;
+    font-family:'JetBrains Mono', monospace; font-size:.92rem; font-weight:600;
+    letter-spacing:.01em; color: var(--text); display:block; margin-bottom:7px;
   }
   .hw-answers{
     font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:.1em;
     font-size:.62rem; font-weight:700; color: var(--pink-soft);
   }
   .hw-row h3{
-    font-family:'Space Grotesk', sans-serif; font-size:1.1rem; font-weight:600;
+    font-family:'Space Grotesk', sans-serif; font-size:1.14rem; font-weight:600;
     letter-spacing:-.01em; color: var(--text); margin: 0 0 8px;
   }
-  .hw-row p{ font-size:.97rem; line-height:1.7; color: var(--text-dim); margin:0; max-width: 62ch; }
+  .hw-row p{ font-size:.97rem; line-height:1.7; color: var(--text-dim); margin:0; max-width: 60ch; }
 
   /* One button on its own does not need a full section's padding at both
      ends, which left it floating in an empty band. */
@@ -123,8 +145,11 @@
 
   @media (max-width: 900px){
     /* the number joins the method line rather than taking a column of its own */
-    .hw-row{ grid-template-columns: 30px 1fr; gap: 12px 14px; }
+    .hw-table-head{ grid-template-columns: 30px 1fr; }
+    .hw-table-head span:last-child{ display:none; }
+    .hw-row{ grid-template-columns: 30px 1fr; gap: 12px 14px; padding-left: 14px; margin-left: -14px; }
     .hw-row > div:last-child{ grid-column: 2; }
+    .hw-num{ font-size:1.05rem; }
   }
 </style>
 
@@ -199,18 +224,29 @@
   </div>
 </section>
 
+<!-- Spec-sheet register, not consumer copy. A laboratory buyer already knows
+     what an endotoxin test is; the previous draft explained it to them anyway
+     ("what bacteria may have left behind"), which reads as retail, not
+     institutional. Each row keeps the same three-part shape -- method,
+     category, one-sentence result -- but the sentence now states what the
+     assay does rather than narrating it. -->
 <section class="lp-section hw-section">
   <div class="container">
     <div class="hw-rows">
+      <div class="hw-table-head reveal" aria-hidden="true">
+        <span></span>
+        <span>Method</span>
+        <span>Analysis</span>
+      </div>
       <div class="hw-row reveal">
         <span class="hw-num">01</span>
         <div>
-          <span class="hw-method">HPLC</span>
+          <span class="hw-method">HPLC-UV</span>
           <span class="hw-answers">Purity</span>
         </div>
         <div>
-          <h3>How much of it is the peptide</h3>
-          <p>Separates the powder into its parts and measures each one. Tells you what percentage is the peptide you ordered, and what is not.</p>
+          <h3>Purity Testing</h3>
+          <p>Quantifies peptide purity by high-performance liquid chromatography with UV detection.</p>
         </div>
       </div>
       <div class="hw-row reveal" style="transition-delay:50ms">
@@ -220,41 +256,41 @@
           <span class="hw-answers">Identity</span>
         </div>
         <div>
-          <h3>Whether it is the right peptide</h3>
-          <p>Weighs the molecule. Every peptide sequence has its own mass, so the result either matches the name on the label or it does not.</p>
+          <h3>Analytical Identification</h3>
+          <p>Confirms that the analyzed compound corresponds to its specified molecular identity.</p>
         </div>
       </div>
       <div class="hw-row reveal" style="transition-delay:100ms">
         <span class="hw-num">03</span>
         <div>
-          <span class="hw-method">Sterility</span>
-          <span class="hw-answers">Microbiological safety</span>
+          <span class="hw-method">Sterility Assay</span>
+          <span class="hw-answers">Microbiological</span>
         </div>
         <div>
-          <h3>Whether anything is growing in it</h3>
-          <p>Checks the batch for living microorganisms. A clean result means nothing grew.</p>
+          <h3>Microbiological Testing</h3>
+          <p>Evaluates the sample for microbial growth.</p>
         </div>
       </div>
       <div class="hw-row reveal" style="transition-delay:150ms">
         <span class="hw-num">04</span>
         <div>
-          <span class="hw-method">Endotoxin</span>
-          <span class="hw-answers">Bacterial residue</span>
+          <span class="hw-method">LAL Assay, USP &lt;85&gt;</span>
+          <span class="hw-answers">Endotoxin</span>
         </div>
         <div>
-          <h3>What bacteria may have left behind</h3>
-          <p>Bacteria leave fragments behind even after they die. The LAL assay, run under USP chapter 85, puts a number on how much is there.</p>
+          <h3>Bacterial Endotoxin Testing</h3>
+          <p>Quantifies bacterial endotoxin using the specified assay methodology.</p>
         </div>
       </div>
       <div class="hw-row reveal" style="transition-delay:200ms">
         <span class="hw-num">05</span>
         <div>
-          <span class="hw-method">Contaminants</span>
-          <span class="hw-answers">Chemical screening</span>
+          <span class="hw-method">Chemical Screening</span>
+          <span class="hw-answers">Contaminants</span>
         </div>
         <div>
-          <h3>What else ended up in the vial</h3>
-          <p>Screens for chemicals left over from making the peptide, so what you get is the compound and nothing extra.</p>
+          <h3>Chemical Contaminant Screening</h3>
+          <p>Screens for residual chemical contaminants introduced during synthesis.</p>
         </div>
       </div>
     </div>
