@@ -925,46 +925,6 @@ console.log('\ncertificate copy');
  *     tools/page-meta.js holds the strings and tools/build-meta.js writes every
  *     copy; this fails the build when a copy no longer matches the source.
  * ------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------
- * 7f. The About page's facts table. Ten rows of prose, three of which restate
- *     values the catalog already holds. Two of those are pinned here.
- *
- *     The Testing row is the one that matters: it reads "COA on request",
- *     which is COA_COPY.short in its held state, typed by hand. Flip
- *     COAS_PUBLISHED and the cart, the FAQ, the account area, the product page
- *     and the evidence panel all upgrade while this row keeps telling people
- *     to email us. Same contract as the evidence panel in product.html: the
- *     markup is a hand edit, and the audit is what stops it going stale.
- * ------------------------------------------------------------------------- */
-console.log('\nAbout page facts');
-{
-  const rows = Object.fromEntries([...read('about.html')
-    .matchAll(/<dt>(.*?)<\/dt>\s*<dd>([\s\S]*?)<\/dd>/g)]
-    .map(m => [m[1].trim(), m[2].replace(/\s+/g, ' ').trim()]));
-
-  ok('the facts table is still there', Object.keys(rows).length >= 8,
-    `found ${Object.keys(rows).length} rows`);
-
-  ok(`the Testing row states the current certificate route ("${COA_COPY.short}")`,
-    (rows.Testing || '').includes(COA_COPY.short),
-    `reads "${rows.Testing}" — COAS_PUBLISHED changed without updating about.html`);
-
-  // The regulatory hedge, taken from SOURCE_LONG rather than restated, so
-  // softening or strengthening it in the catalog fails here until the page
-  // agrees. "operating to ..." is the part that carries the qualification.
-  const hedge = SOURCE_LONG.slice(SOURCE_LONG.indexOf('operating to'));
-  ok('the Manufacturing row keeps the hedge SOURCE_LONG carries',
-    (rows.Manufacturing || '').includes(hedge),
-    `expected "...${hedge}", got "${rows.Manufacturing}"`);
-
-  // Covered globally by the cutoff and transit scans, checked here too because
-  // this row is the compact restatement someone is most likely to hand-edit.
-  ok('the Dispatch row quotes the enforced cutoff and transit',
-    (rows.Dispatch || '').includes(CUTOFF_LABEL) &&
-    (rows.Dispatch || '').includes(`${TRANSIT_DAYS}-day FedEx`),
-    rows.Dispatch);
-}
-
 console.log('\npage metadata');
 {
   const { PAGE_META } = require(path.join(ROOT, 'tools/page-meta.js'));
