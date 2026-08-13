@@ -41,7 +41,7 @@ body{
 img{ max-width:100%; display:block; }
 a{ color: inherit; text-decoration:none; }
 h1,h2,h3,h4,h5{
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
   font-weight: 600;
   line-height: 1.08;
   margin: 0 0 .5em;
