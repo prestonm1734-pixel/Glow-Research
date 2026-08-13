@@ -1181,32 +1181,11 @@ function productThumb(name) {
 // one has nothing left to choose, so the button says "Add to Cart" and does
 // exactly that with no picker in between — and since there is no picker to
 // show the size in, the card states it once, next to the name, instead.
-//
-// A card shows one price, and for a product with two sizes that price is the
-// cheaper one. Left bare it reads as the price, so someone could click a
-// $105 card and land on a $200 size: the card was quietly stating a floor as
-// though it were the figure. "From" says which it is.
-//
-// Both the floor and the decision to label it are read off the sizes rather
-// than taken from p.price. The two agree for every product in the catalog
-// today, but "From" is a claim about the cheapest size specifically, and a
-// card making that claim has to be reading the thing it claims. Out-of-stock
-// sizes are left out of the floor for the same reason: a price nobody can
-// pay is not a price this card should be advertising.
 function productCardHtml(p, i) {
   const href = productHref(p);
   const stocked = productInStock(p);
   const single = p.sizes.length === 1;
   const name = single ? `${p.name} ${p.sizes[0].mg}` : p.name;
-
-  const sellable = p.sizes.filter(sizeInStock);
-  const priced = sellable.length ? sellable : p.sizes;
-  const from = Math.min(...priced.map(s => s.price));
-  // Two sizes at one price is one price, and two sizes with one in stock is
-  // one price you can actually pay. Neither is a range, so neither gets the
-  // label — this counts distinct prices, not sizes.
-  const isRange = new Set(priced.map(s => s.price)).size > 1;
-
   return `
       <div class="product-card reveal" style="transition-delay:${(i % 3) * 60}ms">
         <a class="product-visual" href="${href}">
@@ -1222,8 +1201,8 @@ function productCardHtml(p, i) {
           <h3><a href="${href}">${name}</a></h3>
           <span class="card-divider" aria-hidden="true"></span>
           <span class="price">
-            ${onSaleNow() ? `<s class="price-was">${fmtPrice(from)}</s>` : ''}
-            ${isRange ? '<span class="price-from">From</span> ' : ''}${fmtPrice(salePrice(from))}
+            ${onSaleNow() ? `<s class="price-was">${fmtPrice(p.price)}</s>` : ''}
+            ${fmtPrice(salePrice(p.price))}
           </span>
           <button class="add-btn" ${stocked
             ? `aria-label="${single ? `Add ${name} to research order` : `Choose a size of ${p.name}`}">${single ? 'Add to Cart' : 'Select Options'}`
