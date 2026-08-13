@@ -164,8 +164,8 @@ const COA_COPY = COAS_PUBLISHED ? {
 };
 
 // ---------------------------------------------------------------------------
-// The real catalog, imported from the supplier's SKU map (Glow Nutrition SKU
-// Map, GLO-prefixed product SKUs). `sizes[].sku` is that map's product SKU,
+// The real catalog, imported from the supplier's SKU map (GLO-prefixed
+// product SKUs). `sizes[].sku` is that map's product SKU,
 // the one the backend needs; the sheet's LBL codes are label SKUs for the
 // fulfilment side and are not stored here, since nothing on this site reads
 // one.

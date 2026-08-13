@@ -136,7 +136,6 @@ async function welcome(customer) {
       `  - Points: ${POINTS_PER_DOLLAR} for every $1 spent, redeemed at ${POINTS_PER_DOLLAR_REDEEMED} points per $1 off a future order.`,
       '',
       'Glow Research',
-      '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
     ].join('\n'),
   });
 }

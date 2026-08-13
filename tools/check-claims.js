@@ -642,18 +642,15 @@ console.log('\nlocation');
   ok('and names the state, which the schema and meta cannot do for it',
     /California/.test(body));
 
-  // The address in the Organization schema is the one Google reconciles against
-  // a Business Profile, so it has to agree with the footer rather than be a
-  // second address nobody maintains.
+  // This used to also require every footer to repeat the schema's street
+  // address, on the reasoning that a second unmaintained address is worse
+  // than one. The address is gone from the site entirely now — see the
+  // "entity and address" section, which enforces its absence — so what is
+  // left to hold is the town and state, which the copy above still claims and
+  // the schema still has to back.
   const org = read('index.html');
-  ok('the Organization schema carries the postal address',
+  ok('the Organization schema places the company in the town the copy claims',
     /"addressLocality":\s*"San Diego"/.test(org) && /"addressRegion":\s*"CA"/.test(org));
-  const street = (org.match(/"streetAddress":\s*"([^"]+)"/) || [, ''])[1];
-  const footerPages = pages.filter(f => read(f).includes('site-footer'));
-  const mismatched = footerPages.filter(f => !read(f).includes(street));
-  ok('every page footer states the same street address as the schema',
-    street !== '' && mismatched.length === 0,
-    street === '' ? 'no streetAddress in the schema' : `missing from ${mismatched.join(', ')}`);
 }
 
 /* ---------------------------------------------------------------------------
@@ -1474,6 +1471,51 @@ console.log('\ncart upsell');
  * 7. Sitemap. Never advertise a URL that is not served: while product pages
  *    are held, the generated URLs must not be in there.
  * ------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+ * The registered entity name and the street address were pulled off the site
+ * and out of every email deliberately. They were in the footer of all 23
+ * pages, the homepage Organization schema, the about page's facts list, the
+ * privacy policy, and the footer of every transactional email — so putting
+ * one back is a one-line edit in a file nobody is reading closely, and it
+ * would ship. This is the check that stops that.
+ *
+ * Scans every page, every browser-loaded script and every serverless handler.
+ * This file is not in that set, which is why it can name the strings it is
+ * looking for.
+ * ------------------------------------------------------------------------- */
+console.log('\nentity and address');
+{
+  const street = '10755 Scripps Poway Pkwy';
+  const entity = 'Glow Nutrition';
+  const scanned = [
+    ...pages,
+    ...fs.readdirSync(path.join(ROOT, 'js')).filter(f => f.endsWith('.js')).map(f => `js/${f}`),
+    ...fs.readdirSync(path.join(ROOT, 'api')).filter(f => f.endsWith('.js')).map(f => `api/${f}`),
+  ];
+
+  const withStreet = scanned.filter(f => read(f).includes(street));
+  ok('no page, script or handler states the street address',
+    withStreet.length === 0, withStreet.join(', '));
+
+  const withEntity = scanned.filter(f => read(f).includes(entity));
+  ok('no page, script or handler names the registered entity',
+    withEntity.length === 0, withEntity.join(', '));
+
+  // The homepage Organization block is the one place a machine reads the
+  // company's identity, so it gets checked as parsed data rather than as text.
+  {
+    const blocks = [...read('index.html').matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+    const graph = blocks.flatMap(b => {
+      try { const j = JSON.parse(b[1]); return j['@graph'] || [j]; } catch (e) { return []; }
+    });
+    const org = graph.find(n => n['@type'] === 'Organization');
+    ok('the homepage still declares an Organization', !!org);
+    ok('that Organization carries no legalName and no street address',
+      !!org && !org.legalName && !(org.address && org.address.streetAddress),
+      org ? JSON.stringify(org.address || {}) : 'no Organization node');
+  }
+}
+
 console.log('\nsitemap');
 {
   const locs = [...read('sitemap.xml').matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);

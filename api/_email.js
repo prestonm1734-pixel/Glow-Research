@@ -12,7 +12,6 @@ import { fmtPrice } from '../js/products-data.js';
 const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
 
 export const COMPANY = 'Glow Research';
-export const ADDRESS = '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States';
 
 // fmtPrice() (js/products-data.js) is where "$65, not $65.00" is decided —
 // the same rule the site itself follows, so an order confirmation email
@@ -79,8 +78,7 @@ export function emailShell({ preheader = '', sections = [], footerNote = '' }) {
     ${bands}
 
     <div style="padding:26px 4px 0;font-size:12px;line-height:1.65;color:#8e8e93;">
-      <strong style="color:#55554f;">${COMPANY}</strong><br>
-      ${ADDRESS}
+      <strong style="color:#55554f;">${COMPANY}</strong>
       ${footerNote ? `<br><span style="color:#a1a1a6;">${footerNote}</span>` : ''}
     </div>
 

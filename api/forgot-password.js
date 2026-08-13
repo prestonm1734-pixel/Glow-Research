@@ -127,6 +127,5 @@ function resetText(link) {
     'not changed, and the link stops working on its own.',
     '',
     'Glow Research',
-    '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
   ].join('\n');
 }

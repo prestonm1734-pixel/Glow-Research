@@ -123,7 +123,6 @@ function completed({ order, track }) {
     'administration guidance is provided with this order.',
     '',
     'Glow Research',
-    '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
   ].join('\n');
 
   return {
@@ -164,7 +163,6 @@ function processing({ order }) {
       ...itemsText(order),
       '',
       'Glow Research',
-      '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
     ].join('\n'),
   };
 }
@@ -200,7 +198,6 @@ function onHold({ order }) {
       ...itemsText(order),
       '',
       'Glow Research',
-      '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
     ].join('\n'),
   };
 }
@@ -234,7 +231,6 @@ function cancelled({ order }) {
       ...itemsText(order),
       '',
       'Glow Research',
-      '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
     ].join('\n'),
   };
 }
@@ -269,7 +265,6 @@ function refunded({ order }) {
       ...itemsText(order),
       '',
       'Glow Research',
-      '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
     ].join('\n'),
   };
 }
@@ -304,7 +299,6 @@ function failed({ order }) {
       ...itemsText(order),
       '',
       'Glow Research',
-      '10755 Scripps Poway Pkwy #376, San Diego, CA 92131, United States',
     ].join('\n'),
   };
 }
