@@ -381,8 +381,13 @@ button[disabled].si-forgot{ cursor: progress; }
   max-width: 500px;
   margin: 0 0 32px;
 }
+/* Forces "7x Third-Party Tested…" onto its own line on phones, the same
+   way .hero-br pins the headline: a manual break, not a font-size fight
+   against the wrap point, so the size below can move freely. */
+.hero-sub-br{ display:none; }
 @media (max-width: 560px){
-  .hero-sub{ font-size: 0.87rem; }
+  .hero-sub{ font-size: 0.98rem; }
+  .hero-sub-br{ display:inline; }
 }
 /* hero rhythm runs on an 8px scale end to end: eyebrow 16 → title 24 →
    sub 32 → cta 24 → rule → stats 24. The gaps were previously 20/20/30/30/22,
