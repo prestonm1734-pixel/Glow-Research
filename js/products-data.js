@@ -176,7 +176,7 @@ const COA_COPY = COAS_PUBLISHED ? {
 // exactly that and nothing more: no ingredient list is stated until one is
 // confirmed against the supplier's specification.
 const GLOW_PRODUCTS = [
-  { name: 'BPC-157', tag: 'Tissue Research', cat: 'tissue', purity: '99.8%', badge:'Best Seller',
+  { name: 'BPC-157', tag: null, cat: 'tissue', purity: '99.8%', badge:'Best Seller',
     sizes: [
       { mg: '5mg', price: 50, sku: 'GLO-BC5', image: 'assets/products/bpc-157-5mg.webp' },
       { mg: '10mg', price: 65, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg.webp' },
@@ -191,7 +191,7 @@ const GLOW_PRODUCTS = [
       { t: 'Fibroblast migration', d: 'Used in scratch and outgrowth assays examining how tendon and ligament fibroblasts migrate and organise.' },
       { t: 'Gut epithelial models', d: 'Examined in gastrointestinal tissue models, reflecting the gastric origin of the parent protein.' }
     ] },
-  { name: 'TB-500', tag: 'Tissue Research', cat: 'tissue', purity: '99.6%', badge:null,
+  { name: 'TB-500', tag: null, cat: 'tissue', purity: '99.6%', badge:null,
     sizes: [{ mg: '10mg', price: 70, sku: 'GLO-BT10' }],
     blurb: 'A synthetic fragment of thymosin beta-4, the actin-binding protein. Studied in vitro for cytoskeletal dynamics.',
     about: [
@@ -218,7 +218,7 @@ const GLOW_PRODUCTS = [
       { t: 'Combined pathway models', d: 'Used in fibroblast and endothelial culture models examining both peptides applied from a single source.' },
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials to compare co-formulated and separately administered research protocols.' }
     ] },
-  { name: 'GHK-Cu', tag: 'Tissue Research', cat: 'tissue', purity: '99.8%', badge:null,
+  { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.8%', badge:null,
     sizes: [{ mg: '50mg', price: 55, sku: 'GLO-CU50' }],
     blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
     about: [
@@ -324,7 +324,7 @@ const GLOW_PRODUCTS = [
       { t: 'Pulse kinetics', d: 'Studied for its short functional window relative to modified GHRH analogues in time-course models.' },
       { t: 'Comparative pharmacology', d: 'Run alongside CJC-1295 and Tesamorelin in studies characterising structural modifications to the GHRH sequence.' }
     ] },
-  { name: 'IGF1-LR3', tag: 'Growth Factor Research', cat: 'growth', purity: '99.1%', badge:null,
+  { name: 'IGF1-LR3', tag: null, cat: 'growth', purity: '99.1%', badge:null,
     sizes: [{ mg: '1mg', price: 105, sku: 'GLO-IG1' }],
     blurb: 'A long-acting analogue of insulin-like growth factor 1. Studied for its binding behaviour at the IGF-1 receptor.',
     about: [
@@ -336,7 +336,7 @@ const GLOW_PRODUCTS = [
       { t: 'Binding protein interaction', d: 'Studied for reduced affinity to IGF-binding proteins relative to native IGF-1, and what that does to assay-window duration.' },
       { t: 'Cell proliferation models', d: 'Applied in culture models examining IGF-1 receptor-driven proliferative signalling.' }
     ] },
-  { name: 'GLP-1 (SM)', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.5%', badge:'Popular',
+  { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.5%', badge:'Popular',
     sizes: [{ mg: '5mg', price: 60, sku: 'GLO-SM5' }, { mg: '10mg', price: 80, sku: 'GLO-SM10' }],
     blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
     about: [
@@ -348,7 +348,7 @@ const GLOW_PRODUCTS = [
       { t: 'Albumin binding', d: 'Studied for how the fatty acid chain alters distribution and persistence in model systems.' },
       { t: 'Metabolic pathway research', d: 'Applied in islet and hepatocyte culture models examining downstream incretin signalling.' }
     ] },
-  { name: 'GLP-2 (TZ)', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', badge:'New',
+  { name: 'GLP-2 (TZ)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'New',
     sizes: [{ mg: '10mg', price: 90, sku: 'GLO-T10' }, { mg: '30mg', price: 150, sku: 'GLO-T30' }],
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
     about: [
@@ -360,7 +360,7 @@ const GLOW_PRODUCTS = [
       { t: 'Biased signalling', d: 'Studied for the balance between G-protein coupling and beta-arrestin recruitment at each receptor.' },
       { t: 'Receptor crosstalk', d: 'Applied in models examining how engaging both receptors at once differs from either alone.' }
     ] },
-  { name: 'GLP-3 (RT)', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.4%', badge:'Trending',
+  { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'Trending',
     sizes: [
       { mg: '10mg', price: 105, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg.webp' },
       { mg: '30mg', price: 200, sku: 'GLO-RT30', image: 'assets/products/retatrutide-30mg.webp' },
@@ -375,7 +375,7 @@ const GLOW_PRODUCTS = [
       { t: 'Glucagon receptor signalling', d: 'Studied in hepatocyte and cAMP assays for activity at the glucagon receptor, a target the two-receptor co-agonists do not engage.' },
       { t: 'Comparative incretin pharmacology', d: 'Applied as a comparator when characterising newer multi-receptor agonists against single- and dual-receptor peptides.' }
     ] },
-  { name: 'Cagrilintide', tag: 'Metabolic Research', cat: 'metabolic', purity: '99.3%', badge:null,
+  { name: 'Cagrilintide', tag: null, cat: 'metabolic', purity: '99.3%', badge:null,
     sizes: [{ mg: '5mg', price: 80, sku: 'GLO-CGL5' }],
     blurb: 'A long-acting amylin receptor agonist peptide. Studied for its binding behaviour at the amylin receptor complex.',
     about: [
@@ -399,7 +399,7 @@ const GLOW_PRODUCTS = [
       { t: 'Formulation stability', d: 'Studied for how the two peptides behave when co-formulated versus reconstituted separately.' },
       { t: 'Comparative co-agonism', d: 'Applied alongside single-compound vials to compare co-formulated and separately administered protocols.' }
     ] },
-  { name: 'MOTS-C', tag: 'Longevity Research', cat: 'longevity', purity: '99.1%', badge:null,
+  { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.1%', badge:null,
     sizes: [{ mg: '10mg', price: 75, sku: 'GLO-MS10' }],
     blurb: 'A mitochondrial-derived peptide encoded within the mitochondrial genome. Studied for its role in metabolic signalling.',
     about: [
@@ -411,7 +411,7 @@ const GLOW_PRODUCTS = [
       { t: 'Nuclear translocation', d: 'Investigated for movement from mitochondria to the nucleus under metabolic stress conditions in culture.' },
       { t: 'Mitochondrial-derived peptide research', d: 'Used as a reference compound in the broader study of peptides encoded within the mitochondrial genome.' }
     ] },
-  { name: 'Epithalon', tag: 'Longevity Research', cat: 'longevity', purity: '99.4%', badge:null,
+  { name: 'Epithalon', tag: null, cat: 'longevity', purity: '99.4%', badge:null,
     sizes: [{ mg: '10mg', price: 55, sku: 'GLO-ET10' }],
     blurb: 'A synthetic tetrapeptide studied for interaction with telomerase gene expression. Investigated in cellular senescence models.',
     about: [
@@ -423,7 +423,7 @@ const GLOW_PRODUCTS = [
       { t: 'Cellular senescence models', d: 'Used in models examining replicative senescence and population doubling in culture.' },
       { t: 'Pineal peptide research', d: 'Investigated alongside other pineal-derived peptide preparations for regulatory signalling activity.' }
     ] },
-  { name: 'NAD+', tag: 'Longevity Research', cat: 'longevity', purity: '99.0%', badge:null, kind: 'compound',
+  { name: 'NAD+', tag: null, cat: 'longevity', purity: '99.0%', badge:null, kind: 'compound',
     sizes: [{ mg: '500mg', price: 85, sku: 'GLO-NJ500' }],
     blurb: 'Nicotinamide adenine dinucleotide, a coenzyme central to cellular redox reactions. Studied in mitochondrial signalling models.',
     about: [
@@ -435,7 +435,7 @@ const GLOW_PRODUCTS = [
       { t: 'Mitochondrial redox signalling', d: 'Studied for its role as an electron carrier in oxidative phosphorylation and mitochondrial function assays.' },
       { t: 'PARP pathway research', d: 'Investigated for its consumption by PARP proteins in DNA damage response signalling.' }
     ] },
-  { name: 'TA-1', tag: 'Immune Research', cat: 'immune', purity: '99.3%', badge:null,
+  { name: 'TA-1', tag: null, cat: 'immune', purity: '99.3%', badge:null,
     sizes: [{ mg: '10mg', price: 70, sku: 'GLO-TA10' }],
     blurb: 'A synthetic peptide identical to thymosin alpha-1. Studied for interaction with toll-like receptor signalling.',
     about: [
@@ -447,7 +447,7 @@ const GLOW_PRODUCTS = [
       { t: 'T-cell maturation models', d: 'Used in lymphocyte culture models examining T-cell differentiation and maturation markers.' },
       { t: 'Cytokine expression studies', d: 'Investigated for changes in cytokine gene expression following innate immune pathway activation.' }
     ] },
-  { name: 'KPV', tag: 'Immune Research', cat: 'immune', purity: '99.2%', badge:null,
+  { name: 'KPV', tag: null, cat: 'immune', purity: '99.2%', badge:null,
     sizes: [{ mg: '10mg', price: 60, sku: 'GLO-KPV10' }],
     blurb: 'A synthetic tripeptide fragment of alpha-MSH with no melanocortin receptor activity. Studied for immune signalling pathways.',
     about: [
@@ -459,7 +459,7 @@ const GLOW_PRODUCTS = [
       { t: 'Gut epithelial models', d: 'Examined in intestinal epithelial and gut inflammation model systems for pathway signalling.' },
       { t: 'Melanocortin-independent activity', d: 'Investigated for pathway activity that does not depend on melanocortin receptor engagement, distinguishing it from alpha-MSH.' }
     ] },
-  { name: 'DSIP', tag: 'Neuropeptide Research', cat: 'neuro', purity: '99.2%', badge:null,
+  { name: 'DSIP', tag: null, cat: 'neuro', purity: '99.2%', badge:null,
     sizes: [{ mg: '5mg', price: 50, sku: 'GLO-DSP5' }],
     blurb: 'A nonapeptide first isolated during studies of slow-wave brain activity. Studied for neuropeptide signalling.',
     about: [
@@ -471,7 +471,7 @@ const GLOW_PRODUCTS = [
       { t: 'Electrophysiological models', d: 'Used in preparations examining slow-wave electrical activity, reflecting the assay it was originally isolated from.' },
       { t: 'HPA axis interaction', d: 'Investigated for interaction with corticotropin-releasing factor and related hypothalamic-pituitary-adrenal axis signalling.' }
     ] },
-  { name: 'Oxytocin', tag: 'Neuropeptide Research', cat: 'neuro', purity: '99.3%', badge:null,
+  { name: 'Oxytocin', tag: null, cat: 'neuro', purity: '99.3%', badge:null,
     sizes: [{ mg: '5mg', price: 55, sku: 'GLO-OX5' }],
     blurb: 'A nonapeptide hormone synthesized in the hypothalamus. Studied for binding behaviour at the oxytocin receptor.',
     about: [
@@ -483,7 +483,7 @@ const GLOW_PRODUCTS = [
       { t: 'Central nervous system signalling', d: 'Studied in neuronal models for downstream signalling following receptor activation.' },
       { t: 'Comparative neuropeptide pharmacology', d: 'Run alongside vasopressin in studies distinguishing activity at the two closely related receptor systems.' }
     ] },
-  { name: 'Melanotan 2', tag: 'Neuropeptide Research', cat: 'neuro', purity: '99.1%', badge:null,
+  { name: 'Melanotan 2', tag: null, cat: 'neuro', purity: '99.1%', badge:null,
     sizes: [{ mg: '10mg', price: 65, sku: 'GLO-ML10' }],
     blurb: 'A synthetic cyclic analogue of alpha-MSH. Studied for its binding behaviour across melanocortin receptor subtypes.',
     about: [
@@ -495,7 +495,7 @@ const GLOW_PRODUCTS = [
       { t: 'Receptor selectivity comparisons', d: 'Run as the non-selective reference compound when characterising newer, receptor-selective melanocortin agonists.' },
       { t: 'Cyclic peptide stability', d: 'Studied for how the lactam bridge modification affects structural stability relative to linear alpha-MSH.' }
     ] },
-  { name: 'PT-141', tag: 'Neuropeptide Research', cat: 'neuro', purity: '99.2%', badge:null,
+  { name: 'PT-141', tag: null, cat: 'neuro', purity: '99.2%', badge:null,
     sizes: [{ mg: '10mg', price: 55, sku: 'GLO-P41' }],
     blurb: 'A synthetic melanocortin receptor agonist derived from Melanotan 2. Studied for selectivity at the MC4 receptor.',
     about: [
@@ -507,7 +507,7 @@ const GLOW_PRODUCTS = [
       { t: 'Structure-activity relationship', d: 'Studied as a case example of how a single terminal amino acid change alters melanocortin receptor selectivity.' },
       { t: 'Central melanocortin signalling', d: 'Investigated in neuronal models for downstream signalling following MC4R activation.' }
     ] },
-  { name: 'Selank', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.6%', badge:null,
+  { name: 'Selank', tag: null, cat: 'cognitive', purity: '99.6%', badge:null,
     sizes: [{ mg: '5mg', price: 45, sku: 'GLO-SK5' }],
     blurb: 'A synthetic heptapeptide based on the tetrapeptide tuftsin. Studied in preclinical models of neuropeptide regulation.',
     about: [
@@ -519,7 +519,7 @@ const GLOW_PRODUCTS = [
       { t: 'Monoamine and GABAergic systems', d: 'Examined in tissue models for effects on neurotransmitter turnover.' },
       { t: 'Expression studies', d: 'Used in work measuring changes in neurotrophic factor expression in brain tissue models.' }
     ] },
-  { name: 'Semax', tag: 'Cognitive Research', cat: 'cognitive', purity: '99.7%', badge:null,
+  { name: 'Semax', tag: null, cat: 'cognitive', purity: '99.7%', badge:null,
     sizes: [{ mg: '30mg', price: 80, sku: 'GLO-XA30' }],
     blurb: 'A synthetic peptide derived from the ACTH(4-10) fragment. Investigated in research on neurotrophic signalling.',
     about: [
