@@ -113,21 +113,16 @@
 </script>
 <style>
   /* ---------- hero ----------
-     Title, one line, then straight into the six steps. No product shot in
-     between: it was a full screen of scrolling before the page began saying
-     anything, on a page whose whole argument is that it does not pad. */
+     Title, then straight into the six steps. No lede and no product shot in
+     between: the chain says "six steps, four of them performed by someone
+     else" by drawing it, with each outside party named on its own node, so a
+     line of copy above saying the same thing was the page explaining itself
+     before showing itself. */
   .pr-hero{
     position:relative; overflow:hidden;
     padding-bottom: clamp(26px, 3.5vw, 48px);
   }
   .pr-hero > .container{ position:relative; z-index:1; }
-  /* One line under the title, so it reads balanced rather than ragged.
-     Weight and colour match .hero-sub on the homepage: semibold a shade under
-     full white reads as supporting copy rather than body text, and the lift in
-     colour is what stops bold dim grey going muddy. */
-  .pr-hero .lp-lede{
-    text-wrap: balance; font-weight: 600; color: #c7c7c4;
-  }
 
   /* The chain follows the hero directly, so it does not also need the shared
      section's full top padding on top of the hero's bottom padding. */
@@ -425,9 +420,6 @@
 <section class="lp-hero pr-hero">
   <div class="container">
     <h1>From source<br /><span class="outline">to shipment.</span></h1>
-    <p class="lp-lede">
-      Six steps. Four are performed by someone other than us, and we name them.
-    </p>
   </div>
 </section>
 
