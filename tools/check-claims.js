@@ -281,9 +281,15 @@ console.log('\nthe Glow Standard panel');
 
   // The manufacturing claim is hedged everywhere it appears, deliberately. A
   // four-word data cell is exactly where that hedge gets dropped by accident.
-  ok('the source row keeps the cGMP-aligned hedge',
-    /cGMP-aligned quality practices/.test(SOURCE_LONG) &&
-    read('how-we-test.html').includes('cGMP-aligned quality practices'));
+  // Checked wherever the claim is actually made. It used to be pinned to
+  // how-we-test.html because the chain's first step said it; that step is gone,
+  // and the hedge now has to hold on every page that still states it rather
+  // than on one named file.
+  const sourcePages = pages.filter(f => /cGMP/i.test(read(f)));
+  const unhedged = sourcePages.filter(f => !read(f).includes('cGMP-aligned quality practices'));
+  ok(`the source claim keeps the cGMP-aligned hedge everywhere it is made (${sourcePages.length} pages)`,
+    /cGMP-aligned quality practices/.test(SOURCE_LONG) && sourcePages.length > 0 && unhedged.length === 0,
+    unhedged.length ? `unhedged on: ${unhedged.join(', ')}` : 'no page states the source claim at all');
   const overclaims = pages.filter(f =>
     /\bGMP[\s-]?(certified|approved|compliant)\b/i.test(read(f)));
   ok('no page upgrades that to a GMP certification', overclaims.length === 0,
@@ -481,7 +487,7 @@ console.log('\nlisting copy');
  * ------------------------------------------------------------------------- */
 console.log('\ndisclosures');
 {
-  const discPages = ['how-we-test.html', 'about.html', 'shipping.html', 'wholesale.html'];
+  const discPages = ['about.html', 'shipping.html', 'wholesale.html'];
   const empty = [];
   const noSummary = [];
   let total = 0;
@@ -502,29 +508,10 @@ console.log('\ndisclosures');
   ok('every disclosure has a summary to operate it',
     noSummary.length === 0, [...new Set(noSummary)].join(', '));
 
-  // The point of the rebuild: a step is a heading, one sentence, and who did
-  // it. A paragraph creeping back into the visible half undoes it silently.
-  const proc = read('how-we-test.html');
-  const LEAD_MAX = 130;
-  const leads = [...proc.matchAll(/<p class="pr-lead">([\s\S]*?)<\/p>/g)]
-    .map(m => m[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim());
-  ok('the process chain still has six steps', leads.length === 6, `found ${leads.length}`);
-  const longLead = leads.filter(l => l.length > LEAD_MAX);
-  ok(`every step is one scannable line (${LEAD_MAX} chars)`, longLead.length === 0,
-    longLead.map(l => `${l.length}: "${l.slice(0, 50)}…"`).join('\n          '));
-  // "U.S." ends in a full stop without ending a sentence, and two of the six
-  // steps say it, so initialisms come out before the sentences are counted.
-  const multiSentence = leads.filter(l =>
-    ((l.replace(/\b(?:[A-Z]\.)+/g, '').match(/[.!?](\s|$)/g)) || []).length > 1);
-  ok('no step summary has grown a second sentence', multiSentence.length === 0,
-    multiSentence.join(' | '));
-
-  // Four of the six steps are performed by someone other than Glow. Saying so
-  // on every step is the honest half of this page, and it survives the rebuild.
-  const whos = (proc.match(/class="pr-who"/g) || []).length;
-  ok('every step still names who performs it', whos === 6, `found ${whos}`);
-  const discs = (proc.match(/<details class="disc">/g) || []).length;
-  ok('every step keeps its details behind a disclosure', discs >= 6, `found ${discs}`);
+  // The six-step chain of custody these checks guarded is gone from
+  // how-we-test.html: that page is only about the testing now, and a supply
+  // chain is not a testing method. What guarded it went with it rather than
+  // being left to pass vacuously on a page with no steps to count.
 }
 
 /* ---------------------------------------------------------------------------
@@ -976,22 +963,9 @@ console.log('\ncrawlable content');
   });
   ok('every JSON-LD block parses', broken.length === 0, broken.join('\n          '));
 
-  // The process page's ItemList is a second copy of the six steps. It already
-  // drifted once, describing the pre-rewrite page down to a step name that no
-  // longer existed, so it is pinned to the markup it summarises.
-  const proc = read('how-we-test.html');
-  const schema = JSON.parse(proc.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
-  const steps = schema.mainEntity.itemListElement;
-  // The step titles are h2 with the section heading above them gone, and the
-  // class is what keeps this off the page's other h2.
-  const h3s = [...proc.matchAll(/<h2 class="pr-t">(.*?)<\/h2>/g)].map(m => m[1]).slice(0, 6);
-  const leads = [...proc.matchAll(/<p class="pr-lead">([\s\S]*?)<\/p>/g)]
-    .map(m => m[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()).slice(0, 6);
-  const drifted = h3s.filter((h, i) =>
-    !steps[i] || steps[i].name !== h || steps[i].description !== leads[i]);
-  ok('the process ItemList describes the steps actually on the page',
-    steps.length === 6 && drifted.length === 0,
-    drifted.map(h => `"${h}"`).join(', '));
+  // The ItemList that mirrored those six steps went with them. how-we-test.html
+  // carries a WebPage and a BreadcrumbList now, and the loop above still parses
+  // both.
 
   // Every build script inserts generated copy into a page with String.replace.
   // A replacement *string* reads "$1" as a backreference, and every price the
