@@ -248,23 +248,7 @@
     cell.querySelector('.gs-note').textContent = note;
   }
 
-  /* ================= description & research =================
-     The accordions themselves are native <details> and need no script. This
-     only fills them, and names each one after the compound. */
-
-  function renderInfo(p) {
-    const about = $('pdAbout');
-    const research = $('pdResearch');
-    if (!about || !research) return;
-
-    $('pdAboutH').textContent = `About ${p.name}`;
-    $('pdResearchH').textContent = `${p.name} research`;
-    about.innerHTML = (p.about || []).map(t => `<p>${t}</p>`).join('');
-    research.innerHTML = (p.research || []).map(a =>
-      `<div class="pd-area"><h3>${a.t}</h3><p>${a.d}</p></div>`).join('');
-  }
-
-  /* ================= mg picker ================= */
+/* ================= mg picker ================= */
 
   function renderSizes(p) {
     const wrap = $('pdSizes');
@@ -532,7 +516,6 @@
     renderBreadcrumb(product);
     renderHeader(product);
     renderEvidence(product);
-    renderInfo(product);
     renderSizes(product);
     renderSelection();
     wireBuy();

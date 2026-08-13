@@ -738,52 +738,7 @@
     </div>
   </section>
 
-  <!-- ============ product information ============
-       Two accordions, both closed, so this sits above the catalog row without
-       putting paragraphs between a reader and the next compound: collapsed, the
-       whole section is two hairline rows. What the compound *is* no longer lives
-       down here at all, it is the line under the product name.
-
-       Native <details> rather than a tab strip: no JavaScript needed for the
-       control, and the copy is in the served markup whether a panel is open or
-       not, so a crawler and a reader with scripting off both get all of it. -->
-  <section class="pd-info">
-    <div class="container">
-      <h2 class="pd-info-h">Product information</h2>
-
-      <details class="pd-acc">
-        <summary>
-          <span id="pdAboutH">About</span>
-          <span class="pd-acc-mark" aria-hidden="true"></span>
-        </summary>
-        <div class="pd-acc-body">
-          <div class="pd-prose" id="pdAbout"></div>
-        </div>
-      </details>
-
-      <details class="pd-acc">
-        <summary>
-          <span id="pdResearchH">Research</span>
-          <span class="pd-acc-mark" aria-hidden="true"></span>
-        </summary>
-        <div class="pd-acc-body">
-          <div class="pd-areas" id="pdResearch"></div>
-          <p class="pd-ruo">
-            Listed to describe what this compound is and where it appears in the literature.
-            Nothing here is a claim of efficacy or safety, and none of it is guidance for use.
-            This product has not been evaluated or approved by the FDA, and is not intended to
-            diagnose, treat, cure, or prevent any disease. Glow Research is a retailer and does
-            not manufacture or test this compound; synthesis is performed by a third-party
-            facility and analysis by an independent laboratory.
-            <strong>For laboratory research use only. Not for human or animal consumption.</strong>
-          </p>
-        </div>
-      </details>
-
-    </div>
-  </section>
-
-  <!-- ============ more from Glow ============
+<!-- ============ more from Glow ============
        Last, and reachable without reading anything: everything above it is
        either the buy box, four rows of provenance, or two closed accordions.
        Draws from the whole catalog with same-category compounds first, so the

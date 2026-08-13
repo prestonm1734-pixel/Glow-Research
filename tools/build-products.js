@@ -268,12 +268,6 @@ function buildProduct(p, donor) {
   // will be read, so js/product.js replaces that one on load.
   html = setInner(html, 'pdEvidence', 'dl', evidenceHtml(p));
 
-  html = setText(html, 'pdAboutH', `About ${esc(p.name)}`);
-  html = setText(html, 'pdResearchH', `${esc(p.name)} research`);
-  html = fillEmpty(html, 'pdAbout', (p.about || []).map(t => `<p>${t}</p>`).join(''));
-  html = fillEmpty(html, 'pdResearch', (p.research || []).map(a =>
-    `<div class="pd-area"><h3>${a.t}</h3><p>${a.d}</p></div>`).join(''));
-
   return rewriteDepth(html, 2);
 }
 
