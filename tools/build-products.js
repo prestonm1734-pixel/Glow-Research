@@ -152,7 +152,7 @@ function breadcrumbJsonLd(p, url) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
-      { '@type': 'ListItem', position: 2, name: 'Products', item: `${SITE}/peptides.html` },
+      { '@type': 'ListItem', position: 2, name: 'Catalog', item: `${SITE}/peptides.html` },
       { '@type': 'ListItem', position: 3, name: CAT_LABEL[p.cat], item: `${SITE}/peptides.html?cat=${catFilterGroup(p.cat)}` },
       { '@type': 'ListItem', position: 4, name: p.name, item: url },
     ],
