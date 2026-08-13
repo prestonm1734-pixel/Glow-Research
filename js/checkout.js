@@ -457,7 +457,13 @@
       return true;
     }
 
-    await finishOrder(pending, paymentIntent.id, null, null);
+    // The button is handed over so the resume shows the same "Placing your
+    // order…" state the direct path does. Without it the shopper lands back
+    // from their bank on a checkout page that looks idle while the order is
+    // being created, which is several seconds of looking like nothing
+    // happened at the one moment they most need to see that it did.
+    const resumeBtn = $('coForm') ? $('coForm').querySelector('button[type="submit"]') : null;
+    await finishOrder(pending, paymentIntent.id, resumeBtn, null);
     return true;
   }
 
@@ -670,6 +676,21 @@
       setPlaceBtn(submitBtn, 'Confirming payment…', true);
       $('coPlacedMsg').textContent = '';
 
+      // A shipping toggle or a cart change fires ensurePaymentIntent(), and
+      // that request can still be in the air when this button is pressed a
+      // moment later. Confirming against a PaymentIntent that has not caught
+      // up yet charges the old total, and api/create-order.js then reprices
+      // the cart as it now stands, finds the two do not agree, and refuses to
+      // create the order — leaving the shopper charged for an order that does
+      // not exist, which is the worst outcome this checkout can produce.
+      // Draining the queue first costs a few hundred milliseconds. The loop
+      // rather than a single await is deliberate: ensurePaymentIntent() waits
+      // on any in-flight call before replacing piInFlight with its own, so one
+      // await can return while a newer request is still running.
+      while (piInFlight) {
+        try { await piInFlight; } catch (e) { /* surfaced by stripeErr() where it was thrown */ }
+      }
+
       const payload = {
         customer: { email: $('coEmail').value },
         shipping: shipAddr,
@@ -737,7 +758,10 @@
         // than a redirect or an immediate result — none of the card networks
         // Payment Element offers here behave this way, so this is a backstop
         // for a case this form should not actually produce, not a path
-        // someone is expected to hit.
+        // someone is expected to hit. The stash is cleared like the decline
+        // path above clears it: nothing is going to come back and finish this
+        // order, so leaving it behind only risks a later load finding it.
+        try { sessionStorage.removeItem('glow-pending-order'); } catch (e) {}
         setPlaceBtn(submitBtn, 'Place order', false);
         $('coPlacedMsg').textContent = 'Your payment is still processing. Refresh this page in a moment.';
         $('coPlacedMsg').scrollIntoView({ block: 'nearest', behavior: 'smooth' });

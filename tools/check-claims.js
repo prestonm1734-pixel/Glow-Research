@@ -1303,6 +1303,45 @@ console.log('\npayments');
     /payment_method_types:\s*\['card'\]/.test(intentFn) &&
     !/automatic_payment_methods\s*:\s*\{/.test(intentFn));
 
+  // js/checkout.js prices what the shopper is shown; api/_lib.js prices what
+  // Stripe is actually told to collect. CLAUDE.md has said all along that the
+  // two tables must be changed together, and nothing checked that they had
+  // been. A drift between them is not a display bug: the page quotes one
+  // number, the card is charged another, and api/create-order.js then refuses
+  // the order because the amount it reprices does not match what was taken.
+  {
+    const shipRows = (src, name) => {
+      const block = new RegExp(`${name}\\s*=\\s*\\[([\\s\\S]*?)\\];`).exec(src);
+      if (!block) return null;
+      return (block[1].match(/\{[^}]*\}/g) || []).map(row => {
+        const grab = re => { const m = re.exec(row); return m ? m[1] : '?'; };
+        return `${grab(/id:\s*'([^']+)'/)}@${grab(/cost:\s*([0-9.]+)/)}` +
+               `/free-over-${grab(/freeOver:\s*(null|[0-9.]+)/)}`;
+      });
+    };
+    const served = shipRows(lib, 'SHIPPING_RATES');
+    const shown = shipRows(coJs, 'const SHIPPING');
+    ok('both shipping tables were found to compare',
+      Array.isArray(served) && served.length > 0 && Array.isArray(shown) && shown.length > 0);
+    ok('what Stripe is charged for shipping matches what checkout displays',
+      !!served && !!shown && served.join(' | ') === shown.join(' | '),
+      `_lib.js [${(served || []).join(', ')}] vs checkout.js [${(shown || []).join(', ')}]`);
+  }
+
+  // Pricing a cart line off its display name meant a rename invalidated every
+  // cart already saved in a browser, and the shopper only found out at the
+  // payment step, with no way to act on it. The SKU is the identity that does
+  // not move.
+  ok('orders are priced against the SKU, not just the product name',
+    /i\.sku/.test(lib) && /s\.sku === i\.sku/.test(lib) &&
+    /sku: item\.sku \|\| skuFor\(/.test(read('js/cart.js')));
+
+  // A confirmed payment with no order behind it is the one failure mode the
+  // shopper cannot resolve and the desk would never otherwise see.
+  ok('a captured payment that fails to become an order alerts the desk',
+    /alertOrphanedPayment\(/.test(order) &&
+    (order.match(/await alertOrphanedPayment\(/g) || []).length >= 2);
+
   // The confirmation page is the one surface that describes a payment after
   // the fact, and it got this wrong for real: it went on telling shoppers
   // "card payment is not connected on the site yet, we will contact you to

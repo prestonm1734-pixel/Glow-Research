@@ -51,6 +51,17 @@
   const subtotal = () => items.reduce((n, i) => n + lineUnit(i) * i.qty, 0);
   const savings = () => items.reduce((n, i) => n + (i.unitOriginal - lineUnit(i)) * i.qty, 0);
 
+  // Looked up once when a line is created. Returns '' rather than throwing
+  // for anything the catalog does not hold: an unknown line is add()'s
+  // problem to have avoided, and priceOrder() on the server rejects it either
+  // way, so there is nothing gained by failing louder here.
+  function skuFor(name, variant) {
+    if (typeof GLOW_PRODUCTS === 'undefined') return '';
+    const p = GLOW_PRODUCTS.find(pr => pr.name === name);
+    const size = p && p.sizes.find(s => s.mg === variant);
+    return (size && size.sku) || '';
+  }
+
   /* ---------- badge ---------- */
 
   function renderBadge() {
@@ -326,6 +337,12 @@
     else items.push({
       name: item.name,
       variant: item.variant,
+      // Resolved here rather than asked of every caller, because every caller
+      // already knows the name and size and none of them knew to send this.
+      // priceOrder() in api/_lib.js prices against the SKU when a line
+      // carries one, so a line recorded now survives the product being
+      // renamed later; without it the cart dies at the payment step.
+      sku: item.sku || skuFor(item.name, item.variant),
       qty: item.qty || 1,
       unitOriginal: item.unitOriginal,
       unitSale: item.unitSale,

@@ -101,6 +101,9 @@ export default async function handler(req, res) {
   // is more convenient.
   const chargedCents = Math.round(priced.total * 100);
   if (intent.amount_received !== chargedCents) {
+    await alertOrphanedPayment(paymentIntentId, email, intent.amount_received,
+      `The cart repriced to ${(chargedCents / 100).toFixed(2)} but Stripe collected ` +
+      `${(intent.amount_received / 100).toFixed(2)}, so no order was created.`);
     return res.status(409).json({
       error: 'The order total no longer matches the amount charged. Email support@glowresearch.shop with this reference: ' + paymentIntentId,
     });
@@ -157,6 +160,12 @@ export default async function handler(req, res) {
     phone: customer.phone || '',
   });
 
+  // Tracked so the catch below can tell the two failures apart: WooCommerce
+  // refusing to create the order (no order exists, the shopper has paid for
+  // nothing) and something after it going wrong (the order exists and is
+  // fine). Only the first is worth waking anyone up for.
+  let createdOrder = null;
+
   try {
     const customerId = await resolveCustomer(req, email, shipping);
 
@@ -179,6 +188,7 @@ export default async function handler(req, res) {
         ],
       }),
     });
+    createdOrder = data;
 
     // Best-effort, non-fatal: the WooCommerce order already exists by this
     // point, and losing this write only weakens the idempotency check further
@@ -229,8 +239,50 @@ export default async function handler(req, res) {
       status: STATUS_LABELS[data.status] || data.status || '',
     });
   } catch (err) {
+    if (!createdOrder) {
+      await alertOrphanedPayment(paymentIntentId, email, intent.amount_received,
+        `WooCommerce refused the order: ${err.message || 'no reason given'}`);
+    }
     return res.status(502).json({ error: err.message || 'Could not reach the store backend.' });
   }
+}
+
+// A payment Stripe has already captured, with no order to show for it, is the
+// one failure the shopper cannot fix and nobody here would otherwise see. The
+// browser hands them a support address and that is the end of it: no order
+// exists to appear in WooCommerce, no confirmation email goes out, and the
+// only remaining record is a charge sitting in Stripe that nobody is looking
+// at. This puts it in front of the desk while the customer is still on the
+// page, with the reference needed to find the charge and either finish the
+// order by hand or refund it.
+//
+// Never throws and never blocks the response the shopper is waiting on: the
+// alert failing must not turn a bad outcome into a worse one.
+async function alertOrphanedPayment(paymentIntentId, email, amountCents, reason) {
+  const amount = money((Number(amountCents) || 0) / 100);
+  try {
+    await sendEmail({
+      to: ADMIN_TO,
+      replyTo: email || SUPPORT,
+      subject: `Payment taken, no order created: ${paymentIntentId}`,
+      text: [
+        `A card was charged and the order was not created. The customer has been`,
+        `told to email support, and has paid ${amount}.`,
+        '',
+        `Stripe PaymentIntent: ${paymentIntentId}`,
+        `Customer: ${email || 'unknown'}`,
+        `Amount captured: ${amount}`,
+        '',
+        'WHAT HAPPENED',
+        `  ${reason}`,
+        '',
+        'WHAT TO DO',
+        '  Open the PaymentIntent in Stripe, then either create the order by hand',
+        '  in WooCommerce and reply to this email to confirm it, or refund the',
+        '  charge. Do not leave it: the money is captured either way.',
+      ].join('\n'),
+    });
+  } catch (e) { /* see above: this alert is never allowed to fail the request */ }
 }
 
 // A signed-in shopper's order belongs to their account. A guest's order is

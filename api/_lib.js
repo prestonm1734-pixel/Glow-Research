@@ -117,8 +117,23 @@ export function priceOrder(items, shippingMethodId) {
   }
 
   const lines = items.map(i => {
-    const p = GLOW_PRODUCTS.find(p => p.name === i.name);
-    const size = p && p.sizes.find(s => s.mg === i.variant);
+    // The SKU is the stable identity; the display name is not. A cart lives
+    // in localStorage for weeks and outlives a rename — three products were
+    // renamed in one commit recently — and matching on the name alone meant
+    // every one of those carts died here, at the payment step, with an error
+    // the shopper could do nothing about. Carts saved before js/cart.js
+    // started recording SKUs have no sku to match on, so the name lookup
+    // stays as the fallback rather than being replaced by it.
+    let p = null;
+    let size = null;
+    if (i.sku) {
+      p = GLOW_PRODUCTS.find(pr => pr.sizes.some(s => s.sku === i.sku)) || null;
+      size = p ? p.sizes.find(s => s.sku === i.sku) : null;
+    }
+    if (!size) {
+      p = GLOW_PRODUCTS.find(pr => pr.name === i.name) || null;
+      size = p ? p.sizes.find(s => s.mg === i.variant) : null;
+    }
     if (!p || !size) {
       throw new Error(`"${[i.name, i.variant].filter(Boolean).join(' ')}" is no longer in the catalog.`);
     }
