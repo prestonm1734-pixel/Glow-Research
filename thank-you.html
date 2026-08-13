@@ -10,7 +10,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
 <style>
   /* One column, generous air, thin rules instead of boxes — the whole page
@@ -81,7 +81,7 @@
     #tyShell.is-in .ty-mark::after{ animation:none; }
   }
   .ty-wrap h1{
-    font-family:'Fraunces', serif; font-size: clamp(1.9rem, 5vw, 2.6rem); font-weight:600;
+    font-family: var(--font-display); font-size: clamp(1.9rem, 5vw, 2.6rem); font-weight:700;
     letter-spacing:-.02em; line-height:1.1; margin:0 0 10px;
   }
   .ty-lede{ margin:0 0 6px; font-size:1rem; line-height:1.6; color:#55554f; }
@@ -96,7 +96,7 @@
      is set apart from the number and date rather than reading as more of the
      same grey meta text. */
   .ty-status{
-    font-family:'Space Grotesk',sans-serif; font-size:.68rem; font-weight:700;
+    font-family:var(--font-display); font-size:.68rem; font-weight:700;
     letter-spacing:.08em; text-transform:uppercase; color:#0a0a0a;
     background:#f0efec; padding: 4px 10px; border-radius:999px;
   }
@@ -108,7 +108,7 @@
   .ty-section{ padding: 30px 0; border-top:1px solid rgba(0,0,0,.1); }
   .ty-section:first-child{ border-top:0; padding-top:0; }
   .ty-section h2{
-    font-family:'Space Grotesk',sans-serif; font-size:.7rem; font-weight:700;
+    font-family:var(--font-display); font-size:.7rem; font-weight:700;
     letter-spacing:.1em; text-transform:uppercase; color:#8a8a86; margin:0 0 16px;
   }
 
@@ -128,7 +128,7 @@
   .ty-totals div{ display:flex; justify-content:space-between; gap:16px; padding:5px 0; font-size:.92rem; color:#55554f; }
   .ty-totals .ty-grand{
     color:#0a0a0a; margin-top:5px; padding-top:11px; border-top:1px solid rgba(0,0,0,.1);
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem;
+    font-family:var(--font-display); font-weight:700; font-size:1.05rem;
   }
 
   .ty-addr{ font-size:.94rem; line-height:1.7; color:#55554f; }

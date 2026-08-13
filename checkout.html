@@ -13,7 +13,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
 <link rel="preconnect" href="https://js.stripe.com">
 <!-- Not a dependency in the "js/ may import nothing" sense: this is loaded
@@ -188,7 +188,7 @@
     display:flex; align-items:baseline; justify-content:space-between; gap:12px;
     margin: 0 0 4px;
   }
-  .co-side-head h2{ margin:0; font-size:1.1rem; font-weight:600; letter-spacing:-.02em; }
+  .co-side-head h2{ margin:0; font-size:1.1rem; font-weight:700; letter-spacing:-.02em; }
   .co-edit{ font-size:.88rem; color:#45453f; text-decoration:underline; text-underline-offset:3px; }
   .co-edit:hover{ color:#0a0a0a; }
 
@@ -223,7 +223,7 @@
     margin-top:12px; padding-top:14px; border-top:1px solid rgba(0,0,0,0.14);
     font-size:1rem; font-weight:600;
   }
-  .co-total b{ font-family:'Space Grotesk', sans-serif; font-size:1.4rem; }
+  .co-total b{ font-family:var(--font-display); font-size:1.4rem; }
   .co-taxnote{ margin:12px 0 0; font-size:.8rem; color:#86868b; line-height:1.55; }
 
   /* discount stays folded away — an empty code box on every order invites a
@@ -251,7 +251,7 @@
 
   /* empty cart */
   .co-empty{ text-align:center; padding: 90px 20px 110px; }
-  .co-empty h2{ font-size:1.6rem; font-weight:600; letter-spacing:-.02em; margin:0 0 8px; color:#0a0a0a; }
+  .co-empty h2{ font-size:1.6rem; font-weight:700; letter-spacing:-.02em; margin:0 0 8px; color:#0a0a0a; }
   .co-empty p{ margin:0 0 26px; color:#6e6e73; }
 
   @media (max-width: 1000px){

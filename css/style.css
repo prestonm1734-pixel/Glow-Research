@@ -21,6 +21,21 @@
   --grad-main: linear-gradient(120deg, #ffffff 0%, #cfcfcd 50%, #9c9c99 100%);
   --grad-alt: linear-gradient(120deg, #ffffff, #8a8a87);
 
+  /* The display face: every page title, price, stat numeral and badge.
+     Named once because it was previously written out as 'Space Grotesk' in
+     thirty-odd places across the stylesheet and fourteen page-level <style>
+     blocks, so changing it meant finding all of them.
+
+     Helvetica Neue cannot be served: it is Monotype-licensed, is not on
+     Google Fonts, and self-hosting it needs a licence we do not hold. So this
+     is a system-first stack rather than a webfont. Apple platforms have the
+     real thing installed and use it. Helvetica catches the Linux desktops
+     where fontconfig aliases it to Nimbus Sans, a genuine Helvetica clone.
+     Inter sits ahead of Arial for everyone else because it is the closest
+     thing on the page to a neo-grotesque of this kind, and it is already
+     being downloaded for body copy, so the fallback costs no extra request. */
+  --font-display: 'Helvetica Neue', Helvetica, 'Inter', Arial, sans-serif;
+
   --radius: 20px;
   --radius-sm: 12px;
   --container: 1180px;
@@ -41,8 +56,10 @@ body{
 img{ max-width:100%; display:block; }
 a{ color: inherit; text-decoration:none; }
 h1,h2,h3,h4,h5{
-  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
-  font-weight: 600;
+  font-family: var(--font-display);
+  /* Bold, not semibold: Helvetica Neue has no 600, so a heading asking for one
+     lands on Medium and reads soft next to the rest of the page. */
+  font-weight: 700;
   line-height: 1.08;
   margin: 0 0 .5em;
   letter-spacing: -0.02em;
@@ -387,7 +404,7 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 .stat{ text-align:left; }
 .stat-num, .stat-suffix{
-  font-family:'Space Grotesk', sans-serif; font-size: 1.9rem; font-weight:500;
+  font-family:var(--font-display); font-size: 1.9rem; font-weight:500;
   background: var(--grad-main); -webkit-background-clip:text; background-clip:text; color:transparent;
 }
 .stat p{ margin:4px 0 0; font-size: 0.76rem; color: var(--text-dimmer); text-transform: uppercase; letter-spacing:.06em; }
@@ -698,7 +715,7 @@ button[disabled].si-forgot{ cursor: progress; }
    smaller. Tabular figures so the prices line up down a column of cards
    rather than drifting with the width of a 1 against a 9. */
 .price{
-  display:block; font-family:'Space Grotesk',sans-serif; font-size:1.45rem;
+  display:block; font-family:var(--font-display); font-size:1.45rem;
   color:#fff; font-weight:600; letter-spacing:-.01em;
   font-variant-numeric: tabular-nums; margin-bottom:14px;
 }
@@ -762,7 +779,7 @@ button[disabled].si-forgot{ cursor: progress; }
   width:100%; text-align:left; background:none; border:none; color: var(--text);
   padding: 22px 4px; font-size: 1.02rem; font-weight:600; cursor:pointer;
   display:flex; justify-content:space-between; align-items:center; gap: 20px;
-  font-family:'Space Grotesk', sans-serif;
+  font-family:var(--font-display);
 }
 .faq-q .icon{ flex-shrink:0; width:26px;height:26px; border-radius:50%; border:1px solid var(--border); display:flex;align-items:center;justify-content:center; transition: transform .3s ease, background .3s ease, border-color .3s ease; }
 /* the row is a button but gave no feedback at all before it was clicked */
@@ -1032,7 +1049,7 @@ html:not(.js) .faq-a{ max-height: none; }
 /* solid, not gradient-filled: a washed-out numeral is the one thing on
    the page that should read instantly */
 .lp-fig b{
-  display:block; font-family:'Space Grotesk', sans-serif; font-size: clamp(2rem, 3vw, 2.5rem);
+  display:block; font-family:var(--font-display); font-size: clamp(2rem, 3vw, 2.5rem);
   font-weight:500; letter-spacing:-.02em; font-variant-numeric: tabular-nums;
   color: var(--text);
 }
@@ -1325,7 +1342,7 @@ html:not(.js) .faq-a{ max-height: none; }
   font-size:.85rem; font-weight:600; color:#6e6e73;
 }
 .post-header h1{
-  font-family:'Space Grotesk', 'Inter', system-ui, sans-serif; font-weight:700;
+  font-family:var(--font-display); font-weight:700;
   font-size: clamp(2.1rem, 4.8vw, 3.3rem); line-height:1.06; letter-spacing:-.04em;
   color:#1d1d1f; margin: 0 0 18px; text-wrap: balance;
 }
@@ -1358,7 +1375,7 @@ html:not(.js) .faq-a{ max-height: none; }
 .post-body p{ margin: 0 0 1.4em; color: inherit; font-size: inherit; line-height: inherit; }
 .post-body .lede{ font-size: 1.28rem; line-height:1.55; color:#1d1d1f; margin-bottom: 1.3em; }
 .post-body h2{
-  font-family:'Space Grotesk', 'Inter', system-ui, sans-serif; font-weight:700;
+  font-family:var(--font-display); font-weight:700;
   font-size: clamp(1.5rem, 2.6vw, 1.85rem); letter-spacing:-.035em; color:#1d1d1f;
   margin: 2em 0 .55em;      /* more space above than below, binding a heading to its section */
   scroll-margin-top: 100px; /* so anchor jumps clear the sticky header */
@@ -1755,7 +1772,7 @@ body.qa-open .cart-toast{ opacity:0; pointer-events:none; }
 }
 .cart-row-price{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
 .cart-was{ font-family:'JetBrains Mono', monospace; font-size:.8rem; color:#a3a3a1; text-decoration: line-through; }
-.cart-now{ font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:1rem; }
+.cart-now{ font-family:var(--font-display); font-weight:700; font-size:1rem; }
 .cart-off{
   font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:700;
   letter-spacing:.08em; text-transform:uppercase;
@@ -1816,7 +1833,7 @@ body.qa-open .cart-toast{ opacity:0; pointer-events:none; }
   font-size:1.05rem; font-weight:700; color:#0a0a0a;
   padding-top:12px; border-top:1px solid rgba(0,0,0,0.1);
 }
-.cart-subtotal span:last-child{ font-family:'Space Grotesk', sans-serif; }
+.cart-subtotal span:last-child{ font-family:var(--font-display); }
 .cart-tax{ margin:6px 0 16px; font-size:.8rem; color:#8a8a86; }
 .cart-checkout{ width:100%; justify-content:center; }
 .cart-checkout-msg{ margin:10px 0 0; font-size:.82rem; color:#8a8a86; text-align:center; }

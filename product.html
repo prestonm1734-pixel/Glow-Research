@@ -24,7 +24,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
 <style>
   /* ---------- breadcrumb ---------- */
@@ -144,7 +144,7 @@
     letter-spacing:.02em; margin-bottom:9px; color:#fff;
   }
   .pd-vial-name{
-    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:.98rem;
+    font-family:var(--font-display); font-weight:700; font-size:.98rem;
     line-height:1.15; letter-spacing:-.01em; color:#fff; word-break:break-word;
   }
   .pd-vial-mg{
@@ -166,7 +166,7 @@
     font-size:0.7rem; color:#0a0a0a; text-transform:uppercase; letter-spacing:.14em; font-weight:700;
     display:block; font-family:'JetBrains Mono', monospace; margin-bottom:10px;
   }
-  .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:800; margin: 0 0 8px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
+  .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:700; margin: 0 0 8px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
   /* one quiet line: this is a spec, not a pitch, so it sits back from the name
      above it and the price below it rather than competing with either */
   .pd-identity{
@@ -208,7 +208,7 @@
   }
 
   .pd-price{
-    font-family:'Space Grotesk',sans-serif; font-size: 1.7rem; font-weight:800; color:#0a0a0a;
+    font-family:var(--font-display); font-size: 1.7rem; font-weight:800; color:#0a0a0a;
     letter-spacing:-.03em; display:block; margin-bottom: 22px;
   }
   /* list price a step back from the live one, same treatment as the cards */
@@ -239,7 +239,7 @@
   /* ---------- sections ---------- */
   .pd-section{ background:#fff; padding: 74px 0; border-top:1px solid rgba(0,0,0,.1); }
   .pd-section.alt{ background:#f7f7f5; }
-  .pd-section h2{ font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight:800; margin: 0 0 6px; letter-spacing:-.02em; color:#0a0a0a; }
+  .pd-section h2{ font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight:700; margin: 0 0 6px; letter-spacing:-.02em; color:#0a0a0a; }
 
   /* --- buy more, pay less ---
      Cards rather than rows: each tier shows the vials you actually get, so
@@ -295,7 +295,7 @@
   /* The vial count is the heading of the card, so it is set like one rather
      than in the mono label style the old three-across layout needed. */
   .pd-tier-qty{
-    font-family:'Space Grotesk', sans-serif; font-size:1.16rem; font-weight:800;
+    font-family:var(--font-display); font-size:1.16rem; font-weight:800;
     letter-spacing:-.02em; color:#0a0a0a; margin-bottom:5px;
   }
   /* The discount is what the card is for, so it is the loud line. "Standard"
@@ -361,7 +361,7 @@
      Prose set to a reading measure, no card, no box. */
   .pd-info{ background:#f7f7f5; border-top:1px solid rgba(0,0,0,.1); padding: 58px 0 66px; }
   .pd-info-h{
-    font-size: clamp(1.3rem, 2.3vw, 1.7rem); font-weight:800; letter-spacing:-.025em;
+    font-size: clamp(1.3rem, 2.3vw, 1.7rem); font-weight:700; letter-spacing:-.025em;
     margin: 0 0 24px; color:#0a0a0a;
   }
   .pd-acc{ border-top: 1px solid rgba(0,0,0,.14); }
@@ -417,7 +417,7 @@
   .pd-standard{ background:#f7f7f5; border-top:1px solid rgba(0,0,0,.1); padding: 62px 0 66px; }
   .gs-head{ margin-bottom: 28px; }
   .gs-head h2{
-    font-size: clamp(1.3rem, 2.3vw, 1.8rem); font-weight:800; letter-spacing:-.025em;
+    font-size: clamp(1.3rem, 2.3vw, 1.8rem); font-weight:700; letter-spacing:-.025em;
     margin:0; color:#0a0a0a; max-width: 30ch;
   }
   .gs-grid{
@@ -431,7 +431,7 @@
   }
   .gs-cell dd{ margin:0; }
   .gs-value{
-    display:block; font-family:'Space Grotesk', sans-serif; font-size:1.02rem;
+    display:block; font-family:var(--font-display); font-size:1.02rem;
     font-weight:700; letter-spacing:-.015em; line-height:1.3; color:#0a0a0a;
   }
   .gs-note{ display:block; margin-top:10px; font-size:.82rem; line-height:1.6; color:#6f6f6a; }
