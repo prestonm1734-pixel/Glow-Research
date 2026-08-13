@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- set before first paint: every scroll-reveal below starts hidden and
+     needs the observer to show it, so without scripting the page must
+     opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
 <title>Certificate of Analysis | Glow Research</title>
 <meta name="description" content="Certificates of analysis for Glow Research peptides." />
@@ -61,6 +64,9 @@
 </head>
 <body>
 
+<!-- first-visit age / RUO gate. Loaded here, not with the other
+     scripts at the foot of the page, so the overlay is in the DOM
+     before anything behind it paints. -->
 <script src="js/age-gate.js"></script>
 
 <div class="marquee-bar">
@@ -77,9 +83,10 @@
 <header class="site-header" id="siteHeader">
   <div class="container nav-inner">
     <a href="index.html" class="logo" aria-label="Glow Research home">Glow<span class="spark">✦</span></a>
+
     <nav class="main-nav" id="mainNav">
       <a href="peptides.html">Catalog</a>
-      <a href="coa.html">COA</a>
+      <a href="coa.html" class="active">COA</a>
       <a href="shipping.html">Shipping</a>
       <a href="wholesale.html">Wholesale</a>
     </nav>
@@ -103,10 +110,14 @@
   </div>
 </header>
 
-<main>
-<div class="container" style="padding: 60px 0;">
-  <h1>COA</h1>
-</div>
+<main class="lp-page">
+
+<section class="lp-section">
+  <div class="container">
+    <h1>COA</h1>
+  </div>
+</section>
+
 </main>
 
 <footer class="site-footer">
@@ -118,11 +129,15 @@
           Research-grade peptides, independently verified and discreetly shipped.
           Documented purity from a source you can trace.
         </p>
+        <div class="footer-legal">
+          <span>&copy; <span id="stubYear"></span> Glow Research. All rights reserved.</span>
+        </div>
       </div>
+
       <div class="footer-col">
-        <h4>Shop</h4>
-        <a href="peptides.html">Catalog</a>
-        <a href="cart.html">Cart</a>
+        <h4>Catalog</h4>
+        <a href="peptides.html">All Peptides</a>
+        <a href="wholesale.html">Wholesale</a>
       </div>
       <div class="footer-col">
         <h4>Company</h4>
@@ -133,17 +148,23 @@
         <h4>Support</h4>
         <a href="contact.html">Contact Us</a>
         <a href="shipping.html">Shipping</a>
-        <a href="wholesale.html">Wholesale</a>
-      </div>
-      <div class="footer-col">
-        <h4>Legal</h4>
-        <a href="terms.html">Terms</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="ruo-agreement.html">RUO</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="ruo-agreement.html">RUO Agreement</a>
+        <a href="privacy.html">Privacy Policy</a>
       </div>
     </div>
+
+    <div class="disclaimer">
+      <h5>Research Use Only Disclaimer</h5>
+      <p>
+        All products are sold for research use only (RUO). Not for human or animal
+        consumption. These statements have not been evaluated by the FDA. Products are
+        not intended to diagnose, treat, cure, or prevent any disease.
+      </p>
+    </div>
+
     <div class="footer-bottom">
-      <p>&copy; 2024 Glow Research. All rights reserved.</p>
+      <p>Not for human consumption. For laboratory research use only.</p>
     </div>
   </div>
 </footer>
@@ -172,10 +193,31 @@
   </div>
 </div>
 
+<script>
+  document.getElementById('stubYear').textContent = new Date().getFullYear();
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  const hamburger = document.getElementById('hamburger');
+  const mainNav = document.getElementById('mainNav');
+  hamburger.addEventListener('click', () => {
+    mainNav.classList.toggle('open');
+    hamburger.classList.toggle('open');
+  });
+  mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mainNav.classList.remove('open')));
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => {
+    header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
+  });
+</script>
+<script src="js/products-data.js"></script>
 <script src="js/cart.js"></script>
-<script src="js/product.js"></script>
+<script src="js/cart-modal.js"></script>
 <script src="js/search.js"></script>
-<script src="js/script.js"></script>
-
+<script src="js/account.js"></script>
+<script src="js/referral.js"></script>
 </body>
 </html>
