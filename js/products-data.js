@@ -988,7 +988,7 @@ function findProductBySlug(slug) {
 // set this to true, then run `node tools/build.js` and commit peptides/**.
 // This single constant is read by the browser and by both build scripts, so
 // the site, the sitemap and the generator can never disagree about it.
-const PRODUCT_PAGES_LIVE = false;
+const PRODUCT_PAGES_LIVE = true;
 
 // Where a product card points — the one chokepoint every link goes through,
 // so flipping the constant above moves the whole site at once.

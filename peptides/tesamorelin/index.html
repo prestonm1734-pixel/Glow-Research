@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- set before first paint: every scroll-reveal below starts hidden and
+     needs the observer to show it, so without scripting the page must
+     opt out of hiding rather than opt in to showing -->
+<script>document.documentElement.classList.add('js');</script>
+<title>Tesamorelin 10mg | Glow Research</title>
+<meta name="description" content="Tesamorelin, 10mg per vial. Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only." />
+<meta name="robots" content="index,follow" />
+<meta property="og:type" content="product" />
+<meta property="og:site_name" content="Glow Research" />
+<meta property="og:title" content="Tesamorelin 10mg" />
+<meta property="og:description" content="Tesamorelin, 10mg per vial. Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only." />
+<meta property="og:image" content="https://glowresearch.shop/assets/products/tesamorelin-10mg-v2.webp" />
+<meta property="og:image:width" content="1672" />
+<meta property="og:image:height" content="941" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tesamorelin 10mg" />
+<meta name="twitter:description" content="Tesamorelin, 10mg per vial. Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only." />
+<meta name="twitter:image" content="https://glowresearch.shop/assets/products/tesamorelin-10mg-v2.webp" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://js.stripe.com">
+<link rel="stylesheet" href="../../css/style.css" />
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+  /* ---------- breadcrumb ---------- */
+  .pd-crumb{ background:#ececea; border-bottom:1px solid rgba(0,0,0,0.1); padding: 13px 0; }
+  .pd-crumb-inner{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    font-family:'JetBrains Mono', monospace; font-size:.7rem; letter-spacing:.08em;
+    text-transform:uppercase; color:#8a8a86;
+  }
+  .pd-crumb-inner a{ color:#45453f; }
+  .pd-crumb-inner a:hover{ color:#0a0a0a; }
+  .pd-crumb-inner span{ color:#0a0a0a; }
+
+  /* The product page is a light surface, like checkout. Everything below
+     assumes a white background rather than the site's default near-black. */
+  .pd-page{ background:#fff; color:#0a0a0a; }
+  /* btn-primary is a pale chip built for dark sections; on white it reads as
+     disabled, so it flips to solid black — same treatment as .co-page. */
+  .pd-page .btn-primary{ background:#0a0a0a; color:#fff; }
+  .pd-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
+  .pd-page .btn-outline{ border-color: rgba(0,0,0,.25); color:#0a0a0a; }
+  .pd-page .btn-outline:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; }
+
+  /* ---------- hero ---------- */
+  .pd-hero{ background:#fff; padding: 28px 0 52px; }
+  /* image column is the narrower of the two — the buy column carries more */
+  .pd-hero-grid{
+    display:grid; grid-template-columns: minmax(0,.72fr) minmax(0,1fr);
+    gap: 48px; align-items:start;
+  }
+
+  /* --- the stage ---
+     Top-aligned with the copy, both starting at the same offset below the
+     breadcrumb, so the image's top edge lines up with "METABOLIC RESEARCH"
+     rather than either floating past it or matching the copy's full height. */
+  /* Sticky so the vial stays in view while the buy column scrolls past it.
+     top clears the sticky site header (64px) plus a little breathing room. */
+  .pd-visual{
+    /* an explicit height, not min-height: .pd-photo is height:100%, and against
+       an indefinite parent that percentage does not resolve, so the photo's own
+       aspect ratio would drive the box and blow it up past 700px */
+    /* tall enough to read as a real product photo rather than a thumbnail,
+       but capped near the buy column's own height — taller than that leaves
+       dead space under the shorter column once the row is forced to match */
+    position: sticky; top: 84px; height: clamp(480px, 78vh, 680px);
+    display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
+    border: 1px solid rgba(0,0,0,.1);
+    overflow:hidden;
+    /* real margin, not just aspect-ratio slack — the box got much taller, but
+       object-fit:contain alone would just scale the vial up to match rather
+       than leaving air around it */
+    padding: 9% 14%;
+  }
+  /* A real product shot is photographed on white. Rather than float it on the
+     dark stage as a card-in-a-card, the stage itself goes light and the photo
+     fills it edge to edge, so there is no frame around the vial — multiply
+     drops the shot's white backdrop out entirely against the stage's own
+     light gradient, rather than sitting on top of it as a visible rectangle. */
+  /* the whole vial, always — the stage is sticky, so the image stays with you
+     as the page scrolls rather than being cropped or panned */
+  .pd-photo{
+    position:relative; z-index:2; width:100%; height:100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+  .pd-photo[hidden]{ display:none; }
+
+  /* --- the vial --- */
+  /* The vial is drawn at a fixed pixel size but the stage is much larger than
+     a catalog tile, so it is scaled up as a whole — that keeps the cap, collar
+     and printed label in proportion instead of re-tuning eight numbers. */
+  .pd-vial-wrap{
+    position:relative; z-index:2; display:flex; flex-direction:column; align-items:center;
+    transform: scale(1.1);
+  }
+  .pd-vial-wrap[hidden]{ display:none; }
+  /* glass on a light stage: near-opaque white body with specular edges, so it
+     still reads as a vial rather than dissolving into the background */
+  .pd-vial{
+    width: 134px; height: 272px; border-radius: 30px 30px 6px 6px;
+    background:
+      linear-gradient(100deg,
+        rgba(255,255,255,.30) 0%,
+        rgba(255,255,255,.98) 9%,
+        rgba(255,255,255,.62) 26%,
+        rgba(255,255,255,.45) 52%,
+        rgba(255,255,255,.66) 76%,
+        rgba(255,255,255,.98) 92%,
+        rgba(255,255,255,.32) 100%);
+    border: 1px solid rgba(0,0,0,.13);
+    position: relative;
+    box-shadow: 0 26px 44px -20px rgba(0,0,0,.45);
+  }
+  .pd-vial-cap{
+    position:absolute; top:-32px; left:50%; transform:translateX(-50%);
+    width: 60px; height: 30px; border-radius:3px 3px 0 0;
+    background: linear-gradient(100deg,#39414f,#1b2029 30%,#11151c 70%,#2a313c);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
+  }
+  /* aluminium crimp collar, sitting on the vial's shoulder */
+  .pd-vial-collar{
+    position:absolute; top:-4px; left:50%; transform:translateX(-50%);
+    width: 72px; height: 22px;
+    background: linear-gradient(100deg,#8f8f8b,#f4f4f2 18%,#c3c3bf 42%,#8b8b87 58%,#e4e4e1 82%,#9a9a96);
+    box-shadow: 0 1px 2px rgba(0,0,0,.3);
+  }
+  .pd-vial-label{
+    position:absolute; left:-1px; right:-1px; bottom:14px; top:104px;
+    background: linear-gradient(180deg,#1e2735,#111722);
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    padding: 12px 10px; text-align:center; color:#eef1f5;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+  }
+  .pd-vial-brand{
+    font-family:'Fraunces', Georgia, serif; font-size:.72rem; font-weight:600;
+    letter-spacing:.02em; margin-bottom:9px; color:#fff;
+  }
+  .pd-vial-name{
+    font-family:var(--font-display); font-weight:700; font-size:.98rem;
+    line-height:1.15; letter-spacing:-.01em; color:#fff; word-break:break-word;
+  }
+  .pd-vial-mg{
+    margin-top:8px; font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:600;
+    letter-spacing:.08em; padding: 3px 8px; border:1px solid rgba(255,255,255,.4); color:#fff;
+  }
+  .pd-vial-fine{
+    margin-top:auto; font-size:.5rem; line-height:1.6; color: rgba(238,241,245,.72);
+    letter-spacing:.02em;
+  }
+  .pd-vial-shadow{
+    width: 168px; height: 20px; margin-top: 16px;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,.30), transparent 70%);
+    filter: blur(3px);
+  }
+
+  /* ---------- buy box ---------- */
+  .pd-tag{
+    font-size:0.7rem; color:#0a0a0a; text-transform:uppercase; letter-spacing:.14em; font-weight:700;
+    display:block; font-family:'JetBrains Mono', monospace; margin-bottom:10px;
+  }
+  .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:600; margin: 0 0 8px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
+  /* one quiet line: this is a spec, not a pitch, so it sits back from the name
+     above it and the price below it rather than competing with either */
+  .pd-identity{
+    max-width: 54ch; margin: 0 0 20px;
+    font-size: 0.95rem; line-height:1.6; color:#55554f;
+  }
+  .pd-identity:empty{ display:none; }
+
+  .pd-label{
+    font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:700; letter-spacing:.14em;
+    text-transform:uppercase; color:#0a0a0a; display:block; margin-bottom:11px;
+  }
+
+  /* --- mg picker: the one decision on this page --- */
+  .pd-sizes{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 22px; }
+  /* A picker holding one pre-selected option is a label and a button that
+     answer a question nobody was asked, and every product in the catalog
+     ships a single size today. The mg is already in the identity line under
+     the title, so nothing is lost by collapsing it. Done in CSS against the
+     rendered buttons rather than in the renderer, so the served markup, the
+     baked pages and the hydrated page stay identical to each other, and a
+     second size appearing anywhere brings the picker straight back. */
+  .pd-sizes:has(.pd-size:only-child){ display:none; }
+  .pd-label:has(+ .pd-sizes .pd-size:only-child){ display:none; }
+  .pd-size{
+    font-family:'JetBrains Mono', monospace; font-size:.92rem; font-weight:700;
+    padding: 15px 30px; border:2px solid rgba(0,0,0,.7); background:transparent; color:#0a0a0a;
+    cursor:pointer;
+  }
+  .pd-size:hover{ border-color:#0a0a0a; background:#f2f2f0; }
+  .pd-size.is-active{ background:#0a0a0a; border-color:#0a0a0a; color:#fff; }
+  /* the selected chip is already black, so the border hover above is a no-op
+     on it — it needs to move the fill instead */
+  .pd-size.is-active:hover{ background:#333330; border-color:#333330; }
+  /* Out of stock stays selectable — you can still read its price and see we
+     carry it. The strike says why the buy box is closed without a badge. */
+  .pd-size.is-out{
+    border-color: rgba(0,0,0,.25); color:#8a8a86; text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+  }
+  .pd-size.is-out:hover{ border-color: rgba(0,0,0,.4); background:transparent; }
+  .pd-size.is-out.is-active{ background:#8a8a86; border-color:#8a8a86; color:#fff; }
+  .pd-size.is-out.is-active:hover{ background:#8a8a86; border-color:#8a8a86; }
+
+  .pd-add:disabled{
+    background:#e8e8e6; border-color:#e8e8e6; color:#8a8a86;
+    cursor:not-allowed; transform:none; box-shadow:none;
+  }
+
+  .pd-price{
+    font-family:var(--font-display); font-size: 1.7rem; font-weight:800; color:#0a0a0a;
+    letter-spacing:-.03em; display:block; margin-bottom: 22px;
+  }
+  /* list price a step back from the live one, same treatment as the cards */
+  .pd-price-was{
+    font-size: 1.05rem; font-weight:500; color:#8a8a86;
+    text-decoration-thickness: 1.5px; margin-left: 10px;
+  }
+
+  .pd-buy{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; margin-bottom: 10px; }
+
+  /* --- express pay --- */
+  .pd-express{ margin: 14px 0 16px; }
+  .pd-express-divider{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .pd-express-divider::before, .pd-express-divider::after{ content:''; flex:1; height:1px; background:rgba(0,0,0,.12); }
+  .pd-express-divider span{ font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8a8a86; }
+  .pd-express-btn{ width:100%; min-height:48px; }
+  .pd-express-consent{ margin:10px 0 0; font-size:.74rem; line-height:1.5; color:#8a8a86; text-align:center; }
+  .pd-express-consent a{ color:#55554f; text-decoration:underline; }
+  .pd-express-msg{ margin:8px 0 0; font-size:.82rem; color:#b3261e; text-align:center; }
+  .pd-express-msg:empty{ display:none; }
+  .pd-stepper{ display:flex; align-items:center; border:2px solid rgba(0,0,0,.7); }
+  .pd-stepper button{
+    width:44px; height:56px; background:transparent; border:none; color:#0a0a0a; font-size:1.2rem; cursor:pointer;
+  }
+  .pd-stepper button:hover:not(:disabled){ background: rgba(0,0,0,.06); }
+  .pd-stepper button:disabled{ opacity:.3; cursor:default; }
+  .pd-stepper span{ width:46px; text-align:center; font-family:'JetBrains Mono', monospace; font-size:1rem; font-weight:700; }
+  .pd-add{ height:56px; padding: 0 32px; flex:1; min-width: 180px; justify-content:center; font-size:1.02rem; font-weight:700; }
+
+  /* --- when it ships, when it lands. two lines, no box --- */
+  .pd-deliver{ margin: 2px 0 16px; }
+  .pd-deliver p{ font-size:.92rem; color:#3a3a38; margin:0; padding: 4px 0; }
+  .pd-deliver strong{ color:#0a0a0a; font-weight:800; }
+  .pd-dot{
+    display:inline-block; width:6px; height:6px; border-radius:50%; background:#0a0a0a;
+    margin-right:8px; vertical-align:middle;
+  }
+
+  /* ---------- sections ---------- */
+  .pd-section{ background:#fff; padding: 74px 0; border-top:1px solid rgba(0,0,0,.1); }
+  .pd-section.alt{ background:#f7f7f5; }
+  .pd-section h2{ font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight:600; margin: 0 0 6px; letter-spacing:-.02em; color:#0a0a0a; }
+
+  /* --- buy more, pay less ---
+     Cards rather than rows: each tier shows the vials you actually get, so
+     the quantity reads at a glance before any of the numbers do.
+
+     Three across, because three is how many tiers get a card: one vial, or
+     one of two bundles. The ladder continues past them for anyone who steps
+     higher, and the note underneath says so in words. */
+  .pd-bulk{ margin-top: 2px; padding-top: 18px; border-top:1px solid rgba(0,0,0,.1); }
+  .pd-tiers{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .pd-tier{
+    position:relative; background:#fafaf8; border:1.5px solid rgba(0,0,0,.14); cursor:pointer;
+    padding: 18px 12px 16px; display:flex; flex-direction:column; align-items:center; gap:2px;
+    color:#0a0a0a; text-align:center; font-family:inherit; width:100%;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .pd-tier:hover{ border-color:#0a0a0a; background:#f2f2f0; }
+  .pd-tier:focus-visible{ outline:2px solid #0a0a0a; outline-offset:2px; }
+
+  /* The selected tier. This is the one that has to be unmistakable, because
+     it is the page's answer to "what am I buying" — and unlike the old cards
+     it can be set by the stepper as well as by a press, so it has to read as
+     state rather than as the thing you last clicked. */
+  .pd-tier.is-active{
+    border-color:#0a0a0a; border-width:2px; background:#fff;
+    box-shadow: 0 0 0 3px rgba(10,10,10,.07);
+  }
+  .pd-tier.is-active:hover{ background:#fff; }
+  /* is-best is a label, not a selection: it only marks the biggest discount,
+     so it gets weight without the selected treatment. */
+  .pd-tier.is-best:not(.is-active){ border-color: rgba(0,0,0,.32); }
+
+  /* the vials themselves — overlapped so three still fit a narrow card */
+  .pd-tier-vials{
+    display:flex; align-items:center; justify-content:center;
+    height: 86px; margin-bottom: 10px;
+  }
+  /* Sized by width, not height. A real product photo is a square frame with
+     its own margin baked in (the vial inside is nowhere near 1254x1254), so
+     height:100% scaled it to the container's full height and, on a square
+     image, its full width too — three of those is wider than the card. A
+     fixed width keeps it inside the box no matter what shape the source photo
+     is, at the cost of not filling the row's height on a narrower vial. */
+  .pd-tier-vials img{
+    width: 58px; height:86px; object-fit:contain; mix-blend-mode: multiply;
+  }
+  .pd-tier-vials .vial{ width:22px; height:44px; box-shadow:none; }
+  /* photos carry their own whitespace, so they overlap; the drawn vial is a
+     bare 22px shape and would merge into one block, so it gets a real gap */
+  .pd-tier-vials img + img{ margin-left:-16px; }
+  .pd-tier-vials .vial + .vial{ margin-left:4px; }
+
+  /* The vial count is the heading of the card, so it is set like one rather
+     than in the mono label style the old three-across layout needed. */
+  .pd-tier-qty{
+    font-family:var(--font-display); font-size:1.16rem; font-weight:800;
+    letter-spacing:-.02em; color:#0a0a0a; margin-bottom:5px;
+  }
+  /* The discount is what the card is for, so it is the loud line. "Standard"
+     takes the same slot on the single vial so all four cards align. */
+  .pd-tier-off{
+    font-family:'JetBrains Mono', monospace; font-size:.76rem; font-weight:700;
+    letter-spacing:.06em; text-transform:uppercase; color:#0a0a0a;
+  }
+  .pd-tier-off.is-plain{ color:#8a8a86; font-weight:600; }
+  /* Per-vial is the comparable number across tiers, which is the whole reason
+     someone reads these cards side by side. */
+  .pd-tier-per{ margin-top:6px; font-size:.75rem; color:#8a8a86; }
+
+  /* The line under the headline price: per-vial rate, and which tier earned
+     it. Sits between the price and the size picker without competing.
+
+     When it is showing it takes over the price's gap rather than adding to it,
+     so the note reads as attached to the price above rather than floating
+     between two blocks. Where :has() is unsupported the price simply keeps its
+     own margin, which spaces things out slightly more — never crowds them. */
+  .pd-price-note{
+    margin: 0 0 22px; font-size:.82rem; color:#55554f; line-height:1.5;
+  }
+  .pd-price:has(+ .pd-price-note:not([hidden])){ margin-bottom: 7px; }
+  .pd-price-note[hidden]{ display:none; }
+  .pd-note-sep{ color:#b5b5b0; margin: 0 3px; }
+
+  /* Fine print under the tiers, explaining that any quantity earns the tier
+     it reaches. Someone who steps to 4 should not have to infer the rule. */
+  .pd-bulk-note{
+    margin: 11px 0 0; font-size:.78rem; line-height:1.55; color:#8a8a86;
+  }
+  /* a tab straddling the top border, like a ribbon on the winning card */
+  .pd-tier-flag{
+    position:absolute; top:0; left:50%; transform: translate(-50%, -50%);
+    font-size:.62rem; font-weight:700; background:#0a0a0a; color:#fff;
+    padding:5px 10px; letter-spacing:.08em; text-transform:uppercase;
+    font-family:'JetBrains Mono', monospace; white-space:nowrap;
+  }
+
+  /* --- COA link box --- */
+  .pd-coa{
+    display:flex; align-items:center; gap:13px; margin-top:16px;
+    border:2px solid rgba(0,0,0,.7); padding: 14px 16px; color:#0a0a0a;
+  }
+  .pd-coa:hover{ background:#f7f7f5; }
+  /* no certificate URL set yet: the box keeps its wording but stops
+     behaving like something you can press */
+  .pd-coa.is-static{ cursor:default; }
+  .pd-coa.is-static b{ color:#55554f; }
+  .pd-coa.is-static:hover{ background:transparent; }
+  .pd-coa.is-static .pd-coa-arrow{ display:none; }
+  .pd-coa > svg:first-child{ flex-shrink:0; }
+  .pd-coa b{ display:block; font-size:1rem; font-weight:800; }
+  .pd-coa small{ display:block; margin-top:3px; font-size:.8rem; color:#8a8a86; }
+  .pd-coa span{ flex:1; min-width:0; }
+  .pd-coa-arrow{ flex-shrink:0; }
+
+  /* --- product information ---
+     Native <details>, so the control needs no script and the copy is in the
+     served markup whether a panel is open or not. That also drops the .js gate
+     the old tab strip needed: with no JavaScript the accordions still work.
+     Prose set to a reading measure, no card, no box. */
+  .pd-info{ background:#f7f7f5; border-top:1px solid rgba(0,0,0,.1); padding: 58px 0 66px; }
+  .pd-info-h{
+    font-size: clamp(1.3rem, 2.3vw, 1.7rem); font-weight:700; letter-spacing:-.025em;
+    margin: 0 0 24px; color:#0a0a0a;
+  }
+  .pd-acc{ border-top: 1px solid rgba(0,0,0,.14); }
+  .pd-acc:last-of-type{ border-bottom: 1px solid rgba(0,0,0,.14); }
+  .pd-acc > summary{
+    display:flex; align-items:center; justify-content:space-between; gap: 18px;
+    padding: 21px 0; cursor:pointer; list-style:none;
+    font-family:'JetBrains Mono', monospace; font-size:.76rem; font-weight:600;
+    letter-spacing:.13em; text-transform:uppercase; color:#0a0a0a;
+  }
+  /* the default disclosure triangle, in both engines */
+  .pd-acc > summary::-webkit-details-marker{ display:none; }
+  .pd-acc > summary::marker{ content:''; }
+  .pd-acc > summary:hover{ color:#55554f; }
+  .pd-acc > summary:focus-visible{ outline: 2px solid #0a0a0a; outline-offset: 3px; }
+  /* a plus that loses its upright stroke when the panel opens */
+  .pd-acc-mark{
+    position:relative; flex-shrink:0; width:13px; height:13px;
+  }
+  .pd-acc-mark::before, .pd-acc-mark::after{
+    content:''; position:absolute; background:#0a0a0a;
+  }
+  .pd-acc-mark::before{ top:6px; left:0; width:13px; height:1.5px; }
+  .pd-acc-mark::after{ left:6px; top:0; width:1.5px; height:13px; }
+  .pd-acc[open] .pd-acc-mark::after{ display:none; }
+  .pd-acc-body{ padding: 2px 0 34px; }
+  .pd-prose{ max-width: 68ch; }
+  .pd-prose p{ font-size: 1.05rem; line-height:1.72; color:#45453f; margin: 0 0 1.15em; }
+  .pd-prose p:last-child{ margin-bottom:0; }
+
+  /* research areas: a hairline list, which suits three short entries
+     better than three cards would */
+  .pd-areas{ max-width: 72ch; border-top: 1px solid rgba(0,0,0,.1); }
+  .pd-area{ padding: 22px 0; border-bottom: 1px solid rgba(0,0,0,.1); }
+  .pd-area h3{
+    font-size: 1.05rem; font-weight:700; letter-spacing:-.015em; margin: 0 0 7px; color:#0a0a0a;
+  }
+  .pd-area p{ font-size: 1rem; line-height:1.65; color:#55554f; margin:0; }
+  .pd-ruo{
+    max-width: 72ch; margin: 26px 0 0; font-size:.85rem; line-height:1.7; color:#8a8a86;
+  }
+  .pd-ruo strong{ color:#55554f; }
+
+  /* The page kills all motion sitewide (see below). Colour on a summary is
+     direct feedback for a press, not ambient movement, so it is exempt. */
+  .pd-page .pd-acc > summary{ transition: color .2s ease !important; }
+
+  /* ---------- the Glow Standard ----------
+     A record, not a trust badge. Mono labels, one fact per cell, hairlines
+     doing the separating instead of boxes: the cells sit white on the section's
+     grey and the 1px grid gap is the only rule drawn. Wrapping to two columns
+     and then one needs no extra border rules that way. */
+  .pd-standard{ background:#f7f7f5; border-top:1px solid rgba(0,0,0,.1); padding: 62px 0 66px; }
+  .gs-head{ margin-bottom: 28px; }
+  .gs-head h2{
+    font-size: clamp(1.3rem, 2.3vw, 1.8rem); font-weight:700; letter-spacing:-.025em;
+    margin:0; color:#0a0a0a; max-width: 30ch;
+  }
+  .gs-grid{
+    margin:0; display:grid; grid-template-columns: repeat(4, 1fr); gap:1px;
+    background: rgba(0,0,0,.13); border:1px solid rgba(0,0,0,.13);
+  }
+  .gs-cell{ background:#fff; padding: 24px 24px 26px; }
+  .gs-cell dt{
+    font-family:'JetBrains Mono', monospace; font-size:.63rem; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase; color:#8a8a86; margin-bottom:13px;
+  }
+  .gs-cell dd{ margin:0; }
+  .gs-value{
+    display:block; font-family:var(--font-display); font-size:1.02rem;
+    font-weight:700; letter-spacing:-.015em; line-height:1.3; color:#0a0a0a;
+  }
+  .gs-note{ display:block; margin-top:10px; font-size:.82rem; line-height:1.6; color:#6f6f6a; }
+  /* only drawn when a certificate is actually hosted — see renderEvidence() */
+  .gs-report{
+    display:inline-block; margin-top:12px; padding-bottom:3px;
+    font-family:'JetBrains Mono', monospace; font-size:.65rem; font-weight:600;
+    letter-spacing:.12em; text-transform:uppercase; color:#0a0a0a;
+    border-bottom:1px solid #0a0a0a;
+  }
+  .gs-report:hover{ color:#55554f; border-bottom-color:#55554f; }
+
+  .gs-more{
+    display:inline-flex; align-items:center; gap:9px; margin-top: 30px; padding-bottom:5px;
+    font-family:'JetBrains Mono', monospace; font-size:.69rem; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase; color:#0a0a0a;
+    border-bottom:1px solid rgba(0,0,0,.28);
+  }
+  .gs-more:hover{ border-bottom-color:#0a0a0a; }
+
+  /* --- related --- */
+  .pd-related h2{ margin-bottom: 28px; }
+  .pd-related .gs-more{ margin-top: 34px; }
+
+  /* ---------- no motion ----------
+     Hover states still change (border, colour) so things stay obviously
+     clickable, they just change instantly. This also cancels the lift-on-hover
+     and fade-in-on-scroll that .btn and .product-card carry site-wide.
+     Scoped to .pd-page so other pages keep their existing feel. */
+  .pd-page *, .pd-page *::before, .pd-page *::after{
+    transition: none !important;
+    animation: none !important;
+  }
+  .pd-page .btn:hover,
+  .pd-page .product-card:hover{ transform: none; box-shadow: none; }
+
+  /* ---------- missing ---------- */
+  .pd-missing{ background:#fff; color:#0a0a0a; padding: 130px 0; text-align:center; }
+  .pd-missing h2{ margin-bottom:12px; color:#0a0a0a; }
+  .pd-missing p{ color:#55554f; }
+  .pd-missing a{ display:inline-flex; margin-top:22px; }
+
+  @media (max-width: 900px){
+    .pd-hero-grid{ grid-template-columns:1fr; gap: 36px; }
+    /* stacked on mobile, so pinning the image would just cover the copy */
+    .pd-visual{ position:static; height: clamp(300px, 78vw, 380px); padding: 6% 12%; }
+    /* four data cells at tablet width leave each one about 160px wide, which
+       breaks the manufacturing-partner value onto three lines */
+    .gs-grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px){
+    .pd-hero{ padding: 36px 0 56px; }
+    .pd-standard{ padding: 48px 0 52px; }
+    .gs-grid{ grid-template-columns: 1fr; }
+    .gs-cell{ padding: 20px 20px 22px; }
+
+    /* The buy column ran to 938px on a 390px screen, most of it rhythm rather
+       than content, so the price and the button could not be on screen at the
+       same time. Everything below tightens spacing only: no control is
+       removed and nothing is hidden that carries information.
+
+       The stepper and the button used to take a row each, because .pd-add was
+       forced to width:100%. Side by side they fit a 390px screen with room
+       spare and save a whole row. */
+    .pd-buy{ gap: 8px; flex-wrap:nowrap; margin-bottom: 12px; }
+    .pd-add{ flex:1; min-width:0; height:52px; padding:0 16px; font-size:.98rem; }
+    .pd-stepper{ flex:none; }
+    .pd-stepper button{ width:40px; height:52px; }
+    .pd-stepper span{ width:34px; }
+
+    /* Rhythm set for a wide two-column layout reads as gaps when the column
+       is the whole screen. */
+    .pd-name{ margin-bottom: 6px; }
+    .pd-identity{ margin-bottom: 14px; }
+    .pd-price{ margin-bottom: 16px; }
+    .pd-express{ margin: 12px 0 12px; }
+    .pd-express-divider{ margin-bottom: 10px; }
+    .pd-express-consent{ margin-top: 8px; font-size:.7rem; line-height:1.45; }
+
+    /* Two statements of one fact, dispatch and arrival, sat as two padded
+       paragraphs. Same two lines, without the padding between them. */
+    .pd-deliver{ margin: 0 0 14px; }
+    .pd-deliver p{ padding: 1px 0; font-size:.88rem; }
+
+    .pd-bulk{ padding-top: 14px; }
+    .pd-tiers{ gap: 7px; }
+    .pd-bulk-note{ margin-top: 9px; font-size:.73rem; line-height:1.5; }
+
+    .pd-coa{ padding: 13px 14px; gap: 10px; }
+    .pd-coa small{ font-size:.75rem; line-height:1.45; }
+    /* three vials in a narrower card: scale the fixed width down too, or the
+       desktop size (58px x 3, overlapped) still overruns a ~110px interior. */
+    .pd-tier-vials{ height: 54px; margin-bottom: 8px; }
+    .pd-tier-vials img{ width: 38px; height:54px; }
+    .pd-tier-vials img + img{ margin-left:-12px; }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://glowresearch.shop/product.html#webpage",
+  "url": "https://glowresearch.shop/product.html",
+  "name": "Product",
+  "description": "Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only. Size options, specifications, and same-day shipping before 2PM PST.",
+  "isPartOf": {
+    "@id": "https://glowresearch.shop/#website"
+  },
+  "about": {
+    "@id": "https://glowresearch.shop/#organization"
+  },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://glowresearch.shop/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Products",
+        "item": "https://glowresearch.shop/peptides.html"
+      }
+    ]
+  }
+}
+</script>
+<link rel="canonical" href="https://glowresearch.shop/peptides/tesamorelin/" />
+<meta property="og:url" content="https://glowresearch.shop/peptides/tesamorelin/" />
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","@id":"https://glowresearch.shop/peptides/tesamorelin/#product","name":"Tesamorelin","description":"Tesamorelin is a synthetic analogue of growth hormone releasing hormone carrying a trans-3-hexenoic acid modification at the N-terminus that slows enzymatic degradation by DPP-4.","category":"Growth Hormone Secretagogues","url":"https://glowresearch.shop/peptides/tesamorelin/","brand":{"@type":"Brand","name":"Glow Research"},"additionalProperty":[{"@type":"PropertyValue","name":"Purity","value":"99.5%"}],"offers":[{"@type":"Offer","name":"Tesamorelin 10mg","url":"https://glowresearch.shop/peptides/tesamorelin/","sku":"GLO-TSM10","price":"98.99","priceCurrency":"USD","availability":"https://schema.org/InStock","seller":{"@id":"https://glowresearch.shop/#organization"}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://glowresearch.shop/"},{"@type":"ListItem","position":2,"name":"Catalog","item":"https://glowresearch.shop/peptides.html"},{"@type":"ListItem","position":3,"name":"Growth Hormone Secretagogues","item":"https://glowresearch.shop/peptides.html?cat=peptides"},{"@type":"ListItem","position":4,"name":"Tesamorelin","item":"https://glowresearch.shop/peptides/tesamorelin/"}]}</script>
+</head>
+<body data-product-slug="tesamorelin">
+
+<!-- first-visit age / RUO gate. Loaded here, not with the other
+     scripts at the foot of the page, so the overlay is in the DOM
+     before anything behind it paints. -->
+<script src="../../js/age-gate.js"></script>
+
+<div class="marquee-bar">
+  <div class="marquee-track">
+    <span>FOR LABORATORY &amp; RESEARCH USE ONLY</span><i class="star-bullet">✦</i>
+    <span>THIRD-PARTY LAB TESTED</span><i class="star-bullet">✦</i>
+    <span>COA ON EVERY BATCH</span><i class="star-bullet">✦</i>
+    <span>MANUFACTURING PARTNER</span><i class="star-bullet">✦</i>
+    <span>FREE SHIPPING OVER $400</span><i class="star-bullet">✦</i>
+    <span>SAME-DAY SHIPPING BEFORE 2PM PST</span><i class="star-bullet">✦</i>
+  </div>
+</div>
+
+<header class="site-header" id="siteHeader">
+  <div class="container nav-inner">
+    <a href="../../index.html" class="logo" aria-label="Glow Research home">Glow<span class="spark">✦</span></a>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="../../peptides.html" class="active">Catalog</a>
+      <a href="../../coa.html">COA</a>
+      <a href="../../shipping.html">Shipping</a>
+      <a href="../../wholesale.html">Wholesale</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="nav-icon-btn" id="searchToggle" aria-label="Search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+      <a href="../../signin.html" class="nav-icon-btn nav-signin">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        <span class="nav-signin-label">Sign In</span>
+      </a>
+      <button class="nav-icon-btn nav-cart" aria-label="Cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+        <span class="nav-cart-badge" data-count="0">0</span>
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="pd-crumb" aria-label="Breadcrumb">
+  <div class="container pd-crumb-inner">
+    <a href="../../index.html">Home</a> /
+    <a href="../../peptides.html">Catalog</a> /
+    <span id="pdCrumbName">Tesamorelin</span>
+  </div>
+</nav>
+
+<div id="pdShell" class="pd-page">
+
+  <!-- ============ hero: picture, mg, add to cart ============ -->
+  <section class="pd-hero">
+    <div class="container pd-hero-grid">
+
+      <div class="pd-visual">
+        <img class="pd-photo" id="pdPhoto" alt="" hidden />
+        <div class="pd-vial-wrap" id="pdVialArt">
+          <div class="pd-vial">
+            <span class="pd-vial-cap"></span>
+            <span class="pd-vial-collar"></span>
+            <span class="pd-vial-label">
+              <span class="pd-vial-brand">Glow ✦ Research</span>
+              <span class="pd-vial-name" id="pdVialName">Tesamorelin</span>
+              <span class="pd-vial-mg" id="pdVialMg">10MG</span>
+              <span class="pd-vial-fine" id="pdVialFine">99.5% Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.shop</span>
+            </span>
+          </div>
+          <div class="pd-vial-shadow" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <!-- Order top to bottom the way the decision is actually made: what it
+           is, what it costs, which size, buy. Everything else is reference
+           material and sits underneath. -->
+      <div class="pd-right">
+        <span class="pd-tag" id="pdTag">Growth Hormone Secretagogue</span>
+        <h1 class="pd-name" id="pdName">Tesamorelin</h1>
+        <!-- What is in the vial and what it is for, and nothing else. Built by
+             identityLine() from the name, the selected mg and the fill form, so
+             it follows the size picker and cannot drift from any of the three.
+             What the compound *does* is in the accordions, not here. -->
+        <p class="pd-identity" id="pdIdentity">Tesamorelin 10mg lyophilized peptide for in vitro research.</p>
+
+        <!-- The total for the mg and the quantity currently selected. Both
+             move it: the bulk tier is a function of quantity, so stepping from
+             2 vials to 3 changes the per-vial rate, not just the multiplier. -->
+        <span class="pd-price" id="pdPrice">$98.99<s class="pd-price-was">$125.00</s></span>
+        <!-- Per-vial rate, and which tier is earning it. Empty and hidden at a
+             quantity of one, where there is nothing to explain. -->
+        <p class="pd-price-note" id="pdPriceNote" hidden></p>
+
+        <span class="pd-label">Size</span>
+        <div class="pd-sizes" id="pdSizes"><button type="button" class="pd-size is-active" data-i="0">10mg</button></div>
+
+        <div class="pd-buy">
+          <div class="pd-stepper">
+            <button type="button" id="pdQtyDec" aria-label="Decrease quantity">&minus;</button>
+            <span id="pdQty">1</span>
+            <button type="button" id="pdQtyInc" aria-label="Increase quantity">+</button>
+          </div>
+          <button type="button" class="btn btn-primary pd-add" id="pdAddBtn">Add to cart</button>
+        </div>
+
+        <!-- Express pay: a native Apple Pay / Google Pay button, not a styled
+             lookalike. js/product.js mounts Stripe's Payment Request Button
+             here and only reveals this block once canMakePayment() confirms
+             the visitor's own device actually has a wallet configured — it
+             stays hidden on every browser that cannot show one, same as the
+             COA box only turns into a link once a certificate really exists.
+             Skips the cart and the checkout page: this exact vial and
+             quantity, paid and placed from one sheet. -->
+        <div class="pd-express" id="pdExpress" hidden>
+          <div class="pd-express-divider"><span>or</span></div>
+          <div class="pd-express-btn" id="pdExpressBtn"></div>
+          <p class="pd-express-consent">
+            By continuing you agree to our <a href="../../terms.html">Terms of Sale</a>
+            and <a href="../../ruo-agreement.html">RUO Agreement</a>.
+          </p>
+          <p class="pd-express-msg" id="pdExpressMsg" role="alert"></p>
+        </div>
+
+        <div class="pd-deliver">
+          <p><span class="pd-dot" aria-hidden="true"></span><span id="pdCutoff">Checking dispatch&hellip;</span></p>
+          <p id="pdArrival">Calculating delivery&hellip;</p>
+        </div>
+
+        <!-- bulk pricing sits with the quantity decision, not in its own
+             section further down the page -->
+        <div class="pd-bulk">
+          <span class="pd-label">Buy more, pay less</span>
+          <!-- Quantity shortcuts, not products. Pressing one sets the quantity
+               above and reprices the buy box; nothing is added to the cart
+               until the Add to cart button is pressed. -->
+          <div class="pd-tiers" id="pdTiers"></div>
+          <p class="pd-bulk-note" id="pdBulkNote">Any quantity gets the rate of the tier it reaches: 4 vials are priced at the 3-vial rate. It keeps going past 3 vials: 5 vials 15% off and 10 vials 20% off. 20% is the most on a single compound. Larger volumes are <a href="../../wholesale.html">wholesale</a>.</p>
+        </div>
+
+        <a class="pd-coa" id="pdCoaLink">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 2h8l4 4v16H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M14 2v5h4M9 12h6M9 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <!-- Wording assumes NO hosted certificate, because that is the state
+               today and it is also what a crawler and the generated static page
+               see. js/product.js swaps it to the "view" wording only once a real
+               href exists — honest by default, upgraded when it can be. -->
+          <span>
+            <b>Certificate of analysis on request</b>
+            <small>Email support@glowresearch.shop with the lot number on your vial and we will send the COA for that batch</small>
+          </span>
+          <svg class="pd-coa-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ the Glow Standard ============
+       The one trust section on this page, and the only one, because it stops
+       being a standard the moment it is competing with a second block making
+       the same argument in bigger type. Four rows, in the order the chain of
+       custody actually happens.
+
+       Every cell comes from evidenceRows() in js/products-data.js, so the panel
+       is structurally incapable of stating something the code does not hold.
+       The notes are load-bearing, not decoration: "lot-matched batch
+       documentation" is true of how the business runs and says nothing about
+       whether this site will hand you the document, and the note is where that
+       gets answered. js/product.js redraws these on load and keeps the dispatch
+       row current; tools/build-products.js bakes them into each generated page. -->
+  <section class="pd-standard">
+    <div class="container">
+      <div class="gs-head">
+        <span class="pd-label">The Glow Standard</span>
+        <h2>Everything we know about this vial, in one place.</h2>
+      </div>
+
+      <dl class="gs-grid" id="pdEvidence">
+    <div class="gs-cell" data-row="source">
+      <dt>Source</dt>
+      <dd>
+        <span class="gs-value">Manufacturing partner</span>
+        <span class="gs-note">Synthesis and fill at a partner facility operating to cGMP-aligned quality practices</span>
+      </dd>
+    </div>
+    <div class="gs-cell" data-row="verify">
+      <dt>Verify</dt>
+      <dd>
+        <span class="gs-value">99.5% purity</span>
+        <span class="gs-note">HPLC-UV + LC-MS + net peptide content + sterility + endotoxin + appearance and solubility + heavy metals, by a third-party laboratory with no stake in the result</span>
+      </dd>
+    </div>
+    <div class="gs-cell" data-row="document">
+      <dt>Document</dt>
+      <dd>
+        <span class="gs-value">Lot-matched batch documentation</span>
+        <span class="gs-note">Certificate on request: email support@glowresearch.shop with the lot number on your vial</span>
+      </dd>
+    </div>
+    <div class="gs-cell" data-row="dispatch">
+      <dt>Dispatch</dt>
+      <dd>
+        <span class="gs-value">Same-business-day before 2 PM PST</span>
+        <span class="gs-note">FedEx 2-Day service, Monday to Friday</span>
+      </dd>
+    </div></dl>
+
+      <!-- One small link, because deleting the four-card summary that used to
+           sit below left how-we-test.html with no route in from here except the
+           Resources menu. It is a text link under a panel, not a step in the
+           buying flow: nobody has to press it to finish reading the page. -->
+      <a class="gs-more" href="../../how-we-test.html">
+        See our full process <span aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+  </section>
+
+<!-- ============ more from Glow ============
+       Last, and reachable without reading anything: everything above it is
+       either the buy box, four rows of provenance, or two closed accordions.
+       Draws from the whole catalog with same-category compounds first, so the
+       heading is not writing a cheque a thin category cannot cash. -->
+  <section class="pd-section pd-related" id="pdRelatedSection">
+    <div class="container">
+      <h2>More from Glow</h2>
+      <div class="product-grid" id="pdRelatedGrid"></div>
+      <a class="gs-more" href="../../peptides.html">
+        View the full catalog <span aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<div class="pd-missing pd-page" id="pdMissing" hidden>
+  <div class="container">
+    <h2>We couldn't find that product.</h2>
+    <p>It may have been renamed or retired from the catalog.</p>
+    <a href="../../peptides.html" class="btn btn-outline">Browse the catalog <span aria-hidden="true">&rarr;</span></a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="../../index.html" class="logo">Glow<span class="spark">✦</span></a>
+        <p class="footer-tagline">
+          Research-grade peptides, independently verified and discreetly shipped.
+          Documented purity from a source you can trace.
+        </p>
+        <div class="footer-legal">
+          <span>&copy; <span id="stubYear"></span> Glow Research. All rights reserved.</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Catalog</h4>
+        <a href="../../peptides.html">All Peptides</a>
+        <a href="../../wholesale.html">Wholesale</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="../../how-we-test.html">How We Test</a>
+        <a href="../../affiliate.html">Partner Program</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="../../contact.html">Contact Us</a>
+        <a href="../../shipping.html">Shipping</a>
+        <a href="../../terms.html">Terms of Service</a>
+        <a href="../../ruo-agreement.html">RUO Agreement</a>
+        <a href="../../privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <h5>Research Use Only Disclaimer</h5>
+      <p>
+        All products are sold for research use only (RUO). Not for human or animal
+        consumption. These statements have not been evaluated by the FDA. Products are
+        not intended to diagnose, treat, cure, or prevent any disease.
+      </p>
+    </div>
+
+    <div class="footer-bottom">
+      <p>Not for human consumption. For laboratory research use only.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('stubYear').textContent = new Date().getFullYear();
+  const hamburger = document.getElementById('hamburger');
+  const mainNav = document.getElementById('mainNav');
+  hamburger.addEventListener('click', () => {
+    mainNav.classList.toggle('open');
+    hamburger.classList.toggle('open');
+  });
+  mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mainNav.classList.remove('open')));
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => {
+    header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
+  });
+</script>
+<script src="../../js/products-data.js"></script>
+<script src="../../js/cart.js"></script>
+<script src="../../js/cart-modal.js"></script>
+<script src="../../js/search.js"></script>
+<script src="../../js/product.js"></script>
+<script src="../../js/account.js"></script>
+<script src="../../js/referral.js"></script>
+</body>
+</html>

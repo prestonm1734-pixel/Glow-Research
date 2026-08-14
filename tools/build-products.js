@@ -218,11 +218,6 @@ function buildProduct(p, donor) {
     .replace('<body>', `<body data-product-slug="${slug}">`);
 
   /* --- content a crawler must see without running scripts --- */
-  html = setText(html, 'pdCrumbCat', esc(CAT_LABEL[p.cat]));
-  html = html.replace(
-    /(id="pdCrumbCat"\s+)href="[^"]*"/,
-    (m, open) => `${open}href="peptides.html?cat=${catFilterGroup(p.cat)}"`
-  );
   html = setText(html, 'pdCrumbName', esc(p.name));
   html = setText(html, 'pdTag', esc(p.tag));
   html = setText(html, 'pdName', esc(p.name));
