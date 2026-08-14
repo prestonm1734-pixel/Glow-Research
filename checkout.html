@@ -246,7 +246,9 @@
   .co-promo button:hover{ background:#fff; color:#0a0a0a; }
   .co-promo button:disabled{ opacity:.5; cursor:not-allowed; }
   .co-promo input:disabled{ background:#f5f5f4; color:#6e6e73; }
-  .co-promo-msg{ margin:10px 0 0; font-size:.85rem; color:#6e6e73; }
+  .co-promo-msg{ margin:10px 0 0; font-size:.85rem; color:#6e6e73; display:flex; align-items:center; gap:6px; }
+  .co-promo-msg:empty{ display:none; }
+  .co-promo-msg svg{ flex-shrink:0; }
   .co-promo-msg.is-error{ color:#b3261e; }
   .co-promo-msg.is-ok{ color:#1a7f37; }
 

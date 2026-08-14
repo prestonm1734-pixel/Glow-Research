@@ -172,8 +172,9 @@ export async function resolvePromoCode(rawCode, subtotalCents) {
   }
 
   const promo = Array.isArray(list.data) ? list.data[0] : null;
-  if (!promo || !promo.coupon || promo.coupon.valid === false) {
-    return { ok: false, error: 'That code is not valid.' };
+  if (!promo) return { ok: false, error: 'That code doesn’t exist.' };
+  if (!promo.coupon || promo.coupon.valid === false) {
+    return { ok: false, error: 'That code is no longer active.' };
   }
 
   if (promo.expires_at && promo.expires_at * 1000 < Date.now()) {

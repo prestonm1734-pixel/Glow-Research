@@ -321,6 +321,28 @@
     }
   }
 
+  // Same line-icon style as .co-secure just below this box on the page: a
+  // small stroked SVG, not an emoji. 'ok' draws a check, 'error' draws an X,
+  // 'neutral' (the "Checking…" state) and '' (cleared) draw nothing — the
+  // color alone would not be enough to tell an applied code from a rejected
+  // one for someone who cannot see color, so the icon carries the meaning a
+  // plain-text status line on its own never did.
+  const PROMO_ICON = {
+    ok: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    error: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>',
+  };
+  function setPromoMsg(kind, text) {
+    const el = $('coPromoMsg');
+    if (!el) return;
+    el.className = 'co-promo-msg' + (kind === 'ok' || kind === 'error' ? ' is-' + kind : '');
+    // The icon is a fixed, hardcoded SVG string (safe); the message text is
+    // never trusted to that same innerHTML, even though every caller today
+    // only ever passes a hardcoded string or our own API's error copy — a
+    // text node costs nothing and means this stays true if that changes.
+    el.innerHTML = PROMO_ICON[kind] || '';
+    if (text) el.appendChild(document.createTextNode(text));
+  }
+
   // orderPayload is only ever passed on the final call, right before
   // confirmPayment() — see the submit handler below. Stripe's own metadata on
   // the intent is what api/stripe-webhook.js reads to create the order if the
@@ -369,11 +391,7 @@
             appliedPromoCode = null;
             promoDiscount = 0;
             setPromoUI('idle');
-            const msg = $('coPromoMsg');
-            if (msg) {
-              msg.textContent = (data.error || 'That code is no longer valid.') + ' It has been removed so you can continue.';
-              msg.className = 'co-promo-msg is-error';
-            }
+            setPromoMsg('error', (data.error || 'That code is no longer valid.') + ' It has been removed so you can continue.');
             renderSummary();
             continue; // retry once, now with no promo code in the request
           }
@@ -743,16 +761,13 @@
     });
 
     $('coPromoBtn').addEventListener('click', async () => {
-      const msg = $('coPromoMsg');
-
       // Second click while a code is applied removes it — the button's own
       // label already told them this (setPromoUI above), so no confirmation.
       if (appliedPromoCode) {
         appliedPromoCode = null;
         promoDiscount = 0;
         setPromoUI('idle');
-        msg.textContent = '';
-        msg.className = 'co-promo-msg';
+        setPromoMsg('', '');
         renderSummary();
         if (typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) ensurePaymentIntent();
         return;
@@ -760,15 +775,13 @@
 
       const code = $('coPromo').value.trim();
       if (!code) {
-        msg.textContent = 'Enter a code first.';
-        msg.className = 'co-promo-msg is-error';
+        setPromoMsg('error', 'Enter a code first.');
         return;
       }
 
       const btn = $('coPromoBtn');
       btn.disabled = true;
-      msg.textContent = 'Checking…';
-      msg.className = 'co-promo-msg';
+      setPromoMsg('neutral', 'Checking…');
 
       try {
         const items = window.GlowCart ? window.GlowCart.items() : [];
@@ -786,21 +799,18 @@
         });
         const data = await resp.json();
         if (!resp.ok || !data.valid) {
-          msg.textContent = data.error || 'That code is not valid.';
-          msg.className = 'co-promo-msg is-error';
+          setPromoMsg('error', data.error || 'That code doesn’t exist.');
           return;
         }
 
         appliedPromoCode = data.code;
         setPromoUI('applied');
-        msg.textContent = `Code applied: ${money(data.discount)} off.`;
-        msg.className = 'co-promo-msg is-ok';
+        setPromoMsg('ok', `Applied: ${money(data.discount)} off.`);
 
         if (typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) await ensurePaymentIntent();
         else renderSummary();
       } catch (e) {
-        msg.textContent = 'Could not check that code right now. Try again.';
-        msg.className = 'co-promo-msg is-error';
+        setPromoMsg('error', 'Could not check that code right now. Try again.');
       } finally {
         btn.disabled = false;
       }
