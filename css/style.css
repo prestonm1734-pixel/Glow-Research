@@ -746,20 +746,25 @@ button[disabled].si-forgot{ cursor: progress; }
    badges are capped so a long status ("Best Seller") can't run under the
    category chip on a narrow two-up mobile tile */
 .product-badge{
-  position:absolute; top:0; font-size: 0.62rem; font-weight:700;
+  position:absolute; top:12px; font-size: 0.62rem; font-weight:700;
   padding: 5px 10px; border-radius: 0; text-transform:uppercase; letter-spacing:.06em;
   font-family:'JetBrains Mono', monospace;
-  z-index:2; max-width: calc(50% - 6px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  /* Inset from the corner rather than flush to it, so each chip reads as
+     sitting on the tile instead of being cropped by it. The cap keeps the two
+     from meeting in the middle and has to account for both 12px insets: at
+     calc(50% - 18px) each, the pair plus its insets leaves a 12px gutter
+     between them at any tile width. */
+  z-index:2; max-width: calc(50% - 18px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-.product-badge.cat{ left:0; background: rgba(10,10,10,0.72); color:#fff; }
-.product-badge.status{ right:0; background:#0a0a0a; color:#fff; }
+.product-badge.cat{ left:12px; background: rgba(10,10,10,0.72); color:#fff; }
+.product-badge.status{ right:12px; background:#0a0a0a; color:#fff; }
 /* Left slot, opposite the status chip, and solid rather than the recessive
    .cat treatment: the tile behind it is a light gradient, so a white or
    translucent chip loses its edge against the product shot. Reads as a pair
    with .status, told apart by side and wording rather than by colour, since
    the palette above is monochrome by decision. Only rendered when the
    catalog actually holds a list price above the charged one. */
-.product-badge.sale{ left:0; background:#0a0a0a; color:#fff; }
+.product-badge.sale{ left:12px; background:#0a0a0a; color:#fff; }
 /* Out of stock replaces the promo badge rather than sitting beside it —
    two badges on one card is the clutter the badge was meant to cut through. */
 .product-badge.status.is-out{ background:#8a8a86; color:#fff; }
@@ -962,9 +967,13 @@ html:not(.js) .faq-a{ max-height: none; }
      The category is the one to drop — the catalog has filter chips for it
      and the product page repeats it, whereas the status badge is the only
      place "Best Seller" appears at all. */
-  .product-badge{ top: 9px; font-size: .55rem; padding: 3px 7px; }
+  .product-badge{ top: 9px; font-size: .55rem; padding: 3px 7px; max-width: calc(50% - 13px); }
   .product-badge.cat{ display:none; }
   .product-badge.status{ right: 9px; }
+  /* Matches .status's 9px so the pair stays symmetric on a half-width tile.
+     Without it the sale chip kept the desktop 12px and sat visibly lower and
+     further out than the status chip opposite it. */
+  .product-badge.sale{ left: 9px; }
 
   .hero{ padding: 48px 0 56px; }
   /* .hero-stats spacing is set with its own layout up at .hero-stats, so the

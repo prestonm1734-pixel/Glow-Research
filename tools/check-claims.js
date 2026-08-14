@@ -1220,6 +1220,24 @@ console.log('\nlaunch pricing');
   ok('hasList() agrees with the catalog on every size',
     sized.every(({ s }) => hasList(s) === (s.list > s.price)));
 
+  // "Best Seller", "Popular" and "Trending" are claims about sales volume,
+  // and this system has never held a single figure to support one: there is
+  // no order count, no units-sold field, nothing WooCommerce sends back that
+  // anything here reads. They were four hardcoded strings on a storefront
+  // that had taken zero orders, which is the plainest version of the failure
+  // PRINCIPLES.md is about. A badge earned from real sales data later is
+  // fine, and this check is what will make someone wire that data up first
+  // rather than typing the word again.
+  {
+    const POPULARITY = /best.?sell|popular|trending|hot\b|#1|top.?seller|fan.?favou?rite/i;
+    const claimed = GLOW_PRODUCTS.filter(p => p.badge && POPULARITY.test(p.badge));
+    ok('no product badge claims a popularity the system cannot count',
+      claimed.length === 0,
+      claimed.map(p => `${p.name} is badged "${p.badge}"`).join('; '));
+    ok('nor does the served catalog page',
+      !POPULARITY.test((read('peptides.html').match(/product-badge status[^<]*>[^<]*/g) || []).join(' ')));
+  }
+
   // The SALE badge is a claim in two words, and the only thing making it true
   // is that the same hasList() gate drew the struck price beside it. These
   // check the badge cannot appear without one, on a sold-out card, or on a

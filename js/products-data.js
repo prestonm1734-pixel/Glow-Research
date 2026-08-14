@@ -183,7 +183,7 @@ const COA_COPY = COAS_PUBLISHED ? {
 // a single `sizes[]` row matching the one size the launch list states; add a
 // second size only once the supplier confirms a SKU for it.
 const GLOW_PRODUCTS = [
-  { name: 'BPC-157', tag: null, cat: 'tissue', purity: '99.8%', badge:'Best Seller',
+  { name: 'BPC-157', tag: null, cat: 'tissue', purity: '99.8%', badge:null,
     sizes: [
       { mg: '10mg', price: 64.99, list: 80, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg.webp' },
     ],
@@ -258,7 +258,7 @@ const GLOW_PRODUCTS = [
       { t: 'DPP-4 resistance', d: 'Studied for resistance to enzymatic cleavage relative to native GHRH, and how that changes assay-window duration.' },
       { t: 'Comparative secretagogue pharmacology', d: 'Run as a reference GHRH analogue when newer compounds in the class are characterised.' }
     ] },
-  { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.5%', badge:'Popular',
+  { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.5%', badge:null,
     sizes: [{ mg: '10mg', price: 79.99, list: 100, sku: 'GLO-SM10' }],
     blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
     about: [
@@ -270,7 +270,7 @@ const GLOW_PRODUCTS = [
       { t: 'Albumin binding', d: 'Studied for how the fatty acid chain alters distribution and persistence in model systems.' },
       { t: 'Metabolic pathway research', d: 'Applied in islet and hepatocyte culture models examining downstream incretin signalling.' }
     ] },
-  { name: 'GLP-2 (TR)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'New',
+  { name: 'GLP-2 (TR)', tag: null, cat: 'metabolic', purity: '99.4%', badge:null,
     sizes: [{ mg: '10mg', price: 89.99, list: 110, sku: 'GLO-T10' }],
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
     about: [
@@ -282,7 +282,7 @@ const GLOW_PRODUCTS = [
       { t: 'Biased signalling', d: 'Studied for the balance between G-protein coupling and beta-arrestin recruitment at each receptor.' },
       { t: 'Receptor crosstalk', d: 'Applied in models examining how engaging both receptors at once differs from either alone.' }
     ] },
-  { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'Trending',
+  { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.4%', badge:null,
     sizes: [
       { mg: '10mg', price: 104.99, list: 130, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg.webp' },
     ],
