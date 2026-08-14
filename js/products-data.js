@@ -185,7 +185,7 @@ const COA_COPY = COAS_PUBLISHED ? {
 const GLOW_PRODUCTS = [
   { name: 'BPC-157', tag: null, cat: 'tissue', purity: '99.8%', badge:'Best Seller',
     sizes: [
-      { mg: '10mg', price: 64.97, list: 80, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg.webp' },
+      { mg: '10mg', price: 64.99, list: 80, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg.webp' },
     ],
     blurb: 'A synthetic pentadecapeptide derived from a protein found in gastric juice. Studied in vitro for angiogenic signalling.',
     about: [
@@ -199,7 +199,7 @@ const GLOW_PRODUCTS = [
     ] },
   { name: 'BPC-157/TB-500', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
     sizes: [
-      { mg: '10mg', price: 84.97, list: 105, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg.webp' },
+      { mg: '10mg', price: 84.99, list: 105, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg.webp' },
     ],
     blurb: 'A combined BPC-157 and TB-500 formulation. Supplied for research using both peptides together in one vial.',
     about: [
@@ -212,7 +212,7 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials to compare co-formulated and separately administered research protocols.' }
     ] },
   { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.8%', badge:null,
-    sizes: [{ mg: '50mg', price: 54.97, list: 70, sku: 'GLO-CU50' }],
+    sizes: [{ mg: '50mg', price: 54.99, list: 70, sku: 'GLO-CU50' }],
     blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
     about: [
       'GHK-Cu is the tripeptide glycyl-L-histidyl-L-lysine complexed with copper(II). The tripeptide occurs naturally in plasma and binds copper with high affinity, and it is the complex rather than the bare peptide that most research uses.',
@@ -224,7 +224,7 @@ const GLOW_PRODUCTS = [
       { t: 'Antioxidant enzyme activity', d: 'Examined for interaction with copper-dependent enzyme systems.' }
     ] },
   { name: 'GLOW', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
-    sizes: [{ mg: '70mg', price: 124.97, list: 155, sku: 'GLO-BBG70' }],
+    sizes: [{ mg: '70mg', price: 124.99, list: 155, sku: 'GLO-BBG70' }],
     blurb: 'A multi-peptide blend supplied as a single 70mg vial. Composition detail pending supplier confirmation.',
     about: [
       'GLOW is a compounded blend of multiple research peptides, supplied together in one 70mg vial rather than as separate compounds.',
@@ -235,7 +235,7 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials when comparing blended and separately administered research protocols.' }
     ] },
   { name: 'CJC-1295 No DAC/Ipamorelin', tag: 'Peptide Blend', cat: 'growth', purity: '99.0%', badge:null,
-    sizes: [{ mg: '5/5mg', price: 89.97, list: 110, sku: 'GLO-CP10' }],
+    sizes: [{ mg: '5/5mg', price: 89.99, list: 110, sku: 'GLO-CP10' }],
     blurb: 'A combined CJC-1295 (No DAC) and Ipamorelin formulation. Supplied for research examining GHRH and ghrelin receptor co-agonism.',
     about: [
       'This blend combines CJC-1295 without DAC and Ipamorelin in a single vial, 5/5 mg of each for 10mg total, pairing a GHRH receptor analogue with a selective ghrelin receptor agonist.',
@@ -247,7 +247,7 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative pulse studies', d: 'Applied alongside single-compound vials in models comparing combined and separate administration protocols.' }
     ] },
   { name: 'Tesamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.5%', badge:null,
-    sizes: [{ mg: '10mg', price: 98.97, list: 125, sku: 'GLO-TSM10' }],
+    sizes: [{ mg: '10mg', price: 98.99, list: 125, sku: 'GLO-TSM10' }],
     blurb: 'A synthetic growth hormone releasing hormone analogue with a stabilised N-terminus. Studied for pituitary receptor engagement.',
     about: [
       'Tesamorelin is a synthetic analogue of growth hormone releasing hormone carrying a trans-3-hexenoic acid modification at the N-terminus that slows enzymatic degradation by DPP-4.',
@@ -259,7 +259,7 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative secretagogue pharmacology', d: 'Run as a reference GHRH analogue when newer compounds in the class are characterised.' }
     ] },
   { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.5%', badge:'Popular',
-    sizes: [{ mg: '10mg', price: 79.97, list: 100, sku: 'GLO-SM10' }],
+    sizes: [{ mg: '10mg', price: 79.99, list: 100, sku: 'GLO-SM10' }],
     blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
     about: [
       'GLP-1 (SM) is Glow’s designation for semaglutide, a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
@@ -271,7 +271,7 @@ const GLOW_PRODUCTS = [
       { t: 'Metabolic pathway research', d: 'Applied in islet and hepatocyte culture models examining downstream incretin signalling.' }
     ] },
   { name: 'GLP-2 (TR)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'New',
-    sizes: [{ mg: '10mg', price: 89.97, list: 110, sku: 'GLO-T10' }],
+    sizes: [{ mg: '10mg', price: 89.99, list: 110, sku: 'GLO-T10' }],
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
     about: [
       'GLP-2 (TR) is Glow’s designation for tirzepatide, a dual receptor co-agonist peptide, active at both the GIP and the GLP-1 receptor from a single molecule.',
@@ -284,7 +284,7 @@ const GLOW_PRODUCTS = [
     ] },
   { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'Trending',
     sizes: [
-      { mg: '10mg', price: 104.97, list: 130, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg.webp' },
+      { mg: '10mg', price: 104.99, list: 130, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg.webp' },
     ],
     blurb: 'A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile.',
     about: [
@@ -297,7 +297,7 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative incretin pharmacology', d: 'Applied as a comparator when characterising newer multi-receptor agonists against single- and dual-receptor peptides.' }
     ] },
   { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.1%', badge:null,
-    sizes: [{ mg: '10mg', price: 74.97, list: 95, sku: 'GLO-MS10' }],
+    sizes: [{ mg: '10mg', price: 74.99, list: 95, sku: 'GLO-MS10' }],
     blurb: 'A mitochondrial-derived peptide encoded within the mitochondrial genome. Studied for its role in metabolic signalling.',
     about: [
       'MOTS-C is a 16 amino acid peptide encoded in the mitochondrial 12S rRNA region rather than the nuclear genome, one of a small class of mitochondrial-derived peptides identified in the last two decades.',
