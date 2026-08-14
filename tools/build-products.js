@@ -176,7 +176,7 @@ function buildProduct(p, donor) {
   // supplier's measured values have replaced the placeholders.
   const desc = `${p.name}, ${s.mg} per vial. ` +
     `Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only.`;
-  const ogImage = p.image ? `${SITE}/${p.image}` : `${SITE}/assets/vial-trio-black.jpg`;
+  const ogImage = p.image ? `${SITE}/${p.image}` : `${SITE}/assets/vial-trio-black-v2.jpg`;
 
   let html = donor;
 
