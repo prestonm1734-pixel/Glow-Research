@@ -1220,6 +1220,26 @@ console.log('\nlaunch pricing');
   ok('hasList() agrees with the catalog on every size',
     sized.every(({ s }) => hasList(s) === (s.list > s.price)));
 
+  // The SALE badge is a claim in two words, and the only thing making it true
+  // is that the same hasList() gate drew the struck price beside it. These
+  // check the badge cannot appear without one, on a sold-out card, or on a
+  // different number of cards than the catalog has marked-down products.
+  {
+    const onSale = GLOW_PRODUCTS.filter(p => hasList(p) && p.sizes.some(sizeInStock));
+    const cards = GLOW_PRODUCTS.map((p, i) => productCardHtml(p, i));
+    const badged = cards.filter(c => /product-badge sale/.test(c));
+    ok('a SALE badge appears on exactly the marked-down products',
+      badged.length === onSale.length,
+      `${badged.length} badges against ${onSale.length} marked-down products`);
+    ok('no card shows SALE without a struck price beside it',
+      cards.every(c => !/product-badge sale/.test(c) || /price-was/.test(c)));
+    ok('a sold-out card advertises no sale',
+      GLOW_PRODUCTS.every((p, i) => p.sizes.some(sizeInStock) ||
+        !/product-badge sale/.test(productCardHtml(p, i))));
+    ok('the served catalog page carries the same number of SALE badges',
+      (read('peptides.html').match(/product-badge sale/g) || []).length === onSale.length);
+  }
+
   // The struck figure and the charged figure come from different fields, so
   // this is the check that they are still a matched pair per SKU rather than
   // two lists that drifted.

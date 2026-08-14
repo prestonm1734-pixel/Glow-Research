@@ -753,6 +753,13 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 .product-badge.cat{ left:0; background: rgba(10,10,10,0.72); color:#fff; }
 .product-badge.status{ right:0; background:#0a0a0a; color:#fff; }
+/* Left slot, opposite the status chip, and solid rather than the recessive
+   .cat treatment: the tile behind it is a light gradient, so a white or
+   translucent chip loses its edge against the product shot. Reads as a pair
+   with .status, told apart by side and wording rather than by colour, since
+   the palette above is monochrome by decision. Only rendered when the
+   catalog actually holds a list price above the charged one. */
+.product-badge.sale{ left:0; background:#0a0a0a; color:#fff; }
 /* Out of stock replaces the promo badge rather than sitting beside it —
    two badges on one card is the clutter the badge was meant to cut through. */
 .product-badge.status.is-out{ background:#8a8a86; color:#fff; }

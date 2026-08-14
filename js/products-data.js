@@ -1036,6 +1036,7 @@ function productCardHtml(p, i) {
   return `
       <div class="product-card reveal" style="transition-delay:${(i % 3) * 60}ms">
         <a class="product-visual" href="${href}">
+          ${stocked && hasList(p) ? '<span class="product-badge sale">Sale</span>' : ''}
           ${!stocked
             ? '<span class="product-badge status is-out">Out of stock</span>'
             : p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
