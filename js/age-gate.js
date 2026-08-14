@@ -10,13 +10,38 @@
 (function () {
   var KEY = 'glow-age-ok';
 
+  // Bump when the wording below changes materially. A stored acceptance of an
+  // older version does not carry forward: someone who agreed to a weaker
+  // statement has not agreed to this one, and the whole point of recording an
+  // attestation is that it says what was actually attested to.
+  var ATTESTATION_VERSION = 2;
+
   // localStorage throws in Safari private mode rather than returning null, and
   // a gate that hard-fails there would lock the whole site behind an exception
   function accepted() {
-    try { return localStorage.getItem(KEY) === '1'; } catch (e) { return false; }
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return false;
+      // v1 stored the string '1' and attested only to age. It is deliberately
+      // not honoured here, so those visitors are asked the research-use
+      // question once rather than never.
+      if (raw.charAt(0) !== '{') return false;
+      return JSON.parse(raw).v === ATTESTATION_VERSION;
+    } catch (e) { return false; }
   }
+
+  // What was affirmed, and when. A bare '1' recorded that a button was pressed
+  // and nothing about what it said; api/create-order.js already writes
+  // ruo_terms_accepted_at onto every order for the same reason.
   function remember() {
-    try { localStorage.setItem(KEY, '1'); } catch (e) { /* session-only, fine */ }
+    try {
+      localStorage.setItem(KEY, JSON.stringify({
+        v: ATTESTATION_VERSION,
+        at: new Date().toISOString(),
+        age21: true,
+        researchUseOnly: true,
+      }));
+    } catch (e) { /* session-only, fine */ }
   }
 
   if (accepted()) return;
@@ -45,16 +70,34 @@
       '<div class="age-gate-panel" id="ageGatePanel" tabindex="-1">' +
         '<span class="age-gate-logo">Glow<span class="spark">✦</span></span>' +
         '<span class="age-gate-eyebrow">Research Use Only</span>' +
-        '<h2 class="age-gate-title" id="ageGateTitle">You must be 21 or older to enter</h2>' +
+        '<h2 class="age-gate-title" id="ageGateTitle">Researcher verification</h2>' +
         '<p class="age-gate-copy">' +
-          'Glow Research supplies research compounds strictly for in-vitro laboratory ' +
-          'use, not for human or veterinary consumption. By entering you confirm ' +
-          'you are at least 21 and agree to our ' +
-          '<a href="' + root + 'ruo-agreement.html">Research Use Only Agreement</a>.' +
+          'Glow Research supplies research compounds to qualified researchers and ' +
+          'laboratories for in-vitro use only. Please confirm both before continuing.' +
         '</p>' +
-        '<button type="button" class="btn btn-primary age-gate-enter" id="ageGateEnter">' +
-          'I am 21 or older' +
+        // Two separate boxes, neither ticked, because the point of an
+        // attestation is the affirmative act. A pre-ticked box records that
+        // someone did nothing. The second one is the one that matters here:
+        // age has no bearing on whether a compound is a research chemical,
+        // and it was the only thing the previous gate actually asked.
+        '<label class="age-gate-check">' +
+          '<input type="checkbox" id="ageGateAge" />' +
+          '<span>I am at least <b>21 years of age</b>.</span>' +
+        '</label>' +
+        '<label class="age-gate-check">' +
+          '<input type="checkbox" id="ageGateRuo" />' +
+          '<span>I am purchasing for <b>in-vitro laboratory research only</b>, ' +
+            'not for human or veterinary use, and I agree to the ' +
+            '<a href="' + root + 'ruo-agreement.html">Research Use Only Agreement</a>.</span>' +
+        '</label>' +
+        '<button type="button" class="btn btn-primary age-gate-enter" id="ageGateEnter" disabled>' +
+          'Enter Glow Research' +
         '</button>' +
+        '<p class="age-gate-fine">' +
+          'By proceeding you affirm the statements above are true. These products are ' +
+          'not for human or veterinary use, not for use in diagnostic procedures, and ' +
+          'have not been evaluated by the U.S. Food and Drug Administration.' +
+        '</p>' +
         '<button type="button" class="btn btn-outline age-gate-exit" id="ageGateExit">Exit</button>' +
       '</div>';
     return el;
@@ -67,8 +110,19 @@
 
     var enter = el.querySelector('#ageGateEnter');
     var exit = el.querySelector('#ageGateExit');
+    var age = el.querySelector('#ageGateAge');
+    var ruo = el.querySelector('#ageGateRuo');
+
+    // Enter stays disabled until both are ticked. The button is the record of
+    // the attestation, so it must not be pressable before the attestation has
+    // been made.
+    function sync() { enter.disabled = !(age.checked && ruo.checked); }
+    age.addEventListener('change', sync);
+    ruo.addEventListener('change', sync);
+    sync();
 
     enter.addEventListener('click', function () {
+      if (enter.disabled) return;
       remember();
       document.documentElement.classList.remove('age-gate-open');
       el.classList.add('is-going');
@@ -85,7 +139,7 @@
     // it so a keyboard user can't tab into the page they haven't agreed to.
     el.addEventListener('keydown', function (e) {
       if (e.key !== 'Tab') return;
-      var focusable = el.querySelectorAll('a[href], button');
+      var focusable = el.querySelectorAll('a[href], button, input[type=checkbox]');
       var first = focusable[0];
       var last = focusable[focusable.length - 1];
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }

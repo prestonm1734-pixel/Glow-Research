@@ -1999,7 +1999,37 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
 .age-gate-copy a{ color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
 
 /* full-width stacked buttons, matching the reference layout */
+/* Attestation rows. Bordered and full width so each reads as a control to be
+   acted on rather than a line of small print with a tick beside it. */
+.age-gate-check{
+  display:flex; align-items:flex-start; gap:11px; text-align:left;
+  border:1px solid var(--border); padding:13px 14px; margin-bottom:9px;
+  cursor:pointer; transition: border-color .15s ease, background .15s ease;
+}
+.age-gate-check:hover{ border-color: rgba(255,255,255,.24); }
+.age-gate-check:has(input:checked){ border-color: rgba(255,255,255,.4); background: rgba(255,255,255,.04); }
+.age-gate-check input{
+  appearance:none; -webkit-appearance:none; flex:none;
+  width:19px; height:19px; margin:1px 0 0; border:1.5px solid rgba(255,255,255,.4);
+  background:transparent; cursor:pointer; display:grid; place-content:center;
+}
+.age-gate-check input:checked{ background: var(--text); border-color: var(--text); }
+.age-gate-check input:checked::after{
+  content:''; width:10px; height:6px;
+  border-left:2px solid var(--bg); border-bottom:2px solid var(--bg);
+  transform: rotate(-45deg) translate(1px,-1px);
+}
+.age-gate-check input:focus-visible{ outline:2px solid var(--text); outline-offset:2px; }
+.age-gate-check span{ font-size:.86rem; line-height:1.5; color: var(--text-dim); }
+.age-gate-check b{ color: var(--text); font-weight:600; }
+.age-gate-check a{ color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+
+.age-gate-fine{
+  margin: 12px 0 0; font-size:.72rem; line-height:1.5; color: var(--text-dimmer);
+}
+
 .age-gate .btn{ width: 100%; justify-content: center; }
+.age-gate-enter:disabled{ opacity:.38; cursor:not-allowed; }
 .age-gate-enter{ padding: 13px 22px; font-size: .92rem; }
 .age-gate-exit{ margin-top: 9px; padding: 12px 22px; font-size: .88rem; color: var(--text-dim); }
 .age-gate-exit:hover{ color: var(--text); }
@@ -2007,6 +2037,8 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
 @media (max-width: 480px){
   .age-gate-panel{ padding: 26px 22px 22px; }
   .age-gate-copy{ font-size: .82rem; }
+  .age-gate-check{ padding: 11px 12px; }
+  .age-gate-check span{ font-size: .82rem; }
 }
 @media (prefers-reduced-motion: reduce){
   .age-gate{ transition: none; }
