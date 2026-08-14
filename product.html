@@ -181,6 +181,15 @@
 
   /* --- mg picker: the one decision on this page --- */
   .pd-sizes{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 22px; }
+  /* A picker holding one pre-selected option is a label and a button that
+     answer a question nobody was asked, and every product in the catalog
+     ships a single size today. The mg is already in the identity line under
+     the title, so nothing is lost by collapsing it. Done in CSS against the
+     rendered buttons rather than in the renderer, so the served markup, the
+     baked pages and the hydrated page stay identical to each other, and a
+     second size appearing anywhere brings the picker straight back. */
+  .pd-sizes:has(.pd-size:only-child){ display:none; }
+  .pd-label:has(+ .pd-sizes .pd-size:only-child){ display:none; }
   .pd-size{
     font-family:'JetBrains Mono', monospace; font-size:.92rem; font-weight:700;
     padding: 15px 30px; border:2px solid rgba(0,0,0,.7); background:transparent; color:#0a0a0a;
@@ -497,7 +506,41 @@
     .pd-standard{ padding: 48px 0 52px; }
     .gs-grid{ grid-template-columns: 1fr; }
     .gs-cell{ padding: 20px 20px 22px; }
-    .pd-add{ width:100%; flex-basis:100%; }
+
+    /* The buy column ran to 938px on a 390px screen, most of it rhythm rather
+       than content, so the price and the button could not be on screen at the
+       same time. Everything below tightens spacing only: no control is
+       removed and nothing is hidden that carries information.
+
+       The stepper and the button used to take a row each, because .pd-add was
+       forced to width:100%. Side by side they fit a 390px screen with room
+       spare and save a whole row. */
+    .pd-buy{ gap: 8px; flex-wrap:nowrap; margin-bottom: 12px; }
+    .pd-add{ flex:1; min-width:0; height:52px; padding:0 16px; font-size:.98rem; }
+    .pd-stepper{ flex:none; }
+    .pd-stepper button{ width:40px; height:52px; }
+    .pd-stepper span{ width:34px; }
+
+    /* Rhythm set for a wide two-column layout reads as gaps when the column
+       is the whole screen. */
+    .pd-name{ margin-bottom: 6px; }
+    .pd-identity{ margin-bottom: 14px; }
+    .pd-price{ margin-bottom: 16px; }
+    .pd-express{ margin: 12px 0 12px; }
+    .pd-express-divider{ margin-bottom: 10px; }
+    .pd-express-consent{ margin-top: 8px; font-size:.7rem; line-height:1.45; }
+
+    /* Two statements of one fact, dispatch and arrival, sat as two padded
+       paragraphs. Same two lines, without the padding between them. */
+    .pd-deliver{ margin: 0 0 14px; }
+    .pd-deliver p{ padding: 1px 0; font-size:.88rem; }
+
+    .pd-bulk{ padding-top: 14px; }
+    .pd-tiers{ gap: 7px; }
+    .pd-bulk-note{ margin-top: 9px; font-size:.73rem; line-height:1.5; }
+
+    .pd-coa{ padding: 13px 14px; gap: 10px; }
+    .pd-coa small{ font-size:.75rem; line-height:1.45; }
     /* three vials in a narrower card: scale the fixed width down too, or the
        desktop size (58px x 3, overlapped) still overruns a ~110px interior. */
     .pd-tier-vials{ height: 54px; margin-bottom: 8px; }
