@@ -34,7 +34,7 @@ const SHELL_DONOR = 'product.html';
 const OUT_DIR = 'peptides';
 
 const {
-  GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, PRODUCT_PAGES_LIVE,
+  GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, hasList, listPriceOf, PRODUCT_PAGES_LIVE,
   sizeInStock, productInStock, evidenceHtml, identityLine, unitPriceAt,
   catFilterGroup, CAT_LABEL,
 } = require(path.join(ROOT, 'js/products-data.js'));
@@ -232,14 +232,15 @@ function buildProduct(p, donor) {
   html = fillEmpty(html, 'pdVialFine',
     `${esc(p.purity)} Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.shop`);
 
-  // Not setText: on sale the price is markup (a struck-through list price
-  // beside the marked-down one), and setText stops at the first "<".
+  // Not setText: with a launch list price the markup is a struck-through
+  // figure beside the charged one, and setText stops at the first "<".
   // unitPriceAt(price, 1) rather than salePrice(price): identical today, but
   // it is the same function js/product.js reprices with, so the baked figure
-  // and the hydrated one cannot diverge if the pricing rules change.
-  const priceHtml = onSaleNow()
-    ? `<s class="pd-price-was">${money(s.price)}</s>${money(unitPriceAt(s.price, 1))}`
-    : money(s.price);
+  // and the hydrated one cannot diverge if the pricing rules change. The
+  // struck figure matches renderPrice() in js/product.js at qty 1.
+  const priceHtml = hasList(s)
+    ? `<s class="pd-price-was">${money(Math.max(listPriceOf(s), s.price))}</s>${money(unitPriceAt(s.price, 1))}`
+    : money(unitPriceAt(s.price, 1));
   const priceRe = /(id="pdPrice"[^>]*>)[\s\S]*?(<\/span>)/;
   required(html, priceRe, 'price placeholder #pdPrice');
   html = html.replace(priceRe, (m, open, close) => open + priceHtml + close);

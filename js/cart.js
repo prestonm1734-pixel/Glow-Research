@@ -48,8 +48,16 @@
     ? unitPriceAt(i.unitOriginal, i.qty)
     : i.unitSale);
 
+  // What the struck-through price is measured against. Two separate things can
+  // put a line below its reference: the launch list price in the catalog
+  // (unitList, display only) and a bulk tier (unitOriginal, which is what
+  // lineUnit actually charges from). Whichever is higher is the honest
+  // reference, and taking the max keeps a line that has both from quoting the
+  // smaller of the two.
+  const lineRef = i => Math.max(Number(i.unitList) || 0, i.unitOriginal);
+
   const subtotal = () => items.reduce((n, i) => n + lineUnit(i) * i.qty, 0);
-  const savings = () => items.reduce((n, i) => n + (i.unitOriginal - lineUnit(i)) * i.qty, 0);
+  const savings = () => items.reduce((n, i) => n + (lineRef(i) - lineUnit(i)) * i.qty, 0);
 
   // Looked up once when a line is created. Returns '' rather than throwing
   // for anything the catalog does not hold: an unknown line is add()'s
@@ -60,6 +68,16 @@
     const p = GLOW_PRODUCTS.find(pr => pr.name === name);
     const size = p && p.sizes.find(s => s.mg === variant);
     return (size && size.sku) || '';
+  }
+
+  // Same lookup for the struck-through launch price. Returns 0 for a line the
+  // catalog no longer holds, which renders as no struck price at all rather
+  // than a stale one.
+  function listFor(name, variant) {
+    if (typeof GLOW_PRODUCTS === 'undefined') return 0;
+    const p = GLOW_PRODUCTS.find(pr => pr.name === name);
+    const size = p && p.sizes.find(s => s.mg === variant);
+    return (typeof listPriceOf === 'function' && size) ? listPriceOf(size) : 0;
   }
 
   /* ---------- badge ---------- */
@@ -124,7 +142,12 @@
 
   function rowHtml(item, i) {
     const unit = lineUnit(item);
-    const onSale = item.unitOriginal > unit;
+    const ref = lineRef(item);
+    const onSale = ref > unit;
+    // Deliberately measured from unitOriginal, not ref: the "Save N%" badge is
+    // for bulk tiers only. The launch markdown is never stated as a percentage
+    // anywhere on the site, so folding it in here would be the one place that
+    // does, and it would read as a bulk saving the quantity has not earned.
     const off = bulkSavingPct(item.unitOriginal, unit);
     return `
       <div class="cart-row" data-i="${i}">
@@ -149,7 +172,7 @@
               <button type="button" data-act="inc" aria-label="Increase quantity">+</button>
             </div>
             <div class="cart-row-price">
-              ${onSale ? `<span class="cart-was">${money(item.unitOriginal * item.qty)}</span>` : ''}
+              ${onSale ? `<span class="cart-was">${money(ref * item.qty)}</span>` : ''}
               <span class="cart-now">${money(unit * item.qty)}</span>
               ${off ? `<span class="cart-off">Save ${off}%</span>` : ''}
             </div>
@@ -202,6 +225,7 @@
       name: u.product.name,
       variant: u.size.mg,
       unitOriginal: u.size.price,
+      unitList: listPriceOf(u.size),
       unitSale: salePrice(u.size.price),
     });
   }
@@ -345,6 +369,10 @@
       sku: item.sku || skuFor(item.name, item.variant),
       qty: item.qty || 1,
       unitOriginal: item.unitOriginal,
+      // Display only, and resolved from the catalog when a caller does not
+      // send it, so a line saved before `list` existed still shows the struck
+      // price after a reload rather than silently losing it.
+      unitList: Number(item.unitList) || listFor(item.name, item.variant),
       unitSale: item.unitSale,
     });
     save();

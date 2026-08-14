@@ -125,12 +125,15 @@
     shell.hidden = false;
     empty.hidden = true;
 
+    // The higher of the launch list price and the plain per-vial price, same
+    // reference lineRef() strikes through in js/cart.js.
+    const ref = i => Math.max(Number(i.unitList) || 0, i.unitOriginal);
     const sub = items.reduce((n, i) => n + i.unitSale * i.qty, 0);
-    const saved = items.reduce((n, i) => n + (i.unitOriginal - i.unitSale) * i.qty, 0);
+    const saved = items.reduce((n, i) => n + (ref(i) - i.unitSale) * i.qty, 0);
     const ship = shippingCost(sub);
 
     $('coItems').innerHTML = items.map(i => {
-      const onSale = i.unitOriginal > i.unitSale;
+      const onSale = ref(i) > i.unitSale;
       return `
         <div class="co-item">
           <span class="co-thumb">${productThumb(i.name)}</span>
@@ -139,7 +142,7 @@
             <p class="co-item-meta">${i.variant} &middot; Qty ${i.qty}</p>
           </div>
           <div class="co-item-price">
-            ${onSale ? `<span class="co-was">${money(i.unitOriginal * i.qty)}</span>` : ''}
+            ${onSale ? `<span class="co-was">${money(ref(i) * i.qty)}</span>` : ''}
             <span class="co-now">${money(i.unitSale * i.qty)}</span>
           </div>
         </div>`;

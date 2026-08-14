@@ -278,7 +278,10 @@
   function renderPrice() {
     const s = size();
     const unit = unitPriceAt(s.price, qty);
-    const listTotal = round2(s.price * qty);
+    // The higher of the launch list price and the plain per-vial price, for
+    // the same reason lineRef() in js/cart.js takes a max: a quantity earning
+    // a bulk tier must not quote a reference below the launch price.
+    const listTotal = round2(Math.max(listPriceOf(s), s.price) * qty);
     const total = round2(unit * qty);
 
     $('pdPrice').innerHTML = listTotal > total
@@ -382,6 +385,7 @@
         variant: s.mg,
         qty,
         unitOriginal: s.price,
+        unitList: listPriceOf(s),
         unitSale: unitPriceAt(s.price, qty),
       });
     };
@@ -435,7 +439,7 @@
 
   function expressItem() {
     const s = size();
-    return { name: product.name, variant: s.mg, sku: s.sku, qty, unitOriginal: s.price, unitSale: unitPriceAt(s.price, qty) };
+    return { name: product.name, variant: s.mg, sku: s.sku, qty, unitOriginal: s.price, unitList: listPriceOf(s), unitSale: unitPriceAt(s.price, qty) };
   }
 
   let expressPR = null;

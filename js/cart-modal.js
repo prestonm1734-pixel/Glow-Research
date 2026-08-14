@@ -55,7 +55,7 @@
       <span class="qa-row-label">${size.mg}</span>
       <span class="qa-row-price">
         ${out ? '<span class="qa-row-out">Out of stock</span>' : `
-        ${onSaleNow() ? `<span class="qa-row-was">${fmtPrice(size.price)}</span>` : ''}
+        ${hasList(size) ? `<span class="qa-row-was">${fmtPrice(size.list)}</span>` : ''}
         <span class="qa-row-now">${fmtPrice(sale)}</span>`}
       </span>
       <span class="qa-row-mark" aria-hidden="true">
@@ -73,6 +73,7 @@
           name: product.name,
           variant: size.mg,
           unitOriginal: size.price,
+          unitList: listPriceOf(size),
           unitSale: sale,
         });
       }

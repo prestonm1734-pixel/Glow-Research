@@ -93,8 +93,12 @@
   }).join('');
 
   var sub = items.reduce(function (n, i) { return n + i.unitSale * i.qty; }, 0);
+  // Same reference the cart struck through: the higher of the launch list
+  // price and the plain per-vial price, so this figure matches what the
+  // shopper was shown a moment earlier rather than counting only the bulk tier.
   var saved = items.reduce(function (n, i) {
-    return n + ((i.unitOriginal || i.unitSale) - i.unitSale) * i.qty;
+    var ref = Math.max(Number(i.unitList) || 0, i.unitOriginal || i.unitSale);
+    return n + (ref - i.unitSale) * i.qty;
   }, 0);
   var ship = Number(order.shippingCost || 0);
   var tax = Number(order.tax || 0);
