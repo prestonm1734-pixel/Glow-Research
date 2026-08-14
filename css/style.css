@@ -1,5 +1,59 @@
 /* ===================== Glow Research — styles ===================== */
 
+/* ---------- fonts, self-hosted ----------
+   Used to load from Google's CDN (fonts.googleapis.com / fonts.gstatic.com).
+   That is one more network request that has to succeed, on a connection this
+   site does not control, before a single custom letterform can render — and
+   on a weak mobile signal it sometimes does not, which silently falls back
+   through the stack to a plain system font with no error anywhere to catch.
+   Shipping the files ourselves removes that dependency entirely: the fonts
+   are just part of the site now, cached and served the same way any other
+   asset here is.
+
+   Each family below is one variable-weight woff2 (Google serves the same
+   file for every weight requested from a variable source; verified by
+   downloading the CSS this stylesheet used to import and comparing URLs
+   across weights), so five files cover every weight this site uses. Latin
+   subset only — the one Google subset that covers plain English copy,
+   matching what fonts.googleapis.com/css2's own "latin" block served.
+   Re-fetch tools/README's font-refresh note (below) if a new weight or
+   family is ever needed. */
+@font-face{
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../assets/fonts/space-grotesk.woff2') format('woff2');
+}
+@font-face{
+  font-family: 'Sora';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('../assets/fonts/sora.woff2') format('woff2');
+}
+@font-face{
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 500 600;
+  font-display: swap;
+  src: url('../assets/fonts/fraunces-normal.woff2') format('woff2');
+}
+@font-face{
+  font-family: 'Fraunces';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/fraunces-italic-500.woff2') format('woff2');
+}
+@font-face{
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('../assets/fonts/jetbrains-mono.woff2') format('woff2');
+}
+
 :root{
   --bg: #0a0a0a;
   --bg-2: #111111;
