@@ -212,7 +212,7 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials to compare co-formulated and separately administered research protocols.' }
     ] },
   { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.8%', badge:'Best Value',
-    sizes: [{ mg: '50mg', price: 54.99, list: 70, sku: 'GLO-CU50' }],
+    sizes: [{ mg: '50mg', price: 54.99, list: 70, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg.webp' }],
     blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
     about: [
       'GHK-Cu is the tripeptide glycyl-L-histidyl-L-lysine complexed with copper(II). The tripeptide occurs naturally in plasma and binds copper with high affinity, and it is the complex rather than the bare peptide that most research uses.',
@@ -259,7 +259,7 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative secretagogue pharmacology', d: 'Run as a reference GHRH analogue when newer compounds in the class are characterised.' }
     ] },
   { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.5%', badge:'Popular',
-    sizes: [{ mg: '10mg', price: 79.99, list: 100, sku: 'GLO-SM10' }],
+    sizes: [{ mg: '10mg', price: 79.99, list: 100, sku: 'GLO-SM10', image: 'assets/products/glp-1-sm-10mg.webp' }],
     blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
     about: [
       'GLP-1 (SM) is Glow’s designation for semaglutide, a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
@@ -297,7 +297,7 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative incretin pharmacology', d: 'Applied as a comparator when characterising newer multi-receptor agonists against single- and dual-receptor peptides.' }
     ] },
   { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.1%', badge:null,
-    sizes: [{ mg: '10mg', price: 74.99, list: 95, sku: 'GLO-MS10' }],
+    sizes: [{ mg: '10mg', price: 74.99, list: 95, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg.webp' }],
     blurb: 'A mitochondrial-derived peptide encoded within the mitochondrial genome. Studied for its role in metabolic signalling.',
     about: [
       'MOTS-C is a 16 amino acid peptide encoded in the mitochondrial 12S rRNA region rather than the nuclear genome, one of a small class of mitochondrial-derived peptides identified in the last two decades.',
