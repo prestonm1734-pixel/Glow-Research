@@ -1275,11 +1275,14 @@ console.log('\npayments');
     !/automatic_payment_methods\s*:\s*\{/.test(intentFn));
 
   // js/checkout.js prices what the shopper is shown; api/_lib.js prices what
-  // Stripe is actually told to collect. CLAUDE.md has said all along that the
-  // two tables must be changed together, and nothing checked that they had
-  // been. A drift between them is not a display bug: the page quotes one
-  // number, the card is charged another, and api/create-order.js then refuses
-  // the order because the amount it reprices does not match what was taken.
+  // Stripe is actually told to collect; js/product.js prices the express
+  // Apple Pay / Google Pay button on the product page, which posts to the
+  // same two endpoints but never touches checkout.js. CLAUDE.md has said all
+  // along that the tables must be changed together, and nothing checked that
+  // they had been. A drift between any two is not a display bug: one surface
+  // quotes a number, Stripe collects another, and api/create-order.js then
+  // refuses the order because the amount it reprices does not match what was
+  // taken.
   {
     const shipRows = (src, name) => {
       const block = new RegExp(`${name}\\s*=\\s*\\[([\\s\\S]*?)\\];`).exec(src);
@@ -1292,11 +1295,16 @@ console.log('\npayments');
     };
     const served = shipRows(lib, 'SHIPPING_RATES');
     const shown = shipRows(coJs, 'const SHIPPING');
-    ok('both shipping tables were found to compare',
-      Array.isArray(served) && served.length > 0 && Array.isArray(shown) && shown.length > 0);
+    const express = shipRows(read('js/product.js'), 'EXPRESS_SHIPPING');
+    ok('all three shipping tables were found to compare',
+      Array.isArray(served) && served.length > 0 && Array.isArray(shown) && shown.length > 0 &&
+      Array.isArray(express) && express.length > 0);
     ok('what Stripe is charged for shipping matches what checkout displays',
       !!served && !!shown && served.join(' | ') === shown.join(' | '),
       `_lib.js [${(served || []).join(', ')}] vs checkout.js [${(shown || []).join(', ')}]`);
+    ok('the express pay button on the product page quotes the same rates',
+      !!served && !!express && served.join(' | ') === express.join(' | '),
+      `_lib.js [${(served || []).join(', ')}] vs product.js [${(express || []).join(', ')}]`);
   }
 
   // Pricing a cart line off its display name meant a rename invalidated every

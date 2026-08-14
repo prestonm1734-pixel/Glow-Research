@@ -328,6 +328,7 @@
 
     renderStock();
     renderTiers();
+    updateExpressPay();
   }
 
   // The buy box never offers something we cannot ship. Both the button and the
@@ -362,6 +363,7 @@
     $('pdQtyDec').disabled = qty <= 1;
     renderPrice();
     markActiveTier();
+    updateExpressPay();
   }
 
   function wireBuy() {
@@ -387,6 +389,260 @@
     $('pdAddBtn').addEventListener('click', () => {
       addCurrent();
       flash($('pdAddBtn'), 'Added to cart ✓');
+    });
+  }
+
+  /* ================= express pay (Apple Pay / Google Pay) =================
+     A native wallet button, not a styled lookalike: Stripe's Payment Request
+     Button renders whatever the browser's own Apple Pay / Google Pay sheet
+     looks like, and canMakePayment() only resolves true once the visitor's
+     own device actually has one configured — the block stays hidden on every
+     other browser, the same "nothing claims what it cannot show" rule the
+     COA box follows.
+
+     Skips the cart and the checkout page entirely: the mg and quantity
+     already selected on this page are paid and placed from one sheet. It
+     posts to the same api/create-payment-intent and api/create-order that
+     the cart checkout uses, so a wallet purchase is priced and verified the
+     identical way a card typed into the checkout form is — nothing here
+     trusts the browser for an amount either.
+
+     EXPRESS_SHIPPING mirrors the SHIPPING table in js/checkout.js and
+     SHIPPING_RATES in api/_lib.js by hand, the same duplication CLAUDE.md
+     already accepts between those two. check-claims.js pins all three
+     together. */
+  const EXPRESS_SHIPPING = [
+    { id: '2day', label: 'FedEx 2-Day Express', cost: 12.95, freeOver: 400 },
+    { id: 'overnight', label: 'FedEx Overnight', cost: 39.95, freeOver: null },
+  ];
+
+  function expressShippingCost(id, subtotal) {
+    const rate = EXPRESS_SHIPPING.find(r => r.id === id) || EXPRESS_SHIPPING[0];
+    return (rate.freeOver !== null && subtotal >= rate.freeOver) ? 0 : rate.cost;
+  }
+
+  function expressShippingOptions(subtotal) {
+    return EXPRESS_SHIPPING.map(r => {
+      const cost = expressShippingCost(r.id, subtotal);
+      return { id: r.id, label: r.label, detail: cost === 0 ? 'Free' : '', amount: Math.round(cost * 100) };
+    });
+  }
+
+  function expressSubtotal() {
+    const s = size();
+    return round2(unitPriceAt(s.price, qty) * qty);
+  }
+
+  function expressItem() {
+    const s = size();
+    return { name: product.name, variant: s.mg, sku: s.sku, qty, unitOriginal: s.price, unitSale: unitPriceAt(s.price, qty) };
+  }
+
+  let expressPR = null;
+  let expressStripeClient = null;
+
+  // Keeps the wallet sheet's on-screen amount in step with the qty stepper
+  // and the mg picker, the same job elements.fetchUpdates() does on the real
+  // checkout page. A no-op before the button exists or on a browser where it
+  // never will.
+  function updateExpressPay() {
+    if (!expressPR || !product) return;
+    const s = size();
+    expressPR.update({
+      total: { label: `${product.name} ${s.mg}${qty > 1 ? ` × ${qty}` : ''}`, amount: Math.round(expressSubtotal() * 100) },
+    });
+  }
+
+  function expressError(msg) {
+    const el = $('pdExpressMsg');
+    if (el) el.textContent = msg || '';
+  }
+
+  async function handleExpressPayment(ev) {
+    expressError('');
+    const shippingId = (ev.shippingOption && ev.shippingOption.id) || EXPRESS_SHIPPING[0].id;
+    const shippingRate = EXPRESS_SHIPPING.find(r => r.id === shippingId) || EXPRESS_SHIPPING[0];
+    const addr = ev.shippingAddress || {};
+    const nameParts = ((addr.recipient || ev.payerName || '').trim()).split(/\s+/).filter(Boolean);
+    const shipping = {
+      firstName: nameParts.slice(0, -1).join(' ') || nameParts[0] || '',
+      lastName: nameParts.length > 1 ? nameParts[nameParts.length - 1] : '',
+      address1: (addr.addressLine && addr.addressLine[0]) || '',
+      address2: (addr.addressLine && addr.addressLine[1]) || '',
+      city: addr.city || '',
+      state: addr.region || '',
+      zip: addr.postalCode || '',
+    };
+    const email = ev.payerEmail || '';
+    const items = [expressItem()];
+
+    let piData;
+    try {
+      const resp = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items, shippingMethodId: shippingId, email }),
+      });
+      piData = await resp.json();
+      if (!resp.ok) throw new Error(piData.error);
+    } catch (err) {
+      ev.complete('fail');
+      expressError(err.message || 'Could not start payment.');
+      return;
+    }
+
+    let confirmResult;
+    try {
+      confirmResult = await expressStripeClient.confirmCardPayment(
+        piData.clientSecret,
+        { payment_method: ev.paymentMethod.id },
+        { handleActions: false },
+      );
+    } catch (err) {
+      confirmResult = { error: { message: err.message } };
+    }
+
+    if (confirmResult.error) {
+      ev.complete('fail');
+      expressError(confirmResult.error.message || 'Your payment could not be confirmed.');
+      return;
+    }
+
+    // The sheet closes here. A required 3D Secure challenge is handled below,
+    // after it is gone, the same order js/checkout.js follows for the same
+    // reason: Stripe does not keep the wallet sheet open for it.
+    ev.complete('success');
+
+    let paymentIntent = confirmResult.paymentIntent;
+    if (paymentIntent && paymentIntent.status === 'requires_action') {
+      const actionResult = await expressStripeClient.confirmCardPayment(piData.clientSecret);
+      if (actionResult.error) {
+        expressError(actionResult.error.message || 'Your payment could not be confirmed.');
+        return;
+      }
+      paymentIntent = actionResult.paymentIntent;
+    }
+
+    if (!paymentIntent || paymentIntent.status !== 'succeeded') {
+      expressError('Your payment is still processing. Refresh this page in a moment.');
+      return;
+    }
+
+    // The card is charged by this point. A failure past here is the same dead
+    // end finishOrder() in js/checkout.js treats it as, for the same reason:
+    // reoffering the button would invite a second charge for an order that
+    // already has nothing left to pay for.
+    let orderData;
+    try {
+      const resp = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          customer: { email, phone: ev.payerPhone || '' },
+          shipping,
+          billing: shipping,
+          items,
+          shippingMethod: { id: shippingId, label: shippingRate.label },
+          termsAccepted: true,
+          paymentIntentId: piData.paymentIntentId,
+        }),
+      });
+      orderData = await resp.json();
+      if (!resp.ok) throw new Error(orderData.error);
+    } catch (err) {
+      expressError(err.message ||
+        `Your payment succeeded, but we could not finish placing the order. ` +
+        `Email support@glowresearch.shop with this reference: ${piData.paymentIntentId}`);
+      return;
+    }
+
+    try {
+      sessionStorage.setItem('glow-last-order', JSON.stringify({
+        number: orderData.orderNumber,
+        status: orderData.status || '',
+        date: new Date().toISOString(),
+        email,
+        name: [shipping.firstName, shipping.lastName].filter(Boolean).join(' '),
+        items,
+        shipping,
+        shippingLabel: shippingRate.label,
+        shippingCost: expressShippingCost(shippingId, expressSubtotal()),
+        hasAccount: false,
+      }));
+    } catch (e) { /* private mode: thank-you.html shows its no-recent-order state */ }
+
+    location.href = 'thank-you.html';
+  }
+
+  function initExpressPay() {
+    const wrap = $('pdExpress');
+    const mount = $('pdExpressBtn');
+    if (!wrap || !mount) return;
+    if (typeof Stripe === 'undefined') return;
+    if (typeof PAYMENTS_LIVE === 'undefined' || !PAYMENTS_LIVE) return;
+    if (typeof STRIPE_PUBLISHABLE_KEY === 'undefined' || !STRIPE_PUBLISHABLE_KEY) return;
+
+    const stripeClient = Stripe(STRIPE_PUBLISHABLE_KEY);
+    const s = size();
+
+    expressPR = stripeClient.paymentRequest({
+      country: 'US',
+      currency: 'usd',
+      total: { label: `${product.name} ${s.mg}`, amount: Math.round(expressSubtotal() * 100) },
+      requestPayerName: true,
+      requestPayerEmail: true,
+      requestPayerPhone: true,
+      requestShipping: true,
+      shippingOptions: expressShippingOptions(expressSubtotal()),
+    });
+
+    const elements = stripeClient.elements();
+    const btn = elements.create('paymentRequestButton', {
+      paymentRequest: expressPR,
+      style: { paymentRequestButton: { type: 'buy', theme: 'dark', height: '48px' } },
+    });
+
+    // Only reveals the row once this exact browser confirms it can actually
+    // show a wallet sheet. The static "also pay with" badges above cover
+    // every other visitor, so they step aside rather than sit duplicated next
+    // to a real button.
+    expressPR.canMakePayment().then(result => {
+      if (!result) return;
+      btn.mount('#pdExpressBtn');
+      wrap.hidden = false;
+      const badges = $('pdPayMethods');
+      if (badges) badges.hidden = true;
+    });
+
+    // Cost depends only on the subtotal already fixed by the qty and mg
+    // selected on this page, not on the address itself, so the same two
+    // options come back every time — a non-US destination is the one thing
+    // actually rejected, since that is genuinely outside what this catalog
+    // ships to.
+    expressPR.on('shippingaddresschange', (ev) => {
+      if (ev.shippingAddress.country !== 'US') {
+        ev.updateWith({ status: 'invalid_shipping_address' });
+        return;
+      }
+      ev.updateWith({ status: 'success', shippingOptions: expressShippingOptions(expressSubtotal()) });
+    });
+
+    expressPR.on('shippingoptionchange', (ev) => {
+      const sub = expressSubtotal();
+      const cost = expressShippingCost(ev.shippingOption.id, sub);
+      const sz = size();
+      ev.updateWith({
+        status: 'success',
+        total: {
+          label: `${product.name} ${sz.mg}${qty > 1 ? ` × ${qty}` : ''}`,
+          amount: Math.round((sub + cost) * 100),
+        },
+      });
+    });
+
+    expressPR.on('paymentmethod', (ev) => {
+      handleExpressPayment(ev);
     });
   }
 
@@ -517,6 +773,7 @@
     renderSizes(product);
     renderSelection();
     wireBuy();
+    initExpressPay();
     renderDelivery();
     renderRelated(product);
   });

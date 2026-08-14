@@ -24,8 +24,10 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://js.stripe.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
+<script src="https://js.stripe.com/v3/"></script>
 <style>
   /* ---------- breadcrumb ---------- */
   .pd-crumb{ background:#ececea; border-bottom:1px solid rgba(0,0,0,0.1); padding: 13px 0; }
@@ -236,6 +238,17 @@
     font-size:.83rem; font-weight:700; color:#1a1a1a; letter-spacing:-.01em;
   }
   .pd-pay-badge svg{ flex-shrink:0; }
+
+  /* --- express pay --- */
+  .pd-express{ margin: 14px 0 16px; }
+  .pd-express-divider{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .pd-express-divider::before, .pd-express-divider::after{ content:''; flex:1; height:1px; background:rgba(0,0,0,.12); }
+  .pd-express-divider span{ font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8a8a86; }
+  .pd-express-btn{ width:100%; min-height:48px; }
+  .pd-express-consent{ margin:10px 0 0; font-size:.74rem; line-height:1.5; color:#8a8a86; text-align:center; }
+  .pd-express-consent a{ color:#55554f; text-decoration:underline; }
+  .pd-express-msg{ margin:8px 0 0; font-size:.82rem; color:#b3261e; text-align:center; }
+  .pd-express-msg:empty{ display:none; }
   .pd-stepper{ display:flex; align-items:center; border:2px solid rgba(0,0,0,.7); }
   .pd-stepper button{
     width:44px; height:56px; background:transparent; border:none; color:#0a0a0a; font-size:1.2rem; cursor:pointer;
@@ -657,7 +670,26 @@
           </div>
           <button type="button" class="btn btn-primary pd-add" id="pdAddBtn">Add to cart</button>
         </div>
-        <div class="pd-pay-methods" aria-label="Accepted payment methods">
+
+        <!-- Express pay: a native Apple Pay / Google Pay button, not a styled
+             lookalike. js/product.js mounts Stripe's Payment Request Button
+             here and only reveals this block once canMakePayment() confirms
+             the visitor's own device actually has a wallet configured — it
+             stays hidden on every browser that cannot show one, same as the
+             COA box only turns into a link once a certificate really exists.
+             Skips the cart and the checkout page: this exact vial and
+             quantity, paid and placed from one sheet. -->
+        <div class="pd-express" id="pdExpress" hidden>
+          <div class="pd-express-divider"><span>or</span></div>
+          <div class="pd-express-btn" id="pdExpressBtn"></div>
+          <p class="pd-express-consent">
+            By continuing you agree to our <a href="terms.html">Terms of Sale</a>
+            and <a href="ruo-agreement.html">RUO Agreement</a>.
+          </p>
+          <p class="pd-express-msg" id="pdExpressMsg" role="alert"></p>
+        </div>
+
+        <div class="pd-pay-methods" id="pdPayMethods" aria-label="Accepted payment methods">
           <span class="pd-pay-label">Also pay with</span>
           <span class="pd-pay-badge">
             <svg width="14" height="17" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
