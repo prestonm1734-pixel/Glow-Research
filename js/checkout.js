@@ -161,7 +161,14 @@
 
     $('coSub').textContent = money(sub);
     $('coShipCost').textContent = ship === 0 ? 'Free' : money(ship);
-    $('coTotal').textContent = money(sub + ship);
+
+    const taxRow = $('coTaxRow');
+    if (taxRow) {
+      taxRow.hidden = taxAmount <= 0;
+      if (taxAmount > 0) $('coTaxCost').textContent = money(taxAmount);
+    }
+
+    $('coTotal').textContent = money(sub + ship + taxAmount);
 
     const saveRow = $('coSaveRow');
     if (saved > 0) {
@@ -240,6 +247,27 @@
      top of the file, next to where it is constructed. */
   let elements = null;
   let paymentIntentId = null;
+  // Set from api/create-payment-intent.js's own response, never computed
+  // here: Stripe Tax is the one place a rate is decided, and this page only
+  // ever displays what it said. Zero until a shipping address has enough on
+  // it (state + ZIP) to price against, which is the ordinary state of the
+  // page before someone has typed one.
+  let taxAmount = 0;
+
+  // Only what Stripe Tax actually needs (state + ZIP). Anything short of
+  // that and the server-side calculation returns null, no request wasted.
+  function currentTaxAddress() {
+    const state = $('coState') ? $('coState').value : '';
+    const zip = $('coZip') ? $('coZip').value : '';
+    if (!state || !zip) return null;
+    return {
+      address1: $('coAddr') ? $('coAddr').value : '',
+      address2: $('coAddr2') ? $('coAddr2').value : '',
+      city: $('coCity') ? $('coCity').value : '',
+      state,
+      zip,
+    };
+  }
   let piInFlight = null; // in-flight promise, so a rapid shipping toggle cannot fire two overlapping requests
 
   function stripeErr(msg) {
@@ -269,6 +297,7 @@
             items,
             shippingMethodId: shipId,
             email: $('coEmail') ? $('coEmail').value : '',
+            address: currentTaxAddress(),
             paymentIntentId,
           }),
         });
@@ -276,6 +305,8 @@
         if (!resp.ok) throw new Error(data.error || 'Could not prepare payment.');
 
         paymentIntentId = data.paymentIntentId;
+        taxAmount = data.tax || 0;
+        renderSummary();
 
         if (!elements) {
           // First time only: mounting is what makes the fields exist. After
@@ -399,6 +430,9 @@
         shipping: payload.shipping,
         shippingLabel: payload.shippingMethod.label,
         shippingCost: payload.shippingMethod.cost,
+        // api/create-order.js's own figure, re-derived server-side against
+        // Stripe Tax rather than trusted from whatever this page last showed.
+        tax: data.tax || 0,
         referral: payload.referral,
         accountMessage,
         hasAccount,
@@ -605,6 +639,17 @@
       window.GlowCart.open();
     });
 
+    // Tax is priced off state + ZIP, so those are the two fields that matter
+    // here — 'change' rather than 'input' so a still-being-typed ZIP does not
+    // fire a request on every keystroke, only once the field is left.
+    ['coState', 'coZip'].forEach(id => {
+      const el = $(id);
+      if (!el) return;
+      el.addEventListener('change', () => {
+        if (typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) ensurePaymentIntent();
+      });
+    });
+
     // optional account creation: the password field only exists once asked for
     $('coMakeAcct').addEventListener('change', e => {
       $('coPassField').hidden = !e.target.checked;
@@ -683,13 +728,17 @@
       // the cart as it now stands, finds the two do not agree, and refuses to
       // create the order — leaving the shopper charged for an order that does
       // not exist, which is the worst outcome this checkout can produce.
-      // Draining the queue first costs a few hundred milliseconds. The loop
-      // rather than a single await is deliberate: ensurePaymentIntent() waits
-      // on any in-flight call before replacing piInFlight with its own, so one
-      // await can return while a newer request is still running.
-      while (piInFlight) {
-        try { await piInFlight; } catch (e) { /* surfaced by stripeErr() where it was thrown */ }
-      }
+      //
+      // A plain drain is not enough for tax specifically: only state/zip
+      // changing fires ensurePaymentIntent() (see the coState/coZip
+      // listeners), so a street address or city typed afterward — with state
+      // and zip left alone — would confirm against a PaymentIntent tax was
+      // never recalculated for. Calling it once more here, with every address
+      // field now filled in, is what makes the amount about to be confirmed
+      // match the address about to be submitted. ensurePaymentIntent() drains
+      // any call already in flight before starting its own, so this also
+      // covers the ordinary race the comment above describes.
+      await ensurePaymentIntent();
 
       const payload = {
         customer: { email: $('coEmail').value },

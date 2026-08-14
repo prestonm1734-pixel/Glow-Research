@@ -149,6 +149,84 @@ export function priceOrder(items, shippingMethodId) {
   return { lines, subtotal, shipping, total: round2(subtotal + shipping), shippingMethodId: rate.id };
 }
 
+/* ============================ sales tax ============================ */
+// Computed through Stripe Tax, not WooCommerce — WooCommerce never sees a
+// tax rate table for this store, only the dollar figure Stripe already
+// calculated, attached to the order as a fee line. Stripe Tax needs its own
+// registrations added per state in the Dashboard before it will actually
+// charge anything; until that happens every calculation legitimately comes
+// back $0, which is the correct amount to charge with no registrations on
+// file — not a bug in this code.
+//
+// One tax code covers the whole catalog: every SKU is a physical vial, so
+// there is no mix of taxable and exempt goods to tell apart. A product ever
+// needing different treatment would carry its own code on that catalog row
+// rather than a hardcoded exception here.
+const TAX_CODE_GOODS = 'txcd_99999999';
+const TAX_CODE_SHIPPING = 'txcd_92010001';
+
+// Returns null rather than throwing when there is nothing to price against
+// (no address yet — the ordinary state of the very first PaymentIntent,
+// before a shopper has typed a shipping address) or when Stripe Tax itself
+// is not reachable (not yet enabled in the Dashboard, no registrations, a
+// network hiccup). A checkout that cannot get a tax figure charges nothing
+// rather than guessing one — the same reasoning SHIPPING_RATES already
+// applies to a shipping method it does not recognise.
+export async function calculateTax(lines, shippingCents, address) {
+  if (!address || !address.state || !address.zip) return null;
+
+  const body = {
+    currency: 'usd',
+    customer_details: {
+      address: {
+        line1: address.address1 || undefined,
+        line2: address.address2 || undefined,
+        city: address.city || undefined,
+        state: address.state,
+        postal_code: address.zip,
+        country: 'US',
+      },
+      address_source: 'shipping',
+    },
+    line_items: lines.map((l, i) => ({
+      amount: Math.round(l.total * 100),
+      reference: l.sku || `line-${i}`,
+      tax_behavior: 'exclusive',
+      tax_code: TAX_CODE_GOODS,
+    })),
+  };
+  if (shippingCents > 0) {
+    body.shipping_cost = {
+      amount: shippingCents,
+      tax_behavior: 'exclusive',
+      tax_code: TAX_CODE_SHIPPING,
+    };
+  }
+
+  try {
+    const calc = await stripe('/tax/calculations', body);
+    return { id: calc.id, amount: round2((calc.tax_amount_exclusive || 0) / 100) };
+  } catch (e) {
+    return null;
+  }
+}
+
+// The one function api/create-payment-intent.js and api/create-order.js
+// both call: prices the cart and its shipping exactly as priceOrder() always
+// has, then adds whatever Stripe Tax says the destination owes. Address-less
+// or tax-unreachable calls fall back to zero tax rather than failing the
+// whole price, since a checkout with no address yet is not an error state.
+export async function priceOrderWithTax(items, shippingMethodId, address) {
+  const priced = priceOrder(items, shippingMethodId);
+  const tax = await calculateTax(priced.lines, Math.round(priced.shipping * 100), address);
+  return {
+    ...priced,
+    tax: tax ? tax.amount : 0,
+    taxCalculationId: tax ? tax.id : null,
+    total: round2(priced.total + (tax ? tax.amount : 0)),
+  };
+}
+
 /* ============================ WooCommerce ============================ */
 
 export function wcConfig() {

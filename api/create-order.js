@@ -10,7 +10,7 @@
 
 import {
   wc, currentSession, findCustomerByEmail, readBody, isEmail,
-  stripe, stripeGet, priceOrder, STATUS_LABELS,
+  stripe, stripeGet, priceOrderWithTax, STATUS_LABELS,
 } from './_lib.js';
 import {
   emailShell, heading, paragraph, eyebrow, fine, esc, sendEmail, money,
@@ -68,11 +68,14 @@ export default async function handler(req, res) {
   // Priced fresh against the live catalog — never off i.unitSale, which is
   // whatever the browser sent and is not evidence of anything. This is the
   // same function api/create-payment-intent.js priced the PaymentIntent from,
-  // so the two are checked against each other just below rather than trusted
-  // independently.
+  // tax included, so the two are checked against each other just below rather
+  // than trusted independently. `shipping` (the address the order is going
+  // to) is what tax is calculated against — the same address the client's
+  // last create-payment-intent call would have sent, so a consistent address
+  // reprices to the same tax figure both times.
   let priced;
   try {
-    priced = priceOrder(items, shippingMethod && shippingMethod.id);
+    priced = await priceOrderWithTax(items, shippingMethod && shippingMethod.id, shipping);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
@@ -147,6 +150,15 @@ export default async function handler(req, res) {
     total: priced.shipping.toFixed(2),
   }];
 
+  // A fee line, not a WooCommerce tax_lines entry: tax_lines expects a rate
+  // WooCommerce itself already knows about, and this store has no tax rate
+  // table configured there on purpose — Stripe Tax is the one place the rate
+  // is computed. A named fee carries the dollar figure into the order and the
+  // invoice without WooCommerce needing to agree on how it was reached.
+  if (priced.tax > 0) {
+    fee_lines.push({ name: 'Sales tax', total: priced.tax.toFixed(2) });
+  }
+
   const addr = a => ({
     first_name: a.firstName || '',
     last_name: a.lastName || '',
@@ -201,6 +213,20 @@ export default async function handler(req, res) {
       });
     } catch (e) { /* see comment above */ }
 
+    // Finalizes the calculation into an actual Stripe Tax transaction, keyed
+    // to this order number — the record Stripe's own reporting and filing
+    // tools read. Best-effort and non-fatal for the same reason as the
+    // metadata write just above: the order exists and is paid for either way,
+    // and this is bookkeeping on top of that, not a condition of it.
+    if (priced.taxCalculationId) {
+      try {
+        await stripe('/tax/transactions/create_from_calculation', {
+          calculation: priced.taxCalculationId,
+          reference: String(data.number),
+        });
+      } catch (e) { /* see comment above */ }
+    }
+
     // Priced from priced.lines, not the raw request body: the confirmation
     // email states a payment was received, so the figures in it have to be
     // the ones Stripe actually verified, not whatever the browser sent.
@@ -211,7 +237,7 @@ export default async function handler(req, res) {
     // sent. None of the three sends can throw, and none is allowed to fail
     // the order: it exists in WooCommerce by this point, and telling the
     // shopper otherwise would have them place it twice.
-    const order = { number: data.number, email, items: emailItems, shippingMethod: emailShipping, shipping, notes };
+    const order = { number: data.number, email, items: emailItems, shippingMethod: emailShipping, tax: priced.tax, shipping, notes };
     await Promise.all([
       sendEmail({
         to: email,
@@ -237,6 +263,7 @@ export default async function handler(req, res) {
       orderId: data.id,
       orderNumber: data.number,
       status: STATUS_LABELS[data.status] || data.status || '',
+      tax: priced.tax,
     });
   } catch (err) {
     if (!createdOrder) {
@@ -322,7 +349,7 @@ async function resolveCustomer(req, email, shipping) {
 
 function orderTotal(o) {
   const sub = o.items.reduce((n, i) => n + i.unitSale * i.qty, 0);
-  return sub + (o.shippingMethod ? o.shippingMethod.cost : 0);
+  return sub + (o.shippingMethod ? o.shippingMethod.cost : 0) + (o.tax || 0);
 }
 
 function addressLines(s) {
@@ -337,6 +364,7 @@ function addressLines(s) {
 function itemsTable(o) {
   const sub = o.items.reduce((n, i) => n + i.unitSale * i.qty, 0);
   const ship = o.shippingMethod ? o.shippingMethod.cost : 0;
+  const tax = o.tax || 0;
 
   const line = (label, value, strong) => `
     <tr>
@@ -357,7 +385,8 @@ function itemsTable(o) {
       <tr><td colspan="2" style="padding:6px 0 0;border-top:1px solid #ebebed;"></td></tr>
       ${line('Subtotal', money(sub))}
       ${line(o.shippingMethod ? esc(o.shippingMethod.label) : 'Shipping', ship ? money(ship) : 'Free')}
-      ${line('Total', money(sub + ship), true)}
+      ${tax > 0 ? line('Sales tax', money(tax)) : ''}
+      ${line('Total', money(sub + ship + tax), true)}
     </table>`;
 }
 
@@ -391,10 +420,11 @@ function orderHtml(o) {
 function orderText(o) {
   const sub = o.items.reduce((n, i) => n + i.unitSale * i.qty, 0);
   const ship = o.shippingMethod ? o.shippingMethod.cost : 0;
+  const tax = o.tax || 0;
   return [
     'Order confirmed.',
     '',
-    `Thank you. We have your order and your payment of ${money(sub + ship)}.`,
+    `Thank you. We have your order and your payment of ${money(sub + ship + tax)}.`,
     `Its number is ${o.number}. Quote that in any reply and we will find it straight away.`,
     '',
     'You will get a second email with tracking the moment your box leaves the',
@@ -404,7 +434,8 @@ function orderText(o) {
     ...o.items.map(i => `  ${i.name}${i.variant ? ' ' + i.variant : ''}${i.qty > 1 ? ' ×' + i.qty : ''}   ${money(i.unitSale * i.qty)}`),
     `  Subtotal: ${money(sub)}`,
     `  ${o.shippingMethod ? o.shippingMethod.label : 'Shipping'}: ${ship ? money(ship) : 'Free'}`,
-    `  Total: ${money(sub + ship)}`,
+    ...(tax > 0 ? [`  Sales tax: ${money(tax)}`] : []),
+    `  Total: ${money(sub + ship + tax)}`,
     '',
     'SHIPPING TO',
     ...addressLines(o.shipping).map(l => '  ' + l),

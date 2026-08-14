@@ -1307,6 +1307,29 @@ console.log('\npayments');
       `_lib.js [${(served || []).join(', ')}] vs product.js [${(express || []).join(', ')}]`);
   }
 
+  // checkout.html tells the shopper tax is calculated from their address.
+  // That is only true if every surface that can charge money actually asks
+  // Stripe Tax rather than hardcoding a rate or trusting one from the
+  // browser — the three checks below are what make the claim real rather
+  // than aspirational copy.
+  {
+    const intentJs = read('api/create-payment-intent.js');
+    const orderJs = read('api/create-order.js');
+    const productJs = read('js/product.js');
+
+    ok('create-payment-intent.js prices through the shared tax calculator',
+      /priceOrderWithTax\(/.test(intentJs) && !/priceOrder\(/.test(intentJs.replace(/priceOrderWithTax/g, '')));
+    ok('create-order.js re-derives tax itself rather than trusting a client-sent figure',
+      /priceOrderWithTax\(/.test(orderJs) &&
+      !/body\.tax\b/.test(orderJs) && !/\.tax,?\s*=\s*(?:req|body)/.test(orderJs));
+    ok('the checkout page and the express pay button use the same tax calculator, not a hardcoded rate',
+      !/\*\s*0\.0[0-9]/.test(coJs) && !/\*\s*0\.0[0-9]/.test(productJs));
+    ok('the WooCommerce order carries tax as a fee line, not a WooCommerce tax rate',
+      /fee_lines\.push\(\{ name: 'Sales tax'/.test(orderJs));
+    ok('a finalized order records the tax transaction with Stripe for filing',
+      /tax\/transactions\/create_from_calculation/.test(orderJs));
+  }
+
   // Pricing a cart line off its display name meant a rename invalidated every
   // cart already saved in a browser, and the shopper only found out at the
   // payment step, with no way to act on it. The SKU is the identity that does

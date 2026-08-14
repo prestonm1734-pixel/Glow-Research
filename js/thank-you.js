@@ -97,13 +97,15 @@
     return n + ((i.unitOriginal || i.unitSale) - i.unitSale) * i.qty;
   }, 0);
   var ship = Number(order.shippingCost || 0);
+  var tax = Number(order.tax || 0);
 
   var rows = '';
   rows += '<div><span>Subtotal</span><span>' + money(sub) + '</span></div>';
   if (saved > 0) rows += '<div><span>You saved</span><span>&minus;' + money(saved) + '</span></div>';
   rows += '<div><span>' + esc(order.shippingLabel || 'Shipping') + '</span><span>' +
     (ship === 0 ? 'Free' : money(ship)) + '</span></div>';
-  rows += '<div class="ty-grand"><span>Total</span><span>' + money(sub + ship) + '</span></div>';
+  if (tax > 0) rows += '<div><span>Sales tax</span><span>' + money(tax) + '</span></div>';
+  rows += '<div class="ty-grand"><span>Total</span><span>' + money(sub + ship + tax) + '</span></div>';
   document.getElementById('tyTotals').innerHTML = rows;
 
   /* ---------- address ---------- */

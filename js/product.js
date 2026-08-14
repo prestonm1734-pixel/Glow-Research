@@ -440,11 +440,23 @@
 
   let expressPR = null;
   let expressStripeClient = null;
+  // Carried across every price call for one wallet session so
+  // api/create-payment-intent.js updates the same PaymentIntent in place
+  // rather than minting a new one on every address or shipping-option
+  // change, the identical reasoning js/checkout.js's ensurePaymentIntent()
+  // already follows.
+  let expressPaymentIntentId = null;
+  // Stripe's shippingoptionchange event does not repeat the address, only
+  // shippingaddresschange does — cached here so a shipping-option change can
+  // still reprice tax against the address the sheet is currently showing.
+  let expressLastAddress = null;
 
   // Keeps the wallet sheet's on-screen amount in step with the qty stepper
   // and the mg picker, the same job elements.fetchUpdates() does on the real
   // checkout page. A no-op before the button exists or on a browser where it
-  // never will.
+  // never will. Item price only — tax is address-dependent and handled by
+  // the shippingaddresschange/shippingoptionchange handlers below, which run
+  // inside the sheet where an address actually exists.
   function updateExpressPay() {
     if (!expressPR || !product) return;
     const s = size();
@@ -456,6 +468,51 @@
   function expressError(msg) {
     const el = $('pdExpressMsg');
     if (el) el.textContent = msg || '';
+  }
+
+  // Stripe's PaymentAddress shape (from a paymentRequest event) translated to
+  // the {address1, city, state, zip} shape api/_lib.js's calculateTax()
+  // reads. Apple Pay in particular withholds the street line and city until
+  // after the sheet is authorized, for the shopper's privacy — region and
+  // postal code are what is available before then, and are enough for
+  // Stripe Tax to price against; the full address arrives with the
+  // paymentmethod event and is what actually gets billed and shipped to.
+  function expressTaxAddress(a) {
+    if (!a) return null;
+    return {
+      address1: (a.addressLine && a.addressLine[0]) || '',
+      address2: (a.addressLine && a.addressLine[1]) || '',
+      city: a.city || '',
+      state: a.region || '',
+      zip: a.postalCode || '',
+    };
+  }
+
+  // The one call every step of the wallet flow prices through: same
+  // endpoint, same catalog-derived pricing, same Stripe Tax calculation
+  // js/checkout.js uses. Returns null on any failure rather than throwing,
+  // so a tax-service hiccup mid-sheet degrades to "no tax yet" instead of
+  // breaking the payment sheet open in front of someone.
+  async function expressPriceRemote(shippingId, address, email) {
+    try {
+      const resp = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: [expressItem()],
+          shippingMethodId: shippingId,
+          address,
+          email,
+          paymentIntentId: expressPaymentIntentId,
+        }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error);
+      expressPaymentIntentId = data.paymentIntentId;
+      return data;
+    } catch (err) {
+      return null;
+    }
   }
 
   async function handleExpressPayment(ev) {
@@ -476,18 +533,15 @@
     const email = ev.payerEmail || '';
     const items = [expressItem()];
 
-    let piData;
-    try {
-      const resp = await fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, shippingMethodId: shippingId, email }),
-      });
-      piData = await resp.json();
-      if (!resp.ok) throw new Error(piData.error);
-    } catch (err) {
+    // One more price call with the full address the sheet just handed over
+    // (street and city included, unlike the address-change preview above),
+    // so the amount confirmed below is priced from exactly what is about to
+    // be billed and shipped to — not the partial-address estimate the sheet
+    // was showing a moment earlier.
+    const piData = await expressPriceRemote(shippingId, shipping, email);
+    if (!piData) {
       ev.complete('fail');
-      expressError(err.message || 'Could not start payment.');
+      expressError('Could not start payment.');
       return;
     }
 
@@ -568,6 +622,9 @@
         shipping,
         shippingLabel: shippingRate.label,
         shippingCost: expressShippingCost(shippingId, expressSubtotal()),
+        // api/create-order.js's own figure, re-derived server-side against
+        // Stripe Tax rather than trusted from the sheet's last preview.
+        tax: orderData.tax || 0,
         hasAccount: false,
       }));
     } catch (e) { /* private mode: thank-you.html shows its no-recent-order state */ }
@@ -584,6 +641,7 @@
     if (typeof STRIPE_PUBLISHABLE_KEY === 'undefined' || !STRIPE_PUBLISHABLE_KEY) return;
 
     const stripeClient = Stripe(STRIPE_PUBLISHABLE_KEY);
+    expressStripeClient = stripeClient;
     const s = size();
 
     expressPR = stripeClient.paymentRequest({
@@ -612,28 +670,45 @@
       wrap.hidden = false;
     });
 
-    // Cost depends only on the subtotal already fixed by the qty and mg
-    // selected on this page, not on the address itself, so the same two
-    // options come back every time — a non-US destination is the one thing
-    // actually rejected, since that is genuinely outside what this catalog
-    // ships to.
-    expressPR.on('shippingaddresschange', (ev) => {
+    // Shipping cost depends only on the subtotal already fixed by the qty and
+    // mg selected on this page, so the same two options come back every time
+    // — a non-US destination is the one thing actually rejected, since that
+    // is genuinely outside what this catalog ships to. Tax is the one figure
+    // that does depend on the address, priced through the same
+    // api/create-payment-intent call js/checkout.js uses; a failed or slow
+    // calculation still resolves the sheet at item + shipping, tax added the
+    // moment it is known rather than blocking on it.
+    expressPR.on('shippingaddresschange', async (ev) => {
       if (ev.shippingAddress.country !== 'US') {
         ev.updateWith({ status: 'invalid_shipping_address' });
         return;
       }
-      ev.updateWith({ status: 'success', shippingOptions: expressShippingOptions(expressSubtotal()) });
+      expressLastAddress = expressTaxAddress(ev.shippingAddress);
+      const sub = expressSubtotal();
+      const shippingOptions = expressShippingOptions(sub);
+      const priced = await expressPriceRemote(shippingOptions[0].id, expressLastAddress, '');
+      const sz = size();
+      const fallback = sub + expressShippingCost(shippingOptions[0].id, sub);
+      ev.updateWith({
+        status: 'success',
+        shippingOptions,
+        total: {
+          label: `${product.name} ${sz.mg}${qty > 1 ? ` × ${qty}` : ''}`,
+          amount: Math.round((priced ? priced.total : fallback) * 100),
+        },
+      });
     });
 
-    expressPR.on('shippingoptionchange', (ev) => {
+    expressPR.on('shippingoptionchange', async (ev) => {
       const sub = expressSubtotal();
       const cost = expressShippingCost(ev.shippingOption.id, sub);
+      const priced = await expressPriceRemote(ev.shippingOption.id, expressLastAddress, '');
       const sz = size();
       ev.updateWith({
         status: 'success',
         total: {
           label: `${product.name} ${sz.mg}${qty > 1 ? ` × ${qty}` : ''}`,
-          amount: Math.round((sub + cost) * 100),
+          amount: Math.round((priced ? priced.total : sub + cost) * 100),
         },
       });
     });

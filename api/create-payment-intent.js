@@ -11,7 +11,7 @@
 // rather than leaving that entirely to the backstop.
 
 import { readBody, isEmail, stripe } from './_lib.js';
-import { priceOrder } from './_lib.js';
+import { priceOrderWithTax } from './_lib.js';
 import { PAYMENTS_LIVE } from '../js/products-data.js';
 
 export default async function handler(req, res) {
@@ -29,11 +29,17 @@ export default async function handler(req, res) {
     });
   }
 
-  const { items, shippingMethodId, email, paymentIntentId } = readBody(req);
+  const { items, shippingMethodId, email, address, paymentIntentId } = readBody(req);
 
   let priced;
   try {
-    priced = priceOrder(items, shippingMethodId);
+    // Tax needs a destination, which is not always known yet — called for the
+    // first time the moment there is something to charge, well before a
+    // shipping address exists. priceOrderWithTax() prices that call at $0 tax
+    // rather than failing it; a later call, once the address is on the form,
+    // repriced the same way ensurePaymentIntent() already reprices a shipping
+    // method change.
+    priced = await priceOrderWithTax(items, shippingMethodId, address);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
@@ -51,6 +57,8 @@ export default async function handler(req, res) {
     order_email: isEmail(email) ? email.trim().toLowerCase() : '',
     subtotal: priced.subtotal.toFixed(2),
     shipping: priced.shipping.toFixed(2),
+    tax: priced.tax.toFixed(2),
+    tax_calculation_id: priced.taxCalculationId || '',
     item_count: String(priced.lines.reduce((n, l) => n + l.qty, 0)),
   };
 
@@ -100,6 +108,7 @@ export default async function handler(req, res) {
       clientSecret: intent.client_secret,
       paymentIntentId: intent.id,
       total: priced.total,
+      tax: priced.tax,
     });
   } catch (err) {
     return res.status(502).json({ error: err.message || 'Could not reach the payment processor.' });
