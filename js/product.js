@@ -171,7 +171,7 @@
         $('pdPhoto').hidden = true;
         $('pdVialArt').hidden = false;
       };
-      $('pdPhoto').src = img;
+      $('pdPhoto').src = pageHref(img);
       $('pdPhoto').alt = `${p.name}${s ? ' ' + s.mg : ''} vial`;
       $('pdPhoto').hidden = false;
       $('pdVialArt').hidden = true;
