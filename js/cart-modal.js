@@ -55,8 +55,8 @@
       <span class="qa-row-label">${size.mg}</span>
       <span class="qa-row-price">
         ${out ? '<span class="qa-row-out">Out of stock</span>' : `
-        ${hasList(size) ? `<span class="qa-row-was">${fmtPrice(size.list)}</span>` : ''}
-        <span class="qa-row-now">${fmtPrice(sale)}</span>`}
+        <span class="qa-row-now">${fmtPrice(sale)}</span>
+        ${hasList(size) ? `<span class="qa-row-was">${fmtPrice(size.list)}</span>` : ''}`}
       </span>
       <span class="qa-row-mark" aria-hidden="true">
         <svg class="qa-plus" width="17" height="17" viewBox="0 0 24 24" fill="none">

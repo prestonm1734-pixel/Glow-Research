@@ -43,7 +43,7 @@
         <span class="search-row-copy">
           <span class="search-row-name">${p.name}</span>
           <span class="search-row-meta">${p.tag} &middot; ${hasList(p)
-            ? `<s>${fmtPrice(p.list)}</s> ${fmtPrice(salePrice(p.price))}`
+            ? `${fmtPrice(salePrice(p.price))} <s>${fmtPrice(p.list)}</s>`
             : fmtPrice(salePrice(p.price))}</span>
         </span>
         <svg class="search-row-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">

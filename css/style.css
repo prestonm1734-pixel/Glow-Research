@@ -787,9 +787,9 @@ button[disabled].si-forgot{ cursor: progress; }
    and a size down, so the eye lands on what you actually pay */
 .price-was{
   font-size:0.85rem; font-weight:400; color:#6f6f6c;
-  text-decoration-thickness: 1px; margin-right:7px;
+  text-decoration-thickness: 1px; margin-left:7px;
 }
-.search-row-meta s{ color:#6f6f6c; margin-right:4px; }
+.search-row-meta s{ color:#6f6f6c; margin-left:4px; }
 
 /* white on the card's black footer, flips to the reverse on hover — the same
    invert every button on the site does, plus a lift so the hover has a

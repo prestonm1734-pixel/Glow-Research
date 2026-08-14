@@ -239,7 +239,7 @@ function buildProduct(p, donor) {
   // and the hydrated one cannot diverge if the pricing rules change. The
   // struck figure matches renderPrice() in js/product.js at qty 1.
   const priceHtml = hasList(s)
-    ? `<s class="pd-price-was">${money(Math.max(listPriceOf(s), s.price))}</s>${money(unitPriceAt(s.price, 1))}`
+    ? `${money(unitPriceAt(s.price, 1))}<s class="pd-price-was">${money(Math.max(listPriceOf(s), s.price))}</s>`
     : money(unitPriceAt(s.price, 1));
   const priceRe = /(id="pdPrice"[^>]*>)[\s\S]*?(<\/span>)/;
   required(html, priceRe, 'price placeholder #pdPrice');

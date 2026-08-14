@@ -172,8 +172,8 @@
               <button type="button" data-act="inc" aria-label="Increase quantity">+</button>
             </div>
             <div class="cart-row-price">
-              ${onSale ? `<span class="cart-was">${money(ref * item.qty)}</span>` : ''}
               <span class="cart-now">${money(unit * item.qty)}</span>
+              ${onSale ? `<span class="cart-was">${money(ref * item.qty)}</span>` : ''}
               ${off ? `<span class="cart-off">Save ${off}%</span>` : ''}
             </div>
           </div>

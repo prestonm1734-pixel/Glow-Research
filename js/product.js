@@ -285,7 +285,7 @@
     const total = round2(unit * qty);
 
     $('pdPrice').innerHTML = listTotal > total
-      ? `<s class="pd-price-was">${money(listTotal)}</s>${money(total)}`
+      ? `${money(total)}<s class="pd-price-was">${money(listTotal)}</s>`
       : money(total);
 
     // One vial at list price is the plain case and needs no explaining. Past

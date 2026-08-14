@@ -142,8 +142,8 @@
             <p class="co-item-meta">${i.variant} &middot; Qty ${i.qty}</p>
           </div>
           <div class="co-item-price">
-            ${onSale ? `<span class="co-was">${money(ref(i) * i.qty)}</span>` : ''}
             <span class="co-now">${money(i.unitSale * i.qty)}</span>
+            ${onSale ? `<span class="co-was">${money(ref(i) * i.qty)}</span>` : ''}
           </div>
         </div>`;
     }).join('');
