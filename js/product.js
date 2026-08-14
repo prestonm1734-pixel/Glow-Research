@@ -604,15 +604,12 @@
     });
 
     // Only reveals the row once this exact browser confirms it can actually
-    // show a wallet sheet. The static "also pay with" badges above cover
-    // every other visitor, so they step aside rather than sit duplicated next
-    // to a real button.
+    // show a wallet sheet. Nothing else on the page claims Apple Pay / Google
+    // Pay support, so there is nothing to hide when it can't.
     expressPR.canMakePayment().then(result => {
       if (!result) return;
       btn.mount('#pdExpressBtn');
       wrap.hidden = false;
-      const badges = $('pdPayMethods');
-      if (badges) badges.hidden = true;
     });
 
     // Cost depends only on the subtotal already fixed by the qty and mg
