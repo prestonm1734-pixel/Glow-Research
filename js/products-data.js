@@ -1014,7 +1014,11 @@ function pageHref(file) {
 function productThumb(name) {
   const p = GLOW_PRODUCTS.find(x => x.name === name);
   if (p && p.image) {
-    return `<img class="thumb-photo" src="${pageHref(p.image)}" alt="" loading="lazy" />`;
+    // onerror is inline, not wired up after the fact, because this markup
+    // ships baked into static HTML too: a load that fails should collapse
+    // to the same drawn vial used when a product has no photo at all
+    // (below), not the browser's broken-image icon.
+    return `<img class="thumb-photo" src="${pageHref(p.image)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'vial'}))" />`;
   }
   return '<span class="vial"></span>';
 }
@@ -1043,7 +1047,7 @@ function productCardHtml(p, i) {
               : p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
           </span>
           ${p.image
-            ? `<img class="product-photo" src="${pageHref(p.image)}" alt="${p.name} vial" loading="lazy" />`
+            ? `<img class="product-photo" src="${pageHref(p.image)}" alt="${p.name} vial" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'vial'}))" />`
             : '<div class="vial"></div>'}
         </a>
         <div class="product-footer">

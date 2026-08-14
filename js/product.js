@@ -162,6 +162,15 @@
   function renderPhoto(p, s) {
     const img = (s && s.image) || p.image;
     if (img) {
+      // A path that fails to actually load (a slow CDN edge right after a
+      // deploy, a dropped request) is not the same as having no photo, but
+      // it should end up looking like it: the drawn vial, never the
+      // browser's broken-image icon. Armed before src is set so a load that
+      // fails immediately still catches.
+      $('pdPhoto').onerror = () => {
+        $('pdPhoto').hidden = true;
+        $('pdVialArt').hidden = false;
+      };
       $('pdPhoto').src = img;
       $('pdPhoto').alt = `${p.name}${s ? ' ' + s.mg : ''} vial`;
       $('pdPhoto').hidden = false;
