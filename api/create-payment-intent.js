@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const { items, shippingMethodId, email, address, paymentIntentId, order } = readBody(req);
+  const { items, shippingMethodId, email, address, paymentIntentId, order, promoCode } = readBody(req);
 
   let priced;
   try {
@@ -38,8 +38,10 @@ export default async function handler(req, res) {
     // shipping address exists. priceOrderWithTax() prices that call at $0 tax
     // rather than failing it; a later call, once the address is on the form,
     // repriced the same way ensurePaymentIntent() already reprices a shipping
-    // method change.
-    priced = await priceOrderWithTax(items, shippingMethodId, address);
+    // method change. promoCode is re-validated against Stripe inside
+    // priceOrderWithTax() itself — never trusted as a dollar figure sent from
+    // the browser, only ever as the code string js/checkout.js has applied.
+    priced = await priceOrderWithTax(items, shippingMethodId, address, promoCode);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
@@ -60,6 +62,8 @@ export default async function handler(req, res) {
     tax: priced.tax.toFixed(2),
     tax_calculation_id: priced.taxCalculationId || '',
     item_count: String(priced.lines.reduce((n, l) => n + l.qty, 0)),
+    discount: priced.discount.toFixed(2),
+    promo_code: (priced.promo && priced.promo.code) || '',
   };
 
   // Only present on the final pricing call, right before confirmPayment() —
@@ -78,6 +82,7 @@ export default async function handler(req, res) {
       shippingLabel: (order.shippingMethod && order.shippingMethod.label) || '',
       referral: order.referral || null,
       notes: order.notes || '',
+      promoCode: promoCode || null,
     }));
   }
 
@@ -128,6 +133,8 @@ export default async function handler(req, res) {
       paymentIntentId: intent.id,
       total: priced.total,
       tax: priced.tax,
+      discount: priced.discount,
+      promoCode: (priced.promo && priced.promo.code) || null,
     });
   } catch (err) {
     return res.status(502).json({ error: err.message || 'Could not reach the payment processor.' });

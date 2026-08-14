@@ -35,7 +35,7 @@ export default async function handler(req, res) {
   }
 
   const body = readBody(req);
-  const { customer, shipping, billing, items, shippingMethod, referral, notes, termsAccepted, paymentIntentId } = body;
+  const { customer, shipping, billing, items, shippingMethod, referral, notes, termsAccepted, paymentIntentId, promoCode } = body;
 
   if (!customer || !isEmail(customer.email) || !shipping || !Array.isArray(items) || !items.length) {
     return res.status(400).json({ error: 'Missing required order details.' });
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
   // reprices to the same tax figure both times.
   let priced;
   try {
-    priced = await priceOrderWithTax(items, shippingMethod && shippingMethod.id, shipping);
+    priced = await priceOrderWithTax(items, shippingMethod && shippingMethod.id, shipping, promoCode);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
@@ -108,6 +108,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       orderId: Number(existingOrderId),
       orderNumber: (intent.metadata || {}).woo_order_number || existingOrderId,
+      discount: Number((intent.metadata || {}).discount) || 0,
+      promoCode: (intent.metadata || {}).promo_code || null,
     });
   }
 
@@ -116,6 +118,8 @@ export default async function handler(req, res) {
       paymentIntentId, intent, priced, email, customer, shipping, billing,
       shippingMethod, referral, notes, session: currentSession(req),
     });
+    // priced already carries discount/promo — placeOrder() reads them straight
+    // off priced rather than needing separate params here.
 
     // The status is WooCommerce's own, mapped through the same STATUS_LABELS
     // the account page reads, so the confirmation page states what the store

@@ -149,6 +149,64 @@ export function priceOrder(items, shippingMethodId) {
   return { lines, subtotal, shipping, total: round2(subtotal + shipping), shippingMethodId: rate.id };
 }
 
+/* ============================ promo codes ============================ */
+// Real Stripe Promotion Codes, looked up fresh on every call — never trusted
+// from whatever a client claims a code is worth. A code is validated twice in
+// the ordinary flow: once by api/apply-promo.js for instant feedback in the
+// checkout UI, and again here, inside priceOrderWithTax(), the moment before
+// it actually changes what gets charged. Both paths call this same function
+// so there is exactly one definition of "valid."
+
+// Returns { ok:false, error } or { ok:true, id, code, discount }. discount is
+// already in dollars and already capped at the subtotal — a coupon can never
+// make a line item worth less than zero.
+export async function resolvePromoCode(rawCode, subtotalCents) {
+  const code = (rawCode || '').trim();
+  if (!code) return { ok: false, error: 'Enter a code first.' };
+
+  let list;
+  try {
+    list = await stripeGet(`/promotion_codes?code=${encodeURIComponent(code)}&active=true&limit=1`);
+  } catch (e) {
+    return { ok: false, error: 'Could not check that code right now. Try again in a moment.' };
+  }
+
+  const promo = Array.isArray(list.data) ? list.data[0] : null;
+  if (!promo || !promo.coupon || promo.coupon.valid === false) {
+    return { ok: false, error: 'That code is not valid.' };
+  }
+
+  if (promo.expires_at && promo.expires_at * 1000 < Date.now()) {
+    return { ok: false, error: 'That code has expired.' };
+  }
+  if (typeof promo.max_redemptions === 'number' && promo.times_redeemed >= promo.max_redemptions) {
+    return { ok: false, error: 'That code has already been fully redeemed.' };
+  }
+
+  const restrictions = promo.restrictions || {};
+  if (typeof restrictions.minimum_amount === 'number' && subtotalCents < restrictions.minimum_amount) {
+    return {
+      ok: false,
+      error: `That code needs a subtotal of at least $${(restrictions.minimum_amount / 100).toFixed(2)}.`,
+    };
+  }
+
+  const { percent_off, amount_off } = promo.coupon;
+  let discountCents;
+  if (percent_off > 0) {
+    discountCents = Math.round(subtotalCents * (percent_off / 100));
+  } else if (amount_off > 0) {
+    discountCents = amount_off;
+  } else {
+    return { ok: false, error: 'That code has no discount configured.' };
+  }
+  // Never below zero: a fixed amount_off larger than the cart is capped at
+  // the cart's own value rather than paying someone to take vials away.
+  discountCents = Math.min(discountCents, subtotalCents);
+
+  return { ok: true, id: promo.id, code: promo.code, discount: round2(discountCents / 100) };
+}
+
 /* ============================ sales tax ============================ */
 // Computed through Stripe Tax, not WooCommerce — WooCommerce never sees a
 // tax rate table for this store, only the dollar figure Stripe already
@@ -216,14 +274,45 @@ export async function calculateTax(lines, shippingCents, address) {
 // has, then adds whatever Stripe Tax says the destination owes. Address-less
 // or tax-unreachable calls fall back to zero tax rather than failing the
 // whole price, since a checkout with no address yet is not an error state.
-export async function priceOrderWithTax(items, shippingMethodId, address) {
+//
+// promoCode is optional and, when present, re-validated against Stripe right
+// here — never trusted as a dollar figure from the client, only ever as a
+// string to look up. An invalid code throws rather than silently pricing at
+// full price, so a shopper who typed a code that has since expired is told
+// so at checkout rather than charged more than the page just showed them.
+//
+// The discount is subtracted from the subtotal before tax, and — since
+// Stripe Tax prices per line item, not off one blended total — each line's
+// taxable amount is scaled down by the same ratio the discount represents of
+// the subtotal. Exact for a percent-off coupon; a fixed amount_off is prorated
+// across lines the same way, which is the standard treatment and never lets a
+// single SKU absorb a discount larger than its own price.
+export async function priceOrderWithTax(items, shippingMethodId, address, promoCode) {
   const priced = priceOrder(items, shippingMethodId);
-  const tax = await calculateTax(priced.lines, Math.round(priced.shipping * 100), address);
+
+  let promo = null;
+  let discount = 0;
+  if (promoCode) {
+    const resolved = await resolvePromoCode(promoCode, Math.round(priced.subtotal * 100));
+    if (!resolved.ok) throw new Error(resolved.error);
+    promo = { id: resolved.id, code: resolved.code };
+    discount = resolved.discount;
+  }
+
+  const discountRatio = priced.subtotal > 0 ? discount / priced.subtotal : 0;
+  const taxLines = discountRatio > 0
+    ? priced.lines.map(l => ({ ...l, total: round2(l.total * (1 - discountRatio)) }))
+    : priced.lines;
+
+  const tax = await calculateTax(taxLines, Math.round(priced.shipping * 100), address);
+
   return {
     ...priced,
+    discount,
+    promo,
     tax: tax ? tax.amount : 0,
     taxCalculationId: tax ? tax.id : null,
-    total: round2(priced.total + (tax ? tax.amount : 0)),
+    total: round2(priced.subtotal - discount + priced.shipping + (tax ? tax.amount : 0)),
   };
 }
 

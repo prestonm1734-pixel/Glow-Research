@@ -136,7 +136,7 @@ export default async function handler(req, res) {
 
   let priced;
   try {
-    priced = await priceOrderWithTax(order.items, order.shippingMethodId, order.shipping);
+    priced = await priceOrderWithTax(order.items, order.shippingMethodId, order.shipping, order.promoCode);
   } catch (err) {
     await alertOrphanedPayment(paymentIntentId, order.email, intent.amount_received,
       `Could not reprice the cart to reconstruct the order: ${err.message || 'no reason given'}`);

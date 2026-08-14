@@ -171,7 +171,16 @@
       if (taxAmount > 0) $('coTaxCost').textContent = money(taxAmount);
     }
 
-    $('coTotal').textContent = money(sub + ship + taxAmount);
+    const promoRow = $('coPromoRow');
+    if (promoRow) {
+      promoRow.hidden = promoDiscount <= 0;
+      if (promoDiscount > 0) {
+        $('coPromoRowLabel').textContent = appliedPromoCode ? `Promo code (${appliedPromoCode})` : 'Promo code';
+        $('coPromoRowAmount').textContent = money(promoDiscount);
+      }
+    }
+
+    $('coTotal').textContent = money(sub - promoDiscount + ship + taxAmount);
 
     const saveRow = $('coSaveRow');
     if (saved > 0) {
@@ -257,6 +266,17 @@
   // page before someone has typed one.
   let taxAmount = 0;
 
+  // appliedPromoCode is the code a shopper's "Apply" click validated against
+  // /api/apply-promo — a string, never a dollar amount. promoDiscount is the
+  // dollar figure, and it only ever comes from a server response
+  // (api/apply-promo.js or api/create-payment-intent.js re-validating the
+  // same code against Stripe), the same way taxAmount above is never computed
+  // in the browser. A code that stops pricing clean between "Apply" and
+  // payment is dropped automatically inside ensurePaymentIntent() rather than
+  // being able to block checkout entirely.
+  let appliedPromoCode = null;
+  let promoDiscount = 0;
+
   // Only what Stripe Tax actually needs (state + ZIP). Anything short of
   // that and the server-side calculation returns null, no request wasted.
   function currentTaxAddress() {
@@ -280,6 +300,27 @@
     el.textContent = msg || '';
   }
 
+  // 'applied' disables the promo input and turns the button into Remove, so
+  // pressing it a second time undoes the code rather than re-submitting it.
+  // 'idle' is the ordinary state: an empty, editable box. Used both by the
+  // Apply/Remove click handler and by ensurePaymentIntent() below, which has
+  // to be able to reset this UI on its own when a previously-applied code
+  // stops pricing clean server-side — hence living up here rather than
+  // nested inside the DOMContentLoaded handler with the click listener.
+  function setPromoUI(state) {
+    const input = $('coPromo');
+    const btn = $('coPromoBtn');
+    if (!input || !btn) return;
+    if (state === 'applied') {
+      input.disabled = true;
+      btn.textContent = 'Remove';
+    } else {
+      input.disabled = false;
+      input.value = '';
+      btn.textContent = 'Apply';
+    }
+  }
+
   // orderPayload is only ever passed on the final call, right before
   // confirmPayment() — see the submit handler below. Stripe's own metadata on
   // the intent is what api/stripe-webhook.js reads to create the order if the
@@ -299,24 +340,49 @@
 
     const run = (async () => {
       try {
-        const resp = await fetch('/api/create-payment-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'same-origin',
-          body: JSON.stringify({
-            items,
-            shippingMethodId: shipId,
-            email: $('coEmail') ? $('coEmail').value : '',
-            address: currentTaxAddress(),
-            paymentIntentId,
-            ...(orderPayload ? { order: orderPayload } : {}),
-          }),
-        });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.error || 'Could not prepare payment.');
+        // Two passes at most: one with whatever promo code is currently
+        // applied, and — only if that pass fails specifically because the
+        // code no longer prices clean (expired, redeemed out, since "Apply"
+        // was pressed) — one retry with it dropped. A real failure (network,
+        // tax, anything else) never reaches a second pass; it throws straight
+        // out to the catch below, same as before this existed.
+        let data;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          const resp = await fetch('/api/create-payment-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+              items,
+              shippingMethodId: shipId,
+              email: $('coEmail') ? $('coEmail').value : '',
+              address: currentTaxAddress(),
+              paymentIntentId,
+              ...(appliedPromoCode ? { promoCode: appliedPromoCode } : {}),
+              ...(orderPayload ? { order: orderPayload } : {}),
+            }),
+          });
+          data = await resp.json();
+          if (resp.ok) break;
+
+          if (appliedPromoCode && attempt === 0) {
+            appliedPromoCode = null;
+            promoDiscount = 0;
+            setPromoUI('idle');
+            const msg = $('coPromoMsg');
+            if (msg) {
+              msg.textContent = (data.error || 'That code is no longer valid.') + ' It has been removed so you can continue.';
+              msg.className = 'co-promo-msg is-error';
+            }
+            renderSummary();
+            continue; // retry once, now with no promo code in the request
+          }
+          throw new Error(data.error || 'Could not prepare payment.');
+        }
 
         paymentIntentId = data.paymentIntentId;
         taxAmount = data.tax || 0;
+        promoDiscount = data.discount || 0;
         renderSummary();
 
         if (!elements) {
@@ -444,6 +510,8 @@
         // api/create-order.js's own figure, re-derived server-side against
         // Stripe Tax rather than trusted from whatever this page last showed.
         tax: data.tax || 0,
+        discount: data.discount || 0,
+        promoCode: data.promoCode || null,
         referral: payload.referral,
         accountMessage,
         hasAccount,
@@ -674,10 +742,68 @@
       if (!box.hidden) $('coPromo').focus();
     });
 
-    $('coPromoBtn').addEventListener('click', () => {
-      $('coPromoMsg').textContent = $('coPromo').value.trim()
-        ? 'Promo codes are validated at payment.'
-        : 'Enter a code first.';
+    $('coPromoBtn').addEventListener('click', async () => {
+      const msg = $('coPromoMsg');
+
+      // Second click while a code is applied removes it — the button's own
+      // label already told them this (setPromoUI above), so no confirmation.
+      if (appliedPromoCode) {
+        appliedPromoCode = null;
+        promoDiscount = 0;
+        setPromoUI('idle');
+        msg.textContent = '';
+        msg.className = 'co-promo-msg';
+        renderSummary();
+        if (typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) ensurePaymentIntent();
+        return;
+      }
+
+      const code = $('coPromo').value.trim();
+      if (!code) {
+        msg.textContent = 'Enter a code first.';
+        msg.className = 'co-promo-msg is-error';
+        return;
+      }
+
+      const btn = $('coPromoBtn');
+      btn.disabled = true;
+      msg.textContent = 'Checking…';
+      msg.className = 'co-promo-msg';
+
+      try {
+        const items = window.GlowCart ? window.GlowCart.items() : [];
+        // Validated against the live cart and shipping method so a minimum-
+        // order restriction on the code is checked against what is actually
+        // in the cart right now, not a stale figure. This call never changes
+        // what gets charged — it only reports what the code is worth — the
+        // PaymentIntent itself is only ever updated by ensurePaymentIntent()
+        // below, which re-validates the same code against Stripe again.
+        const resp = await fetch('/api/apply-promo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ code, items, shippingMethodId: shipId }),
+        });
+        const data = await resp.json();
+        if (!resp.ok || !data.valid) {
+          msg.textContent = data.error || 'That code is not valid.';
+          msg.className = 'co-promo-msg is-error';
+          return;
+        }
+
+        appliedPromoCode = data.code;
+        setPromoUI('applied');
+        msg.textContent = `Code applied: ${money(data.discount)} off.`;
+        msg.className = 'co-promo-msg is-ok';
+
+        if (typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) await ensurePaymentIntent();
+        else renderSummary();
+      } catch (e) {
+        msg.textContent = 'Could not check that code right now. Try again.';
+        msg.className = 'co-promo-msg is-error';
+      } finally {
+        btn.disabled = false;
+      }
     });
 
     $('coForm').addEventListener('submit', async e => {
@@ -739,6 +865,7 @@
         items,
         shippingMethod: { id: opt.id, label: opt.label, cost: shippingCost(sub) },
         referral: ref,
+        promoCode: appliedPromoCode,
         termsAccepted: true,
       };
 

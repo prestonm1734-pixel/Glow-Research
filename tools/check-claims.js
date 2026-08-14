@@ -1559,6 +1559,81 @@ console.log('\npayments');
   }
 }
 
+console.log('\npromo codes');
+{
+  const lib = read('api/_lib.js');
+  const applyPromo = read('api/apply-promo.js');
+  const intentFn = read('api/create-payment-intent.js');
+  const order = read('api/create-order.js');
+  const placeOrderJs = read('api/_place-order.js');
+  const coJs = read('js/checkout.js');
+  const coHtml = read('checkout.html');
+
+  // checkout.html used to tell a shopper "Promo codes are validated at
+  // payment" while nothing on the page or the server validated anything —
+  // typing a code did nothing at all. That line is gone now that codes are
+  // real; this guards against it, or anything like it, coming back.
+  ok('no page claims promo codes are validated without code that validates them',
+    !/validated at payment/i.test(coHtml) && !/validated at payment/i.test(coJs));
+
+  // A code is a string to look up, never a dollar figure to trust. Every
+  // caller resolves it against Stripe's own promotion_codes endpoint —
+  // resolvePromoCode() is the one place that happens, so checking its
+  // presence here is checking that no caller invented a shortcut around it.
+  ok('resolvePromoCode() looks the code up against Stripe rather than trusting one',
+    /export async function resolvePromoCode/.test(lib) &&
+    /stripeGet\(`\/promotion_codes\?code=/.test(lib));
+
+  ok('a discount can never exceed the subtotal it is applied to',
+    /discountCents = Math\.min\(discountCents, subtotalCents\)/.test(lib));
+
+  // api/apply-promo.js only ever answers "is this code good, and for how
+  // much" — it must not be the thing that changes what gets charged, or a
+  // shopper could apply a code here and pay full price anyway if
+  // create-payment-intent.js used a different figure.
+  ok('api/apply-promo.js gates on PAYMENTS_LIVE like every other money endpoint',
+    /import\s*\{[^}]*PAYMENTS_LIVE[^}]*\}\s*from\s*'\.\.\/js\/products-data\.js'/.test(applyPromo) &&
+    /if\s*\(!PAYMENTS_LIVE\)/.test(applyPromo));
+  ok('api/apply-promo.js never writes to a PaymentIntent or an order',
+    !/\/payment_intents/.test(applyPromo) && !/\/orders/.test(applyPromo));
+
+  // The actual charge is only ever set by re-resolving the same code against
+  // Stripe a second time, inside priceOrderWithTax() — never by trusting
+  // whatever api/apply-promo.js said a moment earlier, and never by reading a
+  // discount value off the request body.
+  ok('create-payment-intent.js re-validates the code itself rather than trusting a client-sent discount',
+    /priceOrderWithTax\(items, shippingMethodId, address, promoCode\)/.test(intentFn) &&
+    !/body\.discount\b/.test(intentFn) && !/req\.body\.discount\b/.test(intentFn));
+  ok('create-order.js re-validates the code itself rather than trusting a client-sent discount',
+    /priceOrderWithTax\(items, shippingMethod && shippingMethod\.id, shipping, promoCode\)/.test(order) &&
+    !/body\.discount\b/.test(order) && !/req\.body\.discount\b/.test(order));
+
+  // An invalid or expired code must stop the price from being computed at
+  // all, not fall back to full price silently — a shopper who saw a code
+  // apply and then got charged full price with no explanation is a worse
+  // outcome than the checkout page surfacing the error plainly.
+  ok('priceOrderWithTax() throws on an invalid promo code rather than pricing at full price',
+    /if\s*\(!resolved\.ok\)\s*throw new Error\(resolved\.error\)/.test(lib));
+
+  // Mirrors the tax fee line already checked above: a real discount has to
+  // show up as money on the actual WooCommerce order, not just on the
+  // checkout page's own summary.
+  ok('the WooCommerce order carries the discount as a negative fee line',
+    /fee_lines\.push\(\{ name: label, total: \(-priced\.discount\)\.toFixed\(2\) \}\)/.test(placeOrderJs));
+  ok('a captured payment is only ever priced from priced.discount, not a raw request field',
+    /priced\.discount/.test(placeOrderJs) && !/body\.discount/.test(placeOrderJs));
+
+  // js/checkout.js must never compute what a code is worth on its own — every
+  // dollar figure it shows (promoDiscount) has to come back from a server
+  // response, the same discipline taxAmount already keeps for Stripe Tax.
+  ok('js/checkout.js only ever sets its discount from a server response',
+    /promoDiscount = data\.discount \|\| 0/.test(coJs) &&
+    !/promoDiscount\s*=\s*[^d][^;]*\*/.test(coJs));
+
+  ok('checkout.html carries the discount summary row',
+    /id="coPromoRow"/.test(coHtml) && /id="coPromoRowAmount"/.test(coHtml));
+}
+
 console.log('\ncatalog shape');
 {
   const required = ['name', 'tag', 'cat', 'purity', 'sizes', 'blurb', 'about', 'research'];

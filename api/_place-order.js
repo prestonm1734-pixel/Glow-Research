@@ -52,6 +52,15 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
     }
   });
 
+  // A negative fee line, the same mechanism the tax line below uses in
+  // reverse. priced.discount is already re-validated against Stripe by
+  // priceOrderWithTax() (see api/_lib.js) before this function is ever
+  // called, so it is never a number the browser could have made up.
+  if (priced.discount > 0) {
+    const label = priced.promo && priced.promo.code ? `Promo code (${priced.promo.code})` : 'Discount';
+    fee_lines.push({ name: label, total: (-priced.discount).toFixed(2) });
+  }
+
   const shipping_lines = [{
     method_title: (shippingMethod && shippingMethod.label) || 'Shipping',
     method_id: priced.shippingMethodId,
@@ -102,6 +111,7 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
         customer_note: notes || '',
         meta_data: [
           ...(referral ? [{ key: 'referral_code', value: referral }] : []),
+          ...(priced.promo && priced.promo.code ? [{ key: 'promo_code', value: priced.promo.code }] : []),
           { key: 'ruo_terms_accepted', value: 'yes' },
           { key: 'ruo_terms_accepted_at', value: new Date().toISOString() },
           { key: 'stripe_payment_intent_id', value: paymentIntentId },
@@ -145,7 +155,11 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
     // sent. None of the three sends can throw, and none is allowed to fail
     // the order: it exists in WooCommerce by this point, and telling the
     // shopper otherwise would have them place it twice.
-    const order = { number: data.number, email, items: emailItems, shippingMethod: emailShipping, tax: priced.tax, shipping, notes };
+    const order = {
+      number: data.number, email, items: emailItems, shippingMethod: emailShipping,
+      tax: priced.tax, discount: priced.discount, promoCode: (priced.promo && priced.promo.code) || null,
+      shipping, notes,
+    };
     await Promise.all([
       sendEmail({
         to: email,
@@ -164,7 +178,10 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
       sendAdminText(order),
     ]);
 
-    return { orderId: data.id, orderNumber: data.number, status: data.status, tax: priced.tax };
+    return {
+      orderId: data.id, orderNumber: data.number, status: data.status, tax: priced.tax,
+      discount: priced.discount, promoCode: (priced.promo && priced.promo.code) || null,
+    };
   } catch (err) {
     if (!createdOrder) {
       await alertOrphanedPayment(paymentIntentId, email, intent.amount_received,
@@ -246,7 +263,7 @@ async function resolveCustomer(session, email, shipping) {
 
 function orderTotal(o) {
   const sub = o.items.reduce((n, i) => n + i.unitSale * i.qty, 0);
-  return sub + (o.shippingMethod ? o.shippingMethod.cost : 0) + (o.tax || 0);
+  return sub - (o.discount || 0) + (o.shippingMethod ? o.shippingMethod.cost : 0) + (o.tax || 0);
 }
 
 function addressLines(s) {
@@ -262,6 +279,7 @@ function itemsTable(o) {
   const sub = o.items.reduce((n, i) => n + i.unitSale * i.qty, 0);
   const ship = o.shippingMethod ? o.shippingMethod.cost : 0;
   const tax = o.tax || 0;
+  const discount = o.discount || 0;
 
   const line = (label, value, strong) => `
     <tr>
@@ -281,9 +299,10 @@ function itemsTable(o) {
         </tr>`).join('')}
       <tr><td colspan="2" style="padding:6px 0 0;border-top:1px solid #ebebed;"></td></tr>
       ${line('Subtotal', money(sub))}
+      ${discount > 0 ? line(o.promoCode ? `Promo code (${esc(o.promoCode)})` : 'Discount', '&minus;' + money(discount)) : ''}
       ${line(o.shippingMethod ? esc(o.shippingMethod.label) : 'Shipping', ship ? money(ship) : 'Free')}
       ${tax > 0 ? line('Sales tax', money(tax)) : ''}
-      ${line('Total', money(sub + ship + tax), true)}
+      ${line('Total', money(sub - discount + ship + tax), true)}
     </table>`;
 }
 
@@ -318,10 +337,11 @@ function orderText(o) {
   const sub = o.items.reduce((n, i) => n + i.unitSale * i.qty, 0);
   const ship = o.shippingMethod ? o.shippingMethod.cost : 0;
   const tax = o.tax || 0;
+  const discount = o.discount || 0;
   return [
     'Order confirmed.',
     '',
-    `Thank you. We have your order and your payment of ${money(sub + ship + tax)}.`,
+    `Thank you. We have your order and your payment of ${money(sub - discount + ship + tax)}.`,
     `Its number is ${o.number}. Quote that in any reply and we will find it straight away.`,
     '',
     'You will get a second email with tracking the moment your box leaves the',
@@ -330,9 +350,10 @@ function orderText(o) {
     'WHAT YOU ORDERED',
     ...o.items.map(i => `  ${i.name}${i.variant ? ' ' + i.variant : ''}${i.qty > 1 ? ' ×' + i.qty : ''}   ${money(i.unitSale * i.qty)}`),
     `  Subtotal: ${money(sub)}`,
+    ...(discount > 0 ? [`  ${o.promoCode ? `Promo code (${o.promoCode})` : 'Discount'}: -${money(discount)}`] : []),
     `  ${o.shippingMethod ? o.shippingMethod.label : 'Shipping'}: ${ship ? money(ship) : 'Free'}`,
     ...(tax > 0 ? [`  Sales tax: ${money(tax)}`] : []),
-    `  Total: ${money(sub + ship + tax)}`,
+    `  Total: ${money(sub - discount + ship + tax)}`,
     '',
     'SHIPPING TO',
     ...addressLines(o.shipping).map(l => '  ' + l),
@@ -381,6 +402,7 @@ function adminText(o) {
     '',
     'ITEMS',
     ...o.items.map(i => `  ${i.name}${i.variant ? ' ' + i.variant : ''}${i.qty > 1 ? ' ×' + i.qty : ''}   ${money(i.unitSale * i.qty)}`),
+    ...(o.discount > 0 ? [`  ${o.promoCode ? `Promo code (${o.promoCode})` : 'Discount'}: -${money(o.discount)}`] : []),
     `  Total: ${money(orderTotal(o))}`,
     ...(o.notes ? ['', 'NOTE', '  ' + o.notes.replace(/\n/g, '\n  ')] : []),
   ].join('\n');

@@ -244,7 +244,11 @@
     transition: background .15s ease, color .15s ease;
   }
   .co-promo button:hover{ background:#fff; color:#0a0a0a; }
+  .co-promo button:disabled{ opacity:.5; cursor:not-allowed; }
+  .co-promo input:disabled{ background:#f5f5f4; color:#6e6e73; }
   .co-promo-msg{ margin:10px 0 0; font-size:.85rem; color:#6e6e73; }
+  .co-promo-msg.is-error{ color:#b3261e; }
+  .co-promo-msg.is-ok{ color:#1a7f37; }
 
   /* empty cart */
   .co-empty{ text-align:center; padding: 90px 20px 110px; }
@@ -460,6 +464,9 @@
             <div class="co-line"><dt>Subtotal</dt><dd id="coSub">$0.00</dd></div>
             <div class="co-line save" id="coSaveRow" hidden>
               <dt>Savings</dt><dd>&minus;<span id="coSaved">$0.00</span></dd>
+            </div>
+            <div class="co-line save" id="coPromoRow" hidden>
+              <dt id="coPromoRowLabel">Promo code</dt><dd>&minus;<span id="coPromoRowAmount">$0.00</span></dd>
             </div>
             <div class="co-line"><dt>Shipping</dt><dd id="coShipCost">$0.00</dd></div>
             <div class="co-line" id="coTaxRow" hidden><dt>Sales tax</dt><dd id="coTaxCost">$0.00</dd></div>
