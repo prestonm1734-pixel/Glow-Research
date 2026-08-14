@@ -642,7 +642,7 @@ button[disabled].si-forgot{ cursor: progress; }
 
 /* ---------- product grid ---------- */
 .product-grid{
-  display:grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 24px;
+  display:grid; grid-template-columns: repeat(auto-fill, minmax(290px,1fr)); gap: 24px;
 }
 /* squared off with a defined edge so each tile reads as an actual box on the
    page, matching the sharp-cornered language the buttons already use — the
@@ -958,7 +958,7 @@ html:not(.js) .faq-a{ max-height: none; }
      and turns the catalog into a long scroll. Forcing two columns needs
      minmax(0,1fr) rather than 1fr, or a long compound name refuses to
      shrink below its content width and overflows the row. */
-  .product-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+  .product-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
 
   /* everything inside the tile steps down to suit the narrower column */
   .product-footer{ padding: 14px 13px 15px; }
