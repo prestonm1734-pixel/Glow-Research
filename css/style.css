@@ -677,7 +677,7 @@ button[disabled].si-forgot{ cursor: progress; }
   aspect-ratio: 1 / 1; flex-shrink:0;
   display:flex; align-items:center; justify-content:center;
   position:relative; overflow:hidden;
-  background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
+  background: #fff;
 }
 /* Every product shot ships photographed on white, which is already what
    .product-visual fades to — so it drops straight in with no card or border
@@ -1602,7 +1602,7 @@ body.search-locked{ overflow:hidden; }
 .search-row:hover, .search-row:focus-visible{ background:#f7f7f5; }
 .search-thumb{
   width:48px; height:48px; border-radius:0; flex-shrink:0;
-  background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
+  background: #fff;
   border: 1px solid rgba(0,0,0,0.08);
   display:flex; align-items:center; justify-content:center; overflow:hidden;
 }
@@ -1655,7 +1655,7 @@ body.search-locked{ overflow:hidden; }
 }
 .qa-thumb{
   width:52px; height:52px; flex-shrink:0; border-radius:12px;
-  background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
+  background: #fff;
   border:1px solid rgba(0,0,0,0.08);
   display:flex; align-items:center; justify-content:center; overflow:hidden;
 }
@@ -1817,7 +1817,7 @@ body.qa-open .cart-toast{ opacity:0; pointer-events:none; }
 }
 .cart-thumb{
   width:62px; height:62px; flex-shrink:0; border-radius:0;
-  background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
+  background: #fff;
   border:1px solid rgba(0,0,0,0.08);
   display:flex; align-items:center; justify-content:center; overflow:hidden;
 }
