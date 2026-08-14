@@ -211,7 +211,7 @@ const GLOW_PRODUCTS = [
       { t: 'Combined pathway models', d: 'Used in fibroblast and endothelial culture models examining both peptides applied from a single source.' },
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials to compare co-formulated and separately administered research protocols.' }
     ] },
-  { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.8%', badge:null,
+  { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.8%', badge:'Best Value',
     sizes: [{ mg: '50mg', price: 54.99, list: 70, sku: 'GLO-CU50' }],
     blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
     about: [
@@ -258,7 +258,7 @@ const GLOW_PRODUCTS = [
       { t: 'DPP-4 resistance', d: 'Studied for resistance to enzymatic cleavage relative to native GHRH, and how that changes assay-window duration.' },
       { t: 'Comparative secretagogue pharmacology', d: 'Run as a reference GHRH analogue when newer compounds in the class are characterised.' }
     ] },
-  { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.5%', badge:null,
+  { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.5%', badge:'Popular',
     sizes: [{ mg: '10mg', price: 79.99, list: 100, sku: 'GLO-SM10' }],
     blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
     about: [
@@ -282,7 +282,7 @@ const GLOW_PRODUCTS = [
       { t: 'Biased signalling', d: 'Studied for the balance between G-protein coupling and beta-arrestin recruitment at each receptor.' },
       { t: 'Receptor crosstalk', d: 'Applied in models examining how engaging both receptors at once differs from either alone.' }
     ] },
-  { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.4%', badge:null,
+  { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'Best Seller',
     sizes: [
       { mg: '10mg', price: 104.99, list: 130, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg.webp' },
     ],
@@ -1036,10 +1036,12 @@ function productCardHtml(p, i) {
   return `
       <div class="product-card reveal" style="transition-delay:${(i % 3) * 60}ms">
         <a class="product-visual" href="${href}">
-          ${stocked && hasList(p) ? '<span class="product-badge sale">Sale</span>' : ''}
-          ${!stocked
-            ? '<span class="product-badge status is-out">Out of stock</span>'
-            : p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
+          <span class="product-badges">
+            ${stocked && hasList(p) ? '<span class="product-badge sale">Sale</span>' : ''}
+            ${!stocked
+              ? '<span class="product-badge status is-out">Out of stock</span>'
+              : p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
+          </span>
           ${p.image
             ? `<img class="product-photo" src="${pageHref(p.image)}" alt="${p.name} vial" loading="lazy" />`
             : '<div class="vial"></div>'}

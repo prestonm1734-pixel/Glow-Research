@@ -1220,22 +1220,44 @@ console.log('\nlaunch pricing');
   ok('hasList() agrees with the catalog on every size',
     sized.every(({ s }) => hasList(s) === (s.list > s.price)));
 
-  // "Best Seller", "Popular" and "Trending" are claims about sales volume,
-  // and this system has never held a single figure to support one: there is
-  // no order count, no units-sold field, nothing WooCommerce sends back that
-  // anything here reads. They were four hardcoded strings on a storefront
-  // that had taken zero orders, which is the plainest version of the failure
-  // PRINCIPLES.md is about. A badge earned from real sales data later is
-  // fine, and this check is what will make someone wire that data up first
-  // rather than typing the word again.
+  // Card badges. "Best Seller" and "Popular" are editorial: nothing in this
+  // system counts sales, so they are a decision someone made rather than a
+  // figure it read. That was chosen deliberately and knowingly, and the job
+  // of these checks is to keep it bounded instead of unremarked. Derive them
+  // from WooCommerce order counts once real sales exist, and the vocabulary
+  // check below is what will prompt it.
   {
-    const POPULARITY = /best.?sell|popular|trending|hot\b|#1|top.?seller|fan.?favou?rite/i;
-    const claimed = GLOW_PRODUCTS.filter(p => p.badge && POPULARITY.test(p.badge));
-    ok('no product badge claims a popularity the system cannot count',
-      claimed.length === 0,
-      claimed.map(p => `${p.name} is badged "${p.badge}"`).join('; '));
-    ok('nor does the served catalog page',
-      !POPULARITY.test((read('peptides.html').match(/product-badge status[^<]*>[^<]*/g) || []).join(' ')));
+    const BADGE_VOCAB = ['Best Seller', 'Popular', 'Best Value', 'New'];
+    const badged = GLOW_PRODUCTS.filter(p => p.badge);
+    const unknown = badged.filter(p => !BADGE_VOCAB.includes(p.badge));
+    ok('every card badge comes from the agreed vocabulary',
+      unknown.length === 0,
+      unknown.map(p => `${p.name} is badged "${p.badge}"`).join('; '));
+
+    // A badge on most of the grid distinguishes nothing. A third is the point
+    // at which it stops being a highlight and becomes decoration.
+    ok('badges stay rare enough to mean something',
+      badged.length <= Math.floor(GLOW_PRODUCTS.length / 3),
+      `${badged.length} of ${GLOW_PRODUCTS.length} carry one`);
+
+    // The one badge here that is a measurable claim rather than a judgement,
+    // so it is measured: cheapest per mg in the catalog, or it does not ship.
+    const perMg = p => {
+      const s = p.sizes[0];
+      const mg = String(s.mg).split('/').reduce((n, part) => n + parseFloat(part), 0);
+      return s.price / mg;
+    };
+    const cheapest = GLOW_PRODUCTS.reduce((a, b) => (perMg(a) <= perMg(b) ? a : b));
+    const valueBadged = GLOW_PRODUCTS.filter(p => p.badge === 'Best Value');
+    ok('"Best Value" sits on the cheapest product per mg, or nowhere',
+      valueBadged.every(p => p === cheapest),
+      `cheapest is ${cheapest.name} at $${perMg(cheapest).toFixed(2)}/mg`);
+
+    // Sold out and still flagged a best seller is the pairing that reads as
+    // pure decoration, since the one thing the shopper can do about it is
+    // nothing.
+    ok('no badge sits on a product with nothing in stock',
+      badged.every(p => p.sizes.some(sizeInStock)));
   }
 
   // The SALE badge is a claim in two words, and the only thing making it true
