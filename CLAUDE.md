@@ -56,7 +56,13 @@ All three live in `js/products-data.js` and are read by browser and build alike.
   environment variable and must never be checked in. `SHIPPING_RATES` in
   `api/_lib.js` is the server-trusted copy of the `SHIPPING` table in
   `js/checkout.js` — what Stripe actually charges is priced from the former,
-  never the latter, so the two must be changed together.
+  never the latter, so the two must be changed together. `api/create-order.js`
+  is the normal path, run by the browser the instant `confirmPayment()`
+  resolves; `api/stripe-webhook.js` is the server-side backstop for when the
+  browser never makes it back (closed tab, dropped connection). Both create
+  the order through the shared `api/_place-order.js`. The webhook needs its
+  own Vercel environment variable, `STRIPE_WEBHOOK_SECRET`, from the endpoint
+  registered in the Stripe Dashboard for `payment_intent.succeeded`.
 
 Flipping any of the three is a one-line change plus `node tools/build.js`.
 

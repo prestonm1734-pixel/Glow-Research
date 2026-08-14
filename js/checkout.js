@@ -277,7 +277,14 @@
     el.textContent = msg || '';
   }
 
-  async function ensurePaymentIntent() {
+  // orderPayload is only ever passed on the final call, right before
+  // confirmPayment() — see the submit handler below. Stripe's own metadata on
+  // the intent is what api/stripe-webhook.js reads to create the order if the
+  // browser never makes it back after payment (tab closed, connection
+  // dropped, a redirect that does not resolve), so it has to be the complete,
+  // final order: every earlier call in this function (cart change, shipping
+  // toggle, address edit) reprices without it.
+  async function ensurePaymentIntent(orderPayload) {
     const items = window.GlowCart ? window.GlowCart.items() : [];
     if (!items.length) return;
 
@@ -299,6 +306,7 @@
             email: $('coEmail') ? $('coEmail').value : '',
             address: currentTaxAddress(),
             paymentIntentId,
+            ...(orderPayload ? { order: orderPayload } : {}),
           }),
         });
         const data = await resp.json();
@@ -721,6 +729,16 @@
       setPlaceBtn(submitBtn, 'Confirming payment…', true);
       $('coPlacedMsg').textContent = '';
 
+      const payload = {
+        customer: { email: $('coEmail').value },
+        shipping: shipAddr,
+        billing: billAddr,
+        items,
+        shippingMethod: { id: opt.id, label: opt.label, cost: shippingCost(sub) },
+        referral: ref,
+        termsAccepted: true,
+      };
+
       // A shipping toggle or a cart change fires ensurePaymentIntent(), and
       // that request can still be in the air when this button is pressed a
       // moment later. Confirming against a PaymentIntent that has not caught
@@ -737,18 +755,10 @@
       // field now filled in, is what makes the amount about to be confirmed
       // match the address about to be submitted. ensurePaymentIntent() drains
       // any call already in flight before starting its own, so this also
-      // covers the ordinary race the comment above describes.
-      await ensurePaymentIntent();
-
-      const payload = {
-        customer: { email: $('coEmail').value },
-        shipping: shipAddr,
-        billing: billAddr,
-        items,
-        shippingMethod: { id: opt.id, label: opt.label, cost: shippingCost(sub) },
-        referral: ref,
-        termsAccepted: true,
-      };
+      // covers the ordinary race the comment above describes. payload rides
+      // along on this call so it lands in the PaymentIntent's own metadata —
+      // see the comment on ensurePaymentIntent's orderPayload param.
+      await ensurePaymentIntent(payload);
 
       // Stashed before confirmPayment() runs, not after: a redirect-based
       // confirmation (3D Secure) leaves this page entirely and comes back to

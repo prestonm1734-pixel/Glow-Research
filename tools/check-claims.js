@@ -1159,6 +1159,12 @@ console.log('\nbulk pricing');
 console.log('\ncheckout gate');
 {
   const order = read('api/create-order.js');
+  // api/create-order.js verifies the payment and gates PAYMENTS_LIVE;
+  // api/_place-order.js is the shared code it (and api/stripe-webhook.js)
+  // calls to actually create the WooCommerce order and send the emails —
+  // several checks below need both files' content to see the whole picture.
+  const placeOrderJs = read('api/_place-order.js');
+  const orderAll = order + '\n' + placeOrderJs;
   ok('create-order.js imports PAYMENTS_LIVE from the catalog',
     /import\s*\{[^}]*PAYMENTS_LIVE[^}]*\}\s*from\s*'\.\.\/js\/products-data\.js'/.test(order));
   ok('create-order.js refuses to run while PAYMENTS_LIVE is false',
@@ -1186,13 +1192,15 @@ console.log('\ncheckout gate');
   // guards the wording itself so a future re-read of this file does not need
   // to rediscover why the check above exists.
   ok('the confirmation email states a payment was received',
-    /have your order and your payment of/i.test(order),
+    /have your order and your payment of/i.test(orderAll),
     'expected wording so PAYMENTS_LIVE stays the only thing gating it');
 }
 
 console.log('\npayments');
 {
   const order = read('api/create-order.js');
+  const placeOrderJs = read('api/_place-order.js');
+  const orderAll = order + '\n' + placeOrderJs;
   const intentFn = read('api/create-payment-intent.js');
   const lib = read('api/_lib.js');
   const coJs = read('js/checkout.js');
@@ -1222,16 +1230,19 @@ console.log('\npayments');
   // The check above confirms the read happens; this confirms it happens
   // before WooCommerce is touched, the same ordering requirement as the
   // PAYMENTS_LIVE gate itself — a verification that runs after the order
-  // already exists is not a verification.
+  // already exists is not a verification. The WooCommerce write itself lives
+  // in api/_place-order.js now (shared with api/stripe-webhook.js), so the
+  // ordering guarantee create-order.js has to keep is that the verification
+  // runs before it ever calls into that shared function at all.
   {
     const verifyAt = order.indexOf("stripeGet(`/payment_intents/");
-    const firstWcCall = order.search(/\bwc\(/);
+    const placeOrderCallAt = order.search(/\bplaceOrder\(\{/);
     ok('the Stripe verification runs before the WooCommerce order is created',
-      verifyAt !== -1 && firstWcCall !== -1 && verifyAt < firstWcCall);
+      verifyAt !== -1 && placeOrderCallAt !== -1 && verifyAt < placeOrderCallAt);
   }
 
   ok('create-order.js checks the charged amount against a freshly priced total',
-    /priceOrder\(/.test(order) && /amount_received/.test(order));
+    /priceOrder\(/.test(orderAll) && /amount_received/.test(order));
 
   // This is the check that would have caught the bug this whole feature
   // replaced: WooCommerce line totals priced from whatever the browser sent
@@ -1241,11 +1252,13 @@ console.log('\npayments');
   // because the email renderers further down legitimately read `.unitSale`
   // off priced.lines (trusted, catalog-derived) under the same shorthand
   // variable name. Checking the whole file would also trip on this very
-  // comment mentioning the literal it is watching for.
+  // comment mentioning the literal it is watching for. Lives in
+  // api/_place-order.js now, shared by both api/create-order.js and
+  // api/stripe-webhook.js.
   {
-    const start = order.indexOf('const line_items = [];');
-    const end = order.indexOf('const shipping_lines = ', start);
-    const block = (start !== -1 && end !== -1) ? order.slice(start, end) : order;
+    const start = placeOrderJs.indexOf('const line_items = [];');
+    const end = placeOrderJs.indexOf('const shipping_lines = ', start);
+    const block = (start !== -1 && end !== -1) ? placeOrderJs.slice(start, end) : placeOrderJs;
     ok('create-order.js does not price line items from a client-sent unit price',
       start !== -1 && end !== -1 && !/i\.unitSale/.test(block));
   }
@@ -1325,9 +1338,9 @@ console.log('\npayments');
     ok('the checkout page and the express pay button use the same tax calculator, not a hardcoded rate',
       !/\*\s*0\.0[0-9]/.test(coJs) && !/\*\s*0\.0[0-9]/.test(productJs));
     ok('the WooCommerce order carries tax as a fee line, not a WooCommerce tax rate',
-      /fee_lines\.push\(\{ name: 'Sales tax'/.test(orderJs));
+      /fee_lines\.push\(\{ name: 'Sales tax'/.test(placeOrderJs));
     ok('a finalized order records the tax transaction with Stripe for filing',
-      /tax\/transactions\/create_from_calculation/.test(orderJs));
+      /tax\/transactions\/create_from_calculation/.test(placeOrderJs));
   }
 
   // Pricing a cart line off its display name meant a rename invalidated every
@@ -1339,10 +1352,15 @@ console.log('\npayments');
     /sku: item\.sku \|\| skuFor\(/.test(read('js/cart.js')));
 
   // A confirmed payment with no order behind it is the one failure mode the
-  // shopper cannot resolve and the desk would never otherwise see.
+  // shopper cannot resolve and the desk would never otherwise see. The two
+  // call sites this originally checked (an amount mismatch, a WooCommerce
+  // failure) now split across create-order.js and the shared
+  // api/_place-order.js; api/stripe-webhook.js is the backstop that fires if
+  // neither of those ever runs at all, and it has to reach the desk too.
   ok('a captured payment that fails to become an order alerts the desk',
-    /alertOrphanedPayment\(/.test(order) &&
-    (order.match(/await alertOrphanedPayment\(/g) || []).length >= 2);
+    /alertOrphanedPayment\(/.test(orderAll) &&
+    (orderAll.match(/await alertOrphanedPayment\(/g) || []).length >= 2 &&
+    /alertOrphanedPayment\(/.test(read('api/stripe-webhook.js')));
 
   // The confirmation page is the one surface that describes a payment after
   // the fact, and it got this wrong for real: it went on telling shoppers

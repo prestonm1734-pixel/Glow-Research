@@ -227,6 +227,41 @@ export async function priceOrderWithTax(items, shippingMethodId, address) {
   };
 }
 
+/* ==================== order context on the PaymentIntent ==================== */
+// api/create-payment-intent.js writes the shopper's full order (items,
+// shipping address, contact info) into the PaymentIntent's own metadata on
+// the last pricing call before confirmPayment() — see the orderPayload
+// comment in js/checkout.js. api/stripe-webhook.js reads it back out to
+// create the WooCommerce order itself if the browser never returns to do it,
+// which is the entire reason it is stored here rather than only ever living
+// in the checkout page's own request to api/create-order.js.
+//
+// Stripe metadata values cap at 500 characters each, too short for a whole
+// order as one field, so the JSON is split across od0, od1, ... with odn
+// recording how many chunks to read back. 44 chunks (leaving headroom under
+// the 50-key limit for the other metadata fields already in use) is over
+// 20,000 characters — far past what a peptide order's few line items and one
+// address ever reach.
+const ORDER_META_PREFIX = 'od';
+const ORDER_META_CHUNK = 480;
+
+export function encodeOrderMetadata(order) {
+  const json = JSON.stringify(order);
+  const chunks = [];
+  for (let i = 0; i < json.length; i += ORDER_META_CHUNK) chunks.push(json.slice(i, i + ORDER_META_CHUNK));
+  const meta = { [`${ORDER_META_PREFIX}n`]: String(chunks.length) };
+  chunks.forEach((c, i) => { meta[`${ORDER_META_PREFIX}${i}`] = c; });
+  return meta;
+}
+
+export function decodeOrderMetadata(metadata) {
+  const n = Number((metadata || {})[`${ORDER_META_PREFIX}n`] || 0);
+  if (!n) return null;
+  let json = '';
+  for (let i = 0; i < n; i++) json += (metadata || {})[`${ORDER_META_PREFIX}${i}`] || '';
+  try { return JSON.parse(json); } catch (e) { return null; }
+}
+
 /* ============================ WooCommerce ============================ */
 
 export function wcConfig() {

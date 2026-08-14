@@ -10,7 +10,7 @@
 // still mean charging someone the wrong total, so this keeps it current
 // rather than leaving that entirely to the backstop.
 
-import { readBody, isEmail, stripe } from './_lib.js';
+import { readBody, isEmail, stripe, encodeOrderMetadata } from './_lib.js';
 import { priceOrderWithTax } from './_lib.js';
 import { PAYMENTS_LIVE } from '../js/products-data.js';
 
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const { items, shippingMethodId, email, address, paymentIntentId } = readBody(req);
+  const { items, shippingMethodId, email, address, paymentIntentId, order } = readBody(req);
 
   let priced;
   try {
@@ -61,6 +61,25 @@ export default async function handler(req, res) {
     tax_calculation_id: priced.taxCalculationId || '',
     item_count: String(priced.lines.reduce((n, l) => n + l.qty, 0)),
   };
+
+  // Only present on the final pricing call, right before confirmPayment() —
+  // see the orderPayload comment in js/checkout.js. Metadata updates merge
+  // rather than replace, so once these chunks land they survive for
+  // api/stripe-webhook.js to read even though this field is absent from every
+  // earlier call that only repriced the cart or a shipping change.
+  if (order && order.termsAccepted === true && order.shipping && order.customer) {
+    Object.assign(metadata, encodeOrderMetadata({
+      email: isEmail(order.customer.email) ? order.customer.email.trim().toLowerCase() : '',
+      phone: order.customer.phone || '',
+      shipping: order.shipping,
+      billing: order.billing || null,
+      items: (items || []).map(i => ({ sku: i.sku, name: i.name, variant: i.variant, qty: i.qty })),
+      shippingMethodId,
+      shippingLabel: (order.shippingMethod && order.shippingMethod.label) || '',
+      referral: order.referral || null,
+      notes: order.notes || '',
+    }));
+  }
 
   try {
     let intent;
