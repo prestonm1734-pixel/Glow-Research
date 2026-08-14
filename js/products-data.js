@@ -199,11 +199,11 @@ const GLOW_PRODUCTS = [
     ] },
   { name: 'BPC-157/TB-500', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
     sizes: [
-      { mg: '20mg', price: 125, sku: 'GLO-BB20', image: 'assets/products/bpc-157-tb-500-blend-10mg.webp' },
+      { mg: '10mg', price: 85, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg.webp' },
     ],
     blurb: 'A combined BPC-157 and TB-500 formulation. Supplied for research using both peptides together in one vial.',
     about: [
-      'This blend combines BPC-157 and TB-500 in a single vial, 10/10 mg of each for 20mg total, formulated for laboratories that already run both peptides together rather than reconstituting them separately.',
+      'This blend combines BPC-157 and TB-500 in a single vial, 5/5 mg of each for 10mg total, formulated for laboratories that already run both peptides together rather than reconstituting them separately.',
       'BPC-157 and TB-500 act through different mechanisms, angiogenic signalling and actin-binding cytoskeletal dynamics respectively, so the blend is a co-formulation, not a new compound with its own mechanism.'
     ],
     research: [
