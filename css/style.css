@@ -644,6 +644,13 @@ button[disabled].si-forgot{ cursor: progress; }
 .product-grid{
   display:grid; grid-template-columns: repeat(auto-fill, minmax(310px,1fr)); gap: 24px;
 }
+/* Four across on the full desktop nav width. auto-fill only reaches 3 at
+   this container width with a 310px floor, so pin it explicitly rather than
+   shrinking the floor sitewide (which would also shrink the 2-column tablet
+   range below, where 3-per-row auto-fill still reads better). */
+@media (min-width: 981px){
+  .product-grid{ grid-template-columns: repeat(4, minmax(0,1fr)); }
+}
 /* squared off with a defined edge so each tile reads as an actual box on the
    page, matching the sharp-cornered language the buttons already use — the
    12px radius was rounding them into soft blobs */
