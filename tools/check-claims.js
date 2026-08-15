@@ -423,8 +423,15 @@ console.log('\nthe batch analysis panel');
   ok('the bar\'s wallet button is revealed by the same canMakePayment result',
     /canMakePayment\(\)\.then\(result => \{[\s\S]{0,400}?mountStickyExpress\(stripeClient\);/.test(pj),
     'the sticky wallet must mount inside the canMakePayment() success branch');
-  ok('the page reserves the height the wallet row actually takes',
-    /pd-wallet-on/.test(pj) && /body\.pd-wallet-on/.test(pd));
+  // Both controls keep their tap target at every width; the readout beside
+  // them is what gives way. A wallet button squeezed to whatever is left over
+  // is the one control on this page that must not be fiddly to hit.
+  ok('the bar sheds its readout before either button',
+    /pd-wallet-on/.test(pj) &&
+    /body\.pd-wallet-on \.pd-sticky-name\{ display:none/.test(pd) &&
+    /body\.pd-wallet-on \.pd-sticky-id\{ display:none/.test(pd) &&
+    !/\.pd-sticky-add\{ display:none/.test(pd) &&
+    !/\.pd-sticky-express\{ display:none/.test(pd));
 
   // A lot number is the one thing a reader can check against the vial in their
   // hand, which makes an invented one the worst thing this page could print.

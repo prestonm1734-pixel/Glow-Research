@@ -587,41 +587,62 @@
     .pd-page .pd-sticky{ transition: transform .18s ease, visibility 0s .18s !important; }
     .pd-page .pd-sticky.is-shown{ transition: transform .18s ease !important; }
 
-    .pd-sticky-in{ display:flex; align-items:center; gap:14px; }
+    .pd-sticky-in{ display:flex; align-items:center; gap:10px; }
+    /* The only part that gives: both buttons keep their full tap target and
+       the name truncates into whatever is left. */
     .pd-sticky-id{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1 1 auto; }
     .pd-sticky-name{
-      font-size:.9rem; font-weight:700; color:#0a0a0a; letter-spacing:-.01em;
+      font-size:.85rem; font-weight:700; color:#0a0a0a; letter-spacing:-.01em;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .pd-sticky-sub{
-      font-family:'JetBrains Mono', monospace; font-size:.7rem; color:#6f6f6a;
+      font-family:'JetBrains Mono', monospace; font-size:.68rem; color:#6f6f6a;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    .pd-sticky-add{ flex:0 0 auto; padding: 13px 22px; }
+    .pd-sticky-add{ flex:0 0 auto; padding: 12px 15px; font-size:.83rem; }
 
-    /* Its own row rather than a third item beside the name and Add to cart:
-       at 390px those two already use the width, and a wallet button squeezed
-       to whatever is left is the one control on the page that must not be
-       fiddly to hit. */
-    .pd-sticky-express{ margin-top: 9px; }
+    /* Beside Add to cart, not under it. A fixed basis rather than a share of
+       the row: Stripe draws the wallet mark to fit whatever width it is given,
+       and below about 100px Apple Pay's own mark starts to crowd its edges. */
+    .pd-sticky-express{ flex:0 0 108px; }
     .pd-sticky-express[hidden]{ display:none; }
+
+    /* Three things in one row stop fitting before the phones do. Both buttons
+       hold their size all the way down and the readout gives way instead,
+       cheapest part first: the name goes before the price, because you are
+       already on that product's page and the price is the part being decided
+       on. Only applies with the wallet in the row: without it there is room
+       for everything. */
+    body.pd-wallet-on .pd-sticky-add{ padding: 12px 12px; }
+    @media (max-width: 374px){
+      body.pd-wallet-on .pd-sticky-name{ display:none; }
+      /* Darker and heavier rather than larger: it is the only line left, and
+         growing it is what pushed "5/5mg · $104.99", the longest this line
+         gets, back out of the width the row can spare. */
+      body.pd-wallet-on .pd-sticky-sub{ color:#0a0a0a; font-weight:600; }
+      body.pd-wallet-on .pd-sticky-add{ padding: 12px 10px; }
+    }
+    /* Narrower than any current iPhone, and past the point where a truncated
+       price is worse than none: the row becomes the two controls it exists for. */
+    @media (max-width: 339px){
+      body.pd-wallet-on .pd-sticky-id{ display:none; }
+      body.pd-wallet-on .pd-sticky-add{ flex:1 1 auto; }
+      body.pd-wallet-on .pd-sticky-express{ flex:1 1 auto; }
+    }
 
     /* The bar is fixed over the end of the document, so the page needs room to
        scroll clear of it. Reserved for the whole page rather than toggled with
        the bar: changing the document height every time it appears would move
        the content under the reader's thumb mid-scroll. The footer sits outside
        #pdShell, so this goes on the body. */
+    /* One row whether or not the wallet is in it, so the reservation is one
+       number rather than two. */
     body{ padding-bottom: 74px; }
-    /* The wallet row makes the bar about 53px taller, and it only exists on a
-       browser that actually has a wallet, so the reservation follows it rather
-       than being held on every phone. */
-    body.pd-wallet-on{ padding-bottom: 128px; }
     /* The toast is anchored to the bottom of the viewport too. Without this it
        lands underneath the bar that triggered it, which is the one moment it
        has to be readable. Follows the bar rather than sitting high all the
        time, so a toast from the real buy box still appears where it always has. */
     body.pd-sticky-shown .cart-toast{ bottom: calc(92px + env(safe-area-inset-bottom)); }
-    body.pd-sticky-shown.pd-wallet-on .cart-toast{ bottom: calc(146px + env(safe-area-inset-bottom)); }
   }
 
   /* ---------- no motion ----------
@@ -1040,14 +1061,14 @@
         <span class="pd-sticky-sub" id="pdStickySub"></span>
       </span>
       <button type="button" class="btn btn-primary pd-sticky-add" id="pdStickyAdd">Add to cart</button>
-    </div>
-    <!-- The same wallet sheet as the express block up in the buy box, driven by
-         the same Stripe paymentRequest object, so the two buttons are one
-         payment flow with two mount points rather than two flows. Revealed on
-         the same canMakePayment() result that reveals the other one, so it is
-         absent on every browser without a wallet configured. -->
-    <div class="pd-sticky-express" id="pdStickyExpress" hidden>
-      <div id="pdStickyExpressBtn"></div>
+      <!-- The same wallet sheet as the express block up in the buy box, driven
+           by the same Stripe paymentRequest object, so the two buttons are one
+           payment flow with two mount points rather than two flows. Revealed on
+           the same canMakePayment() result that reveals the other one, so it is
+           absent on every browser without a wallet configured. -->
+      <div class="pd-sticky-express" id="pdStickyExpress" hidden>
+        <div id="pdStickyExpressBtn"></div>
+      </div>
     </div>
   </div>
 

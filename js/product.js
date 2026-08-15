@@ -545,8 +545,9 @@
       });
       btn.mount('#pdStickyExpressBtn');
       wrap.hidden = false;
-      // The bar is taller with this row in it, so the page reserves the space
-      // it actually occupies rather than the height it would have without.
+      // Three things share the row once this mounts, so the readout beside the
+      // buttons has to start giving way earlier than it otherwise would. The
+      // class is what the narrow-screen rules in product.html key off.
       document.body.classList.add('pd-wallet-on');
     } catch (e) {
       wrap.hidden = true;   // Add to cart in the bar still works
