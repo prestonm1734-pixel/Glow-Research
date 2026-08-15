@@ -587,7 +587,12 @@
     .pd-page .pd-sticky{ transition: transform .18s ease, visibility 0s .18s !important; }
     .pd-page .pd-sticky.is-shown{ transition: transform .18s ease !important; }
 
-    .pd-sticky-in{ display:flex; align-items:center; gap:10px; }
+    /* min-width:0 on the row itself as well as the readout. A flex item's
+       default min-width is auto, which lets a child that will not shrink push
+       the row wider than the screen instead of being contained by it, and the
+       wallet button is exactly such a child: Safari draws it at whatever width
+       its own label needs. */
+    .pd-sticky-in{ display:flex; align-items:center; gap:10px; min-width:0; }
     /* The only part that gives: both buttons keep their full tap target and
        the name truncates into whatever is left. */
     .pd-sticky-id{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1 1 auto; }
@@ -601,33 +606,26 @@
     }
     .pd-sticky-add{ flex:0 0 auto; padding: 12px 15px; font-size:.83rem; }
 
-    /* Beside Add to cart, not under it. A fixed basis rather than a share of
-       the row: Stripe draws the wallet mark to fit whatever width it is given,
-       and below about 100px Apple Pay's own mark starts to crowd its edges. */
-    .pd-sticky-express{ flex:0 0 108px; }
+    /* Beside Add to cart, not under it. Apple's own minimum for the compact
+       mark is 100pt, so that is the floor, and the overflow guards below are
+       what keep the button inside the screen rather than trusting Stripe's
+       iframe to shrink: it does not. */
+    .pd-sticky-express{ flex:0 0 118px; min-width:0; overflow:hidden; }
+    .pd-sticky-express > div{ max-width:100%; }
     .pd-sticky-express[hidden]{ display:none; }
 
-    /* Three things in one row stop fitting before the phones do. Both buttons
-       hold their size all the way down and the readout gives way instead,
-       cheapest part first: the name goes before the price, because you are
-       already on that product's page and the price is the part being decided
-       on. Only applies with the wallet in the row: without it there is room
-       for everything. */
-    body.pd-wallet-on .pd-sticky-add{ padding: 12px 12px; }
-    @media (max-width: 374px){
+    /* Three things in one row, so the readout gives way rather than either
+       button: both keep their full tap target at every width. Only below
+       340px, narrower than any current iPhone, and the name goes before the
+       price, because you are already on that product's page and the price is
+       the part being decided on. */
+    @media (max-width: 339px){
       body.pd-wallet-on .pd-sticky-name{ display:none; }
       /* Darker and heavier rather than larger: it is the only line left, and
-         growing it is what pushed "5/5mg · $104.99", the longest this line
+         growing it is what pushes "5/5mg · $104.99", the longest this line
          gets, back out of the width the row can spare. */
       body.pd-wallet-on .pd-sticky-sub{ color:#0a0a0a; font-weight:600; }
-      body.pd-wallet-on .pd-sticky-add{ padding: 12px 10px; }
-    }
-    /* Narrower than any current iPhone, and past the point where a truncated
-       price is worse than none: the row becomes the two controls it exists for. */
-    @media (max-width: 339px){
-      body.pd-wallet-on .pd-sticky-id{ display:none; }
-      body.pd-wallet-on .pd-sticky-add{ flex:1 1 auto; }
-      body.pd-wallet-on .pd-sticky-express{ flex:1 1 auto; }
+      body.pd-wallet-on .pd-sticky-add{ padding: 12px 11px; }
     }
 
     /* The bar is fixed over the end of the document, so the page needs room to

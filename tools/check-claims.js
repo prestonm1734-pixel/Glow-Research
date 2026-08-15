@@ -409,9 +409,16 @@ console.log('\nthe batch analysis panel');
     /const sticky = \$\('pdStickyAdd'\)/.test(pj) &&
     /sticky\.addEventListener\('click', \(\) => \{\s*addCurrent\(\);/.test(pj));
   // Out of stock has to reach both buttons from the same test, or the bar
-  // stays sellable on a size the buy box has already closed.
+  // stays sellable on a size the buy box has already closed. Checked as "one
+  // renderStock() disables both" rather than against an exact expression, so
+  // the loop can be rewritten without the guarantee quietly lapsing.
+  const stockFn = pj.match(/function renderStock\(\)\s*\{[\s\S]*?\n  \}/);
   ok('stock closes the bar and the buy box together',
-    /\[\$\('pdAddBtn'\), \$\('pdStickyAdd'\)\]/.test(pj));
+    stockFn !== null &&
+    /sizeInStock\(size\(\)\)/.test(stockFn[0]) &&
+    /pdAddBtn/.test(stockFn[0]) && /pdStickyAdd/.test(stockFn[0]) &&
+    (stockFn[0].match(/\.disabled = /g) || []).length === 1,
+    'renderStock() must disable both buttons off the one sizeInStock() test');
 
   // The wallet appears twice on a phone, in the buy box and in the sticky bar,
   // and both must be mount points on one paymentRequest. A second one would be
@@ -429,9 +436,17 @@ console.log('\nthe batch analysis panel');
   ok('the bar sheds its readout before either button',
     /pd-wallet-on/.test(pj) &&
     /body\.pd-wallet-on \.pd-sticky-name\{ display:none/.test(pd) &&
-    /body\.pd-wallet-on \.pd-sticky-id\{ display:none/.test(pd) &&
     !/\.pd-sticky-add\{ display:none/.test(pd) &&
     !/\.pd-sticky-express\{ display:none/.test(pd));
+
+  // Safari draws "Buy with  Pay" at the width that sentence needs and lets
+  // the overflow run off the side of the screen rather than shrinking it, so
+  // the bar's button asks for the compact mark and the row is built so that
+  // an item refusing to shrink still cannot widen it past the viewport.
+  ok('the bar asks for the compact wallet mark, and cannot be widened past the screen',
+    /paymentRequestButton: \{ type: 'default'/.test(pj) &&
+    /\.pd-sticky-in\{[^}]*min-width:0/.test(pd) &&
+    /\.pd-sticky-express\{[^}]*overflow:hidden/.test(pd));
 
   // A lot number is the one thing a reader can check against the vial in their
   // hand, which makes an invented one the worst thing this page could print.

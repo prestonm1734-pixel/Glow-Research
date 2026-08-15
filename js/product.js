@@ -338,11 +338,16 @@
   // one it stands in for is not.
   function renderStock() {
     const ok = sizeInStock(size());
-    [$('pdAddBtn'), $('pdStickyAdd')].forEach(btn => {
-      if (!btn) return;
-      btn.disabled = !ok;
-      btn.textContent = ok ? 'Add to cart' : 'Out of stock';
-    });
+    // "Add" in the bar once the wallet is beside it: three controls in one row
+    // on a 375px screen, and the two words this drops are the ones the cart
+    // icon in the header already says. The buy box keeps the full label.
+    const short = document.body.classList.contains('pd-wallet-on');
+    [[$('pdAddBtn'), 'Add to cart'], [$('pdStickyAdd'), short ? 'Add' : 'Add to cart']]
+      .forEach(([btn, label]) => {
+        if (!btn) return;
+        btn.disabled = !ok;
+        btn.textContent = ok ? label : 'Out of stock';
+      });
     if (refreshDelivery) refreshDelivery();
   }
 
@@ -541,14 +546,21 @@
     try {
       const btn = stripeClient.elements().create('paymentRequestButton', {
         paymentRequest: expressPR,
-        style: { paymentRequestButton: { type: 'buy', theme: 'dark', height: '44px' } },
+        // 'default' draws the compact mark, where the buy box uses 'buy' and
+        // gets "Buy with  Pay". The long form does not shrink to its
+        // container: Safari draws it at the width that sentence needs and lets
+        // the rest run off the side of the screen, which is exactly what it did
+        // here. In a row this narrow the mark is the only form that fits.
+        style: { paymentRequestButton: { type: 'default', theme: 'dark', height: '44px' } },
       });
       btn.mount('#pdStickyExpressBtn');
       wrap.hidden = false;
       // Three things share the row once this mounts, so the readout beside the
-      // buttons has to start giving way earlier than it otherwise would. The
-      // class is what the narrow-screen rules in product.html key off.
+      // buttons has to start giving way earlier than it otherwise would, and
+      // Add to cart drops to "Add". The class is what the rules in
+      // product.html key off; renderStock() owns the label.
       document.body.classList.add('pd-wallet-on');
+      renderStock();
     } catch (e) {
       wrap.hidden = true;   // Add to cart in the bar still works
     }
