@@ -183,6 +183,50 @@ const COA_COPY = COAS_PUBLISHED ? {
 // a single `sizes[]` row matching the one size the launch list states; add a
 // second size only once the supplier confirms a SKU for it.
 const GLOW_PRODUCTS = [
+  // Order is curated, not alphabetical or by add date: it drives both the
+  // homepage's limit:8 preview slice and the catalog's default "Featured"
+  // sort, so it is the actual answer to "what does a visitor see first."
+  // Ranked by the badge each product already carries (Best Seller, then
+  // Popular, then Best Value), which is the one popularity signal already in
+  // the data rather than a second, separate ranking to keep in sync with it.
+  { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'Best Seller',
+    sizes: [
+      { mg: '10mg', price: 104.99, list: 130, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg-v3.webp' },
+    ],
+    blurb: 'A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile.',
+    about: [
+      'GLP-3 (RT) is Glow’s designation for retatrutide, a synthetic peptide agonist active at three receptors from one molecule: the GIP receptor, the GLP-1 receptor and the glucagon receptor.',
+      'Engaging the glucagon receptor alongside the two incretin receptors is what separates it from earlier co-agonists, and is why it is studied as a distinct pharmacological class rather than a variant of existing GLP-1 or GIP agonists.'
+    ],
+    research: [
+      { t: 'Triple receptor pharmacology', d: 'Used to characterise relative potency and selectivity across the GIP, GLP-1 and glucagon receptors from a single molecule.' },
+      { t: 'Glucagon receptor signalling', d: 'Studied in hepatocyte and cAMP assays for activity at the glucagon receptor, a target the two-receptor co-agonists do not engage.' },
+      { t: 'Comparative incretin pharmacology', d: 'Applied as a comparator when characterising newer multi-receptor agonists against single- and dual-receptor peptides.' }
+    ] },
+  { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.5%', badge:'Popular',
+    sizes: [{ mg: '10mg', price: 79.99, list: 100, sku: 'GLO-SM10', image: 'assets/products/glp-1-sm-10mg-v3.webp' }],
+    blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
+    about: [
+      'GLP-1 (SM) is Glow’s designation for semaglutide, a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
+      'Those two modifications are why it behaves so differently from native GLP-1 across a time course, and usually why it is the chosen comparator.'
+    ],
+    research: [
+      { t: 'Incretin receptor signalling', d: 'Used in cAMP accumulation and beta-arrestin recruitment assays at the GLP-1 receptor.' },
+      { t: 'Albumin binding', d: 'Studied for how the fatty acid chain alters distribution and persistence in model systems.' },
+      { t: 'Metabolic pathway research', d: 'Applied in islet and hepatocyte culture models examining downstream incretin signalling.' }
+    ] },
+  { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.8%', badge:'Best Value',
+    sizes: [{ mg: '50mg', price: 54.99, list: 70, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
+    blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
+    about: [
+      'GHK-Cu is the tripeptide glycyl-L-histidyl-L-lysine complexed with copper(II). The tripeptide occurs naturally in plasma and binds copper with high affinity, and it is the complex rather than the bare peptide that most research uses.',
+      'It ships as the copper complex, which is blue. That colour is a useful handling cue: it tells you the copper is still coordinated.'
+    ],
+    research: [
+      { t: 'Extracellular matrix remodelling', d: 'Studied in fibroblast culture for effects on collagen and proteoglycan gene expression.' },
+      { t: 'Copper transport', d: 'Used as a model for how small peptides carry and deliver copper ions between compartments.' },
+      { t: 'Antioxidant enzyme activity', d: 'Examined for interaction with copper-dependent enzyme systems.' }
+    ] },
   { name: 'BPC-157', tag: null, cat: 'tissue', purity: '99.8%', badge:null,
     sizes: [
       { mg: '10mg', price: 64.99, list: 80, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg-v3.webp' },
@@ -210,18 +254,6 @@ const GLOW_PRODUCTS = [
       { t: 'Co-formulation stability', d: 'Studied for how the two peptides behave when reconstituted and stored together versus from separate vials.' },
       { t: 'Combined pathway models', d: 'Used in fibroblast and endothelial culture models examining both peptides applied from a single source.' },
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials to compare co-formulated and separately administered research protocols.' }
-    ] },
-  { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.8%', badge:'Best Value',
-    sizes: [{ mg: '50mg', price: 54.99, list: 70, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
-    blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
-    about: [
-      'GHK-Cu is the tripeptide glycyl-L-histidyl-L-lysine complexed with copper(II). The tripeptide occurs naturally in plasma and binds copper with high affinity, and it is the complex rather than the bare peptide that most research uses.',
-      'It ships as the copper complex, which is blue. That colour is a useful handling cue: it tells you the copper is still coordinated.'
-    ],
-    research: [
-      { t: 'Extracellular matrix remodelling', d: 'Studied in fibroblast culture for effects on collagen and proteoglycan gene expression.' },
-      { t: 'Copper transport', d: 'Used as a model for how small peptides carry and deliver copper ions between compartments.' },
-      { t: 'Antioxidant enzyme activity', d: 'Examined for interaction with copper-dependent enzyme systems.' }
     ] },
   { name: 'GLOW', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
     sizes: [{ mg: '70mg', price: 124.99, list: 155, sku: 'GLO-BBG70', image: 'assets/products/glow-70mg-v3.webp' }],
@@ -258,18 +290,6 @@ const GLOW_PRODUCTS = [
       { t: 'DPP-4 resistance', d: 'Studied for resistance to enzymatic cleavage relative to native GHRH, and how that changes assay-window duration.' },
       { t: 'Comparative secretagogue pharmacology', d: 'Run as a reference GHRH analogue when newer compounds in the class are characterised.' }
     ] },
-  { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.5%', badge:'Popular',
-    sizes: [{ mg: '10mg', price: 79.99, list: 100, sku: 'GLO-SM10', image: 'assets/products/glp-1-sm-10mg-v3.webp' }],
-    blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
-    about: [
-      'GLP-1 (SM) is Glow’s designation for semaglutide, a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
-      'Those two modifications are why it behaves so differently from native GLP-1 across a time course, and usually why it is the chosen comparator.'
-    ],
-    research: [
-      { t: 'Incretin receptor signalling', d: 'Used in cAMP accumulation and beta-arrestin recruitment assays at the GLP-1 receptor.' },
-      { t: 'Albumin binding', d: 'Studied for how the fatty acid chain alters distribution and persistence in model systems.' },
-      { t: 'Metabolic pathway research', d: 'Applied in islet and hepatocyte culture models examining downstream incretin signalling.' }
-    ] },
   { name: 'GLP-2 (TR)', tag: null, cat: 'metabolic', purity: '99.4%', badge:null,
     sizes: [{ mg: '10mg', price: 89.99, list: 110, sku: 'GLO-T10', image: 'assets/products/glp-2-tr-10mg-v3.webp' }],
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
@@ -281,20 +301,6 @@ const GLOW_PRODUCTS = [
       { t: 'Co-agonist pharmacology', d: 'Used to characterise relative potency at the GIP and GLP-1 receptors from one molecule.' },
       { t: 'Biased signalling', d: 'Studied for the balance between G-protein coupling and beta-arrestin recruitment at each receptor.' },
       { t: 'Receptor crosstalk', d: 'Applied in models examining how engaging both receptors at once differs from either alone.' }
-    ] },
-  { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'Best Seller',
-    sizes: [
-      { mg: '10mg', price: 104.99, list: 130, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg-v3.webp' },
-    ],
-    blurb: 'A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile.',
-    about: [
-      'GLP-3 (RT) is Glow’s designation for retatrutide, a synthetic peptide agonist active at three receptors from one molecule: the GIP receptor, the GLP-1 receptor and the glucagon receptor.',
-      'Engaging the glucagon receptor alongside the two incretin receptors is what separates it from earlier co-agonists, and is why it is studied as a distinct pharmacological class rather than a variant of existing GLP-1 or GIP agonists.'
-    ],
-    research: [
-      { t: 'Triple receptor pharmacology', d: 'Used to characterise relative potency and selectivity across the GIP, GLP-1 and glucagon receptors from a single molecule.' },
-      { t: 'Glucagon receptor signalling', d: 'Studied in hepatocyte and cAMP assays for activity at the glucagon receptor, a target the two-receptor co-agonists do not engage.' },
-      { t: 'Comparative incretin pharmacology', d: 'Applied as a comparator when characterising newer multi-receptor agonists against single- and dual-receptor peptides.' }
     ] },
   { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.1%', badge:null,
     sizes: [{ mg: '10mg', price: 74.99, list: 95, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg-v3.webp' }],
