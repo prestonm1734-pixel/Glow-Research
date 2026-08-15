@@ -363,8 +363,11 @@
     const name = $('pdStickyName');
     const sub = $('pdStickySub');
     if (!name || !sub) return;
-    name.textContent = product.name;
-    sub.textContent = `${size().mg} · ${money(total)}`;
+    // Identity on the quiet line, the number on the loud one. The name and mg
+    // ride together because either alone is ambiguous next to a price, and the
+    // price stands by itself because it is the only part that moves.
+    name.textContent = `${product.name} · ${size().mg}`;
+    sub.textContent = money(total);
   }
 
   // Shows the bar only once every real buy control is out of view. Both are

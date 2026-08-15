@@ -597,14 +597,27 @@
        the name truncates into whatever is left. */
     .pd-sticky-id{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1 1 auto; }
     .pd-sticky-name{
-      font-size:.85rem; font-weight:700; color:#0a0a0a; letter-spacing:-.01em;
+      font-size:.8rem; font-weight:600; color:#6f6f6a; letter-spacing:-.005em;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
+    /* The price leads, not the name. You are already on this product's page,
+       so the name is the label on the number rather than the other way round,
+       and the number is what the two buttons beside it are acting on. */
     .pd-sticky-sub{
-      font-family:'JetBrains Mono', monospace; font-size:.68rem; color:#6f6f6a;
+      font-size:.98rem; font-weight:700; color:#0a0a0a; letter-spacing:-.02em;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    .pd-sticky-add{ flex:0 0 auto; padding: 12px 15px; font-size:.83rem; }
+    /* An explicit height on both controls rather than padding on one and a
+       Stripe-drawn box on the other: they sit side by side, so a two-pixel
+       difference between them is the thing the eye lands on. */
+    .pd-sticky-add{
+      flex:0 0 auto; height:44px; padding: 0 18px; font-size:.85rem;
+      /* Outlined against the wallet's solid black. Two filled blocks of the
+         same colour read as one wide smudge at this size, and the outline is
+         also the honest hierarchy: the wallet finishes the purchase, this
+         puts it in a cart you still have to check out of. */
+      background:transparent;
+    }
 
     /* Beside Add to cart, not under it. Apple's own minimum for the compact
        mark is 100pt, so that is the floor, and the overflow guards below are
@@ -621,11 +634,7 @@
        the part being decided on. */
     @media (max-width: 339px){
       body.pd-wallet-on .pd-sticky-name{ display:none; }
-      /* Darker and heavier rather than larger: it is the only line left, and
-         growing it is what pushes "5/5mg · $104.99", the longest this line
-         gets, back out of the width the row can spare. */
-      body.pd-wallet-on .pd-sticky-sub{ color:#0a0a0a; font-weight:600; }
-      body.pd-wallet-on .pd-sticky-add{ padding: 12px 11px; }
+      body.pd-wallet-on .pd-sticky-add{ padding: 0 13px; }
     }
 
     /* The bar is fixed over the end of the document, so the page needs room to
@@ -1065,7 +1074,7 @@
         <span class="pd-sticky-name" id="pdStickyName"></span>
         <span class="pd-sticky-sub" id="pdStickySub"></span>
       </span>
-      <button type="button" class="btn btn-primary pd-sticky-add" id="pdStickyAdd">Add to cart</button>
+      <button type="button" class="btn btn-outline pd-sticky-add" id="pdStickyAdd">Add to cart</button>
       <!-- The same wallet sheet as the express block up in the buy box, driven
            by the same Stripe paymentRequest object, so the two buttons are one
            payment flow with two mount points rather than two flows. Revealed on
