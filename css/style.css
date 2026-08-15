@@ -625,13 +625,20 @@ button[disabled].si-forgot{ cursor: progress; }
 @media (max-width: 640px){
   .catalog-page .filter-row{
     flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
-    scroll-snap-type: x proximity;
-    margin-left:-24px; margin-right:-24px; padding:0 24px 4px;
+    margin-left:-24px; margin-right:-24px; padding:0 24px 4px 0;
     /* hide the scrollbar itself; the row scrolling is the affordance */
     scrollbar-width:none;
   }
   .catalog-page .filter-row::-webkit-scrollbar{ display:none; }
-  .catalog-page .filter-row .chip{ flex:0 0 auto; scroll-snap-align:start; white-space:nowrap; }
+  .catalog-page .filter-row .chip{ flex:0 0 auto; white-space:nowrap; }
+  /* Chrome drops a scroll container's leading padding once its content
+     overflows, so "All" sat flush against the screen edge instead of lining
+     up with the search box above it. Trailing padding survives fine — this
+     margin does the same job for the edge that doesn't. scroll-snap was the
+     actual culprit for a worse version of the same bug: its first "start"
+     snap point pulled the row's initial scroll position past this margin
+     the instant the page painted, so it's gone rather than fought. */
+  .catalog-page .filter-row .chip:first-child{ margin-left:24px; }
 }
 
 .section-light .btn-outline{
