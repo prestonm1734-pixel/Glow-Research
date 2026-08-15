@@ -587,7 +587,7 @@ const DEFAULT_FORM = 'lyophilized';
 // what arrives, exactly the kind of claim PRINCIPLES.md rules out. One line,
 // read wherever a vial image renders, until real labeled-vial photography
 // replaces the artwork and this note comes out with it.
-const VIAL_ART_NOTICE = 'Vials ship with generic labeling.';
+const VIAL_ART_NOTICE = 'Vials ship with generic labeling, not the label shown.';
 
 // Almost everything in the catalog is a peptide, so that is the default noun.
 // NAD+ is not: it is a dinucleotide coenzyme, and calling it a peptide on the
