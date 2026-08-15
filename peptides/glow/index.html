@@ -180,17 +180,21 @@
     text-transform:uppercase; color:#0a0a0a; display:block; margin-bottom:11px;
   }
 
-  /* --- mg picker: the one decision on this page --- */
+  /* --- mg picker: the one decision on this page, or a plain statement of
+     fact when there isn't one --- */
   .pd-sizes{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 22px; }
-  /* A picker holding one pre-selected option is a label and a button that
-     answer a question nobody was asked, and every product in the catalog
-     ships a single size today. The mg is already in the identity line under
-     the title, so nothing is lost by collapsing it. Done in CSS against the
-     rendered buttons rather than in the renderer, so the served markup, the
-     baked pages and the hydrated page stay identical to each other, and a
-     second size appearing anywhere brings the picker straight back. */
-  .pd-sizes:has(.pd-size:only-child){ display:none; }
-  .pd-label:has(+ .pd-sizes .pd-size:only-child){ display:none; }
+  /* A clickable, hoverable pill for a "choice" of one is a lie about there
+     being a decision to make. But the mg is exactly what someone is about to
+     pay for, so it still needs to be on the page in its own labeled spot, not
+     left to a sentence further up — hence non-interactive rather than
+     hidden. Done in CSS against the rendered button rather than in the
+     renderer, so the served markup, the baked pages and the hydrated page
+     stay identical, and a second size appearing anywhere restores the
+     ordinary pressable picker automatically. */
+  .pd-sizes:has(.pd-size:only-child) .pd-size{
+    cursor:default; pointer-events:none;
+    background:#0a0a0a; border-color:#0a0a0a; color:#fff;
+  }
   .pd-size{
     font-family:'JetBrains Mono', monospace; font-size:.92rem; font-weight:700;
     padding: 15px 30px; border:2px solid rgba(0,0,0,.7); background:transparent; color:#0a0a0a;
