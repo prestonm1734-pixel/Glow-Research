@@ -618,6 +618,22 @@ button[disabled].si-forgot{ cursor: progress; }
 .section-light .chip:hover{ border-color:#0a0a0a; color:#0a0a0a; background: rgba(0,0,0,.04); }
 .section-light .chip.active{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
 
+/* On a phone, five category chips wrapping to three rows push the search bar
+   and the first cards below the fold before a visitor sees anything. One
+   swipeable row reads instantly, the way the sort/search bar above it
+   already reads as "controls, not content" without demanding vertical space. */
+@media (max-width: 640px){
+  .catalog-page .filter-row{
+    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    scroll-snap-type: x proximity;
+    margin-left:-24px; margin-right:-24px; padding:0 24px 4px;
+    /* hide the scrollbar itself; the row scrolling is the affordance */
+    scrollbar-width:none;
+  }
+  .catalog-page .filter-row::-webkit-scrollbar{ display:none; }
+  .catalog-page .filter-row .chip{ flex:0 0 auto; scroll-snap-align:start; white-space:nowrap; }
+}
+
 .section-light .btn-outline{
   border-color: rgba(0,0,0,0.35); color:#0a0a0a;
 }
