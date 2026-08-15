@@ -285,6 +285,8 @@
       ? `${money(total)}<s class="pd-price-was">${money(listTotal)}</s>`
       : money(total);
 
+    renderSticky(total);
+
     // One vial at list price is the plain case and needs no explaining. Past
     // that, say the per-vial rate, and name the tier when one is earning it —
     // someone on 4 vials should be told they are on the 3-vial rate rather
@@ -331,15 +333,60 @@
 
   // The buy box never offers something we cannot ship. Both the button and the
   // dispatch line are driven off the same catalog field, so they cannot end up
-  // disagreeing with each other.
+  // disagreeing with each other. The sticky bar reads the same field for the
+  // same reason: it is the same control, so it cannot be sellable while the
+  // one it stands in for is not.
   function renderStock() {
     const ok = sizeInStock(size());
-    const btn = $('pdAddBtn');
-    if (btn) {
+    [$('pdAddBtn'), $('pdStickyAdd')].forEach(btn => {
+      if (!btn) return;
       btn.disabled = !ok;
       btn.textContent = ok ? 'Add to cart' : 'Out of stock';
-    }
+    });
     if (refreshDelivery) refreshDelivery();
+  }
+
+  /* ================= sticky buy bar =================
+     Mobile only, and only while the real buy controls are off screen. It is a
+     restatement of the buy box, never a second source for any of it: the name,
+     the mg and the total all come from the same place the buy box reads, and
+     the button runs the same addCurrent(). */
+
+  // Called by renderPrice(), so the bar reprices with the buy box rather than
+  // keeping its own copy of a total that a quantity change would strand.
+  function renderSticky(total) {
+    const name = $('pdStickyName');
+    const sub = $('pdStickySub');
+    if (!name || !sub) return;
+    name.textContent = product.name;
+    sub.textContent = `${size().mg} · ${money(total)}`;
+  }
+
+  // Shows the bar only once every real buy control is out of view. Both are
+  // watched because either one is a way to buy: with a wallet configured the
+  // express button sits below Add to cart, so Add to cart can be off screen
+  // while a perfectly good buy button is still sitting there.
+  function initStickyBar() {
+    const bar = $('pdSticky');
+    if (!bar || typeof IntersectionObserver === 'undefined') return;
+
+    const watched = [document.querySelector('.pd-buy'), $('pdExpress')].filter(Boolean);
+    if (!watched.length) return;
+
+    const onScreen = new Map(watched.map(el => [el, true]));
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => onScreen.set(e.target, e.isIntersecting));
+      const show = ![...onScreen.values()].some(Boolean);
+      // Removed on the first callback rather than up front: hidden until the
+      // observer has actually measured something, so the bar cannot flash over
+      // the page during first paint.
+      bar.hidden = false;
+      bar.classList.toggle('is-shown', show);
+      bar.setAttribute('aria-hidden', String(!show));
+      document.body.classList.toggle('pd-sticky-shown', show);
+    }, { rootMargin: '0px 0px -12px 0px' });
+
+    watched.forEach(el => io.observe(el));
   }
 
   /* ================= quantity + add ================= */
@@ -389,6 +436,17 @@
       addCurrent();
       flash($('pdAddBtn'), 'Added to cart ✓');
     });
+
+    // Same add, same confirmation. The sticky bar carries no quantity of its
+    // own: it adds whatever the stepper above is currently set to, which is
+    // the quantity its own price is quoting.
+    const sticky = $('pdStickyAdd');
+    if (sticky) {
+      sticky.addEventListener('click', () => {
+        addCurrent();
+        flash(sticky, 'Added ✓');
+      });
+    }
   }
 
   /* ================= express pay (Apple Pay / Google Pay) =================
@@ -847,5 +905,8 @@
     initExpressPay();
     renderDelivery();
     renderRelated(product);
+    // After initExpressPay(), so the express block is already in whatever
+    // state this browser leaves it in before the observer starts watching it.
+    initStickyBar();
   });
 })();

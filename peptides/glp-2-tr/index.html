@@ -556,6 +556,62 @@
   .pd-related h2{ margin-bottom: 28px; }
   .pd-related .gs-more{ margin-top: 34px; }
 
+  /* ---------- sticky buy bar ----------
+     Hidden outright above 560px: this exists because the buy box scrolls away
+     on a phone, and on a desktop it is beside you the whole time. Kept in the
+     markup either way so js/product.js has one element to observe rather than
+     a branch on viewport width.
+
+     z-index sits above the page but below the cart drawer and search overlay
+     (300-340), so opening either covers this rather than fighting it. */
+  .pd-sticky{ display:none; }
+  .pd-sticky-add{ white-space:nowrap; }
+
+  @media (max-width: 560px){
+    .pd-sticky{
+      display:block; position:fixed; left:0; right:0; bottom:0; z-index:150;
+      background:#fff; border-top:1px solid rgba(0,0,0,.14);
+      /* clears the home indicator on a notched phone */
+      padding: 10px 20px calc(10px + env(safe-area-inset-bottom));
+      box-shadow: 0 -6px 20px -12px rgba(0,0,0,.4);
+      /* visibility, not just the transform: off screen it must also be out of
+         the tab order and the accessibility tree, or the page carries two Add
+         to cart buttons for anyone not using a mouse. */
+      transform: translateY(100%); visibility:hidden;
+    }
+    .pd-sticky[hidden]{ display:none; }
+    .pd-sticky.is-shown{ transform: translateY(0); visibility:visible; }
+    /* The page kills motion under .pd-page, so this opts back in the same way
+       the accordion summary does: a bar that snaps into place over the content
+       reads as a layout bug rather than as something arriving. */
+    .pd-page .pd-sticky{ transition: transform .18s ease, visibility 0s .18s !important; }
+    .pd-page .pd-sticky.is-shown{ transition: transform .18s ease !important; }
+
+    .pd-sticky-in{ display:flex; align-items:center; gap:14px; }
+    .pd-sticky-id{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1 1 auto; }
+    .pd-sticky-name{
+      font-size:.9rem; font-weight:700; color:#0a0a0a; letter-spacing:-.01em;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .pd-sticky-sub{
+      font-family:'JetBrains Mono', monospace; font-size:.7rem; color:#6f6f6a;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .pd-sticky-add{ flex:0 0 auto; padding: 13px 22px; }
+
+    /* The bar is fixed over the end of the document, so the page needs room to
+       scroll clear of it. Reserved for the whole page rather than toggled with
+       the bar: changing the document height every time it appears would move
+       the content under the reader's thumb mid-scroll. The footer sits outside
+       #pdShell, so this goes on the body. */
+    body{ padding-bottom: 74px; }
+    /* The toast is anchored to the bottom of the viewport too. Without this it
+       lands underneath the bar that triggered it, which is the one moment it
+       has to be readable. Follows the bar rather than sitting high all the
+       time, so a toast from the real buy box still appears where it always has. */
+    body.pd-sticky-shown .cart-toast{ bottom: calc(92px + env(safe-area-inset-bottom)); }
+  }
+
   /* ---------- no motion ----------
      Hover states still change (border, colour) so things stay obviously
      clickable, they just change instantly. This also cancels the lift-on-hover
@@ -961,6 +1017,26 @@
       </a>
     </div>
   </section>
+
+  <!-- ============ sticky buy bar ============
+       Mobile only, and only while the real buy controls are off screen. The
+       buy box sits a long way up a page that runs to accordions, a seven-row
+       analysis panel and a related grid, so past a certain scroll depth there
+       is no way to buy without scrolling back. This is that control, not a
+       second one: it reads the same price and adds the same line.
+
+       Starts hidden and stays hidden until the observer in js/product.js has
+       actually measured the buy box, so it cannot flash over the page during
+       first paint or strand itself open on a desktop viewport. -->
+  <div class="pd-sticky" id="pdSticky" hidden aria-hidden="true">
+    <div class="pd-sticky-in">
+      <span class="pd-sticky-id">
+        <span class="pd-sticky-name" id="pdStickyName"></span>
+        <span class="pd-sticky-sub" id="pdStickySub"></span>
+      </span>
+      <button type="button" class="btn btn-primary pd-sticky-add" id="pdStickyAdd">Add to cart</button>
+    </div>
+  </div>
 
 </div>
 

@@ -391,6 +391,28 @@ console.log('\nthe batch analysis panel');
   ok('no meta cell is printed without a value', blankMeta.length === 0,
     blankMeta.join(', '));
 
+  // The sticky buy bar restates the buy box on a phone, which makes it a
+  // second place a price is printed and a second button that adds to the cart.
+  // Both have to be restatements: a bar quoting a total the buy box is not, or
+  // adding a line the buy box would not, is the same page disagreeing with
+  // itself at the moment money is involved.
+  const pj = read('js/product.js');
+  ok('the product page carries the sticky buy bar',
+    /id="pdSticky"/.test(pd) && /id="pdStickyAdd"/.test(pd));
+  ok('the bar quotes the total renderPrice() just worked out, not its own',
+    /renderSticky\(total\)/.test(pj) &&
+    /function renderSticky\(total\)/.test(pj) &&
+    !/function renderSticky\(\)/.test(pj),
+    'renderSticky() must be handed renderPrice()\'s total rather than deriving one');
+  ok('the bar adds through the one cart line the buy box builds',
+    (pj.match(/GlowCart\.add\(/g) || []).length === 1 &&
+    /const sticky = \$\('pdStickyAdd'\)/.test(pj) &&
+    /sticky\.addEventListener\('click', \(\) => \{\s*addCurrent\(\);/.test(pj));
+  // Out of stock has to reach both buttons from the same test, or the bar
+  // stays sellable on a size the buy box has already closed.
+  ok('stock closes the bar and the buy box together',
+    /\[\$\('pdAddBtn'\), \$\('pdStickyAdd'\)\]/.test(pj));
+
   // A lot number is the one thing a reader can check against the vial in their
   // hand, which makes an invented one the worst thing this page could print.
   // Nothing holds lot codes today, so this currently forbids all of them: the
