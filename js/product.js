@@ -328,8 +328,6 @@
 
     renderPrice();
     renderPhoto(product, s);
-    // follows the mg picker: the line names the vial actually selected
-    $('pdIdentity').textContent = identityLine(product, s);
     $('pdVialMg').textContent = s.mg.toUpperCase();
     $('pdVialFine').innerHTML =
       `${product.purity} Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.shop`;

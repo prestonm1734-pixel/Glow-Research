@@ -62,9 +62,6 @@ It currently checks that:
   "cGMP-aligned" hedge on the manufacturing claim, every row still carries the
   note that qualifies it, and no page anywhere prints a lot number the catalog
   does not hold
-- the identity line under the product name states the vial and the intended use
-  and nothing else: it is built by `identityLine()` from the name, the selected
-  mg and the fill form, so it follows the size picker and no claim can enter it
 - no listing copy names an outcome where it should name a mechanism. Pathways,
   receptors, binding behaviour and assays are things a laboratory measures;
   healing, recovery, improvement, treatment and dosing are things a product is

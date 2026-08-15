@@ -15,9 +15,9 @@
 // behaviour are safe ground. Healing, recovery, improvement and treatment are
 // not, however carefully the sentence around them is framed.
 //
-// It is also the one line under the product name in the buy box and the
-// `description` in each generated page's Product schema, so it is short by
-// requirement, not by taste: two lines is the budget.
+// It is also the short description read under the product name in the buy
+// box, so it is short by requirement, not by taste: two sentences is the
+// budget.
 //
 // `sizes` is the mg picker on the product page, cheapest first. The first entry
 // is the one the catalog grid, search and quick-add all quote, so it doubles as
@@ -34,9 +34,9 @@
 // It is what "View certificate of analysis" on the product page opens. A
 // product without one falls back to COA_URL below.
 //
-// `blurb` is the Product schema `description` on each generated page. It is a
-// summary of `about[]`, not a second description that could contradict it. The
-// line under the product name in the buy box is identityLine(), built below.
+// `blurb` is a summary of `about[]`, not a second description that could
+// contradict it; the generated page's Product schema `description` is
+// `about[0]`, the fuller sentence.
 //
 // `about` and `research` fill the accordions under the buy box. Same rule as
 // `blurb`: composition and what laboratory work examines, never dosing,
@@ -560,26 +560,6 @@ const SOURCE_LONG = 'Synthesis and fill at a partner facility operating to cGMP-
 const ANALYSIS_NOT_RUN = [];
 
 // ---------------------------------------------------------------------------
-// The identity line: the sentence under the product name in the buy box.
-//
-// What is in the vial and what it is for, with no claim of any kind in it. It
-// is derived rather than stored, so it cannot drift from the name, from the mg
-// the customer has actually selected, or from the fill form, and so the
-// research-use framing is restated on the one screen where someone is about to
-// buy rather than only in the footer.
-//
-// Everything that describes what the compound *does* now lives entirely in
-// `blurb` (the Product schema description) and in the accordions below the
-// panel. This line is deliberately not the place for it.
-//
-// PLACEHOLDER: every compound in the catalog is supplied as lyophilized powder
-// in a sealed vial, which is why the default answers almost all of them and
-// writing it out on every product would be noise. Nothing here measures it:
-// the supplier import confirms the fill form per product the same way it
-// confirms purity, and a product that arrives in solution sets `form` and the
-// line follows.
-const DEFAULT_FORM = 'lyophilized';
-
 // The photo on every product page, and the illustrated vial that stands in
 // where no photo exists yet, both show Glow's own artwork on the label.
 // Vials actually ship with the manufacturer's generic label, not this one, so
@@ -588,16 +568,6 @@ const DEFAULT_FORM = 'lyophilized';
 // read wherever a vial image renders, until real labeled-vial photography
 // replaces the artwork and this note comes out with it.
 const VIAL_ART_NOTICE = 'Vials ship with generic labeling, not the label shown.';
-
-// Almost everything in the catalog is a peptide, so that is the default noun.
-// NAD+ is not: it is a dinucleotide coenzyme, and calling it a peptide on the
-// one screen where someone is about to buy it would be exactly the kind of
-// claim PRINCIPLES.md rules out. `kind` overrides the noun for the rare
-// product where "peptide" would be a factual error rather than a shorthand.
-function identityLine(p, size) {
-  const mg = size && size.mg ? ` ${size.mg}` : '';
-  return `${p.name}${mg} ${p.form || DEFAULT_FORM} ${p.kind || 'peptide'} for in vitro research.`;
-}
 
 // ---------------------------------------------------------------------------
 // The homepage FAQ.
@@ -1208,8 +1178,6 @@ if (typeof module !== 'undefined' && module.exports) {
     ANALYSIS_NOT_RUN,
     SOURCE_SHORT,
     SOURCE_LONG,
-    identityLine,
-    DEFAULT_FORM,
     VIAL_ART_NOTICE,
     FAQS,
     faqHtml,

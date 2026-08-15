@@ -28,7 +28,7 @@ const {
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, CUTOFF_LABEL, CUTOFF_LABEL_SHORT,
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG, evidenceRows, evidenceHtml,
-  identityLine, FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
+  FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
   hasList, listPriceOf, SITEWIDE_DISCOUNT,
@@ -238,12 +238,6 @@ console.log('\nthe Glow Standard panel');
   const pd = read('product.html');
 
   ok('the product page carries the panel', /id="pdEvidence"/.test(pd));
-  // The line under the product name is built by identityLine(), not stored, so
-  // it follows the mg picker and cannot contradict the name or the fill form.
-  ok('the buy box carries a derived identity line',
-    /id="pdIdentity"/.test(pd) &&
-    /identityLine\(product, s\)/.test(read('js/product.js')) &&
-    /identityLine\(p, s\)/.test(read('tools/build-products.js')));
 
   // The vial in every product photo carries Glow's own artwork; what actually
   // ships carries the manufacturer's generic label. A photo that doesn't
@@ -519,24 +513,6 @@ console.log('\nlisting copy');
   ok('the product page reads the blurb from the catalog, not a copy of it',
     /id="pdDesc"/.test(pdBlurb) && /p\.blurb/.test(read('js/product.js')) &&
     /p\.blurb/.test(read('tools/build-products.js')));
-
-  // The identity line is the most-read sentence on the product page and the
-  // only one a customer sees before deciding, so it is the last place a claim
-  // should ever appear. It states the vial and the intended use, nothing else.
-  const badLine = [];
-  GLOW_PRODUCTS.forEach(prod => prod.sizes.forEach(sz => {
-    const line = identityLine(prod, sz);
-    const hits = [...new Set((line.match(OUTCOME) || []).map(h => h.toLowerCase()))];
-    if (hits.length) badLine.push(`${prod.name} ${sz.mg}: "${hits.join('", "')}"`);
-    if (!line.startsWith(`${prod.name} ${sz.mg} `)) badLine.push(`${prod.name} ${sz.mg}: wrong vial`);
-    if (!/ for in vitro research\.$/.test(line)) badLine.push(`${prod.name} ${sz.mg}: no research-use framing`);
-  }));
-  ok('every identity line names the vial and the intended use, and nothing else',
-    badLine.length === 0, badLine.join('\n          '));
-
-  ok('the fill form is a catalog value, not a word typed into the sentence',
-    /\$\{p\.form \|\| DEFAULT_FORM\}/.test(read('js/products-data.js')),
-    'identityLine() must read the form from the product, so the import can correct it');
 
   // The same rule applies to the taxonomy, and it is easier to break there:
   // "Recovery Peptide" sat directly above the product name for a year and read

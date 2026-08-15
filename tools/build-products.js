@@ -35,7 +35,7 @@ const OUT_DIR = 'peptides';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, hasList, listPriceOf, PRODUCT_PAGES_LIVE,
-  sizeInStock, productInStock, evidenceHtml, identityLine, unitPriceAt,
+  sizeInStock, productInStock, evidenceHtml, unitPriceAt,
   catFilterGroup, CAT_LABEL, VIAL_ART_NOTICE,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
@@ -225,7 +225,6 @@ function buildProduct(p, donor) {
   html = setText(html, 'pdName', esc(p.name));
   html = fillEmpty(html, 'pdAlias', p.alias ? esc(p.alias) : '');
   html = fillEmpty(html, 'pdDesc', esc(p.blurb));
-  html = fillEmpty(html, 'pdIdentity', esc(identityLine(p, s)));
   html = setText(html, 'pdVialName', esc(p.name));
   html = setText(html, 'pdVialMg', esc(s.mg.toUpperCase()));
   html = fillEmpty(html, 'pdVialFine',

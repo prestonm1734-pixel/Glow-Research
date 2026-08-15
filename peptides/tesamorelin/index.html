@@ -188,17 +188,10 @@
   /* the catalog's two-sentence mechanism summary (js/products-data.js: blurb),
      what it is and how it's studied, read here before any spec or price */
   .pd-desc{
-    max-width: 58ch; margin: 0 0 16px;
+    max-width: 58ch; margin: 0 0 20px;
     font-size: 1.02rem; line-height:1.6; color:#33332f;
   }
   .pd-desc:empty{ display:none; }
-  /* one quiet line: this is a spec, not a pitch, so it sits back from the name
-     above it and the price below it rather than competing with either */
-  .pd-identity{
-    max-width: 54ch; margin: 0 0 20px;
-    font-size: 0.95rem; line-height:1.6; color:#55554f;
-  }
-  .pd-identity:empty{ display:none; }
 
   .pd-label{
     font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:700; letter-spacing:.14em;
@@ -555,7 +548,7 @@
     /* Rhythm set for a wide two-column layout reads as gaps when the column
        is the whole screen. */
     .pd-name{ margin-bottom: 6px; }
-    .pd-identity{ margin-bottom: 14px; }
+    .pd-desc{ margin-bottom: 14px; }
     .pd-price{ margin-bottom: 16px; }
     .pd-express{ margin: 12px 0 12px; }
     .pd-express-divider{ margin-bottom: 10px; }
@@ -707,17 +700,13 @@
         <h1 class="pd-name" id="pdName">Tesamorelin</h1>
         <!-- Glow's own shorthand, not what most people searching for the
              compound type into a search bar. Empty and collapsed for a
-             product with no documented alias, same pattern as pd-identity. -->
+             product with no documented alias, same pattern as pd-desc. -->
         <p class="pd-alias" id="pdAlias"></p>
         <!-- The catalog's blurb: what the compound is and how it's studied,
              mechanism only (check-claims.js audits it for outcome language).
              The fuller version is in the About accordion below; this is the
              two-sentence summary read before any spec or price. -->
         <p class="pd-desc" id="pdDesc">A synthetic growth hormone releasing hormone analogue with a stabilised N-terminus. Studied for pituitary receptor engagement.</p>
-        <!-- What is in the vial and what it is for, and nothing else. Built by
-             identityLine() from the name, the selected mg and the fill form, so
-             it follows the size picker and cannot drift from any of the three. -->
-        <p class="pd-identity" id="pdIdentity">Tesamorelin 10mg lyophilized peptide for in vitro research.</p>
 
         <!-- The total for the mg and the quantity currently selected. Both
              move it: the bulk tier is a function of quantity, so stepping from
