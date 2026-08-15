@@ -59,8 +59,12 @@
      Top-aligned with the copy, both starting at the same offset below the
      breadcrumb, so the image's top edge lines up with "METABOLIC RESEARCH"
      rather than either floating past it or matching the copy's full height. */
-  /* Sticky so the vial stays in view while the buy column scrolls past it.
-     top clears the sticky site header (64px) plus a little breathing room. */
+  /* Sticky so the vial (and the caption under it) stay in view while the buy
+     column scrolls past. top clears the sticky site header (64px) plus a
+     little breathing room. Sticky lives on the column, not .pd-visual itself,
+     so the caption travels with the image as one unit instead of the stage
+     pinning while its own caption scrolls off separately. */
+  .pd-visual-col{ position: sticky; top: 84px; }
   .pd-visual{
     /* an explicit height, not min-height: .pd-photo is height:100%, and against
        an indefinite parent that percentage does not resolve, so the photo's own
@@ -68,7 +72,7 @@
     /* tall enough to read as a real product photo rather than a thumbnail,
        but capped near the buy column's own height — taller than that leaves
        dead space under the shorter column once the row is forced to match */
-    position: sticky; top: 84px; height: clamp(480px, 78vh, 680px);
+    height: clamp(480px, 78vh, 680px);
     display:flex; align-items:center; justify-content:center;
     background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
     border: 1px solid rgba(0,0,0,.1);
@@ -92,6 +96,15 @@
     mix-blend-mode: multiply;
   }
   .pd-photo[hidden]{ display:none; }
+
+  /* A caption under the stage, not an overlay on it — the illustrated vial's
+     own printed label already sits near the bottom of the box, and on the
+     shorter mobile stage the two blocks of text collided. Normal flow costs
+     a little height instead. */
+  .pd-render-note{
+    margin: 10px 4px 0; text-align:center; font-size:.68rem;
+    color:rgba(10,10,10,.45); letter-spacing:.01em;
+  }
 
   /* --- the vial --- */
   /* The vial is drawn at a fixed pixel size but the stage is much larger than
@@ -506,7 +519,8 @@
   @media (max-width: 900px){
     .pd-hero-grid{ grid-template-columns:1fr; gap: 36px; }
     /* stacked on mobile, so pinning the image would just cover the copy */
-    .pd-visual{ position:static; height: clamp(300px, 78vw, 380px); padding: 6% 12%; }
+    .pd-visual-col{ position:static; }
+    .pd-visual{ height: clamp(300px, 78vw, 380px); padding: 6% 12%; }
     /* four data cells at tablet width leave each one about 160px wide, which
        breaks the manufacturing-partner value onto three lines */
     .gs-grid{ grid-template-columns: repeat(2, 1fr); }
@@ -658,21 +672,24 @@
   <section class="pd-hero">
     <div class="container pd-hero-grid">
 
-      <div class="pd-visual">
-        <img class="pd-photo" id="pdPhoto" alt="" hidden />
-        <div class="pd-vial-wrap" id="pdVialArt">
-          <div class="pd-vial">
-            <span class="pd-vial-cap"></span>
-            <span class="pd-vial-collar"></span>
-            <span class="pd-vial-label">
-              <span class="pd-vial-brand">Glow ✦ Research</span>
-              <span class="pd-vial-name" id="pdVialName">GLP-3 (RT)</span>
-              <span class="pd-vial-mg" id="pdVialMg">10MG</span>
-              <span class="pd-vial-fine" id="pdVialFine">99.4% Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.shop</span>
-            </span>
+      <div class="pd-visual-col">
+        <div class="pd-visual">
+          <img class="pd-photo" id="pdPhoto" alt="" hidden />
+          <div class="pd-vial-wrap" id="pdVialArt">
+            <div class="pd-vial">
+              <span class="pd-vial-cap"></span>
+              <span class="pd-vial-collar"></span>
+              <span class="pd-vial-label">
+                <span class="pd-vial-brand">Glow ✦ Research</span>
+                <span class="pd-vial-name" id="pdVialName">GLP-3 (RT)</span>
+                <span class="pd-vial-mg" id="pdVialMg">10MG</span>
+                <span class="pd-vial-fine" id="pdVialFine">99.4% Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.shop</span>
+              </span>
+            </div>
+            <div class="pd-vial-shadow" aria-hidden="true"></div>
           </div>
-          <div class="pd-vial-shadow" aria-hidden="true"></div>
         </div>
+        <p class="pd-render-note" id="pdRenderNote">Image is a rendering for reference. Vials ship in manufacturer packaging, not this artwork.</p>
       </div>
 
       <!-- Order top to bottom the way the decision is actually made: what it

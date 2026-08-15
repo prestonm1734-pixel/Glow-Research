@@ -245,6 +245,16 @@ console.log('\nthe Glow Standard panel');
     /identityLine\(product, s\)/.test(read('js/product.js')) &&
     /identityLine\(p, s\)/.test(read('tools/build-products.js')));
 
+  // The vial in every product photo carries Glow's own artwork; what actually
+  // ships carries the manufacturer's generic label. A photo that doesn't
+  // match what arrives is a claim PRINCIPLES.md rules out, so the caption
+  // saying so has to actually reach the page, from the one string, not a
+  // second copy of it that could drift from the first.
+  ok('the product page carries the vial-art disclosure, from the one string',
+    /id="pdRenderNote"/.test(pd) &&
+    /VIAL_ART_NOTICE/.test(read('js/product.js')) &&
+    /VIAL_ART_NOTICE/.test(read('tools/build-products.js')));
+
   // The Product schema uses about[0], the first paragraph of the compound's
   // description, not the catalog's summary blurb. It is a real per-compound
   // explanation of what the compound is and how it is studied, the full depth

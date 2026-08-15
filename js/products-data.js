@@ -580,6 +580,15 @@ const ANALYSIS_NOT_RUN = [];
 // line follows.
 const DEFAULT_FORM = 'lyophilized';
 
+// The photo on every product page, and the illustrated vial that stands in
+// where no photo exists yet, both show Glow's own artwork on the label.
+// Vials actually ship with the manufacturer's generic label, not this one, so
+// showing the image without saying so would be a photo that doesn't match
+// what arrives, exactly the kind of claim PRINCIPLES.md rules out. One line,
+// read wherever a vial image renders, until real labeled-vial photography
+// replaces the artwork and this note comes out with it.
+const VIAL_ART_NOTICE = 'Image is a rendering for reference. Vials ship in manufacturer packaging, not this artwork.';
+
 // Almost everything in the catalog is a peptide, so that is the default noun.
 // NAD+ is not: it is a dinucleotide coenzyme, and calling it a peptide on the
 // one screen where someone is about to buy it would be exactly the kind of
@@ -1201,6 +1210,7 @@ if (typeof module !== 'undefined' && module.exports) {
     SOURCE_LONG,
     identityLine,
     DEFAULT_FORM,
+    VIAL_ART_NOTICE,
     FAQS,
     faqHtml,
     productCardHtml,
