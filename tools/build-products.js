@@ -224,6 +224,7 @@ function buildProduct(p, donor) {
   html = fillEmpty(html, 'pdRenderNote', esc(VIAL_ART_NOTICE));
   html = setText(html, 'pdName', esc(p.name));
   html = fillEmpty(html, 'pdAlias', p.alias ? esc(p.alias) : '');
+  html = fillEmpty(html, 'pdDesc', esc(p.blurb));
   html = fillEmpty(html, 'pdIdentity', esc(identityLine(p, s)));
   html = setText(html, 'pdVialName', esc(p.name));
   html = setText(html, 'pdVialMg', esc(s.mg.toUpperCase()));

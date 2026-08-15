@@ -151,6 +151,7 @@
     $('pdTag').textContent = CAT_LABEL[p.cat];
     $('pdName').textContent = p.name;
     $('pdAlias').textContent = p.alias || '';
+    $('pdDesc').textContent = p.blurb;
     $('pdVialName').textContent = p.name;
     $('pdRenderNote').textContent = VIAL_ART_NOTICE;
 

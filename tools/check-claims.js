@@ -497,12 +497,10 @@ console.log('\nlisting copy');
   ok('no listing copy names an outcome instead of a mechanism',
     bad.length === 0, bad.join('\n          '));
 
-  // `blurb` is the catalog's mechanism-only summary, never displayed on the page
-  // or in the schema. It is a five-field source-of-truth check — if the rules
-  // in products-data.js slip, something the audit is supposed to catch gets
-  // softer. So it is length-capped not for display but to keep the rule
-  // observable: a blurb that spirals to four sentences stops being a summary
-  // and starts being a description that happened to not drift from about[0].
+  // `blurb` is the mechanism-only summary read on the product page (#pdDesc)
+  // above the fold, so it is length-capped to stay a summary: a blurb that
+  // spirals to four sentences stops being one and starts being a description
+  // that happened to not drift from about[0].
   const BLURB_MAX = 130;
   const long = GLOW_PRODUCTS.filter(p => p.blurb.length > BLURB_MAX);
   ok(`every blurb stays within the summary budget (${BLURB_MAX} chars)`, long.length === 0,
@@ -513,6 +511,14 @@ console.log('\nlisting copy');
   const oneLiner = GLOW_PRODUCTS.filter(p => (p.blurb.match(/\.\s|\.$/g) || []).length < 2);
   ok('every blurb says both what it is and how it is studied',
     oneLiner.length === 0, oneLiner.map(p => p.name).join(', '));
+
+  // The product page shows p.blurb verbatim in #pdDesc rather than a written
+  // copy of it, so a future rewrite of the sentence cannot land in the catalog
+  // without also landing on the page.
+  const pdBlurb = read('product.html');
+  ok('the product page reads the blurb from the catalog, not a copy of it',
+    /id="pdDesc"/.test(pdBlurb) && /p\.blurb/.test(read('js/product.js')) &&
+    /p\.blurb/.test(read('tools/build-products.js')));
 
   // The identity line is the most-read sentence on the product page and the
   // only one a customer sees before deciding, so it is the last place a claim
