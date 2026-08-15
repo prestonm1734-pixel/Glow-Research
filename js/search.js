@@ -42,7 +42,7 @@
         <span class="search-thumb">${productThumb(p.name)}</span>
         <span class="search-row-copy">
           <span class="search-row-name">${p.name}</span>
-          <span class="search-row-meta">${p.tag} &middot; ${hasList(p)
+          <span class="search-row-meta">${CAT_LABEL[p.cat]} &middot; ${hasList(p)
             ? `${fmtPrice(salePrice(p.price))} <s>${fmtPrice(p.list)}</s>`
             : fmtPrice(salePrice(p.price))}</span>
         </span>
@@ -56,7 +56,7 @@
   function render(query) {
     const q = query.trim().toLowerCase();
     const list = q
-      ? GLOW_PRODUCTS.filter(p => p.name.toLowerCase().includes(q) || p.tag.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q))
+      ? GLOW_PRODUCTS.filter(p => p.name.toLowerCase().includes(q) || CAT_LABEL[p.cat].toLowerCase().includes(q) || (p.tag && p.tag.toLowerCase().includes(q)))
       : GLOW_PRODUCTS;
 
     if (!list.length) {

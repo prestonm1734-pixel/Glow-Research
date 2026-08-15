@@ -144,7 +144,11 @@
   }
 
   function renderHeader(p) {
-    $('pdTag').textContent = p.tag;
+    // The research category (Metabolic, Tissue…), not p.tag — p.tag is only
+    // set on blends ("Peptide Blend") and is null for most single compounds,
+    // which used to leave this badge silently blank. CAT_LABEL always has an
+    // entry (check-claims.js enforces it), so this is never empty.
+    $('pdTag').textContent = CAT_LABEL[p.cat];
     $('pdName').textContent = p.name;
     $('pdAlias').textContent = p.alias || '';
     $('pdVialName').textContent = p.name;
