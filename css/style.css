@@ -795,7 +795,11 @@ button[disabled].si-forgot{ cursor: progress; }
   display:block; height:1px; margin: 2px 0 14px;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
 }
-.product-card h3{ font-size: 1.15rem; margin: 4px 0 10px; color:#fff; }
+.product-card h3{ font-size: 1.15rem; margin: 4px 0 0; color:#fff; }
+/* The catalog name is Glow's own shorthand ("GLP-3 (RT)"), not what most
+   people searching for the compound type. Namesake in plain words, once,
+   directly under the name it belongs to. */
+.product-alias{ font-size:.82rem; color:rgba(255,255,255,.55); margin: 2px 0 10px; }
 /* The card's one number, so it is sized to be read as one. It carried a
    "/ vial" qualifier until the sizes moved onto the product page, where the
    tier cards state a per-vial rate against a quantity and the words are
@@ -970,7 +974,8 @@ html:not(.js) .faq-a{ max-height: none; }
   /* everything inside the tile steps down to suit the narrower column */
   .product-footer{ padding: 14px 13px 15px; }
   .product-footer::before{ left:13px; right:13px; }
-  .product-card h3{ font-size: .92rem; margin: 3px 0 7px; }
+  .product-card h3{ font-size: .92rem; margin: 3px 0 0; }
+  .product-alias{ font-size:.74rem; margin: 1px 0 7px; }
   .card-divider{ margin: 2px 0 10px; }
   .price{ font-size: 1.18rem; margin-bottom: 10px; }
   .add-btn{ height: 38px; font-size: .78rem; }

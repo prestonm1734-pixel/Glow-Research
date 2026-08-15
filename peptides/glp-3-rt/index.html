@@ -166,7 +166,9 @@
     font-size:0.7rem; color:#0a0a0a; text-transform:uppercase; letter-spacing:.14em; font-weight:700;
     display:block; font-family:'JetBrains Mono', monospace; margin-bottom:10px;
   }
-  .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:600; margin: 0 0 8px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
+  .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:600; margin: 0 0 2px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
+  .pd-alias{ font-size: 1rem; color:#8a8a86; margin: 0 0 10px; }
+  .pd-alias:empty{ display:none; }
   /* one quiet line: this is a spec, not a pitch, so it sits back from the name
      above it and the price below it rather than competing with either */
   .pd-identity{
@@ -588,7 +590,7 @@
 </script>
 <link rel="canonical" href="https://glowresearch.shop/peptides/glp-3-rt/" />
 <meta property="og:url" content="https://glowresearch.shop/peptides/glp-3-rt/" />
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","@id":"https://glowresearch.shop/peptides/glp-3-rt/#product","name":"GLP-3 (RT)","description":"GLP-3 (RT) is Glow’s designation for retatrutide, a synthetic peptide agonist active at three receptors from one molecule: the GIP receptor, the GLP-1 receptor and the glucagon receptor.","category":"Metabolic Research","url":"https://glowresearch.shop/peptides/glp-3-rt/","brand":{"@type":"Brand","name":"Glow Research"},"additionalProperty":[{"@type":"PropertyValue","name":"Purity","value":"99.4%"}],"offers":[{"@type":"Offer","name":"GLP-3 (RT) 10mg","url":"https://glowresearch.shop/peptides/glp-3-rt/","sku":"GLO-RT10","price":"104.99","priceCurrency":"USD","availability":"https://schema.org/InStock","seller":{"@id":"https://glowresearch.shop/#organization"}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","@id":"https://glowresearch.shop/peptides/glp-3-rt/#product","name":"GLP-3 (RT)","alternateName":"Retatrutide","description":"GLP-3 (RT) is Glow’s designation for retatrutide, a synthetic peptide agonist active at three receptors from one molecule: the GIP receptor, the GLP-1 receptor and the glucagon receptor.","category":"Metabolic Research","url":"https://glowresearch.shop/peptides/glp-3-rt/","brand":{"@type":"Brand","name":"Glow Research"},"additionalProperty":[{"@type":"PropertyValue","name":"Purity","value":"99.4%"}],"offers":[{"@type":"Offer","name":"GLP-3 (RT) 10mg","url":"https://glowresearch.shop/peptides/glp-3-rt/","sku":"GLO-RT10","price":"104.99","priceCurrency":"USD","availability":"https://schema.org/InStock","seller":{"@id":"https://glowresearch.shop/#organization"}}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://glowresearch.shop/"},{"@type":"ListItem","position":2,"name":"Catalog","item":"https://glowresearch.shop/peptides.html"},{"@type":"ListItem","position":3,"name":"Metabolic Research","item":"https://glowresearch.shop/peptides.html?cat=peptides"},{"@type":"ListItem","position":4,"name":"GLP-3 (RT)","item":"https://glowresearch.shop/peptides/glp-3-rt/"}]}</script>
 </head>
 <body data-product-slug="glp-3-rt">
@@ -674,8 +676,12 @@
            is, what it costs, which size, buy. Everything else is reference
            material and sits underneath. -->
       <div class="pd-right">
-        <span class="pd-tag" id="pdTag">null</span>
+        <span class="pd-tag" id="pdTag"></span>
         <h1 class="pd-name" id="pdName">GLP-3 (RT)</h1>
+        <!-- Glow's own shorthand, not what most people searching for the
+             compound type into a search bar. Empty and collapsed for a
+             product with no documented alias, same pattern as pd-identity. -->
+        <p class="pd-alias" id="pdAlias">Retatrutide</p>
         <!-- What is in the vial and what it is for, and nothing else. Built by
              identityLine() from the name, the selected mg and the fill form, so
              it follows the size picker and cannot drift from any of the three.

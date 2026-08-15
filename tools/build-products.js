@@ -130,6 +130,7 @@ function productJsonLd(p, url) {
     '@type': 'Product',
     '@id': `${url}#product`,
     name: p.name,
+    ...(p.alias ? { alternateName: p.alias } : {}),
     description: p.about[0],
     category: CAT_LABEL[p.cat],
     url,
@@ -219,8 +220,9 @@ function buildProduct(p, donor) {
 
   /* --- content a crawler must see without running scripts --- */
   html = setText(html, 'pdCrumbName', esc(p.name));
-  html = setText(html, 'pdTag', esc(p.tag));
+  html = setText(html, 'pdTag', p.tag ? esc(p.tag) : '');
   html = setText(html, 'pdName', esc(p.name));
+  html = fillEmpty(html, 'pdAlias', p.alias ? esc(p.alias) : '');
   html = fillEmpty(html, 'pdIdentity', esc(identityLine(p, s)));
   html = setText(html, 'pdVialName', esc(p.name));
   html = setText(html, 'pdVialMg', esc(s.mg.toUpperCase()));

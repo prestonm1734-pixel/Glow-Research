@@ -146,6 +146,7 @@
   function renderHeader(p) {
     $('pdTag').textContent = p.tag;
     $('pdName').textContent = p.name;
+    $('pdAlias').textContent = p.alias || '';
     $('pdVialName').textContent = p.name;
 
     renderPhoto(p, size());

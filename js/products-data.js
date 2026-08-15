@@ -189,7 +189,7 @@ const GLOW_PRODUCTS = [
   // Ranked by the badge each product already carries (Best Seller, then
   // Popular, then Best Value), which is the one popularity signal already in
   // the data rather than a second, separate ranking to keep in sync with it.
-  { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.4%', badge:'Best Seller',
+  { name: 'GLP-3 (RT)', alias: 'Retatrutide', tag: null, cat: 'metabolic', purity: '99.4%', badge:'Best Seller',
     sizes: [
       { mg: '10mg', price: 104.99, list: 130, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg-v3.webp' },
     ],
@@ -241,13 +241,13 @@ const GLOW_PRODUCTS = [
       { t: 'Fibroblast migration', d: 'Used in scratch and outgrowth assays examining how tendon and ligament fibroblasts migrate and organise.' },
       { t: 'Gut epithelial models', d: 'Examined in gastrointestinal tissue models, reflecting the gastric origin of the parent protein.' }
     ] },
-  { name: 'BPC-157/TB-500', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
+  { name: 'BPC-157/TB-500', alias: 'Wolverine', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
     sizes: [
       { mg: '10mg', price: 84.99, list: 105, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg-v3.webp' },
     ],
     blurb: 'A combined BPC-157 and TB-500 formulation. Supplied for research using both peptides together in one vial.',
     about: [
-      'This blend combines BPC-157 and TB-500 in a single vial, 5/5 mg of each for 10mg total, formulated for laboratories that already run both peptides together rather than reconstituting them separately.',
+      'This blend combines BPC-157 and TB-500 in a single vial, 5/5 mg of each for 10mg total, formulated for laboratories that already run both peptides together rather than reconstituting them separately. It is commonly referred to as Wolverine within the peptide research community.',
       'BPC-157 and TB-500 act through different mechanisms, angiogenic signalling and actin-binding cytoskeletal dynamics respectively, so the blend is a co-formulation, not a new compound with its own mechanism.'
     ],
     research: [
@@ -290,7 +290,7 @@ const GLOW_PRODUCTS = [
       { t: 'DPP-4 resistance', d: 'Studied for resistance to enzymatic cleavage relative to native GHRH, and how that changes assay-window duration.' },
       { t: 'Comparative secretagogue pharmacology', d: 'Run as a reference GHRH analogue when newer compounds in the class are characterised.' }
     ] },
-  { name: 'GLP-2 (TR)', tag: null, cat: 'metabolic', purity: '99.4%', badge:null,
+  { name: 'GLP-2 (TR)', alias: 'Tirzepatide', tag: null, cat: 'metabolic', purity: '99.4%', badge:null,
     sizes: [{ mg: '10mg', price: 89.99, list: 110, sku: 'GLO-T10', image: 'assets/products/glp-2-tr-10mg-v3.webp' }],
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
     about: [
@@ -1058,6 +1058,7 @@ function productCardHtml(p, i) {
         </a>
         <div class="product-footer">
           <h3><a href="${href}">${name}</a></h3>
+          ${p.alias ? `<p class="product-alias">${p.alias}</p>` : ''}
           <span class="card-divider" aria-hidden="true"></span>
           <span class="price">
             ${fmtPrice(salePrice(p.price))}
