@@ -255,12 +255,12 @@ const GLOW_PRODUCTS = [
       { t: 'Combined pathway models', d: 'Used in fibroblast and endothelial culture models examining both peptides applied from a single source.' },
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials to compare co-formulated and separately administered research protocols.' }
     ] },
-  { name: 'GLOW', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
+  { name: 'GLOW', alias: 'GHK-Cu/BPC-157/TB-500', tag: 'Peptide Blend', cat: 'tissue', purity: '99.0%', badge:null,
     sizes: [{ mg: '70mg', price: 124.99, list: 155, sku: 'GLO-BBG70', image: 'assets/products/glow-70mg-v3.webp' }],
-    blurb: 'A multi-peptide blend supplied as a single 70mg vial. Composition detail pending supplier confirmation.',
+    blurb: 'A compounded blend of GHK-Cu, BPC-157 and TB-500. Supplied for research using all three peptides together in one vial.',
     about: [
-      'GLOW is a compounded blend of multiple research peptides, supplied together in one 70mg vial rather than as separate compounds.',
-      'The exact component peptides and their individual mg amounts are not yet documented on this page. Confirm composition against the supplier’s specification before using it in a study that depends on a specific component.'
+      'GLOW is Glow Research’s designation for a compounded blend of three research peptides, GHK-Cu, BPC-157 and TB-500, supplied together in one 70mg vial rather than as separate compounds. It is commonly referred to by its components, GHK-Cu/BPC-157/TB-500, within the peptide research community.',
+      'GHK-Cu, BPC-157 and TB-500 act through distinct mechanisms, copper-dependent extracellular matrix signalling, angiogenic signalling and actin-binding cytoskeletal dynamics respectively, so the blend is a co-formulation of three independent compounds rather than a new one with its own mechanism.'
     ],
     research: [
       { t: 'Co-formulation research', d: 'Used by laboratories studying multiple compounded peptides delivered from a single vial rather than several discrete kits.' },
