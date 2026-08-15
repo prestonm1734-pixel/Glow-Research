@@ -43,8 +43,11 @@ function ok(label, cond, detail) {
 }
 
 // Every page a customer can land on. This used to also walk blog/ for the
-// article pages; there is no blog any more.
-const pages = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'));
+// article pages; there is no blog any more. google<token>.html is not a page
+// at all: it is Search Console's site-verification file, a bare line of text
+// with no head or meta, and it has to stay exactly as Google generated it.
+const pages = fs.readdirSync(ROOT)
+  .filter(f => f.endsWith('.html') && !/^google[0-9a-f]+\.html$/.test(f));
 
 // Pull a numeric literal out of a source file by its identifier.
 function constant(file, name) {
@@ -1019,6 +1022,21 @@ console.log('\nstructured data');
 {
   const bad = pages.filter(f => /aggregateRating|"@type":\s*"Review"/.test(read(f)));
   ok('no fabricated ratings or reviews', bad.length === 0, bad.join(', '));
+
+  // The WebSite SearchAction claims peptides.html?q=<term> is a working
+  // search results page. If the target URL and the page's own ?q= handling
+  // ever drift apart, the schema is asserting a search that does not run.
+  const home = read('index.html');
+  const searchActionMatch = home.match(/"urlTemplate":\s*"([^"]+)"/);
+  ok('index.html declares a SearchAction target', !!searchActionMatch);
+  if (searchActionMatch) {
+    ok('the SearchAction target points at peptides.html?q={search_term_string}',
+      searchActionMatch[1] === 'https://glowresearch.shop/peptides.html?q={search_term_string}',
+      searchActionMatch[1]);
+  }
+  const catalog = read('peptides.html');
+  ok('peptides.html reads ?q= into the search box on load',
+    /URLSearchParams\(location\.search\)\.get\('q'\)/.test(catalog));
 }
 
 /* ---------------------------------------------------------------------------

@@ -484,6 +484,14 @@
   sortSelect.addEventListener('change', renderProducts);
   searchInput.addEventListener('input', renderProducts);
 
+  // ?q= makes this page itself a real search results page, not just the
+  // search box's landing point: the WebSite SearchAction schema in
+  // index.html sends Google here with a term filled in, and that URL has to
+  // actually filter on load or the schema is asserting a search that
+  // doesn't run.
+  const qParam = new URLSearchParams(location.search).get('q');
+  if (qParam) searchInput.value = qParam;
+
   renderProducts();
 </script>
 <script src="js/account.js"></script>
