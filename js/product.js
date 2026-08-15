@@ -12,9 +12,9 @@
   // does too rather than keeping its own .toFixed(2) that always shows cents.
   const money = fmtPrice;
 
-  // CUTOFF_HOUR, CUTOFF_LABEL and TRANSIT_DAYS come from js/products-data.js.
-  // The evidence panel quotes all three, so they are sitewide constants rather
-  // than ones this file owns and the panel restates.
+  // CUTOFF_HOUR and TRANSIT_DAYS come from js/products-data.js. The shipping
+  // page and the marquee state the same two figures in words, so they are
+  // sitewide constants rather than ones this file owns and the others restate.
 
   // CAT_LABEL comes from js/products-data.js, loaded before this file.
 
@@ -111,8 +111,6 @@
         cutEl.innerHTML = '<strong>Out of stock</strong>';
         arrEl.innerHTML = 'Email <a href="mailto:support@glowresearch.shop">support@glowresearch.shop</a> ' +
           'and we will tell you when the next lot is released.';
-        setDispatchRow('Out of stock',
-          'Email support@glowresearch.shop and we will tell you when the next lot is released');
         return;
       }
       const e = deliveryEstimate();
@@ -122,14 +120,6 @@
         ? `In stock, <strong>ships today</strong>. Order within <strong>${countdown(e.secondsLeft)}</strong>.`
         : 'In stock, <strong>ships next business day</strong>';
       arrEl.innerHTML = `Estimated delivery <strong>${fmtDay(e.arrivalDate)}</strong>`;
-
-      setDispatchRow(
-        e.shipsToday ? 'Ships today' : 'Ships next business day',
-        e.shipsToday
-          ? `Order within ${countdown(e.secondsLeft)} to make today's pickup. ` +
-            `Estimated delivery ${fmtDay(e.arrivalDate)}`
-          : `Cutoff is ${CUTOFF_LABEL}, Monday to Friday. Estimated delivery ${fmtDay(e.arrivalDate)}`
-      );
     }
 
     refreshDelivery = tick;
@@ -225,41 +215,32 @@
     box.rel = 'noopener';
   }
 
-  /* ================= the Glow Standard =================
-     Drawn by evidenceHtml() in js/products-data.js, which is the same code
+  /* ================= batch analysis =================
+     Drawn by batchPanelHtml() in js/products-data.js, which is the same code
      tools/build-products.js runs at build time. Rendering here rather than
      trusting the baked markup means one product page cannot end up showing
      another's record after a navigation, and it is what fills the panel on
      product.html?p=<slug>, which has no baked content at all. */
 
   function renderEvidence(p) {
-    const grid = $('pdEvidence');
-    if (!grid) return;
-    grid.innerHTML = evidenceHtml(p);
+    const wrap = $('pdEvidence');
+    if (!wrap) return;
+    wrap.innerHTML = batchPanelHtml(p);
 
     // The certificate link is drawn only when there is a document to open, on
-    // the same test renderCoa() uses. No href, no link: a row that says "view
+    // the same test renderCoa() uses. No href, no link: a line that says "view
     // report" and does nothing is the uncertainty this panel exists to remove.
     const href = p.coa || (typeof COA_URL === 'string' ? COA_URL : '');
-    const cell = grid.querySelector('[data-row="document"] dd');
-    if (href && COA_COPY.panelLink && cell) {
+    const foot = wrap.querySelector('.ba-foot');
+    if (href && COA_COPY.panelLink && foot) {
       const a = document.createElement('a');
       a.className = 'gs-report';
       a.href = href;
       a.target = '_blank';
       a.rel = 'noopener';
       a.textContent = `${COA_COPY.panelLink} →`;
-      cell.appendChild(a);
+      foot.after(a);
     }
-  }
-
-  // Called every minute by renderDelivery(): the one row whose answer depends
-  // on the clock rather than on the catalog.
-  function setDispatchRow(value, note) {
-    const cell = document.querySelector('#pdEvidence [data-row="dispatch"] dd');
-    if (!cell) return;
-    cell.querySelector('.gs-value').textContent = value;
-    cell.querySelector('.gs-note').textContent = note;
   }
 
 /* ================= mg picker ================= */

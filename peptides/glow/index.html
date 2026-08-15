@@ -451,32 +451,90 @@
      direct feedback for a press, not ambient movement, so it is exempt. */
   .pd-page .pd-acc > summary{ transition: color .2s ease !important; }
 
-  /* ---------- the Glow Standard ----------
-     A record, not a trust badge. Mono labels, one fact per cell, hairlines
-     doing the separating instead of boxes: the cells sit white on the section's
-     grey and the 1px grid gap is the only rule drawn. Wrapping to two columns
-     and then one needs no extra border rules that way. */
+  /* ---------- batch analysis ----------
+     A record, not a trust badge. The card is the one place on the page that
+     inverts, because the headline figure is the single most-looked-for number
+     on the whole site and everything else here is deliberately quiet. Below it
+     the panel is hairlines and mono labels: no green ticks, no rounded pills,
+     no colour standing in for a result the laboratory has not returned. */
   .pd-standard{ background:#f7f7f5; border-top:1px solid rgba(0,0,0,.1); padding: 62px 0 66px; }
   .gs-head{ margin-bottom: 28px; }
   .gs-head h2{
     font-size: clamp(1.3rem, 2.3vw, 1.8rem); font-weight:700; letter-spacing:-.025em;
     margin:0; color:#0a0a0a; max-width: 30ch;
   }
-  .gs-grid{
-    margin:0; display:grid; grid-template-columns: repeat(4, 1fr); gap:1px;
-    background: rgba(0,0,0,.13); border:1px solid rgba(0,0,0,.13);
+  .ba-intro{
+    margin: 12px 0 0; max-width: 58ch;
+    font-size:.92rem; line-height:1.65; color:#55554f;
   }
-  .gs-cell{ background:#fff; padding: 24px 24px 26px; }
-  .gs-cell dt{
+
+  /* --- the card --- */
+  .ba-card{
+    background:#0a0a0a; color:#fff; padding: 30px 32px 26px;
+    display:grid; grid-template-columns: 1fr auto; grid-template-areas: "lab figure" "meta meta";
+    gap: 26px 40px; align-items:start;
+  }
+  .ba-lab{ grid-area:lab; display:flex; align-items:center; gap:14px; }
+  /* Drawn only once LAB.logo holds a mark: see batchPanelHtml(). */
+  .ba-lab-logo{ flex:0 0 auto; width:38px; height:38px; object-fit:contain; background:#fff; padding:4px; }
+  .ba-lab-id{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .ba-lab-name{ font-family:var(--font-display); font-size:1rem; font-weight:700; letter-spacing:-.015em; }
+  .ba-lab-sub{ font-size:.78rem; line-height:1.5; color:rgba(255,255,255,.55); }
+
+  .ba-figure{ grid-area:figure; display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+  .ba-figure-label{
+    font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.5);
+  }
+  .ba-figure-value{
+    font-family:var(--font-display); font-size: clamp(2.4rem, 5vw, 3.4rem);
+    font-weight:700; letter-spacing:-.04em; line-height:1;
+  }
+
+  .ba-meta{
+    grid-area:meta; margin:0; padding-top:22px; border-top:1px solid rgba(255,255,255,.16);
+    display:flex; flex-wrap:wrap; gap: 20px 44px;
+  }
+  .ba-meta-cell dt{
+    font-family:'JetBrains Mono', monospace; font-size:.58rem; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.45);
+    margin-bottom:7px;
+  }
+  .ba-meta-cell dd{ margin:0; font-size:.88rem; font-weight:600; color:rgba(255,255,255,.92); }
+
+  /* --- the panel --- */
+  .ba-panel{ background:#fff; border:1px solid rgba(0,0,0,.13); border-top:0; }
+  .ba-panel-head{
+    display:flex; justify-content:space-between; align-items:center; gap:16px;
+    padding: 15px 22px; border-bottom:1px solid rgba(0,0,0,.13); background:#fafaf8;
     font-family:'JetBrains Mono', monospace; font-size:.63rem; font-weight:600;
-    letter-spacing:.16em; text-transform:uppercase; color:#8a8a86; margin-bottom:13px;
+    letter-spacing:.16em; text-transform:uppercase; color:#8a8a86;
   }
-  .gs-cell dd{ margin:0; }
-  .gs-value{
-    display:block; font-family:var(--font-display); font-size:1.02rem;
-    font-weight:700; letter-spacing:-.015em; line-height:1.3; color:#0a0a0a;
+  .ba-row{
+    display:grid; grid-template-columns: 1fr auto; gap:20px; align-items:center;
+    padding: 15px 22px; border-bottom:1px solid rgba(0,0,0,.08);
   }
-  .gs-note{ display:block; margin-top:10px; font-size:.82rem; line-height:1.6; color:#6f6f6a; }
+  .ba-row:last-child{ border-bottom:0; }
+  .ba-row-name{
+    display:flex; flex-direction:column; gap:3px;
+    font-size:.95rem; font-weight:600; color:#0a0a0a;
+  }
+  .ba-row-method{
+    font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:500;
+    letter-spacing:.05em; color:#8a8a86;
+  }
+  .ba-row-value{ font-size:.95rem; font-weight:700; color:#0a0a0a; text-align:right; }
+  /* A figure we hold is stated; a row pointing at the certificate is set back,
+     so the one measured number on the panel is not competing with six
+     signposts for the same weight. */
+  .ba-row-value.is-ref{
+    font-family:'JetBrains Mono', monospace; font-size:.68rem; font-weight:600;
+    letter-spacing:.11em; text-transform:uppercase; color:#8a8a86;
+  }
+  .ba-foot{
+    margin: 14px 2px 0; max-width: 68ch;
+    font-size:.8rem; line-height:1.65; color:#6f6f6a;
+  }
   /* only drawn when a certificate is actually hosted — see renderEvidence() */
   .gs-report{
     display:inline-block; margin-top:12px; padding-bottom:3px;
@@ -521,15 +579,23 @@
     /* stacked on mobile, so pinning the image would just cover the copy */
     .pd-visual-col{ position:static; }
     .pd-visual{ height: clamp(300px, 78vw, 380px); padding: 6% 12%; }
-    /* four data cells at tablet width leave each one about 160px wide, which
-       breaks the manufacturing-partner value onto three lines */
-    .gs-grid{ grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 560px){
     .pd-hero{ padding: 36px 0 56px; }
     .pd-standard{ padding: 48px 0 52px; }
-    .gs-grid{ grid-template-columns: 1fr; }
-    .gs-cell{ padding: 20px 20px 22px; }
+
+    /* The lab name and the figure each need the full width at this size, so the
+       card goes to one column and the figure moves under the name rather than
+       shrinking to fit beside it. */
+    .ba-card{
+      padding: 24px 20px 22px; gap: 22px;
+      grid-template-columns: 1fr; grid-template-areas: "lab" "figure" "meta";
+    }
+    .ba-figure{ align-items:flex-start; }
+    .ba-meta{ padding-top:18px; gap: 16px 28px; }
+
+    .ba-panel-head{ padding: 13px 16px; }
+    .ba-row{ gap: 14px; padding: 13px 16px; }
 
     /* The buy column ran to 938px on a 390px screen, most of it rhythm rather
        than content, so the price and the button could not be on screen at the
@@ -784,62 +850,99 @@
     </div>
   </section>
 
-  <!-- ============ the Glow Standard ============
+  <!-- ============ batch analysis ============
        The one trust section on this page, and the only one, because it stops
-       being a standard the moment it is competing with a second block making
-       the same argument in bigger type. Four rows, in the order the chain of
-       custody actually happens.
+       carrying weight the moment it is competing with a second block making the
+       same argument in bigger type.
 
-       Every cell comes from evidenceRows() in js/products-data.js, so the panel
-       is structurally incapable of stating something the code does not hold.
-       The notes are load-bearing, not decoration: "lot-matched batch
-       documentation" is true of how the business runs and says nothing about
-       whether this site will hand you the document, and the note is where that
-       gets answered. js/product.js redraws these on load and keeps the dispatch
-       row current; tools/build-products.js bakes them into each generated page. -->
+       Everything inside #pdEvidence comes from batchPanelHtml() in
+       js/products-data.js, so the panel is structurally incapable of stating a
+       figure the catalog does not hold: the headline number is the compound's
+       own purity, and every analysis with no released figure behind it prints
+       the null indicator rather than a plausible-looking result. js/product.js
+       redraws it on load; tools/build-products.js bakes it into each generated
+       page. -->
   <section class="pd-standard">
     <div class="container">
       <div class="gs-head">
-        <span class="pd-label">The Glow Standard</span>
-        <h2>Everything we know about this vial, in one place.</h2>
+        <span class="pd-label">Batch analysis</span>
+        <h2>Every lot, independently analysed.</h2>
+        <p class="ba-intro">Each lot is analysed by a third-party laboratory before it ships. This is the panel that laboratory runs, and what it reported for this compound.</p>
       </div>
 
-      <dl class="gs-grid" id="pdEvidence">
-    <div class="gs-cell" data-row="source">
-      <dt>Source</dt>
-      <dd>
-        <span class="gs-value">Manufacturing partner</span>
-        <span class="gs-note">Synthesis and fill at a partner facility operating to cGMP-aligned quality practices</span>
-      </dd>
-    </div>
-    <div class="gs-cell" data-row="verify">
-      <dt>Verify</dt>
-      <dd>
-        <span class="gs-value">99.0% purity</span>
-        <span class="gs-note">HPLC-UV + LC-MS + net peptide content + sterility + endotoxin + appearance and solubility + heavy metals, by a third-party laboratory with no stake in the result</span>
-      </dd>
-    </div>
-    <div class="gs-cell" data-row="document">
-      <dt>Document</dt>
-      <dd>
-        <span class="gs-value">Lot-matched batch documentation</span>
-        <span class="gs-note">Certificate on request: email support@glowresearch.shop with the lot number on your vial</span>
-      </dd>
-    </div>
-    <div class="gs-cell" data-row="dispatch">
-      <dt>Dispatch</dt>
-      <dd>
-        <span class="gs-value">Same-business-day before 2 PM PST</span>
-        <span class="gs-note">FedEx 2-Day service, Monday to Friday</span>
-      </dd>
-    </div></dl>
+      <!-- A <section> rather than a <div> so the build has an unambiguous
+           closing tag to replace up to: the panel it writes in here is full of
+           nested divs, and setInner() stops at the first matching close. -->
+      <section id="pdEvidence">
+      <div class="ba-card">
+        <div class="ba-lab">
+          
+          <span class="ba-lab-id">
+            <span class="ba-lab-name">Independent third-party laboratory</span>
+            <span class="ba-lab-sub">Commissioned per lot, with no stake in the result</span>
+          </span>
+        </div>
+        <div class="ba-figure">
+          <span class="ba-figure-label">Purity by Reverse-phase HPLC-UV</span>
+          <span class="ba-figure-value">99.0%</span>
+        </div>
+        <dl class="ba-meta">
+          <div class="ba-meta-cell">
+            <dt>Compound</dt>
+            <dd>GLOW</dd>
+          </div>
+          <div class="ba-meta-cell">
+            <dt>Analyses</dt>
+            <dd>7 per lot</dd>
+          </div>
+          <div class="ba-meta-cell">
+            <dt>Certificate</dt>
+            <dd>COA on request</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="ba-panel">
+        <div class="ba-panel-head">
+          <span>Full analysis panel</span>
+          <span>Run on every lot</span>
+        </div>
+        <div class="ba-row">
+          <span class="ba-row-name">Purity<span class="ba-row-method">Reverse-phase HPLC-UV</span></span>
+          <span class="ba-row-value">99.0%</span>
+        </div>
+        <div class="ba-row">
+          <span class="ba-row-name">Identity<span class="ba-row-method">LC-MS</span></span>
+          <span class="ba-row-value is-ref">On certificate</span>
+        </div>
+        <div class="ba-row">
+          <span class="ba-row-name">Net peptide content</span>
+          <span class="ba-row-value is-ref">On certificate</span>
+        </div>
+        <div class="ba-row">
+          <span class="ba-row-name">Sterility</span>
+          <span class="ba-row-value is-ref">On certificate</span>
+        </div>
+        <div class="ba-row">
+          <span class="ba-row-name">Endotoxin<span class="ba-row-method">LAL assay, USP chapter 85</span></span>
+          <span class="ba-row-value is-ref">On certificate</span>
+        </div>
+        <div class="ba-row">
+          <span class="ba-row-name">Appearance and solubility</span>
+          <span class="ba-row-value is-ref">On certificate</span>
+        </div>
+        <div class="ba-row">
+          <span class="ba-row-name">Heavy metals</span>
+          <span class="ba-row-value is-ref">On certificate</span>
+        </div>
+      </div>
+      <p class="ba-foot">Certificate on request: email support@glowresearch.shop with the lot number on your vial</p></section>
 
       <!-- One small link, because deleting the four-card summary that used to
            sit below left how-we-test.html with no route in from here except the
            Resources menu. It is a text link under a panel, not a step in the
            buying flow: nobody has to press it to finish reading the page. -->
       <a class="gs-more" href="../../how-we-test.html">
-        See our full process <span aria-hidden="true">&rarr;</span>
+        See how we test <span aria-hidden="true">&rarr;</span>
       </a>
     </div>
   </section>

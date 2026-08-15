@@ -27,7 +27,8 @@ const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, CUTOFF_LABEL, CUTOFF_LABEL_SHORT,
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord,
-  ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG, evidenceRows, evidenceHtml,
+  ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
+  LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
   FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
@@ -226,18 +227,84 @@ console.log('\ntransit time');
 }
 
 /* ---------------------------------------------------------------------------
- * 3d. The Glow Standard panel. This is the strongest claim surface on the site:
- *     it tells a buyer that what they are reading is a record of the vial in
- *     front of them. That is only worth saying if the panel is structurally
- *     unable to state anything the catalog does not hold, which is what the
- *     checks below enforce. The failure to prevent is a panel that keeps
- *     reading like a record after the data behind a row has gone away.
+ * 3d. The batch analysis panel. This is the strongest claim surface on the
+ *     site: it is laid out as a laboratory report, which tells a buyer that
+ *     what they are reading is a record of the vial in front of them. A panel
+ *     shaped like a certificate has to be held to a certificate's standard,
+ *     so the checks below are about what it is structurally unable to say.
+ *
+ *     Two failures to prevent, both of which the layout invites. A results
+ *     column is a set of blanks asking to be filled, and a plausible figure
+ *     typed into one is indistinguishable from a measured one. And a header
+ *     built for a laboratory's name and mark is an invitation to name a
+ *     laboratory before one is confirmed, which is a claim about somebody
+ *     else's business.
  * ------------------------------------------------------------------------- */
-console.log('\nthe Glow Standard panel');
+console.log('\nthe batch analysis panel');
 {
   const pd = read('product.html');
 
   ok('the product page carries the panel', /id="pdEvidence"/.test(pd));
+
+  // Every figure in the results column has to come from the catalog. Purity is
+  // the only result held today, so this currently asserts that six of the seven
+  // rows carry no figure at all: the day p.results holds a real released
+  // report, those rows fill from it and this still holds.
+  const invented = [];
+  GLOW_PRODUCTS.forEach(prod => batchRows(prod).forEach(r => {
+    const held = (prod.results || {})[r.name] ||
+      (r.name === PURITY_ROW ? prod.purity : '');
+    if (r.value !== (held || '')) invented.push(`${prod.name}/${r.name}: "${r.value}"`);
+  }));
+  ok('every figure in the results column is one the catalog holds',
+    invented.length === 0, invented.join(', '));
+
+  // And a row with no figure has to say so rather than render blank or borrow
+  // the row above it. Every cell the panel prints is either a held figure or
+  // the one string that points at the document, and nothing else.
+  const strayCell = [];
+  GLOW_PRODUCTS.forEach(prod => {
+    const rows = batchRows(prod);
+    const cells = [...batchPanelHtml(prod).matchAll(/class="ba-row-value[^"]*">([^<]*)</g)]
+      .map(m => m[1]);
+    if (cells.length !== rows.length) {
+      strayCell.push(`${prod.name}: ${cells.length} cells for ${rows.length} rows`);
+    }
+    cells.forEach((cell, i) => {
+      const want = rows[i] && (rows[i].value || RESULT_ON_COA);
+      if (cell !== want) strayCell.push(`${prod.name}/${rows[i] && rows[i].name}: "${cell}"`);
+    });
+  });
+  ok('a row with no figure points at the certificate, from the one string',
+    strayCell.length === 0, strayCell.join(', '));
+
+  // RESULT_ON_COA says the number is on the certificate, which is only true
+  // while every row of the panel is a row that certificate reports.
+  const offCert = ANALYSIS_TESTS.filter(t =>
+    !ANALYSIS_LONG.toLowerCase().includes(t.short.toLowerCase()));
+  ok('every analysis the panel points at the certificate for is one it reports',
+    offCert.length === 0, offCert.map(t => t.name).join(', '));
+
+  // The headline number is the compound's own purity and nothing else, the
+  // same rule the hero average is held to: edit the catalog, not the page.
+  const wrongPurity = GLOW_PRODUCTS.filter(prod =>
+    !batchPanelHtml(prod).includes(`<span class="ba-figure-value">${prod.purity}</span>`));
+  ok('the headline figure is the catalog purity for every compound',
+    wrongPurity.length === 0, wrongPurity.map(prod => prod.name).join(', '));
+  ok('a product with no purity yet shows the null indicator, not a number',
+    batchPanelHtml({}).includes('<span class="ba-figure-value">—</span>'));
+
+  // A named, accredited laboratory is a claim about a third party and a logo is
+  // their property. Neither is confirmed, so the panel states what is true
+  // without them, and this fails the day a name is typed in without a mark and
+  // an accreditation confirmed alongside it.
+  const lab = labIdentity();
+  ok('the laboratory is named only when the catalog names it',
+    (LAB.name && LAB.accreditation && LAB.logo) ||
+    (!LAB.name && !LAB.logo && lab.name === 'Independent third-party laboratory'),
+    'LAB must be wholly empty or wholly filled: a name needs its accreditation and mark with it');
+  ok('the unnamed header still says who ran the analysis and what they gain by it',
+    /third-party/i.test(lab.name) && /no stake in the result/i.test(lab.accreditation));
 
   // The vial in every product photo carries Glow's own artwork; what actually
   // ships carries the manufacturer's generic label. A photo that doesn't
@@ -256,9 +323,9 @@ console.log('\nthe Glow Standard panel');
   ok('the Product schema uses the full description, not the summary',
     /description: p\.about\[0\]/.test(read('tools/build-products.js')));
   ok('the panel is rendered from the catalog, not from its own markup',
-    /evidenceHtml\(/.test(read('js/product.js')) &&
-    /evidenceHtml\(/.test(read('tools/build-products.js')),
-    'js/product.js and tools/build-products.js must both render from evidenceHtml()');
+    /batchPanelHtml\(/.test(read('js/product.js')) &&
+    /batchPanelHtml\(/.test(read('tools/build-products.js')),
+    'js/product.js and tools/build-products.js must both render from batchPanelHtml()');
 
   // The served markup is what a crawler reads and what shows before scripts
   // run, so it has to be the same rows the code produces. Compared as
@@ -267,16 +334,16 @@ console.log('\nthe Glow Standard panel');
   const norm = s => s.replace(/\s+/g, ' ').replace(/> </g, '><').trim();
   // product.html is the donor every generated page is cut from, so it cannot
   // regenerate itself the way peptides/<slug>/ does. Rather than leave that as
-  // a step someone has to remember after flipping COAS_PUBLISHED, the failure
-  // prints the markup to paste. Flipping the flag then stays a one-line change
-  // plus a paste the build hands you, not a hunt.
-  const baked = pd.match(/id="pdEvidence"[^>]*>([\s\S]*?)<\/dl>/);
+  // a step someone has to remember after flipping COAS_PUBLISHED or naming the
+  // laboratory, the failure prints the markup to paste. Either stays a one-line
+  // change plus a paste the build hands you, not a hunt.
+  const baked = pd.match(/id="pdEvidence"[^>]*>([\s\S]*?)<\/section>/);
   ok('the served panel matches what the code renders',
-    baked !== null && norm(baked[1]) === norm(evidenceHtml({})),
-    'product.html has drifted from evidenceHtml(). Replace the contents of\n' +
-    '          <dl id="pdEvidence"> with:\n' + evidenceHtml({}));
+    baked !== null && norm(baked[1]) === norm(batchPanelHtml({})),
+    'product.html has drifted from batchPanelHtml(). Replace the contents of\n' +
+    '          <section id="pdEvidence"> with:\n' + batchPanelHtml({}));
 
-  // The Verify row names the analyses in three words. how-we-test.html names them
+  // The panel names the analyses in short form. how-we-test.html names them
   // in a sentence. The short form must not name one the long one does not:
   // "LC-MS" is a different instrument from "HPLC, and separately mass
   // spectrometry", and a data cell is where that substitution goes unnoticed.
@@ -304,59 +371,39 @@ console.log('\nthe Glow Standard panel');
   ok('no page upgrades that to a GMP certification', overclaims.length === 0,
     overclaims.join(', '));
 
-  // The Verify row states this compound's purity. It is the only per-product
-  // number on the panel, which makes it the only one that can be wrong about
-  // the vial in front of someone, so it has to be the catalog's figure and
-  // nothing else. Same rule as the hero average: edit the catalog, not the page.
-  //
-  // `verifyValue` is the one deliberate exception: a product this panel does
-  // not truthfully describe as written states so explicitly rather than
-  // inheriting "<purity> purity" as if it had been run through the peptide
-  // testing panel. For those products this checks the row echoes verifyValue
-  // exactly, so the override itself cannot silently drift from what
-  // evidenceRows() renders.
-  const wrongPurity = GLOW_PRODUCTS.filter(prod => {
-    const row = evidenceRows(prod).find(r => r.key === 'verify');
-    const want = prod.verifyValue || `${prod.purity} purity`;
-    return row.value !== want;
-  });
-  ok('the Verify row states the catalog purity for every compound, or its documented override',
-    wrongPurity.length === 0, wrongPurity.map(prod => prod.name).join(', '));
-  ok('a product with no purity yet shows the null indicator, not a number',
-    evidenceRows({}).find(r => r.key === 'verify').value === '—');
-
-  // "Lot-matched batch documentation" is true of how the business runs, and it
-  // is silent on the question a buyer is actually asking: can I have it. While
-  // certificates are held, only the note answers that, so the note is the part
-  // that must not go missing. A four-row panel is exactly where a sub-line gets
-  // deleted for looking untidy.
-  const rows = evidenceRows({});
-  const doc = rows.find(r => r.key === 'document');
-  ok('the panel has a document row', Boolean(doc));
+  // The panel is laid out like a released report, so the one question it must
+  // not leave hanging is how to get the actual document. While certificates are
+  // held that answer is the footer note and nothing else, which makes it the
+  // line most likely to be deleted for looking untidy under a tidy table.
+  const foot = batchPanelHtml({});
   if (!COAS_PUBLISHED) {
-    ok('the document row says how to actually get the certificate',
-      Boolean(doc) && /on request/i.test(doc.note) && /support@glowresearch\.shop/.test(doc.note),
-      `note reads: "${doc && doc.note}"`);
+    ok('the panel says how to actually get the certificate',
+      /on request/i.test(foot) && /support@glowresearch\.shop/.test(foot));
     ok('and offers no link, because there is nothing to open',
-      Boolean(doc) && !doc.link);
+      !COA_COPY.panelLink && !/class="gs-report"/.test(pd));
   }
-  ok('every row carries a note',
-    rows.every(r => r.note && r.note.trim().length > 0),
-    rows.filter(r => !r.note).map(r => r.key).join(', '));
+
+  // Every meta cell has to carry a value. The strip filters rather than pads,
+  // so a cell the catalog cannot fill is absent instead of showing a blank or
+  // a dash where a lot number belongs.
+  const blankMeta = GLOW_PRODUCTS.flatMap(prod =>
+    batchMeta(prod).filter(m => !m.value).map(m => `${prod.name}/${m.label}`));
+  ok('no meta cell is printed without a value', blankMeta.length === 0,
+    blankMeta.join(', '));
 
   // A lot number is the one thing a reader can check against the vial in their
   // hand, which makes an invented one the worst thing this page could print.
   // Nothing holds lot codes today, so this currently forbids all of them: the
   // day the catalog carries real ones, they are the only ones allowed through.
   const held = new Set(GLOW_PRODUCTS.map(p => p.lot).filter(Boolean));
-  const invented = [];
+  const inventedLots = [];
   pages.forEach(f => {
     for (const m of read(f).matchAll(/\bGR-[A-Z0-9]{2,}-[\d-]{3,}\b/g)) {
-      if (!held.has(m[0])) invented.push(`${f}: ${m[0]}`);
+      if (!held.has(m[0])) inventedLots.push(`${f}: ${m[0]}`);
     }
   });
-  ok('no page prints a lot number the catalog does not hold', invented.length === 0,
-    invented.join(', '));
+  ok('no page prints a lot number the catalog does not hold', inventedLots.length === 0,
+    inventedLots.join(', '));
 }
 
 /* ---------------------------------------------------------------------------

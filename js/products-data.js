@@ -665,94 +665,126 @@ function escHtml(t) {
   return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// The evidence panel, as data: the four steps of the chain of custody, in the
-// order they happen. Each row is a label, the fact, and the sentence that makes
-// the fact checkable.
+// ---------------------------------------------------------------------------
+// The batch analysis panel: the laboratory, the figure it returned, and every
+// analysis it runs on the lot.
 //
-// The note is not decoration. "Lot-matched batch documentation" is true of how
-// the business runs and says nothing about whether this site will hand you the
-// document, which is the question a buyer is actually asking. The note is where
-// that gets answered, and it is the reason a row can state the operation
-// plainly without the page overpromising. Drop the notes and every row becomes
-// an adjective again.
+// The laboratory itself, as data rather than a name typed into the panel.
 //
-// `key` identifies the one row that cannot be answered ahead of time: dispatch
-// depends on the clock and on whether this size is sellable, so js/product.js
-// rewrites it on load and every minute after.
-function evidenceRows(p) {
-  return [
-    {
-      key: 'source',
-      label: 'Source',
-      value: SOURCE_SHORT,
-      note: SOURCE_LONG,
-    },
-    {
-      // The value is the result, the note is how it was reached. Leading with
-      // the method made this row a description of the process, identical on all
-      // nine compounds; leading with the figure is what makes the heading above
-      // ("this vial") true rather than nearly true. `purity` is still
-      // placeholder data, flagged at the head of this file: it is derived here
-      // rather than typed into the panel precisely so the import corrects it.
-      //
-      // verifyValue/verifyNote override for the rare product this panel does
-      // not describe truthfully as written, so it does not inherit a claim
-      // that it was run through testing it never underwent.
-      key: 'verify',
-      label: 'Verify',
-      value: p.verifyValue || (p.purity && `${p.purity} purity`) || '—',
-      note: p.verifyNote || `${ANALYSIS_SHORT}, by a third-party laboratory with no stake in the result`,
-    },
-    {
-      key: 'document',
-      label: 'Document',
-      value: 'Lot-matched batch documentation',
-      note: COA_COPY.panelNote,
-      link: COA_COPY.panelLink,
-    },
-    {
-      // The standing rule, which is true at any hour. It is what a crawler
-      // reads and what shows before scripts run; the live answer replaces it.
-      key: 'dispatch',
-      label: 'Dispatch',
-      value: `Same-business-day before ${CUTOFF_LABEL_SHORT}`,
-      note: `FedEx ${TRANSIT_DAYS}-Day service, Monday to Friday`,
-    },
-  ];
+// PLACEHOLDER: all three fields are empty, because the laboratory has not been
+// named on the site yet and we hold no mark we are licensed to draw. A named,
+// accredited laboratory is a claim about somebody else's business, and a logo
+// is their property, so inventing either to fill the header is exactly what
+// PRINCIPLES.md rules out. The panel renders its unnamed form until all three
+// are confirmed together: `logo` is a path under assets/.
+const LAB = {
+  name: '',
+  accreditation: '',
+  logo: '',
+};
+
+// What the header states while LAB is empty. Both halves are true either way:
+// the laboratory is not us, and it has nothing riding on the number it returns.
+// This is the fallback rather than the default so that naming the lab is a
+// one-line change, not a rewrite of the panel.
+function labIdentity() {
+  return {
+    name: LAB.name || 'Independent third-party laboratory',
+    accreditation: LAB.accreditation || 'Commissioned per lot, with no stake in the result',
+    logo: LAB.logo,
+  };
 }
 
-// The documentation tab: the same record, longer, plus the fields that belong
-// on a record rather than in a summary.
-function docRows(p) {
-  return [
-    { label: 'Compound', value: p.name },
-    { label: 'Stated purity', value: p.purity },
-    // analysisNote overrides for the same reason as verifyNote above.
-    { label: 'Analysis', value: p.analysisNote || ANALYSIS_LONG },
-    { label: 'Certificate', value: COA_COPY.docLine },
-    { label: 'Current lot', value: p.lot || '—' },
-    { label: 'Lot analysed', value: (p.tested && analysedOn(p.tested)) || '—' },
-    { label: 'Manufacturing', value: SOURCE_LONG },
-    {
-      label: 'Intended use',
-      value: 'Laboratory and in-vitro research only. Not for human or animal consumption.',
-    },
-  ];
+// The row the headline figure is taken from. Named rather than matched on a
+// string in three places, and check-claims.js fails the build if the panel
+// stops holding a row by this name.
+const PURITY_ROW = 'Purity';
+const purityMethod = () => {
+  const row = ANALYSIS_TESTS.find(t => t.name === PURITY_ROW);
+  return (row && row.method) || '';
+};
+
+// What a row says when the catalog holds no figure for it, which today is six
+// of the seven. It is not a hedge: every name in ANALYSIS_TESTS is a row the
+// certificate reports, so pointing at the document is the true answer to where
+// the number is. The alternative, a column of dashes, reads as though the
+// analysis were skipped rather than simply not reprinted here.
+const RESULT_ON_COA = 'On certificate';
+
+// One row per analysis the laboratory runs, and what it reported for this
+// compound.
+//
+// `value` is the released figure. Purity is the only one the catalog holds
+// today, so every other row falls through to RESULT_ON_COA: a results column
+// filled with invented numbers is the most damaging thing this page could
+// print. `p.results`, keyed by the row name, is where a real released report
+// lands, and each row picks its own figure up the moment one does.
+function batchRows(p) {
+  const results = (p && p.results) || {};
+  return ANALYSIS_TESTS.map(t => {
+    const value = results[t.name] || (t.name === PURITY_ROW ? (p && p.purity) || '' : '');
+    return { name: t.name, method: t.method, value, held: Boolean(value) };
+  });
 }
 
-// The panel is drawn from the rows above as a plain string, with no DOM access,
-// so js/product.js renders it at runtime and tools/build-products.js bakes the
-// identical markup into each generated page. One template, so the served HTML
-// and the hydrated HTML cannot disagree.
-function evidenceHtml(p) {
-  return evidenceRows(p).map(r => `
-    <div class="gs-cell" data-row="${r.key}">
-      <dt>${r.label}</dt>
-      <dd>
-        <span class="gs-value">${r.value}</span>
-        <span class="gs-note">${r.note}</span>
-      </dd>
-    </div>`).join('');
+// The card's meta strip. Filtered rather than padded with blanks: a cell is
+// listed when the catalog can fill it, so Lot and Tested appear on their own
+// the day per-lot data lands and print nothing until then.
+function batchMeta(p) {
+  return [
+    { label: 'Compound', value: (p && p.name) || '' },
+    { label: 'Lot', value: (p && p.lot) || '' },
+    { label: 'Tested', value: (p && p.tested) || '' },
+    { label: 'Analyses', value: `${TESTS_PER_BATCH} per lot` },
+    { label: 'Certificate', value: COA_COPY.short },
+  ].filter(m => m.value);
+}
+
+// The panel is drawn as a plain string with no DOM access, so js/product.js
+// renders it at runtime and tools/build-products.js bakes the identical markup
+// into each generated page. One template, so the served HTML and the hydrated
+// HTML cannot disagree.
+//
+// No logo mark is drawn while LAB.logo is empty. An empty box beside the name
+// reads as an image that failed to load, which is worse than the name standing
+// on its own, and any glyph put there to fill it would be a mark for a
+// laboratory nobody has named.
+function batchPanelHtml(p) {
+  const lab = labIdentity();
+  const method = purityMethod();
+  return `
+      <div class="ba-card">
+        <div class="ba-lab">
+          ${lab.logo
+            ? `<img class="ba-lab-logo" src="${escHtml(lab.logo)}" alt="${escHtml(lab.name)}" />`
+            : ''}
+          <span class="ba-lab-id">
+            <span class="ba-lab-name">${escHtml(lab.name)}</span>
+            <span class="ba-lab-sub">${escHtml(lab.accreditation)}</span>
+          </span>
+        </div>
+        <div class="ba-figure">
+          <span class="ba-figure-label">${escHtml(method ? `Purity by ${method}` : 'Purity')}</span>
+          <span class="ba-figure-value">${escHtml((p && p.purity) || '') || '—'}</span>
+        </div>
+        <dl class="ba-meta">${batchMeta(p).map(m => `
+          <div class="ba-meta-cell">
+            <dt>${escHtml(m.label)}</dt>
+            <dd>${escHtml(m.value)}</dd>
+          </div>`).join('')}
+        </dl>
+      </div>
+      <div class="ba-panel">
+        <div class="ba-panel-head">
+          <span>Full analysis panel</span>
+          <span>Run on every lot</span>
+        </div>${batchRows(p).map(r => `
+        <div class="ba-row">
+          <span class="ba-row-name">${escHtml(r.name)}${r.method ? `<span class="ba-row-method">${escHtml(r.method)}</span>` : ''}</span>
+          <span class="ba-row-value${r.held ? '' : ' is-ref'}">${escHtml(r.value || RESULT_ON_COA)}</span>
+        </div>`).join('')}
+      </div>
+      <p class="ba-foot">${escHtml(COA_COPY.panelNote)}</p>`;
 }
 
 // Which chip on peptides.html a product falls under. The catalog only has
@@ -1184,8 +1216,14 @@ if (typeof module !== 'undefined' && module.exports) {
     productCardHtml,
     productHref,
     catFilterGroup,
-    evidenceRows,
-    evidenceHtml,
+    LAB,
+    labIdentity,
+    PURITY_ROW,
+    purityMethod,
+    RESULT_ON_COA,
+    batchRows,
+    batchMeta,
+    batchPanelHtml,
     bulkSavingPct,
     SITEWIDE_DISCOUNT,
     QTY_TIERS,

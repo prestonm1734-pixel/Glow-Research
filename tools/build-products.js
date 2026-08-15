@@ -35,7 +35,7 @@ const OUT_DIR = 'peptides';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, hasList, listPriceOf, PRODUCT_PAGES_LIVE,
-  sizeInStock, productInStock, evidenceHtml, unitPriceAt,
+  sizeInStock, productInStock, batchPanelHtml, unitPriceAt,
   catFilterGroup, CAT_LABEL, VIAL_ART_NOTICE,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
@@ -260,12 +260,12 @@ function buildProduct(p, donor) {
       'Email support@glowresearch.shop and we will tell you when the next lot is released.');
   }
 
-  // The evidence panel, from the same function js/product.js calls on load. The
-  // Verify row carries this compound's own purity figure, so the panel really
-  // is per product rather than four constants repeated nine times. The dispatch
-  // row keeps its standing-rule wording: a build cannot know what time the page
-  // will be read, so js/product.js replaces that one on load.
-  html = setInner(html, 'pdEvidence', 'dl', evidenceHtml(p));
+  // The batch analysis panel, from the same function js/product.js calls on
+  // load. The headline figure is this compound's own purity, so the panel is
+  // genuinely per product rather than one block of constants repeated ten
+  // times, and every analysis with no released figure behind it bakes the null
+  // indicator rather than a number a crawler would read as a result.
+  html = setInner(html, 'pdEvidence', 'section', batchPanelHtml(p));
 
   return rewriteDepth(html, 2);
 }
