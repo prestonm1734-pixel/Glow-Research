@@ -360,7 +360,7 @@ const productInStock = p => p.sizes.some(sizeInStock);
 //
 // tools/check-claims.js fails the build on a category with no label here.
 const CAT_LABEL = {
-  growth: 'Growth Research',
+  growth: 'Secretagogue Research',
   tissue: 'Tissue Research',
   metabolic: 'Metabolic Research',
   longevity: 'Longevity Research',
