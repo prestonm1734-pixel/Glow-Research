@@ -406,6 +406,19 @@
   document.addEventListener('DOMContentLoaded', renderBadge);
   renderBadge();
 
+  // Safari (and other browsers) can restore this exact page, JS state and
+  // all, from the back-forward cache on a back/forward navigation, without
+  // re-running any script. If the cart changed on a page visited in
+  // between, this page's `items` and badge are still whatever they were
+  // before it was cached, until something else forces a re-render. Reload
+  // from localStorage whenever that restore happens.
+  window.addEventListener('pageshow', e => {
+    if (!e.persisted) return;
+    items = load();
+    renderBadge();
+    if (overlay && overlay.classList.contains('open')) render();
+  });
+
   document.querySelectorAll('.nav-cart').forEach(b => b.addEventListener('click', open));
 })();
 
