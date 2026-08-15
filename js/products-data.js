@@ -776,13 +776,13 @@ function evidenceHtml(p) {
     </div>`).join('');
 }
 
-// The catalog filter bar has two top-level chips, not eight: seven research
-// categories all read as "Peptides" to someone deciding what to browse.
-// `cat` still carries the specific research category — the product page
-// breadcrumb and the schema still say "Metabolic Research" — this is only
-// which chip on peptides.html a product falls under.
+// Which chip on peptides.html a product falls under. The catalog only has
+// four research categories (see CAT_LABEL), each already broad enough to
+// browse by, so this is the identity function today — but it stays a named
+// chokepoint rather than every caller reading p.cat directly, so a future
+// split (e.g. two flavors of "growth") only has to change one place.
 function catFilterGroup(cat) {
-  return 'peptides';
+  return cat;
 }
 
 // Sort comparators for the catalog's sort control. Keyed so the <option>

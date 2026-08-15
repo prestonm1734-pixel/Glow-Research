@@ -34,7 +34,7 @@ const MARK = 'catalog-jsonld';
 
 const {
   GLOW_PRODUCTS, productCardHtml, productHref, salePrice, onSaleNow,
-  sizeInStock, PRODUCT_PAGES_LIVE,
+  sizeInStock, PRODUCT_PAGES_LIVE, CAT_LABEL, catFilterGroup,
 } = require(path.join(ROOT, 'js/products-data.js'));
 // The page's name and description come from the one place every other copy of
 // them comes from, so this block cannot describe the catalog differently from
@@ -84,8 +84,27 @@ function catalogJsonLd() {
   };
 }
 
+// One chip per research category actually in the catalog, ranked by how many
+// compounds sit in it — the category the catalog is deepest in reads first,
+// same reasoning as the GLP-3 (RT) reorder in GLOW_PRODUCTS itself. "All"
+// always leads regardless of count.
+function filterChipsHtml() {
+  const counts = {};
+  GLOW_PRODUCTS.forEach(p => { counts[p.cat] = (counts[p.cat] || 0) + 1; });
+  const cats = [...new Set(GLOW_PRODUCTS.map(p => p.cat))]
+    .sort((a, b) => counts[b] - counts[a]);
+  const chips = cats
+    .map(c => `<button class="chip" data-cat="${catFilterGroup(c)}" aria-pressed="false">${CAT_LABEL[c]}</button>`)
+    .join('\n      ');
+  return `<button class="chip active" data-cat="all" aria-pressed="true">All</button>\n      ${chips}`;
+}
+
 function build() {
   let html = fs.readFileSync(path.join(ROOT, PAGE), 'utf8');
+
+  const chipRe = /(<div class="filter-row reveal" id="catFilterRow"[^>]*>)[\s\S]*?(<\/div>)/;
+  required(html, chipRe, '#catFilterRow');
+  html = html.replace(chipRe, (m, open, close) => `${open}\n      ${filterChipsHtml()}\n    ${close}`);
 
   const gridRe = /(<div class="product-grid" id="productGrid">)[\s\S]*?(<\/div>\s*<\/div>\s*<\/section>)/;
   required(html, gridRe, '#productGrid');

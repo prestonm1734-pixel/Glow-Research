@@ -182,6 +182,14 @@
       <span class="eyebrow">The Catalog</span>
     </div>
 
+    <div class="filter-row reveal" id="catFilterRow" role="group" aria-label="Filter by research category">
+      <button class="chip active" data-cat="all" aria-pressed="true">All</button>
+      <button class="chip" data-cat="tissue" aria-pressed="false">Tissue Research</button>
+      <button class="chip" data-cat="metabolic" aria-pressed="false">Metabolic Research</button>
+      <button class="chip" data-cat="growth" aria-pressed="false">Growth Hormone Secretagogues</button>
+      <button class="chip" data-cat="longevity" aria-pressed="false">Longevity Research</button>
+    </div>
+
     <div class="catalog-controls reveal">
       <div class="catalog-search">
         <svg class="catalog-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -480,16 +488,28 @@
 
   /* the cart badge and drawer live in js/cart.js */
 
-  /* ---------- catalog grid + search ---------- */
-  /* the catalog is one flat list of peptides now, so search and sort narrow/
-     order the same list rather than a category chip resetting either */
+  /* ---------- catalog grid + filter + search ---------- */
   const grid = document.getElementById('productGrid');
   const sortSelect = document.getElementById('sortSelect');
   const searchInput = document.getElementById('catalogSearch');
+  const filterRow = document.getElementById('catFilterRow');
+  let activeCat = 'all';
 
   function renderProducts() {
-    renderProductGrid(grid, 'all', { observeReveal, sort: sortSelect.value, query: searchInput.value });
+    renderProductGrid(grid, activeCat, { observeReveal, sort: sortSelect.value, query: searchInput.value });
   }
+
+  filterRow.addEventListener('click', (e) => {
+    const btn = e.target.closest('.chip');
+    if (!btn) return;
+    activeCat = btn.dataset.cat;
+    filterRow.querySelectorAll('.chip').forEach(c => {
+      const on = c === btn;
+      c.classList.toggle('active', on);
+      c.setAttribute('aria-pressed', String(on));
+    });
+    renderProducts();
+  });
 
   sortSelect.addEventListener('change', renderProducts);
   searchInput.addEventListener('input', renderProducts);
@@ -501,6 +521,22 @@
   // doesn't run.
   const qParam = new URLSearchParams(location.search).get('q');
   if (qParam) searchInput.value = qParam;
+
+  // ?cat= is the other half of that promise: every product page's breadcrumb
+  // links its category back here as peptides.html?cat=<group>, which only
+  // means something if this page actually lands on that filter.
+  const catParam = new URLSearchParams(location.search).get('cat');
+  if (catParam) {
+    const match = filterRow.querySelector(`.chip[data-cat="${CSS.escape(catParam)}"]`);
+    if (match) {
+      activeCat = catParam;
+      filterRow.querySelectorAll('.chip').forEach(c => {
+        const on = c === match;
+        c.classList.toggle('active', on);
+        c.setAttribute('aria-pressed', String(on));
+      });
+    }
+  }
 
   renderProducts();
 </script>
