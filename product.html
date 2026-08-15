@@ -599,17 +599,29 @@
     }
     .pd-sticky-add{ flex:0 0 auto; padding: 13px 22px; }
 
+    /* Its own row rather than a third item beside the name and Add to cart:
+       at 390px those two already use the width, and a wallet button squeezed
+       to whatever is left is the one control on the page that must not be
+       fiddly to hit. */
+    .pd-sticky-express{ margin-top: 9px; }
+    .pd-sticky-express[hidden]{ display:none; }
+
     /* The bar is fixed over the end of the document, so the page needs room to
        scroll clear of it. Reserved for the whole page rather than toggled with
        the bar: changing the document height every time it appears would move
        the content under the reader's thumb mid-scroll. The footer sits outside
        #pdShell, so this goes on the body. */
     body{ padding-bottom: 74px; }
+    /* The wallet row makes the bar about 53px taller, and it only exists on a
+       browser that actually has a wallet, so the reservation follows it rather
+       than being held on every phone. */
+    body.pd-wallet-on{ padding-bottom: 128px; }
     /* The toast is anchored to the bottom of the viewport too. Without this it
        lands underneath the bar that triggered it, which is the one moment it
        has to be readable. Follows the bar rather than sitting high all the
        time, so a toast from the real buy box still appears where it always has. */
     body.pd-sticky-shown .cart-toast{ bottom: calc(92px + env(safe-area-inset-bottom)); }
+    body.pd-sticky-shown.pd-wallet-on .cart-toast{ bottom: calc(146px + env(safe-area-inset-bottom)); }
   }
 
   /* ---------- no motion ----------
@@ -1028,6 +1040,14 @@
         <span class="pd-sticky-sub" id="pdStickySub"></span>
       </span>
       <button type="button" class="btn btn-primary pd-sticky-add" id="pdStickyAdd">Add to cart</button>
+    </div>
+    <!-- The same wallet sheet as the express block up in the buy box, driven by
+         the same Stripe paymentRequest object, so the two buttons are one
+         payment flow with two mount points rather than two flows. Revealed on
+         the same canMakePayment() result that reveals the other one, so it is
+         absent on every browser without a wallet configured. -->
+    <div class="pd-sticky-express" id="pdStickyExpress" hidden>
+      <div id="pdStickyExpressBtn"></div>
     </div>
   </div>
 

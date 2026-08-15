@@ -522,6 +522,37 @@
     });
   }
 
+  // The second mount point for the wallet: the sticky bar's own button.
+  //
+  // It shares expressPR, so this is one payment flow with two buttons rather
+  // than two flows. Every handler below (shippingaddresschange,
+  // shippingoptionchange, paymentmethod) is bound to that one object, and
+  // updateExpressPay() reprices it, so the sheet a shopper gets is identical
+  // whichever button opened it and neither can drift from the other's total.
+  //
+  // A second Elements instance is what makes it possible at all: Stripe allows
+  // only one paymentRequestButton per Elements, so the button has to come from
+  // its own. Called only from the canMakePayment() success branch, and its
+  // failure is contained here: the buy box button has already mounted by then,
+  // and the bar keeps its Add to cart either way.
+  function mountStickyExpress(stripeClient) {
+    const wrap = $('pdStickyExpress');
+    if (!wrap || !expressPR || !stripeClient) return;
+    try {
+      const btn = stripeClient.elements().create('paymentRequestButton', {
+        paymentRequest: expressPR,
+        style: { paymentRequestButton: { type: 'buy', theme: 'dark', height: '44px' } },
+      });
+      btn.mount('#pdStickyExpressBtn');
+      wrap.hidden = false;
+      // The bar is taller with this row in it, so the page reserves the space
+      // it actually occupies rather than the height it would have without.
+      document.body.classList.add('pd-wallet-on');
+    } catch (e) {
+      wrap.hidden = true;   // Add to cart in the bar still works
+    }
+  }
+
   function expressError(msg) {
     const el = $('pdExpressMsg');
     if (el) el.textContent = msg || '';
@@ -725,6 +756,7 @@
       if (!result) return;
       btn.mount('#pdExpressBtn');
       wrap.hidden = false;
+      mountStickyExpress(stripeClient);
     });
 
     // Shipping cost depends only on the subtotal already fixed by the qty and

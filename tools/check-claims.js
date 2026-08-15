@@ -413,6 +413,19 @@ console.log('\nthe batch analysis panel');
   ok('stock closes the bar and the buy box together',
     /\[\$\('pdAddBtn'\), \$\('pdStickyAdd'\)\]/.test(pj));
 
+  // The wallet appears twice on a phone, in the buy box and in the sticky bar,
+  // and both must be mount points on one paymentRequest. A second one would be
+  // a second sheet with its own total, its own shipping options and its own
+  // handlers, which is the same page quoting two prices for one vial.
+  ok('there is one wallet payment request, whatever it is mounted into',
+    (pj.match(/\.paymentRequest\(\{/g) || []).length === 1 &&
+    (pj.match(/paymentRequest: expressPR/g) || []).length === 2);
+  ok('the bar\'s wallet button is revealed by the same canMakePayment result',
+    /canMakePayment\(\)\.then\(result => \{[\s\S]{0,400}?mountStickyExpress\(stripeClient\);/.test(pj),
+    'the sticky wallet must mount inside the canMakePayment() success branch');
+  ok('the page reserves the height the wallet row actually takes',
+    /pd-wallet-on/.test(pj) && /body\.pd-wallet-on/.test(pd));
+
   // A lot number is the one thing a reader can check against the vial in their
   // hand, which makes an invented one the worst thing this page could print.
   // Nothing holds lot codes today, so this currently forbids all of them: the
