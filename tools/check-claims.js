@@ -439,17 +439,30 @@ console.log('\nthe batch analysis panel');
     /if \(!sizeInStock\(size\)\) \{[\s\S]{0,120}?throw new Error/.test(lib),
     'priceOrder() must throw on an out-of-stock size');
 
-  // The wallet is offered from the buy box and nowhere else on the page. Not
-  // an oversight: it buys whatever the stepper is set to, and the sticky bar
-  // shows precisely when the stepper, the bulk tier cards and the
-  // free-shipping progress are all off screen. A one-tap buy from down there
-  // closes the order at a single vial with none of that visible, on a catalog
-  // whose average order is two to three. Add to cart opens the drawer that
-  // states both instead.
-  ok('the wallet is offered once, from the buy box',
-    (pj.match(/\.paymentRequest\(\{/g) || []).length === 1 &&
-    (pj.match(/paymentRequest: expressPR/g) || []).length === 1 &&
-    !/pdStickyExpress/.test(pd) && !/pdStickyExpress/.test(pj));
+  // One wallet implementation, in js/express-pay.js, used by the product buy
+  // box and the top of checkout. A second copy of a flow that charges a card
+  // and places an order is the last thing this codebase should carry, so
+  // neither caller may build its own payment request.
+  const ep = read('js/express-pay.js');
+  const coJs2 = read('js/checkout.js');
+  ok('there is one wallet implementation, and both callers use it',
+    (ep.match(/\.paymentRequest\(\{/g) || []).length === 1 &&
+    !/paymentRequest\(/.test(pj) && !/paymentRequest\(/.test(coJs2) &&
+    /GlowExpressPay\.init\(/.test(pj) && /GlowExpressPay\.init\(/.test(coJs2),
+    'js/express-pay.js owns the flow; product.js and checkout.js only configure it');
+  // The product page's own order-placing code went with it. Anything left
+  // would be a second route to create-order that nothing above enforces.
+  ok('the product page places no order of its own',
+    !/api\/create-order/.test(pj));
+
+  // Not offered from the sticky bar, deliberately. It buys whatever the
+  // stepper is set to, and the bar shows precisely when the stepper, the bulk
+  // tier cards and the free-shipping progress are all off screen: a one-tap
+  // buy there closes the order at a single vial with none of that visible, on
+  // a catalog whose average order is two to three.
+  ok('the sticky bar offers Add to cart and not the wallet',
+    !/pdStickyExpress/.test(pd) && !/pdStickyExpress/.test(pj) &&
+    /id="pdStickyAdd"/.test(pd));
   // With one control in the row there is nothing to shed, so the readout has
   // to be the thing that truncates rather than the button being pushed off the
   // edge by a long product name.
@@ -1459,6 +1472,25 @@ console.log('\ncheckout gate');
   ok('checkout.html carries the coNotLive element',
     /id="coNotLive"/.test(coHtml));
 
+  // The whole point of the wallet on this page is that it is reached without
+  // filling the form in. Inside <form id="coForm"> it would be the same button
+  // gated behind the typing it exists to replace, so where it sits in the
+  // markup is the feature, not a layout preference.
+  const formStart = coHtml.indexOf('<form id="coForm"');
+  const expressAt = coHtml.indexOf('id="coExpress"');
+  ok('the wallet sits above the form, and outside it',
+    expressAt !== -1 && formStart !== -1 && expressAt < formStart);
+  ok('checkout runs the shared wallet flow, not one of its own',
+    /GlowExpressPay\.init\(/.test(coJs) && /express-pay\.js/.test(coHtml));
+  // A wallet button over an empty cart would charge for nothing, and the cart
+  // can empty from the drawer while this page is open.
+  ok('the wallet is withdrawn when the cart empties',
+    /canOffer: \(\) => cartItems\(\)\.length > 0/.test(coJs) &&
+    /GlowExpressPay\.setOffered\(cartItems\(\)\.length > 0\)/.test(coJs));
+  // finishOrder() clears the cart for the typed-card path; the wallet skips it.
+  ok('a wallet order clears the cart on its way out',
+    /onPlaced: \(\) => \{ if \(window\.GlowCart\) window\.GlowCart\.clear\(\); \}/.test(coJs));
+
   // While it is false, the order-confirmation email must not exist to be sent
   // — checked structurally above — but if PAYMENTS_LIVE is ever flipped back
   // on, the emails still must not claim a payment the site cannot take. This
@@ -1581,16 +1613,16 @@ console.log('\npayments');
     };
     const served = shipRows(lib, 'SHIPPING_RATES');
     const shown = shipRows(coJs, 'const SHIPPING');
-    const express = shipRows(read('js/product.js'), 'EXPRESS_SHIPPING');
+    const express = shipRows(read('js/express-pay.js'), 'EXPRESS_SHIPPING');
     ok('all three shipping tables were found to compare',
       Array.isArray(served) && served.length > 0 && Array.isArray(shown) && shown.length > 0 &&
       Array.isArray(express) && express.length > 0);
     ok('what Stripe is charged for shipping matches what checkout displays',
       !!served && !!shown && served.join(' | ') === shown.join(' | '),
       `_lib.js [${(served || []).join(', ')}] vs checkout.js [${(shown || []).join(', ')}]`);
-    ok('the express pay button on the product page quotes the same rates',
+    ok('the express wallet quotes the same rates, on both pages that offer it',
       !!served && !!express && served.join(' | ') === express.join(' | '),
-      `_lib.js [${(served || []).join(', ')}] vs product.js [${(express || []).join(', ')}]`);
+      `_lib.js [${(served || []).join(', ')}] vs express-pay.js [${(express || []).join(', ')}]`);
   }
 
   // checkout.html tells the shopper tax is calculated from their address.

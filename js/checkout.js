@@ -92,6 +92,43 @@
     });
   }
 
+  /* ---------- express pay ----------
+     The wallet button above the form, driven by js/express-pay.js, the same
+     flow the product buy box runs. What differs is only what is being bought:
+     there it is one vial and a quantity, here it is the whole cart. */
+
+  const cartItems = () => (window.GlowCart ? window.GlowCart.items() : []);
+
+  function initExpressPay() {
+    if (typeof GlowExpressPay === 'undefined') return;
+    GlowExpressPay.init({
+      wrap: '#coExpress',
+      mount: '#coExpressBtn',
+      items: cartItems,
+      // GlowCart.items() hands back the tier-adjusted unitSale, the same figure
+      // the summary on the right totals from, so the sheet cannot quote a
+      // different number from the one on screen.
+      subtotal: () => round2(cartItems().reduce((n, i) => n + i.unitSale * i.qty, 0)),
+      // What the wallet sheet lists the charge against. One line for a single
+      // item, a count once there are several, since the sheet has no room to
+      // itemise and "2 items" is honest where naming only the first would not be.
+      label: () => {
+        const items = cartItems();
+        if (items.length === 1) {
+          const i = items[0];
+          return `${i.name} ${i.variant}${i.qty > 1 ? ` × ${i.qty}` : ''}`;
+        }
+        const count = items.reduce((n, i) => n + i.qty, 0);
+        return `Glow Research (${count} item${count === 1 ? '' : 's'})`;
+      },
+      canOffer: () => cartItems().length > 0,
+      onError: msg => { const el = $('coExpressMsg'); if (el) el.textContent = msg; },
+      // The wallet skips this page's own submit, so nothing else clears the
+      // cart on the way out. finishOrder() does it for the typed-card path.
+      onPlaced: () => { if (window.GlowCart) window.GlowCart.clear(); },
+    });
+  }
+
   /* ---------- summary ---------- */
 
   function shippingCost(sub) {
@@ -717,11 +754,19 @@
     if (!resumed && typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) {
       ensurePaymentIntent();
     }
+    if (!resumed) initExpressPay();
 
     // the drawer can change the cart while this page is open
     document.addEventListener('glow-cart-change', () => {
       renderSummary();
       if (typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) ensurePaymentIntent();
+      // The wallet sheet quotes the cart, so it has to follow it: reprice on
+      // every change, and withdraw the offer entirely once the cart is empty
+      // rather than leaving a button that would pay for nothing.
+      if (typeof GlowExpressPay !== 'undefined') {
+        GlowExpressPay.reprice();
+        GlowExpressPay.setOffered(cartItems().length > 0);
+      }
     });
 
     $('coShipOptions').addEventListener('change', e => {

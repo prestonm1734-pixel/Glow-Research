@@ -128,6 +128,27 @@
      fields inside an iframe — no colour or spacing rule here reaches inside
      it, only the box it sits in. min-height holds the layout still while it
      loads instead of the page jumping once the iframe paints. */
+  /* ---------- express pay ----------
+     The one loud thing on a deliberately quiet page, because it is the path
+     that skips the whole form. Full width so the wallet mark is drawn at its
+     proper size rather than squeezed. Hidden until canMakePayment() says this
+     browser has a wallet, so most people never see it and the form is simply
+     the first thing on the page. */
+  .co-express{ margin-bottom: 30px; }
+  .co-express[hidden]{ display:none; }
+  .co-express-btn{ min-height: 48px; }
+  .co-express-msg{ margin: 10px 0 0; font-size:.85rem; line-height:1.55; color:#b3261e; }
+  .co-express-msg:empty{ display:none; }
+  /* A rule with the label sitting in it, so the two paths read as alternatives
+     rather than the form looking like a second step after paying. */
+  .co-express-or{
+    display:flex; align-items:center; gap:14px; margin-top: 26px;
+    font-size:.82rem; color:#86868b;
+  }
+  .co-express-or::before, .co-express-or::after{
+    content:''; flex:1; height:1px; background: rgba(0,0,0,0.13);
+  }
+
   .co-stripe-el{ min-height: 44px; }
   .co-stripe-loading{ font-size:.88rem; color:#86868b; }
   .co-stripe-err{
@@ -347,6 +368,26 @@
 
       <div class="co-grid">
 
+        <div class="co-left">
+
+        <!-- ---------- express pay ----------
+             Above the form and outside it, which is the whole point: the wallet
+             sheet already holds the name, email, phone and shipping address
+             this form exists to collect, so anyone using it should never see
+             the form at all. Inside the form it would be the same button
+             gated behind the typing it was meant to replace.
+
+             Driven by js/express-pay.js, the same flow the product buy box
+             runs, so the cart is priced and the order placed the identical
+             way. Stays hidden unless canMakePayment() confirms this browser
+             really has a wallet, so most visitors see the form and nothing
+             else. -->
+        <div class="co-express" id="coExpress" hidden>
+          <div class="co-express-btn" id="coExpressBtn"></div>
+          <p class="co-express-msg" id="coExpressMsg" role="alert"></p>
+          <div class="co-express-or"><span>or pay another way</span></div>
+        </div>
+
         <!-- ---------- left: the form ----------
              Every field here has to justify itself by being needed to ship the
              box or reach the buyer about it. Company, country and a separate
@@ -452,6 +493,7 @@
             <p class="co-placed-msg" id="coPlacedMsg" role="status" aria-live="polite"></p>
           </section>
         </form>
+        </div>
 
         <!-- ---------- right: order summary ---------- -->
         <aside class="co-side">
@@ -560,6 +602,8 @@
 <script src="js/cart.js"></script>
 <script src="js/search.js"></script>
 <script src="js/cart-modal.js"></script>
+<!-- before js/checkout.js, which reads GlowExpressPay off the global -->
+<script src="js/express-pay.js"></script>
 <script src="js/checkout.js"></script>
 <script src="js/account.js"></script>
 <script src="js/referral.js"></script>
