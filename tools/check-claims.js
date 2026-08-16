@@ -425,11 +425,10 @@ console.log('\nthe batch analysis panel');
   // every way to buy has to answer to it. A disabled Add to cart beside a live
   // wallet button is not a partial version of that: it is a one-tap purchase
   // of something we cannot ship, offered next to the control that just refused.
-  ok('a sold-out size takes the wallet buttons down with the Add buttons',
+  ok('a sold-out size takes the wallet down with the Add buttons',
     stockFn !== null &&
-    /pdExpress/.test(stockFn[0]) && /pdStickyExpress/.test(stockFn[0]) &&
-    /walletReady/.test(stockFn[0]),
-    'renderStock() must hide both wallet blocks, and only ones canMakePayment() revealed');
+    /pdExpress/.test(stockFn[0]) && /walletReady/.test(stockFn[0]),
+    'renderStock() must hide the wallet block, and only one canMakePayment() revealed');
   // And the browser is not the thing enforcing it. priceOrder() is the one
   // chokepoint both create-payment-intent.js and create-order.js price through,
   // so refusing the line there covers the wallet sheet, the checkout page, and
@@ -440,33 +439,25 @@ console.log('\nthe batch analysis panel');
     /if \(!sizeInStock\(size\)\) \{[\s\S]{0,120}?throw new Error/.test(lib),
     'priceOrder() must throw on an out-of-stock size');
 
-  // The wallet appears twice on a phone, in the buy box and in the sticky bar,
-  // and both must be mount points on one paymentRequest. A second one would be
-  // a second sheet with its own total, its own shipping options and its own
-  // handlers, which is the same page quoting two prices for one vial.
-  ok('there is one wallet payment request, whatever it is mounted into',
+  // The wallet is offered from the buy box and nowhere else on the page. Not
+  // an oversight: it buys whatever the stepper is set to, and the sticky bar
+  // shows precisely when the stepper, the bulk tier cards and the
+  // free-shipping progress are all off screen. A one-tap buy from down there
+  // closes the order at a single vial with none of that visible, on a catalog
+  // whose average order is two to three. Add to cart opens the drawer that
+  // states both instead.
+  ok('the wallet is offered once, from the buy box',
     (pj.match(/\.paymentRequest\(\{/g) || []).length === 1 &&
-    (pj.match(/paymentRequest: expressPR/g) || []).length === 2);
-  ok('the bar\'s wallet button is revealed by the same canMakePayment result',
-    /canMakePayment\(\)\.then\(result => \{[\s\S]{0,400}?mountStickyExpress\(stripeClient\);/.test(pj),
-    'the sticky wallet must mount inside the canMakePayment() success branch');
-  // Both controls keep their tap target at every width; the readout beside
-  // them is what gives way. A wallet button squeezed to whatever is left over
-  // is the one control on this page that must not be fiddly to hit.
-  ok('the bar sheds its readout before either button',
-    /pd-wallet-on/.test(pj) &&
-    /body\.pd-wallet-on \.pd-sticky-name\{ display:none/.test(pd) &&
-    !/\.pd-sticky-add\{ display:none/.test(pd) &&
-    !/\.pd-sticky-express\{ display:none/.test(pd));
-
-  // Safari draws "Buy with  Pay" at the width that sentence needs and lets
-  // the overflow run off the side of the screen rather than shrinking it, so
-  // the bar's button asks for the compact mark and the row is built so that
-  // an item refusing to shrink still cannot widen it past the viewport.
-  ok('the bar asks for the compact wallet mark, and cannot be widened past the screen',
-    /paymentRequestButton: \{ type: 'default'/.test(pj) &&
+    (pj.match(/paymentRequest: expressPR/g) || []).length === 1 &&
+    !/pdStickyExpress/.test(pd) && !/pdStickyExpress/.test(pj));
+  // With one control in the row there is nothing to shed, so the readout has
+  // to be the thing that truncates rather than the button being pushed off the
+  // edge by a long product name.
+  ok('a long name truncates rather than crowding the bar\'s button',
     /\.pd-sticky-in\{[^}]*min-width:0/.test(pd) &&
-    /\.pd-sticky-express\{[^}]*overflow:hidden/.test(pd));
+    /\.pd-sticky-id\{[^}]*min-width:0/.test(pd) &&
+    /\.pd-sticky-name\{[^}]*text-overflow:ellipsis/.test(pd) &&
+    /\.pd-sticky-add\{[^}]*flex:0 0 auto/.test(pd));
 
   // A lot number is the one thing a reader can check against the vial in their
   // hand, which makes an invented one the worst thing this page could print.

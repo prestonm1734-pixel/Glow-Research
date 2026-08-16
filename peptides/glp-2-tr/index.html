@@ -587,14 +587,12 @@
     .pd-page .pd-sticky{ transition: transform .18s ease, visibility 0s .18s !important; }
     .pd-page .pd-sticky.is-shown{ transition: transform .18s ease !important; }
 
-    /* min-width:0 on the row itself as well as the readout. A flex item's
-       default min-width is auto, which lets a child that will not shrink push
-       the row wider than the screen instead of being contained by it, and the
-       wallet button is exactly such a child: Safari draws it at whatever width
-       its own label needs. */
-    .pd-sticky-in{ display:flex; align-items:center; gap:10px; min-width:0; }
-    /* The only part that gives: both buttons keep their full tap target and
-       the name truncates into whatever is left. */
+    /* min-width:0 so the readout truncates rather than widening the row past
+       the screen: a flex item's default min-width is auto, which lets a long
+       product name push the button off the edge. */
+    .pd-sticky-in{ display:flex; align-items:center; gap:14px; min-width:0; }
+    /* The only part that gives. The button keeps its full tap target and the
+       name truncates into whatever is left. */
     .pd-sticky-id{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1 1 auto; }
     .pd-sticky-name{
       font-size:.8rem; font-weight:600; color:#6f6f6a; letter-spacing:-.005em;
@@ -602,40 +600,14 @@
     }
     /* The price leads, not the name. You are already on this product's page,
        so the name is the label on the number rather than the other way round,
-       and the number is what the two buttons beside it are acting on. */
+       and the number is what the button beside it is acting on. */
     .pd-sticky-sub{
       font-size:.98rem; font-weight:700; color:#0a0a0a; letter-spacing:-.02em;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    /* An explicit height on both controls rather than padding on one and a
-       Stripe-drawn box on the other: they sit side by side, so a two-pixel
-       difference between them is the thing the eye lands on. */
-    .pd-sticky-add{
-      flex:0 0 auto; height:44px; padding: 0 18px; font-size:.85rem;
-      /* Outlined against the wallet's solid black. Two filled blocks of the
-         same colour read as one wide smudge at this size, and the outline is
-         also the honest hierarchy: the wallet finishes the purchase, this
-         puts it in a cart you still have to check out of. */
-      background:transparent;
-    }
-
-    /* Beside Add to cart, not under it. Apple's own minimum for the compact
-       mark is 100pt, so that is the floor, and the overflow guards below are
-       what keep the button inside the screen rather than trusting Stripe's
-       iframe to shrink: it does not. */
-    .pd-sticky-express{ flex:0 0 118px; min-width:0; overflow:hidden; }
-    .pd-sticky-express > div{ max-width:100%; }
-    .pd-sticky-express[hidden]{ display:none; }
-
-    /* Three things in one row, so the readout gives way rather than either
-       button: both keep their full tap target at every width. Only below
-       340px, narrower than any current iPhone, and the name goes before the
-       price, because you are already on that product's page and the price is
-       the part being decided on. */
-    @media (max-width: 339px){
-      body.pd-wallet-on .pd-sticky-name{ display:none; }
-      body.pd-wallet-on .pd-sticky-add{ padding: 0 13px; }
-    }
+    /* Filled again, now that it is the only control in the row and has nothing
+       to sit back from. */
+    .pd-sticky-add{ flex:0 0 auto; height:46px; padding: 0 24px; font-size:.9rem; }
 
     /* The bar is fixed over the end of the document, so the page needs room to
        scroll clear of it. Reserved for the whole page rather than toggled with
@@ -1074,15 +1046,16 @@
         <span class="pd-sticky-name" id="pdStickyName"></span>
         <span class="pd-sticky-sub" id="pdStickySub"></span>
       </span>
-      <button type="button" class="btn btn-outline pd-sticky-add" id="pdStickyAdd">Add to cart</button>
-      <!-- The same wallet sheet as the express block up in the buy box, driven
-           by the same Stripe paymentRequest object, so the two buttons are one
-           payment flow with two mount points rather than two flows. Revealed on
-           the same canMakePayment() result that reveals the other one, so it is
-           absent on every browser without a wallet configured. -->
-      <div class="pd-sticky-express" id="pdStickyExpress" hidden>
-        <div id="pdStickyExpressBtn"></div>
-      </div>
+      <!-- Add to cart, and deliberately not the wallet as well.
+           The wallet buys whatever the stepper is set to, and from down here
+           the stepper, the bulk tier cards and the free-shipping progress are
+           all off screen: a one-tap buy would close the order at one vial with
+           none of that visible. Average order is two to three. Add to cart
+           opens the drawer instead, which is where progress toward
+           FREE_SHIPPING_AT and the accessory offer actually live.
+           The buy box keeps the wallet, where the quantity controls sit beside
+           it and the choice is a deliberate one. -->
+      <button type="button" class="btn btn-primary pd-sticky-add" id="pdStickyAdd">Add to cart</button>
     </div>
   </div>
 

@@ -338,16 +338,11 @@
   // one it stands in for is not.
   function renderStock() {
     const ok = sizeInStock(size());
-    // "Add" in the bar once the wallet is beside it: three controls in one row
-    // on a 375px screen, and the two words this drops are the ones the cart
-    // icon in the header already says. The buy box keeps the full label.
-    const short = document.body.classList.contains('pd-wallet-on');
-    [[$('pdAddBtn'), 'Add to cart'], [$('pdStickyAdd'), short ? 'Add' : 'Add to cart']]
-      .forEach(([btn, label]) => {
-        if (!btn) return;
-        btn.disabled = !ok;
-        btn.textContent = ok ? label : 'Out of stock';
-      });
+    [$('pdAddBtn'), $('pdStickyAdd')].forEach(btn => {
+      if (!btn) return;
+      btn.disabled = !ok;
+      btn.textContent = ok ? 'Add to cart' : 'Out of stock';
+    });
 
     // The wallet has to go with them. A disabled Add to cart beside a live
     // Apple Pay button is not a smaller version of the same state: it is a
@@ -360,10 +355,8 @@
     // Only ever hides a block canMakePayment() already revealed, tracked on
     // the element itself: a browser with no wallet must not be handed one by
     // an in-stock size later flipping this back.
-    [$('pdExpress'), $('pdStickyExpress')].forEach(el => {
-      if (!el || el.dataset.walletReady !== 'true') return;
-      el.hidden = !ok;
-    });
+    const wallet = $('pdExpress');
+    if (wallet && wallet.dataset.walletReady === 'true') wallet.hidden = !ok;
 
     if (refreshDelivery) refreshDelivery();
   }
@@ -545,46 +538,6 @@
     expressPR.update({
       total: { label: `${product.name} ${s.mg}${qty > 1 ? ` × ${qty}` : ''}`, amount: Math.round(expressSubtotal() * 100) },
     });
-  }
-
-  // The second mount point for the wallet: the sticky bar's own button.
-  //
-  // It shares expressPR, so this is one payment flow with two buttons rather
-  // than two flows. Every handler below (shippingaddresschange,
-  // shippingoptionchange, paymentmethod) is bound to that one object, and
-  // updateExpressPay() reprices it, so the sheet a shopper gets is identical
-  // whichever button opened it and neither can drift from the other's total.
-  //
-  // A second Elements instance is what makes it possible at all: Stripe allows
-  // only one paymentRequestButton per Elements, so the button has to come from
-  // its own. Called only from the canMakePayment() success branch, and its
-  // failure is contained here: the buy box button has already mounted by then,
-  // and the bar keeps its Add to cart either way.
-  function mountStickyExpress(stripeClient) {
-    const wrap = $('pdStickyExpress');
-    if (!wrap || !expressPR || !stripeClient) return;
-    try {
-      const btn = stripeClient.elements().create('paymentRequestButton', {
-        paymentRequest: expressPR,
-        // 'default' draws the compact mark, where the buy box uses 'buy' and
-        // gets "Buy with  Pay". The long form does not shrink to its
-        // container: Safari draws it at the width that sentence needs and lets
-        // the rest run off the side of the screen, which is exactly what it did
-        // here. In a row this narrow the mark is the only form that fits.
-        style: { paymentRequestButton: { type: 'default', theme: 'dark', height: '44px' } },
-      });
-      btn.mount('#pdStickyExpressBtn');
-      wrap.dataset.walletReady = 'true';
-      wrap.hidden = !sizeInStock(size());
-      // Three things share the row once this mounts, so the readout beside the
-      // buttons has to start giving way earlier than it otherwise would, and
-      // Add to cart drops to "Add". The class is what the rules in
-      // product.html key off; renderStock() owns the label.
-      document.body.classList.add('pd-wallet-on');
-      renderStock();
-    } catch (e) {
-      wrap.hidden = true;   // Add to cart in the bar still works
-    }
   }
 
   function expressError(msg) {
@@ -794,7 +747,6 @@
       // was selected.
       wrap.dataset.walletReady = 'true';
       wrap.hidden = !sizeInStock(size());
-      mountStickyExpress(stripeClient);
     });
 
     // Shipping cost depends only on the subtotal already fixed by the qty and
