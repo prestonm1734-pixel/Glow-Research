@@ -6,7 +6,7 @@
 // toolchain for what the standard library already does correctly.
 
 import crypto from 'node:crypto';
-import { GLOW_PRODUCTS, unitPriceAt, round2 } from '../js/products-data.js';
+import { GLOW_PRODUCTS, unitPriceAt, round2, sizeInStock } from '../js/products-data.js';
 
 /* ============================ Stripe ============================ */
 // No SDK: the site has no package.json and installs nothing, so this talks to
@@ -136,6 +136,16 @@ export function priceOrder(items, shippingMethodId) {
     }
     if (!p || !size) {
       throw new Error(`"${[i.name, i.variant].filter(Boolean).join(' ')}" is no longer in the catalog.`);
+    }
+    // Sold out is set by hand, from a text message: the supplier says a lot is
+    // low and `stock: false` goes on the size. That one edit is the whole
+    // mechanism, which is exactly why it has to be enforced here rather than
+    // only in the buy box. A cart can sit in localStorage for weeks and be
+    // checked out long after the flag went on, and an express wallet sheet
+    // skips the cart page entirely, so the browser is never the thing that
+    // gets to decide this.
+    if (!sizeInStock(size)) {
+      throw new Error(`${p.name} ${size.mg} is out of stock.`);
     }
     const qty = Math.max(1, Math.floor(Number(i.qty)) || 1);
     const unitSale = unitPriceAt(size.price, qty);

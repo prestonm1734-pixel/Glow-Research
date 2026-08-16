@@ -348,6 +348,23 @@
         btn.disabled = !ok;
         btn.textContent = ok ? label : 'Out of stock';
       });
+
+    // The wallet has to go with them. A disabled Add to cart beside a live
+    // Apple Pay button is not a smaller version of the same state: it is a
+    // one-tap purchase of something we cannot ship, sitting next to the
+    // control that just said so. Hidden rather than disabled because Stripe
+    // draws the button in an iframe we do not style, so there is no disabled
+    // state to put on it. api/_lib.js refuses the line as well; this is what
+    // stops it being offered in the first place.
+    //
+    // Only ever hides a block canMakePayment() already revealed, tracked on
+    // the element itself: a browser with no wallet must not be handed one by
+    // an in-stock size later flipping this back.
+    [$('pdExpress'), $('pdStickyExpress')].forEach(el => {
+      if (!el || el.dataset.walletReady !== 'true') return;
+      el.hidden = !ok;
+    });
+
     if (refreshDelivery) refreshDelivery();
   }
 
@@ -557,7 +574,8 @@
         style: { paymentRequestButton: { type: 'default', theme: 'dark', height: '44px' } },
       });
       btn.mount('#pdStickyExpressBtn');
-      wrap.hidden = false;
+      wrap.dataset.walletReady = 'true';
+      wrap.hidden = !sizeInStock(size());
       // Three things share the row once this mounts, so the readout beside the
       // buttons has to start giving way earlier than it otherwise would, and
       // Add to cart drops to "Add". The class is what the rules in
@@ -771,7 +789,11 @@
     expressPR.canMakePayment().then(result => {
       if (!result) return;
       btn.mount('#pdExpressBtn');
-      wrap.hidden = false;
+      // Marks the block as one renderStock() may show again. Without it, a
+      // wallet-less browser would get a button the first time an in-stock size
+      // was selected.
+      wrap.dataset.walletReady = 'true';
+      wrap.hidden = !sizeInStock(size());
       mountStickyExpress(stripeClient);
     });
 

@@ -420,6 +420,26 @@ console.log('\nthe batch analysis panel');
     (stockFn[0].match(/\.disabled = /g) || []).length === 1,
     'renderStock() must disable both buttons off the one sizeInStock() test');
 
+  // Sold out is set by hand, one `stock: false` in the catalog, off the back of
+  // a text from the supplier. That single edit is the entire mechanism, so
+  // every way to buy has to answer to it. A disabled Add to cart beside a live
+  // wallet button is not a partial version of that: it is a one-tap purchase
+  // of something we cannot ship, offered next to the control that just refused.
+  ok('a sold-out size takes the wallet buttons down with the Add buttons',
+    stockFn !== null &&
+    /pdExpress/.test(stockFn[0]) && /pdStickyExpress/.test(stockFn[0]) &&
+    /walletReady/.test(stockFn[0]),
+    'renderStock() must hide both wallet blocks, and only ones canMakePayment() revealed');
+  // And the browser is not the thing enforcing it. priceOrder() is the one
+  // chokepoint both create-payment-intent.js and create-order.js price through,
+  // so refusing the line there covers the wallet sheet, the checkout page, and
+  // a cart that sat in localStorage since before the flag went on.
+  const lib = read('api/_lib.js');
+  ok('the server refuses a sold-out line, whatever the browser sent',
+    /sizeInStock/.test(lib) &&
+    /if \(!sizeInStock\(size\)\) \{[\s\S]{0,120}?throw new Error/.test(lib),
+    'priceOrder() must throw on an out-of-stock size');
+
   // The wallet appears twice on a phone, in the buy box and in the sticky bar,
   // and both must be mount points on one paymentRequest. A second one would be
   // a second sheet with its own total, its own shipping options and its own
