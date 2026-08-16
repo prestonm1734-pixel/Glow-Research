@@ -386,36 +386,21 @@
 
           <section class="co-sec">
             <h2>Shipping address</h2>
-            <div class="co-fields">
-              <div class="co-field">
-                <input type="text" id="coFirst" name="first" placeholder=" " autocomplete="given-name" required />
-                <label for="coFirst">First name</label>
-              </div>
-              <div class="co-field">
-                <input type="text" id="coLast" name="last" placeholder=" " autocomplete="family-name" required />
-                <label for="coLast">Last name</label>
-              </div>
-              <div class="co-field full">
-                <input type="text" id="coAddr" name="address" placeholder=" " autocomplete="address-line1" required />
-                <label for="coAddr">Street address</label>
-              </div>
-              <div class="co-field full">
-                <input type="text" id="coAddr2" name="address2" placeholder=" " autocomplete="address-line2" />
-                <label for="coAddr2">Apartment or suite (optional)</label>
-              </div>
-              <div class="co-field full">
-                <input type="text" id="coCity" name="city" placeholder=" " autocomplete="address-level2" required />
-                <label for="coCity">City</label>
-              </div>
-              <div class="co-field">
-                <select id="coState" name="state" data-states autocomplete="address-level1" required></select>
-                <label for="coState">State</label>
-              </div>
-              <div class="co-field">
-                <input type="text" id="coZip" name="zip" inputmode="numeric" placeholder=" " autocomplete="postal-code" required />
-                <label for="coZip">ZIP code</label>
-              </div>
+            <!-- Stripe's Address Element, not seven inputs of our own. It is
+                 mounted into the same Elements group as the payment fields
+                 (see ensurePaymentIntent in js/checkout.js), which is what
+                 makes its address autocomplete free: typing a street shows
+                 real addresses and fills city, state and ZIP in one press.
+                 A mistyped address on a physical shipment costs a parcel, so
+                 the fewer characters anyone has to type here, the better.
+
+                 It also owns the state list now. STATES used to live in
+                 js/checkout.js purely to populate a <select> that no longer
+                 exists. -->
+            <div id="coAddressElement" class="co-stripe-el">
+              <p class="co-address-loading">Loading address fields&hellip;</p>
             </div>
+            <p id="coAddressErr" class="co-stripe-err" hidden></p>
           </section>
 
           <section class="co-sec">

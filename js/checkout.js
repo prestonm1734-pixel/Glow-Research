@@ -20,9 +20,16 @@
     { id: 'card', label: 'Credit or debit card', note: 'Visa, Mastercard, American Express, Discover' },
   ];
 
-  const STATES = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','District of Columbia','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
-
   let shipId = SHIPPING[0].id;
+
+  // The shipping address, as Stripe's Address Element last reported it. It is
+  // the only copy: there are no address inputs of our own on the page any
+  // more, so nothing can read a stale one. `complete` is Stripe's own answer
+  // to "is every required part filled in", which is what the submit handler
+  // checks instead of the `required` attributes the old inputs carried.
+  let addressEl = null;
+  let addressValue = null;
+  let addressComplete = false;
   // fmtPrice() (js/products-data.js) is where "$65, not $65.00" is decided.
   const money = fmtPrice;
 
@@ -84,12 +91,65 @@
     },
   };
 
-  /* ---------- state selects ---------- */
-  function fillStates() {
-    document.querySelectorAll('select[data-states]').forEach(sel => {
-      sel.innerHTML = '<option value="">Select a state</option>' +
-        STATES.map(s => `<option>${s}</option>`).join('');
+  /* ---------- shipping address ----------
+     Stripe's Address Element. Mounted into the same Elements group as the
+     payment fields, which is the condition for its address autocomplete being
+     included rather than billed: type a street number and it offers real
+     addresses, filling line 1, city, state and ZIP together.
+
+     `display: { name: 'split' }` keeps the first/last split the WooCommerce
+     order needs, so nothing downstream has to guess where a single "full
+     name" string divides. Phone is off because the checkout never asked for
+     one, and US-only because that is what expressShippingOptions and the
+     shipping table actually cover. */
+  function mountAddress(elements) {
+    const slot = $('coAddressElement');
+    if (!slot || addressEl) return;
+
+    addressEl = elements.create('address', {
+      mode: 'shipping',
+      allowedCountries: ['US'],
+      display: { name: 'split' },
+      fields: { phone: 'never' },
+      autocomplete: { mode: 'automatic' },
     });
+    addressEl.mount('#coAddressElement');
+    addressEl.on('ready', () => {
+      const loading = slot.querySelector('.co-address-loading');
+      if (loading) loading.remove();
+    });
+
+    // Tax is priced off state and ZIP, so a repricing round trip only happens
+    // when one of those two actually changes. The element fires `change` on
+    // every keystroke, and an autocomplete pick rewrites four fields at once,
+    // so without this the sheet would fire a request per character typed.
+    let lastTaxKey = '';
+    addressEl.on('change', ev => {
+      addressComplete = ev.complete;
+      addressValue = ev.value || null;
+
+      const a = (addressValue && addressValue.address) || {};
+      const taxKey = `${a.state || ''}|${a.postal_code || ''}`;
+      if (taxKey === lastTaxKey) return;
+      lastTaxKey = taxKey;
+      if (typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) ensurePaymentIntent();
+    });
+  }
+
+  // The one shape the rest of this file reads an address in, so the Stripe
+  // element's own field names (line1, postal_code) stop at this boundary
+  // rather than spreading through the order payload and the tax call.
+  function shippingAddress() {
+    const a = (addressValue && addressValue.address) || {};
+    return {
+      firstName: (addressValue && addressValue.firstName) || '',
+      lastName: (addressValue && addressValue.lastName) || '',
+      address1: a.line1 || '',
+      address2: a.line2 || '',
+      city: a.city || '',
+      state: a.state || '',
+      zip: a.postal_code || '',
+    };
   }
 
   /* ---------- summary ---------- */
@@ -280,21 +340,24 @@
   // Only what Stripe Tax actually needs (state + ZIP). Anything short of
   // that and the server-side calculation returns null, no request wasted.
   function currentTaxAddress() {
-    const state = $('coState') ? $('coState').value : '';
-    const zip = $('coZip') ? $('coZip').value : '';
-    if (!state || !zip) return null;
-    return {
-      address1: $('coAddr') ? $('coAddr').value : '',
-      address2: $('coAddr2') ? $('coAddr2').value : '',
-      city: $('coCity') ? $('coCity').value : '',
-      state,
-      zip,
-    };
+    const a = shippingAddress();
+    if (!a.state || !a.zip) return null;
+    return { address1: a.address1, address2: a.address2, city: a.city, state: a.state, zip: a.zip };
   }
   let piInFlight = null; // in-flight promise, so a rapid shipping toggle cannot fire two overlapping requests
 
   function stripeErr(msg) {
     const el = $('coStripeErr');
+    if (!el) return;
+    el.hidden = !msg;
+    el.textContent = msg || '';
+  }
+
+  // Same shape, for the address block. Its own line rather than the payment
+  // one, so "complete your address" appears beside the address rather than
+  // under the card fields several sections further down.
+  function addressErr(msg) {
+    const el = $('coAddressErr');
     if (!el) return;
     el.hidden = !msg;
     el.textContent = msg || '';
@@ -410,6 +473,10 @@
           // below is what keeps anything Stripe renders live (a wallet
           // button's on-screen amount, mainly) in step with it.
           elements = stripeClient.elements({ clientSecret: data.clientSecret, appearance: STRIPE_APPEARANCE });
+          // Same Elements group as the payment fields below, deliberately:
+          // that is the condition for the address autocomplete being included
+          // rather than billed as a separate lookup service.
+          mountAddress(elements);
           // Card only (the PaymentIntent was created with payment_method_types:
           // ['card']), and no address/name/email fields: the checkout form
           // already collects all three, further up this same page, so Stripe's
@@ -704,7 +771,6 @@
   /* ---------- wire up ---------- */
 
   document.addEventListener('DOMContentLoaded', async () => {
-    fillStates();
     renderPayMethods();
     renderSummary();
     checkSession();
@@ -736,16 +802,9 @@
       window.GlowCart.open();
     });
 
-    // Tax is priced off state + ZIP, so those are the two fields that matter
-    // here — 'change' rather than 'input' so a still-being-typed ZIP does not
-    // fire a request on every keystroke, only once the field is left.
-    ['coState', 'coZip'].forEach(id => {
-      const el = $(id);
-      if (!el) return;
-      el.addEventListener('change', () => {
-        if (typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) ensurePaymentIntent();
-      });
-    });
+    // Tax repricing on a state or ZIP change is wired inside mountAddress(),
+    // on the Address Element's own change event, since those fields are no
+    // longer inputs of ours to listen to.
 
     // optional account creation: the password field only exists once asked for
     $('coMakeAcct').addEventListener('change', e => {
@@ -841,17 +900,27 @@
         return;
       }
 
+      // The address fields are Stripe's now, so they carry no `required`
+      // attribute for the browser to enforce and the form will happily submit
+      // half-filled. `complete` is the element's own answer to the same
+      // question, and asking it is what replaces those attributes. Without
+      // this an order reaches WooCommerce with a blank street line.
+      if (!addressComplete) {
+        addressErr('Please complete your shipping address.');
+        const slot = $('coAddressElement');
+        if (slot) slot.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        if (addressEl) addressEl.focus();
+        return;
+      }
+      addressErr('');
+
       // the referral code rides along with the order so the backend can credit
       // it. Attribution is decided here, at the point of sale, not later.
       const ref = window.GlowReferral ? window.GlowReferral.code() : null;
       const opt = SHIPPING.find(s => s.id === shipId) || SHIPPING[0];
       const sub = items.reduce((n, i) => n + i.unitSale * i.qty, 0);
 
-      const shipAddr = {
-        firstName: $('coFirst').value, lastName: $('coLast').value,
-        address1: $('coAddr').value, address2: $('coAddr2').value,
-        city: $('coCity').value, state: $('coState').value, zip: $('coZip').value,
-      };
+      const shipAddr = shippingAddress();
       // Billing is the shipping address. A card whose billing address differs
       // is handled by the processor's own AVS step, not by six more fields
       // everybody has to scroll past.
@@ -888,12 +957,12 @@
       // not exist, which is the worst outcome this checkout can produce.
       //
       // A plain drain is not enough for tax specifically: only state/zip
-      // changing fires ensurePaymentIntent() (see the coState/coZip
-      // listeners), so a street address or city typed afterward — with state
-      // and zip left alone — would confirm against a PaymentIntent tax was
-      // never recalculated for. Calling it once more here, with every address
-      // field now filled in, is what makes the amount about to be confirmed
-      // match the address about to be submitted. ensurePaymentIntent() drains
+      // changing fires ensurePaymentIntent() (see the Address Element's change
+      // handler in mountAddress), so a street address or city typed afterward
+      // — with state and zip left alone — would confirm against a PaymentIntent
+      // tax was never recalculated for. Calling it once more here, with every
+      // address field now filled in, is what makes the amount about to be
+      // confirmed match the address about to be submitted. ensurePaymentIntent() drains
       // any call already in flight before starting its own, so this also
       // covers the ordinary race the comment above describes. payload rides
       // along on this call so it lands in the PaymentIntent's own metadata —

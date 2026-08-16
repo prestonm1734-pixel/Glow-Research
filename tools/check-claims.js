@@ -1468,6 +1468,31 @@ console.log('\ncheckout gate');
   ok('checkout.html carries the coNotLive element',
     /id="coNotLive"/.test(coHtml));
 
+  // The shipping address is Stripe's Address Element now, which means it
+  // carries no `required` attributes for the browser to enforce and the form
+  // would submit half-filled. Three things replace them, and a parcel goes to
+  // a blank street if any one is missing: the element has to exist, the
+  // submit has to gate on Stripe's own `complete` flag, and the address the
+  // order is built from has to be read back through the one accessor rather
+  // than from inputs that are no longer on the page.
+  ok('checkout.html mounts the address element',
+    /id="coAddressElement"/.test(coHtml) && /mountAddress\(elements\)/.test(coJs));
+  ok('the order is blocked until Stripe says the address is complete',
+    /if \(!addressComplete\)/.test(coJs) &&
+    /addressComplete = ev\.complete/.test(coJs));
+  ok('the order address is read from the element, not from inputs',
+    /const shipAddr = shippingAddress\(\)/.test(coJs) &&
+    /function shippingAddress\(\)/.test(coJs) &&
+    !/\$\('coAddr'\)|\$\('coCity'\)|\$\('coZip'\)|\$\('coState'\)/.test(coJs));
+
+  // Autocomplete is included rather than billed only while the address and
+  // payment elements share one Elements group. Mounting it from its own
+  // stripeClient.elements() call would still work and would quietly start
+  // asking for a Google Maps key.
+  ok('the address element shares the payment fields\' Elements group',
+    /mountAddress\(elements\);/.test(coJs) &&
+    !/mountAddress\(stripeClient\.elements\(/.test(coJs));
+
   // While it is false, the order-confirmation email must not exist to be sent
   // — checked structurally above — but if PAYMENTS_LIVE is ever flipped back
   // on, the emails still must not claim a payment the site cannot take. This
@@ -1884,7 +1909,11 @@ console.log('\nentity and address');
   // names it as the law the contract runs under, which is a choice of law and
   // not a location. Both are excluded by file; everywhere else, a hit is the
   // site disclosing where it operates from.
-  const placeExempt = new Set(['js/checkout.js', 'terms.html']);
+  // Only the governing-law clause now. js/checkout.js used to be exempt too,
+  // for a 50-state array it kept solely to populate a <select>; Stripe's
+  // Address Element owns that list, so the exemption came out with the array
+  // and the scan covers the checkout script again.
+  const placeExempt = new Set(['terms.html']);
   const scanned = [
     ...pages,
     ...fs.readdirSync(path.join(ROOT, 'js')).filter(f => f.endsWith('.js')).map(f => `js/${f}`),
@@ -1905,7 +1934,7 @@ console.log('\nentity and address');
   const withState = scanned
     .filter(f => !placeExempt.has(f))
     .filter(f => /California|"addressRegion"/.test(read(f)));
-  ok('and none names the state outside the state picker and the governing-law clause',
+  ok('and none names the state outside the governing-law clause',
     withState.length === 0, withState.join(', '));
 
   // The homepage Organization block is the one place a machine reads the
