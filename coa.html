@@ -383,30 +383,6 @@
   </div>
 </footer>
 
-<div class="search-modal" id="searchModal" hidden>
-  <div class="search-modal-inner">
-    <input type="text" class="search-input" id="searchInput" placeholder="Search peptides…" />
-    <div class="search-results" id="searchResults"></div>
-  </div>
-</div>
-
-<div class="qa-sheet" id="qaSheet" hidden>
-  <div class="qa-inner">
-    <button class="qa-close" id="qaClose" aria-label="Close">✕</button>
-    <div class="qa-grid" id="qaGrid"></div>
-  </div>
-</div>
-
-<div class="cart-drawer" id="cartDrawer" hidden>
-  <div class="cart-inner">
-    <div class="cart-header">
-      <h2>Order</h2>
-      <button class="cart-close" id="cartClose" aria-label="Close">✕</button>
-    </div>
-    <div class="cart-body" id="cartBody"></div>
-  </div>
-</div>
-
 <script>
   document.getElementById('stubYear').textContent = new Date().getFullYear();
   const revealObserver = new IntersectionObserver((entries) => {

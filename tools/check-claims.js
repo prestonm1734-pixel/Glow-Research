@@ -813,6 +813,28 @@ if (!COAS_PUBLISHED) {
     /const COA_URL\s*=\s*'[^']+'/.test(read('js/products-data.js')));
 }
 
+/* Duplicate element ids. Invalid HTML on its own, but the reason it is
+   checked is what it hides: coa.html carried a hand-written .cart-drawer,
+   .search-modal and .qa-sheet left over from when it was a stub, each
+   duplicating an id that js/cart.js and js/search.js also create at runtime.
+   The live code scopes its lookups to its own overlay so nothing broke, and
+   the dead markup sat invisible on a dark page for months. Giving the page a
+   white background made it visible: three unstyled blocks below the footer,
+   in normal flow, doubling the document width on a phone.
+
+   A duplicate id is the cheapest signal that a page is carrying two copies of
+   something that should exist once. Scanning markup only, which is the right
+   scope: ids that JS injects are not in the file. */
+{
+  const dupes = [];
+  pages.forEach(f => {
+    const ids = [...read(f).matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
+    const seen = [...new Set(ids.filter((v, i) => ids.indexOf(v) !== i))];
+    if (seen.length) dupes.push(`${f}: ${seen.join(', ')}`);
+  });
+  ok('no page declares the same id twice', dupes.length === 0, dupes.join(' | '));
+}
+
 /* The certificate index. Its whole claim is completeness: a page that lists
    certificates is read as the set of compounds whose paperwork exists, so a
    catalog entry missing from it is a product the site quietly cannot account
