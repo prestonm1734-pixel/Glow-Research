@@ -7,15 +7,17 @@
      needs the observer to show it, so without scripting the page must
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
-<title>Privacy Policy | Glow Research</title>
-<meta name="description" content="How Glow Research collects, stores, and uses information: what's saved in your browser, what we don't track, and what changes once accounts and payment go live." />
+<title>Shipping Policy | Glow Research</title>
+<meta name="description" content="Glow Research shipping policy: processing time, FedEx rates and coverage, delivery area, and the no-returns policy on shipped or opened vials." />
 <meta name="robots" content="index,follow" />
+<link rel="canonical" href="https://glowresearch.shop/shipping-policy.html" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="stylesheet" href="css/style.css" />
 <style>
   /* Same legal-prose treatment as Terms & Conditions: narrower measure than
-     the marketing lp-* sections, number in the heading text rather than a
-     counter badge, read top to bottom. */
+     the marketing lp-* sections, and the number lives in the heading text
+     itself rather than a counter badge, since this is a document to read in
+     order, not a scannable list. */
   .tc-body{ max-width: 68ch; margin: 0 auto; }
   .tc-updated{
     display:block; margin-bottom: clamp(28px, 4vw, 40px);
@@ -32,31 +34,27 @@
   .tc-body strong{ color: var(--text); font-weight:600; }
   .tc-body a{ color: var(--text); text-decoration-color: var(--text-dimmer); text-underline-offset: 3px; }
   .tc-body a:hover{ text-decoration-color: var(--text); }
-  .tc-body code{
-    font-family:'JetBrains Mono', monospace; font-size:.86rem;
-    background: var(--bg-2); padding: 2px 6px; color: var(--text);
-  }
-
-  /* Same honesty pattern as checkout's payment-processor note and signin's
-     "accounts are not live yet" note — say plainly what isn't built. */
-  .tc-note{
-    margin: 0 0 1.4em; padding: 16px 18px; border:1px solid var(--border);
-    font-size:.9rem; line-height:1.65; color: var(--text-dim);
-  }
-  .tc-note strong{ color: var(--text); }
 </style>
-<meta property="og:title" content="Privacy Policy" />
-<meta property="og:description" content="How Glow Research collects, stores, and uses information: what's saved in your browser, what we don't track, and what changes once accounts and payment go live." />
-<meta name="twitter:title" content="Privacy Policy" />
-<meta name="twitter:description" content="How Glow Research collects, stores, and uses information: what's saved in your browser, what we don't track, and what changes once accounts and payment go live." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Glow Research" />
+<meta property="og:title" content="Shipping Policy" />
+<meta property="og:description" content="Glow Research shipping policy: processing time, FedEx rates and coverage, delivery area, and the no-returns policy on shipped or opened vials." />
+<meta property="og:url" content="https://glowresearch.shop/shipping-policy.html" />
+<meta property="og:image" content="https://glowresearch.shop/assets/vial-trio-black-v2.jpg" />
+<meta property="og:image:width" content="1672" />
+<meta property="og:image:height" content="941" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Shipping Policy" />
+<meta name="twitter:description" content="Glow Research shipping policy: processing time, FedEx rates and coverage, delivery area, and the no-returns policy on shipped or opened vials." />
+<meta name="twitter:image" content="https://glowresearch.shop/assets/vial-trio-black-v2.jpg" />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "@id": "https://glowresearch.shop/privacy.html#webpage",
-  "url": "https://glowresearch.shop/privacy.html",
-  "name": "Privacy Policy",
-  "description": "How Glow Research collects, stores, and uses information: what's saved in your browser, what we don't track, and what changes once accounts and payment go live.",
+  "@id": "https://glowresearch.shop/shipping-policy.html#webpage",
+  "url": "https://glowresearch.shop/shipping-policy.html",
+  "name": "Shipping Policy",
+  "description": "Glow Research shipping policy: processing time, FedEx rates and coverage, delivery area, and the no-returns policy on shipped or opened vials.",
   "isPartOf": {
     "@id": "https://glowresearch.shop/#website"
   },
@@ -75,8 +73,8 @@
       {
         "@type": "ListItem",
         "position": 2,
-        "name": "Privacy Policy",
-        "item": "https://glowresearch.shop/privacy.html"
+        "name": "Shipping Policy",
+        "item": "https://glowresearch.shop/shipping-policy.html"
       }
     ]
   }
@@ -136,9 +134,11 @@
 <section class="lp-hero">
   <div class="container">
     <span class="lp-eyebrow">Legal</span>
-    <h1>Privacy Policy</h1>
+    <h1>Shipping Policy</h1>
     <p class="lp-lede">
-      What we collect, what we don't, and where your information actually lives.
+      When an order leaves, what it costs, and what happens after it does. For the
+      day-to-day experience of ordering, see the <a href="shipping.html">Shipping page</a>;
+      this is the policy behind it.
     </p>
   </div>
 </section>
@@ -147,103 +147,83 @@
   <div class="container tc-body">
     <span class="tc-updated">Last updated August 2026</span>
 
+    <h2>1. Processing Time</h2>
     <p>
-      This policy covers glowresearch.shop, operated by Glow Research. It describes
-      what information the site collects, how it's used, and what's stored only in your
-      own browser rather than sent to us.
+      Orders placed before 2:00 PM PST on a business day are packed and handed to the
+      carrier that same afternoon. Orders placed after the cutoff, or on a weekend, ship
+      the next business day. We do not process or dispatch orders on Saturdays or
+      Sundays.
     </p>
 
-    <h2>1. Information You Provide</h2>
+    <h2>2. Carrier &amp; Delivery Method</h2>
     <p>
-      If you use the contact form, sign-up form, or checkout, you may give us your name,
-      email address, phone number, shipping and billing address, and company name. We use
-      this to respond to inquiries, process orders, and ship products.
+      All orders ship via FedEx. The standard method is FedEx 2-Day Express, arriving
+      within 2 business days of dispatch. FedEx Overnight is offered at checkout for
+      next-business-day arrival.
     </p>
-    <div class="tc-note">
-      <strong>Accounts and checkout are not connected to a live backend yet.</strong>
-      Nothing typed into the sign-in or checkout forms today is transmitted, stored on a
-      server, or seen by anyone. The password field in particular is never read at all.
-      This policy will be updated with specifics once the account system and payment
-      processor go live, and we'll note the change here rather than update it quietly.
-    </div>
 
-    <h2>2. Information Stored in Your Browser</h2>
-    <p>
-      Glow Research uses your browser's local storage, not tracking cookies, to remember
-      a small set of functional details on the device you're using:
-    </p>
+    <h2>3. Shipping Rates</h2>
     <ul>
-      <li><strong>Cart contents:</strong> what you've added, so it's still there if you reload the page.</li>
-      <li><strong>Age and RUO gate confirmation:</strong> so the entry screen doesn't reappear on every visit.</li>
-      <li><strong>Sample sign-in state:</strong> while the account system is a design preview, this is a placeholder value, not real authentication.</li>
-    </ul>
-    <p>
-      This information stays on your device. We do not receive it, sell it, or share it
-      with anyone. Clearing your browser's site data for glowresearch.shop removes all of it.
-    </p>
-
-    <h2>3. What We Don't Do</h2>
-    <p>
-      Glow Research does not run third-party analytics, advertising pixels, or behavioral
-      tracking scripts. We don't sell or rent personal information to anyone, and we don't
-      build advertising profiles from your activity on this site.
-    </p>
-
-    <h2>4. Third-Party Services</h2>
-    <p>
-      A small number of outside services support the site:
-    </p>
-    <ul>
-      <li><strong>Google Fonts:</strong> typefaces are loaded from Google's servers, which
-        means your browser makes a request to Google when the page loads.</li>
-      <li><strong>Fulfilment partner:</strong> once an order is placed, your shipping details
-        are shared with the third-party partner who picks, packs, and dispatches it on our
-        behalf. See <a href="terms.html">Terms &amp; Conditions</a> for how that relationship works.</li>
-      <li><strong>Payment processor:</strong> when checkout is connected to a live payment
-        gateway, card details will be handled directly by that processor. Glow Research does
-        not store full card numbers.</li>
+      <li><strong>FedEx 2-Day Express:</strong> $12.95, free on orders over $400 before tax.</li>
+      <li><strong>FedEx Overnight:</strong> $39.95, not discounted regardless of order size.</li>
     </ul>
 
-    <h2>5. Cookies</h2>
+    <h2>4. Delivery Coverage</h2>
     <p>
-      This site does not set tracking or advertising cookies. Any first-party cookie a
-      future payment or hosting provider requires for the checkout to function will be
-      disclosed here when checkout goes live.
+      Every shipment is covered up to $300 against loss, damage, or a carrier delay,
+      applied automatically at no additional cost. There is nothing to purchase and
+      nothing to opt into at checkout.
     </p>
 
-    <h2>6. Your Choices</h2>
+    <h2>5. Delivery Area</h2>
     <p>
-      You can clear everything the site has stored in your browser at any time through
-      your browser's settings. This removes your cart and age-gate confirmation. To ask
-      about, correct, or delete information tied to an order, contact us using the details
-      below.
+      We ship to all 50 states, including Hawaii and Alaska. We do not currently ship
+      outside the United States.
     </p>
 
-    <h2>7. Children's Privacy</h2>
+    <h2>6. Address Accuracy &amp; Undeliverable Packages</h2>
     <p>
-      Glow Research products are restricted to buyers 21 and older, and this site is not
-      directed at anyone under that age. We do not knowingly collect information from
-      minors.
+      You are responsible for entering a complete and accurate shipping address at
+      checkout. Glow Research is not responsible for orders that are delayed,
+      misdelivered, or lost because of an incorrect or incomplete address supplied by
+      the buyer.
+    </p>
+    <p>
+      If a package is returned to our fulfilment partner as undeliverable by the
+      carrier, for example due to an incomplete address or a failed delivery attempt,
+      we will contact you using the information provided at checkout to arrange
+      reshipment.
     </p>
 
-    <h2>8. Data Security</h2>
+    <h2>7. Delays Outside Our Control</h2>
     <p>
-      We take reasonable steps to protect information you provide to us. No method of
-      transmission or storage is completely secure, and we can't guarantee absolute
-      security for information sent over the internet.
+      Glow Research is not responsible for delivery delays caused by the carrier,
+      weather, or other events outside our control. A tracking number is provided so
+      you can follow a shipment directly with FedEx once it is en route.
     </p>
 
-    <h2>9. Changes to This Policy</h2>
+    <h2>8. Order Tracking</h2>
     <p>
-      We may update this policy as the site changes, particularly once accounts and
-      payment processing go live. Continued use of the site after an update constitutes
-      acceptance of the revised policy.
+      A tracking number is emailed within 24 hours of dispatch. Saturday delivery is
+      available on routes where FedEx offers it, at no extra charge.
+    </p>
+
+    <h2>9. Returns &amp; Cancellations</h2>
+    <p>
+      Because these are lyophilized research materials whose storage conditions cannot
+      be verified once they leave our facility, <strong>all sales are final once a vial
+      has shipped or been opened.</strong> We do not accept returns for personal-use
+      dissatisfaction.
+    </p>
+    <p>
+      This shipping policy is part of, and should be read alongside, our full
+      <a href="terms.html">Terms &amp; Conditions</a>, which govern order acceptance and
+      cancellation before an order ships.
     </p>
 
     <h2>10. Contact</h2>
     <p>
-      Questions about this policy or a request about your information can be sent to
-      <a href="mailto:support@glowresearch.shop">support@glowresearch.shop</a>.
+      Questions about an order or a shipment: <a href="mailto:support@glowresearch.shop">support@glowresearch.shop</a>.
     </p>
   </div>
 </section>
@@ -301,12 +281,6 @@
 
 <script>
   document.getElementById('stubYear').textContent = new Date().getFullYear();
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
-    });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   const hamburger = document.getElementById('hamburger');
   const mainNav = document.getElementById('mainNav');
   hamburger.addEventListener('click', () => {

@@ -33,6 +33,7 @@ const STATIC_PAGES = [
   ['terms.html', '0.3'],
   ['privacy.html', '0.3'],
   ['ruo-agreement.html', '0.3'],
+  ['shipping-policy.html', '0.3'],
 ];
 
 function url(loc, lastmod, priority) {

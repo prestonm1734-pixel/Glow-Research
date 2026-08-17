@@ -227,6 +227,66 @@ console.log('\ntransit time');
 }
 
 /* ---------------------------------------------------------------------------
+ * 3d. Shipping policy figures. shipping-policy.html states the two FedEx
+ *     rates, the free-shipping threshold, and the coverage amount in prose,
+ *     as a policy rather than a live price. The rates and the threshold have
+ *     a source of truth elsewhere on the site (SHIPPING_RATES, cart.js's
+ *     FREE_SHIPPING_AT); the policy page has to read the same numbers those
+ *     do, not a copy retyped by hand that can drift the next time a rate
+ *     changes. Coverage has no such source, since nothing in code enforces an
+ *     insurance figure, so that one is pinned only against shipping.html, the
+ *     other page that states it, so the two cannot disagree with each other.
+ * ------------------------------------------------------------------------- */
+console.log('\nshipping policy figures');
+{
+  const policy = read('shipping-policy.html');
+  // SHIPPING_RATES lives in api/_lib.js, an ESM module this CommonJS script
+  // cannot require() — pulled out of the source text by id, the same way the
+  // "all three shipping tables" check below reads it.
+  const lib = read('api/_lib.js');
+  const rate = id => {
+    const m = lib.match(new RegExp(`\\{ id: '${id}', cost: ([0-9.]+), freeOver: (null|[0-9]+) \\}`));
+    return m ? { cost: Number(m[1]), freeOver: m[2] === 'null' ? null : Number(m[2]) } : null;
+  };
+  const twoDayRate = rate('2day');
+  const overnightRate = rate('overnight');
+  const cartFree = constant('js/cart.js', 'FREE_SHIPPING_AT');
+
+  const twoDay = policy.match(/FedEx 2-Day Express:<\/strong>\s*\$([0-9.]+), free on orders over \$([0-9]+)/);
+  ok('the policy states the 2-Day rate SHIPPING_RATES actually charges',
+    twoDay !== null && twoDayRate !== null && Number(twoDay[1]) === twoDayRate.cost,
+    twoDay ? `policy says $${twoDay[1]}, SHIPPING_RATES says $${twoDayRate && twoDayRate.cost}` : 'rate not found in shipping-policy.html');
+  ok('and the free-shipping threshold FREE_SHIPPING_AT actually enforces',
+    twoDay !== null && Number(twoDay[2]) === cartFree,
+    twoDay ? `policy says $${twoDay[2]}, FREE_SHIPPING_AT is $${cartFree}` : 'threshold not found');
+
+  const overnight = policy.match(/FedEx Overnight:<\/strong>\s*\$([0-9.]+)/);
+  ok('the policy states the Overnight rate SHIPPING_RATES actually charges',
+    overnight !== null && overnightRate !== null && Number(overnight[1]) === overnightRate.cost,
+    overnight ? `policy says $${overnight[1]}, SHIPPING_RATES says $${overnightRate && overnightRate.cost}` : 'rate not found');
+  ok('and states Overnight as never free, which is what freeOver: null means',
+    overnightRate !== null && overnightRate.freeOver === null && /Overnight.{0,80}not discounted/s.test(policy));
+
+  // No source of truth to check the figure itself against, so this only
+  // guards the two pages that state it from quietly disagreeing.
+  const shipCoverage = read('shipping.html').match(/Covered to \$([0-9]+)/);
+  const policyCoverage = policy.match(/covered up to \$([0-9]+)/);
+  ok('the coverage figure matches the one on the shipping page',
+    shipCoverage !== null && policyCoverage !== null && shipCoverage[1] === policyCoverage[1],
+    `shipping.html says $${shipCoverage && shipCoverage[1]}, shipping-policy.html says $${policyCoverage && policyCoverage[1]}`);
+
+  // The return policy is the one sentence in this file that cannot be
+  // paraphrased: it is also terms.html's, word for word, and a policy page
+  // that softens it while the contract still says it in full is worse than
+  // not having a policy page at all. Compared with whitespace collapsed,
+  // since the two pages wrap the sentence across markup differently.
+  const norm = s => s.replace(/\s+/g, ' ');
+  const returnLine = 'all sales are final once a vial has shipped or been opened';
+  ok('the no-returns line matches the Terms & Conditions wording exactly',
+    norm(read('terms.html')).includes(returnLine) && norm(policy).includes(returnLine));
+}
+
+/* ---------------------------------------------------------------------------
  * 3d. The batch analysis panel. This is the strongest claim surface on the
  *     site: it is laid out as a laboratory report, which tells a buyer that
  *     what they are reading is a record of the vial in front of them. A panel

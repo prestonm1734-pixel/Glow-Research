@@ -62,6 +62,11 @@ const PAGE_META = {
     title: t('Shipping'),
     desc: 'Order before 2:00 PM PST and it ships the same business day on 2-day FedEx Express. Free over $400. All 50 states.',
   },
+  'shipping-policy.html': {
+    name: 'Shipping Policy',
+    title: t('Shipping Policy'),
+    desc: 'Glow Research shipping policy: processing time, FedEx rates and coverage, delivery area, and the no-returns policy on shipped or opened vials.',
+  },
   'wholesale.html': {
     name: 'Wholesale',
     title: t('Wholesale'),
