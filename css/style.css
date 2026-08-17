@@ -950,21 +950,7 @@ html:not(.js) .faq-a{ max-height: none; }
 .disclaimer h5{ font-family:'Sora',sans-serif; text-transform:uppercase; letter-spacing:.08em; font-size:0.78rem; color: var(--pink-soft); margin-bottom:12px; }
 .disclaimer p{ font-size: 0.78rem; line-height:1.8; color: var(--text-dimmer); }
 
-/* Copyright on the left, the legal docs on the right, one row below the
-   disclaimer — the RUO reminder used to live here as its own centered line,
-   which was a third restatement of what the disclaimer box directly above it
-   already says in full. Terms/Privacy/Shipping Policy/RUO Agreement moved
-   down from the Support column: those four are a contract, not a place to
-   get help, and grouping them with Contact/Shipping was the two ideas
-   sharing one label. */
-.footer-bottom{
-  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;
-  gap: 10px 24px; font-size:0.78rem; color: var(--text-dimmer);
-}
-.footer-bottom .footer-legal{ margin-top:0; }
-.footer-legal-links{ display:flex; flex-wrap:wrap; gap: 8px 22px; }
-.footer-legal-links a{ color: var(--text-dimmer); transition: color .2s; }
-.footer-legal-links a:hover{ color: var(--pink-soft); }
+.footer-bottom{ display:flex; justify-content:center; flex-wrap:wrap; gap:8px; font-size:0.78rem; color: var(--text-dimmer); }
 
 /* Sits directly under the wordmark and says what the company sells before
    the link columns start naming pages. Body-text sizing, not the mono
@@ -1047,8 +1033,7 @@ html:not(.js) .faq-a{ max-height: none; }
   .disclaimer p{ line-height: 1.62; }
   .footer-legal-bar{ margin: 0 0 24px; padding: 14px 0; text-align:left; line-height: 1.7; }
   .footer-legal-bar .divider{ display:block; margin: 4px 0 0; width:0; overflow:hidden; }
-  /* copyright above the legal links rather than squeezed onto one row */
-  .footer-bottom{ flex-direction:column; align-items:flex-start; gap:12px; text-align:left; }
+  .footer-bottom{ justify-content:flex-start; text-align:left; }
 }
 
 /* mobile nav drawer */
