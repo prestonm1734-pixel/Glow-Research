@@ -86,17 +86,36 @@
   /* Hairline grid, same construction as the batch analysis panel: the cells
      sit white on a 1px-gap background, so wrapping to any column count needs
      no extra border rules and never doubles a line. */
-  .coa-card{ background:#fff; display:flex; flex-direction:column; }
+  /* min-width:0 on the card for the same reason as the visual: a grid item
+     that will not shrink is how a single long compound name widens the whole
+     column and takes the document past the viewport. */
+  .coa-card{ background:#fff; display:flex; flex-direction:column; min-width:0; }
   .coa-card[hidden]{ display:none; }
 
+  /* aspect-ratio with a percentage padding is a combination Safari has
+     historically resolved differently from Chromium — the padding resolves
+     against the width, which the ratio is also deriving the height from, and
+     the box can end up far taller than square. A fixed padding takes the
+     circular reference out of it and costs nothing here.
+     min-width:0 because a grid item's default is auto, which lets a wide
+     child push the column, and the column, past the screen. */
   .coa-card-visual{
-    position:relative; aspect-ratio: 1 / 1; display:flex;
-    align-items:center; justify-content:center; padding: 12%;
+    position:relative; aspect-ratio: 1 / 1; min-width:0;
     background: linear-gradient(180deg,#fafafa,#f1f1ef);
     border-bottom:1px solid rgba(0,0,0,.09);
   }
+  /* Absolute, not a flex child. The vials are portrait, and in flow the
+     image's own 1:1.4 ratio drives the container's height — aspect-ratio only
+     applies where the box is not otherwise sized, so it silently loses and
+     every tile comes out tall instead of square. Out of flow the tile's
+     height is the ratio's alone and nothing the image does can change it.
+     Explicit inset and size rather than `inset` alone, because a replaced
+     element with auto width against four insets centres at intrinsic size
+     instead of filling. */
   .coa-card-visual img{
-    width:100%; height:100%; object-fit:contain; mix-blend-mode:multiply;
+    position:absolute; top:26px; left:26px;
+    width:calc(100% - 52px); height:calc(100% - 52px);
+    object-fit:contain; mix-blend-mode:multiply;
   }
   /* Only drawn when a document actually exists, so the badge is a fact about
      this card rather than decoration on all of them. */
