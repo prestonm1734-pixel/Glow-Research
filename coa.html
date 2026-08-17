@@ -32,7 +32,19 @@
      dark lp-page every other legal/marketing page carries. Only the title
      is built for now; the vial grid and its interaction come later. */
   .coa-page{ background:#fff; color:#0a0a0a; }
-  .coa-page .lp-hero h1{ color:#0a0a0a; }
+
+  /* Scaled down from the sitewide lp-hero, which is sized for a landing page
+     whose heading is the whole screen. This one sits directly above a search
+     box and a grid, so it is a label on a tool rather than the reason you are
+     here: the same heading scale signin and account use on their own white
+     surfaces, and roughly half the vertical space, so the compounds are on
+     screen without scrolling. */
+  .coa-page .lp-hero{ padding: clamp(40px, 5.5vw, 64px) 0 clamp(26px, 3.5vw, 38px); }
+  .coa-page .lp-hero h1{
+    color:#0a0a0a; font-size: clamp(1.9rem, 3.6vw, 2.6rem);
+    max-width: none; margin-bottom: 14px;
+  }
+  .coa-page .lp-lede{ font-size: clamp(.98rem, 1.1vw, 1.05rem); max-width: 48ch; }
   /* --text-dim is a light gray tuned for the dark lp-page background; on
      white it reads as barely-there. Same value product.html and account.html
      use for secondary text on their own white surfaces. */
