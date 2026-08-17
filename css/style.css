@@ -2082,10 +2082,6 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
 /* the panel is only a focus target, never an outlined control */
 .age-gate-panel:focus{ outline: none; }
 
-/* affiliate application checkbox inside the account panel */
-.ac-agree{ display:flex; gap:11px; align-items:flex-start; margin-top:18px; font-size:.9rem; color:#55554f; cursor:pointer; }
-.ac-agree input{ width:17px; height:17px; flex-shrink:0; margin:2px 0 0; accent-color:#0a0a0a; }
-.ac-agree a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
 /* the account panels reuse the sign-in field styling */
 .ac-page .si-field{ margin-bottom:16px; }
 .ac-page .si-field label{

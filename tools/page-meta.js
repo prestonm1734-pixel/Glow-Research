@@ -77,11 +77,6 @@ const PAGE_META = {
     title: t('Contact Us'),
     desc: 'Reach the Glow Research team at support@glowresearch.shop for order status, wholesale applications, or general questions.',
   },
-  'affiliate.html': {
-    name: 'Partner Program',
-    title: t('Partner Program'),
-    desc: 'Earn commission referring qualified research buyers to Glow Research as a partner. 60-day attribution, monthly payouts, no therapeutic claims.',
-  },
   'privacy.html': {
     name: 'Privacy Policy',
     title: t('Privacy Policy'),

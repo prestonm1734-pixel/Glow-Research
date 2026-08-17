@@ -35,7 +35,7 @@ export default async function handler(req, res) {
   }
 
   const body = readBody(req);
-  const { customer, shipping, billing, items, shippingMethod, referral, notes, termsAccepted, paymentIntentId, promoCode } = body;
+  const { customer, shipping, billing, items, shippingMethod, notes, termsAccepted, paymentIntentId, promoCode } = body;
 
   if (!customer || !isEmail(customer.email) || !shipping || !Array.isArray(items) || !items.length) {
     return res.status(400).json({ error: 'Missing required order details.' });
@@ -116,7 +116,7 @@ export default async function handler(req, res) {
   try {
     const result = await placeOrder({
       paymentIntentId, intent, priced, email, customer, shipping, billing,
-      shippingMethod, referral, notes, session: currentSession(req),
+      shippingMethod, notes, session: currentSession(req),
     });
     // priced already carries discount/promo — placeOrder() reads them straight
     // off priced rather than needing separate params here.

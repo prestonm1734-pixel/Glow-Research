@@ -6,9 +6,6 @@
 // flag below mirrors it for one job only: deciding whether the header says
 // "Sign In" or "Account". It grants nothing. Every endpoint re-checks the
 // cookie server-side, so a forged flag gets an empty page and a 401.
-//
-// Still sample data: the affiliate/partner panel. There is no backend for
-// referrals yet, and it is marked as such in the UI.
 (function () {
   var SESSION = 'glow-session';
 
@@ -45,12 +42,6 @@
     var depth = /\.html?$/i.test(last) ? segs.length - 1 : segs.length;
     return depth > 0 ? new Array(depth + 1).join('../') : '';
   }
-
-  /* The referral figures below are still sample data — there is no referral
-     backend yet. Orders, points and tracking are real and come from /api/me. */
-  var SAMPLE = {
-    referral: { code: 'GLOW-R4417', rate: 10, clicks: 84, signups: 11, orders: 6, earned: 128.40, pending: 42.10 },
-  };
 
   /* Points earn at 1 per $1 and redeem at 100 per $1 off — a flat 1% back.
      The redemption rate is whatever the API says it is, so the tiers below
@@ -112,12 +103,8 @@
     var form = document.getElementById('siForm');
     if (!form) return;
 
-    // ?next=affiliate lands them on the affiliate tab once they are in, so the
-    // "become an affiliate" journey doesn't dump people on the Overview panel
     var params = new URLSearchParams(location.search);
-    var next = params.get('next');
-    var dest = root() + 'account.html' +
-      (next && /^[a-z]+$/.test(next) ? '#' + next : '');
+    var dest = root() + 'account.html';
 
     // already signed in? go straight through
     if (session()) { location.replace(dest); return; }
@@ -325,8 +312,6 @@
           '<p class="ac-msg">' + err.message + '</p>';
       });
 
-    renderAffiliate(SAMPLE);
-
     // panel switching
     var navBtns = document.querySelectorAll('.ac-nav-btn');
     function show(target) {
@@ -343,7 +328,7 @@
       btn.addEventListener('click', function () { show(btn.dataset.panel); });
     });
 
-    // deep link: affiliate.html sends people straight to their affiliate tab
+    // deep link: a URL fragment lands straight on that panel (e.g. #orders)
     var hash = (location.hash || '').replace('#', '');
     if (hash && document.querySelector('.ac-panel[data-panel="' + hash + '"]')) show(hash);
 
@@ -488,126 +473,6 @@
         '">support@glowresearch.shop</a> and we will apply it to your next order. ' +
         'Redeeming from this page is not automatic yet.';
       note.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    });
-  }
-
-  /* ================= affiliate =================
-     Three states rather than one. Being a customer and being an affiliate are
-     different things, so the panel has to know which one it is looking at:
-
-       none      not applied — the pitch and the application form
-       pending   applied, waiting on review
-       approved  link, stats, payouts
-
-     Status lives on the session here because there is no backend; a real
-     implementation reads it off the account and never trusts the client,
-     since "approved" is what unlocks getting paid. */
-  var AFF_KEY = 'glow-aff-status';
-  function affStatus() { return read(AFF_KEY) || 'none'; }
-
-  function renderAffiliate(d) {
-    var body = document.getElementById('acAffBody');
-    var sub = document.getElementById('acAffSub');
-    if (!body) return;
-    var st = affStatus();
-
-    if (st === 'approved') { affApproved(d, body, sub); return; }
-    if (st === 'pending') { affPending(body, sub); return; }
-    affApply(body, sub);
-  }
-
-  function affApply(body, sub) {
-    sub.textContent = 'Earn commission referring qualified research buyers. Applications are reviewed by hand.';
-    body.innerHTML = '' +
-      '<div class="ac-card">' +
-        '<div class="ac-stats">' +
-          '<div class="ac-stat"><b>10%</b><span>Starting commission</span></div>' +
-          '<div class="ac-stat"><b>60 days</b><span>Attribution window</span></div>' +
-          '<div class="ac-stat"><b>Monthly</b><span>Payouts</span></div>' +
-        '</div>' +
-        '<form id="acAffForm">' +
-          '<div class="si-field"><label for="acAffSite">Where you will share</label>' +
-            '<input type="url" id="acAffSite" required placeholder="https://your-site.com or a channel URL" /></div>' +
-          '<div class="si-field"><label for="acAffAudience">Audience</label>' +
-            '<select id="acAffAudience" required>' +
-              '<option value="">Select the closest fit</option>' +
-              '<option>Academic or institutional researchers</option>' +
-              '<option>Independent research lab</option>' +
-              '<option>Lab supply or equipment reseller</option>' +
-              '<option>Scientific publication or newsletter</option>' +
-              '<option>Other</option>' +
-            '</select></div>' +
-          '<div class="si-field"><label for="acAffReach">Monthly reach</label>' +
-            '<select id="acAffReach" required>' +
-              '<option value="">Select a range</option>' +
-              '<option>Under 1,000</option><option>1,000 to 10,000</option>' +
-              '<option>10,000 to 50,000</option><option>50,000 or more</option>' +
-            '</select></div>' +
-          '<label class="ac-agree">' +
-            '<input type="checkbox" id="acAffAgree" required />' +
-            '<span>I have read the <a href="affiliate.html">programme rules</a> and agree not to make ' +
-            'therapeutic claims, publish dosing guidance, or promote these products for human use.</span>' +
-          '</label>' +
-          '<button type="submit" class="btn btn-primary" style="width:100%;margin-top:18px">Submit application</button>' +
-        '</form>' +
-      '</div>';
-
-    document.getElementById('acAffForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      if (!document.getElementById('acAffAgree').checked) return;
-      write(AFF_KEY, 'pending');
-      renderAffiliate(SAMPLE);
-    });
-  }
-
-  function affPending(body, sub) {
-    sub.textContent = 'Your application is with us.';
-    body.innerHTML = '' +
-      '<div class="ac-card">' +
-        '<h2>Under review</h2>' +
-        '<p class="ac-bar-note">We review every application by hand and answer within one ' +
-        'business day. You will get an email at the address on this account, and your link ' +
-        'and dashboard appear here once you are approved.</p>' +
-      '</div>' +
-      '<p class="ac-note"><strong>Sample flow.</strong> Applications are not being received ' +
-      'automatically yet. Email support@glowresearch.shop and we will set you up.</p>';
-  }
-
-  function affApproved(d, body, sub) {
-    var r = d.referral;
-    sub.innerHTML = 'Share your link. You earn <strong>' + r.rate + '%</strong> of every order it brings in.';
-    body.innerHTML = '' +
-      '<div class="ac-card">' +
-        '<label class="ac-eyebrow" for="acRefLink">Your referral link</label>' +
-        '<div class="ac-ref-row">' +
-          '<input type="text" id="acRefLink" readonly aria-label="Your referral link" />' +
-          '<button type="button" class="btn btn-primary" id="acRefCopy">Copy</button>' +
-        '</div>' +
-        '<div class="ac-stats">' +
-          '<div class="ac-stat"><b>' + r.clicks + '</b><span>Clicks</span></div>' +
-          '<div class="ac-stat"><b>' + r.signups + '</b><span>Sign-ups</span></div>' +
-          '<div class="ac-stat"><b>' + r.orders + '</b><span>Orders</span></div>' +
-          '<div class="ac-stat"><b>' + money(r.earned) + '</b><span>Paid out</span></div>' +
-          '<div class="ac-stat"><b>' + money(r.pending) + '</b><span>Pending</span></div>' +
-        '</div>' +
-      '</div>' +
-      '<p class="ac-note"><strong>Research buyers only.</strong> Referral links may not be ' +
-      'promoted with claims of human benefit, dosing guidance, or any therapeutic use. ' +
-      'Accounts doing so are closed and commission is withheld.</p>';
-
-    var input = document.getElementById('acRefLink');
-    input.value = location.origin + '/?ref=' + r.code;
-
-    var btn = document.getElementById('acRefCopy');
-    btn.addEventListener('click', function () {
-      input.select();
-      var done = function () {
-        btn.textContent = 'Copied';
-        setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
-      };
-      // clipboard API needs a secure context; select() above is the fallback
-      if (navigator.clipboard) navigator.clipboard.writeText(input.value).then(done, done);
-      else { try { document.execCommand('copy'); } catch (e) {} done(); }
     });
   }
 

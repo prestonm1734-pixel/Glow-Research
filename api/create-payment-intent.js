@@ -80,7 +80,6 @@ export default async function handler(req, res) {
       items: (items || []).map(i => ({ sku: i.sku, name: i.name, variant: i.variant, qty: i.qty })),
       shippingMethodId,
       shippingLabel: (order.shippingMethod && order.shippingMethod.label) || '',
-      referral: order.referral || null,
       notes: order.notes || '',
       promoCode: promoCode || null,
     }));

@@ -168,11 +168,6 @@
     }
   }
 
-  if (order.referral) {
-    var lede = document.getElementById('tyLede');
-    lede.innerHTML += ' Referral <strong>' + esc(order.referral) + '</strong> has been credited.';
-  }
-
   /* ---------- one-shot ----------
      Clearing it means a refresh still works (this ran first) but a later
      visit shows the "no recent order" state rather than a stale receipt.

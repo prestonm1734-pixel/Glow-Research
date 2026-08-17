@@ -567,7 +567,6 @@
         tax: data.tax || 0,
         discount: data.discount || 0,
         promoCode: data.promoCode || null,
-        referral: payload.referral,
         accountMessage,
         hasAccount,
         accountExists,
@@ -886,9 +885,6 @@
         return;
       }
 
-      // the referral code rides along with the order so the backend can credit
-      // it. Attribution is decided here, at the point of sale, not later.
-      const ref = window.GlowReferral ? window.GlowReferral.code() : null;
       const opt = SHIPPING.find(s => s.id === shipId) || SHIPPING[0];
       const sub = items.reduce((n, i) => n + i.unitSale * i.qty, 0);
 
@@ -919,7 +915,6 @@
         billing: billAddr,
         items,
         shippingMethod: { id: opt.id, label: opt.label, cost: shippingCost(sub) },
-        referral: ref,
         promoCode: appliedPromoCode,
         termsAccepted: true,
       };

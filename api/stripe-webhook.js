@@ -165,7 +165,6 @@ export default async function handler(req, res) {
       shipping: order.shipping,
       billing: order.billing,
       shippingMethod: { id: order.shippingMethodId, label: order.shippingLabel },
-      referral: order.referral,
       notes: order.notes,
       session: null, // no browser cookie on a server-to-server call — see resolveCustomer in _place-order.js
     });

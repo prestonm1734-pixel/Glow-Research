@@ -30,7 +30,7 @@ const ADMIN_SMS_TO = '6195925152@txt.att.net';
 // Creates the WooCommerce order for a payment Stripe has already verified as
 // succeeded, then sends the confirmation and desk emails. Throws on a
 // WooCommerce failure after alerting the desk — see alertOrphanedPayment.
-export async function placeOrder({ paymentIntentId, intent, priced, email, customer, shipping, billing, shippingMethod, referral, notes, session }) {
+export async function placeOrder({ paymentIntentId, intent, priced, email, customer, shipping, billing, shippingMethod, notes, session }) {
   // WooCommerce line_items match by SKU, resolved and priced by priceOrder()
   // (called by the caller, before this function) rather than trusted from
   // whatever the request said. A line that cannot be matched to a SKU — a
@@ -110,7 +110,6 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
         shipping_lines,
         customer_note: notes || '',
         meta_data: [
-          ...(referral ? [{ key: 'referral_code', value: referral }] : []),
           ...(priced.promo && priced.promo.code ? [{ key: 'promo_code', value: priced.promo.code }] : []),
           { key: 'ruo_terms_accepted', value: 'yes' },
           { key: 'ruo_terms_accepted_at', value: new Date().toISOString() },

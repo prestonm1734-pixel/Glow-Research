@@ -30,7 +30,6 @@ const STATIC_PAGES = [
   ['shipping.html', '0.6'],
   ['wholesale.html', '0.6'],
   ['contact.html', '0.5'],
-  ['affiliate.html', '0.5'],
   ['terms.html', '0.3'],
   ['privacy.html', '0.3'],
   ['ruo-agreement.html', '0.3'],
