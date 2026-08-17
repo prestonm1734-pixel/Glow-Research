@@ -163,6 +163,21 @@ const COA_COPY = COAS_PUBLISHED ? {
        'are issued by the independent laboratory that performed the analysis, not by us.',
 };
 
+// The certificate document for one compound, or '' when there is nothing to
+// open. Three surfaces ask this question — the product page's COA box, its
+// batch analysis panel, and the certificate index — so the test lives here
+// rather than being retyped beside each of them.
+//
+// COAS_PUBLISHED is part of the test on purpose. The flag is what decides
+// whether the site links documents or routes to email, so a per-product `coa`
+// staged in the catalog ahead of the flip must not put a live link on a page
+// whose surrounding copy still says "on request". Fill the URLs first, flip
+// the flag when they are all in, and every surface turns over together.
+function coaHref(p) {
+  if (!COAS_PUBLISHED) return '';
+  return (p && p.coa) || COA_URL || '';
+}
+
 // ---------------------------------------------------------------------------
 // The real catalog, imported from the supplier's SKU map (GLO-prefixed
 // product SKUs). `sizes[].sku` is that map's product SKU,
@@ -1082,6 +1097,45 @@ function productCardHtml(p, i) {
       </div>`;
 }
 
+// One card on the certificate index. Kept beside productCardHtml() and built
+// the same way — a plain string off the catalog, no DOM access — so the page
+// can render it in the browser today and a build script can bake it into the
+// served markup later without the two drawing different cards.
+//
+// Deliberately quieter than a product card: no price, no Add to cart, no sale
+// badge. Someone here is checking paperwork, not shopping, and a buy button
+// beside a certificate reads as an advertisement dressed up as a document.
+//
+// The button says what pressing it actually does. While certificates are held
+// it opens the route to one, so it reads "Request certificate": a button
+// labelled "View certificate" that produces an email address instead of a
+// document is the exact promise COAS_PUBLISHED exists to stop the site making.
+function coaCardHtml(p) {
+  const single = p.sizes.length === 1;
+  const name = single ? `${p.name} ${p.sizes[0].mg}` : p.name;
+  const held = Boolean(coaHref(p));
+  return `
+      <article class="coa-card" data-name="${escHtml(p.name.toLowerCase())}" data-type="${escHtml(CAT_LABEL[p.cat].toLowerCase())}" data-lot="${escHtml((p.lot || '').toLowerCase())}" data-alias="${escHtml((p.alias || '').toLowerCase())}">
+        <div class="coa-card-visual">
+          ${held ? '<span class="coa-card-flag">PDF</span>' : ''}
+          ${p.image
+            ? `<img src="${pageHref(p.image)}" alt="${escHtml(p.name)} vial" loading="lazy" />`
+            : '<span class="vial" aria-hidden="true"></span>'}
+        </div>
+        <div class="coa-card-body">
+          <span class="coa-card-type">${escHtml(CAT_LABEL[p.cat])}</span>
+          <h3 class="coa-card-name">${escHtml(name)}</h3>
+          <dl class="coa-card-meta">
+            <div><dt>Purity</dt><dd>${escHtml(p.purity || '')  || '—'}</dd></div>
+            <div><dt>Lot</dt><dd>${escHtml(p.lot || '') || '—'}</dd></div>
+          </dl>
+          <button type="button" class="coa-card-view" data-coa-view="${escHtml(p.name)}">
+            ${held ? 'View certificate' : 'Request certificate'} <span aria-hidden="true">&rarr;</span>
+          </button>
+        </div>
+      </article>`;
+}
+
 // gridEl: container to render into
 // filter: 'all' or a category key
 // opts.observeReveal(el): optional, hooks each card into a scroll-reveal observer
@@ -1214,6 +1268,8 @@ if (typeof module !== 'undefined' && module.exports) {
     FAQS,
     faqHtml,
     productCardHtml,
+    coaCardHtml,
+    coaHref,
     productHref,
     catFilterGroup,
     LAB,

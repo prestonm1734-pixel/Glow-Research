@@ -29,7 +29,7 @@ const {
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
-  FAQS, faqHtml, COA_COPY, productCardHtml, fmtPrice, salePrice,
+  FAQS, faqHtml, COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
   hasList, listPriceOf, SITEWIDE_DISCOUNT,
@@ -790,9 +790,56 @@ if (!COAS_PUBLISHED) {
   ok('no page promises a certificate the site cannot serve', bad.length === 0, bad.join(', '));
   ok('COA_URL is empty while certificates are held',
     !/const COA_URL\s*=\s*'[^']+'/.test(read('js/products-data.js')));
+
+  // The certificate index draws its cards from the catalog rather than from
+  // markup, so the scan above — which reads .html files — cannot see what its
+  // buttons say. Checked against the rendered card instead: that is
+  // branch-aware, where a text scan of a source file holding both wordings
+  // would flag the published branch that is not running.
+  //
+  // This is the loophole a "View certificate" button sat in: it read as a
+  // promise to open a document and produced an email address.
+  const renderedCards = GLOW_PRODUCTS.map(coaCardHtml).join('');
+  ok('no certificate card offers a document that cannot be opened',
+    !promises.test(renderedCards),
+    'a card on coa.html promises a certificate while COAS_PUBLISHED is false');
+  ok('and no card flags a PDF it does not have',
+    !/coa-card-flag/.test(renderedCards));
+  ok('coaHref() returns nothing while the flag is false, whatever the catalog holds',
+    coaHref({ coa: 'https://example.com/staged.pdf' }) === '',
+    'a per-product coa staged before the flip must not go live on its own');
 } else {
   ok('COA_URL is set now that certificates are published',
     /const COA_URL\s*=\s*'[^']+'/.test(read('js/products-data.js')));
+}
+
+/* The certificate index. Its whole claim is completeness: a page that lists
+   certificates is read as the set of compounds whose paperwork exists, so a
+   catalog entry missing from it is a product the site quietly cannot account
+   for. Rendering from GLOW_PRODUCTS is what makes that true, and this is what
+   keeps it rendering from GLOW_PRODUCTS. */
+{
+  const coaJs = read('js/coa.js');
+  const coaHtml = read('coa.html');
+  ok('the certificate index renders every compound in the catalog',
+    /GLOW_PRODUCTS\.map\(coaCardHtml\)/.test(coaJs),
+    'coa.js must render the catalog itself, not a list kept beside it');
+  ok('coa.html carries the search box and the grid it fills',
+    /id="coaSearch"/.test(coaHtml) && /id="coaGrid"/.test(coaHtml) &&
+    /coa\.js/.test(coaHtml));
+  // Lot numbers are searchable only once the catalog holds any; promising
+  // them over a catalog with none is a search that silently never matches.
+  ok('the search box names lot numbers only when lots exist to match',
+    /GLOW_PRODUCTS\.some\(p => p\.lot\)/.test(coaJs));
+  // One resolver for "is there a document", so the index, the product page's
+  // COA box and its analysis panel cannot disagree about whether one exists.
+  // Matched on the assignment rather than the bare name, so a mention of
+  // coaHref() in a comment does not read as a call site.
+  ok('every certificate surface resolves the document through coaHref()',
+    (read('js/product.js').match(/const href = coaHref\(p\);/g) || []).length === 2 &&
+    /coaHref\(/.test(coaJs) &&
+    !/p\.coa \|\| \(typeof COA_URL/.test(read('js/product.js')),
+    'product.js must ask coaHref() rather than retyping the p.coa || COA_URL test');
 }
 
 // how-we-test.html's certificate section states the current route by hand

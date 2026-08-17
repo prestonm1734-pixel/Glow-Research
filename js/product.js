@@ -179,16 +179,17 @@
   }
 
   /* ================= certificate =================
-     There is no COA page any more. "View certificate of analysis" opens the
-     document itself: the product's own `coa` if it has one, otherwise the
-     shared COA_URL. Until either is filled in the box keeps its wording but
-     carries no href, so it can never send anyone to a 404. */
+     "View certificate of analysis" opens the document itself, resolved by
+     coaHref() in js/products-data.js: the product's own `coa` if it has one,
+     otherwise the shared COA_URL, and nothing at all while COAS_PUBLISHED is
+     false. Until there is a document the box keeps its wording but carries no
+     href, so it can never send anyone to a 404. */
 
   function renderCoa(p) {
     const box = $('pdCoaLink');
     if (!box) return;
 
-    const href = p.coa || (typeof COA_URL === 'string' ? COA_URL : '');
+    const href = coaHref(p);
     if (!href) {
       box.removeAttribute('href');
       box.classList.add('is-static');
@@ -230,7 +231,7 @@
     // The certificate link is drawn only when there is a document to open, on
     // the same test renderCoa() uses. No href, no link: a line that says "view
     // report" and does nothing is the uncertainty this panel exists to remove.
-    const href = p.coa || (typeof COA_URL === 'string' ? COA_URL : '');
+    const href = coaHref(p);
     const foot = wrap.querySelector('.ba-foot');
     if (href && COA_COPY.panelLink && foot) {
       const a = document.createElement('a');
