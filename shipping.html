@@ -37,12 +37,31 @@
     letter-spacing:.08em; text-transform:uppercase; color:#8a8a86;
   }
   .shipping-page .lp-hero h1{
-    color:#0a0a0a; font-size: clamp(2.1rem, 4.2vw, 3.4rem); max-width: 18ch;
+    color:#0a0a0a; font-size: clamp(2.1rem, 4.2vw, 3.4rem); max-width: 20ch;
+    /* without this the break lands after "to your", leaving a long first line
+       over a two-word second one */
+    text-wrap: balance;
   }
-  .shipping-page .lp-hero h1 .outline{ color:#b5b5b0; }
+  .shipping-page .outline{ color:#b5b5b0; }
   .shipping-page .lp-lede{ color:#55554f; }
   .shipping-page .lp-hero-note{ color:#55554f; }
-  .shipping-page .lp-dot{ background:#0a0a0a; }
+  /* --text is the near-white the dark lp-page sets its emphasis in. On this
+     page that is white on white: the live dispatch day, the one word in the
+     line worth reading, was invisible. */
+  .shipping-page .lp-hero-note strong{ color:#0a0a0a; }
+  /* The pulse ring is white, which is a ring drawn on white. Same animation,
+     inked for a light surface. */
+  .shipping-page .lp-dot{ background:#0a0a0a; animation-name: shPulse; }
+  @keyframes shPulse{
+    0%{ box-shadow: 0 0 0 0 rgba(10,10,10,.32); }
+    70%{ box-shadow: 0 0 0 8px rgba(10,10,10,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(10,10,10,0); }
+  }
+
+  /* The lead section is a hero, so it is centred, but the cards inside it are
+     read left to right like any other card. The sitewide rule that does this
+     is scoped to .lp-section and does not reach a .lp-hero. */
+  .sh-lead .lp-points{ text-align:left; }
   .shipping-page .btn-primary{ background:#0a0a0a; color:#fff; }
   .shipping-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
   .shipping-page .btn-outline{ border-color: rgba(0,0,0,.25); color:#0a0a0a; }
@@ -75,7 +94,13 @@
     border-right:1px solid rgba(0,0,0,.13); border-bottom:1px solid rgba(0,0,0,.13);
   }
   .shipping-page .lp-point svg{ color:#0a0a0a; }
-  .shipping-page .lp-point h3{ color:#0a0a0a; }
+  /* The card titles are h2 now that the section above them carries the page's
+     h1, so the sitewide .lp-point h3 sizing no longer reaches them. Same type,
+     stated against the tag they actually use. */
+  .shipping-page .lp-point h2{
+    color:#0a0a0a; font-size:1.22rem; font-weight:700;
+    margin:0 0 10px; letter-spacing:-.02em; line-height:1.25;
+  }
   .shipping-page .lp-point p{ color:#55554f; }
   @media (max-width: 720px){
     .shipping-page .lp-points{ grid-template-columns:1fr; }
@@ -185,37 +210,18 @@
 
 <main class="lp-page shipping-page">
 
-<section class="lp-hero">
+<!-- The page opens on what is actually in the box and how it gets there.
+     "It ships today" is the promise, but it means nothing until you know
+     what "it" is, so the three marks lead and the dispatch claim follows
+     them rather than the other way round. -->
+<section class="lp-hero sh-lead">
   <div class="container">
-    <span class="lp-eyebrow">Shipping &amp; Fulfillment</span>
-    <h1>It ships today.<br /><span class="outline">Fast, every time.</span></h1>
+    <span class="lp-eyebrow">Inside the box</span>
+    <h1>From the warehouse to your bench, fast.</h1>
     <p class="lp-lede">
-      Order by 2:00 PM PST on a weekday and it leaves the same afternoon
-      on 2-day FedEx.
+      Every order ships the same way. There is no cheaper tier that skips
+      ahead of yours.
     </p>
-    <p class="lp-hero-note">
-      <span class="lp-dot" aria-hidden="true"></span>
-      <!-- the static claim is the no-JS fallback; the script swaps in the live
-           countdown against today's cutoff -->
-      <span id="shipClock">Ordered before <strong>2:00 PM PST</strong>, it ships the same business day.</span>
-    </p>
-    <div class="lp-actions">
-      <a href="peptides.html" class="btn btn-primary btn-lg">Explore Catalog <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
-    </div>
-
-    <div class="lp-figs">
-      <div class="lp-fig"><b><span data-count="2">2</span> days</b><span>FedEx Express transit</span></div>
-      <div class="lp-fig"><b><span data-count="50">50</span> states</b><span>Hawaii and Alaska included</span></div>
-      <div class="lp-fig"><b>Free</b><span>Over $400</span></div>
-    </div>
-  </div>
-</section>
-
-<section class="lp-section tint">
-  <div class="container">
-    <span class="eyebrow">Inside the box</span>
-    <h2 class="lp-h2">From the warehouse to your bench, fast.</h2>
-    <p class="lp-sub">Every order ships the same way. There is no cheaper tier that skips ahead of yours.</p>
 
     <div class="lp-points reveal">
       <div class="lp-point">
@@ -227,7 +233,7 @@
             <path pathLength="1" class="lp-draw" d="M12 6.6 9.6 4.2M12 6.6l2.4-2.4M12 17.4l-2.4 2.4M12 17.4l2.4 2.4"/>
           </g>
         </svg>
-        <h3>Packed same day</h3>
+        <h2>Packed same day</h2>
         <p>Pulled, sealed, and boxed the same afternoon your order comes in, out the door before the FedEx cutoff.</p>
       </div>
       <div class="lp-point">
@@ -235,7 +241,7 @@
           <circle pathLength="1" class="lp-draw" cx="12" cy="12" r="9"/>
           <g class="sh-hands"><path pathLength="1" class="lp-draw" d="M12 7v5l3.5 2" stroke-linecap="round"/></g>
         </svg>
-        <h3>Tracked in a day</h3>
+        <h2>Tracked in a day</h2>
         <p>Your tracking number lands within 24 hours. Saturday delivery where FedEx runs it.</p>
       </div>
       <div class="lp-point">
@@ -243,9 +249,32 @@
           <path pathLength="1" class="lp-draw" d="M12 3l7.5 3v5.5c0 4.3-3 8.2-7.5 9.5-4.5-1.3-7.5-5.2-7.5-9.5V6z"/>
           <path pathLength="1" class="lp-draw sh-check" d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <h3>Covered to $300</h3>
+        <h2>Covered to $300</h2>
         <p>Loss, damage, or carrier delay, applied automatically. Nothing to tick and nothing to buy.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section tint">
+  <div class="container">
+    <span class="eyebrow">Shipping &amp; Fulfillment</span>
+    <h2 class="lp-h2">It ships today. <span class="outline">Fast, every time.</span></h2>
+    <p class="lp-sub">
+      Order by 2:00 PM PST on a weekday and it leaves the same afternoon
+      on 2-day FedEx.
+    </p>
+    <p class="lp-hero-note">
+      <span class="lp-dot" aria-hidden="true"></span>
+      <!-- the static claim is the no-JS fallback; the script swaps in the live
+           countdown against today's cutoff -->
+      <span id="shipClock">Ordered before <strong>2:00 PM PST</strong>, it ships the same business day.</span>
+    </p>
+
+    <div class="lp-figs">
+      <div class="lp-fig"><b><span data-count="2">2</span> days</b><span>FedEx Express transit</span></div>
+      <div class="lp-fig"><b><span data-count="50">50</span> states</b><span>Hawaii and Alaska included</span></div>
+      <div class="lp-fig"><b>Free</b><span>Over $400</span></div>
     </div>
 
     <p class="lp-fine">United States only. <strong>All sales are final once a vial has shipped or been opened.</strong></p>
@@ -264,7 +293,8 @@
     </details>
 
     <div class="lp-actions">
-      <a href="peptides.html" class="btn btn-outline">Browse the catalog <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+      <a href="peptides.html" class="btn btn-primary">Explore Catalog <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+      <a href="shipping-policy.html" class="btn btn-outline">Shipping policy</a>
     </div>
   </div>
 </section>
