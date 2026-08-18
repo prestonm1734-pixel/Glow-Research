@@ -688,9 +688,11 @@ button[disabled].si-forgot{ cursor: progress; }
 .td-cloud-a{ animation-delay: 0s; }
 .td-cloud-b{ animation-delay: -4.3s; }
 .td-cloud-c{ animation-delay: -8.6s; }
+/* Never dips far: three half-transparent layers overlapping is how white
+   powder came out grey the first time. They vary in density, not presence. */
 @keyframes td-churn{
-  0%,100%{ opacity:.30; transform: scale(1) translateY(0); }
-  50%    { opacity:.95; transform: scale(1.05) translateY(-5px); }
+  0%,100%{ opacity:.62; transform: scale(1) translateY(0); }
+  50%    { opacity:1;   transform: scale(1.05) translateY(-5px); }
 }
 .td-core{ animation: td-churn 13s ease-in-out infinite; animation-delay:-2.1s; transform-origin:50% 50%; }
 /* Grains carry at their own pace. Prime-ish durations so the field never

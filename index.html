@@ -306,11 +306,16 @@
       <div class="td-powder" aria-hidden="true">
         <svg viewBox="0 0 460 340" role="presentation" focusable="false">
           <defs>
+            <!-- Opaque white well past the middle, then a fast falloff. The
+                 first pass held 60% opacity across most of the radius, which
+                 on black is grey: powder has to be solid where there is
+                 powder and gone where there is not. -->
             <radialGradient id="tdDust" cx="50%" cy="46%" r="52%">
-              <stop offset="0%" stop-color="#fffdf6" stop-opacity=".92"/>
-              <stop offset="38%" stop-color="#ebe3d2" stop-opacity=".62"/>
-              <stop offset="72%" stop-color="#c3bbaa" stop-opacity=".22"/>
-              <stop offset="100%" stop-color="#8e887b" stop-opacity="0"/>
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+              <stop offset="34%" stop-color="#fdfbf6" stop-opacity=".96"/>
+              <stop offset="60%" stop-color="#f2ece0" stop-opacity=".72"/>
+              <stop offset="84%" stop-color="#ddd6c8" stop-opacity=".2"/>
+              <stop offset="100%" stop-color="#b8b1a2" stop-opacity="0"/>
             </radialGradient>
             <!-- High frequency, small displacement. The reverse (big soft
                  billows) is what smoke looks like; dry powder breaks into
@@ -328,20 +333,35 @@
               <feTurbulence type="fractalNoise" baseFrequency="0.055" numOctaves="4" seed="41" result="n"/>
               <feDisplacementMap in="SourceGraphic" in2="n" scale="46" xChannelSelector="R" yChannelSelector="G"/>
             </filter>
+            <!-- Gentler again, for the cores. Left unfiltered they kept a
+                 clean elliptical edge and the middle read as a lit lens
+                 rather than as the densest part of the powder. -->
+            <filter id="tdGrainCore" x="-60%" y="-90%" width="220%" height="280%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.13" numOctaves="3" seed="61" result="n"/>
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="19" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
           </defs>
 
           <g class="td-cloud td-cloud-a" filter="url(#tdGrainA)">
             <ellipse cx="230" cy="168" rx="126" ry="52" fill="url(#tdDust)"/>
           </g>
-          <g class="td-cloud td-cloud-b" filter="url(#tdGrainB)">
+          <!-- Each layer tilted differently. Three concentric ellipses on the
+               same axis add up to one symmetrical lozenge, which nothing
+               poured out of a vial ever looks like. -->
+          <g class="td-cloud td-cloud-b" filter="url(#tdGrainB)" transform="rotate(-5 230 166)">
             <ellipse cx="230" cy="166" rx="104" ry="44" fill="url(#tdDust)"/>
           </g>
-          <g class="td-cloud td-cloud-c" filter="url(#tdGrainC)">
+          <g class="td-cloud td-cloud-c" filter="url(#tdGrainC)" transform="rotate(4 230 170)">
             <ellipse cx="230" cy="170" rx="138" ry="46" fill="url(#tdDust)"/>
           </g>
           <!-- Undisplaced core. Without it the whole mass is edge and the
-               powder has no weight anywhere. -->
-          <ellipse class="td-core" cx="230" cy="168" rx="52" ry="21" fill="url(#tdDust)"/>
+               powder has no weight anywhere. Two of them: the inner one is
+               flat white rather than a gradient, which is what stops the
+               middle reading as a bright grey. -->
+          <g filter="url(#tdGrainCore)">
+            <ellipse class="td-core" cx="230" cy="168" rx="62" ry="26" fill="url(#tdDust)"/>
+            <ellipse class="td-core td-core-hot" cx="226" cy="166" rx="34" ry="14" fill="#fff" opacity=".8"/>
+          </g>
 
           <!-- Loose grain thrown clear of the mass. This is the difference
                between powder and vapour: discrete particles with hard edges,

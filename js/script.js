@@ -235,14 +235,18 @@ if (!reduceMotion.matches && grid) {
 /* ---------- testing diagram ----------
    The seven analyses are already in the markup, baked by
    tools/build-testing.js. Nothing here writes copy: it moves a highlight
-   between nodes that exist whether or not this file runs, so the section is
+   between rows that exist whether or not this file runs, so the section is
    complete with JavaScript off and merely still.
 
-   The highlight walks the list on its own so the section has something to
-   watch, then hands over the moment anyone points at it and stops for good
-   once they click, because a panel that keeps moving under a reader who has
-   chosen a row is a nuisance rather than a feature. Same visibility gating
-   the hero constellation uses: nothing animates off-screen. */
+   The highlight follows the scroll rather than a timer. A timer picks its own
+   pace and is always wrong: too slow to sit through, too fast to read. Tied
+   to the scroll, the reader sets it, the row they are actually looking at is
+   the one lit, and it works the same on a phone where there is no hover.
+
+   The mechanism is a focus band: rootMargin shrinks the observer's viewport
+   to a thin strip across the middle of the screen, so a row "intersects" only
+   while it is crossing that strip. Whichever is nearest the centre of it
+   wins, which keeps a single row lit when two are in the band at once. */
 (function () {
   const stage = document.querySelector('#testing .td-stage');
   if (!stage) return;
@@ -251,10 +255,10 @@ if (!reduceMotion.matches && grid) {
   if (!nodes.length || !list) return;
 
   const still = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const STEP = 3200;
-  let at = -1, timer = null, surrendered = false;
+  let at = -1, held = false;
 
   function show(i) {
+    if (i === at) return;
     at = i;
     nodes.forEach((n, k) => {
       const on = k === i;
@@ -265,31 +269,42 @@ if (!reduceMotion.matches && grid) {
     stage.classList.toggle('is-scanning', i >= 0 && !still.matches);
   }
 
-  function advance() { show((at + 1) % nodes.length); }
-  function start() {
-    if (timer || surrendered || still.matches) return;
-    // Light one immediately. Waiting a full step first left the section
-    // sitting there unlit for three seconds, which reads as broken rather
-    // than as about to move.
-    if (at < 0) show(0);
-    timer = setInterval(advance, STEP);
-  }
-  function stop() { clearInterval(timer); timer = null; }
-
+  // Pointing at a row or tabbing to it takes precedence over the scroll, and
+  // holds until the pointer leaves: a reader who has reached for a specific
+  // row should not have it taken away by a pixel of scroll.
   nodes.forEach((n, i) => {
-    n.addEventListener('mouseenter', () => { stop(); show(i); });
-    n.addEventListener('focus', () => { stop(); show(i); });
-    // A click is a decision, so the walk does not resume on mouseout.
-    n.addEventListener('click', () => { surrendered = true; stop(); show(i); });
+    n.addEventListener('mouseenter', () => { held = true; show(i); });
+    n.addEventListener('focus', () => { held = true; show(i); });
+    n.addEventListener('click', () => { held = true; show(i); });
   });
-  stage.addEventListener('mouseleave', () => { if (!surrendered) start(); });
+  stage.addEventListener('mouseleave', () => { held = false; });
 
-  // Reduced motion still gets a diagram, just not a moving one: the first
-  // analysis stays lit so the layout does not read as broken.
-  if (still.matches) { show(0); return; }
+  if (!('IntersectionObserver' in window)) { show(0); return; }
 
+  // -46%/-46% leaves an 8% band. Wide enough that something is nearly always
+  // in it, narrow enough that it is unambiguous which row that is.
+  const inBand = new Set();
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => (e.isIntersecting ? inBand.add(e.target) : inBand.delete(e.target)));
+    if (held || !inBand.size) return;
+    const mid = window.innerHeight / 2;
+    let best = null, bestGap = Infinity;
+    inBand.forEach(el => {
+      const r = el.getBoundingClientRect();
+      const gap = Math.abs(r.top + r.height / 2 - mid);
+      if (gap < bestGap) { bestGap = gap; best = el; }
+    });
+    if (best) show(nodes.indexOf(best));
+  }, { rootMargin: '-46% 0px -46% 0px', threshold: 0 });
+  nodes.forEach(n => io.observe(n));
+
+  // Scrolled past, or not yet reached: nothing in the band, so light the row
+  // nearest the band rather than leaving the section with no state at all.
   new IntersectionObserver((entries) => {
-    entries.forEach(e => (e.isIntersecting ? start() : stop()));
-  }, { threshold: 0.25 }).observe(stage);
+    entries.forEach(e => {
+      if (!e.isIntersecting || at >= 0 || held) return;
+      show(e.boundingClientRect.top > 0 ? 0 : nodes.length - 1);
+    });
+  }, { threshold: 0.1 }).observe(stage);
 })();
 
