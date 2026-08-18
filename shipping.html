@@ -178,68 +178,10 @@
     .shipping-page .lp-points{ grid-template-columns:1fr; }
   }
 
-  /* ---------- packed and on its way ----------
-     The one place this page steps back into the dark surface every other
-     lp-page uses, framed as a single panel rather than a full-bleed section:
-     a photo and a shipped-order checklist sitting together the way a box and
-     its packing slip do. Higher specificity than the .shipping-page overrides
-     above undoes the white-page recolouring for .lp-fine/.disc inside it,
-     since this panel is dark again while the page around it stays white. */
-  .sh-pack-panel{
-    display:grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-    background:#0a0a0a; color:#f7f7f5;
-  }
-  .sh-pack-media{ position:relative; min-height: 340px; overflow:hidden; }
-  .sh-pack-media img{
-    position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;
-  }
-  .sh-pack-copy{
-    padding: clamp(34px, 4.5vw, 56px); display:flex; flex-direction:column;
-  }
-  .shipping-page .sh-pack-copy .eyebrow{
-    font-family:'JetBrains Mono', monospace; font-size:.7rem; font-weight:600;
-    letter-spacing:.16em; text-transform:uppercase; color:#8a8a86; margin-bottom:14px;
-  }
-  .shipping-page .sh-pack-copy .lp-h2{
-    color:#f7f7f5; text-align:left; margin:0 0 26px; max-width:none;
-    font-size: clamp(1.7rem, 2.6vw, 2.3rem);
-  }
-  .shipping-page .sh-pack-copy .outline{ color:#6b6b69; }
-
-  .sh-pack-list{ display:flex; flex-direction:column; gap:16px; margin:0 0 30px; }
-  .sh-pack-list li{
-    display:flex; align-items:flex-start; gap:12px;
-    font-size:.98rem; line-height:1.5; color:#c9c9c6;
-    padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,.1);
-  }
-  .sh-pack-list li:last-child{ border-bottom:none; padding-bottom:0; }
-  .sh-pack-list li svg{ flex:0 0 auto; margin-top:2px; color:#f7f7f5; }
-  .sh-pack-list li strong, .sh-pack-list li b{ color:#f7f7f5; font-weight:700; }
-  /* The "2 days"/"FedEx Express..." pair is two adjacent inline elements with
-     no space between them in the markup — check-claims.js pins the exact
-     "days</b><span>FedEx" substring, so the gap is added here instead. */
-  .sh-pack-list li b{ margin-right:.3em; white-space:nowrap; }
-
-  .shipping-page .sh-pack-copy .lp-fine{
-    margin: 0 0 0; max-width:none; color:#8a8a86;
-  }
-  .shipping-page .sh-pack-copy .lp-fine strong{ color:#f7f7f5; }
-  .shipping-page .sh-pack-copy .disc{ margin-top:10px; }
-  .shipping-page .sh-pack-copy .disc > summary{ color:#8a8a86; }
-  .shipping-page .sh-pack-copy .disc > summary:hover,
-  .shipping-page .sh-pack-copy .disc[open] > summary{ color:#f7f7f5; }
-  .shipping-page .sh-pack-copy .disc > summary:focus-visible{ outline-color:#f7f7f5; }
-
-  .shipping-page .sh-pack-copy .lp-actions{ justify-content:flex-start; margin-top:28px; }
-  .shipping-page .sh-pack-copy .btn-primary{ background:#f7f7f5; color:#0a0a0a; }
-  .shipping-page .sh-pack-copy .btn-primary:hover{ background:#fff; color:#0a0a0a; }
-  .shipping-page .sh-pack-copy .btn-outline{ border-color:rgba(255,255,255,.28); color:#f7f7f5; }
-  .shipping-page .sh-pack-copy .btn-outline:hover{ border-color:#f7f7f5; background:#f7f7f5; color:#0a0a0a; }
-
-  @media (max-width: 780px){
-    .sh-pack-panel{ grid-template-columns:1fr; }
-    .sh-pack-media{ min-height:220px; }
-  }
+  /* Buttons now sit under the disclosure at the bottom of the lead section,
+     left-aligned like the rest of it rather than centred. */
+  .sh-lead .lp-actions{ justify-content:flex-start; margin-top: clamp(28px, 4vw, 36px); }
+  .sh-lead .lp-fine{ margin: clamp(40px, 5vw, 52px) 0 0; max-width:none; }
 
   /* Each mark draws itself on arrival (shared .lp-* motion rules). Hover
      then replays that mark's own idea rather than applying one generic
@@ -402,64 +344,25 @@
         <p>Loss, damage, or carrier delay, applied automatically. Nothing to tick and nothing to buy.</p>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- Packed and on its way. A photo-plus-checklist panel, dark against the
-     white page the way a shipped box itself would sit: the one place on this
-     page that steps out of the white surface to say what leaves the
-     warehouse and how. Swap assets/vial-trio-black-v2.jpg for a real packed
-     box shot when one exists — it is standing in as the same on-brand dark
-     photography every other page already uses, not placeholder art. -->
-<section class="lp-section sh-pack">
-  <div class="container">
-    <div class="sh-pack-panel">
-      <div class="sh-pack-media">
-        <img src="assets/vial-trio-black-v2.jpg" alt="Glow Research vials, sealed and ready to ship" width="1672" height="941" loading="lazy" />
+    <p class="lp-fine">United States only. <strong>All sales are final once a vial has shipped or been opened.</strong></p>
+    <details class="disc">
+      <summary>Read the full terms <span class="disc-mark" aria-hidden="true"></span></summary>
+      <div class="disc-body">
+        <p class="lp-fine">
+      Because these are lyophilized research materials, storage conditions cannot be
+      verified once a vial leaves our facility. Sold to qualified buyers and verified
+      institutions. Glow Research is a retailer: orders are picked, packed, and
+      dispatched by our third-party fulfilment partner from a US-based,
+      climate-controlled facility. Products are supplied for laboratory research use
+      only.
+        </p>
       </div>
-      <div class="sh-pack-copy">
-        <span class="eyebrow">Shipping &amp; Fulfillment</span>
-        <h2 class="lp-h2">It ships today. <span class="outline">Fast, every time.</span></h2>
+    </details>
 
-        <ul class="sh-pack-list">
-          <li>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>
-            <span><strong>Free shipping</strong> on orders over $400</span>
-          </li>
-          <li>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>
-            <span><b><span data-count="2">2</span> days</b><span>FedEx Express transit, out the door before 2:00&nbsp;PM PST</span></span>
-          </li>
-          <li>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>
-            <span><strong>Covered to $300</strong> against loss, damage, or a carrier delay</span>
-          </li>
-          <li>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>
-            <span><strong>FedEx Overnight</strong> available at checkout</span>
-          </li>
-        </ul>
-
-        <p class="lp-fine">United States only. <strong>All sales are final once a vial has shipped or been opened.</strong></p>
-        <details class="disc">
-          <summary>Read the full terms <span class="disc-mark" aria-hidden="true"></span></summary>
-          <div class="disc-body">
-            <p class="lp-fine">
-          Because these are lyophilized research materials, storage conditions cannot be
-          verified once a vial leaves our facility. Sold to qualified buyers and verified
-          institutions. Glow Research is a retailer: orders are picked, packed, and
-          dispatched by our third-party fulfilment partner from a US-based,
-          climate-controlled facility. Products are supplied for laboratory research use
-          only.
-            </p>
-          </div>
-        </details>
-
-        <div class="lp-actions">
-          <a href="peptides.html" class="btn btn-primary">Explore Catalog <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
-          <a href="shipping-policy.html" class="btn btn-outline">Shipping policy</a>
-        </div>
-      </div>
+    <div class="lp-actions">
+      <a href="peptides.html" class="btn btn-primary">Explore Catalog <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+      <a href="shipping-policy.html" class="btn btn-outline">Shipping policy</a>
     </div>
   </div>
 </section>

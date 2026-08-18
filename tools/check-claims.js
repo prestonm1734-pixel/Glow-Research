@@ -215,12 +215,9 @@ console.log('\ntransit time');
     }
   });
   ok(`every stated FedEx service is ${TRANSIT_DAYS}-day`, wrong.length === 0, wrong.join(', '));
-
-  // shipping.html states it as a counted figure rather than in a sentence.
-  const ship = read('shipping.html').match(/data-count="(\d+)">\d+<\/span> days<\/b><span>FedEx Express transit/);
-  ok('the shipping page figure is the same number',
-    ship !== null && Number(ship[1]) === TRANSIT_DAYS,
-    ship ? `page says ${ship[1]}` : 'figure not found in shipping.html');
+  // shipping.html no longer states transit as a separate counted figure —
+  // just the "2-day FedEx" sentence in its lede, which the scan above
+  // already covers along with every other page.
 
   ok('the delivery estimate reads the shared constant, not its own copy',
     !/const TRANSIT_DAYS/.test(read('js/product.js')) && /TRANSIT_DAYS/.test(read('js/product.js')));
