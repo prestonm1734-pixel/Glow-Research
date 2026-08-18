@@ -231,3 +231,56 @@ if (!reduceMotion.matches && grid) {
   });
 }
 
+
+/* ---------- advisor bio panel ----------
+   One drawer, reused by every advisor: it fills from the clicked advisor's
+   own .expert-bio block, so each bio lives in the markup beside the person
+   it belongs to rather than in a table here. Escape closes it, the backdrop
+   closes it, focus goes to the close button on open and back to the button
+   that opened it on close, and the page behind stops scrolling while it is
+   up — the same handling js/coa.js gives its viewer. */
+(function () {
+  const overlay = document.getElementById('bioOverlay');
+  if (!overlay) return;
+  const drawer = overlay.querySelector('.bio-drawer');
+  const closeBtn = document.getElementById('bioClose');
+  const imgEl = document.getElementById('bioImg');
+  const nameEl = document.getElementById('bioName');
+  const titleEl = document.getElementById('bioTitle');
+  const bodyEl = document.getElementById('bioBody');
+  let lastFocused = null;
+
+  function open(pair) {
+    const img = pair.querySelector('.expert-photo img');
+    const bio = pair.querySelector('.expert-bio');
+    const name = pair.querySelector('.expert-card h3');
+    const role = pair.querySelector('.expert-role');
+    lastFocused = document.activeElement;
+    if (img) { imgEl.src = img.src; imgEl.alt = img.alt; }
+    nameEl.textContent = name ? name.textContent : '';
+    titleEl.textContent = role ? role.textContent : '';
+    bodyEl.innerHTML = bio ? bio.innerHTML : '';
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('search-locked');
+    // a reopen would otherwise start wherever the previous bio was left
+    drawer.scrollTop = 0;
+    setTimeout(() => closeBtn.focus(), 30);
+  }
+
+  function close() {
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('search-locked');
+    if (lastFocused) lastFocused.focus();
+  }
+
+  document.querySelectorAll('.expert-pair .expert-link').forEach(btn => {
+    btn.addEventListener('click', () => open(btn.closest('.expert-pair')));
+  });
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('mousedown', e => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) close();
+  });
+})();

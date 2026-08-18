@@ -719,12 +719,76 @@ button[disabled].si-forgot{ cursor: progress; }
   margin:0; font-size:1.08rem; font-weight:700; letter-spacing:-.01em; color: var(--text);
 }
 .expert-card p{ margin: 6px 0 0; font-size:.9rem; line-height:1.5; color: var(--text-dim); }
+/* A <button>, not a link: it opens the bio panel rather than going
+   anywhere, so the button chrome is stripped back to the underlined
+   mono label it reads as. */
 .expert-link{
-  display:inline-block; margin-top: 12px;
+  display:inline-block; margin-top: 12px; padding:0;
+  background:none; border:none; cursor:pointer;
   font-family:'JetBrains Mono', monospace; font-size:.78rem; color: var(--text);
   text-decoration: underline; text-underline-offset: 3px;
 }
 .expert-link:hover{ color: var(--text-dim); }
+/* Source copy for the panel, never drawn in place. Stated rather than left
+   to the UA sheet's [hidden] so a later display rule cannot reveal it. */
+.expert-bio{ display:none; }
+
+/* ---------- advisor bio panel ----------
+   Right-hand drawer over a dimmed page, the same construction as the cart
+   drawer (fixed overlay, flex-end, sheet translated in from its own width)
+   at a z-index just under it. */
+.bio-overlay{
+  position:fixed; inset:0; z-index: 300;
+  background: rgba(10,10,10,.6);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  display:flex; justify-content:flex-end;
+  opacity:0; pointer-events:none;
+  transition: opacity .22s ease;
+}
+.bio-overlay.open{ opacity:1; pointer-events:auto; }
+.bio-drawer{
+  position:relative; width:100%; max-width: 640px; height:100%;
+  background:#0a0a0a; color: var(--text);
+  padding: clamp(22px, 2.6vw, 36px);
+  overflow-y:auto;
+  transform: translateX(100%);
+  transition: transform .3s cubic-bezier(.2,.8,.2,1);
+}
+.bio-overlay.open .bio-drawer{ transform: translateX(0); }
+
+.bio-close{
+  position:absolute; top: clamp(18px, 2vw, 26px); right: clamp(18px, 2vw, 26px);
+  width:42px; height:42px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.2);
+  color: var(--text); cursor:pointer;
+  transition: background .18s ease, border-color .18s ease;
+}
+.bio-close:hover{ background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.45); }
+.bio-close:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+
+/* The same photo-beside-name pairing the section's own cards use, boxed
+   here because it sits on the drawer's flat black rather than the page. */
+.bio-card{
+  display:flex; align-items:center; gap: 20px;
+  background: var(--surface); padding: 18px;
+  margin: 52px 0 28px;
+}
+.bio-photo{ flex:0 0 auto; width:124px; aspect-ratio: 1 / 1; overflow:hidden; }
+.bio-photo img{ width:100%; height:100%; object-fit:cover; object-position: center 18%; display:block; }
+.bio-ident h3{ margin:0; font-size:1.28rem; font-weight:700; letter-spacing:-.02em; }
+.bio-ident p{ margin: 8px 0 0; font-size:.95rem; line-height:1.5; color: var(--text-dim); }
+
+.bio-body p{ margin: 0 0 18px; font-size:1rem; line-height:1.7; }
+.bio-body p:last-child{ margin-bottom:0; }
+
+@media (max-width: 560px){
+  .bio-drawer{ max-width:none; }
+  .bio-card{ gap:16px; padding:14px; margin-top: 56px; }
+  .bio-photo{ width:88px; }
+  .bio-ident h3{ font-size:1.1rem; }
+  .bio-ident p{ font-size:.88rem; }
+}
 
 /* At 900px+ the pair turns to a row: photo full height down the side,
    card beside it. */
