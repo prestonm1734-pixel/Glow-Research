@@ -784,6 +784,15 @@ button[disabled].si-forgot{ cursor: progress; }
 .bio-body li{ font-size:1rem; line-height:1.7; margin-bottom: 6px; }
 .bio-body p:last-child, .bio-body ul:last-child{ margin-bottom:0; }
 
+/* Every bio closes on this. Ruled off and set smaller so it reads as a limit
+   on what the person is to us, not one more paragraph about them: these are
+   educators, and the section must not imply they signed off on the catalog. */
+.bio-body .bio-disclaimer{
+  margin-top: 28px; padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,.14);
+  font-size: .88rem; line-height:1.65; color: var(--text-dimmer);
+}
+
 @media (max-width: 560px){
   .bio-drawer{ max-width:none; }
   .bio-card{ gap:16px; padding:14px; margin-top: 56px; }
