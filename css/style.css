@@ -701,7 +701,11 @@ button[disabled].si-forgot{ cursor: progress; }
   display:flex; align-items:center; justify-content:center;
   background: var(--surface-2); color: var(--text-dimmer);
 }
-.expert-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+/* object-position leaves headroom above the face rather than a dead centre
+   crop, which is what "breathing room" actually means once this tile gets
+   narrow relative to its height — centring a square photo in a tall, narrow
+   box crops in tight on the face with no space around it. */
+.expert-photo img{ width:100%; height:100%; object-fit:cover; object-position: center 18%; display:block; }
 .expert-card{ min-width:0; padding-top: 2px; }
 .expert-card h3{
   margin:0; font-size:1.08rem; font-weight:700; letter-spacing:-.01em; color: var(--text);
@@ -723,9 +727,12 @@ button[disabled].si-forgot{ cursor: progress; }
 @media (min-width: 900px){
   .expert-pair{
     gap:0; padding:0; background:none; border:none;
-    min-height: 400px; align-items:stretch;
+    min-height: 380px; align-items:stretch;
   }
-  .expert-photo{ width: 34%; height:auto; }
+  /* Wide enough that a square photo isn't forced into a tall, narrow strip
+     — that ratio was cropping in tight on the face with nothing around it.
+     Closer to the reference's own near-square proportion. */
+  .expert-photo{ width: 45%; height:auto; }
   .expert-photo svg{ width:56px; height:56px; }
   .expert-card{
     flex:1; min-width:0; padding: clamp(28px, 3vw, 40px);
