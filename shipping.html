@@ -80,7 +80,7 @@
   /* Centred against the copy block, the photo's top edge landed level with
      the eyebrow instead of the heading, which reads as misaligned rather
      than balanced. Nudged down to sit against the h1 instead. */
-  .sh-lead-media{ margin-top: clamp(12px, 1.8vw, 18px); }
+  .sh-lead-media{ margin-top: clamp(2px, .4vw, 4px); }
 
   /* The photo landed as a plain rectangle next to a page built entirely from
      hairlines and boxed panels, reading as a stock photo dropped in rather
@@ -127,10 +127,8 @@
 
   @media (max-width: 880px){
     .sh-lead-top{ grid-template-columns: 1fr; }
-    /* photo first on a phone would push the h1 below the fold; the words
-       still lead there, the photo follows as a supporting image */
-    .sh-lead-media{ order:2; margin-top: clamp(24px, 5vw, 32px); }
-    .sh-lead-copy{ order:1; max-width:none; }
+    .sh-lead-media{ order:1; margin-top:0; margin-bottom: clamp(24px, 5vw, 32px); }
+    .sh-lead-copy{ order:2; max-width:none; }
   }
   .shipping-page .btn-primary{ background:#0a0a0a; color:#fff; }
   .shipping-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
