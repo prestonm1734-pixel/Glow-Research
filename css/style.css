@@ -675,6 +675,15 @@ button[disabled].si-forgot{ cursor: progress; }
    shares, so it's stated on its own id instead of touching that shared
    token. */
 #experts{ background:#000; }
+/* The sitewide .section-head caps at 640px for a heading meant to wrap
+   across two lines; this one reads as a single line in the reference it's
+   modelled on, so it gets room to stay on one at desktop widths. Left at
+   the sitewide cap below 900px, where the wrap is what keeps the text from
+   running into the section's own edges. */
+@media (min-width: 900px){
+  #experts .section-head{ max-width: none; }
+  #experts .section-head h2{ white-space:nowrap; }
+}
 .experts-grid{
   display:grid; grid-template-columns: 1fr; gap: 20px;
   margin-top: clamp(40px, 5vw, 56px);
