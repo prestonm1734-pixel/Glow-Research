@@ -291,7 +291,7 @@ button[disabled].si-forgot{ cursor: progress; }
 /* ---------- header ---------- */
 .site-header{
   position: sticky; top:0; z-index: 100;
-  background: #ececea;
+  background: #fff;
   border-bottom: 1px solid rgba(0,0,0,0.1);
   transition: box-shadow .3s ease;
   color: #0a0a0a;
