@@ -685,12 +685,17 @@ button[disabled].si-forgot{ cursor: progress; }
   #experts .section-head{ max-width: none; }
   #experts .section-head h2{ white-space:nowrap; }
 }
+/* Matches .container's own padding below 900px, so the stacked cards line up
+   with everything else on the page; above it the wrap is what lets the row
+   run wide. */
+.experts-wrap{ padding: 0 24px; }
 .experts-grid{
   display:grid; grid-template-columns: 1fr; gap: 20px;
   margin-top: clamp(40px, 5vw, 56px);
 }
 @media (min-width: 900px){
-  .experts-grid{ grid-template-columns: repeat(2, 1fr); gap: clamp(24px, 3vw, 40px); }
+  .experts-wrap{ max-width: 1900px; margin: 0 auto; padding: 0 clamp(24px, 3vw, 56px); }
+  .experts-grid{ grid-template-columns: repeat(2, 1fr); gap: clamp(16px, 1.5vw, 24px); }
 }
 .expert-pair{
   display:flex; gap: 20px; padding: 20px;
@@ -727,12 +732,13 @@ button[disabled].si-forgot{ cursor: progress; }
 @media (min-width: 900px){
   .expert-pair{
     gap:0; padding:0; background:none; border:none;
-    min-height: 380px; align-items:stretch;
+    min-height: 300px; align-items:stretch;
   }
-  /* Wide enough that a square photo isn't forced into a tall, narrow strip
-     — that ratio was cropping in tight on the face with nothing around it.
-     Closer to the reference's own near-square proportion. */
-  .expert-photo{ width: 45%; height:auto; }
+  /* aspect-ratio, not height:auto: the headshots are square files, so on
+     auto height the image's own intrinsic ratio drove the panel and the
+     whole row came out square. Stating a landscape ratio keeps the panel
+     the shape the reference uses and lets object-fit crop into it. */
+  .expert-photo{ width: 45%; height:auto; aspect-ratio: 7 / 6; }
   .expert-photo svg{ width:56px; height:56px; }
   .expert-card{
     flex:1; min-width:0; padding: clamp(28px, 3vw, 40px);
