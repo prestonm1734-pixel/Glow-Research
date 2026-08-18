@@ -105,7 +105,7 @@ const PAYMENTS_LIVE = true;
 // for the live-mode key (starts pk_live_, not pk_test_) only once Stripe's
 // own dashboard is also switched out of test mode — the two must move
 // together or a live-looking checkout will silently take test-mode payments.
-const STRIPE_PUBLISHABLE_KEY = 'pk_live_51U3kUmHjOd9MaH5sNxBU6C1neJypFeZGunq4CUybpTBrzWRC0dA4XY72By2DFkWDwIz8RPdHUhXHZlu6M0dgcTjW00ufOBrU9S';
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51U3kUzQXS4Q4Ku0EIyOpARY8Rbi8ATyXYfgWKzWiDtykruMzQyfRIHxlolqwmic0AMY22nzM33NoYATjppOcOSRQ00WOWb9GxT';
 
 // What the confirmation page says about payment, keyed off the same flag that
 // decides whether payment is actually taken. Hand-written copy here was the
