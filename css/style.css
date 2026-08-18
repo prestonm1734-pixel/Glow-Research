@@ -685,6 +685,13 @@ button[disabled].si-forgot{ cursor: progress; }
   #experts .section-head{ max-width: none; }
   #experts .section-head h2{ white-space:nowrap; }
 }
+/* The standing relationship, stated before anyone opens a bio. Kept to a
+   readable measure and centred under the heading, which above 900px is free
+   to run wider than the sitewide 640px cap. */
+#experts .section-head p{
+  max-width: 620px; margin: 16px auto 0;
+  font-size: .95rem; color: var(--text-dim);
+}
 /* Matches .container's own padding below 900px, so the stacked cards line up
    with everything else on the page; above it the wrap is what lets the row
    run wide. */

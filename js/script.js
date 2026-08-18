@@ -232,10 +232,10 @@ if (!reduceMotion.matches && grid) {
 }
 
 
-/* ---------- advisor bio panel ----------
-   One drawer, reused by every advisor: it fills from the clicked advisor's
-   own .expert-bio block, so each bio lives in the markup beside the person
-   it belongs to rather than in a table here. Escape closes it, the backdrop
+/* ---------- contributor bio panel ----------
+   One drawer, reused by everyone in the section: it fills from the clicked
+   person's own .expert-bio block, so each bio lives in the markup beside the
+   person it belongs to rather than in a table here. Escape closes it, the backdrop
    closes it, focus goes to the close button on open and back to the button
    that opened it on close, and the page behind stops scrolling while it is
    up — the same handling js/coa.js gives its viewer. */
