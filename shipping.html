@@ -26,132 +26,27 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  /* White surface with the scaled-down hero, borrowed from coa.html: this
-     page is answering "when does it arrive and what does it cost", which
-     reads as a lookup, not a mood piece, so it drops the full-bleed dark
-     .lp-page treatment for the lighter one signin/product/coa share. */
+  /* Plain white lookup page, the same construction as coa.html: a scaled-down
+     centred hero (h1 + one line of lede, no eyebrow, no photo, no live
+     countdown) sitting directly above a hairlined fact grid built the exact
+     same way the certificate grid is — border-top/left on the container,
+     border-right/bottom on each card. Nothing here needs to be a mood piece;
+     the whole page is answering "when does it arrive and what does it cost." */
   .shipping-page{ background:#fff; color:#0a0a0a; }
-  .shipping-page .lp-hero{ padding: clamp(44px, 6vw, 72px) 0 clamp(30px, 4vw, 44px); }
-  .shipping-page .lp-eyebrow{
-    font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:600;
-    letter-spacing:.08em; text-transform:uppercase; color:#8a8a86;
-  }
+  .shipping-page .lp-hero{ padding: clamp(40px, 5.5vw, 64px) 0 clamp(26px, 3.5vw, 38px); }
   .shipping-page .lp-hero h1{
-    color:#0a0a0a; font-size: clamp(2.1rem, 4.2vw, 3.4rem); max-width: 20ch;
-    /* without this the break lands after "to your", leaving a long first line
-       over a two-word second one */
-    text-wrap: balance;
+    color:#0a0a0a; font-size: clamp(1.9rem, 3.6vw, 2.6rem);
+    max-width: 18ch; margin: 0 auto 14px;
   }
-  /* h1/lede both centre themselves with margin:0 auto sitewide, built for a
-     hero with nothing beside it. This one sits next to a photo, so it reads
-     left, from the left edge of the container rather than the middle. */
-  .sh-lead h1{ margin-left:0; margin-right:0; }
-  .shipping-page .outline{ color:#b5b5b0; }
-  .shipping-page .lp-lede{ color:#55554f; }
-  .shipping-page .lp-hero-note{ color:#55554f; }
-  /* --text is the near-white the dark lp-page sets its emphasis in. On this
-     page that is white on white: the live dispatch day, the one word in the
-     line worth reading, was invisible. */
-  .shipping-page .lp-hero-note strong{ color:#0a0a0a; }
-  /* The pulse ring is white, which is a ring drawn on white. Same animation,
-     inked for a light surface. */
-  .shipping-page .lp-dot{ background:#0a0a0a; animation-name: shPulse; }
-  @keyframes shPulse{
-    0%{ box-shadow: 0 0 0 0 rgba(10,10,10,.32); }
-    70%{ box-shadow: 0 0 0 8px rgba(10,10,10,0); }
-    100%{ box-shadow: 0 0 0 0 rgba(10,10,10,0); }
+  .shipping-page .lp-lede{
+    color:#55554f; font-size: clamp(.98rem, 1.1vw, 1.05rem); max-width: 48ch;
   }
 
-  /* The lead section is a hero, so the sitewide rule centres it. This one
-     runs alongside a photo rather than standing alone over the fold, so it
-     reads left, the way a page with a picture beside its heading normally
-     does — the sitewide .lp-lede/.lp-hero-note margin:auto centring, built
-     for a headline with nothing beside it, is undone with it. */
-  .sh-lead{ text-align:left; }
-  .sh-lead .lp-lede, .sh-lead .lp-hero-note{ margin-left:0; margin-right:0; }
-  .sh-lead .lp-points{ text-align:left; }
-
-  .sh-lead-top{
-    display:grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: clamp(30px, 5vw, 64px); align-items:start;
-    margin-bottom: clamp(48px, 6.5vw, 72px);
-  }
-  .sh-lead-copy{ max-width: 46ch; }
-  /* Centred against the copy block, the photo's top edge landed level with
-     the eyebrow instead of the heading, which reads as misaligned rather
-     than balanced. Nudged down to sit against the h1 instead. */
-  .sh-lead-media{ margin-top: clamp(2px, .4vw, 4px); }
-
-  /* The photo landed as a plain rectangle next to a page built entirely from
-     hairlines and boxed panels, reading as a stock photo dropped in rather
-     than shot for it. A viewfinder frame stands in for the plain hairline
-     border every other panel uses instead: corners only, so the photo still
-     reads as an image bleeding past its own edges rather than a card
-     containing one. The colour stays; the frame is what ties it to the page. */
-  .sh-lead-media{
-    position:relative; aspect-ratio: 16 / 9; overflow:hidden;
-    background:#f5f5f4; padding:14px;
-  }
-  .sh-lead-media img{
-    width:100%; height:100%; object-fit:cover; display:block;
-  }
-  /* A soft vignette rather than a flat tint, so the wash reads as light
-     falling off toward the edges instead of a rectangle laid over a photo. */
-  .sh-lead-media::before{
-    content:''; position:absolute; inset:14px; z-index:1; pointer-events:none;
-    background: radial-gradient(ellipse 130% 120% at 42% 30%, transparent 45%, rgba(10,10,10,.22) 100%);
-    mix-blend-mode:multiply;
-  }
-  .sh-lead-media::after{
-    content:''; position:absolute; inset:0; pointer-events:none;
-    /* four viewfinder brackets, each a pair of arms drawn off an edge with
-       the "right 14px top 14px" form of background-position, which anchors
-       by the tile's own far edge rather than its top-left — the only way to
-       get a right- or bottom-hugging arm without measuring the box in JS */
-    background-image: linear-gradient(#0a0a0a,#0a0a0a);
-    background-repeat: no-repeat;
-    background-size: 26px 1.5px, 1.5px 26px, 26px 1.5px, 1.5px 26px,
-                      26px 1.5px, 1.5px 26px, 26px 1.5px, 1.5px 26px;
-    background-position:
-      left 14px top 14px, left 14px top 14px,
-      right 14px top 14px, right 14px top 14px,
-      left 14px bottom 14px, left 14px bottom 14px,
-      right 14px bottom 14px, right 14px bottom 14px;
-  }
-  .sh-lead-caption{
-    position:absolute; left:26px; bottom:26px; z-index:2;
-    font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:600;
-    letter-spacing:.14em; text-transform:uppercase; color:#fff;
-    text-shadow: 0 1px 6px rgba(0,0,0,.55);
-  }
-
-  @media (max-width: 880px){
-    /* No room for a photo beside the copy at this width, and a stacked one
-       just pushed the heading down further than a phone should have to
-       scroll for it. Dropped rather than stacked, and the copy centres the
-       way the sitewide hero pattern does everywhere else on a phone once
-       there is nothing running alongside it to read left against. */
-    .sh-lead-top{ display:block; }
-    .sh-lead-media{ display:none; }
-    .sh-lead-copy{ max-width:none; text-align:center; }
-    .sh-lead-copy h1{ margin-left:auto; margin-right:auto; }
-    .sh-lead-copy .lp-lede, .sh-lead-copy .lp-hero-note{ margin-left:auto; margin-right:auto; }
-  }
   .shipping-page .btn-primary{ background:#0a0a0a; color:#fff; }
   .shipping-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
   .shipping-page .btn-outline{ border-color: rgba(0,0,0,.25); color:#0a0a0a; }
   .shipping-page .btn-outline:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; }
 
-  /* Figures keep the site's counting behaviour but read as dark-on-white
-     numerals rather than white-on-black, with a hairline rule standing in
-     for the dark page's implicit contrast. */
-  .shipping-page .lp-figs{ border-top:1px solid rgba(0,0,0,.1); }
-  .shipping-page .lp-fig{ color:#0a0a0a; }
-  .shipping-page .lp-fig b{ color:#0a0a0a; }
-  .shipping-page .lp-fig > span{ color:#8a8a86; }
-
-  .shipping-page .lp-section.tint{ background:#fafaf9; }
-  .shipping-page .lp-sub{ color:#55554f; }
   .shipping-page .lp-fine{ color:#55554f; }
   .shipping-page .lp-fine strong{ color:#0a0a0a; }
 
@@ -160,7 +55,7 @@
      border-right/bottom on each card, so partial rows never leave a bare
      patch of background exposed. */
   .shipping-page .lp-points{
-    display:grid; grid-template-columns: repeat(3, 1fr); gap:0;
+    display:grid; grid-template-columns: repeat(3, 1fr); gap:0; text-align:left;
     border-top:1px solid rgba(0,0,0,.13); border-left:1px solid rgba(0,0,0,.13);
     margin-top: clamp(44px, 6vw, 64px);
   }
@@ -188,11 +83,6 @@
     }
     .shipping-page .lp-point{ border-right:none; padding-left:0; padding-right:0; }
   }
-
-  /* Buttons now sit under the disclosure at the bottom of the lead section,
-     left-aligned like the rest of it rather than centred. */
-  .sh-lead .lp-actions{ justify-content:flex-start; margin-top: clamp(28px, 4vw, 36px); }
-  .sh-lead .lp-fine{ margin: clamp(40px, 5vw, 52px) 0 0; max-width:none; }
 
   /* Each mark draws itself on arrival (shared .lp-* motion rules). Hover
      then replays that mark's own idea rather than applying one generic
@@ -298,32 +188,13 @@
 
 <main class="lp-page shipping-page">
 
-<!-- The page opens on what is actually in the box and how it gets there.
-     "It ships today" is the promise, but it means nothing until you know
-     what "it" is, so the three marks lead and the dispatch claim follows
-     them rather than the other way round. -->
-<section class="lp-hero sh-lead">
+<section class="lp-hero">
   <div class="container">
-    <div class="sh-lead-top">
-      <div class="sh-lead-copy">
-        <span class="lp-eyebrow">Inside the box</span>
-        <h1>From the warehouse to your bench, fast.</h1>
-        <p class="lp-lede">
-          Order by 2:00 PM PST on a weekday and it leaves the same afternoon
-          on 2-day FedEx.
-        </p>
-        <p class="lp-hero-note">
-          <span class="lp-dot" aria-hidden="true"></span>
-          <!-- the static claim is the no-JS fallback; the script swaps in the live
-               countdown against today's cutoff -->
-          <span id="shipClock">Ordered before <strong>2:00 PM PST</strong>, it ships the same business day.</span>
-        </p>
-      </div>
-      <div class="sh-lead-media">
-        <img src="assets/fedex-fleet.jpeg" alt="FedEx Express delivery vehicles staged at a depot" width="1000" height="563" loading="eager" />
-        <span class="sh-lead-caption">Our carrier: FedEx Express</span>
-      </div>
-    </div>
+    <h1>From the warehouse to your bench, fast.</h1>
+    <p class="lp-lede">
+      Order by 2:00 PM PST on a weekday and it leaves the same afternoon
+      on 2-day FedEx.
+    </p>
 
     <div class="lp-points reveal">
       <div class="lp-point">
@@ -449,84 +320,6 @@
     header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
   });
 
-  /* Count the figures up as the row arrives. The markup already carries
-     the final value, so with JS off, or under reduced motion, the number
-     is simply sitting there. */
-  (function () {
-    const row = document.querySelector('.lp-figs');
-    if (!row) return;
-    const nums = [...row.querySelectorAll('[data-count]')];
-    if (!nums.length) return;
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    nums.forEach(el => { el.textContent = '0'; });
-
-    function run() {
-      nums.forEach(el => {
-        const to = +el.dataset.count, t0 = performance.now(), dur = 950;
-        (function tick(now) {
-          const p = Math.min((now - t0) / dur, 1);
-          /* the same ease-out the CSS uses, so the digits settle at the
-             moment the row finishes rising */
-          el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
-          if (p < 1) requestAnimationFrame(tick);
-        })(t0);
-      });
-    }
-
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) { run(); io.disconnect(); } });
-    }, { threshold: 0.4 });
-    io.observe(row);
-  })();
-
-  /* Live dispatch cutoff. The page claims "it ships today", so say whether
-     that is still true right now. All arithmetic runs on Pacific wall-clock
-     parts, which sidesteps the DST offset entirely. */
-  (function () {
-    const el = document.getElementById('shipClock');
-    if (!el) return;
-    const CUTOFF_HOUR = 14;
-
-    function nyParts(date) {
-      const out = {};
-      new Intl.DateTimeFormat('en-US', {
-        timeZone: 'America/Los_Angeles', hour12: false,
-        weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit',
-      }).formatToParts(date).forEach(p => { out[p.type] = p.value; });
-      return out;
-    }
-
-    function nextBusinessDayName() {
-      for (let i = 1; i <= 7; i++) {
-        const d = new Date(Date.now() + i * 86400000);
-        const name = new Intl.DateTimeFormat('en-US', {
-          timeZone: 'America/Los_Angeles', weekday: 'long',
-        }).format(d);
-        if (name !== 'Saturday' && name !== 'Sunday') return name;
-      }
-      return 'Monday';
-    }
-
-    function render() {
-      const p = nyParts(new Date());
-      const isWeekday = p.weekday !== 'Sat' && p.weekday !== 'Sun';
-      const secsLeft = CUTOFF_HOUR * 3600 -
-        ((parseInt(p.hour, 10) % 24) * 3600 + parseInt(p.minute, 10) * 60 + parseInt(p.second, 10));
-
-      if (isWeekday && secsLeft > 0) {
-        const h = Math.floor(secsLeft / 3600);
-        const m = Math.floor((secsLeft % 3600) / 60);
-        const left = h > 0 ? (m > 0 ? h + 'h ' + m + 'm' : h + 'h') : m + 'm';
-        el.innerHTML = 'Order within <strong>' + left + '</strong> and it ships today.';
-      } else {
-        el.innerHTML = 'Next dispatch is <strong>' + nextBusinessDayName() + ' morning</strong>.';
-      }
-    }
-
-    render();
-    setInterval(render, 30000);
-  })();
 </script>
 <script src="js/products-data.js"></script>
 <script src="js/cart.js"></script>
