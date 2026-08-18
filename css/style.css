@@ -664,12 +664,13 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 
 /* ---------- medical advisors ----------
-   One card component, not the two-layout (bleeding photo beside a card on
-   desktop, photo-inside-card on mobile) it's visually modelled on: a photo
-   tile and a text block inside one hairlined card, the same card repeated
-   in a grid that is one column on a phone and two once there is room, which
-   is what the site's other card grids (COA, shipping, wholesale) already do
-   rather than a bespoke breakpoint-specific layout for just this section. */
+   Below 900px, one hairlined card holding a small photo beside the text —
+   cheap on width, which a phone doesn't have much of. At 900px and up, the
+   layout the reference actually uses: the photo stops being contained by
+   the card and becomes its own full-height tile flush against it, so the
+   two read as one continuous block rather than an image sitting inside a
+   box. Same two-column grid the site's other card grids (COA, shipping,
+   wholesale) already use. */
 /* Pure black, not var(--bg-2): the one section on the page asked to read as
    a flat black backdrop rather than the near-black every other dark section
    shares, so it's stated on its own id instead of touching that shared
@@ -688,10 +689,10 @@ button[disabled].si-forgot{ cursor: progress; }
   display:grid; grid-template-columns: 1fr; gap: 20px;
   margin-top: clamp(40px, 5vw, 56px);
 }
-@media (min-width: 720px){
-  .experts-grid{ grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 900px){
+  .experts-grid{ grid-template-columns: repeat(2, 1fr); gap: clamp(24px, 3vw, 40px); }
 }
-.expert-card{
+.expert-pair{
   display:flex; gap: 20px; padding: 20px;
   background: var(--surface); border:1px solid var(--border);
 }
@@ -701,11 +702,11 @@ button[disabled].si-forgot{ cursor: progress; }
   background: var(--surface-2); color: var(--text-dimmer);
 }
 .expert-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
-.expert-body{ min-width:0; padding-top: 2px; }
-.expert-body h3{
+.expert-card{ min-width:0; padding-top: 2px; }
+.expert-card h3{
   margin:0; font-size:1.08rem; font-weight:700; letter-spacing:-.01em; color: var(--text);
 }
-.expert-body p{ margin: 6px 0 0; font-size:.9rem; line-height:1.5; color: var(--text-dim); }
+.expert-card p{ margin: 6px 0 0; font-size:.9rem; line-height:1.5; color: var(--text-dim); }
 .expert-link{
   display:inline-block; margin-top: 12px;
   font-family:'JetBrains Mono', monospace; font-size:.78rem; color: var(--text);
@@ -714,6 +715,23 @@ button[disabled].si-forgot{ cursor: progress; }
 .expert-link:hover{ color: var(--text-dim); }
 @media (max-width: 420px){
   .expert-photo{ width:76px; height:76px; }
+}
+
+/* At 900px+, the photo breaks out of the card: full height, flush against
+   it with no gap or padding of its own, so the two tiles behind it (photo,
+   card) read as one shape instead of an image boxed inside a border. */
+@media (min-width: 900px){
+  .expert-pair{
+    gap:0; padding:0; background:none; border:none;
+    min-height: 400px; align-items:stretch;
+  }
+  .expert-photo{ width: 34%; height:auto; }
+  .expert-photo svg{ width:56px; height:56px; }
+  .expert-card{
+    flex:1; min-width:0; padding: clamp(28px, 3vw, 40px);
+    display:flex; flex-direction:column; justify-content:center;
+    background: var(--surface); border:1px solid var(--border);
+  }
 }
 
 /* ---------- product grid ---------- */
