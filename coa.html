@@ -80,16 +80,24 @@
 
   .coa-grid{
     display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1px; background: rgba(0,0,0,.13);
-    border:1px solid rgba(0,0,0,.13); margin-top: 34px;
+    gap: 0; background:#fff;
+    border-top:1px solid rgba(0,0,0,.13); border-left:1px solid rgba(0,0,0,.13);
+    margin-top: 34px;
   }
-  /* Hairline grid, same construction as the batch analysis panel: the cells
-     sit white on a 1px-gap background, so wrapping to any column count needs
-     no extra border rules and never doubles a line. */
+  /* Hairlines from each card's own border, not the container-background-
+     through-a-1px-gap trick the batch analysis panel uses. That trick
+     assumes every grid cell holds a card; 10 compounds in a 4-column row
+     leaves the last row's unused tracks empty, and an empty track still
+     shows the container's background at full cell size, not as a hairline —
+     the gray block this replaces. A border draws only where a card exists,
+     so a partial last row (or a short search-filtered row) just ends. */
   /* min-width:0 on the card for the same reason as the visual: a grid item
      that will not shrink is how a single long compound name widens the whole
      column and takes the document past the viewport. */
-  .coa-card{ background:#fff; display:flex; flex-direction:column; min-width:0; }
+  .coa-card{
+    background:#fff; display:flex; flex-direction:column; min-width:0;
+    border-right:1px solid rgba(0,0,0,.13); border-bottom:1px solid rgba(0,0,0,.13);
+  }
   .coa-card[hidden]{ display:none; }
 
   /* aspect-ratio with a percentage padding is a combination Safari has
