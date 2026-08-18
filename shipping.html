@@ -175,7 +175,15 @@
   }
   .shipping-page .lp-point p{ color:#55554f; }
   @media (max-width: 720px){
-    .shipping-page .lp-points{ grid-template-columns:1fr; }
+    /* Stacked to one column, the container's left border and each card's
+       right border both become vertical lines running the full height of
+       the stack, boxing it in. A single column doesn't need side borders to
+       separate anything, so they drop and only the horizontal rule between
+       cards (and the one above the first) stays, edge to edge. */
+    .shipping-page .lp-points{
+      grid-template-columns:1fr; border-left:none; padding-left:0;
+    }
+    .shipping-page .lp-point{ border-right:none; padding-left:0; padding-right:0; }
   }
 
   /* Buttons now sit under the disclosure at the bottom of the lead section,
