@@ -126,13 +126,16 @@
   }
 
   @media (max-width: 880px){
-    .sh-lead-top{ grid-template-columns: 1fr; }
-    /* The heading is what says what this page is; leading with an untitled
-       truck photo pushes it a full screen down. Words first, photo right
-       under them as support, same order the desktop reading direction
-       already implies (heading column before image column). */
-    .sh-lead-media{ order:2; margin-top: clamp(24px, 5vw, 32px); margin-bottom:0; }
-    .sh-lead-copy{ order:1; max-width:none; }
+    /* No room for a photo beside the copy at this width, and a stacked one
+       just pushed the heading down further than a phone should have to
+       scroll for it. Dropped rather than stacked, and the copy centres the
+       way the sitewide hero pattern does everywhere else on a phone once
+       there is nothing running alongside it to read left against. */
+    .sh-lead-top{ display:block; }
+    .sh-lead-media{ display:none; }
+    .sh-lead-copy{ max-width:none; text-align:center; }
+    .sh-lead-copy h1{ margin-left:auto; margin-right:auto; }
+    .sh-lead-copy .lp-lede, .sh-lead-copy .lp-hero-note{ margin-left:auto; margin-right:auto; }
   }
   .shipping-page .btn-primary{ background:#0a0a0a; color:#fff; }
   .shipping-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
