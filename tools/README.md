@@ -144,7 +144,8 @@ fails if you forget.
 ## `build-testing.js`
 
 Bakes the homepage testing diagram into the markup inside
-`<div id="tdNodes">`: one node per analysis, arranged around a drawn vial.
+`<div id="tdNodes">`: one ruled row per analysis, beside a drawn cloud of the
+powder. The rule fills left to right while that analysis is the one up.
 
 The rows live in `ANALYSIS_TESTS` in `js/products-data.js`, the same array
 `how-we-test.html` lists and the certificate panel summarises. Edit the array,

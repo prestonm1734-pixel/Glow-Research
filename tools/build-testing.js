@@ -4,7 +4,7 @@
 //   node tools/build-testing.js
 //
 // Bakes the seven analyses into the markup inside <div id="tdNodes"> on
-// index.html.
+// index.html: one ruled row each, beside a drawn cloud of the powder.
 //
 // Why this exists. The section it replaced was two invented "medical
 // advisors", and the thing that made them indefensible was that nothing in

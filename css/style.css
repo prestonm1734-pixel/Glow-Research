@@ -664,168 +664,136 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 
 /* ---------- testing diagram ----------
-   Seven analyses arranged around a drawn vial. Below 900px it is a plain
-   stacked list with the vial above it: connector lines to a centre column
-   only mean anything when there are two columns to connect. */
-/* Pure black, not var(--bg-2): the vial's glow needs a flat ground behind it
-   or the halo lands on a slightly-lighter rectangle and reads as a box. */
+   Seven analyses, one ruled row each, beside a drawn cloud of the powder.
+   Single column of rows at every width: split across two, the numbering read
+   in an order nobody follows and the rules stopped lining up with each other.
+   Below 900px the powder sits above them, which is the only change. */
+/* Pure black, not var(--bg-2): the powder's own falloff needs a flat ground
+   behind it or the halo lands on a slightly-lighter rectangle and reads as a
+   box around the artwork. */
 #testing{ background:#000; }
-#testing .section-head p{
-  max-width: 620px; margin: 16px auto 0;
-  font-size: .95rem; color: var(--text-dim);
-}
 
-.td-stage{ margin-top: clamp(32px, 4vw, 48px); }
+.td-stage{ margin-top: clamp(30px, 4vw, 46px); }
 
-/* The vial. Height is capped in vh as well as px so it cannot push the
-   nodes off a short laptop screen. */
-.td-vial{
+.td-powder{
   position:relative; display:flex; justify-content:center;
-  margin: 0 auto clamp(28px, 4vw, 40px);
+  margin: 0 auto clamp(6px, 2vw, 18px);
 }
-.td-vial svg{ width: auto; height: clamp(240px, 38vh, 340px); overflow:visible; }
+.td-powder svg{ width:100%; max-width: 460px; height:auto; overflow:visible; }
 
-/* The halo behind the glass, pulsing slowly. Separate from the SVG's own
-   radial gradient so it can animate without touching the artwork. */
-.td-ring{
-  position:absolute; top:50%; left:50%; translate:-50% -50%;
-  width: 340px; aspect-ratio:1; border-radius:50%;
-  background: radial-gradient(circle, rgba(255,255,255,.10), rgba(255,255,255,0) 68%);
-  pointer-events:none; z-index:-1;
-  animation: td-breathe 6s ease-in-out infinite;
+/* The three noise layers cross-fade rather than the filter being animated, so
+   the cloud churns at no per-frame cost. Offset delays over one shared period
+   keep any two of them from peaking together. */
+.td-cloud{ animation: td-churn 13s ease-in-out infinite; transform-origin: 50% 50%; }
+.td-cloud-a{ animation-delay: 0s; }
+.td-cloud-b{ animation-delay: -4.3s; }
+.td-cloud-c{ animation-delay: -8.6s; }
+@keyframes td-churn{
+  0%,100%{ opacity:.30; transform: scale(1) translateY(0); }
+  50%    { opacity:.95; transform: scale(1.05) translateY(-5px); }
 }
-@keyframes td-breathe{
-  0%,100%{ transform: scale(1); opacity:.75; }
-  50%    { transform: scale(1.08); opacity:1; }
-}
-
-/* The band of light crossing the powder. Held still until .is-scanning is on
-   the stage, so the sweep reads as a response to the active test rather than
-   as decoration running on its own. */
-.td-sweep{ opacity:0; }
-.is-scanning .td-sweep{ animation: td-sweep 2.4s ease-in-out infinite; }
-@keyframes td-sweep{
-  0%   { opacity:0; transform: translateY(70px); }
-  35%  { opacity:.9; }
-  100% { opacity:0; transform: translateY(-96px); }
-}
-.td-motes circle{ animation: td-drift 9s ease-in-out infinite; }
-.td-motes circle:nth-child(2){ animation-duration: 12s; animation-delay:-3s; }
-.td-motes circle:nth-child(3){ animation-duration: 7.5s; animation-delay:-5s; }
-.td-motes circle:nth-child(4){ animation-duration: 11s; animation-delay:-1.5s; }
-.td-motes circle:nth-child(5){ animation-duration: 8.5s; animation-delay:-6s; }
+.td-core{ animation: td-churn 13s ease-in-out infinite; animation-delay:-2.1s; transform-origin:50% 50%; }
+/* Grains carry at their own pace. Prime-ish durations so the field never
+   settles into a visible pulse. */
+.td-motes circle{ animation: td-drift 11s ease-in-out infinite; }
+.td-motes circle:nth-child(2n){ animation-duration: 14s; animation-delay:-4s; }
+.td-motes circle:nth-child(3n){ animation-duration: 9s;  animation-delay:-7s; }
+.td-motes circle:nth-child(4n){ animation-duration: 17s; animation-delay:-2s; }
+.td-motes circle:nth-child(5n){ animation-duration: 8s;  animation-delay:-9s; }
+.td-motes circle:nth-child(7n){ animation-duration: 15s; animation-delay:-5s; }
 @keyframes td-drift{
-  0%,100%{ transform: translate(0,0); }
-  50%    { transform: translate(4px,-14px); }
+  0%,100%{ transform: translate(0,0); opacity:.25; }
+  50%    { transform: translate(9px,-18px); opacity:.8; }
+}
+/* The cloud lifts while a row is up, so the powder answers the diagram
+   instead of running on its own timer beside it. */
+.is-scanning .td-powder svg{ animation: td-lift 3.2s ease-in-out infinite; }
+@keyframes td-lift{
+  0%,100%{ transform: translateY(0) scale(1); }
+  40%    { transform: translateY(-8px) scale(1.03); }
 }
 
-/* Stacked below 900px, so the two columns are just two more rows and the
-   spacing has to come from both of them, not only from between them. */
-.td-nodes{ display:grid; grid-template-columns: 1fr; gap: 10px; }
-.td-col{ display:grid; gap: 10px; }
+.td-nodes{ display:grid; grid-template-columns: 1fr; gap: clamp(18px, 2.4vw, 30px); }
 
-/* A node is a button because activating it does something: it is the control
-   that moves the highlight. Reset to a text block, since none of the button
-   chrome belongs on it. */
+/* A row is a button because activating it does something: it moves the
+   highlight. Reset to a text block, since none of the button chrome belongs. */
 .td-node{
-  position:relative; display:block; width:100%; text-align:left;
-  background:none; border:none; padding: 14px 16px; margin:0;
-  border-left: 1px solid rgba(255,255,255,.14);
-  color: var(--text); cursor:pointer;
-  transition: border-color .25s ease, opacity .25s ease, background .25s ease;
+  display:block; width:100%; text-align:left; padding:0; margin:0;
+  background:none; border:none; color: var(--text); cursor:pointer;
 }
-.td-node:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+.td-node:focus-visible{ outline:2px solid #fff; outline-offset:4px; }
+
+/* The rule, and the dot that terminates it. The bright fill is a second layer
+   scaled from nothing, so activating a row draws its line rather than
+   switching a colour. */
+.td-rule{
+  display:block; position:relative; height:1px; margin-bottom: 16px;
+  background: rgba(255,255,255,.15);
+}
+.td-rule::after{
+  content:''; position:absolute; inset:0; background:#fff;
+  transform: scaleX(0); transform-origin: left center;
+  transition: transform .55s cubic-bezier(.2,.8,.2,1);
+}
+.td-node.is-active .td-rule::after{ transform: scaleX(1); }
+.td-rule i{
+  position:absolute; right:0; top:50%; translate: 0 -50%;
+  width:7px; height:7px; border-radius:50%;
+  background: rgba(255,255,255,.28);
+  transition: background .3s ease, box-shadow .3s ease, scale .3s ease;
+}
+.td-node.is-active .td-rule i{
+  background:#fff; scale:1.2; box-shadow: 0 0 0 5px rgba(255,255,255,.10);
+}
+
+.td-head{ display:flex; align-items:baseline; flex-wrap:wrap; gap: 10px; }
 .td-num{
-  display:block; font-family:'JetBrains Mono', monospace;
-  font-size:.7rem; letter-spacing:.1em; color: var(--text-dimmer);
-  transition: color .25s ease;
+  font-family:'JetBrains Mono', monospace; font-size:.7rem;
+  letter-spacing:.1em; color: var(--text-dimmer);
+  transition: color .3s ease;
 }
 .td-name{
-  margin: 6px 0 0; font-size:1.02rem; font-weight:700; letter-spacing:-.01em;
-  color: var(--text);
+  margin:0; font-size:.94rem; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase; color: var(--text);
 }
 .td-method{
-  display:block; margin-top: 4px;
-  font-family:'JetBrains Mono', monospace; font-size:.72rem;
+  font-family:'JetBrains Mono', monospace; font-size:.7rem;
   letter-spacing:.04em; color: var(--text-dim);
 }
+/* No measure of its own: the sentence should fill the rule above it, so the
+   two read as one row rather than a short paragraph under a long line. The
+   rule is what gets the cap, on .td-node below. */
 .td-plain{
-  display:block; margin-top: 8px;
-  font-size:.9rem; line-height:1.6; color: var(--text-dim);
+  display:block; margin-top: 10px;
+  font-size:.95rem; line-height:1.65; color: var(--text-dim);
+  transition: color .3s ease;
 }
-/* The dot and the connector only exist in the two-column layout. */
-.td-line, .td-dot{ display:none; }
 
-/* Active is the only strong state. Everything else steps back rather than the
-   active one lighting up, which keeps the section from strobing as the
-   highlight moves through seven nodes. */
-.td-nodes.has-active .td-node{ opacity:.42; }
+/* Active is the only strong state, and the others step back rather than it
+   lighting up: seven rows taking turns to flash would strobe. */
+.td-nodes.has-active .td-node{ opacity:.45; transition: opacity .3s ease; }
 .td-nodes.has-active .td-node.is-active{ opacity:1; }
-.td-node.is-active{ border-left-color:#fff; background: rgba(255,255,255,.03); }
 .td-node.is-active .td-num{ color: var(--text); }
+.td-node.is-active .td-plain{ color: var(--text); }
 
 @media (min-width: 900px){
-  /* Vial in the middle, four nodes left, three right. The stage is a grid so
-     the vial can be centred against the taller of the two columns rather than
-     stacked above them. */
+  /* Rows down the left, powder held beside them and centred against the
+     column rather than stacked above it. Sticky so it stays with the reader
+     as they work down all seven. */
   .td-stage{
-    display:grid; align-items:center;
-    grid-template-columns: 1fr minmax(220px, 300px) 1fr;
-    gap: clamp(20px, 3vw, 48px);
-    max-width: 1240px; margin-inline:auto;
+    display:grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 520px);
+    align-items:start; gap: clamp(32px, 5vw, 72px);
+    max-width: 1180px; margin-inline:auto;
   }
-  .td-vial{ grid-column:2; grid-row:1; margin:0; }
-  .td-vial svg{ height: clamp(340px, 52vh, 460px); }
-  .td-nodes{
-    display:contents;   /* the two columns place themselves in the stage grid */
+  .td-nodes{ order:1; }
+  .td-powder{
+    order:2; margin:0; position:sticky; top: 22vh;
   }
-  .td-col{ display:flex; flex-direction:column; gap: clamp(14px, 2vw, 26px); }
-  .td-col-left{ grid-column:1; grid-row:1; }
-  .td-col-right{ grid-column:3; grid-row:1; }
-
-  /* No panel behind the active node here: with the connector and the dot
-     doing the pointing, a filled rectangle just puts a box on the page. The
-     stacked layout keeps it, where there is no connector to read instead. */
-  .td-node{ border-left:none; padding: 0; }
-  .td-node.is-active{ background:none; }
-  /* Room for the connector, which has to cross the grid gap to reach the
-     vial rather than stopping a few pixels off the text. */
-  .td-col-left .td-node{ text-align:right; padding-right: clamp(56px, 7vw, 116px); }
-  .td-col-right .td-node{ text-align:left; padding-left: clamp(56px, 7vw, 116px); }
-
-  /* The connector: a dashed rule from the node to the vial, and a dot where
-     it meets the text. Drawn with a repeating gradient rather than a dashed
-     border so the dashes can travel along it while the node is active. */
-  /* Runs from just past the dot to the far edge of the column, which is where
-     the vial's own column begins. It stops short of the glass on purpose:
-     touching it would claim the line points at some specific part of the
-     vial, and it does not. */
-  .td-line{
-    display:block; position:absolute; top: 11px; height: 1px;
-    width: calc(clamp(56px, 7vw, 116px) - 22px);
-    background-image: repeating-linear-gradient(to right,
-      rgba(255,255,255,.55) 0 3px, transparent 3px 8px);
-    background-size: 8px 1px;
-    opacity:.45; transition: opacity .25s ease;
-  }
-  .td-col-left .td-line{ right: 0; }
-  .td-col-right .td-line{ left: 0; }
-  .td-dot{
-    display:block; position:absolute; top: 8px;
-    width: 7px; height: 7px; border-radius:50%;
-    border:1px solid rgba(255,255,255,.45); background:#000;
-    transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
-  }
-  .td-col-left .td-dot{ right: calc(clamp(56px, 7vw, 116px) - 18px); }
-  .td-col-right .td-dot{ left: calc(clamp(56px, 7vw, 116px) - 18px); }
-
-  .td-node.is-active .td-line{ opacity:1; animation: td-travel .9s linear infinite; }
-  .td-col-right .td-node.is-active .td-line{ animation-name: td-travel-rev; }
-  .td-node.is-active .td-dot{
-    background:#fff; border-color:#fff; box-shadow: 0 0 0 4px rgba(255,255,255,.12);
-  }
-  @keyframes td-travel{ to{ background-position: -8px 0; } }
-  @keyframes td-travel-rev{ to{ background-position: 8px 0; } }
+  .td-powder svg{ max-width: 520px; }
+  /* Caps the rule, and with it the sentence beneath, at a readable measure.
+     Left to the grid column the lines ran to 80-odd characters. */
+  .td-node{ max-width: 58ch; }
+  .td-name{ font-size:1rem; }
 }
 
 .td-foot{
@@ -837,12 +805,12 @@ button[disabled].si-forgot{ cursor: progress; }
 .td-foot p{ margin:0; max-width: 620px; font-size:.9rem; }
 .td-foot .btn-outline{ flex-shrink:0; }
 
-/* Nothing here is load-bearing: the diagram is a list of seven analyses with
-   a picture of a vial, and it reads the same standing still. */
+/* Nothing here is load-bearing: it is seven analyses with a picture of the
+   powder, and it reads the same standing still. */
 @media (prefers-reduced-motion: reduce){
-  .td-ring, .td-motes circle,
-  .is-scanning .td-sweep,
-  .td-node.is-active .td-line{ animation:none; }
+  .td-cloud, .td-motes circle, .is-scanning .td-powder svg{ animation:none; }
+  .td-cloud{ opacity:.62; }
+  .td-rule::after{ transition:none; }
 }
 
 /* ---------- product grid ---------- */
