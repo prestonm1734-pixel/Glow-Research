@@ -26,6 +26,61 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="stylesheet" href="css/style.css" />
 <style>
+  /* White surface with the scaled-down hero, borrowed from coa.html: this
+     page is answering "when does it arrive and what does it cost", which
+     reads as a lookup, not a mood piece, so it drops the full-bleed dark
+     .lp-page treatment for the lighter one signin/product/coa share. */
+  .shipping-page{ background:#fff; color:#0a0a0a; }
+  .shipping-page .lp-hero{ padding: clamp(44px, 6vw, 72px) 0 clamp(30px, 4vw, 44px); }
+  .shipping-page .lp-eyebrow{
+    font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase; color:#8a8a86;
+  }
+  .shipping-page .lp-hero h1{
+    color:#0a0a0a; font-size: clamp(2.1rem, 4.2vw, 3.4rem); max-width: 18ch;
+  }
+  .shipping-page .lp-hero h1 .outline{ color:#b5b5b0; }
+  .shipping-page .lp-lede{ color:#55554f; }
+  .shipping-page .lp-hero-note{ color:#55554f; }
+  .shipping-page .lp-dot{ background:#0a0a0a; }
+  .shipping-page .btn-primary{ background:#0a0a0a; color:#fff; }
+  .shipping-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
+  .shipping-page .btn-outline{ border-color: rgba(0,0,0,.25); color:#0a0a0a; }
+  .shipping-page .btn-outline:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; }
+
+  /* Figures keep the site's counting behaviour but read as dark-on-white
+     numerals rather than white-on-black, with a hairline rule standing in
+     for the dark page's implicit contrast. */
+  .shipping-page .lp-figs{ border-top:1px solid rgba(0,0,0,.1); }
+  .shipping-page .lp-fig{ color:#0a0a0a; }
+  .shipping-page .lp-fig b{ color:#0a0a0a; }
+  .shipping-page .lp-fig > span{ color:#8a8a86; }
+
+  .shipping-page .lp-section.tint{ background:#fafaf9; }
+  .shipping-page .lp-sub{ color:#55554f; }
+  .shipping-page .lp-fine{ color:#55554f; }
+  .shipping-page .lp-fine strong{ color:#0a0a0a; }
+
+  /* "Inside the box" becomes a hairlined card grid, the same construction
+     as the certificate grid on coa.html: border-top/left on the container,
+     border-right/bottom on each card, so partial rows never leave a bare
+     patch of background exposed. */
+  .shipping-page .lp-points{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap:0;
+    border-top:1px solid rgba(0,0,0,.13); border-left:1px solid rgba(0,0,0,.13);
+    margin-top: clamp(44px, 6vw, 64px);
+  }
+  .shipping-page .lp-point{
+    padding: clamp(26px, 3vw, 34px);
+    border-right:1px solid rgba(0,0,0,.13); border-bottom:1px solid rgba(0,0,0,.13);
+  }
+  .shipping-page .lp-point svg{ color:#0a0a0a; }
+  .shipping-page .lp-point h3{ color:#0a0a0a; }
+  .shipping-page .lp-point p{ color:#55554f; }
+  @media (max-width: 720px){
+    .shipping-page .lp-points{ grid-template-columns:1fr; }
+  }
+
   /* Each mark draws itself on arrival (shared .lp-* motion rules). Hover
      then replays that mark's own idea rather than applying one generic
      wobble to all three: the snowflake turns, the clock runs, the tick
@@ -128,7 +183,7 @@
   </div>
 </header>
 
-<main class="lp-page">
+<main class="lp-page shipping-page">
 
 <section class="lp-hero">
   <div class="container">
