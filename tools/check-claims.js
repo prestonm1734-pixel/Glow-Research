@@ -797,14 +797,24 @@ if (!COAS_PUBLISHED) {
   // branch-aware, where a text scan of a source file holding both wordings
   // would flag the published branch that is not running.
   //
-  // This is the loophole a "View certificate" button sat in: it read as a
-  // promise to open a document and produced an email address.
+  // The button's own label is excluded from this scan on purpose. It always
+  // reads "View certificate" now, whether or not coaHref() resolves one,
+  // because it always opens the same modal (js/coa.js) and that modal is the
+  // honest surface, not the label: the embedded PDF when one exists, the
+  // email route when it does not. A label describing where a button leads is
+  // not itself a claim that a document is there — what would be is anything
+  // outside the button asserting one, which the scan below still covers.
   const renderedCards = GLOW_PRODUCTS.map(coaCardHtml).join('');
-  ok('no certificate card offers a document that cannot be opened',
-    !promises.test(renderedCards),
+  const cardsOutsideButton = renderedCards
+    .replace(/<button[^>]*data-coa-view[^>]*>[\s\S]*?<\/button>/g, '');
+  ok('no certificate card claims a document outside its View button',
+    !promises.test(cardsOutsideButton),
     'a card on coa.html promises a certificate while COAS_PUBLISHED is false');
   ok('and no card flags a PDF it does not have',
     !/coa-card-flag/.test(renderedCards));
+  ok('the certificate modal keeps the honest request route, not a promised document',
+    /coa-modal-request/.test(read('js/coa.js')) && /COA_COPY\.boxTitle/.test(read('js/coa.js')),
+    'js/coa.js must still branch on coaHref() now that the button label no longer signals it');
   ok('coaHref() returns nothing while the flag is false, whatever the catalog holds',
     coaHref({ coa: 'https://example.com/staged.pdf' }) === '',
     'a per-product coa staged before the flip must not go live on its own');

@@ -144,17 +144,22 @@
   }
   .coa-card-meta dd{ margin:0; font-size:.9rem; font-weight:700; color:#0a0a0a; }
 
+  /* Boxed like the catalog's Add to cart button — same 44px square-cornered
+     shape, same Sora weight — but outlined rather than filled, and inverted
+     on hover instead of just dimming. A certificate is opened, not bought,
+     so it earns the family's language without borrowing its exact look. */
   .coa-card-view{
-    margin-top: auto; padding-top: 18px;
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    background:none; border:none; width:100%; text-align:left; cursor:pointer;
-    font-family:inherit; font-size:.9rem; font-weight:700; color:#0a0a0a;
-    transition: color .18s ease;
+    margin-top: auto; height:44px; padding: 0 14px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:none; border:1px solid rgba(0,0,0,.28); border-radius:0; width:100%;
+    cursor:pointer; font-family:'Sora', sans-serif; font-size:.83rem; font-weight:700;
+    letter-spacing:.01em; color:#0a0a0a;
+    transition: background .18s ease, color .18s ease, border-color .18s ease;
   }
-  .coa-card-view:hover{ color:#55554f; }
-  .coa-card-view span{ transition: transform .2s ease; }
-  .coa-card-view:hover span{ transform: translateX(4px); }
-  .coa-card-view:focus-visible{ outline:2px solid #0a0a0a; outline-offset:3px; }
+  .coa-card-view svg{ flex:0 0 auto; transition: transform .2s ease; }
+  .coa-card-view:hover{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+  .coa-card-view:hover svg{ transform: translateY(-1px); }
+  .coa-card-view:focus-visible{ outline:2px solid #0a0a0a; outline-offset:2px; }
 
   .coa-empty{ margin: 34px 0 0; text-align:center; font-size:.95rem; color:#55554f; }
   .coa-empty[hidden]{ display:none; }
@@ -227,8 +232,33 @@
     margin: 18px 0 0; font-size:.8rem; line-height:1.6; color:#8a8a86;
   }
 
+  @media (max-width: 640px){
+    /* Two up on phones, the same call the catalog's own .product-grid makes
+       at this width: one column per row wastes most of the screen on a
+       single tile, and minmax(0,1fr) rather than 1fr is what lets a long
+       compound name shrink instead of forcing the column past the viewport. */
+    .coa-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+
+    /* everything inside the tile steps down to suit the narrower column,
+       the same scaling the catalog card goes through at this width */
+    .coa-card-visual{ padding: 18px; }
+    .coa-card-visual img{ top:18px; left:18px; width:calc(100% - 36px); height:calc(100% - 36px); }
+    .coa-card-body{ padding: 14px 13px 15px; }
+    .coa-card-type{ font-size:.56rem; }
+    .coa-card-name{ font-size:.88rem; margin-top:7px; }
+    .coa-card-meta{ margin-top:10px; padding-top:10px; gap: 14px; }
+    .coa-card-view{ height:38px; font-size:.74rem; gap:6px; }
+    .coa-card-view svg{ width:13px; height:13px; }
+  }
+
+  @media (max-width: 420px){
+    /* Two "Purity"/"Lot" labels plus their values is tight at a 165px column
+       — dropping to one decimal's worth of letter-spacing keeps both on one
+       line instead of the second one wrapping under the first. */
+    .coa-card-meta dt{ letter-spacing:.06em; }
+  }
+
   @media (max-width: 560px){
-    .coa-grid{ grid-template-columns: 1fr; }
     .coa-overlay{ padding: 0; align-items:flex-end; }
     .coa-modal{ max-height: 92vh; width:100%; border:none; }
     .coa-modal-doc{ height: 44vh; }

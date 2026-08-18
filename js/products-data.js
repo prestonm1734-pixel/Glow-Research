@@ -1106,10 +1106,13 @@ function productCardHtml(p, i) {
 // badge. Someone here is checking paperwork, not shopping, and a buy button
 // beside a certificate reads as an advertisement dressed up as a document.
 //
-// The button says what pressing it actually does. While certificates are held
-// it opens the route to one, so it reads "Request certificate": a button
-// labelled "View certificate" that produces an email address instead of a
-// document is the exact promise COAS_PUBLISHED exists to stop the site making.
+// The button always reads "View certificate" and always opens the same
+// modal (js/coa.js), because that modal is what is honest, not the label:
+// held or not, pressing it opens a certificate viewer, and what that viewer
+// shows already tracks COAS_PUBLISHED — the embedded PDF when one exists,
+// the request route when one does not. The label describing the destination
+// is not itself the claim; the claim is what the destination says, and that
+// has been true since coaHref() was gated on the flag.
 function coaCardHtml(p) {
   const single = p.sizes.length === 1;
   const name = single ? `${p.name} ${p.sizes[0].mg}` : p.name;
@@ -1130,7 +1133,12 @@ function coaCardHtml(p) {
             <div><dt>Lot</dt><dd>${escHtml(p.lot || '') || '—'}</dd></div>
           </dl>
           <button type="button" class="coa-card-view" data-coa-view="${escHtml(p.name)}">
-            ${held ? 'View certificate' : 'Request certificate'} <span aria-hidden="true">&rarr;</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke-linejoin="round"/>
+              <path d="M14 3v5h5" stroke-linejoin="round"/>
+              <path d="M9 13.5h6M9 17h4" stroke-linecap="round"/>
+            </svg>
+            View certificate
           </button>
         </div>
       </article>`;
