@@ -77,11 +77,54 @@
     margin-bottom: clamp(48px, 6.5vw, 72px);
   }
   .sh-lead-copy{ max-width: 46ch; }
+
+  /* The photo landed as a plain colour rectangle next to a page that is
+     otherwise entirely black, white and grey — FedEx purple and orange
+     reading as the one loud thing on the page, and a stock photo dropped in
+     rather than shot for it. Ink it into the site's own palette instead of
+     framing it: greyscale plus a black multiply wash is the same move the
+     product photos already make (mix-blend-mode:multiply, coa.html), so a
+     vial photo and a fleet photo end up looking like they belong to the same
+     shoot. A viewfinder frame stands in for the plain hairline border every
+     other panel uses — corners only, so the photo still reads as an image
+     bleeding past its own edges rather than a card containing one. */
   .sh-lead-media{
-    aspect-ratio: 16 / 9; overflow:hidden;
-    border:1px solid rgba(0,0,0,.13); background:#f5f5f4;
+    position:relative; aspect-ratio: 16 / 9; overflow:hidden;
+    background:#f5f5f4; padding:14px;
   }
-  .sh-lead-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .sh-lead-media img{
+    width:100%; height:100%; object-fit:cover; display:block;
+    filter: grayscale(1) contrast(1.08) brightness(1.02);
+  }
+  /* A soft vignette rather than a flat tint, so the wash reads as light
+     falling off toward the edges instead of a rectangle laid over a photo. */
+  .sh-lead-media::before{
+    content:''; position:absolute; inset:14px; z-index:1; pointer-events:none;
+    background: radial-gradient(ellipse 130% 120% at 42% 30%, transparent 45%, rgba(10,10,10,.22) 100%);
+    mix-blend-mode:multiply;
+  }
+  .sh-lead-media::after{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    /* four viewfinder brackets, each a pair of arms drawn off an edge with
+       the "right 14px top 14px" form of background-position, which anchors
+       by the tile's own far edge rather than its top-left — the only way to
+       get a right- or bottom-hugging arm without measuring the box in JS */
+    background-image: linear-gradient(#0a0a0a,#0a0a0a);
+    background-repeat: no-repeat;
+    background-size: 26px 1.5px, 1.5px 26px, 26px 1.5px, 1.5px 26px,
+                      26px 1.5px, 1.5px 26px, 26px 1.5px, 1.5px 26px;
+    background-position:
+      left 14px top 14px, left 14px top 14px,
+      right 14px top 14px, right 14px top 14px,
+      left 14px bottom 14px, left 14px bottom 14px,
+      right 14px bottom 14px, right 14px bottom 14px;
+  }
+  .sh-lead-caption{
+    position:absolute; left:26px; bottom:26px; z-index:2;
+    font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase; color:#fff;
+    text-shadow: 0 1px 6px rgba(0,0,0,.55);
+  }
 
   @media (max-width: 880px){
     .sh-lead-top{ grid-template-columns: 1fr; }
@@ -261,6 +304,7 @@
       </div>
       <div class="sh-lead-media">
         <img src="assets/fedex-fleet.jpeg" alt="FedEx Express delivery vehicles staged at a depot" width="1000" height="563" loading="eager" />
+        <span class="sh-lead-caption">Our carrier: FedEx Express</span>
       </div>
     </div>
 
