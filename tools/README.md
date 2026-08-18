@@ -10,6 +10,7 @@ No dependencies to install. Everything here is plain Node.
 node tools/build.js          # the usual one: FAQ + products (when live) + sitemap + audit
 node tools/build-meta.js     # every copy of each page's title + description
 node tools/build-faq.js      # homepage FAQ markup + FAQPage schema
+node tools/build-testing.js  # homepage testing diagram, from ANALYSIS_TESTS
 node tools/build-catalog.js  # peptides.html grid + CollectionPage schema
 node tools/build-llms.js     # llms.txt
 node tools/build-products.js # one page per compound
@@ -19,7 +20,7 @@ node tools/check-claims.js   # promise audit, run before every commit
 
 ## `build.js`
 
-The everyday entry point. Runs `build-meta.js`, `build-faq.js`,
+The everyday entry point. Runs `build-meta.js`, `build-faq.js`, `build-testing.js`,
 `build-catalog.js`, `build-llms.js`, then `build-products.js` (which refreshes `sitemap.xml` on its
 way through), then `check-claims.js`.
 
@@ -139,6 +140,30 @@ crawlable text.
 The COA answer reads from `COA_COPY`, so it flips with `COAS_PUBLISHED` like
 every other certificate surface. Rebuild after flipping the flag; the audit
 fails if you forget.
+
+## `build-testing.js`
+
+Bakes the homepage testing diagram into the markup inside
+`<div id="tdNodes">`: one node per analysis, arranged around a drawn vial.
+
+The rows live in `ANALYSIS_TESTS` in `js/products-data.js`, the same array
+`how-we-test.html` lists and the certificate panel summarises. Edit the array,
+run the build. `js/script.js` only moves the highlight between nodes that are
+already in the DOM.
+
+It exists because of what used to be in that slot: two "medical advisors" who
+did not exist, with invented credentials and stock headshots. What made them
+indefensible was that nothing in the system produced them, so nothing could
+ever contradict them. The replacement is generated from the one array that
+decides what the whole site is allowed to claim about testing, and
+`check-claims.js` compares the served markup against the renderer. A test that
+leaves the certificate leaves the homepage in the same edit, or the build
+fails.
+
+The block is delimited by an `<!-- /tdNodes -->` marker rather than by a run of
+closing tags: the nodes nest two levels deep, and a lazy match up to
+`</div></div>` found the end of the right-hand column instead of the end of the
+block, pushing a spare `</div>` into the page on every rebuild.
 
 ## `build-meta.js`
 

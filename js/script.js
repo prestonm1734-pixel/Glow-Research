@@ -231,3 +231,65 @@ if (!reduceMotion.matches && grid) {
   });
 }
 
+
+/* ---------- testing diagram ----------
+   The seven analyses are already in the markup, baked by
+   tools/build-testing.js. Nothing here writes copy: it moves a highlight
+   between nodes that exist whether or not this file runs, so the section is
+   complete with JavaScript off and merely still.
+
+   The highlight walks the list on its own so the section has something to
+   watch, then hands over the moment anyone points at it and stops for good
+   once they click, because a panel that keeps moving under a reader who has
+   chosen a row is a nuisance rather than a feature. Same visibility gating
+   the hero constellation uses: nothing animates off-screen. */
+(function () {
+  const stage = document.querySelector('#testing .td-stage');
+  if (!stage) return;
+  const nodes = Array.from(stage.querySelectorAll('.td-node'));
+  const list = document.getElementById('tdNodes');
+  if (!nodes.length || !list) return;
+
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const STEP = 3200;
+  let at = -1, timer = null, surrendered = false;
+
+  function show(i) {
+    at = i;
+    nodes.forEach((n, k) => {
+      const on = k === i;
+      n.classList.toggle('is-active', on);
+      n.setAttribute('aria-pressed', String(on));
+    });
+    list.classList.toggle('has-active', i >= 0);
+    stage.classList.toggle('is-scanning', i >= 0 && !still.matches);
+  }
+
+  function advance() { show((at + 1) % nodes.length); }
+  function start() {
+    if (timer || surrendered || still.matches) return;
+    // Light one immediately. Waiting a full step first left the section
+    // sitting there unlit for three seconds, which reads as broken rather
+    // than as about to move.
+    if (at < 0) show(0);
+    timer = setInterval(advance, STEP);
+  }
+  function stop() { clearInterval(timer); timer = null; }
+
+  nodes.forEach((n, i) => {
+    n.addEventListener('mouseenter', () => { stop(); show(i); });
+    n.addEventListener('focus', () => { stop(); show(i); });
+    // A click is a decision, so the walk does not resume on mouseout.
+    n.addEventListener('click', () => { surrendered = true; stop(); show(i); });
+  });
+  stage.addEventListener('mouseleave', () => { if (!surrendered) start(); });
+
+  // Reduced motion still gets a diagram, just not a moving one: the first
+  // analysis stays lit so the layout does not read as broken.
+  if (still.matches) { show(0); return; }
+
+  new IntersectionObserver((entries) => {
+    entries.forEach(e => (e.isIntersecting ? start() : stop()));
+  }, { threshold: 0.25 }).observe(stage);
+})();
+

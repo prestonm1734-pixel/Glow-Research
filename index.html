@@ -275,12 +275,172 @@
   </div>
 </section>
 
-<!-- No people section here on purpose. This slot held two "medical advisors"
-     who did not exist: invented names, invented credentials, stock
-     headshots. Nothing on this site may assert a person, a qualification or
-     an endorsement we cannot produce on request. If real named experts are
-     ever engaged, their consent and credentials come first and the section
-     comes second. -->
+<!-- The testing diagram. This slot used to hold two "medical advisors" who did
+     not exist. What replaced them is the one thing on this page that is
+     provable: the seven analyses actually run on the lot.
+
+     The nodes inside #tdNodes are baked by tools/build-testing.js from
+     ANALYSIS_TESTS in js/products-data.js. Do not type a test in here. A
+     crawler that never runs JavaScript still reads all seven, and
+     check-claims.js fails the build if the served markup and the array
+     disagree. js/script.js only adds the highlighting on top. -->
+<section class="section section-dark" id="testing">
+  <div class="container">
+    <div class="section-head center reveal">
+      <span class="eyebrow">Every lot</span>
+      <h2>What we actually test.</h2>
+      <p>Seven analyses on the powder before it is released for sale. Each one is a line on the certificate, and every figure on this site traces back to one of them.</p>
+    </div>
+
+    <div class="td-stage reveal">
+      <!-- The vial is drawn, not photographed: there is no stock image of our
+           powder, and using someone else's would be the same defect as the
+           section it replaced. Decorative, so it is hidden from the reader
+           that gets the seven analyses read out to them instead. -->
+      <div class="td-vial" aria-hidden="true">
+        <svg viewBox="0 0 240 470" role="presentation" focusable="false">
+          <defs>
+            <linearGradient id="tdCap" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#4c4c4c"/>
+              <stop offset="18%" stop-color="#d8d8d6"/>
+              <stop offset="42%" stop-color="#8e8e8c"/>
+              <stop offset="66%" stop-color="#efefec"/>
+              <stop offset="100%" stop-color="#3c3c3c"/>
+            </linearGradient>
+            <linearGradient id="tdGlass" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity=".16"/>
+              <stop offset="26%" stop-color="#ffffff" stop-opacity=".04"/>
+              <stop offset="72%" stop-color="#ffffff" stop-opacity=".05"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity=".18"/>
+            </linearGradient>
+            <!-- The cake reads as a solid with a lit top face and a shaded
+                 flank, which is what gives it depth on a flat black ground. -->
+            <linearGradient id="tdCake" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#b9b2a4"/>
+              <stop offset="30%" stop-color="#f4efe4"/>
+              <stop offset="62%" stop-color="#ded7c8"/>
+              <stop offset="100%" stop-color="#9c968a"/>
+            </linearGradient>
+            <linearGradient id="tdCakeTop" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#fffdf7"/>
+              <stop offset="100%" stop-color="#ddd6c6"/>
+            </linearGradient>
+            <radialGradient id="tdGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity=".22"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+            </radialGradient>
+            <clipPath id="tdInner">
+              <path d="M84 96h72v292a26 26 0 0 1-26 26h-20a26 26 0 0 1-26-26z"/>
+            </clipPath>
+          </defs>
+
+          <ellipse cx="120" cy="250" rx="118" ry="200" fill="url(#tdGlow)"/>
+
+          <!-- crimp cap and neck -->
+          <rect x="88" y="24" width="64" height="46" rx="7" fill="url(#tdCap)"/>
+          <rect x="88" y="38" width="64" height="2" fill="#000" opacity=".22"/>
+          <rect x="88" y="54" width="64" height="2" fill="#000" opacity=".22"/>
+          <rect x="95" y="68" width="50" height="16" rx="3" fill="#c9c9c6" opacity=".55"/>
+
+          <!-- body -->
+          <path d="M84 84h72v304a26 26 0 0 1-26 26h-20a26 26 0 0 1-26-26z"
+                fill="url(#tdGlass)" stroke="rgba(255,255,255,.34)" stroke-width="1.4"/>
+
+          <g clip-path="url(#tdInner)">
+            <!-- lyophilised cake: an irregular top face, because a flat one
+                 reads as liquid -->
+            <path d="M84 322c14-9 22 4 34-3s20-11 38-4v92H84z" fill="url(#tdCake)"/>
+            <path d="M84 322c14-9 22 4 34-3s20-11 38-4v11c-18-6-26 3-38 8s-20-6-34 2z" fill="url(#tdCakeTop)"/>
+            <path d="M84 322c14-9 22 4 34-3s20-11 38-4v92H84z" fill="#000" opacity=".05"/>
+            <!-- the sweep: a band of light travelling the powder while a test
+                 is active. Parked off the bottom until the section animates. -->
+            <rect class="td-sweep" x="84" y="300" width="72" height="120" fill="url(#tdGlow)"/>
+          </g>
+
+          <!-- suspended particles, so the vial is never completely still -->
+          <g class="td-motes" fill="#ffffff">
+            <circle cx="104" cy="180" r="1.6" opacity=".5"/>
+            <circle cx="132" cy="228" r="1.2" opacity=".38"/>
+            <circle cx="118" cy="146" r="1" opacity=".3"/>
+            <circle cx="142" cy="196" r="1.4" opacity=".42"/>
+            <circle cx="96" cy="252" r="1.1" opacity=".34"/>
+          </g>
+
+          <!-- left-hand specular highlight, the thing that makes glass glass -->
+          <rect x="93" y="102" width="6" height="252" rx="3" fill="#fff" opacity=".2"/>
+        </svg>
+        <span class="td-ring"></span>
+      </div>
+
+      <!-- Baked by tools/build-testing.js. Anything typed between these tags
+           is overwritten on the next build. -->
+      <div class="td-nodes" id="tdNodes">
+      <div class="td-col td-col-left">
+        <button type="button" class="td-node" data-test="0" aria-pressed="false">
+          <span class="td-line" aria-hidden="true"></span>
+          <span class="td-dot" aria-hidden="true"></span>
+          <span class="td-num">01</span>
+          <h3 class="td-name">Purity</h3>
+          <span class="td-method">Reverse-phase HPLC-UV</span>
+          <span class="td-plain">How much of the powder is the peptide you ordered. This is the percentage printed on the certificate.</span>
+        </button>
+        <button type="button" class="td-node" data-test="1" aria-pressed="false">
+          <span class="td-line" aria-hidden="true"></span>
+          <span class="td-dot" aria-hidden="true"></span>
+          <span class="td-num">02</span>
+          <h3 class="td-name">Identity</h3>
+          <span class="td-method">LC-MS</span>
+          <span class="td-plain">Weighs the molecule to confirm it is the one on the label, not something close to it.</span>
+        </button>
+        <button type="button" class="td-node" data-test="2" aria-pressed="false">
+          <span class="td-line" aria-hidden="true"></span>
+          <span class="td-dot" aria-hidden="true"></span>
+          <span class="td-num">03</span>
+          <h3 class="td-name">Net peptide content</h3>
+          <span class="td-plain">How many milligrams of actual peptide are in the vial once salt and water are taken out.</span>
+        </button>
+        <button type="button" class="td-node" data-test="3" aria-pressed="false">
+          <span class="td-line" aria-hidden="true"></span>
+          <span class="td-dot" aria-hidden="true"></span>
+          <span class="td-num">04</span>
+          <h3 class="td-name">Sterility</h3>
+          <span class="td-plain">The lot is cultured to see whether anything grows. Nothing should.</span>
+        </button>
+      </div>
+      <div class="td-col td-col-right">
+        <button type="button" class="td-node" data-test="4" aria-pressed="false">
+          <span class="td-line" aria-hidden="true"></span>
+          <span class="td-dot" aria-hidden="true"></span>
+          <span class="td-num">05</span>
+          <h3 class="td-name">Endotoxin</h3>
+          <span class="td-method">LAL assay, USP chapter 85</span>
+          <span class="td-plain">Checks for bacterial toxin, which is left behind even after the bacteria themselves are gone.</span>
+        </button>
+        <button type="button" class="td-node" data-test="5" aria-pressed="false">
+          <span class="td-line" aria-hidden="true"></span>
+          <span class="td-dot" aria-hidden="true"></span>
+          <span class="td-num">06</span>
+          <h3 class="td-name">Appearance and solubility</h3>
+          <span class="td-plain">The powder is looked at and dissolved. It should look right and go into solution cleanly.</span>
+        </button>
+        <button type="button" class="td-node" data-test="6" aria-pressed="false">
+          <span class="td-line" aria-hidden="true"></span>
+          <span class="td-dot" aria-hidden="true"></span>
+          <span class="td-num">07</span>
+          <h3 class="td-name">Heavy metals</h3>
+          <span class="td-plain">Screens for lead, arsenic and the other metals that can carry over from manufacturing.</span>
+        </button>
+      </div>
+      <!-- /tdNodes -->
+      </div>
+    </div>
+
+    <div class="td-foot reveal">
+      <p>Results are reported per lot by the testing laboratory. Figures on this site are read from those certificates, never entered by hand.</p>
+      <a href="how-we-test.html" class="btn btn-outline">How we test <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </div>
+</section>
 
 <!-- FAQ -->
 <section class="section section-dark" id="faq">

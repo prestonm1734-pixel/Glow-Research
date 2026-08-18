@@ -29,7 +29,8 @@ const {
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
-  FAQS, faqHtml, COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
+  FAQS, faqHtml, analysisDiagramHtml,
+  COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
   hasList, listPriceOf, SITEWIDE_DISCOUNT,
@@ -636,6 +637,41 @@ console.log('\nhow many tests');
   ok('ANALYSIS_SHORT is derived from the rows, not typed beside them',
     /ANALYSIS_TESTS\.map\(t => t\.short\)\.join/.test(read('js/products-data.js')) &&
     ANALYSIS_SHORT.split('+').length === TESTS_PER_BATCH);
+
+  // The homepage diagram. This is the section that replaced two invented
+  // "medical advisors", so the bar it has to clear is the one they failed:
+  // nothing in it may be a thing someone typed onto the page. Every node is a
+  // row of ANALYSIS_TESTS, baked by tools/build-testing.js, and the served
+  // markup is compared against the renderer rather than merely searched for
+  // the names, so an edit made straight into index.html fails here.
+  const home = read('index.html');
+  ok('the homepage carries the testing diagram',
+    home.includes('id="tdNodes"') && home.includes('id="testing"'));
+  const missingNode = ANALYSIS_TESTS.filter(t =>
+    !home.includes(`<h3 class="td-name">${t.name}</h3>`));
+  ok(`the diagram names all ${TESTS_PER_BATCH} analyses in the served markup`,
+    missingNode.length === 0, `missing: ${missingNode.map(t => t.name).join(', ')}`);
+  ok('the diagram is baked from the catalog, not typed into the page',
+    home.includes(analysisDiagramHtml().trim()),
+    'index.html and analysisDiagramHtml() disagree. Run node tools/build-testing.js');
+  // Every sentence in the diagram is the row's own `plain` field, which
+  // how-we-test.html also prints. Two copies of the same claim is how they
+  // start to differ.
+  const strayPlain = ANALYSIS_TESTS.filter(t => !home.includes(t.plain));
+  ok('every sentence in the diagram is the row’s own copy',
+    strayPlain.length === 0, `not from the catalog: ${strayPlain.map(t => t.name).join(', ')}`);
+  // The method line is the row's, or absent. A node inventing a technique for
+  // one of the four rows the certificate reports without naming one would be
+  // the same fabrication in a smaller font.
+  const noMethod = ANALYSIS_TESTS.filter(t => !t.method);
+  ok('no node names a method the catalog leaves blank',
+    noMethod.every(t => {
+      const node = home.split(`<h3 class="td-name">${t.name}</h3>`)[1] || '';
+      return !node.slice(0, 400).includes('class="td-method"');
+    }));
+  ok('the diagram renders no person, credential or endorsement',
+    !/td-node[\s\S]*?(Ph\.D|M\.D\.|advisor|endorse)/i.test(
+      home.split('id="tdNodes"')[1] || ''));
 }
 
 /* ---------------------------------------------------------------------------

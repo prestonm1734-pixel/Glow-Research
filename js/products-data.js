@@ -681,6 +681,43 @@ function escHtml(t) {
 }
 
 // ---------------------------------------------------------------------------
+// The homepage testing diagram: the seven analyses arranged around the vial.
+//
+// Rendered from ANALYSIS_TESTS, never typed into index.html, for the reason
+// the rest of this file exists: the day a test leaves the certificate, it has
+// to leave the homepage in the same edit. tools/build-testing.js bakes the
+// output into the served markup so a crawler that does not run JavaScript
+// still reads all seven, and js/script.js only binds the highlighting on top
+// of markup that is already there.
+//
+// The split decides which side of the vial a node sits on at desktop widths.
+// Left column first so the numbering reads top-left down, then top-right down,
+// which is the order the eye takes them in.
+const DIAGRAM_SPLIT_AT = 4;
+
+function analysisNodeHtml(t, i) {
+  const num = String(i + 1).padStart(2, '0');
+  return `
+        <button type="button" class="td-node" data-test="${i}" aria-pressed="false">
+          <span class="td-line" aria-hidden="true"></span>
+          <span class="td-dot" aria-hidden="true"></span>
+          <span class="td-num">${num}</span>
+          <h3 class="td-name">${escHtml(t.name)}</h3>${t.method
+          ? `\n          <span class="td-method">${escHtml(t.method)}</span>` : ''}
+          <span class="td-plain">${escHtml(t.plain)}</span>
+        </button>`;
+}
+
+function analysisDiagramHtml() {
+  const left = ANALYSIS_TESTS.slice(0, DIAGRAM_SPLIT_AT);
+  const right = ANALYSIS_TESTS.slice(DIAGRAM_SPLIT_AT);
+  const col = (rows, side, offset) =>
+    `\n      <div class="td-col td-col-${side}">${rows.map((t, i) => analysisNodeHtml(t, offset + i)).join('')}
+      </div>`;
+  return col(left, 'left', 0) + col(right, 'right', DIAGRAM_SPLIT_AT);
+}
+
+// ---------------------------------------------------------------------------
 // The batch analysis panel: the laboratory, the figure it returned, and every
 // analysis it runs on the lot.
 //
@@ -1275,6 +1312,7 @@ if (typeof module !== 'undefined' && module.exports) {
     VIAL_ART_NOTICE,
     FAQS,
     faqHtml,
+    analysisDiagramHtml,
     productCardHtml,
     coaCardHtml,
     coaHref,
