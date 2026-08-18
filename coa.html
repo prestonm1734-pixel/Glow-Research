@@ -134,8 +134,13 @@
     margin: 10px 0 0; font-size:1.02rem; font-weight:700;
     letter-spacing:-.02em; color:#0a0a0a; line-height:1.3;
   }
+  /* margin-bottom rather than relying on the button's margin-top:auto for
+     the gap above it: auto only spends leftover space once a taller card in
+     the row has created any, so on a card with no slack it was landing at
+     zero — the button sat flush against the purity/lot row instead of
+     reading as its own element below it. */
   .coa-card-meta{
-    margin: 16px 0 0; display:flex; gap: 26px; flex-wrap:wrap;
+    margin: 16px 0 18px; display:flex; gap: 26px; flex-wrap:wrap;
     padding-top: 14px; border-top:1px solid rgba(0,0,0,.09);
   }
   .coa-card-meta dt{
