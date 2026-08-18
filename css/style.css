@@ -780,7 +780,9 @@ button[disabled].si-forgot{ cursor: progress; }
 .bio-ident p{ margin: 8px 0 0; font-size:.95rem; line-height:1.5; color: var(--text-dim); }
 
 .bio-body p{ margin: 0 0 18px; font-size:1rem; line-height:1.7; }
-.bio-body p:last-child{ margin-bottom:0; }
+.bio-body ul{ margin: 0 0 18px; padding-left: 20px; }
+.bio-body li{ font-size:1rem; line-height:1.7; margin-bottom: 6px; }
+.bio-body p:last-child, .bio-body ul:last-child{ margin-bottom:0; }
 
 @media (max-width: 560px){
   .bio-drawer{ max-width:none; }
