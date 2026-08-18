@@ -670,6 +670,11 @@ button[disabled].si-forgot{ cursor: progress; }
    in a grid that is one column on a phone and two once there is room, which
    is what the site's other card grids (COA, shipping, wholesale) already do
    rather than a bespoke breakpoint-specific layout for just this section. */
+/* Pure black, not var(--bg-2): the one section on the page asked to read as
+   a flat black backdrop rather than the near-black every other dark section
+   shares, so it's stated on its own id instead of touching that shared
+   token. */
+#experts{ background:#000; }
 .experts-grid{
   display:grid; grid-template-columns: 1fr; gap: 20px;
   margin-top: clamp(40px, 5vw, 56px);
