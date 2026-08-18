@@ -693,9 +693,9 @@ function escHtml(t) {
 // PRINCIPLES.md rules out. The panel renders its unnamed form until all three
 // are confirmed together: `logo` is a path under assets/.
 const LAB = {
-  name: '',
-  accreditation: '',
-  logo: '',
+  name: 'Freedom Diagnostics',
+  accreditation: 'ISO/IEC 17025 accredited',
+  logo: 'assets/freedom-diagnostics.png',
 };
 
 // What the header states while LAB is empty. Both halves are true either way:

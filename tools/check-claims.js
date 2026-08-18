@@ -360,8 +360,15 @@ console.log('\nthe batch analysis panel');
     (LAB.name && LAB.accreditation && LAB.logo) ||
     (!LAB.name && !LAB.logo && lab.name === 'Independent third-party laboratory'),
     'LAB must be wholly empty or wholly filled: a name needs its accreditation and mark with it');
-  ok('the unnamed header still says who ran the analysis and what they gain by it',
-    /third-party/i.test(lab.name) && /no stake in the result/i.test(lab.accreditation));
+  // While the lab is unnamed the fallback has to carry the two facts the name
+  // would have carried: that it is not us, and that it gains nothing by the
+  // number it returns. Once LAB is filled, the name and the accreditation
+  // beside it say that themselves, and the check above already guarantees a
+  // name never appears without both.
+  ok('the header says who ran the analysis and what they gain by it',
+    LAB.name
+      ? Boolean(lab.accreditation)
+      : /third-party/i.test(lab.name) && /no stake in the result/i.test(lab.accreditation));
 
   // The vial in every product photo carries Glow's own artwork; what actually
   // ships carries the manufacturer's generic label. A photo that doesn't
