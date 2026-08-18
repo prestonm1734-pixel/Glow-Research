@@ -127,8 +127,12 @@
 
   @media (max-width: 880px){
     .sh-lead-top{ grid-template-columns: 1fr; }
-    .sh-lead-media{ order:1; margin-top:0; margin-bottom: clamp(24px, 5vw, 32px); }
-    .sh-lead-copy{ order:2; max-width:none; }
+    /* The heading is what says what this page is; leading with an untitled
+       truck photo pushes it a full screen down. Words first, photo right
+       under them as support, same order the desktop reading direction
+       already implies (heading column before image column). */
+    .sh-lead-media{ order:2; margin-top: clamp(24px, 5vw, 32px); margin-bottom:0; }
+    .sh-lead-copy{ order:1; max-width:none; }
   }
   .shipping-page .btn-primary{ background:#0a0a0a; color:#fff; }
   .shipping-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
