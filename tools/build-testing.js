@@ -38,6 +38,7 @@ const PAGE = 'index.html';
 
 const {
   analysisDiagramHtml, analysisSideSplit, testingHeading, TESTS_PER_BATCH,
+  vialLabelStrength,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 function build() {
@@ -67,6 +68,14 @@ function build() {
     throw new Error(`Could not find #tvHeading in ${PAGE}.`);
   }
   html = html.replace(headRe, (m, open, close) => `${open}${testingHeading()}${close}`);
+
+  // The strength line over the label, in the same spot the painted-out PNG
+  // text used to occupy.
+  const strengthRe = /(<span class="tv-strength"[^>]*>)[\s\S]*?(<\/span>)/;
+  if (!strengthRe.test(html)) {
+    throw new Error(`Could not find .tv-strength in ${PAGE}.`);
+  }
+  html = html.replace(strengthRe, (m, open, close) => `${open}${vialLabelStrength()}${close}`);
 
   fs.writeFileSync(file, html);
   const split = analysisSideSplit();

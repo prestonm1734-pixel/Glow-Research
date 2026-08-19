@@ -707,21 +707,29 @@ button[disabled].si-forgot{ cursor: progress; }
 .tv-stage{
   position:relative; display:grid; align-items:stretch;
   grid-template-columns: 1fr auto 1fr;
-  gap: clamp(6px, 1.5vw, 26px);
-  margin: clamp(20px, 3.5vh, 40px) auto 0;
-  max-width: 1080px;
+  gap: clamp(14px, 2.4vw, 40px);
+  margin: clamp(28px, 4.5vh, 56px) auto 0;
+  max-width: 1140px;
   /* room above for the cap to rise into without meeting the heading */
-  padding-top: clamp(40px, 9vh, 96px);
+  padding-top: clamp(64px, 12vh, 140px);
 }
 
 .tv-vial{
   grid-column:2; position:relative;
   height: clamp(220px, 46vh, 460px); aspect-ratio: 531 / 1437;
+  /* The one place the explode distances are set. Everything else in this
+     file reads them with var(--capY) and so on, so changing the spacing is a
+     three-number edit here rather than a find-and-replace across a dozen
+     duplicated fallbacks, which is what these used to be. Percentages of the
+     vial's own height, so the exploded spacing keeps its shape at every size.
+     Bumped up from the artwork's first pass, which put the cap close enough
+     to the crimp that the two read as touching rather than separated. */
+  --capY: -32%; --crimpY: -18%; --stopY: -8.5%;
   /* the group's top edge rises as the cap lifts, so it is pushed back down by
      half of that to keep the exploded arrangement centred in the stage. Half
      of the cap's own travel, worked out from the same variable rather than a
      separately-tracked one, so the two cannot drift apart. */
-  transform: translateY(calc(var(--capY, -20%) / -2));
+  transform: translateY(calc(var(--capY) / -2));
 }
 .tv-layer{
   position:absolute; inset:0; width:100%; height:100%;
@@ -730,9 +738,9 @@ button[disabled].si-forgot{ cursor: progress; }
      same canvas, so alignment survives whatever the box gets sized to */
 }
 /* Open state: what every reader gets, including no-JS. */
-.tv-cap{ transform: translateY(var(--capY, -20%)); }
-.tv-crimp{ transform: translateY(var(--crimpY, -11.7%)); }
-.tv-stopper{ transform: translateY(var(--stopY, -5.6%)); }
+.tv-cap{ transform: translateY(var(--capY)); }
+.tv-crimp{ transform: translateY(var(--crimpY)); }
+.tv-stopper{ transform: translateY(var(--stopY)); }
 .tv-body{ transform:none; }
 /* Lifted a tenth of the vial's height off where it was rendered. In place it
    lands across the label and covers the wordmark; up there it sits in the
@@ -742,8 +750,20 @@ button[disabled].si-forgot{ cursor: progress; }
    top of it. The layer is in front of the body out of necessity, not design:
    see the note on the markup. */
 .tv-material{
-  opacity: 1; transform: translateY(-10%);
+  opacity: 1; transform: translateY(-15%);
   mix-blend-mode: screen;
+}
+
+/* Positioned from the pixel band the strength line was painted out of:
+   centred at 73.1% down the shared canvas, 86% of its width, which is where
+   "10 MG - 99%" sat on the original render. Sits on .tv-body's own layer, not
+   .tv-cap, so it stays with the vial rather than lifting away with the cap. */
+.tv-strength{
+  position:absolute; left:50%; top:73.1%; width:86%;
+  translate:-50% -50%; text-align:center;
+  font-family:'JetBrains Mono', monospace; font-weight:600;
+  font-size: clamp(.66rem, 1.6vw, .82rem); letter-spacing:.06em;
+  color:#f2f0ea;
 }
 
 .tv-callouts{ display:contents; }
@@ -835,11 +855,11 @@ button[disabled].si-forgot{ cursor: progress; }
 /* .tv-open reopens every one of the rules above. Only the callout column
    needs its own reset here — the others already point at var(--capY) etc.,
    which is the open position, so removing the .js override is enough. */
-.js #testing.tv-open .tv-cap{ transform: translateY(var(--capY, -20%)); }
-.js #testing.tv-open .tv-crimp{ transform: translateY(var(--crimpY, -11.7%)); }
-.js #testing.tv-open .tv-stopper{ transform: translateY(var(--stopY, -5.6%)); }
-.js #testing.tv-open .tv-vial{ transform: translateY(calc(var(--capY, -20%) / -2)); }
-.js #testing.tv-open .tv-material{ opacity:1; transform: translateY(-10%); }
+.js #testing.tv-open .tv-cap{ transform: translateY(var(--capY)); }
+.js #testing.tv-open .tv-crimp{ transform: translateY(var(--crimpY)); }
+.js #testing.tv-open .tv-stopper{ transform: translateY(var(--stopY)); }
+.js #testing.tv-open .tv-vial{ transform: translateY(calc(var(--capY) / -2)); }
+.js #testing.tv-open .tv-material{ opacity:1; transform: translateY(-15%); }
 .js #testing.tv-open .tv-call{ opacity:1; transform:none; }
 
 @media (max-width: 899px){
@@ -869,11 +889,11 @@ button[disabled].si-forgot{ cursor: progress; }
   .js #testing .tv-call{
     opacity:1; transform:none;
   }
-  .js #testing .tv-cap{ transform: translateY(var(--capY, -20%)); }
-  .js #testing .tv-crimp{ transform: translateY(var(--crimpY, -11.7%)); }
-  .js #testing .tv-stopper{ transform: translateY(var(--stopY, -5.6%)); }
-  .js #testing .tv-vial{ transform: translateY(calc(var(--capY, -20%) / -2)); }
-  .js #testing .tv-material{ transform: translateY(-10%); }
+  .js #testing .tv-cap{ transform: translateY(var(--capY)); }
+  .js #testing .tv-crimp{ transform: translateY(var(--crimpY)); }
+  .js #testing .tv-stopper{ transform: translateY(var(--stopY)); }
+  .js #testing .tv-vial{ transform: translateY(calc(var(--capY) / -2)); }
+  .js #testing .tv-material{ transform: translateY(-15%); }
 }
 
 /* ---------- product grid ---------- */

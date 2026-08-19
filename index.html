@@ -321,6 +321,12 @@
         <img src="assets/vial/glow-rubber-stopper.png" alt="" width="531" height="1437" class="tv-layer tv-stopper" decoding="async" />
         <img src="assets/vial/glow-crimp-seal.png" alt="" width="531" height="1437" class="tv-layer tv-crimp" decoding="async" />
         <img src="assets/vial/glow-flip-cap.png" alt="" width="531" height="1437" class="tv-layer tv-cap" decoding="async" />
+        <!-- Live text over the exact band the strength line was painted out
+             of (see the note above): baked by tools/build-testing.js from
+             vialLabelStrength(), which reads GLP-3 (RT)'s actual size and
+             purity out of the catalog. Sits on .tv-body, not .tv-cap, so it
+             travels with the vial rather than following the cap upward. -->
+        <span class="tv-strength" data-test-strength>10MG • 99.4%</span>
       </div>
 
       <!-- Baked by tools/build-testing.js. Anything typed between these
