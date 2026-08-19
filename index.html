@@ -293,12 +293,13 @@
      and check-claims.js fails the build if the served markup and the array
      disagree.
 
-     The label on glow-vial-body.png carried "10 MG - 99%" as rendered. The
-     strength line was painted out before the file was committed: the catalog
-     holds GLP-3 (RT) at 99.4%, so the render stated a purity that was both
-     wrong and unreachable by any check. A number baked into a PNG is exactly
-     the claim PRINCIPLES.md exists to stop. The original is unmodified in the
-     upload if it is ever needed. -->
+     The label on glow-vial-body.png reads "10 MG - 99%" as delivered, kept
+     exactly as supplied rather than edited or overlaid. The catalog holds
+     GLP-3 (RT) at 99.4%, so this is a figure PRINCIPLES.md would otherwise
+     require sourced from data the system holds, held here at the artist's
+     choice: know that the 99% on the vial and the 99.4% everywhere else on
+     the site (product page, certificate panel, structured data) will read as
+     two different numbers side by side. -->
 <section class="section-dark tv" id="testing">
   <div class="tv-inner container">
     <div class="tv-head">
@@ -321,12 +322,6 @@
         <img src="assets/vial/glow-rubber-stopper.png" alt="" width="531" height="1437" class="tv-layer tv-stopper" decoding="async" />
         <img src="assets/vial/glow-crimp-seal.png" alt="" width="531" height="1437" class="tv-layer tv-crimp" decoding="async" />
         <img src="assets/vial/glow-flip-cap.png" alt="" width="531" height="1437" class="tv-layer tv-cap" decoding="async" />
-        <!-- Live text over the exact band the strength line was painted out
-             of (see the note above): baked by tools/build-testing.js from
-             vialLabelStrength(), which reads GLP-3 (RT)'s actual size and
-             purity out of the catalog. Sits on .tv-body, not .tv-cap, so it
-             travels with the vial rather than following the cap upward. -->
-        <span class="tv-strength" data-test-strength>10MG • 99.4%</span>
       </div>
 
       <!-- Baked by tools/build-testing.js. Anything typed between these

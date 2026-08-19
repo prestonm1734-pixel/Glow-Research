@@ -162,16 +162,16 @@ nothing about the files would show it.
 
 ### The label on the artwork
 
-`glow-vial-body.png` was delivered reading `GLP-3 (RT)` / `10 MG - 99%`. The
-catalog holds GLP-3 (RT) at 99.4%, so the render asserted a purity that was
-both wrong and beyond the reach of every check in `check-claims.js`: a figure
-baked into an image is exactly the claim PRINCIPLES.md exists to stop. The
-strength line was painted out before the file was committed, rebuilt by
-interpolating between the clean label rows above and below it so the curvature
-shading survives. The untouched original is in the upload if it is ever needed.
-
-A check now fails the build on any purity figure appearing beside the vial, so
-the next render cannot quietly reintroduce one.
+`glow-vial-body.png` is kept exactly as delivered: `GLP-3 (RT)` / `10 MG -
+99%`, unedited and with nothing overlaid on top of it. The catalog holds GLP-3
+(RT) at 99.4%, so that 99% is a real, standing disagreement with the number
+everywhere else on the site (product page, certificate panel, structured
+data) — a figure `check-claims.js` cannot see or enforce, because it is
+pixels, not markup, and there is deliberately no live text laid over it
+correcting it. An earlier version of this file painted the line out and
+another put the correct figure back as an HTML overlay; both were reverted at
+the artist's request in favour of the artwork exactly as supplied. Know this
+before changing GLP-3 (RT)'s catalog purity again: the vial will not follow.
 
 It exists because of what used to be in that slot: two "medical advisors" who
 did not exist, with invented credentials and stock headshots. What made them

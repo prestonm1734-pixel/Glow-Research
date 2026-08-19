@@ -737,18 +737,6 @@ function testingHeading() {
   return `${TESTS_PER_BATCH}-point testing.`;
 }
 
-// The vial artwork's label was rendered with a strength and purity line that
-// the build painted out (see the note on the markup): the render read "10 MG
-// - 99%", a figure the catalog does not hold. The line goes back on as live
-// text over the same spot instead of back into the image, reading GLP-3
-// (RT)'s actual size and purity from the catalog so a future price or purity
-// edit updates it in the same commit rather than leaving a second, silently
-// stale copy baked into a PNG. check-claims.js checks the two agree.
-function vialLabelStrength() {
-  const p = GLOW_PRODUCTS.find(x => x.name === 'GLP-3 (RT)');
-  return `${p.sizes[0].mg.toUpperCase()} • ${p.purity}`;
-}
-
 // ---------------------------------------------------------------------------
 // The batch analysis panel: the laboratory, the figure it returned, and every
 // analysis it runs on the lot.
@@ -1347,7 +1335,6 @@ if (typeof module !== 'undefined' && module.exports) {
     analysisDiagramHtml,
     analysisSideSplit,
     testingHeading,
-    vialLabelStrength,
     productCardHtml,
     coaCardHtml,
     coaHref,

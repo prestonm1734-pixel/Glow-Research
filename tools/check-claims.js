@@ -29,7 +29,7 @@ const {
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
-  FAQS, faqHtml, analysisDiagramHtml, testingHeading, vialLabelStrength,
+  FAQS, faqHtml, analysisDiagramHtml, testingHeading,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
@@ -678,14 +678,13 @@ console.log('\nhow many tests');
     !/tv-call[\s\S]*?(Ph\.D|M\.D\.|advisor|endorse)/i.test(
       home.split('id="tdNodes"')[1] || ''));
 
-  // The vial artwork. It is a render, not a photograph of a real lot, and the
-  // label it was delivered with read "10 MG - 99%". The catalog holds GLP-3
-  // (RT) at 99.4%, so the image asserted a purity that was both wrong and
-  // beyond the reach of every check in this file. It was painted out before
-  // the file was committed, and the strength line came back as live text —
-  // .tv-strength, read from vialLabelStrength() — over the same band, so
-  // this is what stops a wrong or stale figure printed on the PNG itself
-  // from coming back, and what stops any future layer arriving with one.
+  // The vial artwork. It is a render, not a photograph of a real lot, and its
+  // label reads "10 MG - 99%" exactly as delivered — kept unedited at the
+  // artist's choice, not painted out or overlaid, despite the catalog holding
+  // GLP-3 (RT) at 99.4%. That is a real, known disagreement between the
+  // artwork and the catalog that nothing here enforces or can enforce: the
+  // figure is pixels, not text, and stays that way as long as the image does.
+  // See the note on the markup.
   const vialDir = path.join(ROOT, 'assets/vial');
   const layers = fs.existsSync(vialDir) ? fs.readdirSync(vialDir).filter(f => f.endsWith('.png')) : [];
   ok('every vial layer the page stacks is present on disk',
@@ -702,14 +701,11 @@ console.log('\nhow many tests');
   }));
   ok('and every layer shares one canvas, which is what aligns them',
     sizes.size === 1, `sizes found: ${[...sizes].join(', ')}`);
-  // No test name or method carries a stray percentage of its own — the only
-  // figure allowed near the vial is .tv-strength, checked below against the
-  // catalog by value, not just by absence.
+  // No test name or method carries a purity figure of its own — a fabricated
+  // percentage attached to "Purity" or "Endotoxin" would be a second, worse
+  // problem stacked on the one already noted above.
   ok('no test name or method states a purity figure of its own',
     !/tv-(label|method|head)[^>]*>[^<]*\d+(\.\d+)?\s*%/i.test(home));
-  ok('the vial\'s strength line matches what the catalog holds for GLP-3 (RT)',
-    home.includes(`<span class="tv-strength" data-test-strength>${vialLabelStrength()}</span>`),
-    `expected "${vialLabelStrength()}". Run node tools/build-testing.js`);
 }
 
 /* ---------------------------------------------------------------------------

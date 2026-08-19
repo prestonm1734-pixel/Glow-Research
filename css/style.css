@@ -754,18 +754,6 @@ button[disabled].si-forgot{ cursor: progress; }
   mix-blend-mode: screen;
 }
 
-/* Positioned from the pixel band the strength line was painted out of:
-   centred at 73.1% down the shared canvas, 86% of its width, which is where
-   "10 MG - 99%" sat on the original render. Sits on .tv-body's own layer, not
-   .tv-cap, so it stays with the vial rather than lifting away with the cap. */
-.tv-strength{
-  position:absolute; left:50%; top:73.1%; width:86%;
-  translate:-50% -50%; text-align:center;
-  font-family:'JetBrains Mono', monospace; font-weight:600;
-  font-size: clamp(.66rem, 1.6vw, .82rem); letter-spacing:.06em;
-  color:#f2f0ea;
-}
-
 .tv-callouts{ display:contents; }
 
 /* A callout is a wire and a label. The wire runs from the text to a dot near
