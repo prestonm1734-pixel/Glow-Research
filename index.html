@@ -279,13 +279,19 @@
      not exist. What replaced them is the one thing on this page that is
      provable: the seven analyses actually run on the lot.
 
-     Five transparent PNGs on one shared canvas, stacked into one box. The
-     layers are plain <img> so the vial is there, already open, with scripting
-     off. js/script.js closes it back up the moment a script-capable browser
-     can (the base CSS is the open state), then reopens it once — via
-     .tv-open — the moment the section is actually in view. Not tied to
-     scroll position: it plays once and stays open, like any other .reveal
-     element on this page, rather than scrubbing with the scrollbar.
+     A single cropped, muted clip of a real vial, rather than the five-layer
+     PNG composite this used to be. Two <source>s, webm (VP9) then mp4
+     (H.264), so the browser picks whichever it actually supports — a
+     sandboxed Chromium with no licensed H.264 decoder is a real case, not a
+     hypothetical one, which is why the fallback exists at all. The
+     explosion is baked into the footage itself, so there is nothing left
+     for CSS or JS to stage-manage about the vial's own motion: js/script.js
+     only calls .play() once, the moment the section is actually in view,
+     the same IntersectionObserver as before. Before that it sits on its
+     poster frame (the calm, closed vial), which is also what a no-JS or
+     reduced-motion reader gets and stays on. Not tied to scroll position,
+     and it does not loop: it plays once and holds its last frame, like any
+     other .reveal element on this page.
 
      The heading's numeral and every callout inside #tdNodes are baked by
      tools/build-testing.js from ANALYSIS_TESTS in js/products-data.js. Do not
@@ -293,13 +299,13 @@
      and check-claims.js fails the build if the served markup and the array
      disagree.
 
-     The label on glow-vial-body.png reads "10 MG - 99%" as delivered, kept
-     exactly as supplied rather than edited or overlaid. The catalog holds
-     GLP-3 (RT) at 99.4%, so this is a figure PRINCIPLES.md would otherwise
-     require sourced from data the system holds, held here at the artist's
-     choice: know that the 99% on the vial and the 99.4% everywhere else on
-     the site (product page, certificate panel, structured data) will read as
-     two different numbers side by side. -->
+     The label in the footage reads "10 MG • 99%" exactly as filmed, not
+     edited or overlaid. The catalog holds GLP-3 (RT) at 99.4%, so this is a
+     figure PRINCIPLES.md would otherwise require sourced from data the
+     system holds, held here at the same standing exception the artwork had:
+     know that the 99% on the vial and the 99.4% everywhere else on the site
+     (product page, certificate panel, structured data) read as two
+     different numbers side by side. -->
 <section class="section-dark tv" id="testing">
   <div class="tv-inner container">
     <div class="tv-head">
@@ -311,17 +317,10 @@
 
     <div class="tv-stage" id="tvStage">
       <div class="tv-vial" aria-hidden="true">
-        <!-- Material in front of the body, not behind it as the asset
-             README suggests. The body render's glass is opaque over the
-             area the molecule occupies (alpha 246 of 255), so behind it
-             the layer is simply never seen. In front, blended, it reads
-             as suspended in the vial, which is what the reference showed
-             it doing. -->
-        <img src="assets/vial/glow-vial-body.png" alt="" width="531" height="1437" class="tv-layer tv-body" decoding="async" />
-        <img src="assets/vial/glow-peptide-material.png" alt="" width="531" height="1437" class="tv-layer tv-material" decoding="async" />
-        <img src="assets/vial/glow-rubber-stopper.png" alt="" width="531" height="1437" class="tv-layer tv-stopper" decoding="async" />
-        <img src="assets/vial/glow-crimp-seal.png" alt="" width="531" height="1437" class="tv-layer tv-crimp" decoding="async" />
-        <img src="assets/vial/glow-flip-cap.png" alt="" width="531" height="1437" class="tv-layer tv-cap" decoding="async" />
+        <video class="tv-video" poster="assets/vial/glow-vial-reveal-poster.jpg" width="880" height="720" muted playsinline preload="auto">
+          <source src="assets/vial/glow-vial-reveal.webm" type="video/webm" />
+          <source src="assets/vial/glow-vial-reveal.mp4" type="video/mp4" />
+        </video>
       </div>
 
       <!-- Baked by tools/build-testing.js. Anything typed between these

@@ -153,25 +153,30 @@ run the build. Which side a callout lands on is derived, not typed: the left
 column takes `floor(n/2)` and the right takes the rest, so an eighth analysis
 rebalances the diagram rather than leaving one side hanging.
 
-`js/script.js` never writes a callout. It sets scroll progress on five
-transparent PNG layers in `assets/vial/`, all sharing one canvas so that
-stacking them is all the alignment they need. `check-claims.js` reads the PNG
-headers and fails if the canvases ever stop matching, because cropping one
-layer on its own would knock the vial apart in a way no CSS could fix and
-nothing about the files would show it.
+`js/script.js` never writes a callout. It plays the vial clip once, the
+moment the section scrolls into view — a cropped, muted recording of a real
+vial (this used to be five transparent PNG layers stacked and pulled apart
+with CSS; the burst is now baked into the footage itself, so there is no
+layer alignment left to check). It ships as two files, `glow-vial-reveal.webm`
+(VP9, what most browsers get) and `glow-vial-reveal.mp4` (H.264, Safari's
+fallback) via `<source>` — a sandboxed or de-Googled Chromium build without
+licensed H.264 support is exactly the case that surfaced the need for the
+second file. `check-claims.js` confirms both, plus the poster frame
+(`glow-vial-reveal-poster.jpg`, the still it rests on before playing), exist
+on disk and are referenced from the page.
 
-### The label on the artwork
+### The label in the footage
 
-`glow-vial-body.png` is kept exactly as delivered: `GLP-3 (RT)` / `10 MG -
-99%`, unedited and with nothing overlaid on top of it. The catalog holds GLP-3
-(RT) at 99.4%, so that 99% is a real, standing disagreement with the number
-everywhere else on the site (product page, certificate panel, structured
-data) — a figure `check-claims.js` cannot see or enforce, because it is
-pixels, not markup, and there is deliberately no live text laid over it
-correcting it. An earlier version of this file painted the line out and
-another put the correct figure back as an HTML overlay; both were reverted at
-the artist's request in favour of the artwork exactly as supplied. Know this
-before changing GLP-3 (RT)'s catalog purity again: the vial will not follow.
+The clip is kept exactly as filmed: `GLP-3 (RT)` / `10 MG • 99%`, uncut and
+with nothing overlaid on top of it. The catalog holds GLP-3 (RT) at 99.4%, so
+that 99% is a real, standing disagreement with the number everywhere else on
+the site (product page, certificate panel, structured data) — a figure
+`check-claims.js` cannot see or enforce, because it is pixels, not markup,
+and there is deliberately no live text laid over it correcting it. The
+five-layer artwork this replaced carried the same standing exception, at the
+same request: the vial is shown exactly as supplied rather than corrected in
+front of the camera. Know this before changing GLP-3 (RT)'s catalog purity
+again: the vial will not follow.
 
 It exists because of what used to be in that slot: two "medical advisors" who
 did not exist, with invented credentials and stock headshots. What made them

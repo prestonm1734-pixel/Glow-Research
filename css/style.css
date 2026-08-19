@@ -664,22 +664,22 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 
 /* ---------- testing diagram ----------
-   A vial that comes apart once, the moment the section arrives in view, with
-   the seven analyses calling themselves out around it. Five transparent PNGs
-   share one canvas and one box, so the only thing separating them is a
-   translate. Not tied to scroll position: it plays once on arrival and stays
-   open, the way any other reveal-on-scroll element on this page does (see
-   .reveal), rather than scrubbing back and forth with the scrollbar.
+   A real vial's burst, filmed once and played once, the moment the section
+   arrives in view, with the seven analyses calling themselves out around it.
+   The video carries its own animation (see the note on the markup), so the
+   only state left for CSS to manage is the callout column: it plays once on
+   arrival and stays open, the way any other reveal-on-scroll element on this
+   page does (see .reveal), rather than scrubbing back and forth with the
+   scrollbar.
 
    The base rules below (no `.js` ancestor needed) are the finished state:
-   fully exploded, every callout up. That is what a reader with no JavaScript
-   gets. `.js #testing` closes it back up the instant the page can run
-   script — see the `.js` convention at the top of this file — so a
-   script-capable browser never sees the open state flash before js/script.js
-   plays the reveal. `.tv-open`, added once by an IntersectionObserver, is
-   what reopens it. Built that way round because the failure mode matters: a
-   diagram stuck open is a diagram, a diagram stuck shut is a picture of a
-   closed vial. */
+   every callout up. That is what a reader with no JavaScript gets, alongside
+   the video's own poster frame, which is a real vial standing still rather
+   than an empty diagram. `.js #testing` closes the callouts back up the
+   instant the page can run script — see the `.js` convention at the top of
+   this file — so a script-capable browser never sees them flash open before
+   js/script.js plays the reveal. `.tv-open`, added once by an
+   IntersectionObserver, is what reopens them and starts the video. */
 .tv{ background:#000; color: var(--text); }
 .tv-inner{ width:100%; padding-block: clamp(48px, 7vh, 80px); }
 
@@ -723,42 +723,16 @@ button[disabled].si-forgot{ cursor: progress; }
 
 .tv-vial{
   grid-column:2; position:relative;
-  height: clamp(220px, 46vh, 460px); aspect-ratio: 531 / 1437;
-  /* The one place the explode distances are set. Everything else in this
-     file reads them with var(--capY) and so on, so changing the spacing is a
-     three-number edit here rather than a find-and-replace across a dozen
-     duplicated fallbacks, which is what these used to be. Percentages of the
-     vial's own height, so the exploded spacing keeps its shape at every size.
-     Bumped up from the artwork's first pass, which put the cap close enough
-     to the crimp that the two read as touching rather than separated. */
-  --capY: -32%; --crimpY: -18%; --stopY: -8.5%;
-  /* the group's top edge rises as the cap lifts, so it is pushed back down by
-     half of that to keep the exploded arrangement centred in the stage. Half
-     of the cap's own travel, worked out from the same variable rather than a
-     separately-tracked one, so the two cannot drift apart. */
-  transform: translateY(calc(var(--capY) / -2));
+  height: clamp(220px, 46vh, 460px); aspect-ratio: 880 / 720;
 }
-.tv-layer{
+/* The burst is baked into the footage, so there is no cap/crimp/stopper
+   choreography left for CSS to run — object-fit is the whole rule. The
+   poster attribute (the clip's first, calm frame) is what every reader sees
+   until js/script.js calls .play(), so there is no separate closed state to
+   maintain here the way the five-layer PNG version needed. */
+.tv-video{
   position:absolute; inset:0; width:100%; height:100%;
-  object-fit:contain; display:block;
-  /* stacked in one box: nothing here is in flow, and every layer shares the
-     same canvas, so alignment survives whatever the box gets sized to */
-}
-/* Open state: what every reader gets, including no-JS. */
-.tv-cap{ transform: translateY(var(--capY)); }
-.tv-crimp{ transform: translateY(var(--crimpY)); }
-.tv-stopper{ transform: translateY(var(--stopY)); }
-.tv-body{ transform:none; }
-/* Lifted a tenth of the vial's height off where it was rendered. In place it
-   lands across the label and covers the wordmark; up there it sits in the
-   space the stopper and crimp have just left, which reads as material
-   released from the vial rather than pasted over it.
-   Screen, so the chrome picks up what is behind it instead of sitting flat on
-   top of it. The layer is in front of the body out of necessity, not design:
-   see the note on the markup. */
-.tv-material{
-  opacity: 1; transform: translateY(-15%);
-  mix-blend-mode: screen;
+  object-fit:contain; display:block; background:transparent;
 }
 
 .tv-callouts{ display:contents; }
@@ -818,26 +792,9 @@ button[disabled].si-forgot{ cursor: progress; }
 
 /* Closed state, JS-capable browsers only (the `.js` class is added by an
    inline <script> in <head>, before first paint — see the top of this file).
-   js/script.js then reopens it with .tv-open the moment the section comes
-   into view. Everything here gets a transition, so the reopen animates;
-   nothing in the open rules above needs one, since a no-JS page never
-   changes state at all. */
-.js #testing .tv-cap,
-.js #testing .tv-crimp,
-.js #testing .tv-stopper,
-.js #testing .tv-vial{
-  transition: transform .9s cubic-bezier(.2,.8,.2,1);
-}
-.js #testing .tv-cap{ transform: translateY(0); }
-.js #testing .tv-crimp{ transition-delay: 70ms; transform: translateY(0); }
-.js #testing .tv-stopper{ transition-delay: 130ms; transform: translateY(0); }
-.js #testing .tv-vial{ transform: translateY(0); }
-
-.js #testing .tv-material{
-  opacity:0; transform: translateY(4%);
-  transition: opacity .6s ease .2s, transform .6s cubic-bezier(.2,.8,.2,1) .2s;
-}
-
+   The video needs nothing here: it starts on its poster frame and
+   js/script.js calls .play() directly, so there is no CSS state to hide
+   before the reveal. Only the callout column has one. */
 .js #testing .tv-call{
   opacity:0; transform: translateX(var(--closedX, -14px));
   transition: opacity .5s ease, transform .5s cubic-bezier(.2,.8,.2,1);
@@ -847,14 +804,6 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 .js #testing .tv-call-right{ --closedX: 14px; }
 
-/* .tv-open reopens every one of the rules above. Only the callout column
-   needs its own reset here — the others already point at var(--capY) etc.,
-   which is the open position, so removing the .js override is enough. */
-.js #testing.tv-open .tv-cap{ transform: translateY(var(--capY)); }
-.js #testing.tv-open .tv-crimp{ transform: translateY(var(--crimpY)); }
-.js #testing.tv-open .tv-stopper{ transform: translateY(var(--stopY)); }
-.js #testing.tv-open .tv-vial{ transform: translateY(calc(var(--capY) / -2)); }
-.js #testing.tv-open .tv-material{ opacity:1; transform: translateY(-15%); }
 .js #testing.tv-open .tv-call{ opacity:1; transform:none; }
 
 @media (max-width: 899px){
@@ -870,25 +819,15 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 
 /* The reveal is the thing being opted out of, so under reduced motion the
-   `.js` closed state never applies at all: the vial renders open on arrival,
-   same as no-JS, and js/script.js does not bother with the observer. The
-   sitewide reduced-motion block (further down this file) also collapses
-   every transition-duration to near-zero, which is what stops .tv-open from
-   producing a fast, motion-heavy snap on the rare load where it still runs. */
+   `.js` closed state never applies at all: the callouts render open on
+   arrival, same as no-JS, and js/script.js never calls .play() (see the
+   note there), so the video stays on its poster frame instead of running
+   the burst. The sitewide reduced-motion block (further down this file)
+   also collapses every transition-duration to near-zero, which is what
+   stops .tv-open from producing a fast, motion-heavy snap on the rare load
+   where it still runs. */
 @media (prefers-reduced-motion: reduce){
-  .js #testing .tv-cap,
-  .js #testing .tv-crimp,
-  .js #testing .tv-stopper,
-  .js #testing .tv-vial,
-  .js #testing .tv-material,
-  .js #testing .tv-call{
-    opacity:1; transform:none;
-  }
-  .js #testing .tv-cap{ transform: translateY(var(--capY)); }
-  .js #testing .tv-crimp{ transform: translateY(var(--crimpY)); }
-  .js #testing .tv-stopper{ transform: translateY(var(--stopY)); }
-  .js #testing .tv-vial{ transform: translateY(calc(var(--capY) / -2)); }
-  .js #testing .tv-material{ transform: translateY(-15%); }
+  .js #testing .tv-call{ opacity:1; transform:none; }
 }
 
 /* ---------- product grid ---------- */

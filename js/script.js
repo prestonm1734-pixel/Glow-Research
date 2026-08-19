@@ -233,46 +233,40 @@ if (!reduceMotion.matches && grid) {
 
 
 /* ---------- testing diagram ----------
-   The vial comes apart once, the moment the section arrives on screen: cap,
-   then crimp and stopper, the material fading in behind them, then the seven
-   callouts one after another. Not tied to scroll position — it plays and
-   stays open, the same as any other .reveal element on this page, rather
-   than scrubbing back and forth with the scrollbar.
+   The vial's burst plays once, the moment the section arrives on screen,
+   then the seven callouts follow one after another. Not tied to scroll
+   position — it plays and stays open, the same as any other .reveal element
+   on this page, rather than scrubbing back and forth with the scrollbar.
 
    This file does not write copy: every callout is baked into the markup by
    tools/build-testing.js, so the seven analyses are readable with scripting
-   off. What it does is exactly two things: close the vial back up the moment
-   a script-capable browser can (the CSS default is the open state, because
-   that is what has to survive with no scripting at all — see the `.js`
-   note in the stylesheet), and reopen it once via .tv-open when the section
-   is actually in view. */
+   off. What it does is exactly two things: reveal the callouts via .tv-open
+   once the section is actually in view, and call .play() on the video at
+   that same moment. Before that the video simply sits on its poster frame —
+   there is no closed CSS state to arm, unlike the five-layer PNG version
+   this replaced, because the video already renders paused on frame one. */
 (function () {
   const section = document.getElementById('testing');
   if (!section) return;
-  const layers = Array.from(section.querySelectorAll('.tv-layer'));
-  if (!layers.length) return;
+  const video = section.querySelector('.tv-video');
+  if (!video) return;
 
   const still = window.matchMedia('(prefers-reduced-motion: reduce)');
-  // Reduced motion never arms the closed state in the first place (see the
-  // stylesheet's own reduced-motion block for #testing), so there is nothing
-  // here to reopen and no observer worth setting up.
+  // Reduced motion never arms the closed callout state in the first place
+  // (see the stylesheet's own reduced-motion block for #testing), and the
+  // video is left on its poster frame rather than played, so there is
+  // nothing here to reopen and no observer worth setting up.
   if (still.matches) return;
 
   function open() {
     section.classList.add('tv-open');
+    video.play().catch(() => {});
   }
-
-  // decode() rather than load: a decoded image is one that can be painted
-  // this frame, which is what the observer callback is about to ask for.
-  // Failures resolve too, since a missing layer is a reason to open on what
-  // did arrive rather than to leave the section permanently closed.
-  const ready = Promise.all(layers.map(img => (img.decode ? img.decode().catch(() => {}) :
-    new Promise(res => { img.complete ? res() : img.addEventListener('load', res, { once: true }); }))));
 
   const io = new IntersectionObserver((entries) => {
     if (!entries.some(e => e.isIntersecting)) return;
     io.disconnect();
-    ready.then(open);
+    open();
   }, { threshold: 0.3 });
   io.observe(section);
 })();

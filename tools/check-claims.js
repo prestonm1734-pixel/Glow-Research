@@ -678,29 +678,19 @@ console.log('\nhow many tests');
     !/tv-call[\s\S]*?(Ph\.D|M\.D\.|advisor|endorse)/i.test(
       home.split('id="tdNodes"')[1] || ''));
 
-  // The vial artwork. It is a render, not a photograph of a real lot, and its
-  // label reads "10 MG - 99%" exactly as delivered — kept unedited at the
-  // artist's choice, not painted out or overlaid, despite the catalog holding
-  // GLP-3 (RT) at 99.4%. That is a real, known disagreement between the
-  // artwork and the catalog that nothing here enforces or can enforce: the
-  // figure is pixels, not text, and stays that way as long as the image does.
-  // See the note on the markup.
+  // The vial footage. It is a real clip, not a photograph standing in for
+  // one, and its label reads "10 MG • 99%" exactly as filmed — kept as shot,
+  // not painted out or overlaid, despite the catalog holding GLP-3 (RT) at
+  // 99.4%. That is a real, known disagreement between the footage and the
+  // catalog that nothing here enforces or can enforce: the figure is pixels,
+  // not text, and stays that way as long as the clip does. See the note on
+  // the markup.
   const vialDir = path.join(ROOT, 'assets/vial');
-  const layers = fs.existsSync(vialDir) ? fs.readdirSync(vialDir).filter(f => f.endsWith('.png')) : [];
-  ok('every vial layer the page stacks is present on disk',
-    ['glow-peptide-material', 'glow-vial-body', 'glow-rubber-stopper',
-      'glow-crimp-seal', 'glow-flip-cap'].every(n => {
-      return layers.includes(`${n}.png`) && home.includes(`assets/vial/${n}.png`);
+  const vialFiles = fs.existsSync(vialDir) ? fs.readdirSync(vialDir) : [];
+  ok('the vial clip (both formats) and its poster frame are present on disk and referenced',
+    ['glow-vial-reveal.webm', 'glow-vial-reveal.mp4', 'glow-vial-reveal-poster.jpg'].every(n => {
+      return vialFiles.includes(n) && home.includes(`assets/vial/${n}`);
     }));
-  // The layers only line up because they share one canvas. Cropping one on its
-  // own would knock the vial apart in a way no amount of CSS could fix, and it
-  // would not be obvious from looking at the files.
-  const sizes = new Set(layers.map(f => {
-    const b = fs.readFileSync(path.join(vialDir, f));
-    return `${b.readUInt32BE(16)}x${b.readUInt32BE(20)}`;   // PNG IHDR
-  }));
-  ok('and every layer shares one canvas, which is what aligns them',
-    sizes.size === 1, `sizes found: ${[...sizes].join(', ')}`);
   // No test name or method carries a purity figure of its own — a fabricated
   // percentage attached to "Purity" or "Endotoxin" would be a second, worse
   // problem stacked on the one already noted above.
