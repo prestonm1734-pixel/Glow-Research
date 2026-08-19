@@ -683,15 +683,17 @@ console.log('\nhow many tests');
   // the markup.
   const vialDir = path.join(ROOT, 'assets/vial');
   const vialFiles = fs.existsSync(vialDir) ? fs.readdirSync(vialDir) : [];
-  ok('the vial clip (both formats) and its poster frame are present on disk and referenced',
-    ['glow-vial-labeled.webm', 'glow-vial-labeled.mp4', 'glow-vial-labeled-poster.jpg'].every(n => {
+  ok('the vial clip and its poster frame are present on disk and referenced',
+    ['glow-vial-labeled.webp', 'glow-vial-labeled-poster.jpg'].every(n => {
       return vialFiles.includes(n) && home.includes(`assets/vial/${n}`);
     }));
+  ok('the animated clip is not a <video> (iOS Low Power Mode blocks video autoplay outright)',
+    !/<video[\s>]/.test(home.split('id="testing"')[1]?.split('</section>')[0] || ''));
   // No list item carries a purity figure of its own — a fabricated
   // percentage attached to "Purity" or "Endotoxin" would be a second, worse
   // problem stacked on the one already noted above. Scoped to #tdNodes and
   // the heading, the only two places this diagram writes text at all; the
-  // video's own baked-in "99%" is the exception the note above already
+  // clip's own baked-in "99%" is the exception the note above already
   // covers and is deliberately outside this check's reach.
   const diagramText = (home.split('id="tdNodes"')[1] || '').split('<!-- /tdNodes -->')[0]
     + (home.match(/<h2 id="tvHeading">[\s\S]*?<\/h2>/) || [''])[0];

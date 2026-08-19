@@ -675,17 +675,18 @@ button[disabled].si-forgot{ cursor: progress; }
    A real vial's burst, filmed once and played once, the moment the section
    arrives in view, with the seven analyses baked into the footage as its
    own callouts — wires, dots and labels all filmed in, not drawn by live
-   HTML/CSS the way the five-layer PNG version this replaced did it. Not
-   tied to scroll position: it plays once on arrival and holds its last
+   HTML/CSS the way the five-layer PNG version this replaced did it. An
+   animated image (see the note on the markup for why it is not <video>),
+   not tied to scroll position: it plays once on arrival and holds its last
    frame, the way any other reveal-on-scroll element on this page does (see
    .reveal), rather than scrubbing back and forth with the scrollbar.
 
-   `.js #testing` does nothing to the video itself — it starts on its poster
-   frame regardless, which is what a no-JS reader keeps seeing. `.tv-open`,
-   added once by an IntersectionObserver, is only there to call .play(). The
-   seven analyses also exist as a visually hidden list (#tdNodes, styled by
-   .sr-only below) for the reader the video cannot reach at all: a screen
-   reader, or a crawler that never runs JavaScript. */
+   `.js #testing` does nothing to .tv-clip itself — it starts on its poster
+   frame regardless, which is what a no-JS reader keeps seeing until
+   js/script.js swaps the src, once an IntersectionObserver says the section
+   is actually in view. The seven analyses also exist as a visually hidden
+   list (#tdNodes, styled by .sr-only below) for the reader the image cannot
+   reach at all: a screen reader, or a crawler that never runs JavaScript. */
 .tv{ background:#000; color: var(--text); }
 .tv-inner{ width:100%; padding-block: clamp(48px, 7vh, 80px); }
 
@@ -718,7 +719,7 @@ button[disabled].si-forgot{ cursor: progress; }
    is one block sized off that ratio, not a narrow vial column flanked by two
    HTML callout columns the way this used to be laid out. */
 .tv-vial{ position:relative; width:100%; aspect-ratio: 1280 / 720; }
-.tv-video{
+.tv-clip{
   position:absolute; inset:0; width:100%; height:100%;
   object-fit:contain; display:block; background:transparent;
 }

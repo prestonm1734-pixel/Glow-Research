@@ -239,43 +239,36 @@ if (!reduceMotion.matches && grid) {
    any other .reveal element on this page, rather than scrubbing back and
    forth with the scrollbar.
 
+   This used to be a <video>, retried through a .play() rejection to cover a
+   slow-network timing gap on iOS Safari. That was the wrong failure to plan
+   for: the real one, confirmed on an actual iPhone, was Low Power Mode,
+   which blocks <video> autoplay outright — muted or not, gesture or none,
+   with no JS hook to retry around. So the vial is an animated WebP now, an
+   <img>, not a <video>, and nothing here calls .play(). All this does is
+   swap `src` from the poster JPG to the animated file once the section is
+   actually in view; the file's own loop count (baked in at 1) is what stops
+   it on its last frame rather than repeating. A src swap is not playback in
+   the sense any autoplay policy governs, so there is nothing left for a
+   power-saving mode to block.
+
    This file does not write copy: the same seven analyses exist as a
    visually hidden list baked by tools/build-testing.js, for a screen reader
    or a crawler that never runs JavaScript, neither of which can read text
-   off a video. All this does is call .play() once the section is actually
-   in view. Before that the video simply sits on its poster frame — there is
-   no closed CSS state to arm, unlike the five-layer PNG version this
-   replaced, because the video already renders paused on frame one.
-
-   iOS Safari treats `preload="auto"` as `preload="metadata"` on cellular, so
-   the clip can still be short of playable data at the exact moment the
-   section scrolls into view — a gap that barely exists on a fast desktop
-   connection but is the normal case on a phone. A rejected play() there is
-   not a real failure, just early, so this retries once on 'canplay' rather
-   than giving up the first time, and sets .muted from script too, belt and
-   suspenders against the HTML attribute alone. */
+   off an image. */
 (function () {
   const section = document.getElementById('testing');
   if (!section) return;
-  const video = section.querySelector('.tv-video');
-  if (!video) return;
+  const img = section.querySelector('.tv-clip');
+  if (!img || !img.dataset.anim) return;
 
-  // Reduced motion leaves the video on its poster frame rather than played,
-  // so there is nothing here to trigger and no observer worth setting up.
+  // Reduced motion leaves the poster frame as the src, so there is nothing
+  // here to trigger and no observer worth setting up.
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  video.muted = true;
-
-  function attempt() {
-    video.play().catch(() => {
-      video.addEventListener('canplay', () => video.play().catch(() => {}), { once: true });
-    });
-  }
 
   const io = new IntersectionObserver((entries) => {
     if (!entries.some(e => e.isIntersecting)) return;
     io.disconnect();
-    attempt();
+    img.src = img.dataset.anim;
   }, { threshold: 0.3 });
   io.observe(section);
 })();

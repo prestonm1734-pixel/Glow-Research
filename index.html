@@ -279,26 +279,38 @@
      not exist. What replaced them is the one thing on this page that is
      provable: the seven analyses actually run on the lot.
 
-     A single muted clip of a real vial, uncropped at its native 1280x720 —
-     the seven callouts are baked into the footage itself now, wires, dots
-     and all, rather than drawn by live HTML/CSS beside a plain vial render.
-     Two <source>s, webm (VP9) then mp4 (H.264), so the browser picks
-     whichever it actually supports — a sandboxed Chromium with no licensed
-     H.264 decoder is a real case, not a hypothetical one, which is why the
-     fallback exists at all. js/script.js calls .play() once, the moment the
-     section is actually in view, the same IntersectionObserver as before.
-     Before that it sits on its poster frame (the calm, closed vial), which
-     is also what a no-JS or reduced-motion reader gets and stays on. Not
-     tied to scroll position, and it does not loop: it plays once and holds
-     its last frame, like any other .reveal element on this page.
+     A real vial's burst, with the seven callouts baked into the footage
+     itself, wires, dots and all, rather than drawn by live HTML/CSS beside a
+     plain vial render. This was an actual <video> until a report that it
+     never played on an iPhone in Low Power Mode: iOS deliberately blocks
+     <video> autoplay there, muted or not, with no JS override — it is a
+     policy, not a bug. An animated image is not <video> and is not covered
+     by that policy, so it plays under any power setting, any autoplay
+     policy, any browser. It is shipped as a single WebP
+     (glow-vial-labeled.webp, its loop count baked in at 1 so it stops on its
+     last frame rather than repeating) rather than a GIF, because GIF's
+     256-colour palette bands badly across this much grey smoke.
 
-     The video's own black is not perfectly the section's #000 (see the note
+     The <img> starts pointed at the poster JPG — a real frame from the clip,
+     not a separate render — and js/script.js swaps `src` to the animated
+     WebP once the section is actually in view, the same IntersectionObserver
+     as before. That swap is the whole trigger: no .play(), no autoplay
+     attribute, nothing an OS power policy has a hook to block. A browser
+     that cannot decode animated WebP at all (essentially none left) still
+     renders its first frame under the WebP spec, so the fallback is a static
+     but correct vial rather than a broken image. Reduced motion never swaps
+     the src, so the poster is also what that reader keeps seeing. Not tied
+     to scroll position, and it does not loop, per the file's own loop count:
+     it plays once and holds its last frame, like any other .reveal element
+     on this page.
+
+     The image's own black is not perfectly the section's #000 (see the note
      on .tv-vial in the stylesheet for why), so .tv-vial::after paints a
      radial fade to true black over its edges — nothing touches the footage
      itself, the frame around it just dissolves into the section instead of
      sitting on it as a visible rectangle.
 
-     Text baked into a video is invisible to a screen reader and to a
+     Text baked into an image is invisible to a screen reader and to a
      crawler that never runs JavaScript, so #tdNodes carries the same seven
      analyses as a visually hidden list, baked by tools/build-testing.js
      from ANALYSIS_TESTS in js/products-data.js. Do not type a test in here.
@@ -322,10 +334,7 @@
 
     <div class="tv-stage" id="tvStage">
       <div class="tv-vial" aria-hidden="true">
-        <video class="tv-video" poster="assets/vial/glow-vial-labeled-poster.jpg" width="1280" height="720" muted playsinline preload="auto">
-          <source src="assets/vial/glow-vial-labeled.webm" type="video/webm" />
-          <source src="assets/vial/glow-vial-labeled.mp4" type="video/mp4" />
-        </video>
+        <img class="tv-clip" src="assets/vial/glow-vial-labeled-poster.jpg" data-anim="assets/vial/glow-vial-labeled.webp" width="1280" height="720" alt="" decoding="async" />
       </div>
 
       <!-- Baked by tools/build-testing.js. Visually hidden: the video above

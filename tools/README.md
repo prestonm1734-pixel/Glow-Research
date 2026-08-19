@@ -145,34 +145,63 @@ fails if you forget.
 
 Bakes the homepage testing diagram: the numeral in the `#tvHeading` heading,
 and the seven analyses inside `<ul id="tdNodes">` — not drawn as callouts on
-the page any more, because the vial video itself now carries them, wires,
+the page any more, because the vial clip itself now carries them, wires,
 dots and labels, baked into its own footage. `#tdNodes` renders visually
-hidden (`.sr-only`) rather than gone: text baked into a video is invisible to
-a screen reader and to a crawler that never runs JavaScript, so this is what
-stands in for the diagram for both of them.
+hidden (`.sr-only`) rather than gone: text baked into an image is invisible
+to a screen reader and to a crawler that never runs JavaScript, so this is
+what stands in for the diagram for both of them.
 
 The rows live in `ANALYSIS_TESTS` in `js/products-data.js`, the same array
 `how-we-test.html` lists and the certificate panel summarises. Edit the
 array, run the build.
 
-`js/script.js` never writes a list item. It plays the vial clip once, the
-moment the section scrolls into view — a muted recording of a real vial,
-uncropped at its native 1280x720 (this used to be five transparent PNG
-layers stacked and pulled apart with CSS, with the callouts drawn separately
-in HTML/CSS beside them; both the burst and the callouts are now baked into
-the footage itself, so there is no layer alignment or callout positioning
-left for CSS to do). It ships as two files, `glow-vial-labeled.webm` (VP9,
-what most browsers get) and `glow-vial-labeled.mp4` (H.264, Safari's
-fallback) via `<source>` — a sandboxed or de-Googled Chromium build without
-licensed H.264 support is exactly the case that surfaced the need for the
-second file. `check-claims.js` confirms both, plus the poster frame
-(`glow-vial-labeled-poster.jpg`, the still it rests on before playing), exist
-on disk and are referenced from the page.
+`js/script.js` never writes a list item. It swaps `.tv-clip`'s `src` from the
+poster JPG to the animated clip once the section scrolls into view — a
+recording of a real vial, uncropped at its native 1280x720 (this used to be
+five transparent PNG layers stacked and pulled apart with CSS, with the
+callouts drawn separately in HTML/CSS beside them; both the burst and the
+callouts are now baked into the footage itself, so there is no layer
+alignment or callout positioning left for CSS to do).
+
+### Why an animated WebP and not a `<video>`
+
+It was a `<video>` at first, muted, `playsinline`, played by
+`IntersectionObserver` — the standard approach, and it worked everywhere it
+was tested, including emulated mobile viewports. It did not work on an actual
+iPhone in Low Power Mode: iOS blocks `<video>` autoplay outright under that
+setting, muted or not, gesture-triggered or not. That is a deliberate power
+policy, not a bug, and there is no JS-side workaround for a `<video>` element
+— retrying `.play()` (which an earlier version of this file did, to cover a
+different, genuinely fixable timing gap on iOS cellular) does nothing against
+it, because the browser is refusing to start playback at all, not failing to
+buffer in time.
+
+An animated image is not covered by that policy at all. `js/script.js` never
+calls anything that autoplay policy has a hook into — a `src` swap on an
+`<img>` is not "playing video" in the sense any power-saving mode governs, so
+it runs under Low Power Mode, Data Saver, any autoplay policy, any browser.
+The clip ships as `glow-vial-labeled.webp`, encoded at 12fps / 960x540 rather
+than the source's 24fps / 1280x720 — animated WebP has no motion-compensated
+inter-frame prediction the way a video codec does, so the same visual runs
+noticeably heavier as an image sequence, and this is the size/quality point
+that keeps the file in the same range the two-format video used to be. Its
+loop count is baked in at 1 (`ffmpeg -loop 1`), which is what stops it on its
+last frame rather than repeating — nothing in CSS or JS has to enforce that.
+`check-claims.js` confirms both the clip and the poster frame
+(`glow-vial-labeled-poster.jpg`, a real frame from the clip, what the `<img>`
+starts pointed at) exist on disk and are referenced from the page, and that
+`#testing` contains no `<video>` element at all, so a future edit cannot
+quietly reintroduce the exact bug this replaced.
+
+A browser that cannot decode animated WebP at all — essentially none by now
+— still renders its first frame, per the WebP spec's own fallback behaviour,
+so the worst case for `.tv-clip` is a correct static vial rather than a
+broken image.
 
 The footage's own black floor sits a few levels above zero — a filmed
 vignette, not a compression artefact, present in the source before any
 encoding here touched it — which reads as a faint rectangle against the
-section's true `#000`. `.tv-vial::after` in the stylesheet fades the video's
+section's true `#000`. `.tv-vial::after` in the stylesheet fades the clip's
 own edges to transparent with a radial gradient, sized to clear every label
 in the frame, rather than grading or cropping the footage to fix it: the
 clip gets the same "exactly as delivered" treatment described below.
