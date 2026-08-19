@@ -143,27 +143,39 @@ fails if you forget.
 
 ## `build-testing.js`
 
-Bakes the homepage testing diagram: the callouts inside `<div id="tdNodes">`,
-one per analysis on a wire ending in a dot, and the numeral in the
-`#tvHeading` heading.
+Bakes the homepage testing diagram: the numeral in the `#tvHeading` heading,
+and the seven analyses inside `<ul id="tdNodes">` — not drawn as callouts on
+the page any more, because the vial video itself now carries them, wires,
+dots and labels, baked into its own footage. `#tdNodes` renders visually
+hidden (`.sr-only`) rather than gone: text baked into a video is invisible to
+a screen reader and to a crawler that never runs JavaScript, so this is what
+stands in for the diagram for both of them.
 
 The rows live in `ANALYSIS_TESTS` in `js/products-data.js`, the same array
-`how-we-test.html` lists and the certificate panel summarises. Edit the array,
-run the build. Which side a callout lands on is derived, not typed: the left
-column takes `floor(n/2)` and the right takes the rest, so an eighth analysis
-rebalances the diagram rather than leaving one side hanging.
+`how-we-test.html` lists and the certificate panel summarises. Edit the
+array, run the build.
 
-`js/script.js` never writes a callout. It plays the vial clip once, the
-moment the section scrolls into view — a cropped, muted recording of a real
-vial (this used to be five transparent PNG layers stacked and pulled apart
-with CSS; the burst is now baked into the footage itself, so there is no
-layer alignment left to check). It ships as two files, `glow-vial-reveal.webm`
-(VP9, what most browsers get) and `glow-vial-reveal.mp4` (H.264, Safari's
+`js/script.js` never writes a list item. It plays the vial clip once, the
+moment the section scrolls into view — a muted recording of a real vial,
+uncropped at its native 1280x720 (this used to be five transparent PNG
+layers stacked and pulled apart with CSS, with the callouts drawn separately
+in HTML/CSS beside them; both the burst and the callouts are now baked into
+the footage itself, so there is no layer alignment or callout positioning
+left for CSS to do). It ships as two files, `glow-vial-labeled.webm` (VP9,
+what most browsers get) and `glow-vial-labeled.mp4` (H.264, Safari's
 fallback) via `<source>` — a sandboxed or de-Googled Chromium build without
 licensed H.264 support is exactly the case that surfaced the need for the
 second file. `check-claims.js` confirms both, plus the poster frame
-(`glow-vial-reveal-poster.jpg`, the still it rests on before playing), exist
+(`glow-vial-labeled-poster.jpg`, the still it rests on before playing), exist
 on disk and are referenced from the page.
+
+The footage's own black floor sits a few levels above zero — a filmed
+vignette, not a compression artefact, present in the source before any
+encoding here touched it — which reads as a faint rectangle against the
+section's true `#000`. `.tv-vial::after` in the stylesheet fades the video's
+own edges to transparent with a radial gradient, sized to clear every label
+in the frame, rather than grading or cropping the footage to fix it: the
+clip gets the same "exactly as delivered" treatment described below.
 
 ### The label in the footage
 

@@ -233,40 +233,33 @@ if (!reduceMotion.matches && grid) {
 
 
 /* ---------- testing diagram ----------
-   The vial's burst plays once, the moment the section arrives on screen,
-   then the seven callouts follow one after another. Not tied to scroll
-   position — it plays and stays open, the same as any other .reveal element
-   on this page, rather than scrubbing back and forth with the scrollbar.
+   The vial's burst, with the seven analyses baked into the footage as its
+   own callouts, plays once, the moment the section arrives on screen. Not
+   tied to scroll position — it plays and holds its last frame, the same as
+   any other .reveal element on this page, rather than scrubbing back and
+   forth with the scrollbar.
 
-   This file does not write copy: every callout is baked into the markup by
-   tools/build-testing.js, so the seven analyses are readable with scripting
-   off. What it does is exactly two things: reveal the callouts via .tv-open
-   once the section is actually in view, and call .play() on the video at
-   that same moment. Before that the video simply sits on its poster frame —
-   there is no closed CSS state to arm, unlike the five-layer PNG version
-   this replaced, because the video already renders paused on frame one. */
+   This file does not write copy: the same seven analyses exist as a
+   visually hidden list baked by tools/build-testing.js, for a screen reader
+   or a crawler that never runs JavaScript, neither of which can read text
+   off a video. All this does is call .play() once the section is actually
+   in view. Before that the video simply sits on its poster frame — there is
+   no closed CSS state to arm, unlike the five-layer PNG version this
+   replaced, because the video already renders paused on frame one. */
 (function () {
   const section = document.getElementById('testing');
   if (!section) return;
   const video = section.querySelector('.tv-video');
   if (!video) return;
 
-  const still = window.matchMedia('(prefers-reduced-motion: reduce)');
-  // Reduced motion never arms the closed callout state in the first place
-  // (see the stylesheet's own reduced-motion block for #testing), and the
-  // video is left on its poster frame rather than played, so there is
-  // nothing here to reopen and no observer worth setting up.
-  if (still.matches) return;
-
-  function open() {
-    section.classList.add('tv-open');
-    video.play().catch(() => {});
-  }
+  // Reduced motion leaves the video on its poster frame rather than played,
+  // so there is nothing here to trigger and no observer worth setting up.
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const io = new IntersectionObserver((entries) => {
     if (!entries.some(e => e.isIntersecting)) return;
     io.disconnect();
-    open();
+    video.play().catch(() => {});
   }, { threshold: 0.3 });
   io.observe(section);
 })();

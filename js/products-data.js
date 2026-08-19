@@ -681,50 +681,17 @@ function escHtml(t) {
 }
 
 // ---------------------------------------------------------------------------
-// The homepage testing diagram: the seven analyses arranged around the vial.
-//
-// Rendered from ANALYSIS_TESTS, never typed into index.html, for the reason
-// the rest of this file exists: the day a test leaves the certificate, it has
-// to leave the homepage in the same edit. tools/build-testing.js bakes the
-// output into the served markup so a crawler that does not run JavaScript
-// still reads all seven, and js/script.js only binds the highlighting on top
-// of markup that is already there.
-//
-// Three callouts left of the vial, four right, each on a thin wire ending in a
-// dot. The split is derived, not typed: with seven rows the left column takes
-// the floor and the right takes the rest, so adding an eighth analysis
-// rebalances the diagram instead of leaving one side hanging.
-//
-// `top` is a percentage of the stage, spread evenly down each side with a
-// margin at either end so no wire runs off the top or bottom of the vial.
-function analysisSideSplit() {
-  const left = Math.floor(ANALYSIS_TESTS.length / 2);
-  return { left, right: ANALYSIS_TESTS.length - left };
-}
-
-function analysisCalloutHtml(t, i, side, nth, of) {
-  // evenly spaced between 16% and 84%, or centred when a side holds only one
-  const top = of === 1 ? 50 : 16 + (68 / (of - 1)) * nth;
-  // --i staggers the reveal in js/script.js: each callout's transition-delay
-  // reads this, so they arrive one after another rather than all at once.
-  return `
-        <div class="tv-call tv-call-${side}" data-test="${i}" style="--top:${top.toFixed(1)}%; --i:${i}">
-          <span class="tv-wire" aria-hidden="true"><i></i></span>
-          <span class="tv-text">
-            <h3 class="tv-label">${escHtml(t.name)}</h3>${t.method
-            ? `\n            <span class="tv-method">${escHtml(t.method)}</span>` : ''}
-          </span>
-        </div>`;
-}
-
-function analysisDiagramHtml() {
-  const { left } = analysisSideSplit();
-  return ANALYSIS_TESTS.map((t, i) => {
-    const onLeft = i < left;
-    const nth = onLeft ? i : i - left;
-    const of = onLeft ? left : ANALYSIS_TESTS.length - left;
-    return analysisCalloutHtml(t, i, onLeft ? 'left' : 'right', nth, of);
-  }).join('');
+// The homepage testing diagram used to arrange these seven analyses around
+// the vial as callouts on wires, drawn by CSS. The vial is now a video with
+// the callouts baked into its own footage (see the note on the markup in
+// index.html), so this is what stands in for them for a screen reader or a
+// crawler that never runs JavaScript, neither of which can read text off a
+// video. Rendered from ANALYSIS_TESTS, never typed into index.html, for the
+// reason the rest of this file exists: the day a test leaves the
+// certificate, it has to leave the homepage in the same edit.
+function analysisListHtml() {
+  return ANALYSIS_TESTS.map(t => `
+        <li>${escHtml(t.name)}${t.method ? `: ${escHtml(t.method)}` : ''}</li>`).join('');
 }
 
 // The heading states the count as a numeral, which the word-form scan in
@@ -1332,8 +1299,7 @@ if (typeof module !== 'undefined' && module.exports) {
     VIAL_ART_NOTICE,
     FAQS,
     faqHtml,
-    analysisDiagramHtml,
-    analysisSideSplit,
+    analysisListHtml,
     testingHeading,
     productCardHtml,
     coaCardHtml,

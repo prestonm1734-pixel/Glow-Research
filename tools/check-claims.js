@@ -29,7 +29,7 @@ const {
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
-  FAQS, faqHtml, analysisDiagramHtml, testingHeading,
+  FAQS, faqHtml, analysisListHtml, testingHeading,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
@@ -640,20 +640,21 @@ console.log('\nhow many tests');
 
   // The homepage diagram. This is the section that replaced two invented
   // "medical advisors", so the bar it has to clear is the one they failed:
-  // nothing in it may be a thing someone typed onto the page. Every node is a
-  // row of ANALYSIS_TESTS, baked by tools/build-testing.js, and the served
-  // markup is compared against the renderer rather than merely searched for
-  // the names, so an edit made straight into index.html fails here.
+  // nothing in it may be a thing someone typed onto the page. The seven
+  // analyses are now baked into the vial video itself, which nothing here
+  // can read — instead #tdNodes carries them as a visually hidden list,
+  // baked by tools/build-testing.js, and the served markup is compared
+  // against the renderer rather than merely searched for the names, so an
+  // edit made straight into index.html fails here.
   const home = read('index.html');
   ok('the homepage carries the testing diagram',
     home.includes('id="tdNodes"') && home.includes('id="testing"'));
-  const missingNode = ANALYSIS_TESTS.filter(t =>
-    !home.includes(`<h3 class="tv-label">${t.name}</h3>`));
+  const missingNode = ANALYSIS_TESTS.filter(t => !home.includes(`<li>${t.name}`));
   ok(`the diagram names all ${TESTS_PER_BATCH} analyses in the served markup`,
     missingNode.length === 0, `missing: ${missingNode.map(t => t.name).join(', ')}`);
-  ok('the diagram is baked from the catalog, not typed into the page',
-    home.includes(analysisDiagramHtml().trim()),
-    'index.html and analysisDiagramHtml() disagree. Run node tools/build-testing.js');
+  ok('the list is baked from the catalog, not typed into the page',
+    home.includes(analysisListHtml().trim()),
+    'index.html and analysisListHtml() disagree. Run node tools/build-testing.js');
   // The heading counts the panel as a numeral. The word-form scan above reads
   // "seven tests" and cannot see "7-Point Testing", so it gets its own check
   // rather than being the one claim on the page nothing is holding.
@@ -663,20 +664,15 @@ console.log('\nhow many tests');
   const headingNums = (home.match(/<h2 id="tvHeading">(\d+)/) || [])[1];
   ok('and states no other number there',
     headingNums === String(TESTS_PER_BATCH), `heading says ${headingNums}`);
-  // The method line is the row's, or absent. A callout inventing a technique
-  // for one of the four rows the certificate reports without naming one would
-  // be the same fabrication in a smaller font.
+  // The method is the row's, or absent. A line inventing a technique for one
+  // of the four rows the certificate reports without naming one would be the
+  // same fabrication in a smaller font.
   const noMethod = ANALYSIS_TESTS.filter(t => !t.method);
-  ok('no callout names a method the catalog leaves blank',
-    noMethod.every(t => {
-      // Cut at the callout's own closing tag. A fixed character window ran
-      // past it into the next callout, which does name one.
-      const after = home.split(`<h3 class="tv-label">${t.name}</h3>`)[1] || '';
-      return !after.split('</div>')[0].includes('class="tv-method"');
-    }));
-  ok('the diagram renders no person, credential or endorsement',
-    !/tv-call[\s\S]*?(Ph\.D|M\.D\.|advisor|endorse)/i.test(
-      home.split('id="tdNodes"')[1] || ''));
+  ok('no list item names a method the catalog leaves blank',
+    noMethod.every(t => !home.includes(`<li>${t.name}:`)));
+  ok('the list renders no person, credential or endorsement',
+    !/(Ph\.D|M\.D\.|advisor|endorse)/i.test(
+      (home.split('id="tdNodes"')[1] || '').split('<!-- /tdNodes -->')[0]));
 
   // The vial footage. It is a real clip, not a photograph standing in for
   // one, and its label reads "10 MG • 99%" exactly as filmed — kept as shot,
@@ -688,14 +684,19 @@ console.log('\nhow many tests');
   const vialDir = path.join(ROOT, 'assets/vial');
   const vialFiles = fs.existsSync(vialDir) ? fs.readdirSync(vialDir) : [];
   ok('the vial clip (both formats) and its poster frame are present on disk and referenced',
-    ['glow-vial-reveal.webm', 'glow-vial-reveal.mp4', 'glow-vial-reveal-poster.jpg'].every(n => {
+    ['glow-vial-labeled.webm', 'glow-vial-labeled.mp4', 'glow-vial-labeled-poster.jpg'].every(n => {
       return vialFiles.includes(n) && home.includes(`assets/vial/${n}`);
     }));
-  // No test name or method carries a purity figure of its own — a fabricated
+  // No list item carries a purity figure of its own — a fabricated
   // percentage attached to "Purity" or "Endotoxin" would be a second, worse
-  // problem stacked on the one already noted above.
+  // problem stacked on the one already noted above. Scoped to #tdNodes and
+  // the heading, the only two places this diagram writes text at all; the
+  // video's own baked-in "99%" is the exception the note above already
+  // covers and is deliberately outside this check's reach.
+  const diagramText = (home.split('id="tdNodes"')[1] || '').split('<!-- /tdNodes -->')[0]
+    + (home.match(/<h2 id="tvHeading">[\s\S]*?<\/h2>/) || [''])[0];
   ok('no test name or method states a purity figure of its own',
-    !/tv-(label|method|head)[^>]*>[^<]*\d+(\.\d+)?\s*%/i.test(home));
+    !/\d+(\.\d+)?\s*%/.test(diagramText));
 }
 
 /* ---------------------------------------------------------------------------

@@ -279,25 +279,30 @@
      not exist. What replaced them is the one thing on this page that is
      provable: the seven analyses actually run on the lot.
 
-     A single cropped, muted clip of a real vial, rather than the five-layer
-     PNG composite this used to be. Two <source>s, webm (VP9) then mp4
-     (H.264), so the browser picks whichever it actually supports — a
-     sandboxed Chromium with no licensed H.264 decoder is a real case, not a
-     hypothetical one, which is why the fallback exists at all. The
-     explosion is baked into the footage itself, so there is nothing left
-     for CSS or JS to stage-manage about the vial's own motion: js/script.js
-     only calls .play() once, the moment the section is actually in view,
-     the same IntersectionObserver as before. Before that it sits on its
-     poster frame (the calm, closed vial), which is also what a no-JS or
-     reduced-motion reader gets and stays on. Not tied to scroll position,
-     and it does not loop: it plays once and holds its last frame, like any
-     other .reveal element on this page.
+     A single muted clip of a real vial, uncropped at its native 1280x720 —
+     the seven callouts are baked into the footage itself now, wires, dots
+     and all, rather than drawn by live HTML/CSS beside a plain vial render.
+     Two <source>s, webm (VP9) then mp4 (H.264), so the browser picks
+     whichever it actually supports — a sandboxed Chromium with no licensed
+     H.264 decoder is a real case, not a hypothetical one, which is why the
+     fallback exists at all. js/script.js calls .play() once, the moment the
+     section is actually in view, the same IntersectionObserver as before.
+     Before that it sits on its poster frame (the calm, closed vial), which
+     is also what a no-JS or reduced-motion reader gets and stays on. Not
+     tied to scroll position, and it does not loop: it plays once and holds
+     its last frame, like any other .reveal element on this page.
 
-     The heading's numeral and every callout inside #tdNodes are baked by
-     tools/build-testing.js from ANALYSIS_TESTS in js/products-data.js. Do not
-     type a test in here. A crawler that never runs JavaScript reads all seven,
-     and check-claims.js fails the build if the served markup and the array
-     disagree.
+     The video's own black is not perfectly the section's #000 (see the note
+     on .tv-vial in the stylesheet for why), so .tv-vial::after paints a
+     radial fade to true black over its edges — nothing touches the footage
+     itself, the frame around it just dissolves into the section instead of
+     sitting on it as a visible rectangle.
+
+     Text baked into a video is invisible to a screen reader and to a
+     crawler that never runs JavaScript, so #tdNodes carries the same seven
+     analyses as a visually hidden list, baked by tools/build-testing.js
+     from ANALYSIS_TESTS in js/products-data.js. Do not type a test in here.
+     check-claims.js fails the build if the list and the array disagree.
 
      The label in the footage reads "10 MG • 99%" exactly as filmed, not
      edited or overlaid. The catalog holds GLP-3 (RT) at 99.4%, so this is a
@@ -317,62 +322,27 @@
 
     <div class="tv-stage" id="tvStage">
       <div class="tv-vial" aria-hidden="true">
-        <video class="tv-video" poster="assets/vial/glow-vial-reveal-poster.jpg" width="880" height="720" muted playsinline preload="auto">
-          <source src="assets/vial/glow-vial-reveal.webm" type="video/webm" />
-          <source src="assets/vial/glow-vial-reveal.mp4" type="video/mp4" />
+        <video class="tv-video" poster="assets/vial/glow-vial-labeled-poster.jpg" width="1280" height="720" muted playsinline preload="auto">
+          <source src="assets/vial/glow-vial-labeled.webm" type="video/webm" />
+          <source src="assets/vial/glow-vial-labeled.mp4" type="video/mp4" />
         </video>
       </div>
 
-      <!-- Baked by tools/build-testing.js. Anything typed between these
+      <!-- Baked by tools/build-testing.js. Visually hidden: the video above
+           carries these seven as its own baked-in pixels. This list is for
+           a screen reader or a crawler that never runs JavaScript, neither
+           of which can read text off a video. Anything typed between these
            tags is overwritten on the next build. -->
-      <div class="tv-callouts" id="tdNodes">
-        <div class="tv-call tv-call-left" data-test="0" style="--top:16.0%; --i:0">
-          <span class="tv-wire" aria-hidden="true"><i></i></span>
-          <span class="tv-text">
-            <h3 class="tv-label">Purity</h3>
-            <span class="tv-method">Reverse-phase HPLC-UV</span>
-          </span>
-        </div>
-        <div class="tv-call tv-call-left" data-test="1" style="--top:50.0%; --i:1">
-          <span class="tv-wire" aria-hidden="true"><i></i></span>
-          <span class="tv-text">
-            <h3 class="tv-label">Identity</h3>
-            <span class="tv-method">LC-MS</span>
-          </span>
-        </div>
-        <div class="tv-call tv-call-left" data-test="2" style="--top:84.0%; --i:2">
-          <span class="tv-wire" aria-hidden="true"><i></i></span>
-          <span class="tv-text">
-            <h3 class="tv-label">Net peptide content</h3>
-          </span>
-        </div>
-        <div class="tv-call tv-call-right" data-test="3" style="--top:16.0%; --i:3">
-          <span class="tv-wire" aria-hidden="true"><i></i></span>
-          <span class="tv-text">
-            <h3 class="tv-label">Sterility</h3>
-          </span>
-        </div>
-        <div class="tv-call tv-call-right" data-test="4" style="--top:38.7%; --i:4">
-          <span class="tv-wire" aria-hidden="true"><i></i></span>
-          <span class="tv-text">
-            <h3 class="tv-label">Endotoxin</h3>
-            <span class="tv-method">LAL assay, USP chapter 85</span>
-          </span>
-        </div>
-        <div class="tv-call tv-call-right" data-test="5" style="--top:61.3%; --i:5">
-          <span class="tv-wire" aria-hidden="true"><i></i></span>
-          <span class="tv-text">
-            <h3 class="tv-label">Appearance and solubility</h3>
-          </span>
-        </div>
-        <div class="tv-call tv-call-right" data-test="6" style="--top:84.0%; --i:6">
-          <span class="tv-wire" aria-hidden="true"><i></i></span>
-          <span class="tv-text">
-            <h3 class="tv-label">Heavy metals</h3>
-          </span>
-        </div>
-          <!-- /tdNodes -->
-      </div>
+      <ul class="sr-only" id="tdNodes">
+        <li>Purity: Reverse-phase HPLC-UV</li>
+        <li>Identity: LC-MS</li>
+        <li>Net peptide content</li>
+        <li>Sterility</li>
+        <li>Endotoxin: LAL assay, USP chapter 85</li>
+        <li>Appearance and solubility</li>
+        <li>Heavy metals</li>
+        <!-- /tdNodes -->
+      </ul>
     </div>
 
     <div class="tv-foot">

@@ -116,6 +116,14 @@ h1,h2,h3,h4,h5{
 p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .container{ max-width: var(--container); margin: 0 auto; padding: 0 24px; }
 
+/* Present to a screen reader or a crawler, gone for anyone looking at the
+   page — the standard clip-based pattern, not display:none (which pulls
+   content out of the accessibility tree, not just off the screen). */
+.sr-only{
+  position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
 .grad-text{
   background: var(--grad-main);
   background-size: 200% 100%;
@@ -665,21 +673,19 @@ button[disabled].si-forgot{ cursor: progress; }
 
 /* ---------- testing diagram ----------
    A real vial's burst, filmed once and played once, the moment the section
-   arrives in view, with the seven analyses calling themselves out around it.
-   The video carries its own animation (see the note on the markup), so the
-   only state left for CSS to manage is the callout column: it plays once on
-   arrival and stays open, the way any other reveal-on-scroll element on this
-   page does (see .reveal), rather than scrubbing back and forth with the
-   scrollbar.
+   arrives in view, with the seven analyses baked into the footage as its
+   own callouts — wires, dots and labels all filmed in, not drawn by live
+   HTML/CSS the way the five-layer PNG version this replaced did it. Not
+   tied to scroll position: it plays once on arrival and holds its last
+   frame, the way any other reveal-on-scroll element on this page does (see
+   .reveal), rather than scrubbing back and forth with the scrollbar.
 
-   The base rules below (no `.js` ancestor needed) are the finished state:
-   every callout up. That is what a reader with no JavaScript gets, alongside
-   the video's own poster frame, which is a real vial standing still rather
-   than an empty diagram. `.js #testing` closes the callouts back up the
-   instant the page can run script — see the `.js` convention at the top of
-   this file — so a script-capable browser never sees them flash open before
-   js/script.js plays the reveal. `.tv-open`, added once by an
-   IntersectionObserver, is what reopens them and starts the video. */
+   `.js #testing` does nothing to the video itself — it starts on its poster
+   frame regardless, which is what a no-JS reader keeps seeing. `.tv-open`,
+   added once by an IntersectionObserver, is only there to call .play(). The
+   seven analyses also exist as a visually hidden list (#tdNodes, styled by
+   .sr-only below) for the reader the video cannot reach at all: a screen
+   reader, or a crawler that never runs JavaScript. */
 .tv{ background:#000; color: var(--text); }
 .tv-inner{ width:100%; padding-block: clamp(48px, 7vh, 80px); }
 
@@ -702,84 +708,33 @@ button[disabled].si-forgot{ cursor: progress; }
 .tv-div::after{ background: linear-gradient(to left, transparent, rgba(255,255,255,.4)); }
 .tv-div i{ font-style:normal; font-size:.72rem; }
 
-/* Three columns, and the callout columns are the flexible pair: the vial is
-   the fixed thing everything else is measured against. */
 .tv-stage{
-  position:relative; display:grid; align-items:stretch;
-  grid-template-columns: 1fr auto 1fr;
-  gap: clamp(14px, 2.4vw, 40px);
+  position:relative;
   margin: clamp(28px, 4.5vh, 56px) auto 0;
   max-width: 1140px;
-  /* room above for the cap to rise into without meeting the heading */
-  padding-top: clamp(64px, 12vh, 140px);
-  /* room below for the vial's own downward shift. .tv-vial moves down by
-     half the cap's travel to stay centred as the cap rises (see the note on
-     that rule) — a transform, so it doesn't grow the grid row it sits in,
-     and the fully open vial was overlapping .tv-foot's divider by 35px on
-     desktop and 23px on mobile until this reserved the room the transform
-     was actually using. */
-  padding-bottom: clamp(72px, 11vh, 130px);
 }
 
-.tv-vial{
-  grid-column:2; position:relative;
-  height: clamp(220px, 46vh, 460px); aspect-ratio: 880 / 720;
-}
-/* The burst is baked into the footage, so there is no cap/crimp/stopper
-   choreography left for CSS to run — object-fit is the whole rule. The
-   poster attribute (the clip's first, calm frame) is what every reader sees
-   until js/script.js calls .play(), so there is no separate closed state to
-   maintain here the way the five-layer PNG version needed. */
+/* The callouts are baked into the footage at 1280x720, so the whole diagram
+   is one block sized off that ratio, not a narrow vial column flanked by two
+   HTML callout columns the way this used to be laid out. */
+.tv-vial{ position:relative; width:100%; aspect-ratio: 1280 / 720; }
 .tv-video{
   position:absolute; inset:0; width:100%; height:100%;
   object-fit:contain; display:block; background:transparent;
 }
-
-.tv-callouts{ display:contents; }
-
-/* A callout is a wire and a label. The wire runs from the text to a dot near
-   the vial; the text sits hard against its own side so all three (or four)
-   line up as a column rather than drifting with their own lengths. */
-.tv-call{
-  position:absolute; top: var(--top); translate: 0 -50%;
-  display:flex; align-items:center; gap: 8px;
-  opacity: 1;
+/* The footage's own black floor sits a few levels above zero (a filmed
+   vignette, not a compression artefact — see tools/README.md), which reads
+   as a faint rectangle against this section's true #000. Rather than crush
+   or grade the footage — the vial video gets the same "exactly as filmed"
+   treatment the artwork before it did — this fades the video's own edges to
+   transparent so the section's real black shows through instead, seamlessly,
+   without touching a pixel of the clip itself. Sized to clear every label:
+   the outermost text ("Heavy metals", "Appearance and solubility") sits
+   inside the fully-opaque 70% core, so nothing legible fades. */
+.tv-vial::after{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background: radial-gradient(ellipse 72% 76% at center, transparent 68%, #000 100%);
 }
-/* DOM order inside a callout is wire then text. On the left the wire has to
-   end up on the vial side of the text, so that column is reversed; both
-   columns then pack towards the vial, which is what puts every dot on one
-   vertical line however long the label is. */
-.tv-call-left{ left:0; right: calc(66.6% + 8px); flex-direction:row-reverse; justify-content:flex-start; text-align:right; }
-.tv-call-right{ right:0; left: calc(66.6% + 8px); flex-direction:row; justify-content:flex-start; text-align:left; }
-.tv-text{ min-width:0; }
-/* Sentence case in the display font, same as any other h3 on the page: no
-   uppercase, no tracking heavier than the rest of the site uses. The method
-   line stays monospace, which is the treatment every other technical
-   annotation on the site already gets (SKUs, lab methods, the cutoff time). */
-.tv-label{
-  margin:0; font-size: clamp(.78rem, 1.7vw, .98rem); font-weight:600;
-  letter-spacing:-.005em; line-height:1.3;
-  color: var(--text);
-}
-.tv-method{
-  display:block; margin-top:3px;
-  font-family:'JetBrains Mono', monospace;
-  font-size: clamp(.6rem, 1.2vw, .7rem);
-  letter-spacing:.02em; color: var(--text-dimmer); line-height:1.4;
-}
-/* A short technical lead, not a rule across the column. Left to flex:1 it took
-   every pixel the label did not, so the wires ran to the page edge and each
-   one was a different length. */
-.tv-wire{
-  flex:0 0 auto; width: clamp(26px, 5vw, 84px); height:1px;
-  background: rgba(255,255,255,.42); position:relative;
-}
-.tv-wire i{
-  position:absolute; top:50%; width:5px; height:5px; border-radius:50%;
-  background:#fff; translate: 0 -50%;
-}
-.tv-call-left .tv-wire i{ right:0; translate: 50% -50%; }
-.tv-call-right .tv-wire i{ left:0; translate: -50% -50%; }
 
 .tv-foot{
   display:flex; align-items:center; justify-content:space-between;
@@ -790,44 +745,9 @@ button[disabled].si-forgot{ cursor: progress; }
 .tv-foot p{ margin:0; max-width: 560px; font-size:.85rem; }
 .tv-foot .btn-outline{ flex-shrink:0; }
 
-/* Closed state, JS-capable browsers only (the `.js` class is added by an
-   inline <script> in <head>, before first paint — see the top of this file).
-   The video needs nothing here: it starts on its poster frame and
-   js/script.js calls .play() directly, so there is no CSS state to hide
-   before the reveal. Only the callout column has one. */
-.js #testing .tv-call{
-  opacity:0; transform: translateX(var(--closedX, -14px));
-  transition: opacity .5s ease, transform .5s cubic-bezier(.2,.8,.2,1);
-  /* staggered by --i, baked per callout by tools/build-testing.js, so they
-     arrive one after another rather than all snapping in together */
-  transition-delay: calc(320ms + var(--i, 0) * 90ms);
-}
-.js #testing .tv-call-right{ --closedX: 14px; }
-
-.js #testing.tv-open .tv-call{ opacity:1; transform:none; }
-
 @media (max-width: 899px){
-  /* The wires get short here, so the text takes the room instead. Same
-     diagram, smaller: the labels are what has to stay legible. */
-  .tv-stage{ gap: 4px; padding-top: clamp(30px, 7vh, 60px); }
-  .tv-call-left{ right: calc(62% + 4px); }
-  .tv-call-right{ left: calc(62% + 4px); }
-  .tv-wire{ min-width: 10px; }
-  .tv-vial{ height: clamp(210px, 40vh, 330px); }
   .tv-foot{ justify-content:flex-start; }
   .tv-foot .btn-outline{ width:100%; text-align:center; }
-}
-
-/* The reveal is the thing being opted out of, so under reduced motion the
-   `.js` closed state never applies at all: the callouts render open on
-   arrival, same as no-JS, and js/script.js never calls .play() (see the
-   note there), so the video stays on its poster frame instead of running
-   the burst. The sitewide reduced-motion block (further down this file)
-   also collapses every transition-duration to near-zero, which is what
-   stops .tv-open from producing a fast, motion-heavy snap on the rare load
-   where it still runs. */
-@media (prefers-reduced-motion: reduce){
-  .js #testing .tv-call{ opacity:1; transform:none; }
 }
 
 /* ---------- product grid ---------- */
