@@ -245,7 +245,15 @@ if (!reduceMotion.matches && grid) {
    off a video. All this does is call .play() once the section is actually
    in view. Before that the video simply sits on its poster frame — there is
    no closed CSS state to arm, unlike the five-layer PNG version this
-   replaced, because the video already renders paused on frame one. */
+   replaced, because the video already renders paused on frame one.
+
+   iOS Safari treats `preload="auto"` as `preload="metadata"` on cellular, so
+   the clip can still be short of playable data at the exact moment the
+   section scrolls into view — a gap that barely exists on a fast desktop
+   connection but is the normal case on a phone. A rejected play() there is
+   not a real failure, just early, so this retries once on 'canplay' rather
+   than giving up the first time, and sets .muted from script too, belt and
+   suspenders against the HTML attribute alone. */
 (function () {
   const section = document.getElementById('testing');
   if (!section) return;
@@ -256,10 +264,18 @@ if (!reduceMotion.matches && grid) {
   // so there is nothing here to trigger and no observer worth setting up.
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+  video.muted = true;
+
+  function attempt() {
+    video.play().catch(() => {
+      video.addEventListener('canplay', () => video.play().catch(() => {}), { once: true });
+    });
+  }
+
   const io = new IntersectionObserver((entries) => {
     if (!entries.some(e => e.isIntersecting)) return;
     io.disconnect();
-    video.play().catch(() => {});
+    attempt();
   }, { threshold: 0.3 });
   io.observe(section);
 })();
