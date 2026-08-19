@@ -232,46 +232,4 @@ if (!reduceMotion.matches && grid) {
 }
 
 
-/* ---------- testing diagram ----------
-   The vial's burst, with the seven analyses baked into the footage as its
-   own callouts, plays once, the moment the section arrives on screen. Not
-   tied to scroll position — it plays and holds its last frame, the same as
-   any other .reveal element on this page, rather than scrubbing back and
-   forth with the scrollbar.
-
-   This used to be a <video>, retried through a .play() rejection to cover a
-   slow-network timing gap on iOS Safari. That was the wrong failure to plan
-   for: the real one, confirmed on an actual iPhone, was Low Power Mode,
-   which blocks <video> autoplay outright — muted or not, gesture or none,
-   with no JS hook to retry around. So the vial is an animated WebP now, an
-   <img>, not a <video>, and nothing here calls .play(). All this does is
-   swap `src` from the poster JPG to the animated file once the section is
-   actually in view; the file's own loop count (baked in at 1) is what stops
-   it on its last frame rather than repeating. A src swap is not playback in
-   the sense any autoplay policy governs, so there is nothing left for a
-   power-saving mode to block.
-
-   This file does not write copy: the same seven analyses exist as a
-   visually hidden list baked by tools/build-testing.js, for a screen reader
-   or a crawler that never runs JavaScript, neither of which can read text
-   off an image. */
-(function () {
-  const section = document.getElementById('testing');
-  if (!section) return;
-  const img = section.querySelector('.tv-clip');
-  if (!img || !img.dataset.anim) return;
-
-  // Reduced motion leaves the poster frame as the src, so there is nothing
-  // here to trigger and no observer worth setting up.
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  const io = new IntersectionObserver((entries) => {
-    if (!entries.some(e => e.isIntersecting)) return;
-    io.disconnect();
-    img.src = img.dataset.anim;
-  }, { threshold: 0.3 });
-  io.observe(section);
-})();
-
-
 

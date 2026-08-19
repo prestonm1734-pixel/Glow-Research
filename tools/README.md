@@ -10,7 +10,6 @@ No dependencies to install. Everything here is plain Node.
 node tools/build.js          # the usual one: FAQ + products (when live) + sitemap + audit
 node tools/build-meta.js     # every copy of each page's title + description
 node tools/build-faq.js      # homepage FAQ markup + FAQPage schema
-node tools/build-testing.js  # homepage vial diagram callouts, from ANALYSIS_TESTS
 node tools/build-catalog.js  # peptides.html grid + CollectionPage schema
 node tools/build-llms.js     # llms.txt
 node tools/build-products.js # one page per compound
@@ -20,7 +19,7 @@ node tools/check-claims.js   # promise audit, run before every commit
 
 ## `build.js`
 
-The everyday entry point. Runs `build-meta.js`, `build-faq.js`, `build-testing.js`,
+The everyday entry point. Runs `build-meta.js`, `build-faq.js`,
 `build-catalog.js`, `build-llms.js`, then `build-products.js` (which refreshes `sitemap.xml` on its
 way through), then `check-claims.js`.
 
@@ -140,98 +139,6 @@ crawlable text.
 The COA answer reads from `COA_COPY`, so it flips with `COAS_PUBLISHED` like
 every other certificate surface. Rebuild after flipping the flag; the audit
 fails if you forget.
-
-## `build-testing.js`
-
-Bakes the homepage testing diagram: the numeral in the `#tvHeading` heading,
-and the seven analyses inside `<ul id="tdNodes">` — not drawn as callouts on
-the page any more, because the vial clip itself now carries them, wires,
-dots and labels, baked into its own footage. `#tdNodes` renders visually
-hidden (`.sr-only`) rather than gone: text baked into an image is invisible
-to a screen reader and to a crawler that never runs JavaScript, so this is
-what stands in for the diagram for both of them.
-
-The rows live in `ANALYSIS_TESTS` in `js/products-data.js`, the same array
-`how-we-test.html` lists and the certificate panel summarises. Edit the
-array, run the build.
-
-`js/script.js` never writes a list item. It swaps `.tv-clip`'s `src` from the
-poster JPG to the animated clip once the section scrolls into view — a
-recording of a real vial, uncropped at its native 1280x720 (this used to be
-five transparent PNG layers stacked and pulled apart with CSS, with the
-callouts drawn separately in HTML/CSS beside them; both the burst and the
-callouts are now baked into the footage itself, so there is no layer
-alignment or callout positioning left for CSS to do).
-
-### Why an animated WebP and not a `<video>`
-
-It was a `<video>` at first, muted, `playsinline`, played by
-`IntersectionObserver` — the standard approach, and it worked everywhere it
-was tested, including emulated mobile viewports. It did not work on an actual
-iPhone in Low Power Mode: iOS blocks `<video>` autoplay outright under that
-setting, muted or not, gesture-triggered or not. That is a deliberate power
-policy, not a bug, and there is no JS-side workaround for a `<video>` element
-— retrying `.play()` (which an earlier version of this file did, to cover a
-different, genuinely fixable timing gap on iOS cellular) does nothing against
-it, because the browser is refusing to start playback at all, not failing to
-buffer in time.
-
-An animated image is not covered by that policy at all. `js/script.js` never
-calls anything that autoplay policy has a hook into — a `src` swap on an
-`<img>` is not "playing video" in the sense any power-saving mode governs, so
-it runs under Low Power Mode, Data Saver, any autoplay policy, any browser.
-The clip ships as `glow-vial-labeled.webp`, encoded at 12fps / 960x540 rather
-than the source's 24fps / 1280x720 — animated WebP has no motion-compensated
-inter-frame prediction the way a video codec does, so the same visual runs
-noticeably heavier as an image sequence, and this is the size/quality point
-that keeps the file in the same range the two-format video used to be. Its
-loop count is baked in at 1 (`ffmpeg -loop 1`), which is what stops it on its
-last frame rather than repeating — nothing in CSS or JS has to enforce that.
-`check-claims.js` confirms both the clip and the poster frame
-(`glow-vial-labeled-poster.jpg`, a real frame from the clip, what the `<img>`
-starts pointed at) exist on disk and are referenced from the page, and that
-`#testing` contains no `<video>` element at all, so a future edit cannot
-quietly reintroduce the exact bug this replaced.
-
-A browser that cannot decode animated WebP at all — essentially none by now
-— still renders its first frame, per the WebP spec's own fallback behaviour,
-so the worst case for `.tv-clip` is a correct static vial rather than a
-broken image.
-
-The footage's own black floor sits a few levels above zero — a filmed
-vignette, not a compression artefact, present in the source before any
-encoding here touched it — which reads as a faint rectangle against the
-section's true `#000`. `.tv-vial::after` in the stylesheet fades the clip's
-own edges to transparent with a radial gradient, sized to clear every label
-in the frame, rather than grading or cropping the footage to fix it: the
-clip gets the same "exactly as delivered" treatment described below.
-
-### The label in the footage
-
-The clip is kept exactly as filmed: `GLP-3 (RT)` / `10 MG • 99%`, uncut and
-with nothing overlaid on top of it. The catalog holds GLP-3 (RT) at 99.4%, so
-that 99% is a real, standing disagreement with the number everywhere else on
-the site (product page, certificate panel, structured data) — a figure
-`check-claims.js` cannot see or enforce, because it is pixels, not markup,
-and there is deliberately no live text laid over it correcting it. The
-five-layer artwork this replaced carried the same standing exception, at the
-same request: the vial is shown exactly as supplied rather than corrected in
-front of the camera. Know this before changing GLP-3 (RT)'s catalog purity
-again: the vial will not follow.
-
-It exists because of what used to be in that slot: two "medical advisors" who
-did not exist, with invented credentials and stock headshots. What made them
-indefensible was that nothing in the system produced them, so nothing could
-ever contradict them. The replacement is generated from the one array that
-decides what the whole site is allowed to claim about testing, and
-`check-claims.js` compares the served markup against the renderer. A test that
-leaves the certificate leaves the homepage in the same edit, or the build
-fails.
-
-The block is delimited by an `<!-- /tdNodes -->` marker rather than by a run of
-closing tags: the callouts nest two levels deep, and a lazy match up to
-`</div></div>` found the end of the first callout instead of the end of the
-block, pushing a spare `</div>` into the page on every rebuild.
 
 ## `build-meta.js`
 

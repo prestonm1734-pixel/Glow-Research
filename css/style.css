@@ -116,14 +116,6 @@ h1,h2,h3,h4,h5{
 p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
 .container{ max-width: var(--container); margin: 0 auto; padding: 0 24px; }
 
-/* Present to a screen reader or a crawler, gone for anyone looking at the
-   page — the standard clip-based pattern, not display:none (which pulls
-   content out of the accessibility tree, not just off the screen). */
-.sr-only{
-  position:absolute; width:1px; height:1px; margin:-1px; padding:0;
-  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
-}
-
 .grad-text{
   background: var(--grad-main);
   background-size: 200% 100%;
@@ -669,86 +661,6 @@ button[disabled].si-forgot{ cursor: progress; }
 @media (max-width: 640px){
   .catalog-head{ flex-direction:column; align-items:flex-start; }
   .catalog-head .btn-outline{ width:100%; text-align:center; }
-}
-
-/* ---------- testing diagram ----------
-   A real vial's burst, filmed once and played once, the moment the section
-   arrives in view, with the seven analyses baked into the footage as its
-   own callouts — wires, dots and labels all filmed in, not drawn by live
-   HTML/CSS the way the five-layer PNG version this replaced did it. An
-   animated image (see the note on the markup for why it is not <video>),
-   not tied to scroll position: it plays once on arrival and holds its last
-   frame, the way any other reveal-on-scroll element on this page does (see
-   .reveal), rather than scrubbing back and forth with the scrollbar.
-
-   `.js #testing` does nothing to .tv-clip itself — it starts on its poster
-   frame regardless, which is what a no-JS reader keeps seeing until
-   js/script.js swaps the src, once an IntersectionObserver says the section
-   is actually in view. The seven analyses also exist as a visually hidden
-   list (#tdNodes, styled by .sr-only below) for the reader the image cannot
-   reach at all: a screen reader, or a crawler that never runs JavaScript. */
-.tv{ background:#000; color: var(--text); }
-.tv-inner{ width:100%; padding-block: clamp(48px, 7vh, 80px); }
-
-/* h2 takes the sitewide rule as-is (Space Grotesk 600, sentence case,
-   -0.02em tracking) rather than the uppercase heavy-tracked treatment this
-   had: every other heading on the page is sentence case, and this one was
-   the only exception. */
-.tv-head{ text-align:center; }
-.tv-head h2{ margin:.5em 0 0; font-size: clamp(1.9rem, 3.6vw, 2.8rem); }
-/* Rule, sparkle, rule. The sparkle is the brand mark the header already
-   uses, so the divider is not one more decoration invented for this section. */
-.tv-div{
-  display:flex; align-items:center; justify-content:center; gap:14px;
-  margin-top: 18px; color: var(--text-dim);
-}
-.tv-div::before, .tv-div::after{
-  content:''; height:1px; width: clamp(48px, 12vw, 130px);
-  background: linear-gradient(to right, transparent, rgba(255,255,255,.4));
-}
-.tv-div::after{ background: linear-gradient(to left, transparent, rgba(255,255,255,.4)); }
-.tv-div i{ font-style:normal; font-size:.72rem; }
-
-.tv-stage{
-  position:relative;
-  margin: clamp(28px, 4.5vh, 56px) auto 0;
-  max-width: 1140px;
-}
-
-/* The callouts are baked into the footage at 1280x720, so the whole diagram
-   is one block sized off that ratio, not a narrow vial column flanked by two
-   HTML callout columns the way this used to be laid out. */
-.tv-vial{ position:relative; width:100%; aspect-ratio: 1280 / 720; }
-.tv-clip{
-  position:absolute; inset:0; width:100%; height:100%;
-  object-fit:contain; display:block; background:transparent;
-}
-/* The footage's own black floor sits a few levels above zero (a filmed
-   vignette, not a compression artefact — see tools/README.md), which reads
-   as a faint rectangle against this section's true #000. Rather than crush
-   or grade the footage — the vial video gets the same "exactly as filmed"
-   treatment the artwork before it did — this fades the video's own edges to
-   transparent so the section's real black shows through instead, seamlessly,
-   without touching a pixel of the clip itself. Sized to clear every label:
-   the outermost text ("Heavy metals", "Appearance and solubility") sits
-   inside the fully-opaque 70% core, so nothing legible fades. */
-.tv-vial::after{
-  content:''; position:absolute; inset:0; pointer-events:none;
-  background: radial-gradient(ellipse 72% 76% at center, transparent 68%, #000 100%);
-}
-
-.tv-foot{
-  display:flex; align-items:center; justify-content:space-between;
-  gap: 20px; flex-wrap:wrap;
-  margin-top: clamp(22px, 3.5vh, 44px);
-  padding-top: 20px; border-top:1px solid rgba(255,255,255,.12);
-}
-.tv-foot p{ margin:0; max-width: 560px; font-size:.85rem; }
-.tv-foot .btn-outline{ flex-shrink:0; }
-
-@media (max-width: 899px){
-  .tv-foot{ justify-content:flex-start; }
-  .tv-foot .btn-outline{ width:100%; text-align:center; }
 }
 
 /* ---------- product grid ---------- */

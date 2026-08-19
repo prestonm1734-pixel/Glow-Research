@@ -681,30 +681,6 @@ function escHtml(t) {
 }
 
 // ---------------------------------------------------------------------------
-// The homepage testing diagram used to arrange these seven analyses around
-// the vial as callouts on wires, drawn by CSS. The vial is now a video with
-// the callouts baked into its own footage (see the note on the markup in
-// index.html), so this is what stands in for them for a screen reader or a
-// crawler that never runs JavaScript, neither of which can read text off a
-// video. Rendered from ANALYSIS_TESTS, never typed into index.html, for the
-// reason the rest of this file exists: the day a test leaves the
-// certificate, it has to leave the homepage in the same edit.
-function analysisListHtml() {
-  return ANALYSIS_TESTS.map(t => `
-        <li>${escHtml(t.name)}${t.method ? `: ${escHtml(t.method)}` : ''}</li>`).join('');
-}
-
-// The heading states the count as a numeral, which the word-form scan in
-// check-claims.js cannot see. Derived here so it cannot be typed wrong.
-// Sentence case with a trailing full stop, matching every other section
-// heading on the homepage ("What we actually test.", "Learn how the testing
-// works."). The uppercase heavy-tracked version this used to be was the only
-// heading on the page that broke that pattern.
-function testingHeading() {
-  return `${TESTS_PER_BATCH}-point testing.`;
-}
-
-// ---------------------------------------------------------------------------
 // The batch analysis panel: the laboratory, the figure it returned, and every
 // analysis it runs on the lot.
 //
@@ -1299,8 +1275,6 @@ if (typeof module !== 'undefined' && module.exports) {
     VIAL_ART_NOTICE,
     FAQS,
     faqHtml,
-    analysisListHtml,
-    testingHeading,
     productCardHtml,
     coaCardHtml,
     coaHref,
