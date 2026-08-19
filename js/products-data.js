@@ -727,8 +727,12 @@ function analysisDiagramHtml() {
 
 // The heading states the count as a numeral, which the word-form scan in
 // check-claims.js cannot see. Derived here so it cannot be typed wrong.
+// Sentence case with a trailing full stop, matching every other section
+// heading on the homepage ("What we actually test.", "Learn how the testing
+// works."). The uppercase heavy-tracked version this used to be was the only
+// heading on the page that broke that pattern.
 function testingHeading() {
-  return `${TESTS_PER_BATCH}-Point Testing`;
+  return `${TESTS_PER_BATCH}-point testing.`;
 }
 
 // ---------------------------------------------------------------------------

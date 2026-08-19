@@ -266,6 +266,13 @@ if (!reduceMotion.matches && grid) {
   // Phase windows, as fractions of the scroll. They overlap on purpose: the
   // cap is still rising as the crimp starts, which is what makes it read as
   // one object coming apart rather than three separate moves.
+  //
+  // The first 0.38 is deliberately dead: the vial sits closed and whole while
+  // the reader scrolls into the section, so the explode reads as something
+  // that happens as they reach the bottom of it, not something that fires the
+  // instant the section arrives. The last 0.10 is dead too, holding the fully
+  // exploded diagram so it does not finish assembling right as the section
+  // lets go and scrolls away underneath it.
   const seg = (p, a, b) => Math.min(1, Math.max(0, (p - a) / (b - a)));
   const ease = t => 1 - Math.pow(1 - t, 3);
 
@@ -278,9 +285,9 @@ if (!reduceMotion.matches && grid) {
     const p = range > 0 ? Math.min(1, Math.max(0, -r.top / range)) : 1;
     const h = vial.getBoundingClientRect().height;
 
-    const cap = ease(seg(p, 0.20, 0.50)) * CAP * h;
-    const crimp = ease(seg(p, 0.28, 0.58)) * CRIMP * h;
-    const stop = ease(seg(p, 0.34, 0.62)) * STOP * h;
+    const cap = ease(seg(p, 0.38, 0.60)) * CAP * h;
+    const crimp = ease(seg(p, 0.44, 0.66)) * CRIMP * h;
+    const stop = ease(seg(p, 0.49, 0.69)) * STOP * h;
 
     vial.style.setProperty('--capY', `${-cap}px`);
     vial.style.setProperty('--crimpY', `${-crimp}px`);
@@ -290,15 +297,16 @@ if (!reduceMotion.matches && grid) {
     // in the stage instead of climbing towards the heading.
     vial.style.setProperty('--recentre', `${cap / 2}px`);
 
-    const mat = ease(seg(p, 0.35, 0.60));
+    const mat = ease(seg(p, 0.50, 0.70));
     vial.style.setProperty('--matO', String(mat));
     vial.style.setProperty('--matY', `${(1 - mat) * 30}px`);
 
-    // 0.50 to 0.85, one after another. Each gets the full window minus the
-    // stagger, so the last is fully up by the time the hold starts at 0.85.
+    // 0.72 to 0.90, one after another, then the 0.90-1.0 hold above. Each
+    // callout gets the full window minus the stagger, so the last is fully up
+    // well before the hold starts rather than right on top of it.
     calls.forEach((el, i) => {
-      const start = 0.50 + (0.24 / calls.length) * i;
-      const t = ease(seg(p, start, start + 0.11));
+      const start = 0.72 + (0.16 / calls.length) * i;
+      const t = ease(seg(p, start, start + 0.10));
       el.style.setProperty('--callO', String(t));
       el.style.setProperty('--slide', `${(1 - t) * (el.matches('.tv-call-left') ? -18 : 18)}px`);
     });
