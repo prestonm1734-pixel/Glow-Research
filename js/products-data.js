@@ -207,7 +207,7 @@ const GLOW_PRODUCTS = [
   // Ranked by the badge each product already carries (Best Seller, then
   // Popular, then Best Value), which is the one popularity signal already in
   // the data rather than a second, separate ranking to keep in sync with it.
-  { name: 'GLP-3 (RT)', alias: 'Retatrutide', tag: null, cat: 'metabolic', purity: '99.9%', badge:'Best Seller',
+  { name: 'GLP-3 (RT)', alias: 'Retatrutide', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:'Best Seller',
     sizes: [
       { mg: '10mg', price: 104.99, list: 130, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg-v3.webp' },
     ],
@@ -221,7 +221,7 @@ const GLOW_PRODUCTS = [
       { t: 'Glucagon receptor signalling', d: 'Studied in hepatocyte and cAMP assays for activity at the glucagon receptor, a target the two-receptor co-agonists do not engage.' },
       { t: 'Comparative incretin pharmacology', d: 'Applied as a comparator when characterising newer multi-receptor agonists against single- and dual-receptor peptides.' }
     ] },
-  { name: 'GLP-1 (SM)', alias: 'Semaglutide', tag: null, cat: 'metabolic', purity: '99.57%', badge:'Popular',
+  { name: 'GLP-1 (SM)', alias: 'Semaglutide', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:'Popular',
     sizes: [{ mg: '10mg', price: 79.99, list: 100, sku: 'GLO-SM10', image: 'assets/products/glp-1-sm-10mg-v3.webp' }],
     blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
     about: [
@@ -233,7 +233,7 @@ const GLOW_PRODUCTS = [
       { t: 'Albumin binding', d: 'Studied for how the fatty acid chain alters distribution and persistence in model systems.' },
       { t: 'Metabolic pathway research', d: 'Applied in islet and hepatocyte culture models examining downstream incretin signalling.' }
     ] },
-  { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.815%', badge:'Best Value',
+  { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.815%', lot: '5567', badge:'Best Value',
     sizes: [{ mg: '50mg', price: 54.99, list: 70, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
     blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
     about: [
@@ -245,7 +245,7 @@ const GLOW_PRODUCTS = [
       { t: 'Copper transport', d: 'Used as a model for how small peptides carry and deliver copper ions between compartments.' },
       { t: 'Antioxidant enzyme activity', d: 'Examined for interaction with copper-dependent enzyme systems.' }
     ] },
-  { name: 'BPC-157', tag: null, cat: 'tissue', purity: '98.2%', badge:null,
+  { name: 'BPC-157', tag: null, cat: 'tissue', purity: '98.2%', lot: '1400', badge:null,
     sizes: [
       { mg: '10mg', price: 64.99, list: 80, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg-v3.webp' },
     ],
@@ -259,7 +259,7 @@ const GLOW_PRODUCTS = [
       { t: 'Fibroblast migration', d: 'Used in scratch and outgrowth assays examining how tendon and ligament fibroblasts migrate and organise.' },
       { t: 'Gut epithelial models', d: 'Examined in gastrointestinal tissue models, reflecting the gastric origin of the parent protein.' }
     ] },
-  { name: 'BPC-157/TB-500', alias: 'Wolverine', tag: 'Peptide Blend', cat: 'tissue', purity: '98.63%', badge:null,
+  { name: 'BPC-157/TB-500', alias: 'Wolverine', tag: 'Peptide Blend', cat: 'tissue', purity: '98.63%', lot: '5615', badge:null,
     sizes: [
       { mg: '10mg', price: 84.99, list: 105, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg-v3.webp' },
     ],
@@ -273,7 +273,7 @@ const GLOW_PRODUCTS = [
       { t: 'Combined pathway models', d: 'Used in fibroblast and endothelial culture models examining both peptides applied from a single source.' },
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials to compare co-formulated and separately administered research protocols.' }
     ] },
-  { name: 'GLOW', alias: 'GHK-Cu/BPC-157/TB-500', tag: 'Peptide Blend', cat: 'tissue', purity: '99.61%', badge:null,
+  { name: 'GLOW', alias: 'GHK-Cu/BPC-157/TB-500', tag: 'Peptide Blend', cat: 'tissue', purity: '99.61%', lot: '1035', badge:null,
     sizes: [{ mg: '70mg', price: 124.99, list: 155, sku: 'GLO-BBG70', image: 'assets/products/glow-70mg-v3.webp' }],
     blurb: 'A compounded blend of GHK-Cu, BPC-157 and TB-500. Supplied for research using all three peptides together in one vial.',
     about: [
@@ -284,7 +284,7 @@ const GLOW_PRODUCTS = [
       { t: 'Co-formulation research', d: 'Used by laboratories studying multiple compounded peptides delivered from a single vial rather than several discrete kits.' },
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials when comparing blended and separately administered research protocols.' }
     ] },
-  { name: 'CJC-1295 No DAC/Ipamorelin', tag: 'Peptide Blend', cat: 'growth', purity: '99.08%', badge:null,
+  { name: 'CJC-1295 No DAC/Ipamorelin', tag: 'Peptide Blend', cat: 'growth', purity: '99.08%', lot: '005', badge:null,
     sizes: [{ mg: '5/5mg', price: 89.99, list: 110, sku: 'GLO-CP10', image: 'assets/products/cjc-1295-ipamorelin-5-5mg-v3.webp' }],
     blurb: 'A combined CJC-1295 (No DAC) and Ipamorelin formulation. Supplied for research examining GHRH and ghrelin receptor co-agonism.',
     about: [
@@ -296,7 +296,7 @@ const GLOW_PRODUCTS = [
       { t: 'Co-formulation stability', d: 'Studied for how the two peptides behave when reconstituted and stored from a single vial.' },
       { t: 'Comparative pulse studies', d: 'Applied alongside single-compound vials in models comparing combined and separate administration protocols.' }
     ] },
-  { name: 'Tesamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.36%', badge:null,
+  { name: 'Tesamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.36%', lot: '1002', badge:null,
     sizes: [{ mg: '10mg', price: 98.99, list: 125, sku: 'GLO-TSM10', image: 'assets/products/tesamorelin-10mg-v3.webp' }],
     blurb: 'A synthetic growth hormone releasing hormone analogue with a stabilised N-terminus. Studied for pituitary receptor engagement.',
     about: [
@@ -308,7 +308,7 @@ const GLOW_PRODUCTS = [
       { t: 'DPP-4 resistance', d: 'Studied for resistance to enzymatic cleavage relative to native GHRH, and how that changes assay-window duration.' },
       { t: 'Comparative secretagogue pharmacology', d: 'Run as a reference GHRH analogue when newer compounds in the class are characterised.' }
     ] },
-  { name: 'GLP-2 (TR)', alias: 'Tirzepatide', tag: null, cat: 'metabolic', purity: '99.75%', badge:null,
+  { name: 'GLP-2 (TR)', alias: 'Tirzepatide', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
     sizes: [{ mg: '10mg', price: 89.99, list: 110, sku: 'GLO-T10', image: 'assets/products/glp-2-tr-10mg-v3.webp' }],
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
     about: [
@@ -320,7 +320,7 @@ const GLOW_PRODUCTS = [
       { t: 'Biased signalling', d: 'Studied for the balance between G-protein coupling and beta-arrestin recruitment at each receptor.' },
       { t: 'Receptor crosstalk', d: 'Applied in models examining how engaging both receptors at once differs from either alone.' }
     ] },
-  { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.84%', badge:null,
+  { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.84%', lot: '1025', badge:null,
     sizes: [{ mg: '10mg', price: 74.99, list: 95, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg-v3.webp' }],
     blurb: 'A mitochondrial-derived peptide encoded within the mitochondrial genome. Studied for its role in metabolic signalling.',
     about: [
