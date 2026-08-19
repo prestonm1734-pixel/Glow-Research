@@ -279,10 +279,13 @@
      not exist. What replaced them is the one thing on this page that is
      provable: the seven analyses actually run on the lot.
 
-     Five transparent PNGs on one shared canvas, stacked and separated by
-     scroll position. The layers are plain <img> so the vial is there with
-     scripting off; js/script.js only takes over the transforms once all five
-     have decoded.
+     Five transparent PNGs on one shared canvas, stacked into one box. The
+     layers are plain <img> so the vial is there, already open, with scripting
+     off. js/script.js closes it back up the moment a script-capable browser
+     can (the base CSS is the open state), then reopens it once — via
+     .tv-open — the moment the section is actually in view. Not tied to
+     scroll position: it plays once and stays open, like any other .reveal
+     element on this page, rather than scrubbing with the scrollbar.
 
      The heading's numeral and every callout inside #tdNodes are baked by
      tools/build-testing.js from ANALYSIS_TESTS in js/products-data.js. Do not
@@ -297,88 +300,84 @@
      the claim PRINCIPLES.md exists to stop. The original is unmodified in the
      upload if it is ever needed. -->
 <section class="section-dark tv" id="testing">
-  <div class="tv-scroll">
-    <div class="tv-sticky">
-      <div class="tv-inner container">
-        <div class="tv-head">
-          <span class="eyebrow">Every lot</span>
-          <!-- baked: the numeral is TESTS_PER_BATCH -->
-          <h2 id="tvHeading">7-point testing.</h2>
-          <span class="tv-div" aria-hidden="true"><i>&#10022;</i></span>
-        </div>
+  <div class="tv-inner container">
+    <div class="tv-head">
+      <span class="eyebrow">Every lot</span>
+      <!-- baked: the numeral is TESTS_PER_BATCH -->
+      <h2 id="tvHeading">7-point testing.</h2>
+      <span class="tv-div" aria-hidden="true"><i>&#10022;</i></span>
+    </div>
 
-        <div class="tv-stage" id="tvStage">
-          <div class="tv-vial" aria-hidden="true">
-            <!-- Material in front of the body, not behind it as the asset
-                 README suggests. The body render's glass is opaque over the
-                 area the molecule occupies (alpha 246 of 255), so behind it
-                 the layer is simply never seen. In front, blended, it reads
-                 as suspended in the vial, which is what the reference showed
-                 it doing. -->
-            <img src="assets/vial/glow-vial-body.png" alt="" width="531" height="1437" class="tv-layer tv-body" decoding="async" />
-            <img src="assets/vial/glow-peptide-material.png" alt="" width="531" height="1437" class="tv-layer tv-material" decoding="async" />
-            <img src="assets/vial/glow-rubber-stopper.png" alt="" width="531" height="1437" class="tv-layer tv-stopper" decoding="async" />
-            <img src="assets/vial/glow-crimp-seal.png" alt="" width="531" height="1437" class="tv-layer tv-crimp" decoding="async" />
-            <img src="assets/vial/glow-flip-cap.png" alt="" width="531" height="1437" class="tv-layer tv-cap" decoding="async" />
-          </div>
+    <div class="tv-stage" id="tvStage">
+      <div class="tv-vial" aria-hidden="true">
+        <!-- Material in front of the body, not behind it as the asset
+             README suggests. The body render's glass is opaque over the
+             area the molecule occupies (alpha 246 of 255), so behind it
+             the layer is simply never seen. In front, blended, it reads
+             as suspended in the vial, which is what the reference showed
+             it doing. -->
+        <img src="assets/vial/glow-vial-body.png" alt="" width="531" height="1437" class="tv-layer tv-body" decoding="async" />
+        <img src="assets/vial/glow-peptide-material.png" alt="" width="531" height="1437" class="tv-layer tv-material" decoding="async" />
+        <img src="assets/vial/glow-rubber-stopper.png" alt="" width="531" height="1437" class="tv-layer tv-stopper" decoding="async" />
+        <img src="assets/vial/glow-crimp-seal.png" alt="" width="531" height="1437" class="tv-layer tv-crimp" decoding="async" />
+        <img src="assets/vial/glow-flip-cap.png" alt="" width="531" height="1437" class="tv-layer tv-cap" decoding="async" />
+      </div>
 
-          <!-- Baked by tools/build-testing.js. Anything typed between these
-               tags is overwritten on the next build. -->
-          <div class="tv-callouts" id="tdNodes">
-        <div class="tv-call tv-call-left" data-test="0" style="--top:16.0%">
+      <!-- Baked by tools/build-testing.js. Anything typed between these
+           tags is overwritten on the next build. -->
+      <div class="tv-callouts" id="tdNodes">
+        <div class="tv-call tv-call-left" data-test="0" style="--top:16.0%; --i:0">
           <span class="tv-wire" aria-hidden="true"><i></i></span>
           <span class="tv-text">
             <h3 class="tv-label">Purity</h3>
             <span class="tv-method">Reverse-phase HPLC-UV</span>
           </span>
         </div>
-        <div class="tv-call tv-call-left" data-test="1" style="--top:50.0%">
+        <div class="tv-call tv-call-left" data-test="1" style="--top:50.0%; --i:1">
           <span class="tv-wire" aria-hidden="true"><i></i></span>
           <span class="tv-text">
             <h3 class="tv-label">Identity</h3>
             <span class="tv-method">LC-MS</span>
           </span>
         </div>
-        <div class="tv-call tv-call-left" data-test="2" style="--top:84.0%">
+        <div class="tv-call tv-call-left" data-test="2" style="--top:84.0%; --i:2">
           <span class="tv-wire" aria-hidden="true"><i></i></span>
           <span class="tv-text">
             <h3 class="tv-label">Net peptide content</h3>
           </span>
         </div>
-        <div class="tv-call tv-call-right" data-test="3" style="--top:16.0%">
+        <div class="tv-call tv-call-right" data-test="3" style="--top:16.0%; --i:3">
           <span class="tv-wire" aria-hidden="true"><i></i></span>
           <span class="tv-text">
             <h3 class="tv-label">Sterility</h3>
           </span>
         </div>
-        <div class="tv-call tv-call-right" data-test="4" style="--top:38.7%">
+        <div class="tv-call tv-call-right" data-test="4" style="--top:38.7%; --i:4">
           <span class="tv-wire" aria-hidden="true"><i></i></span>
           <span class="tv-text">
             <h3 class="tv-label">Endotoxin</h3>
             <span class="tv-method">LAL assay, USP chapter 85</span>
           </span>
         </div>
-        <div class="tv-call tv-call-right" data-test="5" style="--top:61.3%">
+        <div class="tv-call tv-call-right" data-test="5" style="--top:61.3%; --i:5">
           <span class="tv-wire" aria-hidden="true"><i></i></span>
           <span class="tv-text">
             <h3 class="tv-label">Appearance and solubility</h3>
           </span>
         </div>
-        <div class="tv-call tv-call-right" data-test="6" style="--top:84.0%">
+        <div class="tv-call tv-call-right" data-test="6" style="--top:84.0%; --i:6">
           <span class="tv-wire" aria-hidden="true"><i></i></span>
           <span class="tv-text">
             <h3 class="tv-label">Heavy metals</h3>
           </span>
         </div>
           <!-- /tdNodes -->
-          </div>
-        </div>
-
-        <div class="tv-foot">
-          <p>Results are reported per lot by the testing laboratory. Figures on this site are read from those certificates, never entered by hand.</p>
-          <a href="how-we-test.html" class="btn btn-outline">How we test <span aria-hidden="true">&rarr;</span></a>
-        </div>
       </div>
+    </div>
+
+    <div class="tv-foot">
+      <p>Results are reported per lot by the testing laboratory. Figures on this site are read from those certificates, never entered by hand.</p>
+      <a href="how-we-test.html" class="btn btn-outline">How we test <span aria-hidden="true">&rarr;</span></a>
     </div>
   </div>
 </section>

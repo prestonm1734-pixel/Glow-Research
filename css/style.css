@@ -664,19 +664,23 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 
 /* ---------- testing diagram ----------
-   A vial that comes apart as the page scrolls, with the seven analyses called
-   out around it. Five transparent PNGs share one canvas and one box, so the
-   only thing separating them is a translate.
+   A vial that comes apart once, the moment the section arrives in view, with
+   the seven analyses calling themselves out around it. Five transparent PNGs
+   share one canvas and one box, so the only thing separating them is a
+   translate. Not tied to scroll position: it plays once on arrival and stays
+   open, the way any other reveal-on-scroll element on this page does (see
+   .reveal), rather than scrubbing back and forth with the scrollbar.
 
-   The default state written here is the finished one: fully exploded, every
-   callout up. That is what a reader with no JavaScript gets, and what the
-   reduced-motion query below keeps. js/script.js adds .is-live once all five
-   layers have decoded, and only then does anything depend on scroll position.
-   Built that way round because the failure mode matters: a diagram stuck open
-   is a diagram, a diagram stuck shut is a picture of a closed vial. */
+   The base rules below (no `.js` ancestor needed) are the finished state:
+   fully exploded, every callout up. That is what a reader with no JavaScript
+   gets. `.js #testing` closes it back up the instant the page can run
+   script — see the `.js` convention at the top of this file — so a
+   script-capable browser never sees the open state flash before js/script.js
+   plays the reveal. `.tv-open`, added once by an IntersectionObserver, is
+   what reopens it. Built that way round because the failure mode matters: a
+   diagram stuck open is a diagram, a diagram stuck shut is a picture of a
+   closed vial. */
 .tv{ background:#000; color: var(--text); }
-.tv-scroll{ position:relative; }
-.tv-sticky{ min-height:100vh; display:flex; align-items:center; }
 .tv-inner{ width:100%; padding-block: clamp(48px, 7vh, 80px); }
 
 /* h2 takes the sitewide rule as-is (Space Grotesk 600, sentence case,
@@ -714,8 +718,10 @@ button[disabled].si-forgot{ cursor: progress; }
   grid-column:2; position:relative;
   height: clamp(220px, 46vh, 460px); aspect-ratio: 531 / 1437;
   /* the group's top edge rises as the cap lifts, so it is pushed back down by
-     half of that to keep the exploded arrangement centred in the stage */
-  transform: translateY(calc(var(--recentre, 0px)));
+     half of that to keep the exploded arrangement centred in the stage. Half
+     of the cap's own travel, worked out from the same variable rather than a
+     separately-tracked one, so the two cannot drift apart. */
+  transform: translateY(calc(var(--capY, -20%) / -2));
 }
 .tv-layer{
   position:absolute; inset:0; width:100%; height:100%;
@@ -723,14 +729,11 @@ button[disabled].si-forgot{ cursor: progress; }
   /* stacked in one box: nothing here is in flow, and every layer shares the
      same canvas, so alignment survives whatever the box gets sized to */
 }
-/* Final state. .is-live replaces every one of these from scroll position. */
+/* Open state: what every reader gets, including no-JS. */
 .tv-cap{ transform: translateY(var(--capY, -20%)); }
 .tv-crimp{ transform: translateY(var(--crimpY, -11.7%)); }
 .tv-stopper{ transform: translateY(var(--stopY, -5.6%)); }
 .tv-body{ transform:none; }
-/* Screen, so the chrome picks up the glass behind it instead of sitting flat
-   on top of it. The layer is in front of the body out of necessity, not
-   design: see the note on the markup. */
 /* Lifted a tenth of the vial's height off where it was rendered. In place it
    lands across the label and covers the wordmark; up there it sits in the
    space the stopper and crimp have just left, which reads as material
@@ -739,8 +742,7 @@ button[disabled].si-forgot{ cursor: progress; }
    top of it. The layer is in front of the body out of necessity, not design:
    see the note on the markup. */
 .tv-material{
-  opacity: var(--matO, 1);
-  transform: translateY(calc(-10% + var(--matY, 0px)));
+  opacity: 1; transform: translateY(-10%);
   mix-blend-mode: screen;
 }
 
@@ -752,7 +754,7 @@ button[disabled].si-forgot{ cursor: progress; }
 .tv-call{
   position:absolute; top: var(--top); translate: 0 -50%;
   display:flex; align-items:center; gap: 8px;
-  opacity: var(--callO, 1);
+  opacity: 1;
 }
 /* DOM order inside a callout is wire then text. On the left the wire has to
    end up on the vial side of the text, so that column is reversed; both
@@ -799,20 +801,46 @@ button[disabled].si-forgot{ cursor: progress; }
 .tv-foot p{ margin:0; max-width: 560px; font-size:.85rem; }
 .tv-foot .btn-outline{ flex-shrink:0; }
 
-/* Scroll-driven. Only applied once every layer has decoded, so the vial never
-   comes apart around a component that has not arrived yet. */
-/* More distance than the explode itself needs, because the explode now waits
-   until 38% of it has passed: too little and that opening hold reads as the
-   diagram being stuck rather than as the reader having room to arrive first. */
-.tv.is-live .tv-scroll{ height: 340vh; }
-/* The site header is sticky at top:0 too, and wins on z-index, so a pinned
-   panel starting at 0 has its first line permanently behind it. */
-.tv.is-live .tv-sticky{
-  position:sticky; top:0; height:100vh; min-height:0;
-  box-sizing:border-box; padding-top: var(--tv-hdr, 0px);
+/* Closed state, JS-capable browsers only (the `.js` class is added by an
+   inline <script> in <head>, before first paint — see the top of this file).
+   js/script.js then reopens it with .tv-open the moment the section comes
+   into view. Everything here gets a transition, so the reopen animates;
+   nothing in the open rules above needs one, since a no-JS page never
+   changes state at all. */
+.js #testing .tv-cap,
+.js #testing .tv-crimp,
+.js #testing .tv-stopper,
+.js #testing .tv-vial{
+  transition: transform .9s cubic-bezier(.2,.8,.2,1);
 }
-.tv.is-live .tv-call{ transition: opacity .45s ease, translate .45s cubic-bezier(.2,.8,.2,1); }
-.tv.is-live .tv-call{ translate: var(--slide, 0) -50%; }
+.js #testing .tv-cap{ transform: translateY(0); }
+.js #testing .tv-crimp{ transition-delay: 70ms; transform: translateY(0); }
+.js #testing .tv-stopper{ transition-delay: 130ms; transform: translateY(0); }
+.js #testing .tv-vial{ transform: translateY(0); }
+
+.js #testing .tv-material{
+  opacity:0; transform: translateY(4%);
+  transition: opacity .6s ease .2s, transform .6s cubic-bezier(.2,.8,.2,1) .2s;
+}
+
+.js #testing .tv-call{
+  opacity:0; transform: translateX(var(--closedX, -14px));
+  transition: opacity .5s ease, transform .5s cubic-bezier(.2,.8,.2,1);
+  /* staggered by --i, baked per callout by tools/build-testing.js, so they
+     arrive one after another rather than all snapping in together */
+  transition-delay: calc(320ms + var(--i, 0) * 90ms);
+}
+.js #testing .tv-call-right{ --closedX: 14px; }
+
+/* .tv-open reopens every one of the rules above. Only the callout column
+   needs its own reset here — the others already point at var(--capY) etc.,
+   which is the open position, so removing the .js override is enough. */
+.js #testing.tv-open .tv-cap{ transform: translateY(var(--capY, -20%)); }
+.js #testing.tv-open .tv-crimp{ transform: translateY(var(--crimpY, -11.7%)); }
+.js #testing.tv-open .tv-stopper{ transform: translateY(var(--stopY, -5.6%)); }
+.js #testing.tv-open .tv-vial{ transform: translateY(calc(var(--capY, -20%) / -2)); }
+.js #testing.tv-open .tv-material{ opacity:1; transform: translateY(-10%); }
+.js #testing.tv-open .tv-call{ opacity:1; transform:none; }
 
 @media (max-width: 899px){
   /* The wires get short here, so the text takes the room instead. Same
@@ -826,13 +854,26 @@ button[disabled].si-forgot{ cursor: progress; }
   .tv-foot .btn-outline{ width:100%; text-align:center; }
 }
 
-/* The whole point of the scroll is the reveal, and the reveal is the thing
-   being opted out of. So: no sticky, no scroll height, the exploded state and
-   all seven callouts on arrival. */
+/* The reveal is the thing being opted out of, so under reduced motion the
+   `.js` closed state never applies at all: the vial renders open on arrival,
+   same as no-JS, and js/script.js does not bother with the observer. The
+   sitewide reduced-motion block (further down this file) also collapses
+   every transition-duration to near-zero, which is what stops .tv-open from
+   producing a fast, motion-heavy snap on the rare load where it still runs. */
 @media (prefers-reduced-motion: reduce){
-  .tv.is-live .tv-scroll{ height:auto; }
-  .tv.is-live .tv-sticky{ position:static; height:auto; min-height:0; }
-  .tv.is-live .tv-call{ transition:none; translate: 0 -50%; opacity:1; }
+  .js #testing .tv-cap,
+  .js #testing .tv-crimp,
+  .js #testing .tv-stopper,
+  .js #testing .tv-vial,
+  .js #testing .tv-material,
+  .js #testing .tv-call{
+    opacity:1; transform:none;
+  }
+  .js #testing .tv-cap{ transform: translateY(var(--capY, -20%)); }
+  .js #testing .tv-crimp{ transform: translateY(var(--crimpY, -11.7%)); }
+  .js #testing .tv-stopper{ transform: translateY(var(--stopY, -5.6%)); }
+  .js #testing .tv-vial{ transform: translateY(calc(var(--capY, -20%) / -2)); }
+  .js #testing .tv-material{ transform: translateY(-10%); }
 }
 
 /* ---------- product grid ---------- */

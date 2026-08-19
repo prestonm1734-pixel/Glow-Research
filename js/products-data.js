@@ -705,8 +705,10 @@ function analysisSideSplit() {
 function analysisCalloutHtml(t, i, side, nth, of) {
   // evenly spaced between 16% and 84%, or centred when a side holds only one
   const top = of === 1 ? 50 : 16 + (68 / (of - 1)) * nth;
+  // --i staggers the reveal in js/script.js: each callout's transition-delay
+  // reads this, so they arrive one after another rather than all at once.
   return `
-        <div class="tv-call tv-call-${side}" data-test="${i}" style="--top:${top.toFixed(1)}%">
+        <div class="tv-call tv-call-${side}" data-test="${i}" style="--top:${top.toFixed(1)}%; --i:${i}">
           <span class="tv-wire" aria-hidden="true"><i></i></span>
           <span class="tv-text">
             <h3 class="tv-label">${escHtml(t.name)}</h3>${t.method

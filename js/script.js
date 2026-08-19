@@ -233,125 +233,48 @@ if (!reduceMotion.matches && grid) {
 
 
 /* ---------- testing diagram ----------
-   The vial comes apart as the section is scrolled through, and the seven
-   callouts arrive after it. Everything here is driven by one number: how far
-   through the section's scroll range the page is, 0 to 1. No timers, so the
-   reader sets the pace and can hold the exploded view as long as they like by
-   simply not scrolling.
+   The vial comes apart once, the moment the section arrives on screen: cap,
+   then crimp and stopper, the material fading in behind them, then the seven
+   callouts one after another. Not tied to scroll position — it plays and
+   stays open, the same as any other .reveal element on this page, rather
+   than scrubbing back and forth with the scrollbar.
 
-   Two things this file does not do. It does not write copy: every callout is
-   baked into the markup by tools/build-testing.js, so the seven analyses are
-   readable with scripting off. And it does not run until all five layers have
-   decoded, because the whole illusion is one object separating, and an object
-   missing its cap for the first 200ms is not that.
-
-   Until then the CSS default stands, which is the finished exploded state
-   with every callout up. Chosen deliberately: a diagram stuck open is still a
-   diagram, where a diagram stuck shut is a picture of a closed vial. */
+   This file does not write copy: every callout is baked into the markup by
+   tools/build-testing.js, so the seven analyses are readable with scripting
+   off. What it does is exactly two things: close the vial back up the moment
+   a script-capable browser can (the CSS default is the open state, because
+   that is what has to survive with no scripting at all — see the `.js`
+   note in the stylesheet), and reopen it once via .tv-open when the section
+   is actually in view. */
 (function () {
   const section = document.getElementById('testing');
   if (!section) return;
-  const scroller = section.querySelector('.tv-scroll');
-  const vial = section.querySelector('.tv-vial');
-  const calls = Array.from(section.querySelectorAll('.tv-call'));
-  if (!scroller || !vial || !calls.length) return;
+  const layers = Array.from(section.querySelectorAll('.tv-layer'));
+  if (!layers.length) return;
 
   const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+  // Reduced motion never arms the closed state in the first place (see the
+  // stylesheet's own reduced-motion block for #testing), so there is nothing
+  // here to reopen and no observer worth setting up.
+  if (still.matches) return;
 
-  // Travel as a fraction of the vial's own height, so the exploded spacing is
-  // the same shape at every size. At the 900px desktop height these work out
-  // to the -180 / -105 / -50px the artwork was drawn for.
-  const CAP = 0.200, CRIMP = 0.117, STOP = 0.056;
-
-  // Phase windows, as fractions of the scroll. They overlap on purpose: the
-  // cap is still rising as the crimp starts, which is what makes it read as
-  // one object coming apart rather than three separate moves.
-  //
-  // The first 0.38 is deliberately dead: the vial sits closed and whole while
-  // the reader scrolls into the section, so the explode reads as something
-  // that happens as they reach the bottom of it, not something that fires the
-  // instant the section arrives. The last 0.10 is dead too, holding the fully
-  // exploded diagram so it does not finish assembling right as the section
-  // lets go and scrolls away underneath it.
-  const seg = (p, a, b) => Math.min(1, Math.max(0, (p - a) / (b - a)));
-  const ease = t => 1 - Math.pow(1 - t, 3);
-
-  let ticking = false;
-
-  function frame() {
-    ticking = false;
-    const r = scroller.getBoundingClientRect();
-    const range = r.height - window.innerHeight;
-    const p = range > 0 ? Math.min(1, Math.max(0, -r.top / range)) : 1;
-    const h = vial.getBoundingClientRect().height;
-
-    const cap = ease(seg(p, 0.38, 0.60)) * CAP * h;
-    const crimp = ease(seg(p, 0.44, 0.66)) * CRIMP * h;
-    const stop = ease(seg(p, 0.49, 0.69)) * STOP * h;
-
-    vial.style.setProperty('--capY', `${-cap}px`);
-    vial.style.setProperty('--crimpY', `${-crimp}px`);
-    vial.style.setProperty('--stopY', `${-stop}px`);
-    // Only the top of the group moves, so its centre rises by half the cap's
-    // travel. Pushing it back down by that much keeps the arrangement centred
-    // in the stage instead of climbing towards the heading.
-    vial.style.setProperty('--recentre', `${cap / 2}px`);
-
-    const mat = ease(seg(p, 0.50, 0.70));
-    vial.style.setProperty('--matO', String(mat));
-    vial.style.setProperty('--matY', `${(1 - mat) * 30}px`);
-
-    // 0.72 to 0.90, one after another, then the 0.90-1.0 hold above. Each
-    // callout gets the full window minus the stagger, so the last is fully up
-    // well before the hold starts rather than right on top of it.
-    calls.forEach((el, i) => {
-      const start = 0.72 + (0.16 / calls.length) * i;
-      const t = ease(seg(p, start, start + 0.10));
-      el.style.setProperty('--callO', String(t));
-      el.style.setProperty('--slide', `${(1 - t) * (el.matches('.tv-call-left') ? -18 : 18)}px`);
-    });
+  function open() {
+    section.classList.add('tv-open');
   }
 
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(frame);
-  }
+  // decode() rather than load: a decoded image is one that can be painted
+  // this frame, which is what the observer callback is about to ask for.
+  // Failures resolve too, since a missing layer is a reason to open on what
+  // did arrive rather than to leave the section permanently closed.
+  const ready = Promise.all(layers.map(img => (img.decode ? img.decode().catch(() => {}) :
+    new Promise(res => { img.complete ? res() : img.addEventListener('load', res, { once: true }); }))));
 
-  // Measured rather than guessed: the header is sticky at top:0 with a higher
-  // z-index, so the panel has to start below it or its first line is behind
-  // the nav for the whole scroll.
-  function headerRoom() {
-    const hdr = document.querySelector('.site-header');
-    section.style.setProperty('--tv-hdr', `${hdr ? Math.round(hdr.offsetHeight) : 0}px`);
-  }
-
-  function go() {
-    // Reduced motion keeps the CSS default: fully exploded, all seven up, no
-    // sticky and no scroll range. is-live is still set so the media query in
-    // the stylesheet has something to override.
-    headerRoom();
-    section.classList.add('is-live');
-    if (still.matches) return;
-    frame();
-    addEventListener('scroll', onScroll, { passive: true });
-    addEventListener('resize', () => { headerRoom(); onScroll(); });
-  }
-
-  // Assemble now, before waiting on anything. The stylesheet's default is the
-  // exploded state, because that is what has to survive with no scripting at
-  // all, so leaving it up while the layers decode would show the end of the
-  // animation and then snap back to the start of it.
-  if (!still.matches) frame();
-
-  // decode() rather than load: a decoded image is one that can be painted this
-  // frame, which is the thing being waited for. Failures resolve too, since a
-  // missing layer is a reason to run the animation on what did arrive rather
-  // than to leave the section inert.
-  const layers = Array.from(section.querySelectorAll('.tv-layer'));
-  Promise.all(layers.map(img => (img.decode ? img.decode().catch(() => {}) :
-    new Promise(res => { img.complete ? res() : img.addEventListener('load', res, { once: true }); }))))
-    .then(go);
+  const io = new IntersectionObserver((entries) => {
+    if (!entries.some(e => e.isIntersecting)) return;
+    io.disconnect();
+    ready.then(open);
+  }, { threshold: 0.3 });
+  io.observe(section);
 })();
 
 
