@@ -638,22 +638,6 @@ console.log('\nhow many tests');
     /ANALYSIS_TESTS\.map\(t => t\.short\)\.join/.test(read('js/products-data.js')) &&
     ANALYSIS_SHORT.split('+').length === TESTS_PER_BATCH);
 
-  /* The vial stage is the one section on the site that asserts nothing: it is
-     a plate and an animation, no copy at all. That is what makes it safe to
-     ship a generated clip there, so the wordlessness is the thing worth
-     guarding. Text creeping back in would be a claim nobody audited. */
-  const stage = read('index.html').match(/<section class="vialstage"[\s\S]*?<\/section>/);
-  ok('the vial stage is still on the homepage', !!stage);
-  if (stage) {
-    ok('the vial stage carries no copy, so it claims nothing',
-      stage[0].replace(/<[^>]*>/g, '').trim() === '');
-    ok('the vial stage animates an <img>, not a <video> iOS can refuse to play',
-      !/<video/.test(stage[0]) && /data-anim="[^"]+"/.test(stage[0]));
-    for (const src of [...stage[0].matchAll(/(?:src|data-anim)="([^"]+)"/g)].map(m => m[1])) {
-      ok(`the vial stage ships ${src}`, fs.existsSync(path.join(ROOT, src)));
-    }
-  }
-
 }
 
 /* ---------------------------------------------------------------------------

@@ -232,19 +232,3 @@ if (!reduceMotion.matches && grid) {
 }
 
 
-
-/* ---------- vial stage ----------
-   The animation is an <img> whose src is swapped, not a <video> that is asked
-   to play. iOS Low Power Mode blocks video autoplay outright, muted or not,
-   and there is no client-side way around that; an image swap is not playback,
-   so nothing can refuse it. The still frame holds until the plate scrolls into
-   view, which keeps the megabyte-plus clip off the initial load. */
-const vialClip = document.querySelector('.vialstage-clip');
-if (vialClip && vialClip.dataset.anim && !reduceMotion.matches) {
-  new IntersectionObserver((entries, obs) => {
-    if (entries[0].isIntersecting) {
-      vialClip.src = vialClip.dataset.anim;
-      obs.disconnect();
-    }
-  }, { threshold: 0.15 }).observe(vialClip);
-}
