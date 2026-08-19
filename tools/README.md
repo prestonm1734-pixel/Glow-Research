@@ -10,7 +10,7 @@ No dependencies to install. Everything here is plain Node.
 node tools/build.js          # the usual one: FAQ + products (when live) + sitemap + audit
 node tools/build-meta.js     # every copy of each page's title + description
 node tools/build-faq.js      # homepage FAQ markup + FAQPage schema
-node tools/build-testing.js  # homepage testing diagram, from ANALYSIS_TESTS
+node tools/build-testing.js  # homepage vial diagram callouts, from ANALYSIS_TESTS
 node tools/build-catalog.js  # peptides.html grid + CollectionPage schema
 node tools/build-llms.js     # llms.txt
 node tools/build-products.js # one page per compound
@@ -143,14 +143,35 @@ fails if you forget.
 
 ## `build-testing.js`
 
-Bakes the homepage testing diagram into the markup inside
-`<div id="tdNodes">`: one ruled row per analysis, beside a drawn cloud of the
-powder. The rule fills left to right while that analysis is the one up.
+Bakes the homepage testing diagram: the callouts inside `<div id="tdNodes">`,
+one per analysis on a wire ending in a dot, and the numeral in the
+`#tvHeading` heading.
 
 The rows live in `ANALYSIS_TESTS` in `js/products-data.js`, the same array
 `how-we-test.html` lists and the certificate panel summarises. Edit the array,
-run the build. `js/script.js` only moves the highlight between nodes that are
-already in the DOM.
+run the build. Which side a callout lands on is derived, not typed: the left
+column takes `floor(n/2)` and the right takes the rest, so an eighth analysis
+rebalances the diagram rather than leaving one side hanging.
+
+`js/script.js` never writes a callout. It sets scroll progress on five
+transparent PNG layers in `assets/vial/`, all sharing one canvas so that
+stacking them is all the alignment they need. `check-claims.js` reads the PNG
+headers and fails if the canvases ever stop matching, because cropping one
+layer on its own would knock the vial apart in a way no CSS could fix and
+nothing about the files would show it.
+
+### The label on the artwork
+
+`glow-vial-body.png` was delivered reading `GLP-3 (RT)` / `10 MG - 99%`. The
+catalog holds GLP-3 (RT) at 99.4%, so the render asserted a purity that was
+both wrong and beyond the reach of every check in `check-claims.js`: a figure
+baked into an image is exactly the claim PRINCIPLES.md exists to stop. The
+strength line was painted out before the file was committed, rebuilt by
+interpolating between the clean label rows above and below it so the curvature
+shading survives. The untouched original is in the upload if it is ever needed.
+
+A check now fails the build on any purity figure appearing beside the vial, so
+the next render cannot quietly reintroduce one.
 
 It exists because of what used to be in that slot: two "medical advisors" who
 did not exist, with invented credentials and stock headshots. What made them
@@ -162,8 +183,8 @@ leaves the certificate leaves the homepage in the same edit, or the build
 fails.
 
 The block is delimited by an `<!-- /tdNodes -->` marker rather than by a run of
-closing tags: the nodes nest two levels deep, and a lazy match up to
-`</div></div>` found the end of the right-hand column instead of the end of the
+closing tags: the callouts nest two levels deep, and a lazy match up to
+`</div></div>` found the end of the first callout instead of the end of the
 block, pushing a spare `</div>` into the page on every rebuild.
 
 ## `build-meta.js`

@@ -233,78 +233,118 @@ if (!reduceMotion.matches && grid) {
 
 
 /* ---------- testing diagram ----------
-   The seven analyses are already in the markup, baked by
-   tools/build-testing.js. Nothing here writes copy: it moves a highlight
-   between rows that exist whether or not this file runs, so the section is
-   complete with JavaScript off and merely still.
+   The vial comes apart as the section is scrolled through, and the seven
+   callouts arrive after it. Everything here is driven by one number: how far
+   through the section's scroll range the page is, 0 to 1. No timers, so the
+   reader sets the pace and can hold the exploded view as long as they like by
+   simply not scrolling.
 
-   The highlight follows the scroll rather than a timer. A timer picks its own
-   pace and is always wrong: too slow to sit through, too fast to read. Tied
-   to the scroll, the reader sets it, the row they are actually looking at is
-   the one lit, and it works the same on a phone where there is no hover.
+   Two things this file does not do. It does not write copy: every callout is
+   baked into the markup by tools/build-testing.js, so the seven analyses are
+   readable with scripting off. And it does not run until all five layers have
+   decoded, because the whole illusion is one object separating, and an object
+   missing its cap for the first 200ms is not that.
 
-   The mechanism is a focus band: rootMargin shrinks the observer's viewport
-   to a thin strip across the middle of the screen, so a row "intersects" only
-   while it is crossing that strip. Whichever is nearest the centre of it
-   wins, which keeps a single row lit when two are in the band at once. */
+   Until then the CSS default stands, which is the finished exploded state
+   with every callout up. Chosen deliberately: a diagram stuck open is still a
+   diagram, where a diagram stuck shut is a picture of a closed vial. */
 (function () {
-  const stage = document.querySelector('#testing .td-stage');
-  if (!stage) return;
-  const nodes = Array.from(stage.querySelectorAll('.td-node'));
-  const list = document.getElementById('tdNodes');
-  if (!nodes.length || !list) return;
+  const section = document.getElementById('testing');
+  if (!section) return;
+  const scroller = section.querySelector('.tv-scroll');
+  const vial = section.querySelector('.tv-vial');
+  const calls = Array.from(section.querySelectorAll('.tv-call'));
+  if (!scroller || !vial || !calls.length) return;
 
   const still = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let at = -1, held = false;
 
-  function show(i) {
-    if (i === at) return;
-    at = i;
-    nodes.forEach((n, k) => {
-      const on = k === i;
-      n.classList.toggle('is-active', on);
-      n.setAttribute('aria-pressed', String(on));
+  // Travel as a fraction of the vial's own height, so the exploded spacing is
+  // the same shape at every size. At the 900px desktop height these work out
+  // to the -180 / -105 / -50px the artwork was drawn for.
+  const CAP = 0.200, CRIMP = 0.117, STOP = 0.056;
+
+  // Phase windows, as fractions of the scroll. They overlap on purpose: the
+  // cap is still rising as the crimp starts, which is what makes it read as
+  // one object coming apart rather than three separate moves.
+  const seg = (p, a, b) => Math.min(1, Math.max(0, (p - a) / (b - a)));
+  const ease = t => 1 - Math.pow(1 - t, 3);
+
+  let ticking = false;
+
+  function frame() {
+    ticking = false;
+    const r = scroller.getBoundingClientRect();
+    const range = r.height - window.innerHeight;
+    const p = range > 0 ? Math.min(1, Math.max(0, -r.top / range)) : 1;
+    const h = vial.getBoundingClientRect().height;
+
+    const cap = ease(seg(p, 0.20, 0.50)) * CAP * h;
+    const crimp = ease(seg(p, 0.28, 0.58)) * CRIMP * h;
+    const stop = ease(seg(p, 0.34, 0.62)) * STOP * h;
+
+    vial.style.setProperty('--capY', `${-cap}px`);
+    vial.style.setProperty('--crimpY', `${-crimp}px`);
+    vial.style.setProperty('--stopY', `${-stop}px`);
+    // Only the top of the group moves, so its centre rises by half the cap's
+    // travel. Pushing it back down by that much keeps the arrangement centred
+    // in the stage instead of climbing towards the heading.
+    vial.style.setProperty('--recentre', `${cap / 2}px`);
+
+    const mat = ease(seg(p, 0.35, 0.60));
+    vial.style.setProperty('--matO', String(mat));
+    vial.style.setProperty('--matY', `${(1 - mat) * 30}px`);
+
+    // 0.50 to 0.85, one after another. Each gets the full window minus the
+    // stagger, so the last is fully up by the time the hold starts at 0.85.
+    calls.forEach((el, i) => {
+      const start = 0.50 + (0.24 / calls.length) * i;
+      const t = ease(seg(p, start, start + 0.11));
+      el.style.setProperty('--callO', String(t));
+      el.style.setProperty('--slide', `${(1 - t) * (el.matches('.tv-call-left') ? -18 : 18)}px`);
     });
-    list.classList.toggle('has-active', i >= 0);
-    stage.classList.toggle('is-scanning', i >= 0 && !still.matches);
   }
 
-  // Pointing at a row or tabbing to it takes precedence over the scroll, and
-  // holds until the pointer leaves: a reader who has reached for a specific
-  // row should not have it taken away by a pixel of scroll.
-  nodes.forEach((n, i) => {
-    n.addEventListener('mouseenter', () => { held = true; show(i); });
-    n.addEventListener('focus', () => { held = true; show(i); });
-    n.addEventListener('click', () => { held = true; show(i); });
-  });
-  stage.addEventListener('mouseleave', () => { held = false; });
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(frame);
+  }
 
-  if (!('IntersectionObserver' in window)) { show(0); return; }
+  // Measured rather than guessed: the header is sticky at top:0 with a higher
+  // z-index, so the panel has to start below it or its first line is behind
+  // the nav for the whole scroll.
+  function headerRoom() {
+    const hdr = document.querySelector('.site-header');
+    section.style.setProperty('--tv-hdr', `${hdr ? Math.round(hdr.offsetHeight) : 0}px`);
+  }
 
-  // -46%/-46% leaves an 8% band. Wide enough that something is nearly always
-  // in it, narrow enough that it is unambiguous which row that is.
-  const inBand = new Set();
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => (e.isIntersecting ? inBand.add(e.target) : inBand.delete(e.target)));
-    if (held || !inBand.size) return;
-    const mid = window.innerHeight / 2;
-    let best = null, bestGap = Infinity;
-    inBand.forEach(el => {
-      const r = el.getBoundingClientRect();
-      const gap = Math.abs(r.top + r.height / 2 - mid);
-      if (gap < bestGap) { bestGap = gap; best = el; }
-    });
-    if (best) show(nodes.indexOf(best));
-  }, { rootMargin: '-46% 0px -46% 0px', threshold: 0 });
-  nodes.forEach(n => io.observe(n));
+  function go() {
+    // Reduced motion keeps the CSS default: fully exploded, all seven up, no
+    // sticky and no scroll range. is-live is still set so the media query in
+    // the stylesheet has something to override.
+    headerRoom();
+    section.classList.add('is-live');
+    if (still.matches) return;
+    frame();
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', () => { headerRoom(); onScroll(); });
+  }
 
-  // Scrolled past, or not yet reached: nothing in the band, so light the row
-  // nearest the band rather than leaving the section with no state at all.
-  new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (!e.isIntersecting || at >= 0 || held) return;
-      show(e.boundingClientRect.top > 0 ? 0 : nodes.length - 1);
-    });
-  }, { threshold: 0.1 }).observe(stage);
+  // Assemble now, before waiting on anything. The stylesheet's default is the
+  // exploded state, because that is what has to survive with no scripting at
+  // all, so leaving it up while the layers decode would show the end of the
+  // animation and then snap back to the start of it.
+  if (!still.matches) frame();
+
+  // decode() rather than load: a decoded image is one that can be painted this
+  // frame, which is the thing being waited for. Failures resolve too, since a
+  // missing layer is a reason to run the animation on what did arrive rather
+  // than to leave the section inert.
+  const layers = Array.from(section.querySelectorAll('.tv-layer'));
+  Promise.all(layers.map(img => (img.decode ? img.decode().catch(() => {}) :
+    new Promise(res => { img.complete ? res() : img.addEventListener('load', res, { once: true }); }))))
+    .then(go);
 })();
+
+
 

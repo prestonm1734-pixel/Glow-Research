@@ -690,25 +690,45 @@ function escHtml(t) {
 // still reads all seven, and js/script.js only binds the highlighting on top
 // of markup that is already there.
 //
-// One rule per analysis, the rule fills left to right while that one is up.
-// Seven of them in a single column: split across two, the numbering read in
-// an order nobody follows, and the rules stopped lining up with each other.
-function analysisNodeHtml(t, i) {
-  const num = String(i + 1).padStart(2, '0');
+// Three callouts left of the vial, four right, each on a thin wire ending in a
+// dot. The split is derived, not typed: with seven rows the left column takes
+// the floor and the right takes the rest, so adding an eighth analysis
+// rebalances the diagram instead of leaving one side hanging.
+//
+// `top` is a percentage of the stage, spread evenly down each side with a
+// margin at either end so no wire runs off the top or bottom of the vial.
+function analysisSideSplit() {
+  const left = Math.floor(ANALYSIS_TESTS.length / 2);
+  return { left, right: ANALYSIS_TESTS.length - left };
+}
+
+function analysisCalloutHtml(t, i, side, nth, of) {
+  // evenly spaced between 16% and 84%, or centred when a side holds only one
+  const top = of === 1 ? 50 : 16 + (68 / (of - 1)) * nth;
   return `
-        <button type="button" class="td-node" data-test="${i}" aria-pressed="false">
-          <span class="td-rule" aria-hidden="true"><i></i></span>
-          <span class="td-head">
-            <span class="td-num">${num}</span>
-            <h3 class="td-name">${escHtml(t.name)}</h3>${t.method
-            ? `\n            <span class="td-method">${escHtml(t.method)}</span>` : ''}
+        <div class="tv-call tv-call-${side}" data-test="${i}" style="--top:${top.toFixed(1)}%">
+          <span class="tv-wire" aria-hidden="true"><i></i></span>
+          <span class="tv-text">
+            <h3 class="tv-label">${escHtml(t.name)}</h3>${t.method
+            ? `\n            <span class="tv-method">${escHtml(t.method)}</span>` : ''}
           </span>
-          <span class="td-plain">${escHtml(t.plain)}</span>
-        </button>`;
+        </div>`;
 }
 
 function analysisDiagramHtml() {
-  return ANALYSIS_TESTS.map((t, i) => analysisNodeHtml(t, i)).join('');
+  const { left } = analysisSideSplit();
+  return ANALYSIS_TESTS.map((t, i) => {
+    const onLeft = i < left;
+    const nth = onLeft ? i : i - left;
+    const of = onLeft ? left : ANALYSIS_TESTS.length - left;
+    return analysisCalloutHtml(t, i, onLeft ? 'left' : 'right', nth, of);
+  }).join('');
+}
+
+// The heading states the count as a numeral, which the word-form scan in
+// check-claims.js cannot see. Derived here so it cannot be typed wrong.
+function testingHeading() {
+  return `${TESTS_PER_BATCH}-Point Testing`;
 }
 
 // ---------------------------------------------------------------------------
@@ -1307,6 +1327,8 @@ if (typeof module !== 'undefined' && module.exports) {
     FAQS,
     faqHtml,
     analysisDiagramHtml,
+    analysisSideSplit,
+    testingHeading,
     productCardHtml,
     coaCardHtml,
     coaHref,

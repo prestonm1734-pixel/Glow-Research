@@ -29,7 +29,7 @@ const {
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
-  FAQS, faqHtml, analysisDiagramHtml,
+  FAQS, faqHtml, analysisDiagramHtml, testingHeading,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
@@ -648,30 +648,60 @@ console.log('\nhow many tests');
   ok('the homepage carries the testing diagram',
     home.includes('id="tdNodes"') && home.includes('id="testing"'));
   const missingNode = ANALYSIS_TESTS.filter(t =>
-    !home.includes(`<h3 class="td-name">${t.name}</h3>`));
+    !home.includes(`<h3 class="tv-label">${t.name}</h3>`));
   ok(`the diagram names all ${TESTS_PER_BATCH} analyses in the served markup`,
     missingNode.length === 0, `missing: ${missingNode.map(t => t.name).join(', ')}`);
   ok('the diagram is baked from the catalog, not typed into the page',
     home.includes(analysisDiagramHtml().trim()),
     'index.html and analysisDiagramHtml() disagree. Run node tools/build-testing.js');
-  // Every sentence in the diagram is the row's own `plain` field, which
-  // how-we-test.html also prints. Two copies of the same claim is how they
-  // start to differ.
-  const strayPlain = ANALYSIS_TESTS.filter(t => !home.includes(t.plain));
-  ok('every sentence in the diagram is the row’s own copy',
-    strayPlain.length === 0, `not from the catalog: ${strayPlain.map(t => t.name).join(', ')}`);
-  // The method line is the row's, or absent. A node inventing a technique for
-  // one of the four rows the certificate reports without naming one would be
-  // the same fabrication in a smaller font.
+  // The heading counts the panel as a numeral. The word-form scan above reads
+  // "seven tests" and cannot see "7-Point Testing", so it gets its own check
+  // rather than being the one claim on the page nothing is holding.
+  ok(`the heading states the count as ${TESTS_PER_BATCH}`,
+    home.includes(`<h2 id="tvHeading">${testingHeading()}</h2>`),
+    `expected "${testingHeading()}". Run node tools/build-testing.js`);
+  const headingNums = (home.match(/<h2 id="tvHeading">(\d+)/) || [])[1];
+  ok('and states no other number there',
+    headingNums === String(TESTS_PER_BATCH), `heading says ${headingNums}`);
+  // The method line is the row's, or absent. A callout inventing a technique
+  // for one of the four rows the certificate reports without naming one would
+  // be the same fabrication in a smaller font.
   const noMethod = ANALYSIS_TESTS.filter(t => !t.method);
-  ok('no node names a method the catalog leaves blank',
+  ok('no callout names a method the catalog leaves blank',
     noMethod.every(t => {
-      const node = home.split(`<h3 class="td-name">${t.name}</h3>`)[1] || '';
-      return !node.slice(0, 400).includes('class="td-method"');
+      // Cut at the callout's own closing tag. A fixed character window ran
+      // past it into the next callout, which does name one.
+      const after = home.split(`<h3 class="tv-label">${t.name}</h3>`)[1] || '';
+      return !after.split('</div>')[0].includes('class="tv-method"');
     }));
   ok('the diagram renders no person, credential or endorsement',
-    !/td-node[\s\S]*?(Ph\.D|M\.D\.|advisor|endorse)/i.test(
+    !/tv-call[\s\S]*?(Ph\.D|M\.D\.|advisor|endorse)/i.test(
       home.split('id="tdNodes"')[1] || ''));
+
+  // The vial artwork. It is a render, not a photograph of a real lot, and the
+  // label it was delivered with read "10 MG - 99%". The catalog holds GLP-3
+  // (RT) at 99.4%, so the image asserted a purity that was both wrong and
+  // beyond the reach of every check in this file. It was painted out before
+  // the file was committed; this is what stops it coming back, and what stops
+  // any future layer arriving with a figure printed on it.
+  const vialDir = path.join(ROOT, 'assets/vial');
+  const layers = fs.existsSync(vialDir) ? fs.readdirSync(vialDir).filter(f => f.endsWith('.png')) : [];
+  ok('every vial layer the page stacks is present on disk',
+    ['glow-peptide-material', 'glow-vial-body', 'glow-rubber-stopper',
+      'glow-crimp-seal', 'glow-flip-cap'].every(n => {
+      return layers.includes(`${n}.png`) && home.includes(`assets/vial/${n}.png`);
+    }));
+  // The layers only line up because they share one canvas. Cropping one on its
+  // own would knock the vial apart in a way no amount of CSS could fix, and it
+  // would not be obvious from looking at the files.
+  const sizes = new Set(layers.map(f => {
+    const b = fs.readFileSync(path.join(vialDir, f));
+    return `${b.readUInt32BE(16)}x${b.readUInt32BE(20)}`;   // PNG IHDR
+  }));
+  ok('and every layer shares one canvas, which is what aligns them',
+    sizes.size === 1, `sizes found: ${[...sizes].join(', ')}`);
+  ok('the page states no purity figure of its own beside the vial',
+    !/tv-(label|method|head)[^>]*>[^<]*\d+(\.\d+)?\s*%/i.test(home));
 }
 
 /* ---------------------------------------------------------------------------

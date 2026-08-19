@@ -36,17 +36,19 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PAGE = 'index.html';
 
-const { analysisDiagramHtml, TESTS_PER_BATCH } = require(path.join(ROOT, 'js/products-data.js'));
+const {
+  analysisDiagramHtml, analysisSideSplit, testingHeading, TESTS_PER_BATCH,
+} = require(path.join(ROOT, 'js/products-data.js'));
 
 function build() {
   const file = path.join(ROOT, PAGE);
   let html = fs.readFileSync(file, 'utf8');
 
   // Anchored on an explicit end marker, not on a run of closing tags. The
-  // nodes nest two levels deep, so a lazy match up to "</div></div>" found the
-  // end of the right-hand column instead of the end of the block and pushed a
+  // callouts nest two levels deep, so a lazy match up to "</div></div>" found
+  // the end of the first callout instead of the end of the block and pushed a
   // spare </div> into the page on every rebuild. The sentinel cannot drift.
-  const re = /(<div class="td-nodes" id="tdNodes">)[\s\S]*?(<!-- \/tdNodes -->)/;
+  const re = /(<div class="tv-callouts" id="tdNodes">)[\s\S]*?(<!-- \/tdNodes -->)/;
   if (!re.test(html)) {
     throw new Error(
       `Could not find #tdNodes and its <!-- /tdNodes --> marker in ${PAGE}. ` +
@@ -56,10 +58,20 @@ function build() {
 
   // Replacer function, not a replacement string: a "$1" anywhere in the test
   // copy would otherwise be read as a backreference. See tools/build-faq.js.
-  html = html.replace(re, (m, open, close) => `${open}${analysisDiagramHtml()}\n      ${close}`);
+  html = html.replace(re, (m, open, close) => `${open}${analysisDiagramHtml()}\n          ${close}`);
+
+  // The heading counts the panel as a numeral, which the word-form scan in
+  // check-claims.js cannot see. Written from the array like everything else.
+  const headRe = /(<h2 id="tvHeading">)[\s\S]*?(<\/h2>)/;
+  if (!headRe.test(html)) {
+    throw new Error(`Could not find #tvHeading in ${PAGE}.`);
+  }
+  html = html.replace(headRe, (m, open, close) => `${open}${testingHeading()}${close}`);
 
   fs.writeFileSync(file, html);
-  console.log(`  ${PAGE}: ${TESTS_PER_BATCH} analyses baked into #tdNodes`);
+  const split = analysisSideSplit();
+  console.log(`  ${PAGE}: "${testingHeading()}", ${TESTS_PER_BATCH} callouts ` +
+    `(${split.left} left, ${split.right} right)`);
 }
 
 if (require.main === module) build();

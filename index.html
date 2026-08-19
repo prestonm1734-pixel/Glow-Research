@@ -279,183 +279,106 @@
      not exist. What replaced them is the one thing on this page that is
      provable: the seven analyses actually run on the lot.
 
-     The nodes inside #tdNodes are baked by tools/build-testing.js from
-     ANALYSIS_TESTS in js/products-data.js. Do not type a test in here. A
-     crawler that never runs JavaScript still reads all seven, and
-     check-claims.js fails the build if the served markup and the array
-     disagree. js/script.js only adds the highlighting on top. -->
-<section class="section section-dark" id="testing">
-  <div class="container">
-    <div class="section-head center reveal">
-      <span class="eyebrow">Every lot</span>
-      <h2>What we actually test.</h2>
-    </div>
+     Five transparent PNGs on one shared canvas, stacked and separated by
+     scroll position. The layers are plain <img> so the vial is there with
+     scripting off; js/script.js only takes over the transforms once all five
+     have decoded.
 
-    <div class="td-stage reveal">
-      <!-- The powder is drawn, not photographed. There is no stock image of
-           our own material, and using someone else's would be the same defect
-           as the section this replaced.
+     The heading's numeral and every callout inside #tdNodes are baked by
+     tools/build-testing.js from ANALYSIS_TESTS in js/products-data.js. Do not
+     type a test in here. A crawler that never runs JavaScript reads all seven,
+     and check-claims.js fails the build if the served markup and the array
+     disagree.
 
-           It is fractal noise pushed through a displacement map, which is what
-           gives an edge that crumbles instead of a soft ellipse that reads as
-           smoke. Three layers at different noise seeds cross-fade so the cloud
-           churns without the filter being recomputed every frame: animating
-           baseFrequency looks the same and costs a full re-render at 60fps.
-           Decorative, so it is hidden from a reader who is getting the seven
-           analyses read out to them instead. -->
-      <div class="td-powder" aria-hidden="true">
-        <svg viewBox="0 0 460 340" role="presentation" focusable="false">
-          <defs>
-            <!-- Opaque white well past the middle, then a fast falloff. The
-                 first pass held 60% opacity across most of the radius, which
-                 on black is grey: powder has to be solid where there is
-                 powder and gone where there is not. -->
-            <radialGradient id="tdDust" cx="50%" cy="46%" r="52%">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
-              <stop offset="34%" stop-color="#fdfbf6" stop-opacity=".96"/>
-              <stop offset="60%" stop-color="#f2ece0" stop-opacity=".72"/>
-              <stop offset="84%" stop-color="#ddd6c8" stop-opacity=".2"/>
-              <stop offset="100%" stop-color="#b8b1a2" stop-opacity="0"/>
-            </radialGradient>
-            <!-- High frequency, small displacement. The reverse (big soft
-                 billows) is what smoke looks like; dry powder breaks into
-                 grain at the edge, so the noise has to be finer than the
-                 shape it is pushing. -->
-            <filter id="tdGrainA" x="-45%" y="-70%" width="190%" height="240%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.075" numOctaves="3" seed="3" result="n"/>
-              <feDisplacementMap in="SourceGraphic" in2="n" scale="38" xChannelSelector="R" yChannelSelector="G"/>
-            </filter>
-            <filter id="tdGrainB" x="-45%" y="-70%" width="190%" height="240%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.095" numOctaves="3" seed="17" result="n"/>
-              <feDisplacementMap in="SourceGraphic" in2="n" scale="30" xChannelSelector="R" yChannelSelector="G"/>
-            </filter>
-            <filter id="tdGrainC" x="-45%" y="-70%" width="190%" height="240%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.055" numOctaves="4" seed="41" result="n"/>
-              <feDisplacementMap in="SourceGraphic" in2="n" scale="46" xChannelSelector="R" yChannelSelector="G"/>
-            </filter>
-            <!-- Gentler again, for the cores. Left unfiltered they kept a
-                 clean elliptical edge and the middle read as a lit lens
-                 rather than as the densest part of the powder. -->
-            <filter id="tdGrainCore" x="-60%" y="-90%" width="220%" height="280%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.13" numOctaves="3" seed="61" result="n"/>
-              <feDisplacementMap in="SourceGraphic" in2="n" scale="19" xChannelSelector="R" yChannelSelector="G"/>
-            </filter>
-          </defs>
+     The label on glow-vial-body.png carried "10 MG - 99%" as rendered. The
+     strength line was painted out before the file was committed: the catalog
+     holds GLP-3 (RT) at 99.4%, so the render stated a purity that was both
+     wrong and unreachable by any check. A number baked into a PNG is exactly
+     the claim PRINCIPLES.md exists to stop. The original is unmodified in the
+     upload if it is ever needed. -->
+<section class="section-dark tv" id="testing">
+  <div class="tv-scroll">
+    <div class="tv-sticky">
+      <div class="tv-inner container">
+        <div class="tv-head">
+          <span class="eyebrow">Every lot</span>
+          <!-- baked: the numeral is TESTS_PER_BATCH -->
+          <h2 id="tvHeading">7-Point Testing</h2>
+          <span class="tv-div" aria-hidden="true"><i>&#10022;</i></span>
+        </div>
 
-          <g class="td-cloud td-cloud-a" filter="url(#tdGrainA)">
-            <ellipse cx="230" cy="168" rx="126" ry="52" fill="url(#tdDust)"/>
-          </g>
-          <!-- Each layer tilted differently. Three concentric ellipses on the
-               same axis add up to one symmetrical lozenge, which nothing
-               poured out of a vial ever looks like. -->
-          <g class="td-cloud td-cloud-b" filter="url(#tdGrainB)" transform="rotate(-5 230 166)">
-            <ellipse cx="230" cy="166" rx="104" ry="44" fill="url(#tdDust)"/>
-          </g>
-          <g class="td-cloud td-cloud-c" filter="url(#tdGrainC)" transform="rotate(4 230 170)">
-            <ellipse cx="230" cy="170" rx="138" ry="46" fill="url(#tdDust)"/>
-          </g>
-          <!-- Undisplaced core. Without it the whole mass is edge and the
-               powder has no weight anywhere. Two of them: the inner one is
-               flat white rather than a gradient, which is what stops the
-               middle reading as a bright grey. -->
-          <g filter="url(#tdGrainCore)">
-            <ellipse class="td-core" cx="230" cy="168" rx="62" ry="26" fill="url(#tdDust)"/>
-            <ellipse class="td-core td-core-hot" cx="226" cy="166" rx="34" ry="14" fill="#fff" opacity=".8"/>
-          </g>
+        <div class="tv-stage" id="tvStage">
+          <div class="tv-vial" aria-hidden="true">
+            <!-- Material in front of the body, not behind it as the asset
+                 README suggests. The body render's glass is opaque over the
+                 area the molecule occupies (alpha 246 of 255), so behind it
+                 the layer is simply never seen. In front, blended, it reads
+                 as suspended in the vial, which is what the reference showed
+                 it doing. -->
+            <img src="assets/vial/glow-vial-body.png" alt="" width="531" height="1437" class="tv-layer tv-body" decoding="async" />
+            <img src="assets/vial/glow-peptide-material.png" alt="" width="531" height="1437" class="tv-layer tv-material" decoding="async" />
+            <img src="assets/vial/glow-rubber-stopper.png" alt="" width="531" height="1437" class="tv-layer tv-stopper" decoding="async" />
+            <img src="assets/vial/glow-crimp-seal.png" alt="" width="531" height="1437" class="tv-layer tv-crimp" decoding="async" />
+            <img src="assets/vial/glow-flip-cap.png" alt="" width="531" height="1437" class="tv-layer tv-cap" decoding="async" />
+          </div>
 
-          <!-- Loose grain thrown clear of the mass. This is the difference
-               between powder and vapour: discrete particles with hard edges,
-               biggest near the body and finer the further out they carry. -->
-          <g class="td-motes" fill="#f4eee2">
-            <circle cx="118" cy="152" r="1.9" opacity=".7"/>
-            <circle cx="352" cy="184" r="1.6" opacity=".62"/>
-            <circle cx="156" cy="206" r="1.2" opacity=".5"/>
-            <circle cx="318" cy="136" r="2.1" opacity=".58"/>
-            <circle cx="240" cy="112" r="1.3" opacity=".46"/>
-            <circle cx="200" cy="228" r="1.7" opacity=".54"/>
-            <circle cx="284" cy="220" r="1.1" opacity=".44"/>
-            <circle cx="86" cy="176" r="1" opacity=".38"/>
-            <circle cx="386" cy="152" r="1.2" opacity=".4"/>
-            <circle cx="264" cy="96" r=".9" opacity=".34"/>
-            <circle cx="170" cy="124" r="1.4" opacity=".5"/>
-            <circle cx="308" cy="248" r=".9" opacity=".32"/>
-            <circle cx="132" cy="240" r="1.1" opacity=".36"/>
-            <circle cx="404" cy="198" r=".8" opacity=".3"/>
-            <circle cx="64" cy="204" r=".9" opacity=".28"/>
-            <circle cx="222" cy="252" r="1.2" opacity=".38"/>
-          </g>
-        </svg>
+          <!-- Baked by tools/build-testing.js. Anything typed between these
+               tags is overwritten on the next build. -->
+          <div class="tv-callouts" id="tdNodes">
+        <div class="tv-call tv-call-left" data-test="0" style="--top:16.0%">
+          <span class="tv-wire" aria-hidden="true"><i></i></span>
+          <span class="tv-text">
+            <h3 class="tv-label">Purity</h3>
+            <span class="tv-method">Reverse-phase HPLC-UV</span>
+          </span>
+        </div>
+        <div class="tv-call tv-call-left" data-test="1" style="--top:50.0%">
+          <span class="tv-wire" aria-hidden="true"><i></i></span>
+          <span class="tv-text">
+            <h3 class="tv-label">Identity</h3>
+            <span class="tv-method">LC-MS</span>
+          </span>
+        </div>
+        <div class="tv-call tv-call-left" data-test="2" style="--top:84.0%">
+          <span class="tv-wire" aria-hidden="true"><i></i></span>
+          <span class="tv-text">
+            <h3 class="tv-label">Net peptide content</h3>
+          </span>
+        </div>
+        <div class="tv-call tv-call-right" data-test="3" style="--top:16.0%">
+          <span class="tv-wire" aria-hidden="true"><i></i></span>
+          <span class="tv-text">
+            <h3 class="tv-label">Sterility</h3>
+          </span>
+        </div>
+        <div class="tv-call tv-call-right" data-test="4" style="--top:38.7%">
+          <span class="tv-wire" aria-hidden="true"><i></i></span>
+          <span class="tv-text">
+            <h3 class="tv-label">Endotoxin</h3>
+            <span class="tv-method">LAL assay, USP chapter 85</span>
+          </span>
+        </div>
+        <div class="tv-call tv-call-right" data-test="5" style="--top:61.3%">
+          <span class="tv-wire" aria-hidden="true"><i></i></span>
+          <span class="tv-text">
+            <h3 class="tv-label">Appearance and solubility</h3>
+          </span>
+        </div>
+        <div class="tv-call tv-call-right" data-test="6" style="--top:84.0%">
+          <span class="tv-wire" aria-hidden="true"><i></i></span>
+          <span class="tv-text">
+            <h3 class="tv-label">Heavy metals</h3>
+          </span>
+        </div>
+          <!-- /tdNodes -->
+          </div>
+        </div>
+
+        <div class="tv-foot">
+          <p>Results are reported per lot by the testing laboratory. Figures on this site are read from those certificates, never entered by hand.</p>
+          <a href="how-we-test.html" class="btn btn-outline">How we test <span aria-hidden="true">&rarr;</span></a>
+        </div>
       </div>
-
-      <!-- Baked by tools/build-testing.js. Anything typed between these tags
-           is overwritten on the next build. -->
-      <div class="td-nodes" id="tdNodes">
-        <button type="button" class="td-node" data-test="0" aria-pressed="false">
-          <span class="td-rule" aria-hidden="true"><i></i></span>
-          <span class="td-head">
-            <span class="td-num">01</span>
-            <h3 class="td-name">Purity</h3>
-            <span class="td-method">Reverse-phase HPLC-UV</span>
-          </span>
-          <span class="td-plain">How much of the powder is the peptide you ordered. This is the percentage printed on the certificate.</span>
-        </button>
-        <button type="button" class="td-node" data-test="1" aria-pressed="false">
-          <span class="td-rule" aria-hidden="true"><i></i></span>
-          <span class="td-head">
-            <span class="td-num">02</span>
-            <h3 class="td-name">Identity</h3>
-            <span class="td-method">LC-MS</span>
-          </span>
-          <span class="td-plain">Weighs the molecule to confirm it is the one on the label, not something close to it.</span>
-        </button>
-        <button type="button" class="td-node" data-test="2" aria-pressed="false">
-          <span class="td-rule" aria-hidden="true"><i></i></span>
-          <span class="td-head">
-            <span class="td-num">03</span>
-            <h3 class="td-name">Net peptide content</h3>
-          </span>
-          <span class="td-plain">How many milligrams of actual peptide are in the vial once salt and water are taken out.</span>
-        </button>
-        <button type="button" class="td-node" data-test="3" aria-pressed="false">
-          <span class="td-rule" aria-hidden="true"><i></i></span>
-          <span class="td-head">
-            <span class="td-num">04</span>
-            <h3 class="td-name">Sterility</h3>
-          </span>
-          <span class="td-plain">The lot is cultured to see whether anything grows. Nothing should.</span>
-        </button>
-        <button type="button" class="td-node" data-test="4" aria-pressed="false">
-          <span class="td-rule" aria-hidden="true"><i></i></span>
-          <span class="td-head">
-            <span class="td-num">05</span>
-            <h3 class="td-name">Endotoxin</h3>
-            <span class="td-method">LAL assay, USP chapter 85</span>
-          </span>
-          <span class="td-plain">Checks for bacterial toxin, which is left behind even after the bacteria themselves are gone.</span>
-        </button>
-        <button type="button" class="td-node" data-test="5" aria-pressed="false">
-          <span class="td-rule" aria-hidden="true"><i></i></span>
-          <span class="td-head">
-            <span class="td-num">06</span>
-            <h3 class="td-name">Appearance and solubility</h3>
-          </span>
-          <span class="td-plain">The powder is looked at and dissolved. It should look right and go into solution cleanly.</span>
-        </button>
-        <button type="button" class="td-node" data-test="6" aria-pressed="false">
-          <span class="td-rule" aria-hidden="true"><i></i></span>
-          <span class="td-head">
-            <span class="td-num">07</span>
-            <h3 class="td-name">Heavy metals</h3>
-          </span>
-          <span class="td-plain">Screens for lead, arsenic and the other metals that can carry over from manufacturing.</span>
-        </button>
-      <!-- /tdNodes -->
-      </div>
-    </div>
-
-    <div class="td-foot reveal">
-      <p>Results are reported per lot by the testing laboratory. Figures on this site are read from those certificates, never entered by hand.</p>
-      <a href="how-we-test.html" class="btn btn-outline">How we test <span aria-hidden="true">&rarr;</span></a>
     </div>
   </div>
 </section>

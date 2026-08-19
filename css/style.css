@@ -664,155 +664,167 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 
 /* ---------- testing diagram ----------
-   Seven analyses, one ruled row each, beside a drawn cloud of the powder.
-   Single column of rows at every width: split across two, the numbering read
-   in an order nobody follows and the rules stopped lining up with each other.
-   Below 900px the powder sits above them, which is the only change. */
-/* Pure black, not var(--bg-2): the powder's own falloff needs a flat ground
-   behind it or the halo lands on a slightly-lighter rectangle and reads as a
-   box around the artwork. */
-#testing{ background:#000; }
+   A vial that comes apart as the page scrolls, with the seven analyses called
+   out around it. Five transparent PNGs share one canvas and one box, so the
+   only thing separating them is a translate.
 
-.td-stage{ margin-top: clamp(30px, 4vw, 46px); }
+   The default state written here is the finished one: fully exploded, every
+   callout up. That is what a reader with no JavaScript gets, and what the
+   reduced-motion query below keeps. js/script.js adds .is-live once all five
+   layers have decoded, and only then does anything depend on scroll position.
+   Built that way round because the failure mode matters: a diagram stuck open
+   is a diagram, a diagram stuck shut is a picture of a closed vial. */
+.tv{ background:#000; color: var(--text); }
+.tv-scroll{ position:relative; }
+.tv-sticky{ min-height:100vh; display:flex; align-items:center; }
+.tv-inner{ width:100%; padding-block: clamp(48px, 7vh, 80px); }
 
-.td-powder{
-  position:relative; display:flex; justify-content:center;
-  margin: 0 auto clamp(6px, 2vw, 18px);
+.tv-head{ text-align:center; }
+.tv-head h2{
+  margin:.5em 0 0; font-size: clamp(1.5rem, 3.4vw, 2.3rem);
+  text-transform:uppercase; letter-spacing:.22em; font-weight:600;
 }
-.td-powder svg{ width:100%; max-width: 460px; height:auto; overflow:visible; }
+/* Rule, sparkle, rule. The sparkle is the brand mark the header already
+   uses, so the divider is not one more decoration invented for this section. */
+.tv-div{
+  display:flex; align-items:center; justify-content:center; gap:14px;
+  margin-top: 18px; color: var(--text-dim);
+}
+.tv-div::before, .tv-div::after{
+  content:''; height:1px; width: clamp(48px, 12vw, 130px);
+  background: linear-gradient(to right, transparent, rgba(255,255,255,.4));
+}
+.tv-div::after{ background: linear-gradient(to left, transparent, rgba(255,255,255,.4)); }
+.tv-div i{ font-style:normal; font-size:.72rem; }
 
-/* The three noise layers cross-fade rather than the filter being animated, so
-   the cloud churns at no per-frame cost. Offset delays over one shared period
-   keep any two of them from peaking together. */
-.td-cloud{ animation: td-churn 13s ease-in-out infinite; transform-origin: 50% 50%; }
-.td-cloud-a{ animation-delay: 0s; }
-.td-cloud-b{ animation-delay: -4.3s; }
-.td-cloud-c{ animation-delay: -8.6s; }
-/* Never dips far: three half-transparent layers overlapping is how white
-   powder came out grey the first time. They vary in density, not presence. */
-@keyframes td-churn{
-  0%,100%{ opacity:.62; transform: scale(1) translateY(0); }
-  50%    { opacity:1;   transform: scale(1.05) translateY(-5px); }
-}
-.td-core{ animation: td-churn 13s ease-in-out infinite; animation-delay:-2.1s; transform-origin:50% 50%; }
-/* Grains carry at their own pace. Prime-ish durations so the field never
-   settles into a visible pulse. */
-.td-motes circle{ animation: td-drift 11s ease-in-out infinite; }
-.td-motes circle:nth-child(2n){ animation-duration: 14s; animation-delay:-4s; }
-.td-motes circle:nth-child(3n){ animation-duration: 9s;  animation-delay:-7s; }
-.td-motes circle:nth-child(4n){ animation-duration: 17s; animation-delay:-2s; }
-.td-motes circle:nth-child(5n){ animation-duration: 8s;  animation-delay:-9s; }
-.td-motes circle:nth-child(7n){ animation-duration: 15s; animation-delay:-5s; }
-@keyframes td-drift{
-  0%,100%{ transform: translate(0,0); opacity:.25; }
-  50%    { transform: translate(9px,-18px); opacity:.8; }
-}
-/* The cloud lifts while a row is up, so the powder answers the diagram
-   instead of running on its own timer beside it. */
-.is-scanning .td-powder svg{ animation: td-lift 3.2s ease-in-out infinite; }
-@keyframes td-lift{
-  0%,100%{ transform: translateY(0) scale(1); }
-  40%    { transform: translateY(-8px) scale(1.03); }
+/* Three columns, and the callout columns are the flexible pair: the vial is
+   the fixed thing everything else is measured against. */
+.tv-stage{
+  position:relative; display:grid; align-items:stretch;
+  grid-template-columns: 1fr auto 1fr;
+  gap: clamp(6px, 1.5vw, 26px);
+  margin: clamp(20px, 3.5vh, 40px) auto 0;
+  max-width: 1080px;
+  /* room above for the cap to rise into without meeting the heading */
+  padding-top: clamp(40px, 9vh, 96px);
 }
 
-.td-nodes{ display:grid; grid-template-columns: 1fr; gap: clamp(18px, 2.4vw, 30px); }
-
-/* A row is a button because activating it does something: it moves the
-   highlight. Reset to a text block, since none of the button chrome belongs. */
-.td-node{
-  display:block; width:100%; text-align:left; padding:0; margin:0;
-  background:none; border:none; color: var(--text); cursor:pointer;
+.tv-vial{
+  grid-column:2; position:relative;
+  height: clamp(240px, 52vh, 520px); aspect-ratio: 531 / 1437;
+  /* the group's top edge rises as the cap lifts, so it is pushed back down by
+     half of that to keep the exploded arrangement centred in the stage */
+  transform: translateY(calc(var(--recentre, 0px)));
 }
-.td-node:focus-visible{ outline:2px solid #fff; outline-offset:4px; }
-
-/* The rule, and the dot that terminates it. The bright fill is a second layer
-   scaled from nothing, so activating a row draws its line rather than
-   switching a colour. */
-.td-rule{
-  display:block; position:relative; height:1px; margin-bottom: 16px;
-  background: rgba(255,255,255,.15);
+.tv-layer{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:contain; display:block;
+  /* stacked in one box: nothing here is in flow, and every layer shares the
+     same canvas, so alignment survives whatever the box gets sized to */
 }
-.td-rule::after{
-  content:''; position:absolute; inset:0; background:#fff;
-  transform: scaleX(0); transform-origin: left center;
-  transition: transform .55s cubic-bezier(.2,.8,.2,1);
-}
-.td-node.is-active .td-rule::after{ transform: scaleX(1); }
-.td-rule i{
-  position:absolute; right:0; top:50%; translate: 0 -50%;
-  width:7px; height:7px; border-radius:50%;
-  background: rgba(255,255,255,.28);
-  transition: background .3s ease, box-shadow .3s ease, scale .3s ease;
-}
-.td-node.is-active .td-rule i{
-  background:#fff; scale:1.2; box-shadow: 0 0 0 5px rgba(255,255,255,.10);
-}
-
-.td-head{ display:flex; align-items:baseline; flex-wrap:wrap; gap: 10px; }
-.td-num{
-  font-family:'JetBrains Mono', monospace; font-size:.7rem;
-  letter-spacing:.1em; color: var(--text-dimmer);
-  transition: color .3s ease;
-}
-.td-name{
-  margin:0; font-size:.94rem; font-weight:700;
-  letter-spacing:.06em; text-transform:uppercase; color: var(--text);
-}
-.td-method{
-  font-family:'JetBrains Mono', monospace; font-size:.7rem;
-  letter-spacing:.04em; color: var(--text-dim);
-}
-/* No measure of its own: the sentence should fill the rule above it, so the
-   two read as one row rather than a short paragraph under a long line. The
-   rule is what gets the cap, on .td-node below. */
-.td-plain{
-  display:block; margin-top: 10px;
-  font-size:.95rem; line-height:1.65; color: var(--text-dim);
-  transition: color .3s ease;
+/* Final state. .is-live replaces every one of these from scroll position. */
+.tv-cap{ transform: translateY(var(--capY, -20%)); }
+.tv-crimp{ transform: translateY(var(--crimpY, -11.7%)); }
+.tv-stopper{ transform: translateY(var(--stopY, -5.6%)); }
+.tv-body{ transform:none; }
+/* Screen, so the chrome picks up the glass behind it instead of sitting flat
+   on top of it. The layer is in front of the body out of necessity, not
+   design: see the note on the markup. */
+/* Lifted a tenth of the vial's height off where it was rendered. In place it
+   lands across the label and covers the wordmark; up there it sits in the
+   space the stopper and crimp have just left, which reads as material
+   released from the vial rather than pasted over it.
+   Screen, so the chrome picks up what is behind it instead of sitting flat on
+   top of it. The layer is in front of the body out of necessity, not design:
+   see the note on the markup. */
+.tv-material{
+  opacity: var(--matO, 1);
+  transform: translateY(calc(-10% + var(--matY, 0px)));
+  mix-blend-mode: screen;
 }
 
-/* Active is the only strong state, and the others step back rather than it
-   lighting up: seven rows taking turns to flash would strobe. */
-.td-nodes.has-active .td-node{ opacity:.45; transition: opacity .3s ease; }
-.td-nodes.has-active .td-node.is-active{ opacity:1; }
-.td-node.is-active .td-num{ color: var(--text); }
-.td-node.is-active .td-plain{ color: var(--text); }
+.tv-callouts{ display:contents; }
 
-@media (min-width: 900px){
-  /* Rows down the left, powder held beside them and centred against the
-     column rather than stacked above it. Sticky so it stays with the reader
-     as they work down all seven. */
-  .td-stage{
-    display:grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 520px);
-    align-items:start; gap: clamp(32px, 5vw, 72px);
-    max-width: 1180px; margin-inline:auto;
-  }
-  .td-nodes{ order:1; }
-  .td-powder{
-    order:2; margin:0; position:sticky; top: 22vh;
-  }
-  .td-powder svg{ max-width: 520px; }
-  /* Caps the rule, and with it the sentence beneath, at a readable measure.
-     Left to the grid column the lines ran to 80-odd characters. */
-  .td-node{ max-width: 58ch; }
-  .td-name{ font-size:1rem; }
+/* A callout is a wire and a label. The wire runs from the text to a dot near
+   the vial; the text sits hard against its own side so all three (or four)
+   line up as a column rather than drifting with their own lengths. */
+.tv-call{
+  position:absolute; top: var(--top); translate: 0 -50%;
+  display:flex; align-items:center; gap: 8px;
+  opacity: var(--callO, 1);
 }
+/* DOM order inside a callout is wire then text. On the left the wire has to
+   end up on the vial side of the text, so that column is reversed; both
+   columns then pack towards the vial, which is what puts every dot on one
+   vertical line however long the label is. */
+.tv-call-left{ left:0; right: calc(66.6% + 8px); flex-direction:row-reverse; justify-content:flex-start; text-align:right; }
+.tv-call-right{ right:0; left: calc(66.6% + 8px); flex-direction:row; justify-content:flex-start; text-align:left; }
+.tv-text{ min-width:0; }
+.tv-label{
+  margin:0; font-size: clamp(.62rem, 1.5vw, .8rem); font-weight:600;
+  letter-spacing:.13em; text-transform:uppercase; line-height:1.35;
+  color: var(--text);
+}
+.tv-method{
+  display:block; margin-top:3px;
+  font-family:'JetBrains Mono', monospace;
+  font-size: clamp(.53rem, 1.1vw, .66rem);
+  letter-spacing:.02em; color: var(--text-dimmer); line-height:1.4;
+}
+/* A short technical lead, not a rule across the column. Left to flex:1 it took
+   every pixel the label did not, so the wires ran to the page edge and each
+   one was a different length. */
+.tv-wire{
+  flex:0 0 auto; width: clamp(26px, 5vw, 84px); height:1px;
+  background: rgba(255,255,255,.42); position:relative;
+}
+.tv-wire i{
+  position:absolute; top:50%; width:5px; height:5px; border-radius:50%;
+  background:#fff; translate: 0 -50%;
+}
+.tv-call-left .tv-wire i{ right:0; translate: 50% -50%; }
+.tv-call-right .tv-wire i{ left:0; translate: -50% -50%; }
 
-.td-foot{
+.tv-foot{
   display:flex; align-items:center; justify-content:space-between;
-  gap: 24px; flex-wrap:wrap;
-  margin-top: clamp(36px, 5vw, 56px);
-  padding-top: 26px; border-top:1px solid rgba(255,255,255,.12);
+  gap: 20px; flex-wrap:wrap;
+  margin-top: clamp(22px, 3.5vh, 44px);
+  padding-top: 20px; border-top:1px solid rgba(255,255,255,.12);
 }
-.td-foot p{ margin:0; max-width: 620px; font-size:.9rem; }
-.td-foot .btn-outline{ flex-shrink:0; }
+.tv-foot p{ margin:0; max-width: 560px; font-size:.85rem; }
+.tv-foot .btn-outline{ flex-shrink:0; }
 
-/* Nothing here is load-bearing: it is seven analyses with a picture of the
-   powder, and it reads the same standing still. */
+/* Scroll-driven. Only applied once every layer has decoded, so the vial never
+   comes apart around a component that has not arrived yet. */
+.tv.is-live .tv-scroll{ height: 290vh; }
+/* The site header is sticky at top:0 too, and wins on z-index, so a pinned
+   panel starting at 0 has its first line permanently behind it. */
+.tv.is-live .tv-sticky{
+  position:sticky; top:0; height:100vh; min-height:0;
+  box-sizing:border-box; padding-top: var(--tv-hdr, 0px);
+}
+.tv.is-live .tv-call{ transition: opacity .45s ease, translate .45s cubic-bezier(.2,.8,.2,1); }
+.tv.is-live .tv-call{ translate: var(--slide, 0) -50%; }
+
+@media (max-width: 899px){
+  /* The wires get short here, so the text takes the room instead. Same
+     diagram, smaller: the labels are what has to stay legible. */
+  .tv-stage{ gap: 4px; padding-top: clamp(30px, 7vh, 60px); }
+  .tv-call-left{ right: calc(62% + 4px); }
+  .tv-call-right{ left: calc(62% + 4px); }
+  .tv-wire{ min-width: 10px; }
+  .tv-vial{ height: clamp(210px, 40vh, 330px); }
+  .tv-foot{ justify-content:flex-start; }
+  .tv-foot .btn-outline{ width:100%; text-align:center; }
+}
+
+/* The whole point of the scroll is the reveal, and the reveal is the thing
+   being opted out of. So: no sticky, no scroll height, the exploded state and
+   all seven callouts on arrival. */
 @media (prefers-reduced-motion: reduce){
-  .td-cloud, .td-motes circle, .is-scanning .td-powder svg{ animation:none; }
-  .td-cloud{ opacity:.62; }
-  .td-rule::after{ transition:none; }
+  .tv.is-live .tv-scroll{ height:auto; }
+  .tv.is-live .tv-sticky{ position:static; height:auto; min-height:0; }
+  .tv.is-live .tv-call{ transition:none; translate: 0 -50%; opacity:1; }
 }
 
 /* ---------- product grid ---------- */
