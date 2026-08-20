@@ -130,7 +130,20 @@ console.log('\ndispatch cutoff');
 
   // The estimate must be computed in Pacific, since that is what the copy says.
   ok('the estimate is computed in Pacific time',
-    /America\/Los_Angeles/.test(read('js/product.js')));
+    /America\/Los_Angeles/.test(read('js/products-data.js')));
+
+  // And computed once. The arithmetic lived inside product.js's IIFE, where
+  // only that page could reach it; shipping.html now states the same ship and
+  // arrival dates, and the only way to give it them without sharing this was
+  // a second copy. Two implementations of "does it go out today" can disagree,
+  // and the wrong one is still printing a date for a customer.
+  const dateOwners = ['js/products-data.js'];
+  const dateCopies = ['js/product.js', 'shipping.html', 'index.html', 'checkout.html']
+    .filter(f => /America\/Los_Angeles|function addBusinessDays/.test(read(f)));
+  ok('the ship and arrival dates are worked out in one place',
+    dateCopies.length === 0 && dateOwners.every(f => /function deliveryEstimate/.test(read(f))),
+    dateCopies.length ? `a second copy of the date arithmetic is in: ${dateCopies.join(', ')}`
+                      : 'deliveryEstimate() is not in js/products-data.js');
 }
 
 /* ---------------------------------------------------------------------------
@@ -264,6 +277,35 @@ console.log('\nshipping policy figures');
     overnight ? `policy says $${overnight[1]}, SHIPPING_RATES says $${overnightRate && overnightRate.cost}` : 'rate not found');
   ok('and states Overnight as never free, which is what freeOver: null means',
     overnightRate !== null && overnightRate.freeOver === null && /Overnight.{0,80}not discounted/s.test(policy));
+
+  // shipping.html states both rates too now. It is the page a customer opens
+  // to find out what shipping costs, and until this it was the one page on
+  // the site that did not say: both figures lived on the policy page only.
+  // Pinned to the same SHIPPING_RATES the policy page is, by data attribute
+  // rather than by prose, so the wording around them stays free to change.
+  const ship = read('shipping.html');
+  const shipRate = id => {
+    const m = ship.match(new RegExp(`data-rate="${id}"[^>]*>\\s*\\$([0-9.]+)\\s*<`));
+    return m ? Number(m[1]) : null;
+  };
+  ok('the shipping page quotes the 2-Day rate SHIPPING_RATES charges',
+    twoDayRate !== null && shipRate('2day') === twoDayRate.cost,
+    `shipping.html says $${shipRate('2day')}, SHIPPING_RATES says $${twoDayRate && twoDayRate.cost}`);
+  ok('the shipping page quotes the Overnight rate SHIPPING_RATES charges',
+    overnightRate !== null && shipRate('overnight') === overnightRate.cost,
+    `shipping.html says $${shipRate('overnight')}, SHIPPING_RATES says $${overnightRate && overnightRate.cost}`);
+
+  const shipFree = ship.match(/data-rate-free="2day"[^>]*>\s*Free on orders over \$([0-9]+)\./);
+  ok('and its free-shipping threshold is the one FREE_SHIPPING_AT enforces',
+    shipFree !== null && Number(shipFree[1]) === cartFree,
+    shipFree ? `shipping.html says $${shipFree[1]}, FREE_SHIPPING_AT is $${cartFree}`
+             : 'no [data-rate-free="2day"] threshold found in shipping.html');
+
+  // Overnight carries no free threshold in the data, so the page must not
+  // imply one. Stated as its own check because the absence is the claim.
+  ok('and it does not offer free Overnight, which SHIPPING_RATES never gives',
+    overnightRate !== null && overnightRate.freeOver === null &&
+    !/data-rate-free="overnight"/.test(ship));
 
   // No source of truth to check the figure itself against, so this only
   // guards the two pages that state it from quietly disagreeing.
