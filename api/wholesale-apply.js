@@ -6,6 +6,7 @@
 // goes out.
 
 import { readBody, isEmail } from './_lib.js';
+import { WHOLESALE_MIN } from '../js/products-data.js';
 import { emailShell, heading, paragraph, eyebrow, fine, esc } from './_email.js';
 
 const WHOLESALE_TO = 'wholesale@glowresearch.shop';
@@ -25,6 +26,18 @@ export default async function handler(req, res) {
 
   if (!name || !company || !isEmail(email) || !volume || !compounds) {
     return res.status(400).json({ error: 'Missing required application details.' });
+  }
+
+  // The page states a qualifying minimum and the form's `min` attribute is a
+  // suggestion to a browser that can skip it, the same reasoning that put the
+  // PAYMENTS_LIVE gate on the server rather than in checkout.js. Read from
+  // WHOLESALE_TIERS so the number the handler enforces is the number the page
+  // prints. Rejected with the figure in the message, since an application
+  // bounced without saying why is worse than one that never sent.
+  if (!(Number(volume) >= WHOLESALE_MIN)) {
+    return res.status(400).json({
+      error: `Wholesale starts at ${WHOLESALE_MIN} vials a month. For smaller volumes, bulk pricing on the product pages applies automatically.`,
+    });
   }
 
   const apiKey = process.env.RESEND_API_KEY;

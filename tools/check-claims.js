@@ -32,6 +32,7 @@ const {
   FAQS, faqHtml,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
+  WHOLESALE_TIERS, WHOLESALE_MIN, wholesaleRangeLabel, wholesaleRateLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
   hasList, listPriceOf, SITEWIDE_DISCOUNT,
 } = require(path.join(ROOT, 'js/products-data.js'));
@@ -1417,9 +1418,65 @@ console.log('\nbulk pricing');
   // retail tier ever went past what wholesale opens at, the two ladders would
   // be advertising against each other.
   ok('the bulk ceiling is 20%', BULK_MAX_OFF === 0.20, `${BULK_MAX_OFF * 100}%`);
+
+  // This used to grep wholesale.html for "25% off starting at", because the
+  // wholesale ladder was a sentence in a card and a regex over prose was the
+  // only thing there was to check. It is WHOLESALE_TIERS now, so the two
+  // ladders can be compared as numbers.
   ok('wholesale still starts richer than the retail ceiling',
-    /(2[5-9]|[3-9][0-9])% off starting at/.test(read('wholesale.html')),
-    'wholesale.html must open above the retail bulk ceiling');
+    WHOLESALE_TIERS[0].off > BULK_MAX_OFF,
+    `wholesale opens at ${WHOLESALE_TIERS[0].off * 100}%, retail already reaches ${BULK_MAX_OFF * 100}%`);
+  ok('the wholesale ladder only climbs, and only the last band may be unpriced',
+    WHOLESALE_TIERS.every((t, i) => {
+      const prev = WHOLESALE_TIERS[i - 1];
+      const last = i === WHOLESALE_TIERS.length - 1;
+      if (t.off === null) return last;                       // custom quote, and only at the top
+      return (!prev || t.min > prev.min) && (!prev || prev.off === null || t.off >= prev.off);
+    }));
+
+  // The bands are baked into wholesale.html so a crawler and a reader with no
+  // JavaScript get them, which means they are a second copy and have to be
+  // held to the first. Matched on the threshold, so reordering the markup
+  // cannot quietly pair a range with another band's rate.
+  const wsPage = read('wholesale.html');
+  const wsRowFor = min => {
+    const m = wsPage.match(new RegExp(
+      `data-tier-min="${min}"[\\s\\S]*?class="ws-tier-range">([^<]*)<[\\s\\S]*?class="ws-tier-off">([^<]*)<`));
+    return m ? { range: m[1].trim(), off: m[2].trim() } : null;
+  };
+  const wsWrong = [];
+  WHOLESALE_TIERS.forEach(t => {
+    const row = wsRowFor(t.min);
+    if (!row) return wsWrong.push(`no row for ${t.min}`);
+    if (row.range !== wholesaleRangeLabel(t)) wsWrong.push(`${t.min}: range "${row.range}" vs "${wholesaleRangeLabel(t)}"`);
+    if (row.off !== wholesaleRateLabel(t)) wsWrong.push(`${t.min}: rate "${row.off}" vs "${wholesaleRateLabel(t)}"`);
+  });
+  ok(`every band on wholesale.html is the one WHOLESALE_TIERS holds (${WHOLESALE_TIERS.length})`,
+    wsWrong.length === 0, wsWrong.join('; '));
+  ok('and the page lists no band the array does not',
+    (wsPage.match(/data-tier-min="/g) || []).length === WHOLESALE_TIERS.length);
+
+  // A band whose rate is a floor has to read as one. Dropping the "From" off
+  // the entry band turns a quoted minimum into an exact published rate, which
+  // is the one thing the wholesale ladder is not allowed to say: the steps
+  // between the two published anchors have never been written down.
+  ok('a band with no exact published rate is not printed as though it had one',
+    WHOLESALE_TIERS.every(t => t.off === null || !t.from || /^From /.test(wholesaleRateLabel(t))));
+
+  // The qualifying minimum was written out three times on this page and
+  // enforced nowhere. The form's `min` is a suggestion to a browser that can
+  // skip it, so the handler that receives the application checks it too, and
+  // reads the same constant rather than a number typed beside it.
+  const formMin = wsPage.match(/id="wsVolume"[^>]*\bmin="(\d+)"/);
+  ok(`the application form's minimum is WHOLESALE_MIN (${WHOLESALE_MIN})`,
+    formMin !== null && Number(formMin[1]) === WHOLESALE_MIN,
+    formMin ? `form says ${formMin[1]}` : 'no min on #wsVolume');
+  ok('the page states that minimum in words as well',
+    new RegExp(`${WHOLESALE_MIN}-vial monthly minimum`).test(wsPage));
+  const wsApi = read('api/wholesale-apply.js');
+  ok('and the server enforces it rather than trusting the form',
+    /WHOLESALE_MIN/.test(wsApi) && /from '\.\.\/js\/products-data\.js'/.test(wsApi) &&
+    /Number\(volume\) >= WHOLESALE_MIN/.test(wsApi));
 
   // Cards are a subset of the ladder, and they have to be the cheap end of it:
   // cards for 1 and 10 with the middle hidden would be a worse offer presented

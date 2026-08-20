@@ -1002,6 +1002,66 @@ const QTY_TIERS = [
 // adding a richer tier raises it here and in the copy at the same time.
 const BULK_MAX_OFF = Math.max(...QTY_TIERS.map(t => t.off));
 
+// ---------------------------------------------------------------------------
+// Where the retail ladder above stops and the wholesale one starts.
+//
+// This whole ladder used to be a single sentence typed into a card on
+// wholesale.html: "25% off starting at 25 vials a month, scaling to 45% at
+// 250-499. Custom quote at 500 and up." Four commercial terms and a
+// qualifying minimum, with nothing holding any of them to anything. The
+// minimum in particular was written out three times on that one page, once in
+// prose, once in the form's `min` attribute and once in the sub-heading, and
+// the server that receives the application did not enforce it at all.
+//
+// PLACEHOLDER, in part, and the part matters. The two anchors below (25% from
+// 25 vials, 45% from 250) are the figures the site has always published. What
+// "scaling" meant between them was never written down anywhere, so nothing
+// here invents a middle tier: the first band is marked `from`, which renders
+// as "From 25% off" and is the floor the site already promises for any volume
+// in it. Fill the real ladder in by adding rows here, and the page, the
+// calculator, the form minimum and the audit all follow. Do not put a rate on
+// the page that is not in this array.
+//
+//   min   the first monthly volume, in vials, that earns the band
+//   off   the discount, or null where the band has no published rate
+//   from  true when `off` is a floor for the band rather than the exact rate
+const WHOLESALE_TIERS = [
+  { min: 25,  off: 0.25, from: true },
+  { min: 250, off: 0.45, from: false },
+  { min: 500, off: null, from: false },
+];
+
+// The qualifying minimum, derived from the first band rather than typed
+// beside it. Read by the page copy, the form's `min`, and the serverless
+// handler that receives the application.
+const WHOLESALE_MIN = WHOLESALE_TIERS[0].min;
+
+// The band a monthly volume actually earns: the highest threshold at or below
+// it, the same rule tierFor() applies to the retail ladder. Returns null below
+// the minimum, which is a real answer and not an error: that volume belongs on
+// the retail bulk ladder instead.
+function wholesaleTierFor(vials) {
+  const n = Number(vials);
+  if (!isFinite(n) || n < WHOLESALE_MIN) return null;
+  return WHOLESALE_TIERS.filter(t => n >= t.min).pop();
+}
+
+// "25 to 249 vials" / "500 vials or more". Generated from the neighbouring
+// thresholds so a band cannot end up describing a range it no longer covers.
+function wholesaleRangeLabel(tier) {
+  const i = WHOLESALE_TIERS.indexOf(tier);
+  const next = WHOLESALE_TIERS[i + 1];
+  return next ? `${tier.min} to ${next.min - 1} vials` : `${tier.min} vials or more`;
+}
+
+// "From 25% off" / "45% off" / "Custom quote". The one place a wholesale rate
+// turns into words, so a band with no published figure cannot be rendered as
+// though it had one.
+function wholesaleRateLabel(tier) {
+  if (!tier || tier.off === null) return 'Custom quote';
+  return `${tier.from ? 'From ' : ''}${Math.round(tier.off * 100)}% off`;
+}
+
 // "3 vials" / "1 vial". Generated so a threshold change cannot leave a label
 // describing the old number.
 function tierLabel(qty) {
@@ -1388,6 +1448,11 @@ if (typeof module !== 'undefined' && module.exports) {
     QTY_TIERS,
     BULK_MAX_OFF,
     bulkNote,
+    WHOLESALE_TIERS,
+    WHOLESALE_MIN,
+    wholesaleTierFor,
+    wholesaleRangeLabel,
+    wholesaleRateLabel,
     tierFor,
     tierLabel,
     bulkOff,
