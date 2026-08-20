@@ -32,7 +32,7 @@
   let cfg = null;
 
   const EXPRESS_SHIPPING = [
-    { id: '2day', label: 'FedEx 2-Day Express', cost: 12.95, freeOver: 400 },
+    { id: '2day', label: 'FedEx 2-Day Express', cost: 14.99, freeOver: 400 },
     { id: 'overnight', label: 'FedEx Overnight', cost: 39.95, freeOver: null },
   ];
 

@@ -104,7 +104,7 @@ export async function stripeGet(path) {
 // products-data.js. Two rows, changed rarely: a drift here surfaces
 // immediately as a checkout that charges the wrong amount, not silently.
 export const SHIPPING_RATES = [
-  { id: '2day', cost: 12.95, freeOver: 400 },
+  { id: '2day', cost: 14.99, freeOver: 400 },
   { id: 'overnight', cost: 39.95, freeOver: null },
 ];
 

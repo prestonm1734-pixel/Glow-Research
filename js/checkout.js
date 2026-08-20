@@ -10,7 +10,7 @@
      drives what the page displays; changing a cost here without changing it
      there means the page quotes one number and Stripe collects another. */
   const SHIPPING = [
-    { id: '2day', label: 'FedEx 2-Day Express', note: 'Arrives in 2 business days', cost: 12.95, freeOver: 400 },
+    { id: '2day', label: 'FedEx 2-Day Express', note: 'Arrives in 2 business days', cost: 14.99, freeOver: 400 },
     { id: 'overnight', label: 'FedEx Overnight', note: 'Next business day, order before 2:00 PM PST', cost: 39.95, freeOver: null },
   ];
 
