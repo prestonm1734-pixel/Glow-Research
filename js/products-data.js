@@ -145,12 +145,9 @@ const COA_COPY = COAS_PUBLISHED ? {
   // the Certificate row of the documentation record
   docLine: 'Batch-specific, issued by the analysing laboratory and linked from this page',
   // homepage FAQ answer
-  faq: 'Two places, and you should use both. Every product page links the certificate for its ' +
-       'current lot, and your vial carries the lot number that certificate is issued against, so ' +
-       'you can check what is in your hand rather than trusting what was posted online. Already ' +
-       'have a vial from an older batch? Email support@glowresearch.shop with the lot number and ' +
-       'we will send that batch’s certificate. Either way the document comes from the ' +
-       'laboratory that ran the analysis, not from us.',
+  faq: 'Every product page links the certificate for its current lot. For a vial you already ' +
+       'have, email support@glowresearch.shop with the lot number and we will send that batch’s ' +
+       'certificate, sold out or not.',
 } : {
   short: 'COA on request',
   boxTitle: 'Certificate of analysis on request',
@@ -159,11 +156,8 @@ const COA_COPY = COAS_PUBLISHED ? {
   panelNote: 'Certificate on request: email support@glowresearch.shop with the lot number on your vial',
   panelLink: '',
   docLine: 'Batch-specific, issued by the analysing laboratory. Email support@glowresearch.shop with the lot number for a copy',
-  faq: 'Email support@glowresearch.shop with the compound and lot number, or your order number if ' +
-       'you have already bought, and we will send you the certificate for that exact batch, ' +
-       'including batches that have since sold out. Your vial carries the lot number its ' +
-       'certificate is issued against, so you can check the document against what is in your ' +
-       'hand. It comes from the independent laboratory that ran the analysis, not from us.',
+  faq: 'Email support@glowresearch.shop with the lot number on your vial, or your order number, ' +
+       'and we will send the certificate for that exact batch, sold out or not.',
 };
 
 // The certificate document for one compound, or '' when there is nothing to
@@ -606,21 +600,23 @@ const VIAL_ART_NOTICE = 'Vials ship with generic labeling, not the label shown.'
 // rationale and testing recency are all stated elsewhere on the site (the
 // evidence panel, shipping.html, the dispatch row) and repeating them here
 // just pushed the questions someone actually needs answered before they will
-// trust a peptide supplier further down the page. What is left is short on
-// purpose: can I take it, what was tested, how do I get the document, how do I
-// know the document is real, and where is the lot number that ties the two
-// together. That ordering is the point, human-consumption first because it is
-// the one legal line, then the verification trail in the order someone
-// actually walks it.
+// trust a peptide supplier further down the page. What is left is the
+// verification trail in the order someone walks it: what was tested, how do I
+// get the document, how do I know the document is real, and where is the lot
+// number that ties the document to the vial in my hand.
+//
+// Research-use-only is deliberately not among them. It is the age gate, the
+// footer disclaimer, ruo-agreement.html and a line on every product page, so
+// an FAQ entry restating it spent the most-read slot on the page on the one
+// thing a visitor has already been told before they scrolled this far.
 //
 // Every question is phrased the way the person asking would phrase it, first
-// person, and every answer is addressed back to them. "Are Glow Research
-// peptides intended for human consumption?" is how a lawyer asks it, and
-// nobody who genuinely wants to know has ever typed that sentence. The two
-// that carry the most weight are the two a supplier would rather not see
-// written down, so they are written down in full: can I take it, and did you
-// write your own homework. Naming the suspicion is worth more than any
-// assurance that steps around it.
+// person, and every answer is addressed back to them in one or two sentences.
+// This is the part of a page people skim, and an explanation nobody finishes
+// reading persuades nobody: the long version of each of these already exists
+// on how-we-test.html for anyone who wants it. "How do I know you did not
+// write the certificate yourselves?" is the question a supplier would rather
+// not see written down, which is the reason it is written down.
 //
 // Answers are plain text: faqHtml() escapes them and build-faq.js puts the same
 // strings in the FAQPage schema, so there is no markup to get out of step.
@@ -634,17 +630,14 @@ const VIAL_ART_NOTICE = 'Vials ship with generic labeling, not the label shown.'
 // reports numbers. This page explains how to go read them.
 const FAQS = [
   {
-    q: 'Can I take these myself?',
-    a: 'No, and we would rather lose the sale than tell you otherwise. Everything Glow Research sells is for laboratory and in-vitro research use only. It is not a drug, supplement, food or cosmetic, the FDA has not evaluated it for any use, and it is not intended to diagnose, treat, cure or prevent any disease. That applies to animals as well as people. If you are looking for something to take, we are not your supplier.',
-  },
-  {
     // Derived from ANALYSIS_LONG and ANALYSIS_NOT_RUN rather than restated, so
     // this cannot end up describing a test the laboratory does not run, or
     // staying silent about one it does not. check-claims.js requires this
     // answer to start with ANALYSIS_LONG verbatim and to name every entry in
-    // ANALYSIS_NOT_RUN somewhere in the FAQ.
+    // ANALYSIS_NOT_RUN somewhere in the FAQ. The list is the answer, so the
+    // only thing after it is who did the grading.
     q: 'What gets tested before my vial ships?',
-    a: `${ANALYSIS_LONG}. Every lot, before any of it is released for sale, which is ${numberWord(TESTS_PER_BATCH)} separate analyses. Identity and purity sound like one question and are not: identity is whether the vial holds the sequence you ordered, purity is how much of what is in there is that sequence rather than salt, leftover reagent or a truncated version of it. You get both answered. None of it is graded by us. We do not manufacture and we do not run a laboratory, so the certificate you read was written by the people who actually ran the analysis.`,
+    a: `${ANALYSIS_LONG}. Every lot, before any of it is released. We do not run a laboratory, so the certificate is not ours to write.`,
   },
   {
     // Answer comes from COA_COPY, which keys off COAS_PUBLISHED. While
@@ -656,11 +649,11 @@ const FAQS = [
   },
   {
     q: 'How do I know you did not write the certificate yourselves?',
-    a: 'Because we could not, and you can check that for yourself. A certificate names the laboratory that ran the analysis, carries that laboratory\u2019s own report reference and the date it was run, and is issued against a single lot number. Match that lot number to the one on your vial, then take the report reference to the laboratory and ask them directly. That is the whole point of it coming from someone else: a document we produced on our own would prove nothing, and you would be right not to trust it.',
+    a: 'We could not. A certificate names the laboratory that ran the analysis, that laboratory\u2019s own report reference, and one lot number. Match the lot number to your vial, then take the reference to the laboratory and ask them.',
   },
   {
     q: 'Where do I find the lot number on my vial?',
-    a: 'Printed on the label. It is what the certificate for that batch is issued against, so it is the number to quote when you ask us for the certificate, and the number to match once you have it. If the label is smudged or you are not sure which field you are reading, email support@glowresearch.shop with your order number and we will tell you which lot shipped to you.',
+    a: 'Printed on the label. Quote it when you ask us for the certificate, then check it against the lot the certificate names.',
   },
 ];
 
