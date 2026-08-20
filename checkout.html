@@ -101,8 +101,8 @@
     margin-bottom:10px; transition: border-color .15s ease;
   }
   .co-ship:last-child{ margin-bottom:0; }
-  .co-ship:hover, .co-pay-head:not(.is-static):hover{ border-color:#0a0a0a; }
-  .co-pay-head.is-static{ cursor:default; }
+  .co-ship:not(.is-static):hover, .co-pay-head:not(.is-static):hover{ border-color:#0a0a0a; }
+  .co-ship.is-static, .co-pay-head.is-static{ cursor:default; }
   .co-ship.is-on, .co-pay-head.is-on{ border-color:#0a0a0a; box-shadow: inset 0 0 0 1px #0a0a0a; }
   .co-ship input, .co-pay-head input{ position:absolute; opacity:0; width:0; height:0; }
   .co-ship-box{

@@ -225,15 +225,20 @@ console.log('\ntransit time');
 }
 
 /* ---------------------------------------------------------------------------
- * 3d. Shipping policy figures. shipping-policy.html states the two FedEx
- *     rates, the free-shipping threshold, and the coverage amount in prose,
- *     as a policy rather than a live price. The rates and the threshold have
- *     a source of truth elsewhere on the site (SHIPPING_RATES, cart.js's
+ * 3d. Shipping policy figures. shipping-policy.html states the FedEx rate,
+ *     the free-shipping threshold, and the coverage amount in prose, as a
+ *     policy rather than a live price. The rate and the threshold have a
+ *     source of truth elsewhere on the site (SHIPPING_RATES, cart.js's
  *     FREE_SHIPPING_AT); the policy page has to read the same numbers those
  *     do, not a copy retyped by hand that can drift the next time a rate
  *     changes. Coverage has no such source, since nothing in code enforces an
  *     insurance figure, so that one is pinned only against shipping.html, the
  *     other page that states it, so the two cannot disagree with each other.
+ *
+ *     FedEx Overnight was a second method here and in SHIPPING_RATES,
+ *     js/checkout.js and js/express-pay.js. It is gone from all four now, not
+ *     just repriced, so this section also has to fail if it quietly comes
+ *     back on only one of them.
  * ------------------------------------------------------------------------- */
 console.log('\nshipping policy figures');
 {
@@ -247,7 +252,6 @@ console.log('\nshipping policy figures');
     return m ? { cost: Number(m[1]), freeOver: m[2] === 'null' ? null : Number(m[2]) } : null;
   };
   const twoDayRate = rate('2day');
-  const overnightRate = rate('overnight');
   const cartFree = constant('js/cart.js', 'FREE_SHIPPING_AT');
 
   const twoDay = policy.match(/FedEx 2-Day Express:<\/strong>\s*\$([0-9.]+), free on orders over \$([0-9]+)/);
@@ -258,12 +262,17 @@ console.log('\nshipping policy figures');
     twoDay !== null && Number(twoDay[2]) === cartFree,
     twoDay ? `policy says $${twoDay[2]}, FREE_SHIPPING_AT is $${cartFree}` : 'threshold not found');
 
-  const overnight = policy.match(/FedEx Overnight:<\/strong>\s*\$([0-9.]+)/);
-  ok('the policy states the Overnight rate SHIPPING_RATES actually charges',
-    overnight !== null && overnightRate !== null && Number(overnight[1]) === overnightRate.cost,
-    overnight ? `policy says $${overnight[1]}, SHIPPING_RATES says $${overnightRate && overnightRate.cost}` : 'rate not found');
-  ok('and states Overnight as never free, which is what freeOver: null means',
-    overnightRate !== null && overnightRate.freeOver === null && /Overnight.{0,80}not discounted/s.test(policy));
+  // Only one method is offered. Checked everywhere the second one used to
+  // live, so a re-added Overnight row on any one of them fails here rather
+  // than shipping as a page that quotes one method while checkout offers two.
+  ok('SHIPPING_RATES offers only FedEx 2-Day, not a second method',
+    !/id: 'overnight'/.test(lib));
+  ok('js/checkout.js offers only FedEx 2-Day, not a second method',
+    !/id: 'overnight'/.test(read('js/checkout.js')));
+  ok('js/express-pay.js offers only FedEx 2-Day, not a second method',
+    !/id: 'overnight'/.test(read('js/express-pay.js')));
+  ok('shipping-policy.html does not mention FedEx Overnight',
+    !/Overnight/.test(policy));
 
   // No source of truth to check the figure itself against, so this only
   // guards the two pages that state it from quietly disagreeing.

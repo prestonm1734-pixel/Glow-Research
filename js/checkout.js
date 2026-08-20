@@ -11,7 +11,6 @@
      there means the page quotes one number and Stripe collects another. */
   const SHIPPING = [
     { id: '2day', label: 'FedEx 2-Day Express', note: 'Arrives in 2 business days', cost: 14.99, freeOver: 400 },
-    { id: 'overnight', label: 'FedEx Overnight', note: 'Next business day, order before 2:00 PM PST', cost: 39.95, freeOver: null },
   ];
 
   /* Card only for now. Add entries here to offer more (bank transfer, crypto);
@@ -185,19 +184,37 @@
         </div>`;
     }).join('');
 
-    $('coShipOptions').innerHTML = SHIPPING.map(s => {
+    // One method is not a choice, the same reasoning renderPayMethods() below
+    // applies to a single payment method: nothing to label or select, so a
+    // radio input and a hit target around it would be asking for a decision
+    // there isn't one to make. The "Shipping" heading already on the page
+    // says what this row is.
+    if (SHIPPING.length === 1) {
+      const s = SHIPPING[0];
       const free = s.freeOver !== null && sub >= s.freeOver;
-      return `
-        <label class="co-ship ${s.id === shipId ? 'is-on' : ''}">
-          <input type="radio" name="shipmethod" value="${s.id}" ${s.id === shipId ? 'checked' : ''} />
-          <span class="co-ship-box" aria-hidden="true"></span>
+      $('coShipOptions').innerHTML = `
+        <div class="co-ship is-static">
           <span class="co-ship-copy">
             <span class="co-ship-label">${s.label}</span>
             <span class="co-ship-note">${s.note}</span>
           </span>
           <span class="co-ship-cost">${free ? 'Free' : money(s.cost)}</span>
-        </label>`;
-    }).join('');
+        </div>`;
+    } else {
+      $('coShipOptions').innerHTML = SHIPPING.map(s => {
+        const free = s.freeOver !== null && sub >= s.freeOver;
+        return `
+          <label class="co-ship ${s.id === shipId ? 'is-on' : ''}">
+            <input type="radio" name="shipmethod" value="${s.id}" ${s.id === shipId ? 'checked' : ''} />
+            <span class="co-ship-box" aria-hidden="true"></span>
+            <span class="co-ship-copy">
+              <span class="co-ship-label">${s.label}</span>
+              <span class="co-ship-note">${s.note}</span>
+            </span>
+            <span class="co-ship-cost">${free ? 'Free' : money(s.cost)}</span>
+          </label>`;
+      }).join('');
+    }
 
     $('coSub').textContent = money(sub);
     $('coShipCost').textContent = ship === 0 ? 'Free' : money(ship);

@@ -105,7 +105,6 @@ export async function stripeGet(path) {
 // immediately as a checkout that charges the wrong amount, not silently.
 export const SHIPPING_RATES = [
   { id: '2day', cost: 14.99, freeOver: 400 },
-  { id: 'overnight', cost: 39.95, freeOver: null },
 ];
 
 // Throws rather than returning an error object: every caller is about to
