@@ -608,6 +608,28 @@ console.log('\nhow many tests');
     numerals.join(',') === wantNumerals.join(','),
     `page has ${numerals.join(',') || '(none)'}, catalog wants ${wantNumerals.join(',')}`);
 
+  // The hero's spec strip states the count as a numeral, which the word-form
+  // scan below cannot see. This is the failure wholesale.html's old stat
+  // widget had: a figure typed into a page, with nothing holding it to the
+  // panel it counts. Pinned by its data attribute rather than by position, so
+  // rearranging the strip does not quietly unpin it.
+  const specFig = hw.match(/data-spec="tests"[^>]*>\s*(\d+)\s*</);
+  ok(`the hero states the panel size as a numeral, and it is ${TESTS_PER_BATCH}`,
+    !!specFig && Number(specFig[1]) === TESTS_PER_BATCH,
+    specFig ? `hero says ${specFig[1]}, catalog holds ${TESTS_PER_BATCH}`
+            : 'no [data-spec="tests"] figure found in how-we-test.html');
+
+  // The other two figures beside it are structural rather than counted, so
+  // they are pinned to the thing that makes them true: one laboratory, named
+  // in LAB, and none of the seven performed by us. The second is the whole
+  // claim of the page and the site repeats it in prose in three other places.
+  ok('the hero claims one laboratory, and the catalog names exactly one',
+    /<b>1<\/b><span>independent laboratory<\/span>/.test(hw) && !!LAB.name,
+    'LAB.name is empty, so "1 independent laboratory" is not backed');
+  ok('the hero claims Glow runs none of them, and no page says otherwise',
+    /<b>0<\/b><span>run by Glow Research<\/span>/.test(hw) &&
+    /We do not run any of them/.test(hw));
+
   // The count in words, wherever any page says it. Catches the headline, the
   // subhead under it, and anything written later that quietly disagrees.
   const word = numberWord(TESTS_PER_BATCH);
