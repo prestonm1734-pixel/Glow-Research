@@ -28,8 +28,9 @@
 <style>
   /* =====================================================================
      SHIPPING
-     Dark, on the same ground as the rest of the site, and phone first: every
-     rule here is the narrow layout and the two queries at the foot widen it.
+     Surface, heading scale, hairline grid and button colours come from
+     .lp-light in css/style.css, the construction coa.html established.
+     Only the dispatch panel, the track and the rate rows are below.
 
      The page used to answer "when does it arrive" with the rule: order by
      2:00 PM PST and it goes the same day. The rule is correct and it is also
@@ -39,162 +40,118 @@
      does the arithmetic, the same function the product page's buy box uses,
      so the two can never quote different days.
      ===================================================================== */
-  .shipping-page{ --sh-line: rgba(255,255,255,.1); }
-  .shipping-page .lp-section{ padding: clamp(52px, 12vw, 100px) 0; }
-  .shipping-page .lp-section + .lp-section{ border-top: 1px solid var(--sh-line); }
-
-  /* ---------- hero ---------- */
-  .shipping-page .lp-hero{
-    text-align: left;
-    padding: clamp(36px, 11vw, 82px) 0 clamp(34px, 8vw, 56px);
-  }
-  .shipping-page .lp-hero h1{
-    margin: 0 0 16px; max-width: 13ch;
-    font-size: clamp(2.4rem, 11.5vw, 4.4rem);
-    line-height: .98; letter-spacing: -.045em;
-  }
-  .shipping-page .lp-hero h1 span{ color: var(--text-dimmer); }
-  .shipping-page .lp-lede{
-    margin: 0; max-width: 42ch; text-align: left;
-    font-size: clamp(1.02rem, 4.2vw, 1.2rem); line-height: 1.55; color: var(--text-dim);
-  }
-  .shipping-page .lp-eyebrow{
-    display: block; margin-bottom: 14px;
-    font-family: 'JetBrains Mono', monospace; font-size: .68rem; font-weight: 600;
-    letter-spacing: .16em; text-transform: uppercase; color: var(--text-dimmer);
-  }
 
   /* ---------- the dispatch panel ----------
-     The one thing on the page worth putting first. Its markup ships the rule
-     ("Before 2:00 PM PST") rather than a date, because a date baked into
-     static HTML is wrong within hours and a crawler would cache it; the
+     Its markup ships the rule ("2:00 PM PST"), not a date: a date baked into
+     static HTML is wrong within hours and a crawler would cache it. The
      script upgrades it to the live figures on load and re-ticks every minute.
-     Everything it prints is derived, so there is nothing here to keep true by
-     hand. */
+     Square and hairlined like every other box on these pages, with the head
+     and the two date rows separated by rules rather than by gaps. */
   .sh-dispatch{
-    margin: clamp(28px, 8vw, 44px) 0 0;
-    border: 1px solid var(--sh-line); border-radius: var(--radius-sm);
-    background: var(--surface); overflow: hidden;
+    max-width: 620px; margin: clamp(30px, 4vw, 44px) auto 0; text-align:left;
+    border:1px solid var(--ll-line); background:#fff;
   }
   .sh-dispatch-head{
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--sh-line);
-  }
-  .sh-dispatch-label{
-    font-family: 'JetBrains Mono', monospace; font-size: .64rem; font-weight: 600;
-    letter-spacing: .16em; text-transform: uppercase; color: var(--text-dimmer);
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; padding:13px 18px; border-bottom:1px solid var(--ll-line);
   }
   /* Green would be the obvious colour for "yes it goes today" and the site
-     does not have one. The dot carries the state on a monochrome page: lit
-     and pulsing when the van has not gone, flat when it has. */
-  .sh-flag{
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: .76rem; font-weight: 600; color: var(--text);
-  }
+     does not have one. The dot carries the state: lit and pulsing while the
+     van has not gone, flat once it has. */
+  .sh-flag{ display:inline-flex; align-items:center; gap:8px; font-size:.78rem; font-weight:600; color: var(--ll-ink); }
   .sh-flag::before{
-    content: ''; width: 7px; height: 7px; border-radius: 50%;
-    background: var(--text-dimmer); flex: 0 0 auto;
+    content:''; width:7px; height:7px; border-radius:50%;
+    background:#c4c4c0; flex:0 0 auto;
   }
   .sh-dispatch.is-open .sh-flag::before{
-    background: #fff; box-shadow: 0 0 0 0 rgba(255,255,255,.55);
+    background: var(--ll-ink); box-shadow:0 0 0 0 rgba(10,10,10,.4);
     animation: shPulse 2.4s ease-out infinite;
   }
   @keyframes shPulse{
-    0%{ box-shadow: 0 0 0 0 rgba(255,255,255,.5); }
-    70%{ box-shadow: 0 0 0 7px rgba(255,255,255,0); }
-    100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+    0%{ box-shadow:0 0 0 0 rgba(10,10,10,.35); }
+    70%{ box-shadow:0 0 0 7px rgba(10,10,10,0); }
+    100%{ box-shadow:0 0 0 0 rgba(10,10,10,0); }
   }
 
-  .sh-clock-wrap{ padding: clamp(22px, 6vw, 30px) 18px clamp(20px, 5vw, 26px); }
-  .sh-clock{
-    margin: 0; font-family: var(--font-display); font-weight: 600;
-    font-size: clamp(2.5rem, 13vw, 3.9rem); line-height: 1;
-    letter-spacing: -.05em; color: var(--text);
-    font-variant-numeric: tabular-nums;
+  .sh-clock-wrap{ padding: clamp(22px, 3vw, 30px) 18px clamp(20px, 2.6vw, 26px); }
+  .lp-light .sh-clock{
+    margin:0; font-family: var(--font-display); font-weight:600;
+    font-size: clamp(2rem, 4.4vw, 2.9rem); line-height:1;
+    letter-spacing:-.045em; color: var(--ll-ink); font-variant-numeric: tabular-nums;
   }
-  .sh-clock-sub{ margin: 12px 0 0; font-size: .92rem; line-height: 1.5; color: var(--text-dim); }
+  .sh-clock-sub{ margin:11px 0 0; font-size:.95rem; line-height:1.5; color: var(--ll-body); }
 
   /* Two rows on a phone rather than two columns: "Wednesday, Aug 20" beside
      "Friday, Aug 22" in half a 360px screen wraps both of them. */
-  .sh-when{
-    display: grid; gap: 0; margin: 0;
-    border-top: 1px solid var(--sh-line);
-  }
+  .sh-when{ display:grid; margin:0; border-top:1px solid var(--ll-line); }
   .sh-when > div{
-    display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
-    padding: 14px 18px;
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:16px; padding:13px 18px;
   }
-  .sh-when > div + div{ border-top: 1px solid var(--sh-line); }
-  .sh-when dt{
-    font-family: 'JetBrains Mono', monospace; font-size: .64rem; font-weight: 600;
-    letter-spacing: .14em; text-transform: uppercase; color: var(--text-dimmer);
+  .sh-when > div + div{ border-top:1px solid var(--ll-line); }
+  .sh-when dd{ margin:0; font-size:1rem; font-weight:700; color: var(--ll-ink); text-align:right; }
+  @media (min-width: 560px){
+    .sh-when{ grid-template-columns:1fr 1fr; }
+    .sh-when > div{ display:block; }
+    .sh-when > div + div{ border-top:0; border-left:1px solid var(--ll-line); }
+    .sh-when dd{ margin-top:7px; text-align:left; }
   }
-  .sh-when dd{ margin: 0; font-size: 1rem; font-weight: 600; color: var(--text); text-align: right; }
 
   /* ---------- the track ----------
-     Vertical on a phone with the rail down the left, which is the shape a
-     parcel-tracking screen already has, so it needs no legend. */
-  .sh-track{
-    list-style: none; margin: clamp(30px, 8vw, 46px) 0 0; padding: 0;
-    position: relative;
-  }
-  .sh-step{ position: relative; padding: 0 0 clamp(26px, 6vw, 34px) 34px; }
-  .sh-step:last-child{ padding-bottom: 0; }
-  /* the rail, drawn per step so the last one has none trailing off it */
-  .sh-step:not(:last-child)::before{
-    content: ''; position: absolute; left: 6px; top: 16px; bottom: -2px;
-    width: 1px; background: var(--sh-line);
-  }
+     Four cells of the shared grid, with the rail drawn through the dots. The
+     first two steps are what Glow controls and the last two are the
+     carrier's: filling only ours is the same distinction how-we-test.html
+     makes about whose accreditation is whose, and it is the honest framing
+     for a delivery date. */
+  .sh-track{ --ll-cols: 4; list-style:none; margin: clamp(38px, 5vw, 54px) 0 0; padding:0; }
+  .sh-step{ position:relative; }
+  /* The dot sits in normal flow at the top of the cell, so it lines up with
+     the heading under it without anyone computing the cell's padding twice.
+     The rail is the cell's own rule, drawn from the dot's edge to the cell
+     edge at the dot's centre line, and suppressed on the last step so none
+     trails off the end. */
   .sh-dot{
-    position: absolute; left: 0; top: 5px;
-    width: 13px; height: 13px; border-radius: 50%;
-    border: 1px solid rgba(255,255,255,.32); background: var(--bg);
+    display:block; width:13px; height:13px; border-radius:50%;
+    border:1px solid rgba(0,0,0,.32); background:#fff; margin-bottom:18px;
   }
-  /* The first two steps are what Glow controls and the last two are the
-     carrier's. Filling only ours is the same distinction the testing page
-     makes about whose accreditation is whose. */
-  .sh-step.is-ours .sh-dot{ background: #fff; border-color: #fff; }
-  .sh-step h3{
-    margin: 0; font-size: clamp(1rem, 4.4vw, 1.1rem);
-    letter-spacing: -.02em; line-height: 1.2;
+  .sh-step::after{
+    content:''; position:absolute;
+    left: calc(clamp(24px, 3vw, 32px) + 21px); right:0;
+    top: calc(clamp(24px, 3vw, 32px) + 6px); height:1px; background: var(--ll-line);
   }
-  .sh-step p{
-    margin: 7px 0 0; font-size: .92rem; line-height: 1.5; color: var(--text-dim);
+  .sh-step:last-child::after{ display:none; }
+  .sh-step.is-ours .sh-dot{ background: var(--ll-ink); border-color: var(--ll-ink); }
+  .sh-step h3{ color: var(--ll-ink); font-size:1.05rem; font-weight:700; margin:0; letter-spacing:-.02em; line-height:1.25; }
+  .sh-step p{ margin:8px 0 0; font-size:.93rem; line-height:1.55; color: var(--ll-body); }
+  .sh-step b{ color: var(--ll-ink); font-weight:700; }
+  @media (max-width: 720px){
+    /* Stacked, the rail turns and runs down the left instead of across, and
+       the dot moves out of flow so the copy can sit beside it rather than
+       under it. */
+    .sh-step{ padding: 0 0 26px 32px; }
+    .sh-step:last-child{ padding-bottom:0; }
+    .sh-step::after{ left:6px; right:auto; top:20px; bottom:-1px; width:1px; height:auto; }
+    .sh-dot{ position:absolute; left:0; top:4px; margin:0; }
   }
-  .sh-step b{ color: var(--text); font-weight: 600; }
 
   /* ---------- rates ----------
-     The page that answers "what does shipping cost" did not state a price:
-     both rates lived on shipping-policy.html only. Both figures below are
-     pinned by check-claims.js to SHIPPING_RATES in api/_lib.js, which is what
-     Stripe is actually charged, and to FREE_SHIPPING_AT in js/cart.js. */
-  .sh-rates{ display: grid; gap: 10px; margin-top: clamp(28px, 7vw, 44px); }
-  .sh-rate{
-    display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 6px 16px;
-    padding: 18px; border: 1px solid var(--sh-line); border-radius: var(--radius-sm);
-    background: var(--surface);
-  }
-  .sh-rate-name{ font-size: 1.02rem; font-weight: 600; color: var(--text); line-height: 1.3; }
+     The page whose job is shipping did not state a shipping price: both
+     rates lived on shipping-policy.html only. Both figures are pinned by
+     check-claims.js to SHIPPING_RATES in api/_lib.js, which is what Stripe is
+     actually charged, and to FREE_SHIPPING_AT in js/cart.js. */
+  .sh-rates{ --ll-cols: 2; margin-top: clamp(38px, 5vw, 54px); }
+  .sh-rate{ display:grid; grid-template-columns:1fr auto; align-items:start; gap:6px 16px; }
+  .sh-rate-name{ font-size:1.05rem; font-weight:700; color: var(--ll-ink); line-height:1.3; letter-spacing:-.02em; }
   .sh-rate-cost{
-    font-family: var(--font-display); font-weight: 600;
-    font-size: 1.3rem; letter-spacing: -.03em; color: var(--text); text-align: right;
+    font-family: var(--font-display); font-weight:600; font-size:1.35rem;
+    letter-spacing:-.03em; color: var(--ll-ink); text-align:right;
   }
-  .sh-rate p{ grid-column: 1 / -1; margin: 0; font-size: .88rem; line-height: 1.5; color: var(--text-dim); }
-  .sh-rate-free p{ color: var(--text); }
+  .sh-rate p{ grid-column:1 / -1; margin:8px 0 0; }
+  .sh-rate p strong{ color: var(--ll-ink); font-weight:700; }
 
   /* ---------- the three ---------- */
-  .sh-cards{ display: grid; gap: 10px; margin-top: clamp(30px, 8vw, 48px); }
-  .sh-card{
-    padding: 22px 20px 24px;
-    border: 1px solid var(--sh-line); border-radius: var(--radius-sm);
-    background: var(--surface);
-  }
-  .sh-card svg{ display: block; color: var(--text); margin-bottom: 16px; }
-  .sh-card h2{
-    margin: 0; font-size: clamp(1.08rem, 4.6vw, 1.18rem);
-    letter-spacing: -.02em; line-height: 1.2;
-  }
-  .sh-card p{ margin: 10px 0 0; font-size: .93rem; line-height: 1.58; color: var(--text-dim); }
+  .sh-cards{ --ll-cols: 3; margin-top: clamp(38px, 5vw, 54px); }
+  .sh-card svg{ margin-bottom:16px; }
 
   /* Each mark draws itself on arrival (shared .lp-* motion rules). Hover
      replays that mark's own idea rather than one generic wobble for all
@@ -209,65 +166,12 @@
   /* the tick already sits at dashoffset 0, so replaying it needs a keyframe
      rather than a transition */
   .sh-card:hover .sh-check{ animation: shCheck .6s var(--lp-ease); }
-  @keyframes shCheck{ from{ stroke-dashoffset: 1; } to{ stroke-dashoffset: 0; } }
-
-  /* ---------- fine print ---------- */
-  .shipping-page .lp-fine{ color: var(--text-dim); max-width: 62ch; margin: clamp(28px, 7vw, 40px) 0 0; }
-  .shipping-page .lp-fine strong{ color: var(--text); font-weight: 600; }
-  .shipping-page .lp-actions{ justify-content: flex-start; }
-  .shipping-page .disc{ margin-top: 16px; }
-
-  /* ---------- wider than a phone ---------- */
-  @media (min-width: 640px){
-    .sh-when{ grid-template-columns: 1fr 1fr; }
-    .sh-when > div + div{ border-top: 0; border-left: 1px solid var(--sh-line); }
-    .sh-when > div{ display: block; }
-    .sh-when dd{ margin-top: 7px; text-align: left; font-size: 1.08rem; }
-    .sh-rates{ grid-template-columns: 1fr 1fr; }
-    .sh-cards{ grid-template-columns: repeat(3, 1fr); }
-    .sh-card{ padding: 26px 22px 28px; }
-
-    /* The track turns and runs across, rail through the dots rather than
-       down the side. Four abreast is the whole journey in one glance, which
-       is what the shape is for. */
-    .sh-track{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
-    .sh-step{ padding: 30px 18px 0 0; }
-    .sh-step:last-child{ padding-bottom: 0; }
-    .sh-step:not(:last-child)::before{
-      left: 13px; right: 0; top: 6px; bottom: auto; width: auto; height: 1px;
-    }
-    .sh-dot{ top: 0; left: 0; }
-  }
-
-  @media (min-width: 940px){
-    /* Headline and lede left, the live panel beside them: the panel is the
-       answer and the copy is the question, so they belong on one screen
-       rather than one above the other.
-
-       The copy is wrapped in its own element rather than left as three loose
-       children so this can be a plain two-column grid. A panel spanning the
-       three text rows instead sizes them between itself, which opens a hole
-       under the eyebrow whenever the panel is the taller of the two. */
-    .shipping-page .lp-hero > .container{
-      display: grid; grid-template-columns: minmax(0, 1fr) minmax(330px, 396px);
-      column-gap: clamp(44px, 6vw, 88px); align-items: start;
-    }
-    .sh-hero-copy{ padding-top: 6px; }
-    .shipping-page .lp-hero .sh-dispatch{ margin: 0; }
-    .sh-clock-wrap{ padding: 30px 22px 26px; }
-    .sh-dispatch-head, .sh-when > div{ padding-left: 22px; padding-right: 22px; }
-  }
+  @keyframes shCheck{ from{ stroke-dashoffset:1; } to{ stroke-dashoffset:0; } }
 
   @media (prefers-reduced-motion: reduce){
-    .sh-dispatch.is-open .sh-flag::before{ animation: none; }
-    .sh-card:hover .sh-cold, .sh-card:hover .sh-hands{ transform: none; }
-    .sh-card:hover .sh-check{ animation: none; }
-  }
-
-  /* section headings, stated once */
-  .sh-h2{
-    margin: 0 0 4px; font-size: clamp(1.7rem, 7.5vw, 2.5rem);
-    line-height: 1.08; letter-spacing: -.035em; text-wrap: balance;
+    .sh-dispatch.is-open .sh-flag::before{ animation:none; }
+    .sh-card:hover .sh-cold, .sh-card:hover .sh-hands{ transform:none; }
+    .sh-card:hover .sh-check{ animation:none; }
   }
 </style>
 <script type="application/ld+json">
@@ -352,7 +256,7 @@
   </div>
 </header>
 
-<main class="lp-page shipping-page">
+<main class="lp-page lp-light shipping-page">
 
 <!-- The page answers one question, so the answer goes at the top and
      everything under it is detail.
@@ -364,18 +268,16 @@
      serving it. The script upgrades the rule to live figures on load. -->
 <section class="lp-hero">
   <div class="container">
-    <div class="sh-hero-copy">
-      <span class="lp-eyebrow">Shipping</span>
-      <h1>Same afternoon.<br /><span>Every weekday.</span></h1>
-      <p class="lp-lede">
-        Order before the cutoff and it is picked, packed and handed to FedEx
-        that day. This is exactly when yours would go, and when it would land.
-      </p>
-    </div>
+    <span class="eyebrow">Shipping</span>
+    <h1>Same afternoon, every weekday.</h1>
+    <p class="lp-lede">
+      Order before the cutoff and it is picked, packed and handed to FedEx
+      that day. This is exactly when yours would go, and when it would land.
+    </p>
 
     <div class="sh-dispatch" id="shDispatch">
       <div class="sh-dispatch-head">
-        <span class="sh-dispatch-label">Next dispatch</span>
+        <span class="ll-label">Next dispatch</span>
         <span class="sh-flag" id="shFlag">Weekdays</span>
       </div>
       <div class="sh-clock-wrap">
@@ -384,11 +286,11 @@
       </div>
       <dl class="sh-when">
         <div>
-          <dt>Ships</dt>
+          <dt class="ll-label">Ships</dt>
           <dd id="shShips">Same business day</dd>
         </div>
         <div>
-          <dt>Arrives</dt>
+          <dt class="ll-label">Arrives</dt>
           <dd id="shArrives">2-day FedEx Express</dd>
         </div>
       </dl>
@@ -403,26 +305,26 @@
      part of it Glow controls is getting the box on the van. -->
 <section class="lp-section">
   <div class="container">
-    <span class="lp-eyebrow">The journey</span>
-    <h2 class="sh-h2">Four steps, two of them ours.</h2>
+    <span class="eyebrow">The journey</span>
+    <h2 class="ll-h2">Four steps, two of them ours.</h2>
 
-    <ol class="sh-track reveal">
-      <li class="sh-step is-ours">
+    <ol class="ll-grid sh-track reveal">
+      <li class="ll-cell sh-step is-ours">
         <span class="sh-dot" aria-hidden="true"></span>
         <h3>Order placed</h3>
         <p id="shT1">Before 2:00 PM PST on a weekday</p>
       </li>
-      <li class="sh-step is-ours">
+      <li class="ll-cell sh-step is-ours">
         <span class="sh-dot" aria-hidden="true"></span>
         <h3>Picked and packed</h3>
         <p id="shT2">The same afternoon, at our fulfilment partner</p>
       </li>
-      <li class="sh-step">
+      <li class="ll-cell sh-step">
         <span class="sh-dot" aria-hidden="true"></span>
         <h3>With FedEx</h3>
         <p id="shT3">2-day FedEx Express, tracking within 24 hours</p>
       </li>
-      <li class="sh-step">
+      <li class="ll-cell sh-step">
         <span class="sh-dot" aria-hidden="true"></span>
         <h3>Delivered</h3>
         <p id="shT4">To any address in the 50 states</p>
@@ -438,16 +340,16 @@
      Stripe is actually charged, and to FREE_SHIPPING_AT in js/cart.js. -->
 <section class="lp-section">
   <div class="container">
-    <span class="lp-eyebrow">What it costs</span>
-    <h2 class="sh-h2">Two services. No surcharges.</h2>
+    <span class="eyebrow">What it costs</span>
+    <h2 class="ll-h2">Two services. No surcharges.</h2>
 
-    <div class="sh-rates reveal">
-      <div class="sh-rate sh-rate-free">
+    <div class="ll-grid sh-rates reveal">
+      <div class="ll-cell sh-rate sh-rate-free">
         <span class="sh-rate-name">FedEx 2-Day Express</span>
         <span class="sh-rate-cost" data-rate="2day">$12.95</span>
         <p><strong data-rate-free="2day">Free on orders over $400.</strong> The default on every order.</p>
       </div>
-      <div class="sh-rate">
+      <div class="ll-cell sh-rate">
         <span class="sh-rate-name">FedEx Overnight</span>
         <span class="sh-rate-cost" data-rate="overnight">$39.95</span>
         <p>Not discounted at any order total, because the carrier does not discount it either.</p>
@@ -458,11 +360,11 @@
 
 <section class="lp-section">
   <div class="container">
-    <span class="lp-eyebrow">Inside the box</span>
-    <h2 class="sh-h2">How it travels.</h2>
+    <span class="eyebrow">Inside the box</span>
+    <h2 class="ll-h2">How it travels.</h2>
 
-    <div class="sh-cards reveal">
-      <div class="sh-card">
+    <div class="ll-grid sh-cards reveal">
+      <div class="ll-cell sh-card">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
           <g class="sh-cold">
             <path pathLength="1" class="lp-draw" d="M12 2.5v19"/>
@@ -471,23 +373,23 @@
             <path pathLength="1" class="lp-draw" d="M12 6.6 9.6 4.2M12 6.6l2.4-2.4M12 17.4l-2.4 2.4M12 17.4l2.4 2.4"/>
           </g>
         </svg>
-        <h2>Packed same day</h2>
+        <h3>Packed same day</h3>
         <p>Pulled, sealed, and boxed the same afternoon your order comes in, out the door before the FedEx cutoff.</p>
       </div>
-      <div class="sh-card">
+      <div class="ll-cell sh-card">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
           <circle pathLength="1" class="lp-draw" cx="12" cy="12" r="9"/>
           <g class="sh-hands"><path pathLength="1" class="lp-draw" d="M12 7v5l3.5 2" stroke-linecap="round"/></g>
         </svg>
-        <h2>Tracked in a day</h2>
+        <h3>Tracked in a day</h3>
         <p>Your tracking number lands within 24 hours. Saturday delivery where FedEx runs it.</p>
       </div>
-      <div class="sh-card">
+      <div class="ll-cell sh-card">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
           <path pathLength="1" class="lp-draw" d="M12 3l7.5 3v5.5c0 4.3-3 8.2-7.5 9.5-4.5-1.3-7.5-5.2-7.5-9.5V6z"/>
           <path pathLength="1" class="lp-draw sh-check" d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <h2>Covered to $300</h2>
+        <h3>Covered to $300</h3>
         <p>Loss, damage, or carrier delay, applied automatically. Nothing to tick and nothing to buy.</p>
       </div>
     </div>

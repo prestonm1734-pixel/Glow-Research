@@ -644,7 +644,10 @@ console.log('\nhow many tests');
   const missingRow = ANALYSIS_TESTS.filter(t => !hw.includes(`<h3>${t.name}</h3>`));
   ok(`how-we-test.html lists all ${TESTS_PER_BATCH} by name`,
     missingRow.length === 0, `missing: ${missingRow.map(t => t.name).join(', ')}`);
-  const numerals = (hw.match(/class="hw-num"[^>]*>\s*(\d\d)\s*</g) || [])
+  // class="hw-num ll-label" is still an hw-num: matched on the class being
+  // present rather than on it being the whole attribute, so adding a utility
+  // class beside it does not silently stop the numbering being checked.
+  const numerals = (hw.match(/class="hw-num[^"]*"[^>]*>\s*(\d\d)\s*</g) || [])
     .map(m => m.replace(/\D/g, '').slice(-2));
   const wantNumerals = ANALYSIS_TESTS.map((_, i) => String(i + 1).padStart(2, '0'));
   ok('the rows are numbered 01 upward with none skipped or repeated',
