@@ -896,9 +896,11 @@ function bulkSavingPct(original, sale) {
 // states the rest in words so nothing is hidden — a discount you only find by
 // guessing a number is not an offer.
 //
-// 20% at ten vials is the ceiling for a single compound. Above that the answer
-// is wholesale, which starts at 25% for 25 vials a month, so the retail ladder
-// stops exactly where the wholesale one begins rather than overlapping it.
+// 20% at ten vials is the ceiling for a single compound in one order. Above
+// that the answer is wholesale, priced on volume per month rather than per
+// order and starting at 40% for 10 vials a month, so the richer rate is what
+// separates the two rather than the quantity: the same ten vials earns 20% as
+// a one-time retail order or 40% as a standing monthly account.
 //
 // PLACEHOLDER RATES. The thresholds and percentages are ours to set, but the
 // supplier import decides what margin actually supports them. Confirm before
