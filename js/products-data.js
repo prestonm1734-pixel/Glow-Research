@@ -467,92 +467,6 @@ const CUTOFF_LABEL_SHORT = `${CUTOFF_H12} ${CUTOFF_MERIDIEM} PST`;
 const TRANSIT_DAYS = 2;
 
 // ---------------------------------------------------------------------------
-// When it ships and when it lands, worked out from the two constants above.
-//
-// This lived inside the IIFE in js/product.js, where exactly one page could
-// reach it. The shipping page needs the same answer, and the only way to give
-// it one without this was a second copy of the same date arithmetic, which is
-// the drift PRINCIPLES.md exists to stop: two implementations of "does it go
-// out today" can disagree, and the one that is wrong is still telling a
-// customer a date. One function, both callers, and check-claims.js fails the
-// build if either page grows its own.
-//
-// Everything is computed from Pacific wall-clock parts, then anchored to UTC
-// noon before any day arithmetic. Anchoring at noon means adding whole days
-// can never land on a DST seam and silently shift the date by one.
-function pacificParts(date) {
-  const out = {};
-  new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Los_Angeles', hour12: false,
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', second: '2-digit',
-  }).formatToParts(date).forEach(p => { out[p.type] = p.value; });
-  return out;
-}
-
-const anchorNoon = p => new Date(Date.UTC(+p.year, +p.month - 1, +p.day, 12));
-const isWeekendDay = d => d.getUTCDay() === 0 || d.getUTCDay() === 6;
-
-function addBusinessDays(date, n) {
-  const out = new Date(date);
-  while (n > 0) {
-    out.setUTCDate(out.getUTCDate() + 1);
-    if (!isWeekendDay(out)) n--;
-  }
-  return out;
-}
-
-// Formatted in UTC on purpose: the dates above are noon-anchored UTC stand-ins
-// for a Pacific calendar day, so reading them back in the viewer's own zone
-// would rotate the weekday for anyone east of London.
-const fmtDay = d => new Intl.DateTimeFormat('en-US', {
-  timeZone: 'UTC', weekday: 'long', month: 'short', day: 'numeric',
-}).format(d);
-const fmtDayShort = d => new Intl.DateTimeFormat('en-US', {
-  timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric',
-}).format(d);
-const fmtWeekday = d => new Intl.DateTimeFormat('en-US', {
-  timeZone: 'UTC', weekday: 'long',
-}).format(d);
-
-function deliveryEstimate(now) {
-  const p = pacificParts(now || new Date());
-  const today = anchorNoon(p);
-  const secondsIn = (+p.hour % 24) * 3600 + (+p.minute) * 60 + (+p.second);
-
-  // Miss the 2pm cutoff, or land on a weekend, and dispatch rolls to the next
-  // business morning. addBusinessDays already steps over Sat/Sun.
-  const shipsToday = !isWeekendDay(today) && secondsIn < CUTOFF_HOUR * 3600;
-  const shipDate = shipsToday ? today : addBusinessDays(today, 1);
-
-  return {
-    shipsToday,
-    shipDate,
-    // Whole calendar days from today to the dispatch run, which is exact
-    // because both dates are noon-anchored. Lets a caller say "tomorrow"
-    // instead of naming a weekday the reader then has to place.
-    daysUntilShip: Math.round((shipDate - today) / 86400000),
-    // How long is left to make today's pickup. Only meaningful when
-    // shipsToday, and it is the whole point of showing a countdown at all:
-    // "same-day shipping" is a rule, "1h 12m" is an answer.
-    secondsLeft: CUTOFF_HOUR * 3600 - secondsIn,
-    arrivalDate: addBusinessDays(shipDate, TRANSIT_DAYS),
-  };
-}
-
-// Rounded down to the minute, because the tick that drives it is a minute
-// long: saying "2h 14m" and meaning "somewhere under that" is the safe
-// direction to err.
-function countdown(seconds) {
-  const mins = Math.floor(seconds / 60);
-  if (mins < 1) return 'less than a minute';
-  const hours = Math.floor(mins / 60);
-  return hours
-    ? `${hours}h ${String(mins % 60).padStart(2, '0')}m`
-    : `${mins}m`;
-}
-
-// ---------------------------------------------------------------------------
 // What the site is allowed to say about how a lot is verified and where it is
 // made. Both claims are already made at length on how-we-test.html and about.html.
 // The evidence panel states them in four words, and it states them from here,
@@ -1002,66 +916,6 @@ const QTY_TIERS = [
 // adding a richer tier raises it here and in the copy at the same time.
 const BULK_MAX_OFF = Math.max(...QTY_TIERS.map(t => t.off));
 
-// ---------------------------------------------------------------------------
-// Where the retail ladder above stops and the wholesale one starts.
-//
-// This whole ladder used to be a single sentence typed into a card on
-// wholesale.html: "25% off starting at 25 vials a month, scaling to 45% at
-// 250-499. Custom quote at 500 and up." Four commercial terms and a
-// qualifying minimum, with nothing holding any of them to anything. The
-// minimum in particular was written out three times on that one page, once in
-// prose, once in the form's `min` attribute and once in the sub-heading, and
-// the server that receives the application did not enforce it at all.
-//
-// PLACEHOLDER, in part, and the part matters. The two anchors below (25% from
-// 25 vials, 45% from 250) are the figures the site has always published. What
-// "scaling" meant between them was never written down anywhere, so nothing
-// here invents a middle tier: the first band is marked `from`, which renders
-// as "From 25% off" and is the floor the site already promises for any volume
-// in it. Fill the real ladder in by adding rows here, and the page, the
-// calculator, the form minimum and the audit all follow. Do not put a rate on
-// the page that is not in this array.
-//
-//   min   the first monthly volume, in vials, that earns the band
-//   off   the discount, or null where the band has no published rate
-//   from  true when `off` is a floor for the band rather than the exact rate
-const WHOLESALE_TIERS = [
-  { min: 25,  off: 0.25, from: true },
-  { min: 250, off: 0.45, from: false },
-  { min: 500, off: null, from: false },
-];
-
-// The qualifying minimum, derived from the first band rather than typed
-// beside it. Read by the page copy, the form's `min`, and the serverless
-// handler that receives the application.
-const WHOLESALE_MIN = WHOLESALE_TIERS[0].min;
-
-// The band a monthly volume actually earns: the highest threshold at or below
-// it, the same rule tierFor() applies to the retail ladder. Returns null below
-// the minimum, which is a real answer and not an error: that volume belongs on
-// the retail bulk ladder instead.
-function wholesaleTierFor(vials) {
-  const n = Number(vials);
-  if (!isFinite(n) || n < WHOLESALE_MIN) return null;
-  return WHOLESALE_TIERS.filter(t => n >= t.min).pop();
-}
-
-// "25 to 249 vials" / "500 vials or more". Generated from the neighbouring
-// thresholds so a band cannot end up describing a range it no longer covers.
-function wholesaleRangeLabel(tier) {
-  const i = WHOLESALE_TIERS.indexOf(tier);
-  const next = WHOLESALE_TIERS[i + 1];
-  return next ? `${tier.min} to ${next.min - 1} vials` : `${tier.min} vials or more`;
-}
-
-// "From 25% off" / "45% off" / "Custom quote". The one place a wholesale rate
-// turns into words, so a band with no published figure cannot be rendered as
-// though it had one.
-function wholesaleRateLabel(tier) {
-  if (!tier || tier.off === null) return 'Custom quote';
-  return `${tier.from ? 'From ' : ''}${Math.round(tier.off * 100)}% off`;
-}
-
 // "3 vials" / "1 vial". Generated so a threshold change cannot leave a label
 // describing the old number.
 function tierLabel(qty) {
@@ -1413,12 +1267,6 @@ if (typeof module !== 'undefined' && module.exports) {
     CUTOFF_LABEL,
     CUTOFF_LABEL_SHORT,
     TRANSIT_DAYS,
-    deliveryEstimate,
-    addBusinessDays,
-    fmtDay,
-    fmtDayShort,
-    fmtWeekday,
-    countdown,
     ANALYSIS_TESTS,
     TESTS_PER_BATCH,
     numberWord,
@@ -1448,11 +1296,6 @@ if (typeof module !== 'undefined' && module.exports) {
     QTY_TIERS,
     BULK_MAX_OFF,
     bulkNote,
-    WHOLESALE_TIERS,
-    WHOLESALE_MIN,
-    wholesaleTierFor,
-    wholesaleRangeLabel,
-    wholesaleRateLabel,
     tierFor,
     tierLabel,
     bulkOff,

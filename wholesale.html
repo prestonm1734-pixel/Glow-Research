@@ -26,130 +26,93 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  /* =====================================================================
-     WHOLESALE
-     Surface, heading scale, hairline grid and button colours come from
-     .lp-light in css/style.css, the construction coa.html established. Only
-     the calculator, the ladder rows and the application form are below.
+  /* Plain white page, the same construction as coa.html and the redesigned
+     shipping.html: a scaled-down centred hero (h1 + one line of lede, no
+     eyebrow, no split-colour headline, no live "answered in a day" dot)
+     sitting above a hairlined fact grid built the exact same way the
+     certificate grid is, then a plain white form. Nothing here needs to be
+     a mood piece; the whole page is answering "what does it cost and how do
+     I open an account." */
+  .wholesale-page{ background:#fff; color:#0a0a0a; }
+  .wholesale-page .lp-hero{ padding: clamp(40px, 5.5vw, 64px) 0 clamp(26px, 3.5vw, 38px); }
+  .wholesale-page .lp-hero h1{
+    color:#0a0a0a; font-size: clamp(1.9rem, 3.6vw, 2.6rem);
+    max-width: 20ch; margin: 0 auto 14px;
+  }
+  .wholesale-page .lp-lede{
+    color:#55554f; font-size: clamp(.98rem, 1.1vw, 1.05rem); max-width: 48ch;
+  }
 
-     Buyers arrive with one question already formed: what would my rate be.
-     It used to be answered by a sentence inside the first of three equal
-     cards. It is a figure they can move now, and the band it lands in lights
-     up in the ladder. Every number comes from WHOLESALE_TIERS in
-     js/products-data.js.
-     ===================================================================== */
+  .wholesale-page .btn-primary{ background:#0a0a0a; color:#fff; }
+  .wholesale-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
+  .wholesale-page .btn-outline{ border-color: rgba(0,0,0,.25); color:#0a0a0a; }
+  .wholesale-page .btn-outline:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; }
 
-  /* ---------- the calculator ----------
-     A range input, because the question is "roughly how many" and a slider
-     is the control for roughly. Paired with a number field rather than
-     replaced by one: a slider alone cannot be typed into, read out or
-     operated precisely, and a buyer who already knows their figure should
-     not have to drag for it. Both drive the same handler. */
-  .ws-calc{
-    max-width: 620px; margin: clamp(30px, 4vw, 44px) auto 0; text-align:left;
-    border:1px solid var(--ll-line); background:#fff;
-  }
-  .ws-calc-head{
-    display:flex; align-items:center; justify-content:space-between;
-    gap:12px; padding:13px 18px; border-bottom:1px solid var(--ll-line);
-  }
-  .ws-vol{ display:flex; align-items:baseline; gap:7px; }
-  .ws-vol input{
-    width:4.6ch; padding:0; border:0; background:none;
-    font-family: var(--font-display); font-weight:600; font-size:1.05rem;
-    color: var(--ll-ink); text-align:right;
-    border-bottom:1px solid rgba(0,0,0,.3); font-variant-numeric: tabular-nums;
-  }
-  .ws-vol input::-webkit-outer-spin-button,
-  .ws-vol input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
-  .ws-vol input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
-  .ws-vol input:focus{ outline:none; border-bottom-color: var(--ll-ink); }
-  .ws-vol input:focus-visible{ outline:2px solid var(--ll-ink); outline-offset:3px; }
-  .ws-vol span{ font-size:.8rem; color: var(--ll-mute); }
+  .wholesale-page .lp-section{ padding: clamp(56px, 7vw, 90px) 0; }
+  /* A hairline in place of the dark/light tint alternation the sitewide
+     .lp-section.tint pattern uses: the whole page is one white surface now,
+     so what used to separate two moods separates two topics instead. */
+  .wholesale-page .lp-section + .lp-section{ border-top:1px solid rgba(0,0,0,.1); }
 
-  .ws-calc-body{ padding: clamp(22px, 3vw, 30px) 18px clamp(18px, 2.4vw, 24px); }
-  .lp-light .ws-rate{
-    margin:0; font-family: var(--font-display); font-weight:600;
-    font-size: clamp(2rem, 4.4vw, 2.9rem); line-height:1;
-    letter-spacing:-.045em; color: var(--ll-ink);
-  }
-  .ws-band{ margin:11px 0 0; font-size:.95rem; line-height:1.5; color: var(--ll-body); }
-  .ws-band a{ color: var(--ll-ink); text-decoration:underline; text-underline-offset:3px; }
+  .wholesale-page .eyebrow{ color:#8a8a86; }
+  .wholesale-page .lp-h2{ color:#0a0a0a; }
+  .wholesale-page .lp-sub{ color:#55554f; }
+  .wholesale-page .lp-fine{ color:#55554f; }
+  .wholesale-page .lp-fine strong{ color:#0a0a0a; }
 
-  /* One styled track for both engines. -webkit- and -moz- pseudo-elements
-     cannot be combined in one selector list: a browser drops the whole rule
-     when it does not recognise a selector in it, so the two are written out
-     separately even though the declarations match. */
-  .ws-slider{
-    -webkit-appearance:none; appearance:none;
-    display:block; width:100%; margin: clamp(20px, 2.6vw, 26px) 0 0;
-    height:26px; background:none; cursor:pointer;
+  /* The three-point row becomes a hairlined card grid, the same construction
+     as the certificate grid on coa.html and the shipping page's fact grid:
+     border-top/left on the container, border-right/bottom on each card, so
+     partial rows never leave a bare patch of background exposed. */
+  .wholesale-page .lp-points{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap:0; text-align:left;
+    border-top:1px solid rgba(0,0,0,.13); border-left:1px solid rgba(0,0,0,.13);
+    margin-top: clamp(40px, 5.5vw, 56px);
   }
-  .ws-slider::-webkit-slider-runnable-track{ height:2px; background: rgba(0,0,0,.18); }
-  .ws-slider::-moz-range-track{ height:2px; background: rgba(0,0,0,.18); }
-  .ws-slider::-webkit-slider-thumb{
-    -webkit-appearance:none; appearance:none;
-    width:20px; height:20px; margin-top:-9px; border-radius:50%;
-    background: var(--ll-ink); border:0; cursor:grab;
+  .wholesale-page .lp-point{
+    padding: clamp(26px, 3vw, 34px);
+    border-right:1px solid rgba(0,0,0,.13); border-bottom:1px solid rgba(0,0,0,.13);
   }
-  .ws-slider::-moz-range-thumb{
-    width:20px; height:20px; border-radius:50%;
-    background: var(--ll-ink); border:0; cursor:grab;
+  .wholesale-page .lp-point svg{ color:#0a0a0a; margin-bottom:16px; }
+  .wholesale-page .lp-point h3{
+    color:#0a0a0a; font-size:1.15rem; font-weight:700;
+    margin:0 0 10px; letter-spacing:-.02em; line-height:1.25;
   }
-  .ws-slider:focus-visible{ outline:2px solid var(--ll-ink); outline-offset:4px; }
-  .ws-scale{ display:flex; justify-content:space-between; margin:4px 0 0; }
-
-  /* ---------- the ladder ----------
-     Baked into the markup rather than drawn by the calculator, so the bands a
-     buyer is deciding on are in the served HTML for a crawler and for anyone
-     with no JavaScript. check-claims.js compares every row against
-     WHOLESALE_TIERS. The calculator only moves the highlight. */
-  .ws-ladder{ --ll-cols: 3; margin-top: clamp(38px, 5vw, 54px); }
-  .ws-tier{ transition: background-color .3s ease, box-shadow .3s ease; }
-  .ws-tier-range{ display:block; font-size:1.02rem; font-weight:700; color: var(--ll-ink); letter-spacing:-.02em; }
-  .ws-tier-off{
-    display:block; margin-top:8px;
-    font-family: var(--font-display); font-weight:600; font-size:1.5rem;
-    letter-spacing:-.03em; color: var(--ll-ink);
+  .wholesale-page .lp-point p{ color:#55554f; font-size:.98rem; }
+  @media (max-width: 720px){
+    /* Stacked to one column, the container's left border and each card's
+       right border both become vertical lines running the full height of
+       the stack, boxing it in. Dropped for the same reason shipping.html
+       drops them: a single column needs no side borders to separate
+       anything, only the horizontal rule between cards. */
+    .wholesale-page .lp-points{ grid-template-columns:1fr; border-left:none; padding-left:0; }
+    .wholesale-page .lp-point{ border-right:none; padding-left:0; padding-right:0; }
   }
-  .ws-tier-note{ margin:10px 0 0; }
-  /* The band the slider is sitting in. An inset rule rather than a fill, so
-     the highlight reads at the same weight as every other hairline on the
-     page instead of introducing a second surface colour. */
-  .ws-tier.is-on{ background:#fafafa; box-shadow: inset 0 0 0 1px var(--ll-ink); }
-
-  /* ---------- the three ---------- */
-  .ws-cards{ --ll-cols: 3; margin-top: clamp(38px, 5vw, 54px); }
-  .ws-card svg{ margin-bottom:16px; }
-
-  /* Each mark animates the idea in its own heading: the bars step lower, the
-     contact comes online, the fill level rises. */
-  .ws-bar{ transform-box: view-box; transform-origin: center 21px; transition: transform .55s var(--lp-ease); }
-  .ws-card:hover .ws-bar1{ transform: scaleY(.80); }
-  .ws-card:hover .ws-bar2{ transform: scaleY(.72); transition-delay:.05s; }
-  .ws-card:hover .ws-bar3{ transform: scaleY(.60); transition-delay:.1s; }
-  .ws-live{ transform-box: view-box; transform-origin: 18.4px 5.6px; transform: scale(0); transition: transform .4s var(--lp-ease); }
-  .ws-card:hover .ws-live{ transform: scale(1); }
-  .ws-fill{ transform-box: view-box; transform-origin: center; transition: transform .55s var(--lp-ease); }
-  .ws-card:hover .ws-fill{ transform: translateY(-3.6px); }
 
   /* ---------- the application form ----------
-     Square hairlined inputs, the same box coa.html's search field and the
-     sign-in form use on their own white surfaces. */
-  .ws-form{ max-width: 560px; margin: clamp(34px, 4.5vw, 48px) 0 0; }
+     Recoloured for the white surface, the same square hairlined input the
+     sign-in page's own form uses (.si-field), not the dark-surface fill
+     this form was built against. */
+  .ws-form{ max-width: 560px; margin: clamp(40px, 5.5vw, 52px) auto 0; }
   .ws-field{ margin-bottom: 16px; }
-  .ws-field label{ display:block; margin-bottom:9px; font-size:.9rem; font-weight:500; color:#6e6e73; }
-  .ws-field input, .ws-field textarea{
-    width:100%; padding:14px 16px; border-radius:0;
-    border:1px solid rgba(0,0,0,.22); background:#fff; color: var(--ll-ink);
-    font-family:inherit; font-size:1rem; transition: border-color .18s ease;
+  .ws-field label{
+    display:block; margin-bottom:9px;
+    font-size:.9rem; font-weight:500; color:#6e6e73;
   }
-  .ws-field textarea{ resize:vertical; min-height:96px; }
-  .ws-field input::placeholder, .ws-field textarea::placeholder{ color: var(--ll-mute); }
+  .ws-field input, .ws-field textarea{
+    width:100%; padding: 14px 16px; border-radius: 0;
+    border:1px solid rgba(0,0,0,.22); background:#fff; color:#0a0a0a;
+    font-family:inherit; font-size:1rem;
+    transition: border-color .18s ease;
+  }
+  .ws-field textarea{ resize:vertical; min-height: 96px; }
+  .ws-field input::placeholder, .ws-field textarea::placeholder{ color:#8a8a86; }
   .ws-field input:hover, .ws-field textarea:hover{ border-color: rgba(0,0,0,.4); }
-  .ws-field input:focus, .ws-field textarea:focus{ outline:none; border-color: var(--ll-ink); }
-  .ws-field input:focus-visible, .ws-field textarea:focus-visible{ outline:2px solid var(--ll-ink); outline-offset:2px; }
-  .ws-field:focus-within label{ color: var(--ll-ink); }
+  .ws-field input:focus, .ws-field textarea:focus{ outline:none; border-color:#0a0a0a; }
+  .ws-field input:focus-visible, .ws-field textarea:focus-visible{
+    outline: 2px solid #0a0a0a; outline-offset: 2px;
+  }
+  .ws-field:focus-within label{ color:#0a0a0a; }
 
   /* fields arrive one after another, like the rows above them */
   .js .ws-form .ws-field, .js .ws-form .ws-submit{
@@ -166,40 +129,49 @@
   .ws-submit{ margin-top: 26px; }
   .ws-form{ transition: opacity .3s ease; }
   .ws-form.is-gone{ opacity:0; }
-  .ws-error{ max-width:560px; margin: clamp(34px, 4.5vw, 48px) 0 0; color:#c0392b; font-size:.95rem; line-height:1.5; }
+  .ws-error{
+    max-width: 560px; margin: clamp(40px, 5.5vw, 52px) auto 0;
+    color:#c0392b; font-size:.95rem;
+  }
   .ws-error[hidden]{ display:none; }
 
   /* ---------- the confirmation ----------
      Submitting is the one thing this page is for, so it gets a real moment
      instead of a line of text appearing under the button. */
-  .ws-done{ max-width:560px; margin: clamp(34px, 4.5vw, 48px) 0 0; }
+  .ws-done{ max-width: 560px; margin: clamp(40px, 5.5vw, 52px) auto 0; }
   .ws-done[hidden]{ display:none; }
-  .ws-done-mark{ display:block; margin:0 0 20px; color: var(--ll-ink); }
+  .ws-done-mark{ display:block; margin: 0 0 20px; color:#0a0a0a; }
   .js .ws-done-mark .lp-draw{
-    stroke-dasharray:1; stroke-dashoffset:1;
+    stroke-dasharray: 1; stroke-dashoffset: 1;
     transition: stroke-dashoffset .85s var(--lp-ease);
   }
-  .ws-done.is-in .ws-done-mark .lp-draw{ stroke-dashoffset:0; }
-  .ws-done.is-in .ws-tick{ transition-delay:.38s; }
-  .ws-done h3{ color: var(--ll-ink); font-size: clamp(1.35rem, 2.4vw, 1.75rem); letter-spacing:-.035em; margin:0 0 10px; }
-  .ws-done p{ font-size:1.02rem; margin:0; color: var(--ll-body); }
+  .ws-done.is-in .ws-done-mark .lp-draw{ stroke-dashoffset: 0; }
+  .ws-done.is-in .ws-tick{ transition-delay: .38s; }
+  .ws-done h3{ color:#0a0a0a; font-size: clamp(1.35rem, 2.4vw, 1.75rem); letter-spacing:-.035em; margin: 0 0 10px; }
+  .ws-done p{ font-size: 1.02rem; margin: 0; color:#55554f; }
   .js .ws-done > *{ opacity:0; transform: translateY(12px); transition: opacity .6s var(--lp-ease), transform .6s var(--lp-ease); }
   .ws-done.is-in > *{ opacity:1; transform:none; }
-  .ws-done.is-in h3{ transition-delay:.18s; }
-  .ws-done.is-in p{ transition-delay:.26s; }
+  .ws-done.is-in h3{ transition-delay: .18s; }
+  .ws-done.is-in p{ transition-delay: .26s; }
 
-  /* the number field is labelled by its unit text visually; screen readers
-     get a real label rather than inferring one from the span beside it */
-  .ws-sr{
-    position:absolute; width:1px; height:1px; margin:-1px; padding:0;
-    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
-  }
+  /* ---------- marks ----------
+     Each one animates the idea in its own heading: the bars step lower,
+     the contact comes online, the fill level rises. */
+  .ws-bar{ transform-box: view-box; transform-origin: center 21px; transition: transform .55s var(--lp-ease); }
+  .lp-point:hover .ws-bar1{ transform: scaleY(.80); }
+  .lp-point:hover .ws-bar2{ transform: scaleY(.72); transition-delay:.05s; }
+  .lp-point:hover .ws-bar3{ transform: scaleY(.60); transition-delay:.1s; }
+
+  .ws-live{ transform-box: view-box; transform-origin: 18.4px 5.6px; transform: scale(0); transition: transform .4s var(--lp-ease); }
+  .lp-point:hover .ws-live{ transform: scale(1); }
+
+  .ws-fill{ transform-box: view-box; transform-origin: center; transition: transform .55s var(--lp-ease); }
+  .lp-point:hover .ws-fill{ transform: translateY(-3.6px); }
 
   @media (prefers-reduced-motion: reduce){
-    .ws-card:hover .ws-bar1, .ws-card:hover .ws-bar2, .ws-card:hover .ws-bar3,
-    .ws-card:hover .ws-fill{ transform:none; }
+    .lp-point:hover .ws-bar1, .lp-point:hover .ws-bar2, .lp-point:hover .ws-bar3,
+    .lp-point:hover .ws-fill{ transform: none; }
     .ws-live{ transform: scale(1); }
-    .ws-tier{ transition:none; }
   }
 </style>
 <script type="application/ld+json">
@@ -284,83 +256,29 @@
   </div>
 </header>
 
-<main class="lp-page lp-light wholesale-page">
+<main class="lp-page wholesale-page">
 
-<!-- Buyers arrive at this page with one question already formed: what would
-     my rate be. It used to be answered by a sentence inside the first of
-     three equal cards, which meant reading three cards to find it and then
-     doing the banding in your head.
-
-     Every figure below comes from WHOLESALE_TIERS in js/products-data.js.
-     The ladder itself is baked into the markup rather than drawn by the
-     calculator, so the bands are in the served HTML for a crawler and for a
-     reader with no JavaScript; check-claims.js compares each row against the
-     array, and the calculator only moves the highlight. -->
 <section class="lp-hero">
   <div class="container">
-    <span class="eyebrow">Wholesale</span>
-    <h1>25 vials a month, 25% off to start.</h1>
+    <h1>Order more, pay less.</h1>
     <p class="lp-lede">
-      Volume pricing, a named contact and custom fill sizes for labs buying in
-      quantity. Move the slider to see the band you land in. Applications are
-      answered within one business day.
+      Volume pricing, a named contact, and custom fill sizes for labs buying
+      in quantity. Applications are answered within one business day.
     </p>
-
-    <div class="ws-calc">
-      <div class="ws-calc-head">
-        <span class="ll-label">Your volume</span>
-        <span class="ws-vol">
-          <label class="ws-sr" for="wsVolInput">Monthly volume in vials</label>
-          <input type="number" id="wsVolInput" value="40" min="0" max="9999" step="1" inputmode="numeric" />
-          <span>vials / month</span>
-        </span>
-      </div>
-      <div class="ws-calc-body">
-        <p class="ws-rate" id="wsRate">From 25% off</p>
-        <p class="ws-band" id="wsBand">on 25 to 249 vials a month.</p>
-        <input type="range" class="ws-slider" id="wsSlider"
-               min="0" max="600" step="1" value="40"
-               aria-label="Monthly volume in vials" />
-        <p class="ws-scale ll-label" aria-hidden="true"><span>0</span><span>250</span><span>500+</span></p>
-      </div>
-    </div>
-
     <div class="lp-actions">
       <a href="#apply" class="btn btn-primary btn-lg">Apply for an account <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
     </div>
   </div>
 </section>
 
-<!-- The ladder. `from` on the first band is not a hedge added here: it is what
-     "scaling to 45%" has always meant on this page, and the steps between the
-     two published anchors have never been written down. Nothing invents one.
-     See the note above WHOLESALE_TIERS. -->
 <section class="lp-section">
   <div class="container">
     <span class="eyebrow">Volume pricing</span>
-    <h2 class="ll-h2">Your rate drops as your volume climbs.</h2>
-    <p class="ll-sub">Tell us roughly what you need each month and we come back with a priced tier sheet. No portal, no sales call.</p>
+    <h2 class="lp-h2">Your rate drops as your volume climbs.</h2>
+    <p class="lp-sub">Tell us roughly what you need each month and we come back with a priced tier sheet. No portal, no sales call.</p>
 
-    <div class="ll-grid ws-ladder reveal" id="wsLadder">
-      <div class="ll-cell ws-tier" data-tier-min="25">
-        <span class="ws-tier-range">25 to 249 vials</span>
-        <span class="ws-tier-off">From 25% off</span>
-        <p class="ws-tier-note">The entry band. Your exact rate is quoted against the compounds and the volume you list.</p>
-      </div>
-      <div class="ll-cell ws-tier" data-tier-min="250">
-        <span class="ws-tier-range">250 to 499 vials</span>
-        <span class="ws-tier-off">45% off</span>
-        <p class="ws-tier-note">The deepest rate we publish. Priced per compound on the tier sheet.</p>
-      </div>
-      <div class="ll-cell ws-tier" data-tier-min="500">
-        <span class="ws-tier-range">500 vials or more</span>
-        <span class="ws-tier-off">Custom quote</span>
-        <p class="ws-tier-note">Priced against the specific compounds and the reorder cadence, with custom fill sizes included.</p>
-      </div>
-    </div>
-
-    <div class="ll-grid ws-cards reveal">
-      <div class="ll-cell ws-card">
+    <div class="lp-points reveal">
+      <div class="lp-point">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
           <path pathLength="1" class="lp-draw" d="M3 21h18"/>
           <path pathLength="1" class="lp-draw ws-bar ws-bar1" d="M6.5 21V7"/>
@@ -368,9 +286,9 @@
           <path pathLength="1" class="lp-draw ws-bar ws-bar3" d="M17.5 21v-4.5"/>
         </svg>
         <h3>Tiered pricing</h3>
-        <p>Banded on monthly volume, not per order, so a slow month does not cost you the rate you qualified for.</p>
+        <p>25% off starting at 25 vials a month, scaling to 45% at 250&ndash;499. Custom quote at 500 and up.</p>
       </div>
-      <div class="ll-cell ws-card">
+      <div class="lp-point">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
           <circle pathLength="1" class="lp-draw" cx="12" cy="8.4" r="3.6"/>
           <path pathLength="1" class="lp-draw" d="M5.2 20.5c0-3.75 3.05-6.8 6.8-6.8s6.8 3.05 6.8 6.8"/>
@@ -379,7 +297,7 @@
         <h3>A named contact</h3>
         <p>One person who knows your account and reorders with you directly, not a ticket queue.</p>
       </div>
-      <div class="ll-cell ws-card">
+      <div class="lp-point">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
           <rect pathLength="1" class="lp-draw" x="8.6" y="2.6" width="6.8" height="2.9" rx="0.5"/>
           <path pathLength="1" class="lp-draw" d="M9.7 5.5v11.9a2.3 2.3 0 0 0 2.3 2.3 2.3 2.3 0 0 0 2.3-2.3V5.5"/>
@@ -395,8 +313,8 @@
 <section class="lp-section" id="apply">
   <div class="container">
     <span class="eyebrow">Open an account</span>
-    <h2 class="ll-h2">Five fields. We do the rest by email.</h2>
-    <p class="ll-sub" id="wsMinNote">25-vial monthly minimum to qualify. Below that, bulk pricing on the product pages applies automatically, with no account needed.</p>
+    <h2 class="lp-h2">Five fields. We do the rest by email.</h2>
+    <p class="lp-sub">25-vial monthly minimum to qualify.</p>
 
     <form class="ws-form reveal" id="wsForm">
       <div class="ws-field">
@@ -602,68 +520,6 @@
   })();
 </script>
 <script src="js/products-data.js"></script>
-<script>
-  /* The rate calculator.
-
-     Every figure it prints comes from wholesaleTierFor() and its two label
-     helpers in js/products-data.js, so the slider cannot quote a band the
-     ladder below it does not list, and adding a tier to that array moves both
-     at once. Nothing here knows what a discount is; it asks.
-
-     The ladder rows are in the served markup already. This only moves the
-     highlight and drives the two paired inputs from each other. */
-  (function () {
-    var slider = document.getElementById('wsSlider');
-    var box = document.getElementById('wsVolInput');
-    var rate = document.getElementById('wsRate');
-    var band = document.getElementById('wsBand');
-    var volume = document.getElementById('wsVolume');
-    if (!slider || !box || typeof wholesaleTierFor !== 'function') return;
-
-    var rows = [].slice.call(document.querySelectorAll('.ws-tier'));
-
-    function render(n) {
-      var tier = wholesaleTierFor(n);
-
-      if (!tier) {
-        // A real answer, not an error state: that volume belongs on the
-        // retail bulk ladder, which needs no account and applies by itself.
-        rate.textContent = 'Bulk pricing';
-        band.innerHTML = 'Below the ' + WHOLESALE_MIN + '-vial wholesale minimum. Volume discounts still apply ' +
-          'automatically on <a href="peptides.html">the product pages</a>.';
-      } else {
-        rate.textContent = wholesaleRateLabel(tier);
-        band.textContent = 'on ' + wholesaleRangeLabel(tier).toLowerCase() + ' a month.';
-      }
-
-      rows.forEach(function (row) {
-        row.classList.toggle('is-on', !!tier && Number(row.dataset.tierMin) === tier.min);
-      });
-
-      // Carry the figure into the application, so the number someone settled
-      // on with the slider is the one the desk is asked to quote.
-      if (volume && n >= WHOLESALE_MIN) volume.value = n;
-    }
-
-    function fromSlider() {
-      box.value = slider.value;
-      render(Number(slider.value));
-    }
-    function fromBox() {
-      var n = Number(box.value);
-      if (!isFinite(n) || n < 0) return;
-      // The slider tops out well below what someone can type. Pinning it to
-      // its max rather than ignoring the entry keeps the two controls from
-      // showing different things.
-      slider.value = Math.min(n, Number(slider.max));
-      render(n);
-    }
-
-    slider.addEventListener('input', fromSlider);
-    box.addEventListener('input', fromBox);
-    render(Number(slider.value));
-  })();
-</script>
 <script src="js/cart.js"></script>
 <script src="js/cart-modal.js"></script>
 <script src="js/search.js"></script>

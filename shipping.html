@@ -26,152 +26,82 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  /* =====================================================================
-     SHIPPING
-     Surface, heading scale, hairline grid and button colours come from
-     .lp-light in css/style.css, the construction coa.html established.
-     Only the dispatch panel, the track and the rate rows are below.
-
-     The page used to answer "when does it arrive" with the rule: order by
-     2:00 PM PST and it goes the same day. The rule is correct and it is also
-     work for the reader, who has to know the time in Pacific, whether today
-     is a weekday, and how business days fall to get to the date they wanted.
-     It answers with the date now. deliveryEstimate() in js/products-data.js
-     does the arithmetic, the same function the product page's buy box uses,
-     so the two can never quote different days.
-     ===================================================================== */
-
-  /* ---------- the dispatch panel ----------
-     Its markup ships the rule ("2:00 PM PST"), not a date: a date baked into
-     static HTML is wrong within hours and a crawler would cache it. The
-     script upgrades it to the live figures on load and re-ticks every minute.
-     Square and hairlined like every other box on these pages, with the head
-     and the two date rows separated by rules rather than by gaps. */
-  .sh-dispatch{
-    max-width: 620px; margin: clamp(30px, 4vw, 44px) auto 0; text-align:left;
-    border:1px solid var(--ll-line); background:#fff;
+  /* Plain white lookup page, the same construction as coa.html: a scaled-down
+     centred hero (h1 + one line of lede, no eyebrow, no photo, no live
+     countdown) sitting directly above a hairlined fact grid built the exact
+     same way the certificate grid is — border-top/left on the container,
+     border-right/bottom on each card. Nothing here needs to be a mood piece;
+     the whole page is answering "when does it arrive and what does it cost." */
+  .shipping-page{ background:#fff; color:#0a0a0a; }
+  .shipping-page .lp-hero{ padding: clamp(40px, 5.5vw, 64px) 0 clamp(26px, 3.5vw, 38px); }
+  .shipping-page .lp-hero h1{
+    color:#0a0a0a; font-size: clamp(1.9rem, 3.6vw, 2.6rem);
+    max-width: 18ch; margin: 0 auto 14px;
   }
-  .sh-dispatch-head{
-    display:flex; align-items:center; justify-content:space-between;
-    gap:12px; padding:13px 18px; border-bottom:1px solid var(--ll-line);
-  }
-  /* Green would be the obvious colour for "yes it goes today" and the site
-     does not have one. The dot carries the state: lit and pulsing while the
-     van has not gone, flat once it has. */
-  .sh-flag{ display:inline-flex; align-items:center; gap:8px; font-size:.78rem; font-weight:600; color: var(--ll-ink); }
-  .sh-flag::before{
-    content:''; width:7px; height:7px; border-radius:50%;
-    background:#c4c4c0; flex:0 0 auto;
-  }
-  .sh-dispatch.is-open .sh-flag::before{
-    background: var(--ll-ink); box-shadow:0 0 0 0 rgba(10,10,10,.4);
-    animation: shPulse 2.4s ease-out infinite;
-  }
-  @keyframes shPulse{
-    0%{ box-shadow:0 0 0 0 rgba(10,10,10,.35); }
-    70%{ box-shadow:0 0 0 7px rgba(10,10,10,0); }
-    100%{ box-shadow:0 0 0 0 rgba(10,10,10,0); }
+  .shipping-page .lp-lede{
+    color:#55554f; font-size: clamp(.98rem, 1.1vw, 1.05rem); max-width: 48ch;
   }
 
-  .sh-clock-wrap{ padding: clamp(22px, 3vw, 30px) 18px clamp(20px, 2.6vw, 26px); }
-  .lp-light .sh-clock{
-    margin:0; font-family: var(--font-display); font-weight:600;
-    font-size: clamp(2rem, 4.4vw, 2.9rem); line-height:1;
-    letter-spacing:-.045em; color: var(--ll-ink); font-variant-numeric: tabular-nums;
-  }
-  .sh-clock-sub{ margin:11px 0 0; font-size:.95rem; line-height:1.5; color: var(--ll-body); }
+  .shipping-page .btn-primary{ background:#0a0a0a; color:#fff; }
+  .shipping-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
+  .shipping-page .btn-outline{ border-color: rgba(0,0,0,.25); color:#0a0a0a; }
+  .shipping-page .btn-outline:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; }
 
-  /* Two rows on a phone rather than two columns: "Wednesday, Aug 20" beside
-     "Friday, Aug 22" in half a 360px screen wraps both of them. */
-  .sh-when{ display:grid; margin:0; border-top:1px solid var(--ll-line); }
-  .sh-when > div{
-    display:flex; align-items:baseline; justify-content:space-between;
-    gap:16px; padding:13px 18px;
-  }
-  .sh-when > div + div{ border-top:1px solid var(--ll-line); }
-  .sh-when dd{ margin:0; font-size:1rem; font-weight:700; color: var(--ll-ink); text-align:right; }
-  @media (min-width: 560px){
-    .sh-when{ grid-template-columns:1fr 1fr; }
-    .sh-when > div{ display:block; }
-    .sh-when > div + div{ border-top:0; border-left:1px solid var(--ll-line); }
-    .sh-when dd{ margin-top:7px; text-align:left; }
-  }
+  .shipping-page .lp-fine{ color:#55554f; }
+  .shipping-page .lp-fine strong{ color:#0a0a0a; }
 
-  /* ---------- the track ----------
-     Four cells of the shared grid, with the rail drawn through the dots. The
-     first two steps are what Glow controls and the last two are the
-     carrier's: filling only ours is the same distinction how-we-test.html
-     makes about whose accreditation is whose, and it is the honest framing
-     for a delivery date. */
-  .sh-track{ --ll-cols: 4; list-style:none; margin: clamp(38px, 5vw, 54px) 0 0; padding:0; }
-  .sh-step{ position:relative; }
-  /* The dot sits in normal flow at the top of the cell, so it lines up with
-     the heading under it without anyone computing the cell's padding twice.
-     The rail is the cell's own rule, drawn from the dot's edge to the cell
-     edge at the dot's centre line, and suppressed on the last step so none
-     trails off the end. */
-  .sh-dot{
-    display:block; width:13px; height:13px; border-radius:50%;
-    border:1px solid rgba(0,0,0,.32); background:#fff; margin-bottom:18px;
+  /* "Inside the box" becomes a hairlined card grid, the same construction
+     as the certificate grid on coa.html: border-top/left on the container,
+     border-right/bottom on each card, so partial rows never leave a bare
+     patch of background exposed. */
+  .shipping-page .lp-points{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap:0; text-align:left;
+    border-top:1px solid rgba(0,0,0,.13); border-left:1px solid rgba(0,0,0,.13);
+    margin-top: clamp(44px, 6vw, 64px);
   }
-  .sh-step::after{
-    content:''; position:absolute;
-    left: calc(clamp(24px, 3vw, 32px) + 21px); right:0;
-    top: calc(clamp(24px, 3vw, 32px) + 6px); height:1px; background: var(--ll-line);
+  .shipping-page .lp-point{
+    padding: clamp(26px, 3vw, 34px);
+    border-right:1px solid rgba(0,0,0,.13); border-bottom:1px solid rgba(0,0,0,.13);
   }
-  .sh-step:last-child::after{ display:none; }
-  .sh-step.is-ours .sh-dot{ background: var(--ll-ink); border-color: var(--ll-ink); }
-  .sh-step h3{ color: var(--ll-ink); font-size:1.05rem; font-weight:700; margin:0; letter-spacing:-.02em; line-height:1.25; }
-  .sh-step p{ margin:8px 0 0; font-size:.93rem; line-height:1.55; color: var(--ll-body); }
-  .sh-step b{ color: var(--ll-ink); font-weight:700; }
+  .shipping-page .lp-point svg{ color:#0a0a0a; }
+  /* The card titles are h2 now that the section above them carries the page's
+     h1, so the sitewide .lp-point h3 sizing no longer reaches them. Same type,
+     stated against the tag they actually use. */
+  .shipping-page .lp-point h2{
+    color:#0a0a0a; font-size:1.22rem; font-weight:700;
+    margin:0 0 10px; letter-spacing:-.02em; line-height:1.25;
+  }
+  .shipping-page .lp-point p{ color:#55554f; }
   @media (max-width: 720px){
-    /* Stacked, the rail turns and runs down the left instead of across, and
-       the dot moves out of flow so the copy can sit beside it rather than
-       under it. */
-    .sh-step{ padding: 0 0 26px 32px; }
-    .sh-step:last-child{ padding-bottom:0; }
-    .sh-step::after{ left:6px; right:auto; top:20px; bottom:-1px; width:1px; height:auto; }
-    .sh-dot{ position:absolute; left:0; top:4px; margin:0; }
+    /* Stacked to one column, the container's left border and each card's
+       right border both become vertical lines running the full height of
+       the stack, boxing it in. A single column doesn't need side borders to
+       separate anything, so they drop and only the horizontal rule between
+       cards (and the one above the first) stays, edge to edge. */
+    .shipping-page .lp-points{
+      grid-template-columns:1fr; border-left:none; padding-left:0;
+    }
+    .shipping-page .lp-point{ border-right:none; padding-left:0; padding-right:0; }
   }
-
-  /* ---------- rates ----------
-     The page whose job is shipping did not state a shipping price: both
-     rates lived on shipping-policy.html only. Both figures are pinned by
-     check-claims.js to SHIPPING_RATES in api/_lib.js, which is what Stripe is
-     actually charged, and to FREE_SHIPPING_AT in js/cart.js. */
-  .sh-rates{ --ll-cols: 2; margin-top: clamp(38px, 5vw, 54px); }
-  .sh-rate{ display:grid; grid-template-columns:1fr auto; align-items:start; gap:6px 16px; }
-  .sh-rate-name{ font-size:1.05rem; font-weight:700; color: var(--ll-ink); line-height:1.3; letter-spacing:-.02em; }
-  .sh-rate-cost{
-    font-family: var(--font-display); font-weight:600; font-size:1.35rem;
-    letter-spacing:-.03em; color: var(--ll-ink); text-align:right;
-  }
-  .sh-rate p{ grid-column:1 / -1; margin:8px 0 0; }
-  .sh-rate p strong{ color: var(--ll-ink); font-weight:700; }
-
-  /* ---------- the three ---------- */
-  .sh-cards{ --ll-cols: 3; margin-top: clamp(38px, 5vw, 54px); }
-  .sh-card svg{ margin-bottom:16px; }
 
   /* Each mark draws itself on arrival (shared .lp-* motion rules). Hover
-     replays that mark's own idea rather than one generic wobble for all
-     three: the snowflake turns, the clock runs, the tick re-checks.
-     transform-box:view-box lets the origin be stated in the 24x24 user space
-     instead of guessing at a percentage. */
+     then replays that mark's own idea rather than applying one generic
+     wobble to all three: the snowflake turns, the clock runs, the tick
+     re-checks. transform-box:view-box lets the origin be stated in the
+     24x24 user space instead of guessing at a percentage. */
   .sh-cold, .sh-hands{ transform-box: view-box; transform-origin: 12px 12px; }
   .sh-cold{ transition: transform 1s var(--lp-ease); }
-  .sh-card:hover .sh-cold{ transform: rotate(90deg); }
+  .lp-point:hover .sh-cold{ transform: rotate(90deg); }
   .sh-hands{ transition: transform 1.15s var(--lp-ease); }
-  .sh-card:hover .sh-hands{ transform: rotate(360deg); }
-  /* the tick already sits at dashoffset 0, so replaying it needs a keyframe
-     rather than a transition */
-  .sh-card:hover .sh-check{ animation: shCheck .6s var(--lp-ease); }
-  @keyframes shCheck{ from{ stroke-dashoffset:1; } to{ stroke-dashoffset:0; } }
+  .lp-point:hover .sh-hands{ transform: rotate(360deg); }
+  /* the tick already sits at dashoffset 0, so replaying it needs a
+     keyframe rather than a transition */
+  .lp-point:hover .sh-check{ animation: shCheck .6s var(--lp-ease); }
+  @keyframes shCheck{ from{ stroke-dashoffset: 1; } to{ stroke-dashoffset: 0; } }
 
   @media (prefers-reduced-motion: reduce){
-    .sh-dispatch.is-open .sh-flag::before{ animation:none; }
-    .sh-card:hover .sh-cold, .sh-card:hover .sh-hands{ transform:none; }
-    .sh-card:hover .sh-check{ animation:none; }
+    .lp-point:hover .sh-cold, .lp-point:hover .sh-hands{ transform: none; }
+    .lp-point:hover .sh-check{ animation: none; }
   }
 </style>
 <script type="application/ld+json">
@@ -256,115 +186,18 @@
   </div>
 </header>
 
-<main class="lp-page lp-light shipping-page">
+<main class="lp-page shipping-page">
 
-<!-- The page answers one question, so the answer goes at the top and
-     everything under it is detail.
-
-     Every date on this page is computed by deliveryEstimate() in
-     js/products-data.js, the same function the product page's buy box calls.
-     What ships in the markup is the rule rather than a date: static HTML
-     saying "arrives Friday" is wrong by Saturday and a crawler would keep
-     serving it. The script upgrades the rule to live figures on load. -->
 <section class="lp-hero">
   <div class="container">
-    <span class="eyebrow">Shipping</span>
-    <h1>Same afternoon, every weekday.</h1>
+    <h1>From the warehouse to your bench, fast.</h1>
     <p class="lp-lede">
-      Order before the cutoff and it is picked, packed and handed to FedEx
-      that day. This is exactly when yours would go, and when it would land.
+      Order by 2:00 PM PST on a weekday and it leaves the same afternoon
+      on 2-day FedEx.
     </p>
 
-    <div class="sh-dispatch" id="shDispatch">
-      <div class="sh-dispatch-head">
-        <span class="ll-label">Next dispatch</span>
-        <span class="sh-flag" id="shFlag">Weekdays</span>
-      </div>
-      <div class="sh-clock-wrap">
-        <p class="sh-clock" id="shClock">2:00 PM PST</p>
-        <p class="sh-clock-sub" id="shClockSub">is the cutoff to make today's FedEx pickup.</p>
-      </div>
-      <dl class="sh-when">
-        <div>
-          <dt class="ll-label">Ships</dt>
-          <dd id="shShips">Same business day</dd>
-        </div>
-        <div>
-          <dt class="ll-label">Arrives</dt>
-          <dd id="shArrives">2-day FedEx Express</dd>
-        </div>
-      </dl>
-    </div>
-  </div>
-</section>
-
-<!-- The journey, with the two halves marked out: the first two steps are
-     ours and the last two are the carrier's. Saying which is which is the
-     same distinction how-we-test.html makes about whose accreditation is
-     whose, and it is the honest framing for a delivery date, since the only
-     part of it Glow controls is getting the box on the van. -->
-<section class="lp-section">
-  <div class="container">
-    <span class="eyebrow">The journey</span>
-    <h2 class="ll-h2">Four steps, two of them ours.</h2>
-
-    <ol class="ll-grid sh-track reveal">
-      <li class="ll-cell sh-step is-ours">
-        <span class="sh-dot" aria-hidden="true"></span>
-        <h3>Order placed</h3>
-        <p id="shT1">Before 2:00 PM PST on a weekday</p>
-      </li>
-      <li class="ll-cell sh-step is-ours">
-        <span class="sh-dot" aria-hidden="true"></span>
-        <h3>Picked and packed</h3>
-        <p id="shT2">The same afternoon, at our fulfilment partner</p>
-      </li>
-      <li class="ll-cell sh-step">
-        <span class="sh-dot" aria-hidden="true"></span>
-        <h3>With FedEx</h3>
-        <p id="shT3">2-day FedEx Express, tracking within 24 hours</p>
-      </li>
-      <li class="ll-cell sh-step">
-        <span class="sh-dot" aria-hidden="true"></span>
-        <h3>Delivered</h3>
-        <p id="shT4">To any address in the 50 states</p>
-      </li>
-    </ol>
-  </div>
-</section>
-
-<!-- What it costs. The page whose job is shipping did not state a shipping
-     price: both rates lived only on shipping-policy.html, so a reader had to
-     leave the shipping page to find out what shipping cost. Both figures are
-     pinned by check-claims.js to SHIPPING_RATES in api/_lib.js, which is what
-     Stripe is actually charged, and to FREE_SHIPPING_AT in js/cart.js. -->
-<section class="lp-section">
-  <div class="container">
-    <span class="eyebrow">What it costs</span>
-    <h2 class="ll-h2">Two services. No surcharges.</h2>
-
-    <div class="ll-grid sh-rates reveal">
-      <div class="ll-cell sh-rate sh-rate-free">
-        <span class="sh-rate-name">FedEx 2-Day Express</span>
-        <span class="sh-rate-cost" data-rate="2day">$12.95</span>
-        <p><strong data-rate-free="2day">Free on orders over $400.</strong> The default on every order.</p>
-      </div>
-      <div class="ll-cell sh-rate">
-        <span class="sh-rate-name">FedEx Overnight</span>
-        <span class="sh-rate-cost" data-rate="overnight">$39.95</span>
-        <p>Not discounted at any order total, because the carrier does not discount it either.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="lp-section">
-  <div class="container">
-    <span class="eyebrow">Inside the box</span>
-    <h2 class="ll-h2">How it travels.</h2>
-
-    <div class="ll-grid sh-cards reveal">
-      <div class="ll-cell sh-card">
+    <div class="lp-points reveal">
+      <div class="lp-point">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
           <g class="sh-cold">
             <path pathLength="1" class="lp-draw" d="M12 2.5v19"/>
@@ -373,23 +206,23 @@
             <path pathLength="1" class="lp-draw" d="M12 6.6 9.6 4.2M12 6.6l2.4-2.4M12 17.4l-2.4 2.4M12 17.4l2.4 2.4"/>
           </g>
         </svg>
-        <h3>Packed same day</h3>
+        <h2>Packed same day</h2>
         <p>Pulled, sealed, and boxed the same afternoon your order comes in, out the door before the FedEx cutoff.</p>
       </div>
-      <div class="ll-cell sh-card">
+      <div class="lp-point">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
           <circle pathLength="1" class="lp-draw" cx="12" cy="12" r="9"/>
           <g class="sh-hands"><path pathLength="1" class="lp-draw" d="M12 7v5l3.5 2" stroke-linecap="round"/></g>
         </svg>
-        <h3>Tracked in a day</h3>
+        <h2>Tracked in a day</h2>
         <p>Your tracking number lands within 24 hours. Saturday delivery where FedEx runs it.</p>
       </div>
-      <div class="ll-cell sh-card">
+      <div class="lp-point">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
           <path pathLength="1" class="lp-draw" d="M12 3l7.5 3v5.5c0 4.3-3 8.2-7.5 9.5-4.5-1.3-7.5-5.2-7.5-9.5V6z"/>
           <path pathLength="1" class="lp-draw sh-check" d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <h3>Covered to $300</h3>
+        <h2>Covered to $300</h2>
         <p>Loss, damage, or carrier delay, applied automatically. Nothing to tick and nothing to buy.</p>
       </div>
     </div>
@@ -410,8 +243,8 @@
     </details>
 
     <div class="lp-actions">
-      <a href="peptides.html" class="btn btn-primary btn-lg">Explore catalog <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
-      <a href="shipping-policy.html" class="btn btn-outline btn-lg">Shipping policy</a>
+      <a href="peptides.html" class="btn btn-primary">Explore Catalog <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+      <a href="shipping-policy.html" class="btn btn-outline">Shipping policy</a>
     </div>
   </div>
 </section>
@@ -489,57 +322,6 @@
 
 </script>
 <script src="js/products-data.js"></script>
-<script>
-  /* The live half of the dispatch panel and the track.
-
-     Everything here is read from deliveryEstimate() in js/products-data.js,
-     which the product page's buy box also calls, so the two surfaces cannot
-     quote different days. Nothing is computed locally and nothing is typed:
-     if the cutoff hour or the FedEx service changes, one constant moves and
-     both pages follow.
-
-     The markup this replaces states the rule rather than a date, so a reader
-     with no JavaScript, and a crawler that caches the page for a week, get a
-     sentence that stays true instead of a Friday that has passed. */
-  (function () {
-    var panel = document.getElementById('shDispatch');
-    if (!panel || typeof deliveryEstimate !== 'function') return;
-
-    function set(id, html) {
-      var el = document.getElementById(id);
-      if (el) el.innerHTML = html;
-    }
-
-    function tick() {
-      var e = deliveryEstimate();
-
-      panel.classList.toggle('is-open', e.shipsToday);
-      set('shFlag', e.shipsToday ? 'Ships today' : 'Closed for today');
-
-      if (e.shipsToday) {
-        set('shClock', countdown(e.secondsLeft));
-        set('shClockSub', 'left to make today\'s FedEx pickup.');
-        set('shT1', 'Today, within <b>' + countdown(e.secondsLeft) + '</b>');
-      } else {
-        // Past the cutoff, or a weekend. The countdown would be a negative
-        // number dressed up as urgency, so it is replaced by the plain answer.
-        set('shClock', e.daysUntilShip === 1 ? 'Tomorrow' : fmtWeekday(e.shipDate));
-        set('shClockSub', 'is the next dispatch. Order now and it goes out on that run.');
-        set('shT1', 'Now, for the <b>' + fmtDay(e.shipDate) + '</b> run');
-      }
-
-      set('shShips', fmtDayShort(e.shipDate));
-      set('shArrives', fmtDayShort(e.arrivalDate));
-      set('shT2', '<b>' + fmtDay(e.shipDate) + '</b>, at our fulfilment partner');
-      set('shT4', 'Estimated <b>' + fmtDay(e.arrivalDate) + '</b>');
-    }
-
-    tick();
-    // A minute, matching countdown()'s own resolution. Anything faster would
-    // repaint the same string.
-    setInterval(tick, 60000);
-  })();
-</script>
 <script src="js/cart.js"></script>
 <script src="js/cart-modal.js"></script>
 <script src="js/search.js"></script>

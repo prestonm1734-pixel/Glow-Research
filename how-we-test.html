@@ -66,159 +66,173 @@
 <style>
   /* =====================================================================
      HOW WE TEST
-     Surface, heading scale, hairline grid and button colours all come from
-     .lp-light in css/style.css, which coa.html's construction defines and
-     shipping and wholesale share. Only what is genuinely unique to this page
-     is below: the chromatogram, the three figures, the partner plaques and
-     the seven analysis cells.
+     White surface, the same construction as coa / shipping / wholesale.
+     This page is a trust document read top to bottom, not a mood piece:
+     the claim, who verifies it and that it is not us, the seven rows that
+     back it, and the document it all lands on.
      ===================================================================== */
+  .hw-page{ background:#fff; color:#0a0a0a; }
+  .hw-page .lp-section{ padding: clamp(52px, 6.5vw, 84px) 0; }
+  .hw-page .lp-section + .lp-section{ border-top:1px solid rgba(0,0,0,.1); }
 
-  /* Three figures under the lede, and the third is the point of the page.
-     Seven and one are the sort of number any storefront prints; a zero next
-     to "run by Glow" is the only one a competitor would not copy. */
-  .hw-specs{ --ll-cols: 3; margin-top: clamp(30px, 4vw, 44px); text-align:left; }
-  .hw-spec{ padding: clamp(18px, 2.4vw, 26px); }
-  .hw-spec b{
-    display:block; font-family: var(--font-display); font-weight:600;
-    font-size: clamp(1.8rem, 3.4vw, 2.5rem); line-height:1;
-    letter-spacing:-.04em; color: var(--ll-ink);
+  /* Compact centred hero, the scale coa.html uses. The stock laboratory
+     photograph that used to sit here is gone: it pictured a lab Glow does
+     not operate, which is the one thing this page exists to be straight
+     about. The partner's own marks below do that job honestly. */
+  .hw-page .lp-hero{ padding: clamp(40px, 5.5vw, 64px) 0 clamp(26px, 3.5vw, 38px); }
+  .hw-page .lp-hero h1{
+    color:#0a0a0a; font-size: clamp(1.9rem, 3.6vw, 2.6rem);
+    max-width: 16ch; margin: 0 auto 14px;
   }
-  .hw-spec span{
-    display:block; margin-top:9px; max-width: 16ch;
-    font-size:.8rem; line-height:1.4; color: var(--ll-mute);
-  }
+  .hw-lede{ color:#55554f; font-size: clamp(.98rem, 1.1vw, 1.05rem); max-width: 48ch; }
+  .hw-lede strong{ color:#0a0a0a; font-weight:600; }
 
-  /* ---------- the trace ----------
-     A chromatogram, which is the shape a purity figure is read off. No axis,
-     no scale, no number, and aria-hidden: the picture of a method, not the
-     output of one. Drawing a labelled trace would be publishing a
-     measurement nobody took. Full bleed, so it sits outside .container. */
-  .hw-trace{
-    display:block; width:100%; height: clamp(84px, 16vw, 150px);
-    margin-top: clamp(30px, 4vw, 44px); color:#c8c8c4;
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  .hw-page .eyebrow, .hw-page .lp-eyebrow{
+    display:block; margin-bottom: 14px;
+    font-family:'JetBrains Mono', monospace; font-size:.72rem; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase; color:#8a8a86;
   }
-  .hw-trace svg{ display:block; width:100%; height:100%; }
-  /* non-scaling-stroke keeps the hairline a hairline: the viewBox is 1200
-     wide and squeezes to 360 on a phone, which would otherwise thin the line
-     to about a third of a pixel and drop it out of the render. */
-  .hw-trace path{ vector-effect: non-scaling-stroke; }
-  /* pathLength normalises the path to 1 unit, so the dash pair is exact
-     without anyone measuring the curve. */
-  .js .hw-trace-line{
-    stroke-dasharray:1; stroke-dashoffset:1;
-    animation: hwDraw 2.9s cubic-bezier(.32,0,.18,1) .25s forwards;
-  }
-  @keyframes hwDraw{ to{ stroke-dashoffset:0; } }
+  .hw-page .lp-h2{ color:#0a0a0a; }
+  .hw-page .btn-primary{ background:#0a0a0a; color:#fff; }
+  .hw-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
+  .hw-page .btn-outline{ border-color: rgba(0,0,0,.25); color:#0a0a0a; }
+  .hw-page .btn-outline:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; }
 
   /* Off the visible page. This exact sentence still has to exist in the
-     markup: check-claims.js pins ANALYSIS_LONG in js/products-data.js to the
-     prose on this page verbatim, so a change to one is caught against the
-     other. Hidden rather than deleted keeps that guarantee without stacking
-     a second, denser list on top of the one a reader sees. */
+     markup, because check-claims.js pins ANALYSIS_LONG in
+     js/products-data.js to the prose on this page verbatim, so a change to
+     one is caught against the other. Hidden rather than deleted keeps that
+     guarantee without stacking a second, denser list on top of the one a
+     reader actually sees. */
   .hw-fine{
     position:absolute; width:1px; height:1px; margin:-1px; padding:0;
     overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
   }
 
-  /* ---------- who runs the tests ---------- */
-  .hw-who-grid{ display:grid; grid-template-columns:1fr; gap: clamp(30px, 4vw, 52px); align-items:center; }
-  @media (min-width: 900px){ .hw-who-grid{ grid-template-columns: 1fr 1fr; } }
-  .hw-who p{ margin:16px 0 0; max-width:52ch; font-size:1rem; line-height:1.65; color: var(--ll-body); }
+  /* ---------- who runs the tests ----------
+     The strongest thing on the page is the admission, so it leads, and the
+     partner's marks sit beside it as the evidence for it rather than as
+     decoration somewhere further down. */
+  .hw-who-grid{
+    display:grid; grid-template-columns: 1fr;
+    gap: clamp(30px, 4vw, 54px); align-items:center;
+  }
+  @media (min-width: 880px){
+    .hw-who-grid{ grid-template-columns: 1fr 1fr; }
+  }
+  .hw-who h2{
+    font-size: clamp(1.6rem, 3vw, 2.3rem); letter-spacing:-.03em;
+    margin:0; line-height:1.15; text-wrap: balance;
+  }
+  .hw-who p{
+    margin: 18px 0 0; max-width: 52ch;
+    font-size: clamp(1rem, 1.4vw, 1.06rem); line-height:1.65; color:#55554f;
+  }
 
-  /* All three marks carry dark type of their own, so they sit straight on
-     the page's white in the same hairline grid the analyses use. Each names
-     what it is underneath: the three are not the same kind of thing, and a
-     row of bare logos would let a reader take the manufacturing mark for a
-     testing one. */
-  .hw-marks{ --ll-cols: 3; }
+  /* All three marks carry dark type of their own, so they sit on the page's
+     white rather than on a tinted tile, in the same hairline grid the
+     certificate cards and the shipping facts use. Each names what it is
+     underneath: the three are not the same kind of thing, and a row of bare
+     logos would let a reader take the manufacturing mark for a testing one. */
+  .hw-marks{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap:0;
+    border-top:1px solid rgba(0,0,0,.13); border-left:1px solid rgba(0,0,0,.13);
+  }
   .hw-mark{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:14px; padding: clamp(16px, 2.2vw, 24px) 12px; min-height:148px;
+    gap: 14px; padding: clamp(16px, 2.2vw, 24px) 12px; min-height: 152px;
+    border-right:1px solid rgba(0,0,0,.13); border-bottom:1px solid rgba(0,0,0,.13);
   }
   /* One box per logo, contained rather than sized: the ISO mark is nearly
      three times as wide as it is tall and the other two are close to square,
      so a shared max-width would tower the wide one over the others and a
-     shared max-height would shrink the tall ones to an illegible wordmark. */
+     shared max-height would shrink the tall ones to an illegible wordmark.
+     A fixed box with object-fit lets each fill whichever axis binds first. */
   .hw-mark img{
-    width:100%; height: clamp(54px, 6vw, 76px);
+    width:100%; height: clamp(58px, 6.5vw, 84px);
     object-fit:contain; object-position:center; display:block;
   }
-  .hw-mark-cap{ margin:0; text-align:center; }
-  .hw-mark-note{
-    grid-column: 1 / -1; margin:0; padding:13px 16px; text-align:center;
-    border-right:1px solid var(--ll-line); border-bottom:1px solid var(--ll-line);
+  .hw-mark-cap{
+    margin:0; text-align:center;
+    font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:600;
+    letter-spacing:.1em; text-transform:uppercase; color:#8a8a86;
   }
-  @media (max-width: 720px){
-    .hw-mark{ flex-direction:row; gap:18px; min-height:0; padding:18px 0; justify-content:flex-start; }
-    .hw-mark img{ flex:0 0 auto; width:104px; height:48px; }
+  .hw-mark-note{
+    grid-column: 1 / -1; margin:0; padding: 13px 16px; text-align:center;
+    border-right:1px solid rgba(0,0,0,.13); border-bottom:1px solid rgba(0,0,0,.13);
+    font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:600;
+    letter-spacing:.1em; text-transform:uppercase; color:#8a8a86;
+  }
+  @media (max-width: 460px){
+    .hw-marks{ grid-template-columns: 1fr; }
+    .hw-mark{ flex-direction:row; gap:18px; min-height:0; padding:18px; justify-content:flex-start; }
+    .hw-mark img{ flex:0 0 auto; width:96px; height:46px; }
     .hw-mark-cap{ text-align:left; }
-    .hw-mark-note{ border-right:none; padding-left:0; padding-right:0; text-align:left; }
   }
 
   /* ---------- the seven ----------
-     Two across in the shared hairline grid, with Purity spanning the row: it
-     is the figure the certificate leads with and the one every product page
-     quotes, so it opens the panel at a different size rather than sitting
-     first in a queue of equals. Spanning also makes seven cells fill four
-     rows exactly instead of leaving an orphan.
-
-     Every glyph is a diagram of a method and never of a result: an empty
-     dish, a funnel, a trace with no axis. None can be read as a figure. */
-  .hw-grid{ --ll-cols: 2; margin-top: clamp(38px, 5vw, 54px); }
-  .hw-grid > .ll-cell:first-child{ grid-column: 1 / -1; }
-  .hw-card-top{
-    display:flex; align-items:center; justify-content:space-between;
-    gap:16px; margin-bottom:18px;
+     A numbered list on hairlines. The dark page's filling rail went with the
+     dark page: on white the rule between rows already reads as a sequence,
+     and the rail was furniture for a surface that no longer exists. */
+  .hw-list{
+    max-width: 820px; margin: clamp(38px, 5vw, 54px) auto 0;
+    border-top:1px solid rgba(0,0,0,.13);
   }
-  .hw-ico{ width:38px; height:38px; }
-  .hw-num{ font-variant-numeric: tabular-nums; }
-  /* Only rendered for the rows where the certificate names a technique.
-     Guessing one for the others would be inventing a fact about somebody
-     else's laboratory. */
+  .hw-row{
+    display:grid; grid-template-columns: 58px 1fr;
+    padding: clamp(19px, 2.4vw, 25px) 0;
+    border-bottom:1px solid rgba(0,0,0,.13);
+  }
+  .hw-num{
+    font-family:'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    font-size:.78rem; letter-spacing:.06em; color:#8a8a86; padding-top: 3px;
+  }
+  .hw-body h3{
+    font-size: clamp(1.05rem, 1.7vw, 1.18rem); font-weight:700;
+    letter-spacing:-.02em; color:#0a0a0a; margin:0;
+  }
+  /* only rendered for the rows where the certificate names a technique */
   .hw-method{
-    display:block; margin-top:7px;
-    font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:600;
-    letter-spacing:.1em; text-transform:uppercase; color: var(--ll-mute);
+    display:block; margin-top: 6px;
+    font-family:'JetBrains Mono', monospace; font-size:.69rem; letter-spacing:.09em;
+    text-transform:uppercase; color:#8a8a86;
   }
-  @media (max-width: 720px){
-    .hw-grid > .ll-cell:first-child{ grid-column: auto; }
+  .hw-body p{
+    margin: 10px 0 0; font-size:.98rem; line-height:1.6;
+    color:#55554f; max-width: 56ch;
+  }
+  @media (max-width: 620px){
+    .hw-row{ grid-template-columns: 40px 1fr; }
   }
 
-  /* ---------- the certificate ---------- */
-  .hw-coa-grid{
-    display:grid; grid-template-columns:1fr; gap: clamp(30px, 5vw, 60px); align-items:center;
+  /* ---------- the terms ----------
+     What is left of the certificate section: a three-line list on the same
+     hairlines the panel rows use, and the request route. The two-column
+     layout, the blank-template artwork and the paragraph explaining what a
+     certificate is all went with the section they were arguing for. */
+  .hw-coa h2{
+    font-size: clamp(1.6rem, 3vw, 2.3rem); letter-spacing:-.03em;
+    margin:0; line-height:1.1; color:#0a0a0a;
   }
-  @media (min-width: 860px){ .hw-coa-grid{ grid-template-columns: 1fr .8fr; } }
   .hw-coa-list{
     list-style:none; margin: clamp(22px, 3vw, 30px) 0 0; padding:0;
-    border-top:1px solid var(--ll-line);
+    border-top:1px solid rgba(0,0,0,.13);
   }
   .hw-coa-list li{
-    padding:14px 0; border-bottom:1px solid var(--ll-line);
-    font-size:.96rem; line-height:1.5; color: var(--ll-body);
+    padding: 14px 0; border-bottom:1px solid rgba(0,0,0,.13);
+    font-size:.96rem; color:#55554f;
   }
-  .hw-coa-list strong{ color: var(--ll-ink); font-weight:700; }
-  .hw-coa-cta{ margin-top: clamp(24px, 3vw, 32px); display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-  .hw-coa-note{ flex:1 1 100%; }
-  @media (min-width: 560px){ .hw-coa-note{ flex:0 0 auto; } }
-  .hw-coa-art{ border:1px solid var(--ll-line); overflow:hidden; background:#f5f5f4; }
-  .hw-coa-art img{ width:100%; height:auto; display:block; }
+  .hw-coa-list strong{ color:#0a0a0a; font-weight:700; }
+  .hw-coa-cta{
+    margin-top: clamp(24px, 3vw, 32px);
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .hw-coa-note{
+    font-family:'JetBrains Mono', monospace; font-size:.7rem; font-weight:600;
+    letter-spacing:.1em; text-transform:uppercase; color:#8a8a86;
+  }
   @media (max-width: 860px){
-    /* the template above the copy on a phone: it is the thing being
-       described, and describing it first then showing it means scrolling
-       back up */
-    .hw-coa-art{ order:-1; max-width:380px; margin:0 auto; }
-  }
-
-  /* One button does not need a full section's padding at both ends. */
-  .hw-page .hw-end{ padding: clamp(38px, 4.5vw, 60px) 0 clamp(46px, 6vw, 76px); }
-  .hw-end .lp-actions{ margin:0; }
-
-  @media (prefers-reduced-motion: reduce){
-    .js .hw-trace-line{ animation:none; stroke-dashoffset:0; }
-  }
+  
 </style>
 
 </head>
@@ -270,105 +284,31 @@
   </div>
 </header>
 
-<main class="lp-page lp-light hw-page">
+<main class="lp-page hw-page">
 
-<!-- The whole claim, then who stands behind it. Everything below is evidence
-     for this and nothing else.
-
-     The headline used to read "Seven tests. Every batch." Both halves were
-     true and the second was the weaker one: every storefront in this category
-     says "every batch". What none of them say is the second line now, which
-     is the same admission the section below it makes at length.
-
-     The stock laboratory photograph that used to sit under the heading is
-     gone, and nothing pictorial has replaced it. It showed a laboratory Glow
-     does not operate, on the one page whose whole point is that we do not
-     operate one. -->
+<!-- Three sections and nothing else: how we test, who our partners are, and
+     the terms. The page used to open with two paragraphs arguing that we do
+     not run our own tests, and close with a certificate section explaining at
+     length what a certificate is. Both were true and both were the page
+     talking rather than the page answering. The admission is one line under
+     the partners now, where their marks are the evidence for it, and the
+     terms are three lines instead of a section. -->
 <section class="lp-hero hw-hero">
   <div class="container">
-    <span class="eyebrow">Quality and testing</span>
-    <h1>Seven tests. None of them ours.</h1>
-    <p class="lp-lede">
-      Every lot is analysed by an independent laboratory before it reaches the
-      catalog, and the certificate is issued by them rather than by us.
-      <strong>No exceptions.</strong>
+    <span class="lp-eyebrow">Quality and testing</span>
+    <h1>Seven tests. Every batch.</h1>
+    <p class="lp-lede hw-lede">
+      Every lot is tested by an independent laboratory before it reaches our
+      catalog. <strong>No exceptions.</strong>
     </p>
-
-    <!-- Three figures, and the third is the page. check-claims.js pins the
-         first to ANALYSIS_TESTS.length in js/products-data.js, so the panel
-         growing or shrinking a row moves this numeral or fails the build.
-         The other two are structural: one named laboratory in LAB, and the
-         count of those seven that Glow performs, which is none of them. -->
-    <div class="ll-grid hw-specs">
-      <div class="ll-cell hw-spec"><b data-spec="tests">7</b><span>analyses per lot</span></div>
-      <div class="ll-cell hw-spec"><b>1</b><span>independent laboratory</span></div>
-      <div class="ll-cell hw-spec"><b>0</b><span>run by Glow Research</span></div>
-    </div>
-
     <p class="hw-fine">
-      <!-- One line on purpose: a wrap would break the verbatim match. -->
+      <!-- One line on purpose: a wrap would break the verbatim match.
+           check-claims.js pins ANALYSIS_LONG in js/products-data.js to this
+           sentence, so a change to either is caught against the other. Hidden
+           rather than deleted keeps that guarantee without stacking a second,
+           denser list on top of the seven rows a reader actually sees. -->
       reverse-phase HPLC-UV for purity, LC-MS for identity, net peptide content, sterility testing, endotoxin testing by LAL assay under USP chapter 85, appearance and solubility inspection, heavy metals screening, and lot archival linking every batch to its certificate.
     </p>
-  </div>
-
-  <!-- A chromatogram, which is the shape a purity figure is read off. It
-       carries no axis, no scale and no number, and it is aria-hidden and
-       decorative: this is the picture of a method, not the output of one.
-       Drawing a labelled trace here would be publishing a measurement
-       nobody took. Sits outside .container so it runs full bleed. -->
-  <div class="hw-trace" aria-hidden="true">
-    <svg viewBox="0 0 1200 220" preserveAspectRatio="none" fill="none"
-         stroke="currentColor" stroke-width="1.25" stroke-linejoin="round">
-      <path d="M0 205h1200" opacity=".28" />
-      <path class="hw-trace-line" pathLength="1" stroke-width="1.5"
-            d="M0 190 L120 190 Q145 154 170 190 L210 190 Q230 166 250 190 L300 190 Q350 -110 400 190 L430 190 Q450 138 470 190 L520 190 Q555 62 590 190 L640 190 Q660 158 680 190 L730 190 Q760 110 790 190 L840 190 Q855 170 870 190 L930 190 Q960 134 990 190 L1040 190 Q1057 162 1075 190 L1200 190" />
-    </svg>
-  </div>
-</section>
-
-<!-- Who runs them. This used to sit below the seven rows as one sentence; it
-     leads now, because "we do not run these" is the claim the rest of the
-     page depends on, and the marks beside it are what make it checkable
-     rather than merely stated. Both laboratory marks belong to the lab, not
-     to Glow, and the copy says so. Name and accreditation are read from LAB
-     in js/products-data.js, which check-claims.js requires to be wholly
-     filled or wholly empty, so the two cannot drift apart. -->
-<section class="lp-section hw-who">
-  <div class="container">
-    <div class="hw-who-grid">
-      <div class="hw-who-copy reveal">
-        <span class="eyebrow">Who runs the tests</span>
-        <h2 class="ll-h2">We do not run any of them.</h2>
-        <p>
-          Glow does not manufacture and does not operate a laboratory. Every
-          result comes from a lab with no stake in the outcome, and the
-          certificate is issued in their name, not ours. That is the whole
-          point of it.
-        </p>
-        <p>
-          Our testing partner is Freedom Diagnostics, an ISO/IEC 17025
-          accredited laboratory. The accreditation is theirs, held for the
-          methods they run, and it is what makes a number from them worth
-          more than a number from us.
-        </p>
-      </div>
-
-      <div class="ll-grid hw-marks reveal">
-        <div class="ll-cell hw-mark">
-          <img src="assets/freedom-diagnostics.png" alt="Freedom Diagnostics" width="520" height="382" loading="lazy" />
-          <p class="hw-mark-cap ll-label">Testing partner</p>
-        </div>
-        <div class="ll-cell hw-mark">
-          <img src="assets/iso-17025.png" alt="ISO/IEC 17025 certified" width="600" height="216" loading="lazy" />
-          <p class="hw-mark-cap ll-label">Laboratory accreditation</p>
-        </div>
-        <div class="ll-cell hw-mark">
-          <img src="assets/gmp.png" alt="Good Manufacturing Practice" width="400" height="398" loading="lazy" />
-          <p class="hw-mark-cap ll-label">Manufacturing standard</p>
-        </div>
-        <p class="hw-mark-note ll-label">Held by our partners, none by Glow Research</p>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -380,157 +320,130 @@
 
      Copy here is the `plain` field of ANALYSIS_TESTS in js/products-data.js.
      That array is also where the count in the headline comes from, and
-     check-claims.js fails the build if this page states a different one,
-     drops a row, or renumbers them.
-
-     Every glyph is a diagram of a method and never of a result: an empty
-     dish, a funnel, a trace with no axis on it. None of them can be read as
-     a figure, which is the only reason they are safe to draw. -->
+     check-claims.js fails the build if this page states a different one or
+     drops a row. -->
 <section class="lp-section hw-tests">
   <div class="container">
-    <div class="reveal">
-      <span class="eyebrow">The panel</span>
-      <h2 class="ll-h2">What gets checked.</h2>
-      <p class="ll-sub">Seven separate analyses, run on the lot before it is released for sale.</p>
+    <div class="reveal" style="text-align:center">
+      <span class="lp-eyebrow">How we test</span>
+      <h2 class="lp-h2">What gets checked.</h2>
     </div>
 
-    <div class="ll-grid hw-grid">
-      <article class="ll-cell hw-card reveal">
-        <div class="hw-card-top">
-          <svg class="hw-ico" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 34h34" opacity=".35" />
-            <path d="M3 30h5l2-4 2 4h2l3-22 3 22h4l2-7 2 7h6" />
-          </svg>
-          <span class="hw-num ll-label" aria-hidden="true">01</span>
+<div class="hw-list">
+      <div class="hw-row">
+        <span class="hw-num" aria-hidden="true">01</span>
+        <div class="hw-body">
+          <h3>Purity</h3>
+          <span class="hw-method">Reverse-phase HPLC-UV</span>
+          <p>How much of the powder is the peptide you ordered. This is the percentage printed on the certificate.</p>
         </div>
-        <h3>Purity</h3>
-        <span class="hw-method">Reverse-phase HPLC-UV</span>
-        <p>How much of the powder is the peptide you ordered. This is the percentage printed on the certificate.</p>
-      </article>
+      </div>
 
-      <article class="ll-cell hw-card reveal">
-        <div class="hw-card-top">
-          <svg class="hw-ico" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M4 33h32" opacity=".35" />
-            <path d="M9 33V23M15 33V13M21 33V5M27 33V17M33 33V27" />
-          </svg>
-          <span class="hw-num ll-label" aria-hidden="true">02</span>
+      <div class="hw-row">
+        <span class="hw-num" aria-hidden="true">02</span>
+        <div class="hw-body">
+          <h3>Identity</h3>
+          <span class="hw-method">LC-MS</span>
+          <p>Weighs the molecule to confirm it is the one on the label, not something close to it.</p>
         </div>
-        <h3>Identity</h3>
-        <span class="hw-method">LC-MS</span>
-        <p>Weighs the molecule to confirm it is the one on the label, not something close to it.</p>
-      </article>
+      </div>
 
-      <article class="ll-cell hw-card reveal">
-        <div class="hw-card-top">
-          <svg class="hw-ico" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M13 4h14M16 4v25a4 4 0 0 0 8 0V4" />
-            <path d="M16 15h8" opacity=".4" stroke-dasharray="2 2.5" />
-            <path d="M16 22h8" />
-          </svg>
-          <span class="hw-num ll-label" aria-hidden="true">03</span>
+      <div class="hw-row">
+        <span class="hw-num" aria-hidden="true">03</span>
+        <div class="hw-body">
+          <h3>Net peptide content</h3>
+          <p>How many milligrams of actual peptide are in the vial once salt and water are taken out.</p>
         </div>
-        <h3>Net peptide content</h3>
-        <p>How many milligrams of actual peptide are in the vial once salt and water are taken out.</p>
-      </article>
+      </div>
 
-      <article class="ll-cell hw-card reveal">
-        <div class="hw-card-top">
-          <svg class="hw-ico" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="20" cy="21" r="13" />
-            <path d="M7 17a13 13 0 0 1 26 0" opacity=".4" />
-          </svg>
-          <span class="hw-num ll-label" aria-hidden="true">04</span>
+      <div class="hw-row">
+        <span class="hw-num" aria-hidden="true">04</span>
+        <div class="hw-body">
+          <h3>Sterility</h3>
+          <p>The lot is cultured to see whether anything grows. Nothing should.</p>
         </div>
-        <h3>Sterility</h3>
-        <p>The lot is cultured to see whether anything grows. Nothing should.</p>
-      </article>
+      </div>
 
-      <article class="ll-cell hw-card reveal">
-        <div class="hw-card-top">
-          <svg class="hw-ico" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M14 5h12M16 5v22a4 4 0 0 0 8 0V5" />
-            <path d="M16 22c1.6 1.5 2.4 1.5 4 0s2.4-1.5 4 0" />
-          </svg>
-          <span class="hw-num ll-label" aria-hidden="true">05</span>
+      <div class="hw-row">
+        <span class="hw-num" aria-hidden="true">05</span>
+        <div class="hw-body">
+          <h3>Endotoxin</h3>
+          <span class="hw-method">LAL assay, USP chapter 85</span>
+          <p>Checks for bacterial toxin, which is left behind even after the bacteria themselves are gone.</p>
         </div>
-        <h3>Endotoxin</h3>
-        <span class="hw-method">LAL assay, USP chapter 85</span>
-        <p>Checks for bacterial toxin, which is left behind even after the bacteria themselves are gone.</p>
-      </article>
+      </div>
 
-      <article class="ll-cell hw-card reveal">
-        <div class="hw-card-top">
-          <svg class="hw-ico" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M15 4h10M17 4v7l-5 9v12a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V20l-5-9V4" />
-            <circle cx="17" cy="28" r="1.2" /><circle cx="22.5" cy="31" r="1.2" /><circle cx="24" cy="25" r="1.2" />
-          </svg>
-          <span class="hw-num ll-label" aria-hidden="true">06</span>
+      <div class="hw-row">
+        <span class="hw-num" aria-hidden="true">06</span>
+        <div class="hw-body">
+          <h3>Appearance and solubility</h3>
+          <p>The powder is looked at and dissolved. It should look right and go into solution cleanly.</p>
         </div>
-        <h3>Appearance and solubility</h3>
-        <p>The powder is looked at and dissolved. It should look right and go into solution cleanly.</p>
-      </article>
+      </div>
 
-      <article class="ll-cell hw-card reveal">
-        <div class="hw-card-top">
-          <svg class="hw-ico" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 8h30L23.5 21.5V34l-7 3V21.5z" />
-            <path d="M11 14.5h18" opacity=".4" />
-          </svg>
-          <span class="hw-num ll-label" aria-hidden="true">07</span>
+      <div class="hw-row">
+        <span class="hw-num" aria-hidden="true">07</span>
+        <div class="hw-body">
+          <h3>Heavy metals</h3>
+          <p>Screens for lead, arsenic and the other metals that can carry over from manufacturing.</p>
         </div>
-        <h3>Heavy metals</h3>
-        <p>Screens for lead, arsenic and the other metals that can carry over from manufacturing.</p>
-      </article>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- What the certificate ties together, illustrated by its own blank
-     structure rather than a filled-out example. COAS_PUBLISHED is false:
-     there is no hosted certificate to link to and no COA_URL, so this
-     section cannot show or promise a real result. The image is a template
-     built for this page with every field a bare en rule, the site's own
-     established "no value yet" glyph (see evidenceRows() in
-     js/products-data.js). It is not a photograph of a real certificate and
-     not an example with invented numbers: nothing in it could be mistaken
-     for an actual test result. check-claims.js already fails the build if
-     any page implies a hosted certificate while the flag is false, and it
-     additionally pins the note below to COA_COPY, so the day the flag flips
-     this copy is caught if nobody updated it. -->
+<!-- Who runs them. Both laboratory marks belong to the lab, not to Glow: the
+     accreditation is theirs and the copy says so. The third is the fill
+     site's. Name and accreditation are read from LAB in js/products-data.js,
+     which check-claims.js requires to be wholly filled or wholly empty, so
+     the two cannot drift apart. -->
+<section class="lp-section hw-who">
+  <div class="container">
+    <div class="hw-who-grid">
+      <div class="hw-who-copy reveal">
+        <span class="eyebrow">Our partners</span>
+        <h2>We do not run any of these tests.</h2>
+        <p>
+          Glow does not manufacture and does not operate a laboratory. Testing
+          is Freedom Diagnostics, an ISO/IEC 17025 accredited lab with no stake
+          in the result, and the certificate is issued in their name.
+        </p>
+      </div>
+      <div class="hw-marks reveal">
+        <div class="hw-mark">
+          <img src="assets/freedom-diagnostics.png" alt="Freedom Diagnostics" width="520" height="382" loading="lazy" />
+          <p class="hw-mark-cap">Testing partner</p>
+        </div>
+        <div class="hw-mark">
+          <img src="assets/iso-17025.png" alt="ISO/IEC 17025 certified" width="600" height="216" loading="lazy" />
+          <p class="hw-mark-cap">Laboratory accreditation</p>
+        </div>
+        <div class="hw-mark">
+          <img src="assets/gmp.png" alt="Good Manufacturing Practice" width="400" height="398" loading="lazy" />
+          <p class="hw-mark-cap">Manufacturing standard</p>
+        </div>
+        <p class="hw-mark-note">Held by our partners, not by Glow Research</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- The terms, as three lines rather than a section arguing for them.
+     COAS_PUBLISHED is false, so there is no hosted certificate to link and
+     the route is email. check-claims.js pins the note below to COA_COPY, so
+     the day that flag flips this copy is caught if nobody updated it. -->
 <section class="lp-section hw-coa">
   <div class="container">
-    <div class="hw-coa-grid">
-      <div class="reveal">
-        <span class="eyebrow">The document</span>
-        <h2 class="ll-h2">Documented, not claimed.</h2>
-        <p class="ll-sub">
-          A certificate is only worth something if it is specific. Every result
-          is tied to the lot number printed on your vial, not to the product in
-          general. This is the structure every one of them follows.
-        </p>
-        <ul class="hw-coa-list">
-          <li><strong>Every test above</strong>, with the result it returned</li>
-          <li><strong>One lot number</strong>, matching the vial in your hand</li>
-          <li><strong>The lab that ran it</strong>, and the date they ran it</li>
-        </ul>
-        <div class="hw-coa-cta">
-          <a href="mailto:support@glowresearch.shop" class="btn btn-primary btn-lg">Request a certificate <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
-          <a href="coa.html" class="btn btn-outline btn-lg">Browse by compound</a>
-          <span class="hw-coa-note ll-label" id="hwCoaNote">COA on request</span>
-        </div>
-      </div>
-      <div class="hw-coa-art reveal">
-        <img src="assets/coa-template.jpg" alt="Blank Glow Research certificate of analysis template, showing the fields and tests every certificate carries with no values filled in" width="985" height="1265" loading="lazy" />
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="lp-section hw-end">
-  <div class="container">
-    <div class="lp-actions">
-      <a href="peptides.html" class="btn btn-primary btn-lg">Explore catalog <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+    <span class="lp-eyebrow">Compliance</span>
+    <h2>Research use only.</h2>
+    <ul class="hw-coa-list reveal">
+      <li><strong>Not for human or veterinary use</strong>, not for diagnostics, and not evaluated by the FDA.</li>
+      <li><strong>One lot, one certificate.</strong> Every result is issued against the lot number printed on your vial.</li>
+      <li><strong>We do not grade our own inventory.</strong> The laboratory that ran the analysis issues the document, not us.</li>
+    </ul>
+    <div class="hw-coa-cta">
+      <a href="mailto:support@glowresearch.shop" class="btn btn-outline btn-lg">Request a certificate <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+      <span class="hw-coa-note" id="hwCoaNote">COA on request</span>
     </div>
   </div>
 </section>

@@ -32,7 +32,6 @@ const {
   FAQS, faqHtml,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
-  WHOLESALE_TIERS, WHOLESALE_MIN, wholesaleRangeLabel, wholesaleRateLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
   hasList, listPriceOf, SITEWIDE_DISCOUNT,
 } = require(path.join(ROOT, 'js/products-data.js'));
@@ -131,20 +130,7 @@ console.log('\ndispatch cutoff');
 
   // The estimate must be computed in Pacific, since that is what the copy says.
   ok('the estimate is computed in Pacific time',
-    /America\/Los_Angeles/.test(read('js/products-data.js')));
-
-  // And computed once. The arithmetic lived inside product.js's IIFE, where
-  // only that page could reach it; shipping.html now states the same ship and
-  // arrival dates, and the only way to give it them without sharing this was
-  // a second copy. Two implementations of "does it go out today" can disagree,
-  // and the wrong one is still printing a date for a customer.
-  const dateOwners = ['js/products-data.js'];
-  const dateCopies = ['js/product.js', 'shipping.html', 'index.html', 'checkout.html']
-    .filter(f => /America\/Los_Angeles|function addBusinessDays/.test(read(f)));
-  ok('the ship and arrival dates are worked out in one place',
-    dateCopies.length === 0 && dateOwners.every(f => /function deliveryEstimate/.test(read(f))),
-    dateCopies.length ? `a second copy of the date arithmetic is in: ${dateCopies.join(', ')}`
-                      : 'deliveryEstimate() is not in js/products-data.js');
+    /America\/Los_Angeles/.test(read('js/product.js')));
 }
 
 /* ---------------------------------------------------------------------------
@@ -278,35 +264,6 @@ console.log('\nshipping policy figures');
     overnight ? `policy says $${overnight[1]}, SHIPPING_RATES says $${overnightRate && overnightRate.cost}` : 'rate not found');
   ok('and states Overnight as never free, which is what freeOver: null means',
     overnightRate !== null && overnightRate.freeOver === null && /Overnight.{0,80}not discounted/s.test(policy));
-
-  // shipping.html states both rates too now. It is the page a customer opens
-  // to find out what shipping costs, and until this it was the one page on
-  // the site that did not say: both figures lived on the policy page only.
-  // Pinned to the same SHIPPING_RATES the policy page is, by data attribute
-  // rather than by prose, so the wording around them stays free to change.
-  const ship = read('shipping.html');
-  const shipRate = id => {
-    const m = ship.match(new RegExp(`data-rate="${id}"[^>]*>\\s*\\$([0-9.]+)\\s*<`));
-    return m ? Number(m[1]) : null;
-  };
-  ok('the shipping page quotes the 2-Day rate SHIPPING_RATES charges',
-    twoDayRate !== null && shipRate('2day') === twoDayRate.cost,
-    `shipping.html says $${shipRate('2day')}, SHIPPING_RATES says $${twoDayRate && twoDayRate.cost}`);
-  ok('the shipping page quotes the Overnight rate SHIPPING_RATES charges',
-    overnightRate !== null && shipRate('overnight') === overnightRate.cost,
-    `shipping.html says $${shipRate('overnight')}, SHIPPING_RATES says $${overnightRate && overnightRate.cost}`);
-
-  const shipFree = ship.match(/data-rate-free="2day"[^>]*>\s*Free on orders over \$([0-9]+)\./);
-  ok('and its free-shipping threshold is the one FREE_SHIPPING_AT enforces',
-    shipFree !== null && Number(shipFree[1]) === cartFree,
-    shipFree ? `shipping.html says $${shipFree[1]}, FREE_SHIPPING_AT is $${cartFree}`
-             : 'no [data-rate-free="2day"] threshold found in shipping.html');
-
-  // Overnight carries no free threshold in the data, so the page must not
-  // imply one. Stated as its own check because the absence is the claim.
-  ok('and it does not offer free Overnight, which SHIPPING_RATES never gives',
-    overnightRate !== null && overnightRate.freeOver === null &&
-    !/data-rate-free="overnight"/.test(ship));
 
   // No source of truth to check the figure itself against, so this only
   // guards the two pages that state it from quietly disagreeing.
@@ -644,37 +601,12 @@ console.log('\nhow many tests');
   const missingRow = ANALYSIS_TESTS.filter(t => !hw.includes(`<h3>${t.name}</h3>`));
   ok(`how-we-test.html lists all ${TESTS_PER_BATCH} by name`,
     missingRow.length === 0, `missing: ${missingRow.map(t => t.name).join(', ')}`);
-  // class="hw-num ll-label" is still an hw-num: matched on the class being
-  // present rather than on it being the whole attribute, so adding a utility
-  // class beside it does not silently stop the numbering being checked.
-  const numerals = (hw.match(/class="hw-num[^"]*"[^>]*>\s*(\d\d)\s*</g) || [])
+  const numerals = (hw.match(/class="hw-num"[^>]*>\s*(\d\d)\s*</g) || [])
     .map(m => m.replace(/\D/g, '').slice(-2));
   const wantNumerals = ANALYSIS_TESTS.map((_, i) => String(i + 1).padStart(2, '0'));
   ok('the rows are numbered 01 upward with none skipped or repeated',
     numerals.join(',') === wantNumerals.join(','),
     `page has ${numerals.join(',') || '(none)'}, catalog wants ${wantNumerals.join(',')}`);
-
-  // The hero's spec strip states the count as a numeral, which the word-form
-  // scan below cannot see. This is the failure wholesale.html's old stat
-  // widget had: a figure typed into a page, with nothing holding it to the
-  // panel it counts. Pinned by its data attribute rather than by position, so
-  // rearranging the strip does not quietly unpin it.
-  const specFig = hw.match(/data-spec="tests"[^>]*>\s*(\d+)\s*</);
-  ok(`the hero states the panel size as a numeral, and it is ${TESTS_PER_BATCH}`,
-    !!specFig && Number(specFig[1]) === TESTS_PER_BATCH,
-    specFig ? `hero says ${specFig[1]}, catalog holds ${TESTS_PER_BATCH}`
-            : 'no [data-spec="tests"] figure found in how-we-test.html');
-
-  // The other two figures beside it are structural rather than counted, so
-  // they are pinned to the thing that makes them true: one laboratory, named
-  // in LAB, and none of the seven performed by us. The second is the whole
-  // claim of the page and the site repeats it in prose in three other places.
-  ok('the hero claims one laboratory, and the catalog names exactly one',
-    /<b>1<\/b><span>independent laboratory<\/span>/.test(hw) && !!LAB.name,
-    'LAB.name is empty, so "1 independent laboratory" is not backed');
-  ok('the hero claims Glow runs none of them, and no page says otherwise',
-    /<b>0<\/b><span>run by Glow Research<\/span>/.test(hw) &&
-    /We do not run any of them/.test(hw));
 
   // The count in words, wherever any page says it. Catches the headline, the
   // subhead under it, and anything written later that quietly disagrees.
@@ -1421,65 +1353,9 @@ console.log('\nbulk pricing');
   // retail tier ever went past what wholesale opens at, the two ladders would
   // be advertising against each other.
   ok('the bulk ceiling is 20%', BULK_MAX_OFF === 0.20, `${BULK_MAX_OFF * 100}%`);
-
-  // This used to grep wholesale.html for "25% off starting at", because the
-  // wholesale ladder was a sentence in a card and a regex over prose was the
-  // only thing there was to check. It is WHOLESALE_TIERS now, so the two
-  // ladders can be compared as numbers.
   ok('wholesale still starts richer than the retail ceiling',
-    WHOLESALE_TIERS[0].off > BULK_MAX_OFF,
-    `wholesale opens at ${WHOLESALE_TIERS[0].off * 100}%, retail already reaches ${BULK_MAX_OFF * 100}%`);
-  ok('the wholesale ladder only climbs, and only the last band may be unpriced',
-    WHOLESALE_TIERS.every((t, i) => {
-      const prev = WHOLESALE_TIERS[i - 1];
-      const last = i === WHOLESALE_TIERS.length - 1;
-      if (t.off === null) return last;                       // custom quote, and only at the top
-      return (!prev || t.min > prev.min) && (!prev || prev.off === null || t.off >= prev.off);
-    }));
-
-  // The bands are baked into wholesale.html so a crawler and a reader with no
-  // JavaScript get them, which means they are a second copy and have to be
-  // held to the first. Matched on the threshold, so reordering the markup
-  // cannot quietly pair a range with another band's rate.
-  const wsPage = read('wholesale.html');
-  const wsRowFor = min => {
-    const m = wsPage.match(new RegExp(
-      `data-tier-min="${min}"[\\s\\S]*?class="ws-tier-range">([^<]*)<[\\s\\S]*?class="ws-tier-off">([^<]*)<`));
-    return m ? { range: m[1].trim(), off: m[2].trim() } : null;
-  };
-  const wsWrong = [];
-  WHOLESALE_TIERS.forEach(t => {
-    const row = wsRowFor(t.min);
-    if (!row) return wsWrong.push(`no row for ${t.min}`);
-    if (row.range !== wholesaleRangeLabel(t)) wsWrong.push(`${t.min}: range "${row.range}" vs "${wholesaleRangeLabel(t)}"`);
-    if (row.off !== wholesaleRateLabel(t)) wsWrong.push(`${t.min}: rate "${row.off}" vs "${wholesaleRateLabel(t)}"`);
-  });
-  ok(`every band on wholesale.html is the one WHOLESALE_TIERS holds (${WHOLESALE_TIERS.length})`,
-    wsWrong.length === 0, wsWrong.join('; '));
-  ok('and the page lists no band the array does not',
-    (wsPage.match(/data-tier-min="/g) || []).length === WHOLESALE_TIERS.length);
-
-  // A band whose rate is a floor has to read as one. Dropping the "From" off
-  // the entry band turns a quoted minimum into an exact published rate, which
-  // is the one thing the wholesale ladder is not allowed to say: the steps
-  // between the two published anchors have never been written down.
-  ok('a band with no exact published rate is not printed as though it had one',
-    WHOLESALE_TIERS.every(t => t.off === null || !t.from || /^From /.test(wholesaleRateLabel(t))));
-
-  // The qualifying minimum was written out three times on this page and
-  // enforced nowhere. The form's `min` is a suggestion to a browser that can
-  // skip it, so the handler that receives the application checks it too, and
-  // reads the same constant rather than a number typed beside it.
-  const formMin = wsPage.match(/id="wsVolume"[^>]*\bmin="(\d+)"/);
-  ok(`the application form's minimum is WHOLESALE_MIN (${WHOLESALE_MIN})`,
-    formMin !== null && Number(formMin[1]) === WHOLESALE_MIN,
-    formMin ? `form says ${formMin[1]}` : 'no min on #wsVolume');
-  ok('the page states that minimum in words as well',
-    new RegExp(`${WHOLESALE_MIN}-vial monthly minimum`).test(wsPage));
-  const wsApi = read('api/wholesale-apply.js');
-  ok('and the server enforces it rather than trusting the form',
-    /WHOLESALE_MIN/.test(wsApi) && /from '\.\.\/js\/products-data\.js'/.test(wsApi) &&
-    /Number\(volume\) >= WHOLESALE_MIN/.test(wsApi));
+    /(2[5-9]|[3-9][0-9])% off starting at/.test(read('wholesale.html')),
+    'wholesale.html must open above the retail bulk ceiling');
 
   // Cards are a subset of the ladder, and they have to be the cheap end of it:
   // cards for 1 and 10 with the middle hidden would be a worse offer presented

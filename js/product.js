@@ -37,11 +37,66 @@
   }
 
   /* ================= delivery estimate =================
-     deliveryEstimate(), countdown() and fmtDay() are in js/products-data.js,
-     beside the CUTOFF_HOUR and TRANSIT_DAYS they are derived from. They used
-     to live here, which meant this page was the only one that could answer
-     "does it go out today"; shipping.html now asks the same question and gets
-     the same answer rather than a second copy of the arithmetic. */
+     Everything is computed from Pacific wall-clock parts, then anchored to
+     UTC noon before any day arithmetic. Anchoring at noon means adding whole
+     days can never land on a DST seam and silently shift the date by one. */
+
+  function pacificParts(date) {
+    const out = {};
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Los_Angeles', hour12: false,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }).formatToParts(date).forEach(p => { out[p.type] = p.value; });
+    return out;
+  }
+
+  const anchor = p => new Date(Date.UTC(+p.year, +p.month - 1, +p.day, 12));
+  const isWeekend = d => d.getUTCDay() === 0 || d.getUTCDay() === 6;
+
+  function addBusinessDays(date, n) {
+    const out = new Date(date);
+    while (n > 0) {
+      out.setUTCDate(out.getUTCDate() + 1);
+      if (!isWeekend(out)) n--;
+    }
+    return out;
+  }
+
+  const fmtDay = d => new Intl.DateTimeFormat('en-US', {
+    timeZone: 'UTC', weekday: 'long', month: 'short', day: 'numeric',
+  }).format(d);
+
+  function deliveryEstimate() {
+    const p = pacificParts(new Date());
+    const today = anchor(p);
+    const secondsIn = (+p.hour % 24) * 3600 + (+p.minute) * 60 + (+p.second);
+
+    // Miss the 2pm cutoff, or land on a weekend, and dispatch rolls to the
+    // next business morning. addBusinessDays already steps over Sat/Sun.
+    const shipsToday = !isWeekend(today) && secondsIn < CUTOFF_HOUR * 3600;
+    const shipDate = shipsToday ? today : addBusinessDays(today, 1);
+
+    return {
+      shipsToday,
+      // How long is left to make today's pickup. Only meaningful when
+      // shipsToday, and it is the whole point of showing a countdown at all:
+      // "same-day shipping" is a rule, "1h 12m" is an answer.
+      secondsLeft: CUTOFF_HOUR * 3600 - secondsIn,
+      arrivalDate: addBusinessDays(shipDate, TRANSIT_DAYS),
+    };
+  }
+
+  // Rounded down to the minute, because the tick below is a minute long: saying
+  // "2h 14m" and meaning "somewhere under that" is the safe direction to err.
+  function countdown(seconds) {
+    const mins = Math.floor(seconds / 60);
+    if (mins < 1) return 'less than a minute';
+    const hours = Math.floor(mins / 60);
+    return hours
+      ? `${hours}h ${String(mins % 60).padStart(2, '0')}m`
+      : `${mins}m`;
+  }
 
   // Dispatch and delivery are only claims we can make about something we can
   // actually send. An out-of-stock size gets the honest line and a next step
