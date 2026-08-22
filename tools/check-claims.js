@@ -1635,6 +1635,21 @@ console.log('\ncheckout gate');
     expressAt !== -1 && formStart !== -1 && expressAt < formStart);
   ok('checkout runs the shared wallet flow, not one of its own',
     /GlowExpressPay\.init\(/.test(coJs) && /express-pay\.js/.test(coHtml));
+
+  // The divider under the wallet button names the alternative instead of
+  // gesturing at it: "or pay another way" was the only route a customer
+  // without Apple Pay had, set in the same grey as the tax fine print above
+  // it. Naming the card makes it a signpost, and makes it a claim, so it is
+  // held to PAY_METHODS. Add crypto or bank transfer and "with a card" stops
+  // being the whole truth, which is the day this fails and points here.
+  {
+    const methods = (coJs.match(/\{ id: '[a-z]+', label: '[^']+', note: '[^']+' \}/g) || []);
+    const namesCard = /or pay with a card below/.test(coHtml);
+    ok('the wallet divider names every way there is to pay',
+      !namesCard || (methods.length === 1 && /id: 'card'/.test(methods[0])),
+      `checkout.html says "or pay with a card below" but PAY_METHODS carries ${methods.length}: ` +
+      'reword the divider in checkout.html to cover the others.');
+  }
   // A wallet button over an empty cart would charge for nothing, and the cart
   // can empty from the drawer while this page is open.
   ok('the wallet is withdrawn when the cart empties',
