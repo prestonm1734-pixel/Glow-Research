@@ -104,11 +104,13 @@ const PAYMENTS_LIVE = true;
 // Publishable, not secret: this key can only create PaymentIntents that were
 // already priced server-side and confirm payment for them — it cannot move
 // money on its own, which is why Stripe's own docs say it is safe to ship in
-// client-side code. Read by js/checkout.js to construct `Stripe(...)`. Swap
-// for the live-mode key (starts pk_live_, not pk_test_) only once Stripe's
-// own dashboard is also switched out of test mode — the two must move
-// together or a live-looking checkout will silently take test-mode payments.
-const STRIPE_PUBLISHABLE_KEY = 'pk_test_51U3kUzQXS4Q4Ku0EIyOpARY8Rbi8ATyXYfgWKzWiDtykruMzQyfRIHxlolqwmic0AMY22nzM33NoYATjppOcOSRQ00WOWb9GxT';
+// client-side code. Read by js/checkout.js to construct `Stripe(...)`. This is
+// the live-mode key (starts pk_live_): Stripe's dashboard is out of test mode,
+// STRIPE_SECRET_KEY in Vercel is the matching live secret key, and the webhook
+// endpoint for payment_intent.succeeded is registered under Live, not Test.
+// All three have to stay in the same mode or a live-looking checkout will
+// silently take test-mode payments, or a live payment will find no webhook.
+const STRIPE_PUBLISHABLE_KEY = 'pk_live_51U3kUmHjOd9MaH5sNxBU6C1neJypFeZGunq4CUybpTBrzWRC0dA4XY72By2DFkWDwIz8RPdHUhXHZlu6M0dgcTjW00ufOBrU9S';
 
 // What the confirmation page says about payment, keyed off the same flag that
 // decides whether payment is actually taken. Hand-written copy here was the
