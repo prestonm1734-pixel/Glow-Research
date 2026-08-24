@@ -4,7 +4,7 @@
 // analytics calls) must never affect the page it's sitting on, so every
 // failure is swallowed silently.
 (function () {
-  var DASHBOARD_ORIGIN = 'https://glow-dashboard.vercel.app';
+  var DASHBOARD_ORIGIN = 'https://glow-dashboard-ruby.vercel.app';
   var KEY = 'glow-session-id';
 
   function sessionId() {
