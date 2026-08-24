@@ -355,6 +355,10 @@
   /* ---------- public surface ---------- */
 
   function add(item) {
+    // Fire-and-forget funnel signal for the internal dashboard's live map
+    // (see js/analytics.js); undefined harmlessly if that script hasn't
+    // loaded, so cart.js gains no dependency on it.
+    if (window.GlowAnalytics) window.GlowAnalytics.track('cart_add');
     const key = item.name + '::' + item.variant;
     const found = items.find(i => i.name + '::' + i.variant === key);
     if (found) found.qty += (item.qty || 1);
