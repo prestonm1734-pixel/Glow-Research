@@ -96,6 +96,28 @@
     });
   }
 
+  // The zoom to open a certificate at, as a percentage.
+  //
+  // The browser's PDF viewer picks its own and clamps it well above what a
+  // phone-width frame needs, so every letter-size certificate opened on the
+  // top-left corner of page one, magnified past reading. view=FitH and
+  // zoom=page-width are both ignored in an iframe; a number is not, so the
+  // number is worked out here, and navpanes=0 rides along with it to close the
+  // thumbnail sidebar, which otherwise takes a third of the frame. Both are
+  // ignored when paired with view=FitH; on their own they hold.
+  // 816 is a US Letter page at the viewer's 100%,
+  // in CSS pixels: 8.5in at 96dpi. The frame is the modal's inner width, which
+  // is the dialog's max width or the viewport, whichever is smaller, less its
+  // horizontal padding.
+  //
+  // Capped at 100 so a wide desktop does not magnify a document that already
+  // fits, and floored at 25 so a very narrow phone gets something legible
+  // rather than a thumbnail.
+  function fitZoom() {
+    const frame = Math.min(760, document.documentElement.clientWidth) - 50;
+    return Math.max(25, Math.min(100, Math.round((frame / 816) * 100)));
+  }
+
   // What the dialog shows when there is a document, and what it shows when
   // there is not. The second is not an error state: every lot is tested and
   // every lot has a certificate, so the honest answer is how to get the one
@@ -128,7 +150,7 @@
 
     return meta + `
       <div class="coa-modal-doc">
-        <iframe src="${escHtml(href)}#navpanes=0&amp;view=FitH" title="Certificate of analysis for ${escHtml(p.name)}" loading="lazy"></iframe>
+        <iframe src="${escHtml(href)}#navpanes=0&amp;zoom=${fitZoom()}" title="Certificate of analysis for ${escHtml(p.name)}"></iframe>
       </div>
       <div class="coa-modal-actions">
         <a class="btn btn-primary" href="${escHtml(href)}" download>Download PDF</a>

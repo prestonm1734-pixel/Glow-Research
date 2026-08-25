@@ -238,16 +238,19 @@
   .coa-modal-doc iframe{ width:100%; height:100%; border:none; display:block; }
   .coa-modal-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top: 18px; }
   .coa-modal-actions .btn{ padding: 13px 22px; font-size:.9rem; }
-  .coa-page .coa-modal-actions .btn-primary{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
-  .coa-page .coa-modal-actions .btn-primary:hover{ background:#2a2a28; }
-  .coa-page .coa-modal-actions .btn-outline{ border-color:rgba(0,0,0,.28); color:#0a0a0a; }
-  .coa-page .coa-modal-actions .btn-outline:hover{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+  /* Scoped to the overlay, not to .coa-page. The overlay is appended to
+     <body> by js/coa.js and .coa-page is on <main>, so these never matched:
+     both buttons fell back to the sitewide .btn styles, which are built for
+     the dark sections, and "Open full document" rendered white on white. */
+  .coa-overlay .btn-primary{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+  .coa-overlay .btn-primary:hover{ background:#2a2a28; color:#fff; }
+  .coa-overlay .btn-outline{ border-color:rgba(0,0,0,.28); color:#0a0a0a; background:none; }
+  .coa-overlay .btn-outline:hover{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
 
   /* The state while certificates are held: not an error, a route. */
   .coa-modal-request h3{ margin:0 0 8px; font-size:1.05rem; font-weight:700; }
   .coa-modal-request p{ margin:0 0 18px; font-size:.95rem; line-height:1.65; color:#55554f; }
-  .coa-modal-request .btn{ padding: 13px 22px; font-size:.9rem; background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
-  .coa-modal-request .btn:hover{ background:#2a2a28; color:#fff; }
+  .coa-modal-request .btn{ padding: 13px 22px; font-size:.9rem; }
 
   .coa-modal-note{
     margin: 18px 0 0; font-size:.8rem; line-height:1.6; color:#8a8a86;
@@ -282,8 +285,26 @@
   @media (max-width: 560px){
     .coa-overlay{ padding: 0; align-items:flex-end; }
     .coa-modal{ max-height: 92vh; width:100%; border:none; }
-    .coa-modal-doc{ height: 44vh; }
     .coa-modal-actions .btn{ width:100%; justify-content:center; }
+
+    /* Everything above the document is overhead on a phone, and there was
+       enough of it that the two buttons under the embed sat below the fold:
+       the reader could see a PDF too small to read and no way out to the
+       full one. The chrome tightens and the embed takes the room back. */
+    .coa-modal-head{ padding: 15px 16px; }
+    .coa-modal-name{ margin-top: 5px; font-size:1.15rem; }
+    .coa-modal-body{ padding: 15px 16px 20px; }
+    /* Four cells wrapping unevenly across a phone's width, with a 20px
+       bottom margin under each row. A two-column grid puts them in two even
+       rows instead, and pairs each label with its value. */
+    .coa-modal-meta{
+      display:grid; grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px 16px; margin-bottom: 15px; padding-bottom: 15px;
+    }
+    .coa-modal-meta dd{ font-size:.92rem; }
+    .coa-modal-doc{ height: 52vh; }
+    .coa-modal-actions{ margin-top: 14px; }
+    .coa-modal-note{ margin-top: 14px; font-size:.75rem; }
   }
 </style>
 <script type="application/ld+json">
@@ -375,7 +396,7 @@
   <div class="container">
     <h1>Certificate of Analysis</h1>
     <p class="lp-lede">
-      Purity by HPLC-UV, identity by LC-MS, documented against the lot number
+      Purity by HPLC, identity and quantity, documented against the lot number
       on every vial.
     </p>
   </div>

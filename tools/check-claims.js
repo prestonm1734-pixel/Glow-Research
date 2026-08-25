@@ -1062,6 +1062,27 @@ console.log('\nwhat the FAQ is allowed to say about testing');
   ok('the FAQ names no analysis the laboratory does not run',
     invented.length === 0, `unbacked: ${invented.join(', ')}`);
 
+  // The same rule, over every page rather than the FAQ alone. coa.html's hero
+  // read "Purity by HPLC-UV, identity by LC-MS" long after the panel had
+  // stopped claiming either, because nothing outside the FAQ was looking:
+  // instrument names are the easiest kind of claim to leave behind, since they
+  // sound like description rather than assertion. Comments, styles and scripts
+  // are stripped so a note explaining why a method was dropped is not read as
+  // the page claiming it.
+  const visible = f => read(f)
+    .replace(/<style>[\s\S]*?<\/style>/g, '')
+    .replace(/<script[\s\S]*?<\/script>/g, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .toLowerCase();
+  const pageInvented = [];
+  pages.forEach(f => {
+    const text = visible(f);
+    methods.filter(m => text.includes(m) && !backing.includes(m))
+      .forEach(m => pageInvented.push(`${f}: ${m}`));
+  });
+  ok('no page names an analysis the laboratory does not run',
+    pageInvented.length === 0, pageInvented.join(', '));
+
   // The denial and the claim are two halves of one statement. If a test moves
   // from "not run" to "run", ANALYSIS_LONG grows and this fails until the array
   // is updated, which is the only way "we do not test for X" stops being said
