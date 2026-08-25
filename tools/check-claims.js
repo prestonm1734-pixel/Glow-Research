@@ -26,7 +26,7 @@ const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, CUTOFF_LABEL, CUTOFF_LABEL_SHORT,
-  ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord,
+  ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord, PACKAGING_PLAIN, STORAGE_LONG,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
   productMetaDesc, productSlug,
@@ -1422,6 +1422,52 @@ console.log('\nwhat the FAQ is allowed to say about testing');
   const withUnits = FAQS.filter(f => /\bEU\s*\/\s*m[lg]\b/i.test(f.a));
   ok('no answer states an endotoxin limit', withUnits.length === 0,
     withUnits.map(f => f.q).join(' | '));
+}
+
+console.log('\nwhat the FAQ is allowed to say about the box and the vial');
+{
+  const answers = FAQS.map(f => f.a).join('\n');
+
+  // "Discreetly shipped" sat in the footer of every page for the whole life of
+  // the site with nothing anywhere saying what it meant, which is a promise a
+  // reader has no way to check. It is allowed to stay only while the FAQ
+  // actually describes the box, in the same words the constant holds.
+  const claimsDiscreet = pages.some(f => /discreetly shipped/i.test(read(f)));
+  ok('the "discreetly shipped" footer claim is explained somewhere the reader can find it',
+    !claimsDiscreet || answers.includes(PACKAGING_PLAIN),
+    'pages promise discreet shipping but no FAQ answer says what arrives');
+
+  // A temperature in the storage answer stops being guidance and becomes a
+  // specification, held on every lot, verifiable by nobody once the vial is
+  // out of the building. STORAGE_LONG carries none deliberately; this is what
+  // stops a helpful-looking figure being added to it later.
+  const storage = FAQS.filter(f => f.a.includes(STORAGE_LONG));
+  ok('the storage answer exists and comes from STORAGE_LONG', storage.length === 1);
+  // No leading \b: a boundary between a space and the minus of "-20C" does not
+  // exist, so anchoring on one let exactly the figure this is here to catch
+  // through. Matched on the digits and the unit instead. "C" and "F" only
+  // count as a unit when nothing word-like follows, so "$300 Covered" and
+  // "FedEx 2-Day" do not trip it.
+  const withTemp = FAQS.filter(f =>
+    /\d+\s*(?:°|deg\b|degrees\b)|\d+\s*[CF]\b/.test(f.a));
+  ok('no answer commits the material to a storage temperature',
+    withTemp.length === 0, withTemp.map(f => f.q).join(' | '));
+
+  // Clause 04 of the RUO agreement says we publish no dosing or administration
+  // guidance. The FAQ is the likeliest place for it to creep in, phrased as
+  // helpfulness. Checked against the answers, not the questions: "can these be
+  // used in humans" is a question we should be asked and should answer no to.
+  const dosing = /\b(dose|doses|dosage|dosing|mcg per|mg per kg|inject|injection|subcutaneous|intramuscular|administer)\b/i;
+  const offending = FAQS.filter(f => dosing.test(f.a) && !/we do not publish dosing/i.test(f.a));
+  ok('no answer drifts into dosing or administration',
+    offending.length === 0, offending.map(f => f.q).join(' | '));
+
+  // The research-use-only answer is the one place on the site where the reader
+  // is asking the question directly. It has to say no, and point at the
+  // agreement they already accepted, rather than hedge.
+  const ruo = FAQS.find(f => /humans or animals/i.test(f.q));
+  ok('the research-use-only answer says no and names the agreement',
+    !!ruo && /^No\./.test(ruo.a) && /RUO Agreement/.test(ruo.a));
 }
 
 /* ---------------------------------------------------------------------------

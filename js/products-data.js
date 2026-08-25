@@ -526,6 +526,23 @@ const CUTOFF_LABEL_SHORT = `${CUTOFF_H12} ${CUTOFF_MERIDIEM} PST`;
 // pins every "FedEx <n>-Day" on the site to this number.
 const TRANSIT_DAYS = 2;
 
+// What the box actually looks like. The footer on every page has said
+// "discreetly shipped" for as long as the site has existed without anywhere
+// saying what that meant, which is a promise a reader cannot check. Stated
+// once, here, so the FAQ answer and the footer claim describe the same box.
+const PACKAGING_PLAIN = 'a plain box with no branding on it and nothing on the ' +
+  'outside naming what is inside';
+
+// Storage, as laboratory chemistry. Clause 04 of the RUO agreement draws the
+// line this sits on: handling and reconstitution information is publishable,
+// a quantity to use or a route of administration is not. Deliberately no
+// figures. A temperature written here becomes a specification we are held to
+// on every lot, and the vial label and the certificate are what actually
+// govern the material in someone's hand.
+const STORAGE_LONG = 'Keep an unopened vial cold and out of the light, in a freezer ' +
+  'for anything longer than short-term. Once reconstituted, refrigerate it and use it ' +
+  'within a short window';
+
 // ---------------------------------------------------------------------------
 // What the site is allowed to say about how a lot is verified and where it is
 // made. Both claims are already made at length on how-we-test.html and about.html.
@@ -745,6 +762,46 @@ const FAQS = [
   {
     q: 'Where do I find the lot number on my vial?',
     a: 'Printed on the label. Quote it when you ask us for the certificate, then check it against the lot the certificate names.',
+  },
+  {
+    // Every figure here is the constant the rest of the site quotes: the
+    // cutoff from CUTOFF_HOUR, the transit from TRANSIT_DAYS. check-claims.js
+    // pins both sitewide, so this answer cannot drift from the shipping page.
+    q: 'How quickly does an order go out?',
+    a: `Order before ${CUTOFF_LABEL} on a weekday and it is picked, sealed and boxed ` +
+       `the same afternoon rather than held for the next run, then travels FedEx ` +
+       `${TRANSIT_DAYS}-Day. Tracking follows within a day. Saturday delivery happens on ` +
+       'the routes FedEx runs it, at no extra charge. We ship within the United States only.',
+  },
+  {
+    // The footer has claimed "discreetly shipped" on every page since launch.
+    // This is the first place that says what it means, and it reads the same
+    // constant rather than describing the box a second time.
+    q: 'What does the package look like when it arrives?',
+    a: `It arrives in ${PACKAGING_PLAIN}. The carrier label carries the shipping ` +
+       'details it has to carry and nothing else, so the contents are not identifiable ' +
+       'from the outside.',
+  },
+  {
+    // STORAGE_LONG rather than a sentence typed here: the same guidance is
+    // laboratory chemistry, which clause 04 of the RUO agreement permits, and
+    // keeping it in one constant is what stops a figure creeping into one copy
+    // of it later. The deferral to the label is the honest half of the answer.
+    q: 'How should a vial be stored?',
+    a: `${STORAGE_LONG}. Storage conditions cannot be verified once a vial leaves the ` +
+       'facility, so the label on the vial and the certificate for its lot are what govern ' +
+       'the material you are holding, not this page.',
+  },
+  {
+    // No hedging and no softening. This is the one answer on the site where
+    // being liked matters less than being unambiguous, and the RUO agreement
+    // it points at is the document the buyer already accepted at the gate.
+    q: 'Can these be used in humans or animals?',
+    a: 'No. Everything here is sold for laboratory and in-vitro research use only, by ' +
+       'qualified buyers and institutions. It is not a drug, not a supplement, and not for ' +
+       'human or veterinary use. We do not publish dosing guidance, administration ' +
+       'protocols, or instructions for use in a living subject, and we will not supply them ' +
+       'if asked. The RUO Agreement sets out what you accepted when you entered the site.',
   },
 ];
 
@@ -1467,6 +1524,8 @@ if (typeof module !== 'undefined' && module.exports) {
     CUTOFF_LABEL,
     CUTOFF_LABEL_SHORT,
     TRANSIT_DAYS,
+    PACKAGING_PLAIN,
+    STORAGE_LONG,
     ANALYSIS_TESTS,
     TESTS_PER_BATCH,
     numberWord,
