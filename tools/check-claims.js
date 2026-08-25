@@ -1311,14 +1311,26 @@ console.log('\nwhat the FAQ is allowed to say about testing');
   const answers = FAQS.map(f => f.a).join('\n');
   const questions = FAQS.map(f => f.q).join('\n');
 
-  // The answer that explains the analysis is built from ANALYSIS_LONG, so it
-  // cannot describe an instrument the evidence panel and how-we-test.html do not.
-  // It has to lead with it, not merely contain it somewhere: a later answer
-  // quotes the same constant, and matching anywhere in the FAQ would let this
-  // one be retyped while the check still passed on the other one's copy.
-  ok('the FAQ explains the analysis in the catalog’s own words',
-    FAQS.some(f => f.a.startsWith(ANALYSIS_LONG)),
-    `no answer opens with "${ANALYSIS_LONG}"`);
+  // This used to require an answer to open with ANALYSIS_LONG verbatim, which
+  // pinned the copy to a 30-word specification sentence and made the first
+  // thing a reader met a wall. What actually needs guarding is that the FAQ
+  // accounts for every analysis in the catalog, so that is what is checked:
+  // against ANALYSIS_TESTS itself rather than a prose restatement of it. An
+  // added test now fails here until the FAQ names it, which the old check
+  // could not do, since ANALYSIS_LONG could go stale alongside the answer.
+  const unnamedTests = ANALYSIS_TESTS
+    .filter(t => !answers.toLowerCase().includes(t.name.toLowerCase()));
+  ok('the FAQ names every analysis the laboratory runs',
+    unnamedTests.length === 0,
+    `not named in any answer: ${unnamedTests.map(t => t.name).join(', ')}`);
+
+  // And the method, wherever the catalog records one. "Purity" alone does not
+  // tell a reader it was measured by HPLC.
+  const unnamedMethods = ANALYSIS_TESTS
+    .filter(t => t.method && !answers.toLowerCase().includes(t.method.toLowerCase()));
+  ok('and the method behind each one, where the catalog records a method',
+    unnamedMethods.length === 0,
+    `method missing: ${unnamedMethods.map(t => `${t.name} (${t.method})`).join(', ')}`);
 
   // And no answer may name an instrument ANALYSIS_LONG does not. "LC-MS" reads
   // like shorthand for the same two runs and is a different measurement; the

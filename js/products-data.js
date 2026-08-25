@@ -530,8 +530,8 @@ const TRANSIT_DAYS = 2;
 // "discreetly shipped" for as long as the site has existed without anywhere
 // saying what that meant, which is a promise a reader cannot check. Stated
 // once, here, so the FAQ answer and the footer claim describe the same box.
-const PACKAGING_PLAIN = 'a plain box with no branding on it and nothing on the ' +
-  'outside naming what is inside';
+const PACKAGING_PLAIN = 'A plain box, no branding, nothing on the outside naming ' +
+  'what is inside';
 
 // Storage, as laboratory chemistry. Clause 04 of the RUO agreement draws the
 // line this sits on: handling and reconstitution information is publishable,
@@ -539,9 +539,8 @@ const PACKAGING_PLAIN = 'a plain box with no branding on it and nothing on the '
 // figures. A temperature written here becomes a specification we are held to
 // on every lot, and the vial label and the certificate are what actually
 // govern the material in someone's hand.
-const STORAGE_LONG = 'Keep an unopened vial cold and out of the light, in a freezer ' +
-  'for anything longer than short-term. Once reconstituted, refrigerate it and use it ' +
-  'within a short window';
+const STORAGE_LONG = 'Cold and out of the light. Freezer if you are keeping it a ' +
+  'while, fridge once it is reconstituted, and use it up reasonably soon after that';
 
 // ---------------------------------------------------------------------------
 // What the site is allowed to say about how a lot is verified and where it is
@@ -724,22 +723,23 @@ const VIAL_ART_NOTICE = 'Vials ship with generic labeling, not the label shown.'
 // reports numbers. This page explains how to go read them.
 const FAQS = [
   {
-    // Derived from ANALYSIS_LONG and ANALYSIS_NOT_RUN rather than restated, so
-    // this cannot end up describing a test the laboratory does not run, or
-    // staying silent about one it does not. check-claims.js requires this
-    // answer to start with ANALYSIS_LONG verbatim and to name every entry in
-    // ANALYSIS_NOT_RUN somewhere in the FAQ. The list is the answer, so the
-    // only thing after it is who did the grading.
+    // The list is built from ANALYSIS_TESTS, not typed, so it cannot name a
+    // test the laboratory does not run or go quiet about one it does.
+    // ANALYSIS_LONG says the same thing at length for llms.txt, where being
+    // exhaustive is the point. Here it read like a specification sheet, so
+    // this states it the way a person would say it out loud.
     q: 'What gets tested before my vial ships?',
-    a: `${ANALYSIS_LONG}. Every lot, before any of it is released. ` +
+    a: `${sentenceCase(numberWord(ANALYSIS_TESTS.length))} analyses on every lot before it ships: ` +
+       `${listWords(ANALYSIS_TESTS.map(t =>
+         t.method ? `${t.name.toLowerCase()} by ${t.method}` : t.name.toLowerCase()), 'and')}. ` +
        (ANALYSIS_SOME_LOTS.length
-         ? `Some lots are also given ${listWords(ANALYSIS_SOME_LOTS.map(t => t.toLowerCase()), 'and')} ` +
-           'testing and some are not, so read the certificate for the lot you have rather than assuming. '
+         ? `Some lots also get ${listWords(ANALYSIS_SOME_LOTS.map(t => t.toLowerCase()), 'and')} ` +
+           'testing, some do not, so read the certificate for the lot you have. '
          : '') +
        (ANALYSIS_NOT_RUN.length
-         ? `No lot is given ${listWords(ANALYSIS_NOT_RUN, 'or')} testing. `
+         ? `We do not run ${listWords(ANALYSIS_NOT_RUN, 'or')}. `
          : '') +
-       'We do not run a laboratory, so the certificate is not ours to write.',
+       'An outside lab does all of it, so the certificate is not ours to write.',
   },
   {
     // Answer comes from COA_COPY, which keys off COAS_PUBLISHED. While
@@ -755,32 +755,29 @@ const FAQS = [
     // it is the same link the panel and the certificate dialog offer, built
     // from LAB.verify rather than typed here.
     q: 'How do I know you did not write the certificate yourselves?',
-    a: 'We could not. A certificate names the laboratory that ran the analysis, that laboratory\u2019s own report reference, and one lot number. Match the lot number to your vial, then check the reference at ' +
-       verifyHost() +
-       ', which is the laboratory\u2019s own records and not ours. Every product page and every certificate here links it for you.',
+    a: 'Do not take our word for it. Every certificate carries the lab\u2019s own report ' +
+       `reference, and you can check it at ${verifyHost()}. Those are their records, not ` +
+       'ours. We link it on every product page and every certificate.',
   },
   {
     q: 'Where do I find the lot number on my vial?',
-    a: 'Printed on the label. Quote it when you ask us for the certificate, then check it against the lot the certificate names.',
+    a: 'Printed on the label. Quote it when you ask for a certificate, and check it matches the lot the certificate names.',
   },
   {
     // Every figure here is the constant the rest of the site quotes: the
     // cutoff from CUTOFF_HOUR, the transit from TRANSIT_DAYS. check-claims.js
     // pins both sitewide, so this answer cannot drift from the shipping page.
     q: 'How quickly does an order go out?',
-    a: `Order before ${CUTOFF_LABEL} on a weekday and it is picked, sealed and boxed ` +
-       `the same afternoon rather than held for the next run, then travels FedEx ` +
-       `${TRANSIT_DAYS}-Day. Tracking follows within a day. Saturday delivery happens on ` +
-       'the routes FedEx runs it, at no extra charge. We ship within the United States only.',
+    a: `Order before ${CUTOFF_LABEL} on a weekday and it ships that afternoon on FedEx ` +
+       `${TRANSIT_DAYS}-Day. Tracking follows within a day. Saturday delivery where FedEx ` +
+       'runs it, no extra charge. United States only.',
   },
   {
     // The footer has claimed "discreetly shipped" on every page since launch.
     // This is the first place that says what it means, and it reads the same
     // constant rather than describing the box a second time.
     q: 'What does the package look like when it arrives?',
-    a: `It arrives in ${PACKAGING_PLAIN}. The carrier label carries the shipping ` +
-       'details it has to carry and nothing else, so the contents are not identifiable ' +
-       'from the outside.',
+    a: `${PACKAGING_PLAIN}. The carrier label is the only thing on it.`,
   },
   {
     // STORAGE_LONG rather than a sentence typed here: the same guidance is
@@ -788,20 +785,17 @@ const FAQS = [
     // keeping it in one constant is what stops a figure creeping into one copy
     // of it later. The deferral to the label is the honest half of the answer.
     q: 'How should a vial be stored?',
-    a: `${STORAGE_LONG}. Storage conditions cannot be verified once a vial leaves the ` +
-       'facility, so the label on the vial and the certificate for its lot are what govern ' +
-       'the material you are holding, not this page.',
+    a: `${STORAGE_LONG}. The vial label is what governs, not this page.`,
   },
   {
     // No hedging and no softening. This is the one answer on the site where
     // being liked matters less than being unambiguous, and the RUO agreement
     // it points at is the document the buyer already accepted at the gate.
     q: 'Can these be used in humans or animals?',
-    a: 'No. Everything here is sold for laboratory and in-vitro research use only, by ' +
-       'qualified buyers and institutions. It is not a drug, not a supplement, and not for ' +
-       'human or veterinary use. We do not publish dosing guidance, administration ' +
-       'protocols, or instructions for use in a living subject, and we will not supply them ' +
-       'if asked. The RUO Agreement sets out what you accepted when you entered the site.',
+    a: 'No. Laboratory and in-vitro research only, sold to qualified buyers and ' +
+       'institutions. Not a drug, not a supplement, not for human or veterinary use. We ' +
+       'do not publish dosing or administration guidance and will not supply it if asked. ' +
+       'The RUO Agreement covers what you accepted on the way in.',
   },
 ];
 
@@ -829,6 +823,12 @@ function faqHtml() {
           <div class="faq-a"><p${f.id ? ` id="${f.id}"` : ''}>${escHtml(f.a)}</p></div>
         </div>`).join('')}
       </div>`).join('');
+}
+
+// A derived word at the head of a sentence. numberWord() and the rest return
+// lowercase, which is right mid-sentence and wrong at the start of one.
+function sentenceCase(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
 }
 
 // "a, b and c", or "a, b or c" for a sentence that denies the whole list.
