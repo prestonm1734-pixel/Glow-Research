@@ -2649,6 +2649,87 @@ console.log('\ndeploy headers');
     conflicted.length === 0, conflicted.join(', '));
 }
 
+/* ---------------------------------------------------------------------------
+ * Client-side navigation depth. A link in HTML is checked by the broken-link
+ * pass and by rewriteDepth() on the generated pages. A redirect written in
+ * JavaScript is checked by neither, and js/express-pay.js carried a bare
+ * "thank-you.html" that was correct for as long as it only ran on
+ * checkout.html at the root. The product pages then moved to
+ * /peptides/<slug>/ and started running the same file, so a wallet payment
+ * that had already been captured and turned into an order redirected the
+ * buyer to /peptides/<slug>/thank-you.html and showed them a 404.
+ * ------------------------------------------------------------------------- */
+console.log('\nclient-side navigation');
+{
+  const navScripts = fs.readdirSync(path.join(ROOT, 'js')).filter(f => f.endsWith('.js'));
+
+  // A redirect to a string literal that is not absolute and not routed
+  // through a depth helper. Variables and template reads are left alone:
+  // what is being caught is a hardcoded page name.
+  const bare = [];
+  navScripts.forEach(f => {
+    const src = read(`js/${f}`)
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^[ \t]*\/\/.*$/gm, '');
+    // The whole right-hand side, not just a literal sitting directly after the
+    // "=". The bug this exists for was written as `cfg.thankYouHref ||
+    // 'thank-you.html'`, where the literal is a fallback rather than the
+    // assignment, and a pattern anchored on the "=" walked straight past it.
+    const re = /location\s*\.\s*(?:href\s*=|replace\s*\(|assign\s*\()([^;]*)/g;
+    for (const m of src.matchAll(re)) {
+      // Literals already routed through the depth helper are the fix, not the
+      // defect, so they come out before anything is judged.
+      const rhs = m[1].replace(/pageHref\s*\(\s*(['"])[^'"]*\1\s*\)/g, '')
+                      .replace(/root\s*\(\s*\)\s*\+\s*(['"])[^'"]*\1/g, '');
+      for (const lit of rhs.matchAll(/(['"])([^'"]+)\1/g)) {
+        const target = lit[2];
+        if (/^(https?:)?\/\//.test(target)) continue;      // absolute, deliberate
+        if (/^(mailto:|tel:|#|\/)/.test(target)) continue; // non-navigational or root-relative
+        if (!/\.html?$/i.test(target)) continue;           // not a page name
+        bare.push(`js/${f}: ${target}`);
+      }
+    }
+  });
+  ok('no script redirects to a bare relative page name',
+    bare.length === 0,
+    bare.length ? `${bare.join(', ')} — route it through pageHref() so it resolves from /peptides/<slug>/ too` : '');
+
+  // The two that matter by name, checked positively rather than by absence, so
+  // deleting the redirect does not read as a pass.
+  ['js/express-pay.js', 'js/checkout.js'].forEach(f => {
+    const src = read(f);
+    if (!/thank-you\.html/.test(src)) return;
+    ok(`${f} sends the buyer to the confirmation page through pageHref()`,
+      /pageHref\(\s*'thank-you\.html'\s*\)/.test(src));
+  });
+
+  // Both redirects call pageHref() unguarded, which is only safe while
+  // js/products-data.js is loaded ahead of them on every page that runs them.
+  // Reordering the script tags would turn a confirmation redirect into a
+  // ReferenceError immediately after a card was charged.
+  ['js/express-pay.js', 'js/checkout.js'].forEach(dep => {
+    const hosts = pages.filter(f => read(f).includes(`${dep}"`));
+    const wrong = hosts.filter(f => {
+      const html = read(f);
+      const data = html.indexOf('js/products-data.js"');
+      const user = html.indexOf(`${dep}"`);
+      return data === -1 || data > user;
+    });
+    ok(`every page loading ${dep} loads js/products-data.js before it`,
+      hosts.length > 0 && wrong.length === 0,
+      hosts.length ? wrong.join(', ') : `no page loads ${dep}`);
+  });
+
+  // 404.html is the one page the server can return under any URL, so a
+  // relative stylesheet resolves against whatever path was missed and the
+  // page renders unstyled. Everything on it has to be root-relative.
+  const relative = [...read('404.html')
+    .matchAll(/(?:href|src)="(?!https?:|\/\/|\/|#|mailto:|tel:|data:)([^"]+)"/g)]
+    .map(m => m[1]);
+  ok('404.html references every asset from the root, so it renders wherever it is served',
+    relative.length === 0, relative.join(', '));
+}
+
 console.log('\nsitemap');
 {
   const locs = [...read('sitemap.xml').matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);

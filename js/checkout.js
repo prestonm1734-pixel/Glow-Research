@@ -594,7 +594,11 @@
     } catch (e) { /* private mode: the fallback message on thank-you.html still shows */ }
 
     if (window.GlowCart) window.GlowCart.clear();
-    location.href = 'thank-you.html';
+    // Correct as a bare path today, since this file only ever runs on
+    // checkout.html at the root. Routed through pageHref anyway: the identical
+    // line in js/express-pay.js was correct on the same reasoning until the
+    // product pages moved two directories down and started running it too.
+    location.href = pageHref('thank-you.html');
   }
 
   // Runs on every load of this page. Only does anything when the URL carries

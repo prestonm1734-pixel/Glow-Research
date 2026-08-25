@@ -220,7 +220,15 @@
     } catch (e) { /* private mode: thank-you.html shows its no-recent-order state */ }
 
     if (cfg.onPlaced) cfg.onPlaced();
-    location.href = cfg.thankYouHref || 'thank-you.html';
+    // Depth-aware, and it has to be. This runs on the product page as well as
+    // checkout, and the product pages now live at /peptides/<slug>/, two
+    // directories down. A bare "thank-you.html" resolved against that path,
+    // so a wallet payment that had already been captured and already become an
+    // order landed the buyer on a 404 instead of their confirmation. Nobody
+    // passes thankYouHref, so this fallback is the live path, not a spare.
+    // pageHref() is not guarded: js/products-data.js is loaded ahead of this
+    // file on both pages that mount the wallet, which check-claims.js pins.
+    location.href = cfg.thankYouHref || pageHref('thank-you.html');
   }
 
   function init(config) {
