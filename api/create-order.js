@@ -110,6 +110,7 @@ export default async function handler(req, res) {
       orderNumber: (intent.metadata || {}).woo_order_number || existingOrderId,
       discount: Number((intent.metadata || {}).discount) || 0,
       promoCode: (intent.metadata || {}).promo_code || null,
+      total: intent.amount_received / 100,
     });
   }
 
@@ -129,6 +130,10 @@ export default async function handler(req, res) {
       orderNumber: result.orderNumber,
       status: STATUS_LABELS[result.status] || result.status || '',
       tax: result.tax,
+      // Stripe's own record of what was actually collected, not the cart's
+      // re-derived subtotal — this is what js/checkout.js reports to the
+      // dashboard as the purchase's revenue.
+      total: intent.amount_received / 100,
     });
   } catch (err) {
     // placeOrder() has already alerted the desk if WooCommerce refused the

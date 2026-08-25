@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const { items, shippingMethodId, email, address, paymentIntentId, order, promoCode } = readBody(req);
+  const { items, shippingMethodId, email, address, paymentIntentId, order, promoCode, analytics } = readBody(req);
 
   let priced;
   try {
@@ -64,6 +64,14 @@ export default async function handler(req, res) {
     item_count: String(priced.lines.reduce((n, l) => n + l.qty, 0)),
     discount: priced.discount.toFixed(2),
     promo_code: (priced.promo && priced.promo.code) || '',
+    // The dashboard's own IDs (js/analytics.js), carried through so
+    // api/orders/sync in the glow-dashboard repo can tie a completed order
+    // back to the session whose funnel events led to it. Not sanitized
+    // beyond the string cast: they are opaque IDs this server minted no
+    // guarantees about, but never rendered or executed anywhere, only stored
+    // and compared as text.
+    session_id: (analytics && String(analytics.sessionId || '')) || '',
+    anon_id: (analytics && String(analytics.anonId || '')) || '',
   };
 
   // Only present on the final pricing call, right before confirmPayment() —

@@ -94,6 +94,7 @@
           address,
           email,
           paymentIntentId: expressPaymentIntentId,
+          ...(window.GlowAnalytics ? { analytics: window.GlowAnalytics.ids() } : {}),
         }),
       });
       const data = await resp.json();
@@ -219,6 +220,13 @@
       }));
     } catch (e) { /* private mode: thank-you.html shows its no-recent-order state */ }
 
+    if (window.GlowAnalytics) {
+      window.GlowAnalytics.track('purchase_completed', {
+        orderNumber: orderData.orderNumber,
+        revenue: orderData.total,
+        itemCount: items.reduce((n, i) => n + (i.qty || 1), 0),
+      });
+    }
     if (cfg.onPlaced) cfg.onPlaced();
     // Depth-aware, and it has to be. This runs on the product page as well as
     // checkout, and the product pages now live at /peptides/<slug>/, two

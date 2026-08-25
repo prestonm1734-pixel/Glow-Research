@@ -438,6 +438,11 @@
               paymentIntentId,
               ...(appliedPromoCode ? { promoCode: appliedPromoCode } : {}),
               ...(orderPayload ? { order: orderPayload } : {}),
+              // Carried into the PaymentIntent's own metadata (see
+              // api/create-payment-intent.js), so a completed purchase can be
+              // tied back to the session whose funnel events led to it,
+              // rather than counted as an order with no session of its own.
+              ...(window.GlowAnalytics ? { analytics: window.GlowAnalytics.ids() } : {}),
             }),
           });
           data = await resp.json();
@@ -593,6 +598,16 @@
       sessionStorage.removeItem('glow-pending-order');
     } catch (e) { /* private mode: the fallback message on thank-you.html still shows */ }
 
+    if (window.GlowAnalytics) {
+      window.GlowAnalytics.track('purchase_completed', {
+        orderNumber: data.orderNumber,
+        // Stripe's own collected amount (see api/create-order.js), not a
+        // client-side re-sum of the cart, which would drift from what was
+        // actually charged once tax, shipping and discounts are applied.
+        revenue: data.total,
+        itemCount: payload.items.reduce((n, i) => n + (i.qty || 1), 0),
+      });
+    }
     if (window.GlowCart) window.GlowCart.clear();
     // Correct as a bare path today, since this file only ever runs on
     // checkout.html at the root. Routed through pageHref anyway: the identical
@@ -777,6 +792,13 @@
       ensurePaymentIntent();
     }
     if (!resumed) initExpressPay();
+    // Not on the resumed path: a 3D Secure redirect return is a continuation
+    // of a checkout that already started, not a fresh one landing on the page.
+    if (!resumed && window.GlowAnalytics && cartItems().length) {
+      window.GlowAnalytics.track('checkout_started', {
+        itemCount: cartItems().reduce((n, i) => n + (i.qty || 1), 0),
+      });
+    }
 
     // the drawer can change the cart while this page is open
     document.addEventListener('glow-cart-change', () => {

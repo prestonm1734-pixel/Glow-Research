@@ -630,6 +630,15 @@
       return;
     }
 
+    if (window.GlowAnalytics) {
+      window.GlowAnalytics.track('product_viewed', {
+        sku: size().sku,
+        name: product.name,
+        category: product.cat,
+        price: size().price,
+      });
+    }
+
     setCanonical(product);
     renderBreadcrumb(product);
     renderHeader(product);
