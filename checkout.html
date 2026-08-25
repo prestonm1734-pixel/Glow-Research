@@ -15,12 +15,6 @@
 <link rel="preload" href="assets/fonts/sora.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="css/style.css" />
 <link rel="preconnect" href="https://js.stripe.com">
-<!-- Not a dependency in the "js/ may import nothing" sense: this is loaded
-     live from Stripe's own CDN, on purpose. Stripe requires it, for PCI
-     compliance and their own fraud signals — self-hosting or bundling a copy
-     is against their terms and loses both. js/checkout.js is what actually
-     uses it, further down the page. -->
-<script src="https://js.stripe.com/v3/"></script>
 <style>
   /* ---------- checkout ----------
      Deliberately the quietest page on the site. Everywhere else earns
@@ -601,6 +595,13 @@
     header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
   });
 </script>
+<!-- Not a dependency in the "js/ may import nothing" sense: this is loaded
+     live from Stripe's own CDN, on purpose. Stripe requires it, for PCI
+     compliance and their own fraud signals — self-hosting or bundling a copy
+     is against their terms and loses both. Moved here, off the head, so it no
+     longer blocks first paint; document order still guarantees it finishes
+     before js/express-pay.js and js/checkout.js run and read window.Stripe. -->
+<script src="https://js.stripe.com/v3/"></script>
 <script src="js/products-data.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/search.js"></script>

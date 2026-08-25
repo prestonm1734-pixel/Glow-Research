@@ -32,7 +32,6 @@
 <link rel="preload" href="../../assets/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="../../assets/fonts/sora.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="../../css/style.css" />
-<script src="https://js.stripe.com/v3/"></script>
 <style>
   /* ---------- breadcrumb ---------- */
   .pd-crumb{ background:#ececea; border-bottom:1px solid rgba(0,0,0,0.1); padding: 13px 0; }
@@ -1124,6 +1123,11 @@
     header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
   });
 </script>
+<!-- Loaded live from Stripe's own CDN, not self-hosted (required for their PCI
+     compliance and fraud signals). Moved here, off the head, so it no longer
+     blocks first paint; document order still guarantees it finishes before
+     js/express-pay.js and js/product.js run and read window.Stripe. -->
+<script src="https://js.stripe.com/v3/"></script>
 <script src="../../js/products-data.js"></script>
 <script src="../../js/cart.js"></script>
 <script src="../../js/cart-modal.js"></script>
