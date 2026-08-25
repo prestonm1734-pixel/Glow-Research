@@ -1077,10 +1077,10 @@ function bulkSavingPct(original, sale) {
 // separates the two rather than the quantity: the same ten vials earns 20% as
 // a one-time retail order or 40% as a standing monthly account.
 //
-// PLACEHOLDER RATES. The thresholds and percentages are ours to set, but the
-// supplier import decides what margin actually supports them. Confirm before
-// launch; nothing else needs touching, since every price on the site is
-// derived from these rows.
+// The published tiers, confirmed against supplier margin. Every bulk price on
+// the site is derived from these rows, so a rate change here is the whole
+// change: the cards, the buy box, bulkNote() and the wholesale comparison all
+// read them rather than restating the percentages.
 const QTY_TIERS = [
   { qty: 1, off: 0, card: true },
   { qty: 2, off: 0.05, card: true },

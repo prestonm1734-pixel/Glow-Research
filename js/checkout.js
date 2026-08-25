@@ -4,11 +4,13 @@
 // price. Card fields are mounted by the payment processor, never by us.
 (function () {
   /* ---------- config ----------
-     PLACEHOLDER RATES. Replace with the real published rates before launch,
-     and keep them in step with the shipping page — and with SHIPPING_RATES in
-     api/_lib.js, which is the copy that actually gets charged. This one only
-     drives what the page displays; changing a cost here without changing it
-     there means the page quotes one number and Stripe collects another. */
+     The published rates. This table only drives what the page displays:
+     SHIPPING_RATES in api/_lib.js is the copy that actually gets charged, and
+     changing a cost here without changing it there would mean the page quotes
+     one number while Stripe collects another. tools/check-claims.js compares
+     the two tables by id, cost and free-over threshold on every build, along
+     with EXPRESS_SHIPPING in js/express-pay.js, so that drift fails the build
+     rather than reaching a shopper. */
   const SHIPPING = [
     { id: '2day', label: 'FedEx 2-Day Express', note: 'Arrives in 2 business days', cost: 14.99, freeOver: 400 },
   ];
