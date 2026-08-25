@@ -68,6 +68,9 @@ document.querySelectorAll('.faq-item').forEach(item => {
       item.classList.add('open');
       ans.style.maxHeight = ans.scrollHeight + 'px';
       btn.setAttribute('aria-expanded', 'true');
+      if (window.GlowAnalytics) {
+        window.GlowAnalytics.track('faq_opened', { question: btn.textContent.replace(/\s*\+\s*$/, '').trim() });
+      }
     }
   });
 });

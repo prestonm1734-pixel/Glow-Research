@@ -57,7 +57,26 @@
   }
 
   render('');
-  if (input) input.addEventListener('input', () => render(input.value));
+
+  // Debounced so a lot number typed character by character fires one event,
+  // not one per keystroke. lot_lookup_completed rides on the same click that
+  // fires coa_opened below, distinguished there by whether a query was
+  // active when the click landed.
+  let lookupTimer;
+  if (input) {
+    input.addEventListener('input', () => {
+      render(input.value);
+      clearTimeout(lookupTimer);
+      const q = input.value.trim();
+      if (!q) return;
+      lookupTimer = setTimeout(() => {
+        if (window.GlowAnalytics) {
+          const shown = cards.filter(c => !c.hidden).length;
+          window.GlowAnalytics.track('lot_lookup_started', { query: q, resultsShown: shown });
+        }
+      }, 400);
+    });
+  }
 
   /* ---------- the viewer ----------
      Built once, on first open, and reused. Escape closes it, the backdrop
@@ -91,6 +110,15 @@
     document.body.appendChild(overlay);
     overlay.addEventListener('mousedown', e => { if (e.target === overlay) close(); });
     overlay.querySelector('#coaModalClose').addEventListener('click', close);
+    overlay.addEventListener('click', e => {
+      const dl = e.target.closest('a[download]');
+      if (dl && window.GlowAnalytics) {
+        window.GlowAnalytics.track('coa_downloaded', {
+          name: overlay.querySelector('#coaModalName').textContent,
+          lot: overlay.querySelector('#coaModalLot').textContent.replace(/^Lot\s*·\s*/, '') || null,
+        });
+      }
+    });
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && overlay.classList.contains('open')) close();
     });
@@ -163,6 +191,18 @@
   }
 
   function open(p) {
+    if (window.GlowAnalytics) {
+      const activeQuery = input ? input.value.trim() : '';
+      window.GlowAnalytics.track('coa_opened', {
+        sku: p.sizes[0] && p.sizes[0].sku,
+        name: p.name,
+        lot: p.lot || null,
+        documentAvailable: !!coaHref(p),
+      });
+      if (activeQuery) {
+        window.GlowAnalytics.track('lot_lookup_completed', { query: activeQuery, name: p.name, lot: p.lot || null });
+      }
+    }
     if (!overlay) build();
     lastFocused = document.activeElement;
     const single = p.sizes.length === 1;

@@ -29,7 +29,33 @@
 
     overlay.addEventListener('mousedown', (e) => { if (e.target === overlay) close(); });
     overlay.querySelector('#searchClose').addEventListener('click', close);
-    input.addEventListener('input', () => render(input.value));
+    // Debounced: one event per pause in typing, not one per keystroke.
+    let queryTimer;
+    input.addEventListener('input', () => {
+      render(input.value);
+      clearTimeout(queryTimer);
+      const q = input.value.trim();
+      if (!q) return;
+      queryTimer = setTimeout(() => {
+        if (window.GlowAnalytics) {
+          window.GlowAnalytics.track('search_query', {
+            query: q,
+            resultsReturned: results.querySelectorAll('.search-row').length,
+            zeroResults: results.querySelectorAll('.search-row').length === 0,
+          });
+        }
+      }, 400);
+    });
+    results.addEventListener('click', (e) => {
+      const row = e.target.closest('.search-row');
+      if (!row || !window.GlowAnalytics) return;
+      const rows = [...results.querySelectorAll('.search-row')];
+      window.GlowAnalytics.track('search_result_clicked', {
+        query: input.value.trim(),
+        name: row.querySelector('.search-row-name').textContent,
+        position: rows.indexOf(row) + 1,
+      });
+    });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && overlay.classList.contains('open')) close();
     });

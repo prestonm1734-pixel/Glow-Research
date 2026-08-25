@@ -991,6 +991,8 @@
       // resumeAfterRedirect() reads this back out on the way back.
       try { sessionStorage.setItem('glow-pending-order', JSON.stringify(payload)); } catch (e) { /* private mode — see resumeAfterRedirect's own fallback message */ }
 
+      if (window.GlowAnalytics) window.GlowAnalytics.track('payment_attempted');
+
       let confirmResult;
       try {
         confirmResult = await stripeClient.confirmPayment({
@@ -1029,6 +1031,16 @@
         // No redirect happened and no charge went through — the ordinary
         // shape of a declined card or an incomplete field. Safe to let them
         // try again with the same mounted fields.
+        if (window.GlowAnalytics) {
+          // Stripe's own error/decline code, never the message text: the
+          // message can echo back what the shopper typed (an incomplete
+          // field name, sometimes more), and this event is a coarse failure
+          // category for the funnel, not a place to carry that.
+          window.GlowAnalytics.track('payment_failed', {
+            errorType: confirmResult.error.type || 'unknown',
+            errorCode: confirmResult.error.code || confirmResult.error.decline_code || 'unknown',
+          });
+        }
         try { sessionStorage.removeItem('glow-pending-order'); } catch (e) {}
         setPlaceBtn(submitBtn, 'Place order', false);
         $('coPlacedMsg').textContent = confirmResult.error.message || 'Your payment could not be confirmed. Please try again.';

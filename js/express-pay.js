@@ -136,6 +136,8 @@
       return;
     }
 
+    if (window.GlowAnalytics) window.GlowAnalytics.track('payment_attempted');
+
     let confirmResult;
     try {
       confirmResult = await expressStripeClient.confirmCardPayment(
@@ -148,6 +150,12 @@
     }
 
     if (confirmResult.error) {
+      if (window.GlowAnalytics) {
+        window.GlowAnalytics.track('payment_failed', {
+          errorType: confirmResult.error.type || 'unknown',
+          errorCode: confirmResult.error.code || confirmResult.error.decline_code || 'unknown',
+        });
+      }
       ev.complete('fail');
       showError(confirmResult.error.message || 'Your payment could not be confirmed.');
       return;
