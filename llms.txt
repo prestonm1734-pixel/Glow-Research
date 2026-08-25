@@ -60,7 +60,7 @@ Every product page links the certificate for its current lot. For a vial you alr
 
 **How do I know you did not write the certificate yourselves?**
 
-We could not. A certificate names the laboratory that ran the analysis, that laboratory’s own report reference, and one lot number. Match the lot number to your vial, then take the reference to the laboratory and ask them.
+We could not. A certificate names the laboratory that ran the analysis, that laboratory’s own report reference, and one lot number. Match the lot number to your vial, then check the reference at accumarklabs.com, which is the laboratory’s own records and not ours. Every product page and every certificate here links it for you.
 
 **Where do I find the lot number on my vial?**
 

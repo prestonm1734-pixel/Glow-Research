@@ -162,6 +162,15 @@
     letter-spacing:.08em; text-transform:uppercase; color:#8a8a86;
   }
   .hw-mark-pending strong{ font-size:.92rem; letter-spacing:.04em; color:#0a0a0a; }
+  .hw-verify{
+    margin: 18px 0 0; max-width: 54ch;
+    font-size:.92rem; line-height:1.7; color:#55554f;
+  }
+  .hw-verify a{
+    color:#0a0a0a; font-weight:600;
+    text-decoration:underline; text-underline-offset:3px;
+  }
+  .hw-verify a:hover{ color:#45453f; }
   .hw-mark-cap{
     margin:0; text-align:center;
     font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:600;
@@ -393,6 +402,19 @@
           the certificate is issued in their name. Their ISO/IEC 17025
           accreditation is pending, not granted, so read their reports as the
           work of an independent laboratory rather than an accredited one.
+        </p>
+        <!-- The route Accumark publishes for checking one of their reports,
+             which is also what the QR on every certificate points at. Named
+             here rather than linked blind, because the reference it wants is
+             printed on the document the reader has to open anyway; the panel
+             on each product page and the certificate dialog link it directly,
+             with that lot's reference already in the URL. -->
+        <p class="hw-verify">
+          You do not have to take any of this from us. Every certificate carries
+          the laboratory&rsquo;s own report reference, and
+          <a href="https://accumarklabs.com/verify" target="_blank" rel="noopener">accumarklabs.com/verify <span aria-hidden="true">&#8599;</span></a>
+          checks it against their records. Each certificate on this site links
+          it with the reference already filled in.
         </p>
       </div>
       <div class="hw-marks reveal">

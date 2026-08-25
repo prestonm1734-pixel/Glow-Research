@@ -158,7 +158,8 @@
           Open full document <span aria-hidden="true">&#8599;</span>
         </a>
       </div>
-      <p class="coa-modal-note">Certificates are issued by the independent laboratory that ran the analysis, not by us.</p>`;
+      <p class="coa-modal-note">Certificates are issued by the independent laboratory that ran the analysis, not by us.${verifyUrl(p) ? `
+        <a class="coa-modal-verify" href="${escHtml(verifyUrl(p))}" target="_blank" rel="noopener">${escHtml(verifyCopy(p))} <span aria-hidden="true">&#8599;</span></a>` : ''}</p>`;
   }
 
   function open(p) {

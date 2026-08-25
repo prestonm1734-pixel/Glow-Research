@@ -59,6 +59,29 @@
 // which is better than sending a buyer to a dead link.
 const COA_URL = '';
 
+// Where the laboratory lets anyone check one of its reports, with the report
+// reference appended.
+//
+// Not a URL we invented: it is the target of the QR code printed on every one
+// of the ten certificates, and each QR carries that certificate's own code.
+// All ten were decoded and every code matched the `coaRef` already in the
+// catalog, which is what makes it safe to build each link from data instead
+// of storing a second copy of the URL per product.
+//
+// It points at their site rather than a page of ours, on purpose. A
+// verification step we host is us confirming our own paperwork, which is the
+// exact thing every claim on this subject exists to avoid. Empty it and every
+// surface drops the link rather than offering a check that goes nowhere.
+//
+// It lives up here rather than inside LAB, where it is read from, because the
+// FAQ answer that names the host is written before LAB is.
+const LAB_VERIFY_URL = 'https://accumarklabs.com/verify?code=';
+
+// The host on its own, for copy that names where a reader is being sent
+// rather than linking it.
+const verifyHost = () =>
+  LAB_VERIFY_URL.replace(/^https?:\/\//, '').replace(/[/?].*$/, '');
+
 // ---------------------------------------------------------------------------
 // Are certificates hosted and linked per batch yet?
 //
@@ -702,8 +725,14 @@ const FAQS = [
     a: COA_COPY.faq,
   },
   {
+    // The answer told a reader to take the reference to the laboratory, on a
+    // site that gave them no way to do it. The laboratory publishes one, and
+    // it is the same link the panel and the certificate dialog offer, built
+    // from LAB.verify rather than typed here.
     q: 'How do I know you did not write the certificate yourselves?',
-    a: 'We could not. A certificate names the laboratory that ran the analysis, that laboratory\u2019s own report reference, and one lot number. Match the lot number to your vial, then take the reference to the laboratory and ask them.',
+    a: 'We could not. A certificate names the laboratory that ran the analysis, that laboratory\u2019s own report reference, and one lot number. Match the lot number to your vial, then check the reference at ' +
+       verifyHost() +
+       ', which is the laboratory\u2019s own records and not ours. Every product page and every certificate here links it for you.',
   },
   {
     q: 'Where do I find the lot number on my vial?',
@@ -787,7 +816,30 @@ const LAB = {
   name: 'Accumark Labs',
   accreditation: 'ISO/IEC 17025 accreditation pending',
   logo: 'assets/accumark-labs.png',
+  verify: LAB_VERIFY_URL,
 };
+
+// Where a reader checks a certificate against the laboratory's own records.
+//
+// Empty unless both halves are there. A compound with no report reference
+// gets no link rather than one that lands on a verification form with nothing
+// in it, which would look like the check had failed.
+function verifyUrl(p) {
+  const ref = p && p.coaRef;
+  return LAB.verify && ref ? LAB.verify + encodeURIComponent(ref) : '';
+}
+
+// The sentence that offers it, built from the reference so it names the code
+// the reader is about to check. One string, four surfaces: the panel foot,
+// the certificate dialog, the FAQ and how-we-test.html.
+//
+// It says where the link goes and stops there. Whether the laboratory's page
+// returns a pass is theirs to answer, and promising an outcome on their
+// behalf would be the same overreach as writing the certificate ourselves.
+function verifyCopy(p) {
+  const ref = p && p.coaRef;
+  return ref ? `Check report ${ref} against ${LAB.name}\u2019 own records` : '';
+}
 
 // What the header states while LAB is empty. Both halves are true either way:
 // the laboratory is not us, and it has nothing riding on the number it returns.
@@ -916,7 +968,8 @@ function batchPanelHtml(p) {
           <span class="ba-row-value${r.held ? '' : ' is-ref'}">${escHtml(r.value || RESULT_ON_COA)}</span>
         </div>`).join('')}
       </div>
-      <p class="ba-foot">${escHtml(COA_COPY.panelNote)}</p>`;
+      <p class="ba-foot">${escHtml(COA_COPY.panelNote)}${verifyUrl(p) ? `
+        <a class="ba-verify" href="${escHtml(verifyUrl(p))}" target="_blank" rel="noopener">${escHtml(verifyCopy(p))} <span aria-hidden="true">&#8599;</span></a>` : ''}</p>`;
 }
 
 // Which chip on peptides.html a product falls under. The catalog only has
@@ -1390,6 +1443,10 @@ if (typeof module !== 'undefined' && module.exports) {
     ANALYSIS_LONG,
     ANALYSIS_NOT_RUN,
     ANALYSIS_SOME_LOTS,
+    verifyUrl,
+    verifyCopy,
+    verifyHost,
+    LAB_VERIFY_URL,
     SOURCE_SHORT,
     SOURCE_LONG,
     VIAL_ART_NOTICE,

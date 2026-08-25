@@ -29,6 +29,7 @@ const {
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
+  verifyUrl, verifyHost, LAB_VERIFY_URL,
   FAQS, faqHtml,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
@@ -412,6 +413,37 @@ console.log('\nthe batch analysis panel');
     });
     ok('no page states the accreditation as held while it is pending',
       claimed.length === 0, claimed.join(', '));
+  }
+
+  // The verification link is the strongest thing on the site: it is the one
+  // claim a reader can settle without trusting us. So it has to actually
+  // reach every certificate, and it has to be built rather than typed.
+  if (LAB_VERIFY_URL) {
+    const unverifiable = GLOW_PRODUCTS.filter(p => coaHref(p) && !verifyUrl(p));
+    ok('every published certificate can be checked with the laboratory',
+      unverifiable.length === 0,
+      `${unverifiable.map(p => p.name).join(', ')} publish a certificate with no coaRef, ` +
+      'so no verification link is drawn for them');
+
+    // Built from the catalog, so a link always carries the reference for the
+    // lot the reader is looking at. A ?code= typed into a page is one product
+    // sending people to another product's report.
+    const hardCoded = pages.filter(f => /verify\?code=/i.test(read(f)));
+    ok('no page hard-codes a verification code',
+      hardCoded.length === 0,
+      `${hardCoded.join(', ')} must build the link with verifyUrl(), not type it`);
+
+    // how-we-test.html names the route in prose, by hand, like everything else
+    // in that section. Pinned to the host the catalog actually links, so the
+    // two cannot come apart if the laboratory moves it.
+    const hw = read('how-we-test.html');
+    ok('how-we-test.html points at the verification route the catalog uses',
+      hw.includes(verifyHost()),
+      `the hw-verify paragraph must name ${verifyHost()}`);
+
+    ok('the certificate surfaces resolve the link through verifyUrl()',
+      /verifyUrl\(p\)/.test(read('js/coa.js')) &&
+      /verifyUrl\(p\)/.test(read('js/products-data.js')));
   }
 
   // A named laboratory with a broken image beside it reads worse than the name

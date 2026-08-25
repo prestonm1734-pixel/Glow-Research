@@ -535,6 +535,14 @@
     margin: 14px 2px 0; max-width: 68ch;
     font-size:.8rem; line-height:1.65; color:#6f6f6a;
   }
+  /* The panel's one outbound link, under the note rather than inside it: it
+     sends a reader to the laboratory, which is a different kind of thing from
+     the sentence explaining who issued the document. */
+  .ba-verify{
+    display:inline-block; margin-top:7px; color:#0a0a0a; font-weight:600;
+    text-decoration:underline; text-underline-offset:3px;
+  }
+  .ba-verify:hover{ color:#45453f; }
   /* only drawn when a certificate is actually hosted — see renderEvidence() */
   .gs-report{
     display:inline-block; margin-top:12px; padding-bottom:3px;
