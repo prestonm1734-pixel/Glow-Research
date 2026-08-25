@@ -17,9 +17,27 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
 const SITE = 'https://glowresearch.shop';
+
+// The date a page actually last changed, read from git rather than stamped
+// with today's date on every rebuild. A sitemap where every URL always says
+// "changed today" tells a crawler nothing, which is what this file did before
+// lastmod was wired to the commit history. Falls back to today for a file
+// with no commits yet (freshly generated, not committed).
+function lastCommitDate(relPath) {
+  try {
+    const out = execSync(`git log -1 --format=%cd --date=short -- "${relPath}"`, {
+      cwd: ROOT,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).toString().trim();
+    return out || null;
+  } catch (e) {
+    return null;
+  }
+}
 
 // [path, priority] — path is relative to the site root, '' being the homepage.
 const STATIC_PAGES = [
@@ -63,13 +81,17 @@ function build() {
   }
 
   const urls = [
-    ...STATIC_PAGES.map(([p, pri]) => url(`${SITE}/${p}`, today, pri)),
+    ...STATIC_PAGES.map(([p, pri]) =>
+      url(`${SITE}/${p}`, lastCommitDate(p || 'index.html') || today, pri)),
     // Products rank above articles: they are the pages the catalog exists for.
     // Listed only once the pages are actually published — advertising nine URLs
     // that are not in the repo would be nine 404s handed straight to Google.
     // See PRODUCT_PAGES_LIVE in js/products-data.js.
     ...(PRODUCT_PAGES_LIVE
-      ? GLOW_PRODUCTS.map(p => url(`${SITE}/peptides/${productSlug(p.name)}/`, today, '0.8'))
+      ? GLOW_PRODUCTS.map(p => {
+          const rel = `peptides/${productSlug(p.name)}/index.html`;
+          return url(`${SITE}/peptides/${productSlug(p.name)}/`, lastCommitDate(rel) || today, '0.8');
+        })
       : []),
   ];
 

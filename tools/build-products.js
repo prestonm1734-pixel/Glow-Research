@@ -128,6 +128,14 @@ function rewriteDepth(html, depth) {
 
 /* ---------- structured data ---------- */
 
+// Every sale is final once a vial ships or is opened (shipping-policy.html,
+// "Returns & Cancellations") — a real policy, not the schema's own default of
+// implying returns are allowed by omission.
+const RETURN_POLICY = {
+  '@type': 'MerchantReturnPolicy',
+  returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+};
+
 function productJsonLd(p, url) {
   // One Offer per mg. `price` is what the buyer is actually charged — the
   // sitewide markdown is applied — because structured data that quotes the
@@ -145,6 +153,7 @@ function productJsonLd(p, url) {
     availability: sizeInStock(s)
       ? 'https://schema.org/InStock'
       : 'https://schema.org/OutOfStock',
+    hasMerchantReturnPolicy: RETURN_POLICY,
     seller: { '@id': `${SITE}/#organization` },
   }));
 
@@ -157,6 +166,9 @@ function productJsonLd(p, url) {
     description: p.about[0],
     category: CAT_LABEL[p.cat],
     url,
+    // Same file og:image points at. Structured data with no image is
+    // ineligible for a rich result no matter how complete the rest of it is.
+    ...(p.image ? { image: [`${SITE}/${p.image}`] } : {}),
     brand: { '@type': 'Brand', name: 'Glow Research' },
     // Purity is the one measured attribute the catalog carries. No
     // aggregateRating and no review: there are no reviews, and inventing them
