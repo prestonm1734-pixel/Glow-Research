@@ -23,19 +23,24 @@
 // is the one the catalog grid, search and quick-add all quote, so it doubles as
 // the product's headline size/price (see the normalise pass below).
 //
-// `purity` is the measured figure from the current in-stock lot, sourced from
-// Chaos & Control's COA order quote (COA-2026-063, issued 2026-08-18) against
-// the lot numbers on that quote. It is real, not layout filler, but the
-// certificates themselves are not hosted yet: COAS_PUBLISHED stays false until
-// the actual PDFs arrive and are linked. When a lot turns over, update the
-// figure here from the new quote or certificate. Only two things read
-// `purity` — the fine print on the drawn vial and the `additionalProperty` in
-// the Product schema — so replacing the strings in place is the whole job; no
-// other file needs touching.
+// `purity`, `lot`, `tested`, `coaRef` and every figure in `results` are read
+// off that compound's certificate, the same PDF `coa` points at. All ten were
+// checked against the documents when they were hosted and every purity and lot
+// already in this file matched. When a lot turns over, replace the whole group
+// together from the new certificate: they describe one document, and a `lot`
+// updated without the `coa` beside it is a page citing a batch whose paperwork
+// it does not link.
 //
-// `coa` is optional: a URL to that compound's own certificate of analysis.
-// It is what "View certificate of analysis" on the product page opens. A
-// product without one falls back to COA_URL below.
+// `results` is keyed by row name from ANALYSIS_TESTS. Purity is deliberately
+// absent from it: the panel reads `purity` for that row, so the headline figure
+// and the panel row cannot disagree. A key that is not an ANALYSIS_TESTS row is
+// an analysis this lot was given and others were not, and renders under its own
+// heading. See ANALYSIS_SOME_LOTS.
+//
+// `coa` is that compound's own certificate of analysis, and it is what "View
+// certificate of analysis" opens. Filenames carry the lot, so a new lot lands
+// as a new file rather than quietly overwriting the certificate a past order
+// was shipped against. A product without one falls back to COA_URL below.
 //
 // `blurb` is a summary of `about[]`, not a second description that could
 // contradict it; the generated page's Product schema `description` is
@@ -46,10 +51,12 @@
 // outcomes, or a finding we cannot stand behind.
 
 // One certificate link shared by every product that has no `coa` of its own.
-// Paste the hosted COA here (a PDF, a Drive link, whatever the lab gives you)
-// and every product page's "View certificate of analysis" goes live at once.
-// Left empty the box stays put and simply is not clickable, which is better
-// than sending a buyer to a dead link.
+// Empty, and it should stay that way: every launch compound carries its own
+// batch certificate, and a shared fallback is a document that does not name
+// the reader's lot. It exists so a compound added before its certificate is
+// hosted degrades to something rather than nothing, not as a substitute for
+// per-lot paperwork. Left empty the box stays put and simply is not clickable,
+// which is better than sending a buyer to a dead link.
 const COA_URL = '';
 
 // ---------------------------------------------------------------------------
@@ -61,14 +68,20 @@ const COA_URL = '';
 // what the certificate wording across the site keys off, so the two states are
 // a constant rather than seven copies of the same sentence.
 //
-// Flip it to true in the same change that fills COA_URL (or per-product `coa`)
-// and every surface upgrades from "email us for the COA" to a direct
-// batch-specific link at once.
+// That is no longer the state. All ten launch compounds carry a `coa` under
+// assets/coas/, so this is true and every surface links the batch-specific
+// document instead of routing to email. Email still works, and the FAQ still
+// offers it for a vial from a lot that is no longer in the catalog.
+//
+// It goes back to false only if the documents come down. A compound added
+// without a certificate is not a reason to flip it: that product falls through
+// to COA_URL and, finding it empty, renders an unclickable box, which is the
+// case this was built to handle.
 //
 // Kept separate from PRODUCT_PAGES_LIVE below on purpose: certificates and the
 // generated product pages both arrive with the supplier import, but they do not
 // have to go live in the same deploy.
-const COAS_PUBLISHED = false;
+const COAS_PUBLISHED = true;
 
 // ---------------------------------------------------------------------------
 // Is a payment processor actually wired in yet?
@@ -204,6 +217,8 @@ const GLOW_PRODUCTS = [
   // Popular, then Best Value), which is the one popularity signal already in
   // the data rather than a second, separate ranking to keep in sync with it.
   { name: 'GLP-3 (RT)', alias: 'Retatrutide', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:'Best Seller',
+    coa: 'assets/coas/glp-3-rt-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
+    results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [
       { mg: '10mg', price: 104.99, list: 130, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg-v3.webp' },
     ],
@@ -218,6 +233,8 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative incretin pharmacology', d: 'Applied as a comparator when characterising newer multi-receptor agonists against single- and dual-receptor peptides.' }
     ] },
   { name: 'GLP-1 (SM)', alias: 'Semaglutide', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:'Popular',
+    coa: 'assets/coas/glp-1-sm-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
+    results: { Identity: 'Conforms', Quantity: '11.96 mg' },
     sizes: [{ mg: '10mg', price: 79.99, list: 100, sku: 'GLO-SM10', image: 'assets/products/glp-1-sm-10mg-v3.webp' }],
     blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
     about: [
@@ -230,6 +247,8 @@ const GLOW_PRODUCTS = [
       { t: 'Metabolic pathway research', d: 'Applied in islet and hepatocyte culture models examining downstream incretin signalling.' }
     ] },
   { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.815%', lot: '5567', badge:'Best Value',
+    coa: 'assets/coas/ghk-cu-lot-5567.pdf', coaRef: 'D69A-YY5F', tested: '6 July 2026',
+    results: { Identity: 'Conforms', Quantity: '56.93 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [{ mg: '50mg', price: 54.99, list: 70, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
     blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
     about: [
@@ -242,6 +261,8 @@ const GLOW_PRODUCTS = [
       { t: 'Antioxidant enzyme activity', d: 'Examined for interaction with copper-dependent enzyme systems.' }
     ] },
   { name: 'BPC-157', tag: null, cat: 'tissue', purity: '98.2%', lot: '1400', badge:null,
+    coa: 'assets/coas/bpc-157-lot-1400.pdf', coaRef: 'X9RM-SMBN', tested: '5 July 2026',
+    results: { Identity: 'Conforms', Quantity: '11.13 mg' },
     sizes: [
       { mg: '10mg', price: 64.99, list: 80, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg-v3.webp' },
     ],
@@ -256,6 +277,8 @@ const GLOW_PRODUCTS = [
       { t: 'Gut epithelial models', d: 'Examined in gastrointestinal tissue models, reflecting the gastric origin of the parent protein.' }
     ] },
   { name: 'BPC-157/TB-500', alias: 'Wolverine', tag: 'Peptide Blend', cat: 'tissue', purity: '98.63%', lot: '5615', badge:null,
+    coa: 'assets/coas/bpc-157-tb-500-lot-5615.pdf', coaRef: '7STD-6SRY', tested: '5 July 2026',
+    results: { Identity: 'Conforms', Quantity: '9.73 mg' },
     sizes: [
       { mg: '10mg', price: 84.99, list: 105, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg-v3.webp' },
     ],
@@ -270,6 +293,8 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials to compare co-formulated and separately administered research protocols.' }
     ] },
   { name: 'GLOW', alias: 'GHK-Cu/BPC-157/TB-500', tag: 'Peptide Blend', cat: 'tissue', purity: '99.61%', lot: '1035', badge:null,
+    coa: 'assets/coas/glow-lot-1035.pdf', coaRef: 'X7MB-H2H8', tested: '13 June 2026',
+    results: { Identity: 'Conforms', Quantity: '65.63 mg' },
     sizes: [{ mg: '70mg', price: 124.99, list: 155, sku: 'GLO-BBG70', image: 'assets/products/glow-70mg-v3.webp' }],
     blurb: 'A compounded blend of GHK-Cu, BPC-157 and TB-500. Supplied for research using all three peptides together in one vial.',
     about: [
@@ -281,6 +306,8 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials when comparing blended and separately administered research protocols.' }
     ] },
   { name: 'CJC-1295 No DAC/Ipamorelin', tag: 'Peptide Blend', cat: 'growth', purity: '99.08%', lot: '005', badge:null,
+    coa: 'assets/coas/cjc-1295-no-dac-ipamorelin-lot-005.pdf', coaRef: 'MHCU-CDXL', tested: '5 July 2026',
+    results: { Identity: 'Conforms', Quantity: '11.18 mg' },
     sizes: [{ mg: '5/5mg', price: 89.99, list: 110, sku: 'GLO-CP10', image: 'assets/products/cjc-1295-ipamorelin-5-5mg-v3.webp' }],
     blurb: 'A combined CJC-1295 (No DAC) and Ipamorelin formulation. Supplied for research examining GHRH and ghrelin receptor co-agonism.',
     about: [
@@ -293,6 +320,8 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative pulse studies', d: 'Applied alongside single-compound vials in models comparing combined and separate administration protocols.' }
     ] },
   { name: 'Tesamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.36%', lot: '1002', badge:null,
+    coa: 'assets/coas/tesamorelin-lot-1002.pdf', coaRef: 'R934-S6U9', tested: '23 June 2026',
+    results: { Identity: 'Conforms', Quantity: '10.59 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [{ mg: '10mg', price: 98.99, list: 125, sku: 'GLO-TSM10', image: 'assets/products/tesamorelin-10mg-v3.webp' }],
     blurb: 'A synthetic growth hormone releasing hormone analogue with a stabilised N-terminus. Studied for pituitary receptor engagement.',
     about: [
@@ -305,6 +334,8 @@ const GLOW_PRODUCTS = [
       { t: 'Comparative secretagogue pharmacology', d: 'Run as a reference GHRH analogue when newer compounds in the class are characterised.' }
     ] },
   { name: 'GLP-2 (TR)', alias: 'Tirzepatide', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
+    coa: 'assets/coas/glp-2-tr-lot-1600.pdf', coaRef: '7RRU-W2LV', tested: '29 July 2026',
+    results: { Identity: 'Conforms', Quantity: '12.49 mg' },
     sizes: [{ mg: '10mg', price: 89.99, list: 110, sku: 'GLO-T10', image: 'assets/products/glp-2-tr-10mg-v3.webp' }],
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
     about: [
@@ -317,6 +348,8 @@ const GLOW_PRODUCTS = [
       { t: 'Receptor crosstalk', d: 'Applied in models examining how engaging both receptors at once differs from either alone.' }
     ] },
   { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.84%', lot: '1025', badge:null,
+    coa: 'assets/coas/mots-c-lot-1025.pdf', coaRef: 'N8VT-H88T', tested: '5 July 2026',
+    results: { Identity: 'Conforms', Quantity: '11.45 mg' },
     sizes: [{ mg: '10mg', price: 74.99, list: 95, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg-v3.webp' }],
     blurb: 'A mitochondrial-derived peptide encoded within the mitochondrial genome. Studied for its role in metabolic signalling.',
     about: [
@@ -479,6 +512,15 @@ const TRANSIT_DAYS = 2;
 // now renders it from `.length` and check-claims.js fails the build if any of
 // them states a different one.
 //
+// It stated seven until the certificates were hosted, and hosting them is what
+// made the number checkable. Accumark reports purity, identity and quantity on
+// all ten lots; sterility and endotoxin on three of them; appearance,
+// solubility and heavy metals on none. Only what every certificate carries
+// belongs here, because the panel this feeds is headed "Run on every lot" and
+// six of those seven rows pointed a reader at a document that does not contain
+// them. Sterility and endotoxin did not disappear: they are reported per lot
+// through `results` below, which is what ANALYSIS_SOME_LOTS is derived from.
+//
 // Lot archival is deliberately not a row here. It is on every certificate and
 // ANALYSIS_LONG still names it, but it is a record, not an analysis: no
 // instrument runs and no result is measured. Counting it would buy one extra
@@ -495,51 +537,36 @@ const TRANSIT_DAYS = 2;
 const ANALYSIS_TESTS = [
   {
     name: 'Purity',
-    short: 'HPLC-UV',
-    method: 'Reverse-phase HPLC-UV',
+    short: 'HPLC',
+    // The certificate heads this section "HPLC Chromatogram Report" and says
+    // nothing about the detector. It read "Reverse-phase HPLC-UV" here, which
+    // is the usual configuration and still two facts about somebody else's
+    // instrument that their own document does not state.
+    method: 'HPLC',
     plain: 'How much of the powder is the peptide you ordered. This is the percentage printed on the certificate.',
   },
   {
     name: 'Identity',
-    short: 'LC-MS',
-    method: 'LC-MS',
-    plain: 'Weighs the molecule to confirm it is the one on the label, not something close to it.',
-  },
-  {
-    name: 'Net peptide content',
-    short: 'net peptide content',
+    short: 'identity',
+    // Reported as a pass against the declared compound, with no technique
+    // named. It said LC-MS, which is a specific measurement, not shorthand.
     method: '',
-    plain: 'How many milligrams of actual peptide are in the vial once salt and water are taken out.',
+    plain: 'Confirms the compound in the vial is the one on the label, not something close to it.',
   },
   {
-    name: 'Sterility',
-    short: 'sterility',
+    name: 'Quantity',
+    short: 'quantity',
+    // Named for the row the certificate actually prints. "Net peptide content"
+    // is the stricter reading, peptide mass with salt and water taken out, and
+    // the certificate does not say which of the two it measured.
     method: '',
-    plain: 'The lot is cultured to see whether anything grows. Nothing should.',
-  },
-  {
-    name: 'Endotoxin',
-    short: 'endotoxin',
-    method: 'LAL assay, USP chapter 85',
-    plain: 'Checks for bacterial toxin, which is left behind even after the bacteria themselves are gone.',
-  },
-  {
-    name: 'Appearance and solubility',
-    short: 'appearance and solubility',
-    method: '',
-    plain: 'The powder is looked at and dissolved. It should look right and go into solution cleanly.',
-  },
-  {
-    name: 'Heavy metals',
-    short: 'heavy metals',
-    method: '',
-    plain: 'Screens for lead, arsenic and the other metals that can carry over from manufacturing.',
+    plain: 'How many milligrams the laboratory weighed out of the vial, against the size on the label.',
   },
 ];
 
 // The number every page states, derived from the rows above so it cannot be
-// typed wrong. Spelled out as well as counted, because the pages say "Seven
-// tests" in a headline and "7x" in a subheading and both have to move together.
+// typed wrong. Spelled out as well as counted, because the pages state it in a
+// headline and again in a subheading and both have to move together.
 const TESTS_PER_BATCH = ANALYSIS_TESTS.length;
 const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
 const numberWord = n => NUMBER_WORDS[n] || String(n);
@@ -547,7 +574,7 @@ const numberWord = n => NUMBER_WORDS[n] || String(n);
 // Built from the rows, not typed alongside them: the panel's four-word summary
 // used to carry an eighth term the certificate does not report.
 const ANALYSIS_SHORT = ANALYSIS_TESTS.map(t => t.short).join(' + ');
-const ANALYSIS_LONG = 'reverse-phase HPLC-UV for purity, LC-MS for identity, net peptide content, sterility testing, endotoxin testing by LAL assay under USP chapter 85, appearance and solubility inspection, heavy metals screening, and lot archival linking every batch to its certificate';
+const ANALYSIS_LONG = 'HPLC for purity, an identity check against the declared compound, a quantity assay reporting the milligrams weighed out of the vial, and lot archival linking every batch to its certificate';
 const SOURCE_SHORT = 'Manufacturing partner';
 const SOURCE_LONG = 'Synthesis and fill at a partner facility operating to cGMP-aligned quality practices';
 
@@ -558,20 +585,37 @@ const SOURCE_LONG = 'Synthesis and fill at a partner facility operating to cGMP-
 // absence reads as a pass, so anything in this array is named by the FAQ, and
 // the FAQ builds that sentence from here rather than from prose someone typed.
 //
-// The array is empty, and has been repeatedly reduced rather than written.
-// Endotoxin came out when the certificate format showed a LAL assay under
-// USP <85> as a standard line. General contaminant screening came out when
-// the panel was rebuilt around the analyses the laboratory actually reports
-// per lot, which are now the rows of ANALYSIS_TESTS above. Sterility briefly
-// dropped out of that rebuild and was put back in when it was confirmed the
-// lab still runs it on every lot; it is not a stand-in for any of the others.
+// The array was empty, and had been repeatedly reduced rather than written,
+// each removal reasoned from what a certificate format was assumed to carry.
+// The certificates are hosted now, so it is written from the documents: across
+// all ten, no lot is given an appearance and solubility inspection and no lot
+// is screened for heavy metals. Both were rows of the panel and sections of
+// how-we-test.html until this file could be checked against a real report.
 //
-// Empty is not the same as unchecked. check-claims.js still holds the two
-// halves apart: nothing in this array may appear in ANALYSIS_SHORT,
-// ANALYSIS_LONG, or the testing copy on how-we-test.html, so the day a test
-// moves back out of the certificate, adding it here is enough to make every
-// page that claims it fail.
-const ANALYSIS_NOT_RUN = [];
+// check-claims.js holds the two halves apart: nothing in this array may appear
+// in ANALYSIS_SHORT, ANALYSIS_LONG, or the testing copy on how-we-test.html,
+// and every entry has to be named out loud in the FAQ. So the day one of these
+// starts appearing on the certificate, moving it out of here is what lets the
+// rest of the site claim it.
+const ANALYSIS_NOT_RUN = ['appearance and solubility', 'heavy metals'];
+
+// The analyses some certificates carry and others do not, derived from the
+// lots themselves rather than listed by hand.
+//
+// Accumark runs sterility and endotoxin on some lots and not others. Neither
+// half of the file above can hold that: ANALYSIS_TESTS is what the panel heads
+// "Run on every lot", and ANALYSIS_NOT_RUN would say we never run them, which
+// three certificates disprove. Left in neither, they would be absent from the
+// site while sitting in plain sight on a document it links, and an unexplained
+// absence is the failure this whole section exists to prevent.
+//
+// So they come off the lots. A product's `results` may name a row outside
+// ANALYSIS_TESTS; batchRows() renders it under its own heading on that lot's
+// panel, and the FAQ names the set here. Nothing is typed twice, so a lot
+// arriving with a new analysis on it says so everywhere without an edit.
+const ANALYSIS_SOME_LOTS = [...new Set(
+  GLOW_PRODUCTS.flatMap(p => Object.keys(p.results || {}))
+)].filter(name => !ANALYSIS_TESTS.some(t => t.name === name));
 
 // ---------------------------------------------------------------------------
 // The photo on every product page, and the illustrated vial that stands in
@@ -639,7 +683,15 @@ const FAQS = [
     // ANALYSIS_NOT_RUN somewhere in the FAQ. The list is the answer, so the
     // only thing after it is who did the grading.
     q: 'What gets tested before my vial ships?',
-    a: `${ANALYSIS_LONG}. Every lot, before any of it is released. We do not run a laboratory, so the certificate is not ours to write.`,
+    a: `${ANALYSIS_LONG}. Every lot, before any of it is released. ` +
+       (ANALYSIS_SOME_LOTS.length
+         ? `Some lots are also given ${listWords(ANALYSIS_SOME_LOTS.map(t => t.toLowerCase()), 'and')} ` +
+           'testing and some are not, so read the certificate for the lot you have rather than assuming. '
+         : '') +
+       (ANALYSIS_NOT_RUN.length
+         ? `No lot is given ${listWords(ANALYSIS_NOT_RUN, 'or')} testing. `
+         : '') +
+       'We do not run a laboratory, so the certificate is not ours to write.',
   },
   {
     // Answer comes from COA_COPY, which keys off COAS_PUBLISHED. While
@@ -685,6 +737,14 @@ function faqHtml() {
       </div>`).join('');
 }
 
+// "a, b and c", or "a, b or c" for a sentence that denies the whole list.
+// Used wherever prose has to name a set the catalog derives: adding to the set
+// rewrites the sentence, instead of leaving it one item short of the data.
+function listWords(items, conjunction) {
+  if (items.length <= 1) return items[0] || '';
+  return `${items.slice(0, -1).join(', ')} ${conjunction} ${items[items.length - 1]}`;
+}
+
 function escHtml(t) {
   return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
@@ -695,16 +755,30 @@ function escHtml(t) {
 //
 // The laboratory itself, as data rather than a name typed into the panel.
 //
-// PLACEHOLDER: all three fields are empty, because the laboratory has not been
-// named on the site yet and we hold no mark we are licensed to draw. A named,
-// accredited laboratory is a claim about somebody else's business, and a logo
-// is their property, so inventing either to fill the header is exactly what
-// PRINCIPLES.md rules out. The panel renders its unnamed form until all three
-// are confirmed together: `logo` is a path under assets/.
+// A named, accredited laboratory is a claim about somebody else's business and
+// a logo is their property, so the panel renders an unnamed form rather than
+// invent any of the three. `logo` is a path under assets/.
+//
+// The name here read "Freedom Diagnostics" until the certificates arrived.
+// Every one of the ten is issued by Accumark Labs, signed by their lab manager
+// and lab director, so the panel was naming a laboratory that did not run the
+// analysis on a page that now links the document proving it. assets/freedom-
+// diagnostics.png is left in place but nothing reads it.
+//
+// PLACEHOLDER: `logo` is empty. The mark on the certificates is Accumark's
+// property and we have no permission on file to reproduce it, which is a
+// different question from whether they ran the work. Drop the file under
+// assets/ and fill this in once that permission exists.
+//
+// The accreditation is stated on the strength of Accumark's ISO/IEC 17025
+// certificate, which we hold but do not host: none of the ten batch
+// certificates carries an accreditation line, so this one claim cannot be
+// verified from the documents this site links. Host it and link it from
+// how-we-test.html and it stops resting on our word.
 const LAB = {
-  name: 'Freedom Diagnostics',
+  name: 'Accumark Labs',
   accreditation: 'ISO/IEC 17025 accredited',
-  logo: 'assets/freedom-diagnostics.png',
+  logo: '',
 };
 
 // What the header states while LAB is empty. Both halves are true either way:
@@ -728,27 +802,40 @@ const purityMethod = () => {
   return (row && row.method) || '';
 };
 
-// What a row says when the catalog holds no figure for it, which today is six
-// of the seven. It is not a hedge: every name in ANALYSIS_TESTS is a row the
+// What a row says when the catalog holds no figure for it, which is now none
+// of them: every row of every launch compound is filled from its certificate.
+// It stays as the fallback for the next compound added before its numbers are
+// keyed in. It is not a hedge: every name in ANALYSIS_TESTS is a row the
 // certificate reports, so pointing at the document is the true answer to where
 // the number is. The alternative, a column of dashes, reads as though the
 // analysis were skipped rather than simply not reprinted here.
 const RESULT_ON_COA = 'On certificate';
 
-// One row per analysis the laboratory runs, and what it reported for this
-// compound.
+// One row per analysis the laboratory reported for this compound, and what it
+// returned.
 //
-// `value` is the released figure. Purity is the only one the catalog holds
-// today, so every other row falls through to RESULT_ON_COA: a results column
-// filled with invented numbers is the most damaging thing this page could
-// print. `p.results`, keyed by the row name, is where a real released report
-// lands, and each row picks its own figure up the moment one does.
+// `value` is the released figure, read from `p.results` keyed by row name.
+// A row with nothing behind it falls through to RESULT_ON_COA rather than
+// printing a number nobody measured, which is the most damaging thing this
+// page could do.
+//
+// Two kinds of row come back. The rows of ANALYSIS_TESTS are on every
+// certificate, so they are listed for every compound whether or not the
+// catalog holds the figure yet. Anything else in `results` is an analysis this
+// particular lot was given and others were not, and comes back with
+// everyLot false so the panel can head it separately: "run on every lot" and
+// "run on this one" are different promises and the panel used to make only the
+// first, in a block that contained both.
 function batchRows(p) {
   const results = (p && p.results) || {};
-  return ANALYSIS_TESTS.map(t => {
+  const universal = ANALYSIS_TESTS.map(t => {
     const value = results[t.name] || (t.name === PURITY_ROW ? (p && p.purity) || '' : '');
-    return { name: t.name, method: t.method, value, held: Boolean(value) };
+    return { name: t.name, method: t.method, value, held: Boolean(value), everyLot: true };
   });
+  const thisLot = Object.keys(results)
+    .filter(name => !ANALYSIS_TESTS.some(t => t.name === name))
+    .map(name => ({ name, method: '', value: results[name], held: true, everyLot: false }));
+  return universal.concat(thisLot);
 }
 
 // The card's meta strip. Filtered rather than padded with blanks: a cell is
@@ -759,6 +846,11 @@ function batchMeta(p) {
     { label: 'Compound', value: (p && p.name) || '' },
     { label: 'Lot', value: (p && p.lot) || '' },
     { label: 'Tested', value: (p && p.tested) || '' },
+    // The laboratory's own reference for the report, printed on the
+    // certificate beside their name. The FAQ tells a buyer to take it to the
+    // laboratory and ask, which is only a real instruction if the site shows
+    // them what to quote.
+    { label: 'Report', value: (p && p.coaRef) || '' },
     { label: 'Analyses', value: `${TESTS_PER_BATCH} per lot` },
     { label: 'Certificate', value: COA_COPY.short },
   ].filter(m => m.value);
@@ -802,7 +894,15 @@ function batchPanelHtml(p) {
         <div class="ba-panel-head">
           <span>Full analysis panel</span>
           <span>Run on every lot</span>
-        </div>${batchRows(p).map(r => `
+        </div>${batchRows(p).map((r, i, all) => `${
+          // The second heading is drawn by the first row that needs it, so a
+          // compound whose certificate carries nothing extra never renders an
+          // empty section under it.
+          !r.everyLot && (i === 0 || all[i - 1].everyLot) ? `
+        <div class="ba-panel-head">
+          <span>Also on this lot</span>
+          <span>Not run on every lot</span>
+        </div>` : ''}
         <div class="ba-row">
           <span class="ba-row-name">${escHtml(r.name)}${r.method ? `<span class="ba-row-method">${escHtml(r.method)}</span>` : ''}</span>
           <span class="ba-row-value${r.held ? '' : ' is-ref'}">${escHtml(r.value || RESULT_ON_COA)}</span>
@@ -1281,6 +1381,7 @@ if (typeof module !== 'undefined' && module.exports) {
     ANALYSIS_SHORT,
     ANALYSIS_LONG,
     ANALYSIS_NOT_RUN,
+    ANALYSIS_SOME_LOTS,
     SOURCE_SHORT,
     SOURCE_LONG,
     VIAL_ART_NOTICE,

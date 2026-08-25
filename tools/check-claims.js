@@ -361,15 +361,20 @@ console.log('\nthe batch analysis panel');
   ok('a product with no purity yet shows the null indicator, not a number',
     batchPanelHtml({}).includes('<span class="ba-figure-value">—</span>'));
 
-  // A named, accredited laboratory is a claim about a third party and a logo is
-  // their property. Neither is confirmed, so the panel states what is true
-  // without them, and this fails the day a name is typed in without a mark and
-  // an accreditation confirmed alongside it.
+  // A named, accredited laboratory is a claim about a third party, so a name
+  // may not appear without the standing that makes naming it mean anything.
+  //
+  // The logo used to be required alongside both, from when none of the three
+  // was known and the safe rule was all or nothing. It is optional now: the
+  // certificates name Accumark Labs, and refusing to say so until we hold a
+  // mark we are licensed to reproduce would leave the panel vaguer than the
+  // document it links. The mark is their property and its absence is a
+  // permissions question, not a doubt about who ran the work.
   const lab = labIdentity();
   ok('the laboratory is named only when the catalog names it',
-    (LAB.name && LAB.accreditation && LAB.logo) ||
+    (LAB.name && LAB.accreditation) ||
     (!LAB.name && !LAB.logo && lab.name === 'Independent third-party laboratory'),
-    'LAB must be wholly empty or wholly filled: a name needs its accreditation and mark with it');
+    'LAB must be wholly empty, or carry a name and the accreditation that stands behind it');
   // While the lab is unnamed the fallback has to carry the two facts the name
   // would have carried: that it is not us, and that it gains nothing by the
   // number it returns. Once LAB is filled, the name and the accreditation
@@ -833,8 +838,32 @@ if (!COAS_PUBLISHED) {
     coaHref({ coa: 'https://example.com/staged.pdf' }) === '',
     'a per-product coa staged before the flip must not go live on its own');
 } else {
-  ok('COA_URL is set now that certificates are published',
-    /const COA_URL\s*=\s*'[^']+'/.test(read('js/products-data.js')));
+  // Published means every compound resolves to a document, not that the shared
+  // fallback is filled. It is empty on purpose now: each product carries its
+  // own batch certificate, and COA_URL would hand a reader a document that
+  // does not name their lot. So the check is coverage, per compound, which is
+  // what the flag actually promises.
+  const noDoc = GLOW_PRODUCTS.filter(p => !coaHref(p));
+  ok('every compound resolves to a certificate now that they are published',
+    noDoc.length === 0,
+    `${noDoc.map(p => p.name).join(', ')} would fall through to an empty COA_URL. ` +
+    'Add a `coa` for each, or set COA_URL in js/products-data.js.');
+
+  // A link to a file that is not in the repository is worse than the request
+  // route it replaced: the copy around it now states the document exists.
+  const missing = GLOW_PRODUCTS
+    .filter(p => p.coa && !p.coa.startsWith('http'))
+    .filter(p => !fs.existsSync(path.join(ROOT, p.coa)));
+  ok('every certificate the catalog links is a file that exists',
+    missing.length === 0, missing.map(p => `${p.name}: ${p.coa}`).join(', '));
+
+  // The filename carries the lot, so a lot that turns over cannot quietly keep
+  // serving the previous batch's certificate under the same path.
+  const wrongLot = GLOW_PRODUCTS.filter(p =>
+    p.coa && p.lot && !p.coa.includes(`-lot-${p.lot}.`));
+  ok('each certificate filename names the lot the catalog claims for it',
+    wrongLot.length === 0,
+    wrongLot.map(p => `${p.name}: lot ${p.lot} vs ${p.coa}`).join(', '));
 }
 
 /* Duplicate element ids. Invalid HTML on its own, but the reason it is

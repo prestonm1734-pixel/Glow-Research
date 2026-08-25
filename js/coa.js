@@ -73,8 +73,11 @@
     overlay.innerHTML = `
       <div class="coa-modal" role="dialog" aria-modal="true" aria-labelledby="coaModalName">
         <div class="coa-modal-head">
-          <div>
-            <span class="coa-modal-type" id="coaModalType"></span>
+          <div class="coa-modal-heading">
+            <div class="coa-modal-kicker">
+              <span class="coa-modal-type" id="coaModalType"></span>
+              <span class="coa-modal-lot" id="coaModalLot"></span>
+            </div>
             <h2 class="coa-modal-name" id="coaModalName"></h2>
           </div>
           <button type="button" class="coa-modal-close" id="coaModalClose" aria-label="Close">
@@ -99,10 +102,15 @@
   // for the vial in your hand, not "unavailable".
   function bodyFor(p) {
     const href = coaHref(p);
+    // Lot moved into the head beside the eyebrow, where a reader checking a
+    // vial against a document looks first. Report is the laboratory's own
+    // reference for the analysis, which is what the FAQ tells someone to quote
+    // when they want to verify the certificate with the lab directly.
     const meta = `
       <dl class="coa-modal-meta">
         <div><dt>Purity</dt><dd>${escHtml(p.purity || '') || '—'}</dd></div>
-        <div><dt>Lot</dt><dd>${escHtml(p.lot || '') || '—'}</dd></div>
+        <div><dt>Tested</dt><dd>${escHtml(p.tested || '') || '—'}</dd></div>
+        <div><dt>Report</dt><dd>${escHtml(p.coaRef || '') || '—'}</dd></div>
         <div><dt>Analyses</dt><dd>${TESTS_PER_BATCH} per lot</dd></div>
       </dl>`;
 
@@ -120,7 +128,7 @@
 
     return meta + `
       <div class="coa-modal-doc">
-        <iframe src="${escHtml(href)}#view=FitH" title="Certificate of analysis for ${escHtml(p.name)}" loading="lazy"></iframe>
+        <iframe src="${escHtml(href)}#navpanes=0&amp;view=FitH" title="Certificate of analysis for ${escHtml(p.name)}" loading="lazy"></iframe>
       </div>
       <div class="coa-modal-actions">
         <a class="btn btn-primary" href="${escHtml(href)}" download>Download PDF</a>
@@ -135,7 +143,11 @@
     if (!overlay) build();
     lastFocused = document.activeElement;
     const single = p.sizes.length === 1;
-    overlay.querySelector('#coaModalType').textContent = CAT_LABEL[p.cat];
+    // The eyebrow names the document rather than the research category: the
+    // category is on the card the reader just pressed, and what they need
+    // confirming here is which lot they are looking at.
+    overlay.querySelector('#coaModalType').textContent = 'Certificate of analysis';
+    overlay.querySelector('#coaModalLot').textContent = p.lot ? `Lot · ${p.lot}` : '';
     overlay.querySelector('#coaModalName').textContent =
       single ? `${p.name} ${p.sizes[0].mg}` : p.name;
     overlay.querySelector('#coaModalBody').innerHTML = bodyFor(p);

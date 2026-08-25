@@ -196,10 +196,18 @@
     display:flex; align-items:flex-start; justify-content:space-between; gap:18px;
     padding: 22px 24px; border-bottom:1px solid rgba(0,0,0,.13);
   }
-  .coa-modal-type{
-    display:block; font-family:'JetBrains Mono', monospace; font-size:.62rem;
+  .coa-modal-heading{ flex:1 1 auto; min-width:0; }
+  /* The document's name on the left, the lot it belongs to on the right, on
+     one line: those are the two things a reader holding a vial is matching. */
+  .coa-modal-kicker{
+    display:flex; align-items:baseline; justify-content:space-between; gap:16px;
+  }
+  .coa-modal-type,
+  .coa-modal-lot{
+    font-family:'JetBrains Mono', monospace; font-size:.62rem;
     font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#8a8a86;
   }
+  .coa-modal-lot{ flex:0 0 auto; color:#0a0a0a; }
   .coa-modal-name{
     margin: 8px 0 0; font-size:1.35rem; font-weight:700; letter-spacing:-.025em;
   }

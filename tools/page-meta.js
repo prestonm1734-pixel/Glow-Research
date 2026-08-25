@@ -50,7 +50,7 @@ const PAGE_META = {
   'how-we-test.html': {
     name: 'How We Test',
     title: t('How We Test'),
-    desc: 'Seven tests on every batch, run by an independent laboratory before a lot reaches our catalog: purity, identity, net peptide content, sterility, endotoxin, appearance and heavy metals.',
+    desc: 'Purity, identity and quantity on every batch, run by an independent laboratory before a lot reaches our catalog. Every certificate is published against its lot number.',
   },
   'about.html': {
     name: 'About Glow Research',

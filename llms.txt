@@ -17,8 +17,8 @@ benefit.
 ## The supply chain
 
 - Manufacturing: Synthesis and fill at a partner facility operating to cGMP-aligned quality practices. Performed by a manufacturing partner, not by Glow.
-- Testing: every lot is analysed by an independent third-party laboratory. reverse-phase HPLC-UV for purity, LC-MS for identity, net peptide content, sterility testing, endotoxin testing by LAL assay under USP chapter 85, appearance and solubility inspection, heavy metals screening, and lot archival linking every batch to its certificate.
-- Certificates: COA on request. Certificate on request: email support@glowresearch.shop with the lot number on your vial
+- Testing: every lot is analysed by an independent third-party laboratory. HPLC for purity, an identity check against the declared compound, a quantity assay reporting the milligrams weighed out of the vial, and lot archival linking every batch to its certificate.
+- Certificates: Batch-matched COA. Issued against this lot number by the laboratory that ran the analysis
 - Fulfilment: US-based climate-controlled facility, stock held by lot.
 - Dispatch: orders placed before 2:00 PM PST on a business day ship the same
   day, then 2-day FedEx Express within the United States.
@@ -52,11 +52,11 @@ benefit.
 
 **What gets tested before my vial ships?**
 
-reverse-phase HPLC-UV for purity, LC-MS for identity, net peptide content, sterility testing, endotoxin testing by LAL assay under USP chapter 85, appearance and solubility inspection, heavy metals screening, and lot archival linking every batch to its certificate. Every lot, before any of it is released. We do not run a laboratory, so the certificate is not ours to write.
+HPLC for purity, an identity check against the declared compound, a quantity assay reporting the milligrams weighed out of the vial, and lot archival linking every batch to its certificate. Every lot, before any of it is released. Some lots are also given sterility and endotoxin testing and some are not, so read the certificate for the lot you have rather than assuming. No lot is given appearance and solubility or heavy metals testing. We do not run a laboratory, so the certificate is not ours to write.
 
 **How do I get the COA for my vial?**
 
-Email support@glowresearch.shop with the lot number on your vial, or your order number, and we will send the certificate for that exact batch, sold out or not.
+Every product page links the certificate for its current lot. For a vial you already have, email support@glowresearch.shop with the lot number and we will send that batch’s certificate, sold out or not.
 
 **How do I know you did not write the certificate yourselves?**
 
