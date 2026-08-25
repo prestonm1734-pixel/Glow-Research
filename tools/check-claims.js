@@ -385,6 +385,50 @@ console.log('\nthe batch analysis panel');
       ? Boolean(lab.accreditation)
       : /third-party/i.test(lab.name) && /no stake in the result/i.test(lab.accreditation));
 
+  // The panel reads LAB. how-we-test.html names the laboratory in prose, by
+  // hand, because there is no template step for that page's sections — so it
+  // is pinned here, the same way its certificate note is pinned to COA_COPY.
+  // It said Freedom Diagnostics for as long as LAB did, and kept saying it
+  // after the certificates arrived and LAB was corrected.
+  if (LAB.name) {
+    const who = (read('how-we-test.html').match(
+      /<div class="hw-who-copy[^"]*">[\s\S]*?<\/div>/) || [''])[0];
+    ok('how-we-test.html names the laboratory the catalog names',
+      who.includes(LAB.name) && who.includes(LAB.accreditation),
+      `the hw-who-copy block must name "${LAB.name}" and "${LAB.accreditation}"`);
+  }
+
+  // Switching laboratories is the moment a name gets left behind: it lives in
+  // LAB, in prose, in an alt attribute and in an image filename, and only the
+  // first of those fails loudly when it goes stale. A retired name is listed
+  // here on the way out, and nothing may mention it again — not a page, not a
+  // script, not a file in assets/. Removing a name from this array is how you
+  // say a laboratory is back, and then LAB has to agree.
+  const RETIRED_LABS = ['Freedom Diagnostics'];
+  const stale = [];
+  RETIRED_LABS.forEach(name => {
+    if (name === LAB.name) {
+      stale.push(`LAB names ${name}, which is listed as retired`);
+      return;
+    }
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    // Comments are stripped first: the note in js/products-data.js explaining
+    // why the name was wrong has to be allowed to say which name it was.
+    // Only whole-line // comments are cut, so a URL's slashes survive.
+    const bare = f => read(f)
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/^[ \t]*\/\/.*$/gm, '')
+      .toLowerCase();
+    pages.concat(['js/products-data.js', 'js/coa.js', 'js/product.js'])
+      .filter(f => bare(f).includes(name.toLowerCase()))
+      .forEach(f => stale.push(`${f} still names ${name}`));
+    if (fs.existsSync(path.join(ROOT, 'assets', `${slug}.png`))) {
+      stale.push(`assets/${slug}.png is still in the repository`);
+    }
+  });
+  ok('no retired laboratory is still named anywhere',
+    stale.length === 0, stale.join(', '));
+
   // The vial in every product photo carries Glow's own artwork; what actually
   // ships carries the manufacturer's generic label. A photo that doesn't
   // match what arrives is a claim PRINCIPLES.md rules out, so the caption
