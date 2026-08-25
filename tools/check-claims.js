@@ -29,6 +29,7 @@ const {
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
+  productMetaDesc, productSlug,
   verifyUrl, verifyHost, LAB_VERIFY_URL,
   FAQS, faqHtml,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
@@ -997,6 +998,141 @@ if (!COAS_PUBLISHED) {
   ok('each certificate filename names the lot the catalog claims for it',
     wrongLot.length === 0,
     wrongLot.map(p => `${p.name}: lot ${p.lot} vs ${p.coa}`).join(', '));
+}
+
+/* ---------------------------------------------------------------------------
+ * Every page we ask to be indexed says which address it is.
+ *
+ *     terms, privacy and ruo-agreement sat in the sitemap for months with no
+ *     canonical and, because build-meta.js derives og:url from the canonical,
+ *     no og:url either. Nothing caught it: the meta build skips a page with no
+ *     canonical rather than failing on one, which is right for the noindex
+ *     pages and wrong for these.
+ * ------------------------------------------------------------------------- */
+console.log('\ncanonical addresses');
+{
+  const { STATIC_PAGES } = require('./build-sitemap.js');
+  const listed = STATIC_PAGES.map(([f]) => f || 'index.html');
+  const bare = listed.filter(f => {
+    const html = read(f);
+    return !new RegExp(`<link rel="canonical" href="https://glowresearch\\.shop/${
+      f === 'index.html' ? '(index\\.html)?' : f.replace('.', '\\.')}" />`).test(html);
+  });
+  ok(`every page in the sitemap is canonical to its own URL (${listed.length})`,
+    bare.length === 0,
+    `${bare.join(', ')} would be indexed without saying which address to keep`);
+
+  const noOgUrl = listed.filter(f => !/<meta property="og:url"/.test(read(f)));
+  ok('and carries the og:url the meta build derives from it',
+    noOgUrl.length === 0, noOgUrl.join(', '));
+
+  // A page kept out of the sitemap because it is transactional or a fallback
+  // must actually be telling crawlers that, rather than relying on absence
+  // from a file they are not obliged to read.
+  const shouldNotIndex = ['product.html', 'checkout.html', 'thank-you.html',
+    'signin.html', 'account.html', 'reset-password.html', '404.html'];
+  const stillIndexed = shouldNotIndex
+    .filter(f => fs.existsSync(path.join(ROOT, f)))
+    .filter(f => !/<meta name="robots" content="noindex/.test(read(f)));
+  ok('every page kept out of the sitemap is noindex, not merely unlisted',
+    stillIndexed.length === 0, stillIndexed.join(', '));
+}
+
+/* ---------------------------------------------------------------------------
+ * The generated product pages, once they are live.
+ *
+ *     Turning PRODUCT_PAGES_LIVE on gives every compound a second address:
+ *     /peptides/<slug>/ and product.html?p=<slug> render the same content from
+ *     the same catalog. That is fine as a fallback and a duplicate-content
+ *     problem as an indexable page, so which of the two search engines are
+ *     told to keep is checked rather than remembered.
+ * ------------------------------------------------------------------------- */
+if (PRODUCT_PAGES_LIVE) {
+  console.log('\ngenerated product pages');
+
+  const slugs = GLOW_PRODUCTS.map(p => productSlug(p.name));
+  const built = slugs.filter(sl => fs.existsSync(path.join(ROOT, 'peptides', sl, 'index.html')));
+  ok(`every compound has a generated page (${built.length}/${slugs.length})`,
+    built.length === slugs.length,
+    `missing: ${slugs.filter(sl => !built.includes(sl)).join(', ')}. Run node tools/build.js`);
+
+  const readPage = sl => read(path.join('peptides', sl, 'index.html'));
+
+  // The renderer must not compete with the pages generated from it.
+  ok('product.html is noindex now that every compound has its own URL',
+    /<meta name="robots" content="noindex/.test(read('product.html')),
+    'product.html?p=<slug> serves the same content as /peptides/<slug>/');
+
+  const notIndexed = built.filter(sl => !/<meta name="robots" content="index,follow"/.test(readPage(sl)));
+  ok('every generated page is indexable',
+    notIndexed.length === 0,
+    `${notIndexed.join(', ')} inherited the donor's noindex`);
+
+  // A canonical pointing at itself is what tells a crawler this address is the
+  // one to keep, and it is the only thing separating these from the fallback.
+  const badCanonical = built.filter(sl =>
+    !readPage(sl).includes(`<link rel="canonical" href="https://glowresearch.shop/peptides/${sl}/" />`));
+  ok('every generated page is canonical to itself',
+    badCanonical.length === 0, badCanonical.join(', '));
+
+  // One page, one description of itself. The donor carries a WebPage entity
+  // naming product.html, and copying it through gave every generated page a
+  // second, conflicting identity at an address that is not even in the sitemap.
+  const twoIdentities = built.filter(sl => /"@type":\s*"WebPage"/.test(readPage(sl)));
+  ok('no generated page carries the donor’s WebPage schema',
+    twoIdentities.length === 0,
+    `${twoIdentities.join(', ')} still claim to be product.html`);
+
+  // A share card sized to the wrong shape crops the vial instead of fitting
+  // it. The donor's numbers describe the sitewide landscape image; every
+  // product photo is portrait.
+  const wrongShape = [];
+  GLOW_PRODUCTS.forEach(p => {
+    const html = readPage(productSlug(p.name));
+    const w = (html.match(/og:image:width" content="(\d+)"/) || [])[1];
+    const h = (html.match(/og:image:height" content="(\d+)"/) || [])[1];
+    const src = (html.match(/og:image" content="[^"]*\/([^"/]+)"/) || [])[1];
+    if (!w || !h || !src) { wrongShape.push(`${p.name}: no og:image dimensions`); return; }
+    if (!p.image || !p.image.endsWith(src)) wrongShape.push(`${p.name}: og:image is ${src}`);
+    if (w === '1672' && h === '941') wrongShape.push(`${p.name}: still the donor's dimensions`);
+  });
+  ok('every share card states its own image and that image’s real size',
+    wrongShape.length === 0, wrongShape.join(', '));
+
+  // Every local URL a generated page loads has to resolve from two
+  // directories down. The static markup was rewritten by the generator and
+  // was fine; js/product.js then re-rendered the evidence panel on load with
+  // the catalog's own root-relative paths, so the laboratory mark and the
+  // certificate link 404'd for a reader while a crawler saw them resolve.
+  // Both go through pageHref() now, which is why this checks the runtime
+  // renderers rather than only the files on disk.
+  ok('the panel resolves its mark and its certificate through pageHref()',
+    /pageHref\(lab\.logo\)/.test(read('js/products-data.js')) &&
+    /return pageHref\(\(p && p\.coa\)/.test(read('js/products-data.js')),
+    'a path rendered at runtime is relative to the page, not to the repo root');
+
+  const brokenAsset = [];
+  built.forEach(sl => {
+    const html = readPage(sl);
+    for (const m of html.matchAll(/(?:href|src)="((?!https?:|\/\/|mailto:|tel:|data:|#)[^"]+)"/g)) {
+      const target = path.join(ROOT, 'peptides', sl, m[1].split(/[?#]/)[0]);
+      if (/\.(png|jpe?g|webp|svg|css|js|pdf|woff2?)$/i.test(m[1]) && !fs.existsSync(target)) {
+        brokenAsset.push(`${sl}: ${m[1]}`);
+      }
+    }
+  });
+  ok('every file a generated page asks for resolves from two directories down',
+    brokenAsset.length === 0, brokenAsset.slice(0, 8).join(', '));
+
+  // The served page and the hydrated one describe the same product, because
+  // both read productMetaDesc(). They were two typed sentences before.
+  const badDesc = GLOW_PRODUCTS.filter(p =>
+    !readPage(productSlug(p.name)).includes(`<meta name="description" content="${productMetaDesc(p, p.sizes[0])}" />`));
+  ok('every generated description comes from the catalog',
+    badDesc.length === 0, badDesc.map(p => p.name).join(', '));
+  ok('js/product.js sets the same description at runtime',
+    /productMetaDesc\(product, s\)/.test(read('js/product.js')),
+    'product.html must not retype the sentence the generator bakes in');
 }
 
 /* Duplicate element ids. Invalid HTML on its own, but the reason it is

@@ -36,10 +36,33 @@ const OUT_DIR = 'peptides';
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, hasList, listPriceOf, PRODUCT_PAGES_LIVE,
   sizeInStock, productInStock, batchPanelHtml, unitPriceAt,
-  catFilterGroup, CAT_LABEL, VIAL_ART_NOTICE,
+  catFilterGroup, CAT_LABEL, VIAL_ART_NOTICE, productMetaDesc,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 /* ---------- helpers ---------- */
+
+// Pixel dimensions of a product photo, read from the file rather than typed
+// beside it, so og:image:width and og:image:height describe the image the card
+// will actually load. Only the WebP shapes this catalog uses are handled; an
+// unrecognised file returns null and the caller keeps the donor's numbers.
+function imageSize(rel) {
+  if (!rel) return null;
+  let buf;
+  try { buf = fs.readFileSync(path.join(ROOT, rel)); } catch (e) { return null; }
+  if (buf.length < 30 || buf.toString('latin1', 0, 4) !== 'RIFF') return null;
+  const kind = buf.toString('latin1', 12, 16);
+  if (kind === 'VP8X') {
+    return { width: buf.readUIntLE(24, 3) + 1, height: buf.readUIntLE(27, 3) + 1 };
+  }
+  if (kind === 'VP8 ') {
+    return { width: buf.readUInt16LE(26) & 0x3fff, height: buf.readUInt16LE(28) & 0x3fff };
+  }
+  if (kind === 'VP8L') {
+    const bits = buf.readUInt32LE(21);
+    return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
+  }
+  return null;
+}
 
 function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -170,14 +193,12 @@ function buildProduct(p, donor) {
   // Matches what js/product.js sets on load, so the title does not change
   // under the reader between the static page and hydration.
   const title = `${p.name} ${s.mg} | Glow Research`;
-  // Kept identical to the runtime description in js/product.js, so the served
-  // page and the hydrated one agree. Says the lot is third-party tested, which
-  // is true, without promising a certificate the site cannot yet serve — see
-  // COAS_PUBLISHED in js/products-data.js. Add the purity figure here once the
-  // supplier's measured values have replaced the placeholders.
-  const desc = `${p.name}, ${s.mg} per vial. ` +
-    `Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only.`;
+  // productMetaDesc() rather than a sentence typed here: js/product.js sets
+  // the same description at runtime on product.html?p=<slug>, and the two
+  // copies had already drifted once. Both read the catalog now.
+  const desc = productMetaDesc(p, s);
   const ogImage = p.image ? `${SITE}/${p.image}` : `${SITE}/assets/vial-trio-black-v2.jpg`;
+  const ogSize = imageSize(p.image) || { width: 1672, height: 941 };
 
   let html = donor;
 
@@ -203,10 +224,31 @@ function buildProduct(p, donor) {
       `<meta name="twitter:description" content="${esc(desc)}" />`)
     .replace(/<meta property="og:image" content="[^"]*"\s*\/?>/,
       `<meta property="og:image" content="${ogImage}" />`)
+    // The donor's dimensions belong to the sitewide sharing image, which is
+    // landscape. Every product photo is portrait, and a share card told the
+    // wrong shape crops the vial rather than fitting it.
+    .replace(/<meta property="og:image:width" content="[^"]*"\s*\/?>/,
+      `<meta property="og:image:width" content="${ogSize.width}" />`)
+    .replace(/<meta property="og:image:height" content="[^"]*"\s*\/?>/,
+      `<meta property="og:image:height" content="${ogSize.height}" />`)
     .replace(/<meta name="twitter:image" content="[^"]*"\s*\/?>/,
       `<meta name="twitter:image" content="${ogImage}" />`)
     .replace(/<meta property="og:type" content="[^"]*"\s*\/?>/,
-      `<meta property="og:type" content="product" />`);
+      `<meta property="og:type" content="product" />`)
+    // The donor is noindex: it is a renderer serving every compound at one
+    // URL, and a second address for content that now has its own would be a
+    // duplicate of all ten. These pages are the destinations, so each one
+    // opts itself back in.
+    .replace(/<meta name="robots" content="[^"]*"\s*\/?>/,
+      `<meta name="robots" content="index,follow" />`);
+
+  // The donor's WebPage entity names product.html: its @id, its url and its
+  // breadcrumb all point there. Copied through, every generated page shipped a
+  // second, conflicting description of itself claiming to be a different URL,
+  // one that is not even in the sitemap. The Product and BreadcrumbList
+  // entities appended below are this page's own.
+  const webPage = /<script type="application\/ld\+json">\s*\{[\s\S]*?"@type":\s*"WebPage"[\s\S]*?<\/script>\s*/;
+  html = required(html, webPage, 'the donor WebPage schema').replace(webPage, '');
 
   const headExtra = `<link rel="canonical" href="${url}" />
 <meta property="og:url" content="${url}" />

@@ -319,12 +319,11 @@
     document.title = `${product.name} ${s.mg} | Glow Research`;
     const desc = document.querySelector('meta[name="description"]');
     if (desc) {
-      desc.setAttribute('content',
-        // Says the lot is third-party tested, which is true, but does not
-        // promise a certificate the site can serve — COA_URL is empty, so the
-        // document is available by email, not by link. Kept identical to the
-        // build-time description in tools/build-products.js.
-        `${product.name}, ${s.mg} per vial. Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only.`);
+      // productMetaDesc() from the catalog, which tools/build-products.js
+      // bakes into the generated page's head. It was a second copy of the
+      // sentence typed here, so the served page and the hydrated one could
+      // describe the same product differently.
+      desc.setAttribute('content', productMetaDesc(product, s));
     }
 
     renderStock();

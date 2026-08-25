@@ -85,13 +85,13 @@ const verifyHost = () =>
 // ---------------------------------------------------------------------------
 // Are certificates hosted and linked per batch yet?
 //
-// Every lot IS third-party tested and DOES have a batch-specific certificate —
-// that is how the business runs. What is not true yet is that this site hosts
-// them, so the only route that works today is asking us for one. This flag is
-// what the certificate wording across the site keys off, so the two states are
-// a constant rather than seven copies of the same sentence.
+// Every lot is third-party tested and has a batch-specific certificate. The
+// question this flag answers is only whether the site hosts them, or routes
+// the reader to email instead, and it is what the certificate wording across
+// the site keys off so the two states are a constant rather than seven copies
+// of the same sentence.
 //
-// That is no longer the state. All ten launch compounds carry a `coa` under
+// It is true now. All ten launch compounds carry a `coa` under
 // assets/coas/, so this is true and every surface links the batch-specific
 // document instead of routing to email. Email still works, and the FAQ still
 // offers it for a vial from a lot that is no longer in the catalog.
@@ -210,7 +210,14 @@ const COA_COPY = COAS_PUBLISHED ? {
 // the flag when they are all in, and every surface turns over together.
 function coaHref(p) {
   if (!COAS_PUBLISHED) return '';
-  return (p && p.coa) || COA_URL || '';
+  // Through pageHref(), because the generated pages live at
+  // /peptides/<slug>/ and every caller puts this straight into the DOM. The
+  // static markup was rewritten to depth by the generator and then js/
+  // product.js re-rendered the panel on load with the catalog's own root
+  // paths, so a certificate that resolved for a crawler 404'd for a reader.
+  // A no-op at the repo root, and on Node, where the build reads the plain
+  // catalog path.
+  return pageHref((p && p.coa) || COA_URL || '');
 }
 
 // ---------------------------------------------------------------------------
@@ -477,9 +484,10 @@ function cartUpsell() {
 // figure moves with them. tools/check-claims.js pins the number in index.html
 // to this function, so the served markup and the data cannot drift.
 //
-// One decimal, because that is the precision the certificates report.
-// NOTE: `purity` is still placeholder data (see the header of this file), so
-// this figure is only as true as those stand-ins until the import runs.
+// One decimal, because that is the precision the certificates report. Every
+// figure it averages was checked against the lot's own certificate when those
+// were hosted, so the hero number is now derived from documents the site
+// publishes rather than from stand-ins.
 //
 function avgPurity() {
   const ps = GLOW_PRODUCTS.map(p => parseFloat(p.purity));
@@ -932,7 +940,7 @@ function batchPanelHtml(p) {
       <div class="ba-card">
         <div class="ba-lab">
           ${lab.logo
-            ? `<img class="ba-lab-logo" src="${escHtml(lab.logo)}" alt="${escHtml(lab.name)}" />`
+            ? `<img class="ba-lab-logo" src="${escHtml(pageHref(lab.logo))}" alt="${escHtml(lab.name)}" />`
             : ''}
           <span class="ba-lab-id">
             <span class="ba-lab-name">${escHtml(lab.name)}</span>
@@ -1167,6 +1175,22 @@ function bulkNote() {
     `Larger volumes are <a href="wholesale.html">wholesale</a>.`;
 }
 
+// The meta description for one compound, for the generated page's head and
+// for js/product.js to set on product.html?p=<slug>. Both read this, because
+// they described the same product in two separately typed sentences and the
+// pair had already drifted once.
+//
+// It carries the purity and says the certificate is published, neither of
+// which it could before: purity was placeholder and the documents were not
+// hosted. Both are now true of every compound and both are the things a
+// search result or an answer engine is actually asked for.
+function productMetaDesc(p, size) {
+  const s = size || (p.sizes && p.sizes[0]) || {};
+  const purity = p.purity ? ` at ${p.purity} purity` : '';
+  return `${p.name}, ${s.mg} per vial${purity}. Third-party tested, with the batch ` +
+         `certificate published against its lot number. Research use only.`;
+}
+
 // URL-safe id for linking a card to its detail page: "BPC-157" -> "bpc-157"
 function productSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -1179,20 +1203,24 @@ function findProductBySlug(slug) {
 // Launch switch for the per-compound pages.
 //
 // tools/build-products.js generates a real static page per product at
-// /peptides/<slug>/ — its own URL, its own content in the served markup, its
-// own Product schema. None of that is live yet: the real catalog, prices,
-// images and COAs are still to be imported, and nine crawlable pages carrying
+// /peptides/<slug>/: its own URL, its own content in the served markup, its
+// own Product schema. It was held back because crawlable pages carrying
 // placeholder prices and placeholder purity figures are worse than no pages.
-// Nothing here is broken — the generator is finished. What is missing is data.
+// The generator was never the missing part. The data was.
 //
-// Until then every link stays on product.html?p=<slug>, which renders the same
-// product from the same catalog.
+// The data is here. The catalog is the supplier's launch SKUs with their real
+// prices, every purity and lot was checked against that lot's certificate,
+// every compound has a photo, and every certificate is hosted and linked. So
+// the pages go live, each one crawlable and each one carrying figures that
+// trace to a document the same page links.
 //
-// To launch: import the real catalog, fill COA_URL (or a per-product `coa`),
-// set this to true, then run `node tools/build.js` and commit peptides/**.
-// This single constant is read by the browser and by both build scripts, so
-// the site, the sitemap and the generator can never disagree about it.
-const PRODUCT_PAGES_LIVE = false;
+// Flipping this back to false is the honest move if that stops being true,
+// and it moves the whole site at once: every link falls back to
+// product.html?p=<slug>, which renders the same product from the same
+// catalog, and the sitemap drops the product URLs. One constant, read by the
+// browser and by both build scripts, so the site, the sitemap and the
+// generator can never disagree about it.
+const PRODUCT_PAGES_LIVE = true;
 
 // Where a product card points — the one chokepoint every link goes through,
 // so flipping the constant above moves the whole site at once.
@@ -1207,6 +1235,8 @@ function productHref(p) {
 function pageHref(file) {
   // The build runs from the repo root, where every path is already correct.
   if (typeof document === 'undefined') return file;
+  // A full URL is already absolute and must not be walked up out of.
+  if (/^(https?:)?\/\//.test(file) || /^(mailto:|tel:|data:|#|\/)/.test(file)) return file;
   const link = document.querySelector('#mainNav a[href$="peptides.html"]');
   const prefix = link ? link.getAttribute('href').replace(/peptides\.html$/, '') : '';
   return prefix + file;
@@ -1418,6 +1448,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     GLOW_PRODUCTS,
     productSlug,
+    productMetaDesc,
     findProductBySlug,
     getProductVariants,
     salePrice,
@@ -1447,6 +1478,7 @@ if (typeof module !== 'undefined' && module.exports) {
     verifyCopy,
     verifyHost,
     LAB_VERIFY_URL,
+    listWords,
     SOURCE_SHORT,
     SOURCE_LONG,
     VIAL_ART_NOTICE,

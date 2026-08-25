@@ -25,6 +25,9 @@ const SITE = 'https://glowresearch.shop';
 const STATIC_PAGES = [
   ['', '1.0'],
   ['peptides.html', '0.9'],
+  // The certificate index. Missing from this list until the certificates were
+  // actually hosted, when it stopped being a page with nothing on it.
+  ['coa.html', '0.8'],
   ['how-we-test.html', '0.7'],
   ['about.html', '0.6'],
   ['shipping.html', '0.6'],
