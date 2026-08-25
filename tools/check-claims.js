@@ -2528,6 +2528,69 @@ console.log('\nprivacy disclosure');
   }
 }
 
+/* ---------------------------------------------------------------------------
+ * Deploy headers. vercel.json is the one config file whose mistakes are
+ * invisible locally: nothing in the repo serves through it, so a source
+ * pattern that quietly matches nothing looks identical to one that works.
+ * The first version shipped with "/(.*).html", which matches /coa.html but
+ * not "/" or /peptides/<slug>/, because those are directory URLs with no
+ * ".html" anywhere in the path. The homepage and all ten product pages, the
+ * pages that matter most, fell through with no cache rule at all.
+ * ------------------------------------------------------------------------- */
+console.log('\ndeploy headers');
+{
+  const rules = JSON.parse(read('vercel.json')).headers || [];
+
+  // Vercel matches with path-to-regexp. Only the two shapes this file uses
+  // need handling: a literal path, and a single (.*) wildcard. Matched by
+  // prefix and suffix rather than by building a regex, since every character
+  // class this would have to escape is one more thing to get wrong.
+  function matches(source, url) {
+    const star = source.indexOf('(.*)');
+    if (star === -1) return source === url;
+    const head = source.slice(0, star);
+    const tail = source.slice(star + 4);
+    return url.length >= head.length + tail.length &&
+      url.startsWith(head) && url.endsWith(tail);
+  }
+  const headersFor = url =>
+    rules.filter(r => matches(r.source, url)).flatMap(r => r.headers);
+  const cacheFor = url =>
+    headersFor(url).filter(h => h.key === 'Cache-Control').map(h => h.value);
+
+  // One representative of every URL shape the site actually serves, taken from
+  // the catalog rather than typed, so a new page shape is covered too.
+  const htmlUrls = ['/', '/coa.html', '/peptides.html'].concat(
+    PRODUCT_PAGES_LIVE ? ['/peptides/' + productSlug(GLOW_PRODUCTS[0].name) + '/'] : []
+  );
+  const assetUrls = ['/assets/fonts/sora.woff2'].concat(
+    GLOW_PRODUCTS.filter(p => coaHref(p)).slice(0, 1).map(p => '/' + p.coa)
+  );
+  const all = htmlUrls.concat(assetUrls);
+
+  const uncached = all.filter(u => cacheFor(u).length === 0);
+  ok('every served URL shape resolves a Cache-Control rule',
+    uncached.length === 0, uncached.join(', '));
+
+  // A page frozen as immutable cannot be corrected: someone who saw a wrong
+  // price would keep seeing it for a year. Only /assets/ is safe to freeze.
+  const frozen = htmlUrls.filter(u => cacheFor(u).some(v => /immutable/.test(v)));
+  ok('no HTML page is served immutable', frozen.length === 0, frozen.join(', '));
+
+  ok('assets are served immutable',
+    assetUrls.every(u => cacheFor(u).some(v => /immutable/.test(v))));
+
+  const unprotected = htmlUrls.filter(u =>
+    !headersFor(u).some(h => h.key === 'X-Content-Type-Options'));
+  ok('every page carries the security headers',
+    unprotected.length === 0, unprotected.join(', '));
+
+  // Two different Cache-Control rules on one URL is a coin flip on which wins.
+  const conflicted = all.filter(u => new Set(cacheFor(u)).size > 1);
+  ok('no URL matches two conflicting Cache-Control rules',
+    conflicted.length === 0, conflicted.join(', '));
+}
+
 console.log('\nsitemap');
 {
   const locs = [...read('sitemap.xml').matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
