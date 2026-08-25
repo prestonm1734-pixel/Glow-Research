@@ -152,6 +152,16 @@
     width:100%; height: clamp(58px, 6.5vw, 84px);
     object-fit:contain; object-position:center; display:block;
   }
+  /* Occupies the same box as a mark image so the row still reads as three
+     even panels, without borrowing a badge's authority for a status that is
+     not one. */
+  .hw-mark-pending{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:5px; width:100%; height: clamp(58px, 6.5vw, 84px); text-align:center;
+    font-family:'JetBrains Mono', monospace; font-size:.66rem; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase; color:#8a8a86;
+  }
+  .hw-mark-pending strong{ font-size:.92rem; letter-spacing:.04em; color:#0a0a0a; }
   .hw-mark-cap{
     margin:0; text-align:center;
     font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:600;
@@ -167,6 +177,8 @@
     .hw-marks{ grid-template-columns: 1fr; }
     .hw-mark{ flex-direction:row; gap:18px; min-height:0; padding:18px; justify-content:flex-start; }
     .hw-mark img{ flex:0 0 auto; width:96px; height:46px; }
+    .hw-mark-pending{ flex:0 0 auto; width:96px; height:46px; gap:2px; font-size:.56rem; }
+    .hw-mark-pending strong{ font-size:.76rem; }
     .hw-mark-cap{ text-align:left; }
   }
 
@@ -377,8 +389,10 @@
              LAB was corrected, because nothing was holding the two together. -->
         <p>
           Glow does not manufacture and does not operate a laboratory. Testing
-          is Accumark Labs, an ISO/IEC 17025 accredited lab with no stake
-          in the result, and the certificate is issued in their name.
+          is Accumark Labs, an independent lab with no stake in the result, and
+          the certificate is issued in their name. Their ISO/IEC 17025
+          accreditation is pending, not granted, so read their reports as the
+          work of an independent laboratory rather than an accredited one.
         </p>
       </div>
       <div class="hw-marks reveal">
@@ -386,15 +400,27 @@
           <img src="assets/accumark-labs.png" alt="Accumark Labs" width="384" height="361" loading="lazy" />
           <p class="hw-mark-cap">Testing partner</p>
         </div>
+        <!-- Set in our own type, not as a mark. This slot held the ISO 17025
+             certification logo, which is a credential Accumark has applied for
+             and does not yet hold: a badge is read at a glance and a glance
+             does not carry "pending". The two boxes either side are marks
+             their holders actually have. -->
         <div class="hw-mark">
-          <img src="assets/iso-17025.png" alt="ISO/IEC 17025 certified" width="600" height="216" loading="lazy" />
+          <span class="hw-mark-pending">
+            <strong>ISO/IEC 17025</strong>
+            Pending, not granted
+          </span>
           <p class="hw-mark-cap">Laboratory accreditation</p>
         </div>
         <div class="hw-mark">
           <img src="assets/gmp.png" alt="Good Manufacturing Practice" width="400" height="398" loading="lazy" />
           <p class="hw-mark-cap">Manufacturing standard</p>
         </div>
-        <p class="hw-mark-note">Held by our partners, not by Glow Research</p>
+        <!-- "Held by our partners" stopped being true of all three when the
+             middle box became a pending status, which nobody holds yet. The
+             point it exists to make is the same either way: none of this is
+             ours, so none of it is us grading our own work. -->
+        <p class="hw-mark-note">None of these is Glow Research’s own</p>
       </div>
     </div>
   </div>

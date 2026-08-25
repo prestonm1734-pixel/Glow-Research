@@ -385,6 +385,35 @@ console.log('\nthe batch analysis panel');
       ? Boolean(lab.accreditation)
       : /third-party/i.test(lab.name) && /no stake in the result/i.test(lab.accreditation));
 
+  // Pending is not accredited, and the gap between the two is the single most
+  // load-bearing claim on this site: it is the reason a buyer is asked to
+  // trust a number. The site said "ISO/IEC 17025 accredited" in the panel, in
+  // prose, and as a certification badge, while the laboratory's own listing
+  // said the assessment was still open.
+  //
+  // So while LAB.accreditation says pending, no page may state the
+  // accreditation as held, in words or as a mark. Granting flips one string in
+  // js/products-data.js and this check stops applying on its own.
+  if (/pending/i.test(LAB.accreditation)) {
+    const claimed = [];
+    pages.forEach(f => {
+      const text = read(f)
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(/<script[\s\S]*?<\/script>/g, '');
+      // The standard's number followed by a word that asserts it is held,
+      // with only a space or a hyphen allowed between: "17025 accredited",
+      // "17025-certified". "17025 accreditation is pending" does not match.
+      if (/17025[\s-]+(accredited|certified|compliant)\b/i.test(text)) {
+        claimed.push(`${f} states it as held`);
+      }
+      if (/(iso[^"']{0,12}17025|17025)[^"']*\.(png|jpg|jpeg|svg|webp)/i.test(text)) {
+        claimed.push(`${f} draws an accreditation mark`);
+      }
+    });
+    ok('no page states the accreditation as held while it is pending',
+      claimed.length === 0, claimed.join(', '));
+  }
+
   // A named laboratory with a broken image beside it reads worse than the name
   // on its own, and the panel's empty-logo branch already renders that cleanly.
   // So a logo path that does not resolve is a build failure, not a page that
@@ -414,9 +443,16 @@ console.log('\nthe batch analysis panel');
   if (LAB.name) {
     const who = (read('how-we-test.html').match(
       /<div class="hw-who-copy[^"]*">[\s\S]*?<\/div>/) || [''])[0];
-    ok('how-we-test.html names the laboratory the catalog names',
-      who.includes(LAB.name) && who.includes(LAB.accreditation),
-      `the hw-who-copy block must name "${LAB.name}" and "${LAB.accreditation}"`);
+    // The name verbatim, and every substantial word of the standing, in any
+    // order. Requiring LAB.accreditation as one literal string would force the
+    // paragraph to read like a data field; requiring its words means the prose
+    // can say "their ISO/IEC 17025 accreditation is pending" and still be held
+    // to saying all of it.
+    const words = LAB.accreditation.split(/\s+/).filter(w => w.length >= 5);
+    const absent = words.filter(w => !who.toLowerCase().includes(w.toLowerCase()));
+    ok('how-we-test.html names the laboratory and its standing as the catalog does',
+      who.includes(LAB.name) && absent.length === 0,
+      `the hw-who-copy block must name "${LAB.name}" and say ${absent.join(', ') || LAB.accreditation}`);
   }
 
   // Switching laboratories is the moment a name gets left behind: it lives in

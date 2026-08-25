@@ -773,14 +773,19 @@ function escHtml(t) {
 // file, because a named laboratory with a broken image beside it reads worse
 // than the name on its own, which is what the empty branch below renders.
 //
-// The accreditation is stated on the strength of Accumark's ISO/IEC 17025
-// certificate, which we hold but do not host: none of the ten batch
-// certificates carries an accreditation line, so this one claim cannot be
-// verified from the documents this site links. Host it and link it from
-// how-we-test.html and it stops resting on our word.
+// `accreditation` is the laboratory's standing, in whatever state it is
+// actually in, not a credential we are asserting they hold. It read
+// "ISO/IEC 17025 accredited" until Accumark's own listing turned out to say
+// pending. Pending is not accredited: the assessment is underway and may not
+// conclude, so every surface says pending until it does, and check-claims.js
+// will not let a page say otherwise while this string does.
+//
+// When it is granted, change this line, put the certificate under assets/ and
+// link it. Until then the honest form of the claim is the one that names the
+// standard, says where the lab is with it, and stops there.
 const LAB = {
   name: 'Accumark Labs',
-  accreditation: 'ISO/IEC 17025 accredited',
+  accreditation: 'ISO/IEC 17025 accreditation pending',
   logo: 'assets/accumark-labs.png',
 };
 
