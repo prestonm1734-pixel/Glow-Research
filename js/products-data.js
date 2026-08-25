@@ -765,10 +765,13 @@ function escHtml(t) {
 // analysis on a page that now links the document proving it. assets/freedom-
 // diagnostics.png is left in place but nothing reads it.
 //
-// PLACEHOLDER: `logo` is empty. The mark on the certificates is Accumark's
-// property and we have no permission on file to reproduce it, which is a
-// different question from whether they ran the work. Drop the file under
-// assets/ and fill this in once that permission exists.
+// The mark is Accumark's property, supplied by the business owner to display
+// as our testing partner. Drawn at 38px in the panel header and up to 84px on
+// how-we-test.html, so the file is sized for the larger of the two and no
+// more: a 1249px original for a 38px slot is ten times the bytes for the same
+// pixels. check-claims.js fails the build if this path stops resolving to a
+// file, because a named laboratory with a broken image beside it reads worse
+// than the name on its own, which is what the empty branch below renders.
 //
 // The accreditation is stated on the strength of Accumark's ISO/IEC 17025
 // certificate, which we hold but do not host: none of the ten batch
@@ -778,7 +781,7 @@ function escHtml(t) {
 const LAB = {
   name: 'Accumark Labs',
   accreditation: 'ISO/IEC 17025 accredited',
-  logo: '',
+  logo: 'assets/accumark-labs.png',
 };
 
 // What the header states while LAB is empty. Both halves are true either way:

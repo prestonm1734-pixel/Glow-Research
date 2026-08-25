@@ -385,6 +385,27 @@ console.log('\nthe batch analysis panel');
       ? Boolean(lab.accreditation)
       : /third-party/i.test(lab.name) && /no stake in the result/i.test(lab.accreditation));
 
+  // A named laboratory with a broken image beside it reads worse than the name
+  // on its own, and the panel's empty-logo branch already renders that cleanly.
+  // So a logo path that does not resolve is a build failure, not a page that
+  // degrades quietly to an alt attribute.
+  ok('the laboratory mark is a file that exists',
+    !LAB.logo || fs.existsSync(path.join(ROOT, LAB.logo)),
+    `LAB.logo points at ${LAB.logo}, which is not in the repository`);
+
+  // Every mark on how-we-test.html is drawn at up to 84px. An original ten
+  // times that is the same picture and ten times the bytes, on a page whose
+  // whole job is to be read rather than admired.
+  const heavy = (read('how-we-test.html').match(/src="(assets\/[^"]+)"/g) || [])
+    .map(m => m.slice(5, -1))
+    .concat(LAB.logo ? [LAB.logo] : [])
+    .filter((v, i, a) => a.indexOf(v) === i)
+    .filter(f => fs.existsSync(path.join(ROOT, f)) &&
+                 fs.statSync(path.join(ROOT, f)).size > 120 * 1024);
+  ok('no partner mark ships at more than 120 KB',
+    heavy.length === 0,
+    heavy.map(f => `${f} is ${Math.round(fs.statSync(path.join(ROOT, f)).size / 1024)} KB`).join(', '));
+
   // The panel reads LAB. how-we-test.html names the laboratory in prose, by
   // hand, because there is no template step for that page's sections — so it
   // is pinned here, the same way its certificate note is pinned to COA_COPY.
