@@ -526,10 +526,13 @@ const CUTOFF_LABEL_SHORT = `${CUTOFF_H12} ${CUTOFF_MERIDIEM} PST`;
 // pins every "FedEx <n>-Day" on the site to this number.
 const TRANSIT_DAYS = 2;
 
-// What the box actually looks like. The footer on every page has said
-// "discreetly shipped" for as long as the site has existed without anywhere
-// saying what that meant, which is a promise a reader cannot check. Stated
-// once, here, so the FAQ answer and the footer claim describe the same box.
+// What the box actually looks like. Written when the footer on every page
+// still promised "discreetly shipped" without anywhere saying what that meant,
+// which is a promise a reader cannot check. The footer says something else
+// now, but the question is still one people ask before ordering, so the answer
+// stays and this is the one place the box is described. check-claims.js holds
+// the other half: if that wording ever returns to a page, it has to be
+// explained here again.
 const PACKAGING_PLAIN = 'A plain box, no branding, nothing on the outside naming ' +
   'what is inside';
 
@@ -773,9 +776,7 @@ const FAQS = [
        'runs it, no extra charge. United States only.',
   },
   {
-    // The footer has claimed "discreetly shipped" on every page since launch.
-    // This is the first place that says what it means, and it reads the same
-    // constant rather than describing the box a second time.
+    // Reads PACKAGING_PLAIN rather than describing the box a second time.
     q: 'What does the package look like when it arrives?',
     a: `${PACKAGING_PLAIN}. The carrier label is the only thing on it.`,
   },
