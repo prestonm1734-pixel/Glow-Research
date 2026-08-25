@@ -85,7 +85,7 @@ const PAGE_META = {
   'privacy.html': {
     name: 'Privacy Policy',
     title: t('Privacy Policy'),
-    desc: "How Glow Research collects, stores, and uses information: what's saved in your browser, what we don't track, and what changes once accounts and payment go live.",
+    desc: "How Glow Research collects, stores, and uses information: what's saved in your browser, the services that handle payments and orders, and what we don't track.",
   },
   'terms.html': {
     name: 'Terms &amp; Conditions',

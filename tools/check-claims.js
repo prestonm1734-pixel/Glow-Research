@@ -2433,6 +2433,101 @@ console.log('\nentity and address');
   }
 }
 
+/* ---------------------------------------------------------------------------
+ * Privacy disclosure. The privacy policy is the one page whose copy is a
+ * statement about what the system does, made to someone who cannot check. It
+ * went stale the moment PAYMENTS_LIVE and the account system went true: it
+ * still told readers that nothing typed into checkout was transmitted and that
+ * the password field was never read, while api/auth.js was hashing passwords
+ * into WooCommerce and Stripe was charging live cards.
+ *
+ * Nothing caught it, because every other claim on this site is derived from
+ * js/products-data.js and this one was hand-written prose. These checks are
+ * the substitute: the policy cannot contradict the flags, and it has to name
+ * each service that actually receives customer data.
+ * ------------------------------------------------------------------------- */
+console.log('\nprivacy disclosure');
+{
+  // Comments stripped: an explanatory note about copy that was removed is not
+  // itself a claim to a reader.
+  const bare = f => read(f)
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '');
+
+  if (PAYMENTS_LIVE) {
+    // The exact shape of the sentence that was wrong for weeks, plus the
+    // family it belongs to. Any page, not just privacy.html: signin.html
+    // carried its own copy of the same claim.
+    const denials = [
+      /payment(s)? (is|are) not connected/i,
+      /not connected to a live backend/i,
+      /cannot take a card/i,
+      /checkout (is )?(is not|isn't|not) (live|connected)/i,
+      /once (accounts and )?payment.{0,20}go(es)? live/i,
+      /when checkout goes live/i,
+      /nothing typed into[^.]*is transmitted/i,
+      /password field[^.]*never read/i,
+      /account system is a design preview/i,
+      /not real authentication/i,
+    ];
+    const liars = [];
+    pages.forEach(f => {
+      const html = bare(f);
+      denials.forEach(re => { if (re.test(html)) liars.push(`${f}: ${re}`); });
+    });
+    ok('no page still says payment or accounts are not live',
+      liars.length === 0, liars.join('\n          '));
+  }
+
+  const privacy = bare('privacy.html');
+
+  // Each service that receives customer data has to be named. Derived from
+  // what api/ actually calls rather than a list typed here, so wiring up a
+  // new processor fails this until the policy admits to it.
+  const apiSrc = fs.readdirSync(path.join(ROOT, 'api'))
+    .map(f => read(`api/${f}`)).join('\n');
+  const processors = [
+    ['Stripe', /api\.stripe\.com|require\(['"]stripe|from ['"]stripe/i, /stripe/i],
+    ['Resend', /resend\.com/i, /resend/i],
+    ['WooCommerce', /wp-json|WC_CONSUMER_KEY/i, /woocommerce/i],
+  ];
+  const undisclosed = processors
+    .filter(([, used]) => used.test(apiSrc))
+    .filter(([, , named]) => !named.test(privacy))
+    .map(([name]) => name);
+  ok('the privacy policy names every service that receives customer data',
+    undisclosed.length === 0,
+    undisclosed.length ? `not named: ${undisclosed.join(', ')}` : '');
+
+  // A cookie the server sets is a cookie the policy has to disclose by name.
+  const cookieName = (read('api/_lib.js').match(/(\w+)=\$\{token\}/) || [])[1];
+  if (cookieName) {
+    ok(`the privacy policy discloses the ${cookieName} cookie`,
+      privacy.includes(cookieName),
+      `api/_lib.js sets ${cookieName}, privacy.html does not mention it`);
+    ok('and does not claim the site sets no cookies at all',
+      !/(sets?|uses?) no cookies|does not (set|use) (any )?cookies\b(?![^.]*tracking)/i.test(privacy));
+  }
+
+  // Fonts moved in-house; the policy spent that whole time telling readers
+  // their browser was calling Google on every page load.
+  const usesGoogleFonts = pages.some(f => /fonts\.(googleapis|gstatic)\.com/.test(read(f)));
+  ok('the privacy policy does not claim third-party font loading that does not happen',
+    usesGoogleFonts || !/google fonts/i.test(privacy),
+    'fonts are self-hosted in assets/fonts, but privacy.html still names Google Fonts');
+
+  // The beacon in js/analytics.js is first-party and carries no PII, but it is
+  // still page-view logging, and "we don't track" has to be narrower than that.
+  if (/GlowAnalytics|\/api\/track/.test(read('js/analytics.js'))) {
+    ok('the privacy policy accounts for the page-view logging that actually runs',
+      /page view|page-view|visit identifier|traffic dashboard/i.test(privacy));
+    ok('and does not claim there is no behavioural logging of any kind',
+      !/no behaviou?ral tracking\b/i.test(privacy) ||
+      /third-party|cross-site/i.test(privacy));
+  }
+}
+
 console.log('\nsitemap');
 {
   const locs = [...read('sitemap.xml').matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);

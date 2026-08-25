@@ -1,0 +1,11 @@
+# Secrets. Every key this site needs is a Vercel environment variable:
+# STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, WC_CONSUMER_KEY, WC_CONSUMER_SECRET,
+# SESSION_SECRET, RESEND_API_KEY. None of them belongs in the repo.
+.env
+.env.*
+!.env.example
+
+# Local tooling
+node_modules/
+.vercel
+.DS_Store

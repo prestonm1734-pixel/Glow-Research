@@ -8,7 +8,7 @@
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
 <title>Privacy Policy | Glow Research</title>
-<meta name="description" content="How Glow Research collects, stores, and uses information: what's saved in your browser, what we don't track, and what changes once accounts and payment go live." />
+<meta name="description" content="How Glow Research collects, stores, and uses information: what's saved in your browser, the services that handle payments and orders, and what we don't track." />
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://glowresearch.shop/privacy.html" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
@@ -40,8 +40,10 @@
     background: var(--bg-2); padding: 2px 6px; color: var(--text);
   }
 
-  /* Same honesty pattern as checkout's payment-processor note and signin's
-     "accounts are not live yet" note — say plainly what isn't built. */
+  /* A callout for anything this policy needs to state plainly rather than
+     leave in the body copy. Unused at present: the "accounts and checkout are
+     not connected yet" note it was written for described a site that no longer
+     exists, and was removed when payments and accounts went live. */
   .tc-note{
     margin: 0 0 1.4em; padding: 16px 18px; border:1px solid var(--border);
     font-size:.9rem; line-height:1.65; color: var(--text-dim);
@@ -49,9 +51,9 @@
   .tc-note strong{ color: var(--text); }
 </style>
 <meta property="og:title" content="Privacy Policy" />
-<meta property="og:description" content="How Glow Research collects, stores, and uses information: what's saved in your browser, what we don't track, and what changes once accounts and payment go live." />
+<meta property="og:description" content="How Glow Research collects, stores, and uses information: what's saved in your browser, the services that handle payments and orders, and what we don't track." />
 <meta name="twitter:title" content="Privacy Policy" />
-<meta name="twitter:description" content="How Glow Research collects, stores, and uses information: what's saved in your browser, what we don't track, and what changes once accounts and payment go live." />
+<meta name="twitter:description" content="How Glow Research collects, stores, and uses information: what's saved in your browser, the services that handle payments and orders, and what we don't track." />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -59,7 +61,7 @@
   "@id": "https://glowresearch.shop/privacy.html#webpage",
   "url": "https://glowresearch.shop/privacy.html",
   "name": "Privacy Policy",
-  "description": "How Glow Research collects, stores, and uses information: what's saved in your browser, what we don't track, and what changes once accounts and payment go live.",
+  "description": "How Glow Research collects, stores, and uses information: what's saved in your browser, the services that handle payments and orders, and what we don't track.",
   "isPartOf": {
     "@id": "https://glowresearch.shop/#website"
   },
@@ -160,67 +162,97 @@
 
     <h2>1. Information You Provide</h2>
     <p>
-      If you use the contact form, sign-up form, or checkout, you may give us your name,
-      email address, phone number, shipping and billing address, and company name. We use
-      this to respond to inquiries, process orders, and ship products.
+      If you use the contact form, create an account, or place an order, you may give us
+      your name, email address, phone number, shipping and billing address, and company
+      name. We use this to respond to inquiries, process orders, and ship products.
     </p>
-    <div class="tc-note">
-      <strong>Accounts and checkout are not connected to a live backend yet.</strong>
-      Nothing typed into the sign-in or checkout forms today is transmitted, stored on a
-      server, or seen by anyone. The password field in particular is never read at all.
-      This policy will be updated with specifics once the account system and payment
-      processor go live, and we'll note the change here rather than update it quietly.
-    </div>
+    <p>
+      If you create an account, we also store a password. We never keep the password
+      itself: it is put through a one-way scrypt hash with a random salt before it is
+      stored, so the stored value cannot be turned back into your password, by us or by
+      anyone who obtained the record. Checking a password at sign-in re-runs the same
+      hash and compares the results.
+    </p>
+    <p>
+      Card details are a deliberate exception. They are entered into fields hosted by
+      Stripe, our payment processor, and sent directly to Stripe. They do not pass
+      through our servers, and we never see or store a full card number.
+    </p>
 
     <h2>2. Information Stored in Your Browser</h2>
     <p>
-      Glow Research uses your browser's local storage, not tracking cookies, to remember
-      a small set of functional details on the device you're using:
+      Glow Research uses your browser's own storage to remember a small set of functional
+      details on the device you're using:
     </p>
     <ul>
       <li><strong>Cart contents:</strong> what you've added, so it's still there if you reload the page.</li>
       <li><strong>Age and RUO gate confirmation:</strong> so the entry screen doesn't reappear on every visit.</li>
-      <li><strong>Sample sign-in state:</strong> while the account system is a design preview, this is a placeholder value, not real authentication.</li>
+      <li><strong>Signed-in hint:</strong> a flag recording that you are signed in, so the header
+        can show "Account" instead of "Sign In". It is a display hint and grants no access on
+        its own: the session cookie described in section 5 is what actually authenticates you,
+        and every request is re-checked against it on the server.</li>
+      <li><strong>Visit identifier:</strong> a random ID held for the length of the browser
+        session, used by the page-view logging described in section 4. It is not tied to your
+        name, email, or account.</li>
     </ul>
     <p>
-      This information stays on your device. We do not receive it, sell it, or share it
-      with anyone. Clearing your browser's site data for glowresearch.shop removes all of it.
+      Clearing your browser's site data for glowresearch.shop removes all of it.
     </p>
 
     <h2>3. What We Don't Do</h2>
     <p>
-      Glow Research does not run third-party analytics, advertising pixels, or behavioral
-      tracking scripts. We don't sell or rent personal information to anyone, and we don't
-      build advertising profiles from your activity on this site.
+      Glow Research does not run third-party analytics, advertising pixels, or
+      cross-site tracking scripts. There is no Google Analytics, no advertising tag, and
+      no data broker on this site. Fonts are served from our own domain rather than a
+      font provider, so loading a page makes no request to a third party. We don't sell
+      or rent personal information to anyone, and we don't build advertising profiles
+      from your activity.
     </p>
 
     <h2>4. Third-Party Services</h2>
     <p>
-      A small number of outside services support the site:
+      A small number of outside services support the site. Each receives only what it
+      needs to do its job:
     </p>
     <ul>
-      <li><strong>Google Fonts:</strong> typefaces are loaded from Google's servers, which
-        means your browser makes a request to Google when the page loads.</li>
+      <li><strong>Stripe (payments):</strong> receives your card details directly, along with
+        your email address, billing address, and the contents and total of your order, in order
+        to process the charge. Stripe handles this under its own privacy policy.</li>
+      <li><strong>WooCommerce (order and account records):</strong> stores your customer record,
+        order history, shipping details, and the hashed password described in section 1.</li>
+      <li><strong>Resend (email):</strong> receives your email address and the contents of
+        transactional messages, such as order confirmations and password resets, in order to
+        deliver them.</li>
       <li><strong>Fulfilment partner:</strong> once an order is placed, your shipping details
         are shared with the third-party partner who picks, packs, and dispatches it on our
         behalf. See <a href="terms.html">Terms &amp; Conditions</a> for how that relationship works.</li>
-      <li><strong>Payment processor:</strong> when checkout is connected to a live payment
-        gateway, card details will be handled directly by that processor. Glow Research does
-        not store full card numbers.</li>
+      <li><strong>Our own traffic dashboard:</strong> each page view sends the page address, the
+        referring address, and the random visit identifier from section 2 to a dashboard we run
+        ourselves. It records no name, email, account, or IP-based profile, sets no cookie, and
+        is not shared with anyone.</li>
     </ul>
 
     <h2>5. Cookies</h2>
     <p>
-      This site does not set tracking or advertising cookies. Any first-party cookie a
-      future payment or hosting provider requires for the checkout to function will be
-      disclosed here when checkout goes live.
+      This site sets no tracking or advertising cookies. It sets one functional cookie,
+      and only if you sign in:
+    </p>
+    <ul>
+      <li><strong>glow_session:</strong> a signed session token that keeps you signed in. It is
+        marked HttpOnly, so page scripts cannot read it, and Secure, so it is only ever sent over
+        an encrypted connection. It expires after 30 days, and signing out clears it immediately.</li>
+    </ul>
+    <p>
+      Stripe may set its own cookies on the checkout page as part of processing a
+      payment and detecting fraud. Those are governed by Stripe's privacy policy.
     </p>
 
     <h2>6. Your Choices</h2>
     <p>
       You can clear everything the site has stored in your browser at any time through
-      your browser's settings. This removes your cart and age-gate confirmation. To ask
-      about, correct, or delete information tied to an order, contact us using the details
+      your browser's settings. This removes your cart, your age-gate confirmation, and
+      the signed-in hint, and signs you out. To ask about, correct, or delete the
+      information held against your account or an order, contact us using the details
       below.
     </p>
 
@@ -233,16 +265,18 @@
 
     <h2>8. Data Security</h2>
     <p>
-      We take reasonable steps to protect information you provide to us. No method of
-      transmission or storage is completely secure, and we can't guarantee absolute
-      security for information sent over the internet.
+      The site is served over an encrypted connection throughout. Passwords are stored
+      only as one-way scrypt hashes, session cookies are HttpOnly and Secure, and card
+      numbers never reach our servers. We take reasonable steps to protect the
+      information you provide, but no method of transmission or storage is completely
+      secure, and we can't guarantee absolute security for information sent over the
+      internet.
     </p>
 
     <h2>9. Changes to This Policy</h2>
     <p>
-      We may update this policy as the site changes, particularly once accounts and
-      payment processing go live. Continued use of the site after an update constitutes
-      acceptance of the revised policy.
+      We may update this policy as the site changes. Continued use of the site after an
+      update constitutes acceptance of the revised policy.
     </p>
 
     <h2>10. Contact</h2>
