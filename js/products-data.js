@@ -534,7 +534,7 @@ const BATCHES_TESTED = 150;
 const NO_DISPATCH_DAY = 0;                    // Sunday, in getUTCDay() terms
 const NO_DELIVERY_DAY = 0;                    // FedEx does not deliver Sundays
 const NO_DISPATCH_DAY_NAME = 'Sunday';
-const DISPATCH_LABEL = `within a day, every day except ${NO_DISPATCH_DAY_NAME}`;
+const DISPATCH_LABEL = `within one business day`;
 
 // FedEx transit. Also the span the product page's arrival estimate counts
 // forward, inclusively: the day the page is being read is day one, so a
@@ -793,9 +793,8 @@ const FAQS = [
     // TRANSIT_DAYS. check-claims.js pins both sitewide, so this answer cannot
     // drift from the shipping page.
     q: 'How quickly does an order go out?',
-    a: `Every order ships ${DISPATCH_LABEL}, on FedEx ${TRANSIT_DAYS}-Day. A ` +
-       `${NO_DISPATCH_DAY_NAME} order goes out Monday. Tracking follows within a day. Saturday ` +
-       'delivery where FedEx runs it, no extra charge. United States only.',
+    a: `Every order ships ${DISPATCH_LABEL} on FedEx ${TRANSIT_DAYS}-Day. ` +
+       'Tracking follows within a day. United States only.',
   },
   {
     // Reads PACKAGING_PLAIN rather than describing the box a second time.

@@ -60,7 +60,7 @@ const PAGE_META = {
   'shipping.html': {
     name: 'Shipping',
     title: t('Shipping'),
-    desc: 'Every order ships within a day, Monday to Saturday, on 2-day FedEx Express. Free over $400. All 50 states.',
+    desc: 'Every order ships within one business day on 2-day FedEx Express. Free over $400. All 50 states.',
   },
   'shipping-policy.html': {
     name: 'Shipping Policy',

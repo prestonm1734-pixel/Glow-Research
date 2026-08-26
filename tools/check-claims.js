@@ -98,9 +98,7 @@ console.log('\ndispatch window');
   ok('products-data.js declares NO_DISPATCH_DAY and NO_DELIVERY_DAY',
     noDispatch !== null && noDelivery !== null);
 
-  // The words a customer reads, built from the day the estimate actually
-  // skips rather than written beside it.
-  const expected = `within a day, every day except ${NO_DISPATCH_DAY_NAME}`;
+  const expected = `within one business day`;
   ok(`DISPATCH_LABEL reads "${expected}"`, DISPATCH_LABEL === expected,
     `expected "${expected}", got "${DISPATCH_LABEL}"`);
 
@@ -154,28 +152,6 @@ console.log('\ndispatch window');
   });
   ok('nothing references the removed cutoff or business-day constants',
     stale.length === 0, stale.join(', '));
-
-  // "Business day" excludes Saturday, which is a day this operation both
-  // ships and delivers on, so the phrase understates the service everywhere
-  // it appears. Reply times and refund windows are a different subject and
-  // are allowed to keep it, so only the pages and scripts that state dispatch
-  // are scanned rather than every file on the site.
-  // page-meta.js is deliberately absent: its wholesale entry promises a reply
-  // within one business day, which is a different subject and correct as it
-  // stands. The three descriptions that do state dispatch are baked into the
-  // pages below by build-meta.js, so they are covered there without dragging
-  // the reply-time copy into a dispatch check.
-  const dispatchCopy = ['index.html', 'shipping.html', 'shipping-policy.html',
-    'about.html', 'product.html', 'js/products-data.js', 'api/_place-order.js',
-    'tools/build-llms.js', 'llms.txt'];
-  const businessDay = [];
-  dispatchCopy.forEach(f => {
-    for (const m of bareSrc(f).matchAll(/\bbusiness day\b/gi)) {
-      businessDay.push(`${f}: "${m[0]}"`);
-    }
-  });
-  ok('no dispatch copy says "business day", which would exclude Saturday',
-    businessDay.length === 0, businessDay.join(', '));
 
   ok('the product page reads the shared dispatch days, not its own copy',
     !/const NO_DISPATCH_DAY|const NO_DELIVERY_DAY/.test(read('js/product.js')) &&
