@@ -156,7 +156,7 @@ const STRIPE_PUBLISHABLE_KEY = 'pk_live_51U3kUmHjOd9MaH5sNxBU6C1neJypFeZGunq4CUy
 // Meta Events Manager replaces it. The matching server-side piece,
 // META_CAPI_ACCESS_TOKEN, is a Vercel environment variable and must never be
 // checked in — see api/_meta-capi.js.
-const META_PIXEL_ID = '';
+const META_PIXEL_ID = '895737919981822';
 
 // What the confirmation page says about payment, keyed off the same flag that
 // decides whether payment is actually taken. Hand-written copy here was the
