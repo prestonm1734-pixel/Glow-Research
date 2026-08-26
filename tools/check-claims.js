@@ -2671,7 +2671,25 @@ console.log('\ndeploy headers');
   const assetUrls = ['/assets/fonts/sora.woff2'].concat(
     GLOW_PRODUCTS.filter(p => coaHref(p)).slice(0, 1).map(p => '/' + p.coa)
   );
-  const all = htmlUrls.concat(assetUrls);
+
+  // Every browser script, read off disk rather than listed here, so a new one
+  // is covered the day it is added.
+  //
+  // These were the shape this section forgot, and it cost a production error.
+  // js/ had no Cache-Control rule at all: it fell through to the catch-all
+  // that sets only security headers. The scripts are therefore cached
+  // independently of one another, and they are not independent — one file
+  // declares the sitewide constants and the others consume them by name. When
+  // CUTOFF_HOUR became DISPATCH_BUSINESS_DAYS, returning visitors held a
+  // cached products-data.js that still declared the old name while fetching a
+  // fresh product.js that used the new one, and the product page threw
+  // "DISPATCH_BUSINESS_DAYS is not defined" on the delivery estimate. Nothing
+  // was wrong with either file; they were simply from different deploys.
+  const scriptUrls = fs.readdirSync(path.join(ROOT, 'js'))
+    .filter(f => f.endsWith('.js'))
+    .map(f => '/js/' + f);
+
+  const all = htmlUrls.concat(assetUrls, scriptUrls);
 
   const uncached = all.filter(u => cacheFor(u).length === 0);
   ok('every served URL shape resolves a Cache-Control rule',
@@ -2681,6 +2699,16 @@ console.log('\ndeploy headers');
   // price would keep seeing it for a year. Only /assets/ is safe to freeze.
   const frozen = htmlUrls.filter(u => cacheFor(u).some(v => /immutable/.test(v)));
   ok('no HTML page is served immutable', frozen.length === 0, frozen.join(', '));
+
+  // The scripts have to revalidate for the same reason, and one more: they
+  // have to agree with each other. A script held past a deploy that renamed a
+  // shared constant is a page that half works.
+  const frozenScripts = scriptUrls.filter(u => cacheFor(u).some(v => /immutable/.test(v)));
+  ok('no browser script is served immutable', frozenScripts.length === 0,
+    frozenScripts.join(', '));
+  const stale = scriptUrls.filter(u => !cacheFor(u).some(v => /must-revalidate|no-store|no-cache/.test(v)));
+  ok('every browser script is revalidated, so siblings cannot come from different deploys',
+    stale.length === 0, stale.join(', '));
 
   ok('assets are served immutable',
     assetUrls.every(u => cacheFor(u).some(v => /immutable/.test(v))));
