@@ -12,9 +12,10 @@
   // does too rather than keeping its own .toFixed(2) that always shows cents.
   const money = fmtPrice;
 
-  // CUTOFF_HOUR and TRANSIT_DAYS come from js/products-data.js. The shipping
-  // page and the marquee state the same two figures in words, so they are
-  // sitewide constants rather than ones this file owns and the others restate.
+  // DISPATCH_BUSINESS_DAYS, DISPATCH_LABEL and TRANSIT_DAYS come from
+  // js/products-data.js. The shipping page and the marquee state the same
+  // figures in words, so they are sitewide constants rather than ones this
+  // file owns and the others restate.
 
   // CAT_LABEL comes from js/products-data.js, loaded before this file.
 
@@ -68,34 +69,17 @@
   }).format(d);
 
   function deliveryEstimate() {
-    const p = pacificParts(new Date());
-    const today = anchor(p);
-    const secondsIn = (+p.hour % 24) * 3600 + (+p.minute) * 60 + (+p.second);
+    const today = anchor(pacificParts(new Date()));
 
-    // Miss the 2pm cutoff, or land on a weekend, and dispatch rolls to the
-    // next business morning. addBusinessDays already steps over Sat/Sun.
-    const shipsToday = !isWeekend(today) && secondsIn < CUTOFF_HOUR * 3600;
-    const shipDate = shipsToday ? today : addBusinessDays(today, 1);
+    // DISPATCH_BUSINESS_DAYS is a window, not a deadline: the order leaves
+    // within it, possibly sooner. The arrival estimate is built from the far
+    // edge of that window rather than the near one, so the date on the page is
+    // the latest the box should go out and not the earliest it might. Ordering
+    // on a weekend starts the count on Monday, which addBusinessDays already
+    // does by stepping over Sat/Sun.
+    const shipDate = addBusinessDays(today, DISPATCH_BUSINESS_DAYS);
 
-    return {
-      shipsToday,
-      // How long is left to make today's pickup. Only meaningful when
-      // shipsToday, and it is the whole point of showing a countdown at all:
-      // "same-day shipping" is a rule, "1h 12m" is an answer.
-      secondsLeft: CUTOFF_HOUR * 3600 - secondsIn,
-      arrivalDate: addBusinessDays(shipDate, TRANSIT_DAYS),
-    };
-  }
-
-  // Rounded down to the minute, because the tick below is a minute long: saying
-  // "2h 14m" and meaning "somewhere under that" is the safe direction to err.
-  function countdown(seconds) {
-    const mins = Math.floor(seconds / 60);
-    if (mins < 1) return 'less than a minute';
-    const hours = Math.floor(mins / 60);
-    return hours
-      ? `${hours}h ${String(mins % 60).padStart(2, '0')}m`
-      : `${mins}m`;
+    return { arrivalDate: addBusinessDays(shipDate, TRANSIT_DAYS) };
   }
 
   // Dispatch and delivery are only claims we can make about something we can
@@ -114,16 +98,15 @@
         return;
       }
       const e = deliveryEstimate();
-      // The countdown is the certainty the rest of this page is built on: not
-      // "we ship fast", but how long is left to make today's pickup.
-      cutEl.innerHTML = e.shipsToday
-        ? `In stock, <strong>ships today</strong>. Order within <strong>${countdown(e.secondsLeft)}</strong>.`
-        : 'In stock, <strong>ships next business day</strong>';
+      cutEl.innerHTML = `In stock, <strong>ships ${DISPATCH_LABEL}</strong>`;
       arrEl.innerHTML = `Estimated delivery <strong>${fmtDay(e.arrivalDate)}</strong>`;
     }
 
     refreshDelivery = tick;
     tick();
+    // Nothing counts down any more, but the arrival date still rolls over at
+    // Pacific midnight, and a page left open overnight would otherwise sit
+    // there quoting yesterday's estimate.
     setInterval(tick, 60000);
   }
 

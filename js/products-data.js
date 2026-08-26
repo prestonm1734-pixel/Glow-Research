@@ -519,17 +519,21 @@ const BATCHES_TESTED = 150;
 // which meant the evidence panel could only quote them by typing them out
 // again, and a string typed into a template is not a number the audit can pin.
 //
-// CUTOFF_LABEL is derived rather than written, so the hour and the words a
-// customer reads cannot come apart. check-claims.js pins every "<n> AM|PM PST"
-// on the site, and in the scripts that render copy, to CUTOFF_HOUR.
-const CUTOFF_HOUR = 14;
-const CUTOFF_H12 = CUTOFF_HOUR > 12 ? CUTOFF_HOUR - 12 : CUTOFF_HOUR;
-const CUTOFF_MERIDIEM = CUTOFF_HOUR >= 12 ? 'PM' : 'AM';
-const CUTOFF_LABEL = `${CUTOFF_H12}:00 ${CUTOFF_MERIDIEM} PST`;
-// The same time without the minutes, for the evidence panel, where the row is
-// three words and ":00" is noise. Derived from the same hour, so there is still
-// only one number to change.
-const CUTOFF_LABEL_SHORT = `${CUTOFF_H12} ${CUTOFF_MERIDIEM} PST`;
+// This was a 2:00 PM PST cutoff: order before it and the box went out the same
+// afternoon, miss it and the order waited. The promise is now a window rather
+// than a race. An order leaves within one business day of being placed,
+// whenever it is placed, so there is no clock an evening order is already on
+// the wrong side of and no hour, meridiem and timezone for eleven pages to
+// restate consistently.
+//
+// DISPATCH_LABEL is derived from the number of days rather than written beside
+// it, so the figure the code works from and the words a customer reads cannot
+// come apart. check-claims.js pins every dispatch claim on the site to it, and
+// fails the build if the old cutoff wording returns anywhere.
+const DISPATCH_BUSINESS_DAYS = 1;
+const DISPATCH_LABEL = DISPATCH_BUSINESS_DAYS === 1
+  ? 'within one business day'
+  : `within ${DISPATCH_BUSINESS_DAYS} business days`;
 
 // FedEx transit, in business days. Quoted by the delivery estimate on the
 // product page and by the dispatch row of the evidence panel. check-claims.js
@@ -778,12 +782,13 @@ const FAQS = [
   },
   {
     // Every figure here is the constant the rest of the site quotes: the
-    // cutoff from CUTOFF_HOUR, the transit from TRANSIT_DAYS. check-claims.js
-    // pins both sitewide, so this answer cannot drift from the shipping page.
+    // dispatch window from DISPATCH_BUSINESS_DAYS, the transit from
+    // TRANSIT_DAYS. check-claims.js pins both sitewide, so this answer cannot
+    // drift from the shipping page.
     q: 'How quickly does an order go out?',
-    a: `Order before ${CUTOFF_LABEL} on a weekday and it ships that afternoon on FedEx ` +
-       `${TRANSIT_DAYS}-Day. Tracking follows within a day. Saturday delivery where FedEx ` +
-       'runs it, no extra charge. United States only.',
+    a: `Every order ships ${DISPATCH_LABEL}, on FedEx ${TRANSIT_DAYS}-Day. Weekends and ` +
+       'public holidays do not count toward that. Tracking follows within a day. Saturday ' +
+       'delivery where FedEx runs it, no extra charge. United States only.',
   },
   {
     // Reads PACKAGING_PLAIN rather than describing the box a second time.
@@ -1531,9 +1536,8 @@ if (typeof module !== 'undefined' && module.exports) {
     cartUpsell,
     avgPurity,
     BATCHES_TESTED,
-    CUTOFF_HOUR,
-    CUTOFF_LABEL,
-    CUTOFF_LABEL_SHORT,
+    DISPATCH_BUSINESS_DAYS,
+    DISPATCH_LABEL,
     TRANSIT_DAYS,
     PACKAGING_PLAIN,
     STORAGE_LONG,

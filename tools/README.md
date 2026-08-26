@@ -43,10 +43,15 @@ It currently checks that:
 
 - the free-shipping threshold in the marquee equals `FREE_SHIPPING_AT` in
   `cart.js` **and** `freeOver` in `checkout.js`. Three places, one number
-- every stated dispatch cutoff equals `CUTOFF_HOUR`, and the estimate is
-  computed in Pacific time, which is what the copy claims. The scripts are
-  scanned as well as the pages: the product page states the cutoff in a string
-  it renders at runtime, and a claim is a claim whichever file it was typed into
+- `DISPATCH_LABEL` reads as the window `DISPATCH_BUSINESS_DAYS` actually sets,
+  the estimate counts business days rather than calendar days, and it is
+  computed in Pacific time, which is what the copy claims. Dispatch was a
+  2 PM PST cutoff until August 2026, so the same section also fails the build
+  if any clock-time cutoff or same-day-shipping wording returns to a page or a
+  script. Comments are stripped before that scan, since a note recording what
+  the copy used to say is not itself a claim. The scripts are scanned as well
+  as the pages: the product page states the window in a string it renders at
+  runtime, and a claim is a claim whichever file it was typed into
 - every stated FedEx service equals `TRANSIT_DAYS`, in both word orders the copy
   uses ("FedEx 2-Day", "2-day FedEx Express") and as the counted figure on the
   shipping page and in the homepage hero
@@ -94,13 +99,13 @@ It currently checks that:
   `productCardHtml()`; every indexable page carries structured data; every
   JSON-LD block parses; the process page's `ItemList` describes the six steps
   actually on the page; and `llms.txt` covers the whole catalog with the
-  research-use framing and the enforced cutoff
+  research-use framing and the enforced dispatch window
 - every copy of every page title and description matches `tools/page-meta.js`,
   `og:url` equals the canonical, no description runs past what a search result
   shows, and every indexable page has an entry
 - the About page's facts table agrees with the catalog: the Testing row states
   the current `COA_COPY.short`, the Manufacturing row keeps the hedge
-  `SOURCE_LONG` carries, and the Dispatch row quotes `CUTOFF_LABEL` and
+  `SOURCE_LONG` carries, and the Dispatch row quotes `DISPATCH_LABEL` and
   `TRANSIT_DAYS`
 - no build script inserts copy with a `$1` replacement string, and a price
   beginning `$1` is run through the card renderer to prove it survives

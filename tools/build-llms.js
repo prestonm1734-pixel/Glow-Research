@@ -30,7 +30,7 @@ const OUT = 'llms.txt';
 
 const {
   GLOW_PRODUCTS, FAQS, productHref, salePrice, onSaleNow, fmtPrice,
-  CUTOFF_LABEL, TRANSIT_DAYS, ANALYSIS_LONG, SOURCE_LONG, COA_COPY,
+  DISPATCH_LABEL, TRANSIT_DAYS, ANALYSIS_LONG, SOURCE_LONG, COA_COPY,
   PRODUCT_PAGES_LIVE, avgPurity, CAT_LABEL, LAB, coaHref, verifyUrl,
   ANALYSIS_NOT_RUN, ANALYSIS_SOME_LOTS, listWords, verifyHost,
 } = require(path.join(ROOT, 'js/products-data.js'));
@@ -94,8 +94,8 @@ benefit.
   links its own, and each one can be checked against the laboratory's records
   at ${verifyHost()} using the report reference printed on it.
 - Fulfilment: US-based climate-controlled facility, stock held by lot.
-- Dispatch: orders placed before ${CUTOFF_LABEL} on a business day ship the same
-  day, then ${TRANSIT_DAYS}-day FedEx Express within the United States.
+- Dispatch: every order ships ${DISPATCH_LABEL} of being placed, then
+  ${TRANSIT_DAYS}-day FedEx Express within the United States.
 - Average catalog purity: ${avgPurity()}%. Individual figures are per compound.
 
 ## Catalog
@@ -112,7 +112,7 @@ ${faq}
 - [Certificates](${SITE}/coa.html): every compound's certificate of analysis, searchable by compound or lot
 - [Our process](${SITE}/how-we-test.html): what is tested on every lot, who runs it, and what is not tested
 - [About](${SITE}/about.html): where Glow sits in the chain, and the five published principles
-- [Shipping](${SITE}/shipping.html): cutoff, transit, coverage and terms
+- [Shipping](${SITE}/shipping.html): dispatch window, transit, coverage and terms
 - [Wholesale](${SITE}/wholesale.html): volume pricing for institutions
 - [Contact](${SITE}/contact.html)
 `;

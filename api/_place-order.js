@@ -349,7 +349,7 @@ function orderHtml(o) {
       (o.shippingMethod ? `<p style="margin:12px 0 0;font-size:13px;color:#6e6e73;">${esc(o.shippingMethod.label)}</p>` : ''),
 
       eyebrow('What happens next') +
-      fine('<strong style="color:#0a0a0a;">1.</strong> Your vials are pulled, sealed, and packed in a plain, unmarked box. Orders placed before 2:00 PM PT on a weekday go out the same afternoon.') +
+      fine('<strong style="color:#0a0a0a;">1.</strong> Your vials are pulled, sealed, and packed in a plain, unmarked box. Orders go out within one business day of being placed.') +
       fine('<strong style="color:#0a0a0a;">2.</strong> It goes out on 2-day FedEx with tracking.') +
       fine('<strong style="color:#0a0a0a;">3.</strong> The tracking number appears against this order in your account the moment it is issued.') +
       `<p style="margin:16px 0 0;font-size:12px;line-height:1.55;color:#86868b;">
@@ -387,7 +387,7 @@ function orderText(o) {
     '',
     'WHAT HAPPENS NEXT',
     '  1. Your vials are pulled, sealed, and packed in a plain, unmarked box.',
-    '     Orders placed before 2:00 PM PT on a weekday go out the same afternoon.',
+    '     Orders go out within one business day of being placed.',
     '  2. It goes out on 2-day FedEx with tracking.',
     '  3. The tracking number appears against this order in your account the',
     '     moment it is issued.',

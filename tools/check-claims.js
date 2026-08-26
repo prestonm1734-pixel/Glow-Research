@@ -25,7 +25,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
-  avgPurity, BATCHES_TESTED, TRANSIT_DAYS, CUTOFF_LABEL, CUTOFF_LABEL_SHORT,
+  avgPurity, BATCHES_TESTED, TRANSIT_DAYS, DISPATCH_LABEL,
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord, PACKAGING_PLAIN, STORAGE_LONG,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
@@ -83,52 +83,85 @@ console.log('\nfree shipping threshold');
 }
 
 /* ---------------------------------------------------------------------------
- * 2. Dispatch cutoff. The product page computes "ships today" from
- *    CUTOFF_HOUR; the marquee, hero and shipping page state it in words. If
- *    someone tunes the constant without touching the copy, the site promises
- *    same-day shipping on an order it has already decided to hold.
+ * 2. Dispatch window. This was a 2 PM PST cutoff, stated in words on eleven
+ *    pages and counted down to on the product page. It is now a window: an
+ *    order ships within DISPATCH_BUSINESS_DAYS of being placed. The risk that
+ *    replaced "the constant and the copy disagree" is "one page still promises
+ *    the old cutoff", which is worse, because a cutoff is a promise about a
+ *    specific hour that nothing in the code enforces any more.
  * ------------------------------------------------------------------------- */
-console.log('\ndispatch cutoff');
+console.log('\ndispatch window');
 {
-  const hour = constant('js/products-data.js', 'CUTOFF_HOUR');
-  ok('products-data.js declares CUTOFF_HOUR', hour !== null);
-  const h12 = hour > 12 ? hour - 12 : hour;
-  const meridiem = hour >= 12 ? 'PM' : 'AM';
-  const stated = `${h12}${meridiem}`;   // 14 -> "2PM"
+  const days = constant('js/products-data.js', 'DISPATCH_BUSINESS_DAYS');
+  ok('products-data.js declares DISPATCH_BUSINESS_DAYS', days !== null);
 
-  // Any "<n>[:00] AM|PM PST" anywhere in the copy is a cutoff claim. The
-  // scripts are scanned too, not just the pages: the product page states the
-  // cutoff in a string it renders at runtime, and a claim a customer reads is
-  // a claim whether it was typed into markup or into a template literal.
-  const wrong = [];
+  // The words a customer reads, checked against the number the estimate is
+  // computed from rather than against the source that builds them.
+  const expected = days === 1
+    ? 'within one business day'
+    : `within ${days} business days`;
+  ok(`DISPATCH_LABEL reads "${expected}"`, DISPATCH_LABEL === expected,
+    `expected "${expected}", got "${DISPATCH_LABEL}"`);
+
+  // Nothing may state a clock-time cutoff any more. The old guard checked that
+  // every "<n> AM|PM PST" matched CUTOFF_HOUR; there is no such hour now, so
+  // any surviving one is a promise about a deadline the code does not keep.
+  // Scripts are scanned alongside pages for the same reason as before: a claim
+  // rendered from a template literal is still a claim a customer reads.
   const cutoffSources = pages.concat(
-    ['js/product.js', 'js/products-data.js', 'js/cart.js', 'js/checkout.js']);
+    ['js/product.js', 'js/products-data.js', 'js/cart.js', 'js/checkout.js',
+     'api/_place-order.js', 'tools/build-llms.js', 'tools/page-meta.js']);
+
+  // Comments stripped, the same rule the privacy and navigation sections use:
+  // a note recording what the copy used to say is not itself a claim anyone
+  // reads. The constant's own comment explains why the cutoff was dropped, and
+  // it has to be able to quote the hour it dropped without failing this.
+  // &nbsp; is folded to a space first: it is a typographic choice, not a
+  // different claim, and about.html read "2:00&nbsp;PM PST" and was invisible
+  // to exactly this scan once before.
+  const bareSrc = f => read(f)
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^[ \t]*\/\/.*$/gm, '')
+    .replace(/&nbsp;|&#160;| /g, ' ');
+
+  const clocks = [];
   cutoffSources.forEach(f => {
-    // &nbsp; between the time and the meridiem is a typographic choice, not a
-    // different claim, but it is not whitespace to a regex. about.html reads
-    // "2:00&nbsp;PM PST" and was therefore invisible to this scan: the one
-    // page stating the cutoff in prose was the one page never checked.
-    const src = read(f).replace(/&nbsp;|&#160;| /g, ' ');
-    for (const m of src.matchAll(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\s*PST\b/gi)) {
-      const [, h, mins, ap] = m;
-      if (+h !== h12 || ap.toUpperCase() !== meridiem || (mins && mins !== '00')) {
-        wrong.push(`${f}: "${m[0]}"`);
-      }
+    for (const m of bareSrc(f).matchAll(/\b\d{1,2}(?::\d{2})?\s*(?:AM|PM)\s*P[SD]T\b/gi)) {
+      clocks.push(`${f}: "${m[0]}"`);
     }
   });
-  ok(`every stated cutoff is ${stated} PST`, wrong.length === 0, wrong.join(', '));
+  ok('no page or script states a dispatch cutoff time', clocks.length === 0,
+    clocks.join(', '));
 
-  // The words a customer reads are checked against the hour rather than against
-  // the source that builds them: however the two labels get written, they have
-  // to come out saying the time the code actually enforces.
-  ok(`CUTOFF_LABEL reads "${CUTOFF_LABEL}"`,
-    CUTOFF_LABEL === `${h12}:00 ${meridiem} PST`,
-    `expected "${h12}:00 ${meridiem} PST"`);
-  ok(`CUTOFF_LABEL_SHORT reads "${CUTOFF_LABEL_SHORT}"`,
-    CUTOFF_LABEL_SHORT === `${h12} ${meridiem} PST`,
-    `expected "${h12} ${meridiem} PST"`);
-  ok('the product page reads the shared cutoff, not its own copy',
-    !/const CUTOFF_HOUR/.test(read('js/product.js')) && /CUTOFF_HOUR/.test(read('js/product.js')));
+  // The same-day family of phrases. Dispatch within one business day is not
+  // same-day dispatch, and a page still saying so is claiming more than the
+  // code and the warehouse now promise.
+  const sameDay = [];
+  cutoffSources.forEach(f => {
+    for (const m of bareSrc(f).matchAll(/same[- ]day\s+(?:ship|dispatch)\w*|ships?\s+(?:that|the)\s+same\s+(?:day|afternoon)|packed\s+same\s+day/gi)) {
+      sameDay.push(`${f}: "${m[0]}"`);
+    }
+  });
+  ok('no page still promises same-day dispatch', sameDay.length === 0,
+    sameDay.join(', '));
+
+  // The constants are gone; nothing should still be reaching for them.
+  const stale = [];
+  cutoffSources.forEach(f => {
+    if (/CUTOFF_HOUR|CUTOFF_LABEL/.test(read(f))) stale.push(f);
+  });
+  ok('nothing references the removed cutoff constants', stale.length === 0,
+    stale.join(', '));
+
+  ok('the product page reads the shared dispatch window, not its own copy',
+    !/const DISPATCH_BUSINESS_DAYS/.test(read('js/product.js')) &&
+    /DISPATCH_BUSINESS_DAYS/.test(read('js/product.js')));
+
+  // The window is stated in business days, so the estimate has to step over
+  // weekends rather than adding calendar days.
+  ok('the estimate counts business days, not calendar days',
+    /addBusinessDays\(\s*today\s*,\s*DISPATCH_BUSINESS_DAYS\s*\)/.test(read('js/product.js')));
 
   // The estimate must be computed in Pacific, since that is what the copy says.
   ok('the estimate is computed in Pacific time',
@@ -1664,8 +1697,8 @@ console.log('\ncrawlable content');
     `${absent.map(p => p.name).join(', ')} — run \`node tools/build-llms.js\``);
   ok('llms.txt states the research-use framing',
     /not for human or animal consumption/i.test(llms) && /not FDA-approved/i.test(llms));
-  ok('llms.txt quotes the enforced cutoff and transit',
-    llms.includes(CUTOFF_LABEL) && llms.includes(`${TRANSIT_DAYS}-day FedEx`));
+  ok('llms.txt quotes the enforced dispatch window and transit',
+    llms.includes(DISPATCH_LABEL) && llms.includes(`${TRANSIT_DAYS}-day FedEx`));
 }
 
 console.log('\nstructured data');
