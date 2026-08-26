@@ -2584,6 +2584,20 @@ console.log('\nprivacy disclosure');
       !/no behaviou?ral tracking\b/i.test(privacy) ||
       /third-party|cross-site/i.test(privacy));
   }
+
+  // js/meta-pixel.js exists and can go live the moment META_PIXEL_ID is
+  // filled in, with no other deploy required — so the policy has to already
+  // account for the capability, not just today's on/off state. The three
+  // spans it corrects at runtime (js/meta-pixel.js) are what let the default
+  // "not currently" text stay honest until that flag flips.
+  if (/fbq\(/.test(read('js/meta-pixel.js'))) {
+    ok('the privacy policy accounts for the Meta pixel/Conversions API capability',
+      /meta/i.test(privacy) && /pixel|conversions api/i.test(privacy));
+    ok('and no longer claims there are no advertising pixels on the site',
+      !/no advertising pixels?\b/i.test(privacy));
+    ok('the runtime disclosure spans exist for meta-pixel.js to correct if the flag ever flips',
+      ['metaPixelNote3', 'metaPixelNote4', 'metaPixelNote5'].every(id => privacy.includes(id)));
+  }
 }
 
 /* ---------------------------------------------------------------------------

@@ -72,6 +72,12 @@ export default async function handler(req, res) {
     // and compared as text.
     session_id: (analytics && String(analytics.sessionId || '')) || '',
     anon_id: (analytics && String(analytics.anonId || '')) || '',
+    // Meta's own cookies (js/analytics.js reads them), carried the same way
+    // so api/_meta-capi.js can send them with the server-side Purchase event
+    // for better match quality — without these, Meta can only match a sale
+    // to a click by hashed email/phone alone.
+    fbc: (analytics && String(analytics.fbc || '')) || '',
+    fbp: (analytics && String(analytics.fbp || '')) || '',
   };
 
   // Only present on the final pricing call, right before confirmPayment() —

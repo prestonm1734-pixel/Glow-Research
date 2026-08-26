@@ -90,6 +90,7 @@
 <meta property="og:url" content="https://glowresearch.shop/privacy.html" />
 </head>
 <body>
+<script src="js/meta-pixel.js" defer></script>
 <script src="js/analytics.js" defer></script>
 
 <!-- first-visit age / RUO gate. Loaded here, not with the other
@@ -205,12 +206,13 @@
 
     <h2>3. What We Don't Do</h2>
     <p>
-      Glow Research does not run third-party analytics, advertising pixels, or
-      cross-site tracking scripts. There is no Google Analytics, no advertising tag, and
-      no data broker on this site. Fonts are served from our own domain rather than a
-      font provider, so loading a page makes no request to a third party. We don't sell
-      or rent personal information to anyone, and we don't build advertising profiles
-      from your activity.
+      Glow Research does not run general cross-site tracking scripts of the kind that
+      follow you across other, unrelated sites to build a profile of you. There is no
+      Google Analytics and no data broker on this site. Fonts are served from our own
+      domain rather than a font provider, so loading a page makes no request to a third
+      party. We don't sell or rent personal information to anyone.
+      <span id="metaPixelNote3">We do not currently run an advertising pixel of any
+      kind.</span>
     </p>
 
     <h2>4. Third-Party Services</h2>
@@ -239,12 +241,16 @@
         along with which product and price were involved, so we can see where people stop rather
         than only that they visited. None of it carries a name, email, account, or IP address, it
         sets no cookie of its own, and it is not shared with anyone.</li>
+      <li><strong>Meta (advertising measurement):</strong>
+        <span id="metaPixelNote4">We do not currently send Meta any data about your visit
+        or purchases. If that changes, this line will say exactly what is shared and
+        why.</span></li>
     </ul>
 
     <h2>5. Cookies</h2>
     <p>
-      This site sets no tracking or advertising cookies. It sets one functional cookie,
-      and only if you sign in:
+      <span id="metaPixelNote5">This site sets no advertising cookies.</span> It sets one
+      functional cookie, and only if you sign in:
     </p>
     <ul>
       <li><strong>glow_session:</strong> a signed session token that keeps you signed in. It is

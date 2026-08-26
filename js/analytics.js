@@ -82,7 +82,55 @@
     return ctx;
   }
 
-  function track(eventType, properties) {
+  // Meta sets these two cookies itself once the pixel below has loaded
+  // (_fbp always, _fbc only after an ad click carrying fbclid). Read here
+  // rather than duplicated: this is the one place any caller — the pixel
+  // forward below, or api/create-payment-intent.js via ids() — gets them
+  // from, so there is one implementation of "how to read a cookie" in this
+  // file, not several slightly different ones.
+  function cookie(name) {
+    var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+
+  // Our own event names mapped to Meta's standard ones, with just enough of
+  // each event's own properties translated into the fields Meta's Pixel
+  // expects. Not every internal event has a Meta equivalent — pageview is
+  // skipped because js/meta-pixel.js already sends its own PageView on load,
+  // and everything else (scroll depth, form funnel, errors) has no standard
+  // ads event to map to, so it simply never reaches fbq at all.
+  function forwardToMeta(eventType, properties, metaEventId) {
+    if (typeof window.fbq !== 'function') return;
+    var p = properties || {};
+    var opts = metaEventId ? { eventID: metaEventId } : undefined;
+
+    if (eventType === 'product_viewed') {
+      fbq('track', 'ViewContent', {
+        content_ids: p.sku ? [p.sku] : undefined,
+        content_type: 'product',
+        value: p.price || undefined,
+        currency: 'USD',
+      }, opts);
+    } else if (eventType === 'cart_add') {
+      fbq('track', 'AddToCart', {
+        content_ids: p.sku ? [p.sku] : undefined,
+        content_type: 'product',
+        value: p.price || undefined,
+        currency: 'USD',
+      }, opts);
+    } else if (eventType === 'checkout_started') {
+      fbq('track', 'InitiateCheckout', { num_items: p.itemCount || undefined }, opts);
+    } else if (eventType === 'purchase_completed') {
+      fbq('track', 'Purchase', { value: p.revenue || 0, currency: 'USD' }, opts);
+    }
+  }
+
+  // metaEventId is only ever passed by the purchase call sites (js/checkout.js,
+  // js/express-pay.js), set to the Stripe PaymentIntent ID — the one value
+  // both this browser call and the server-side Conversions API call for the
+  // same purchase already agree on, which is what lets Meta deduplicate the
+  // two into one event instead of double-counting a sale.
+  function track(eventType, properties, metaEventId) {
     try {
       var v = visitor();
       var ctx = sessionContext(v.isNew);
@@ -109,14 +157,22 @@
         keepalive: true,
       }).catch(function () {});
     } catch (e) {}
+    try { forwardToMeta(eventType, properties, metaEventId); } catch (e) {}
   }
 
   // Read by js/checkout.js and js/express-pay.js so the PaymentIntent
   // metadata carries the same IDs an order's earlier funnel events used,
   // which is what lets the dashboard tie a completed purchase back to the
-  // session that produced it instead of counting orders on their own.
+  // session that produced it instead of counting orders on their own, and
+  // separately lets api/_meta-capi.js send fbc/fbp along with the
+  // server-side Purchase event for better match quality with Meta.
   function ids() {
-    return { sessionId: sessionId(), anonId: visitor().id };
+    return {
+      sessionId: sessionId(),
+      anonId: visitor().id,
+      fbc: cookie('_fbc') || null,
+      fbp: cookie('_fbp') || null,
+    };
   }
 
   // Assigns and remembers a variant for a named experiment, stable for this

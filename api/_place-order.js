@@ -15,6 +15,8 @@
 
 import { wc, stripe, findCustomerByEmail } from './_lib.js';
 import { emailShell, heading, paragraph, eyebrow, fine, esc, sendEmail, money } from './_email.js';
+import { sendMetaPurchaseEvent } from './_meta-capi.js';
+import { META_PIXEL_ID } from '../js/products-data.js';
 
 const ADMIN_TO = 'preston@glowresearch.shop';
 const SUPPORT = 'support@glowresearch.shop';
@@ -30,7 +32,7 @@ const ADMIN_SMS_TO = '6195925152@txt.att.net';
 // Creates the WooCommerce order for a payment Stripe has already verified as
 // succeeded, then sends the confirmation and desk emails. Throws on a
 // WooCommerce failure after alerting the desk — see alertOrphanedPayment.
-export async function placeOrder({ paymentIntentId, intent, priced, email, customer, shipping, billing, shippingMethod, notes, session }) {
+export async function placeOrder({ paymentIntentId, intent, priced, email, customer, shipping, billing, shippingMethod, notes, session, clientIp, userAgent }) {
   // WooCommerce line_items match by SKU, resolved and priced by priceOrder()
   // (called by the caller, before this function) rather than trusted from
   // whatever the request said. A line that cannot be matched to a SKU — a
@@ -153,12 +155,38 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
     // Awaited, because the function can be frozen the moment the response is
     // sent. None of the three sends can throw, and none is allowed to fail
     // the order: it exists in WooCommerce by this point, and telling the
-    // shopper otherwise would have them place it twice.
+    // shopper otherwise would have them told to email support twice.
     const order = {
       number: data.number, email, items: emailItems, shippingMethod: emailShipping,
       tax: priced.tax, discount: priced.discount, promoCode: (priced.promo && priced.promo.code) || null,
       shipping, notes,
     };
+
+    // Same reasoning as the two best-effort Stripe writes above: the order
+    // exists and is paid for either way, so a failure here (Meta down, a bad
+    // token) must never surface as a problem with the order itself. fbc/fbp
+    // ride on the PaymentIntent's own metadata (set at creation time by
+    // api/create-payment-intent.js) rather than being passed in fresh here,
+    // since the webhook backstop path has no browser present to read a
+    // cookie from — the intent is the one place both paths can read them.
+    // clientIp/userAgent are only ever present on the browser's own call
+    // (api/create-order.js); the webhook path sends the event without them,
+    // which lowers Meta's match quality for that one order but does not
+    // prevent it from counting.
+    await sendMetaPurchaseEvent({
+      pixelId: META_PIXEL_ID,
+      accessToken: process.env.META_CAPI_ACCESS_TOKEN,
+      eventId: paymentIntentId,
+      eventSourceUrl: 'https://glowresearch.shop/checkout.html',
+      email,
+      phone: (customer && customer.phone) || '',
+      fbc: (intent.metadata && intent.metadata.fbc) || '',
+      fbp: (intent.metadata && intent.metadata.fbp) || '',
+      clientIp,
+      userAgent,
+      value: intent.amount_received / 100,
+    }).catch(() => {});
+
     await Promise.all([
       sendEmail({
         to: email,

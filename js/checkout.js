@@ -599,6 +599,10 @@
     } catch (e) { /* private mode: the fallback message on thank-you.html still shows */ }
 
     if (window.GlowAnalytics) {
+      // stripePaymentIntentId doubles as the Meta event ID (third arg), so
+      // the browser pixel's Purchase and the server-side Conversions API
+      // Purchase for this same sale (see api/_meta-capi.js) dedupe into one
+      // event in Meta's Events Manager instead of counting twice.
       window.GlowAnalytics.track('purchase_completed', {
         orderNumber: data.orderNumber,
         // Stripe's own collected amount (see api/create-order.js), not a
@@ -606,7 +610,7 @@
         // actually charged once tax, shipping and discounts are applied.
         revenue: data.total,
         itemCount: payload.items.reduce((n, i) => n + (i.qty || 1), 0),
-      });
+      }, stripePaymentIntentId);
     }
     if (window.GlowCart) window.GlowCart.clear();
     // Correct as a bare path today, since this file only ever runs on

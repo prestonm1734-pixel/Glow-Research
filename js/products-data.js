@@ -148,6 +148,16 @@ const PAYMENTS_LIVE = true;
 // silently take test-mode payments, or a live payment will find no webhook.
 const STRIPE_PUBLISHABLE_KEY = 'pk_live_51U3kUmHjOd9MaH5sNxBU6C1neJypFeZGunq4CUybpTBrzWRC0dA4XY72By2DFkWDwIz8RPdHUhXHZlu6M0dgcTjW00ufOBrU9S';
 
+// Meta's Pixel ID, not secret — it identifies which pixel a browser event
+// belongs to, the same way a Google Analytics measurement ID would, and
+// Meta's own docs say it is safe to ship client-side. Read by
+// js/meta-pixel.js, which no-ops entirely while this is empty, so nothing
+// fires (no fbq script loads, no PageView, nothing) until a real ID from
+// Meta Events Manager replaces it. The matching server-side piece,
+// META_CAPI_ACCESS_TOKEN, is a Vercel environment variable and must never be
+// checked in — see api/_meta-capi.js.
+const META_PIXEL_ID = '';
+
 // What the confirmation page says about payment, keyed off the same flag that
 // decides whether payment is actually taken. Hand-written copy here was the
 // exact failure this guards against: thank-you.html told shoppers "card
@@ -1572,6 +1582,7 @@ if (typeof module !== 'undefined' && module.exports) {
     PAYMENTS_LIVE,
     PAYMENT_COPY,
     STRIPE_PUBLISHABLE_KEY,
+    META_PIXEL_ID,
     round2,
   };
 }

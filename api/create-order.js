@@ -118,6 +118,11 @@ export default async function handler(req, res) {
     const result = await placeOrder({
       paymentIntentId, intent, priced, email, customer, shipping, billing,
       shippingMethod, notes, session: currentSession(req),
+      // For the Meta Conversions API Purchase event (api/_meta-capi.js) —
+      // present here because a real browser made this request, absent on
+      // the webhook backstop path, which has no client to read these from.
+      clientIp: (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress,
+      userAgent: req.headers['user-agent'],
     });
     // priced already carries discount/promo — placeOrder() reads them straight
     // off priced rather than needing separate params here.
