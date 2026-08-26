@@ -27,8 +27,9 @@ benefit.
   links its own, and each one can be checked against the laboratory's records
   at accumarklabs.com using the report reference printed on it.
 - Fulfilment: US-based climate-controlled facility, stock held by lot.
-- Dispatch: every order ships within one business day of being placed, then
-  2-day FedEx Express within the United States.
+- Dispatch: every order ships within a day, every day except Sunday, then 2-day FedEx
+  Express within the United States. FedEx delivers Saturday where it runs it;
+  nothing is delivered on a Sunday.
 - Average catalog purity: 99.4%. Individual figures are per compound.
 
 ## Catalog
@@ -75,7 +76,7 @@ Printed on the label. Quote it when you ask for a certificate, and check it matc
 
 **How quickly does an order go out?**
 
-Every order ships within one business day, on FedEx 2-Day. Weekends and public holidays do not count toward that. Tracking follows within a day. Saturday delivery where FedEx runs it, no extra charge. United States only.
+Every order ships within a day, every day except Sunday, on FedEx 2-Day. A Sunday order goes out Monday. Tracking follows within a day. Saturday delivery where FedEx runs it, no extra charge. United States only.
 
 **What does the package look like when it arrives?**
 

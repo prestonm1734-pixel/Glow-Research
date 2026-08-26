@@ -519,25 +519,28 @@ const BATCHES_TESTED = 150;
 // which meant the evidence panel could only quote them by typing them out
 // again, and a string typed into a template is not a number the audit can pin.
 //
-// This was a 2:00 PM PST cutoff: order before it and the box went out the same
-// afternoon, miss it and the order waited. The promise is now a window rather
-// than a race. An order leaves within one business day of being placed,
-// whenever it is placed, so there is no clock an evening order is already on
-// the wrong side of and no hour, meridiem and timezone for eleven pages to
-// restate consistently.
+// This was a 2:00 PM PST cutoff, then briefly "one business day", which was
+// wrong in the other direction: Saturday is a dispatch day here, and Sunday is
+// the only day nothing leaves. Stated in plain days rather than business days
+// for exactly that reason, since a business day excludes the Saturday this
+// operation actually ships on.
 //
-// DISPATCH_LABEL is derived from the number of days rather than written beside
-// it, so the figure the code works from and the words a customer reads cannot
-// come apart. check-claims.js pins every dispatch claim on the site to it, and
-// fails the build if the old cutoff wording returns anywhere.
-const DISPATCH_BUSINESS_DAYS = 1;
-const DISPATCH_LABEL = DISPATCH_BUSINESS_DAYS === 1
-  ? 'within one business day'
-  : `within ${DISPATCH_BUSINESS_DAYS} business days`;
+// NO_DISPATCH_DAY and NO_DELIVERY_DAY are getUTCDay() indexes, so the estimate
+// on the product page and the words on ten others read the same values rather
+// than each carrying their own idea of which day is the exception. They are
+// deliberately two constants that happen to share a value: "we do not ship on
+// Sunday" and "FedEx does not deliver on Sunday" are separate facts, and if
+// either changes it should be changeable on its own.
+const NO_DISPATCH_DAY = 0;                    // Sunday, in getUTCDay() terms
+const NO_DELIVERY_DAY = 0;                    // FedEx does not deliver Sundays
+const NO_DISPATCH_DAY_NAME = 'Sunday';
+const DISPATCH_LABEL = `within a day, every day except ${NO_DISPATCH_DAY_NAME}`;
 
-// FedEx transit, in business days. Quoted by the delivery estimate on the
-// product page and by the dispatch row of the evidence panel. check-claims.js
-// pins every "FedEx <n>-Day" on the site to this number.
+// FedEx transit. Also the span the product page's arrival estimate counts
+// forward, inclusively: the day the page is being read is day one, so a
+// Tuesday visitor is shown Thursday. Counted in plain days, not business days,
+// because FedEx runs Saturday and the estimate has to match what the copy
+// promises. check-claims.js pins every "FedEx <n>-Day" on the site to this.
 const TRANSIT_DAYS = 2;
 
 // What the package actually looks like. Written when the footer on every page
@@ -786,12 +789,12 @@ const FAQS = [
   },
   {
     // Every figure here is the constant the rest of the site quotes: the
-    // dispatch window from DISPATCH_BUSINESS_DAYS, the transit from
+    // dispatch rule from NO_DISPATCH_DAY, the transit from
     // TRANSIT_DAYS. check-claims.js pins both sitewide, so this answer cannot
     // drift from the shipping page.
     q: 'How quickly does an order go out?',
-    a: `Every order ships ${DISPATCH_LABEL}, on FedEx ${TRANSIT_DAYS}-Day. Weekends and ` +
-       'public holidays do not count toward that. Tracking follows within a day. Saturday ' +
+    a: `Every order ships ${DISPATCH_LABEL}, on FedEx ${TRANSIT_DAYS}-Day. A ` +
+       `${NO_DISPATCH_DAY_NAME} order goes out Monday. Tracking follows within a day. Saturday ` +
        'delivery where FedEx runs it, no extra charge. United States only.',
   },
   {
@@ -1540,7 +1543,9 @@ if (typeof module !== 'undefined' && module.exports) {
     cartUpsell,
     avgPurity,
     BATCHES_TESTED,
-    DISPATCH_BUSINESS_DAYS,
+    NO_DISPATCH_DAY,
+    NO_DELIVERY_DAY,
+    NO_DISPATCH_DAY_NAME,
     DISPATCH_LABEL,
     TRANSIT_DAYS,
     PACKAGING_PLAIN,

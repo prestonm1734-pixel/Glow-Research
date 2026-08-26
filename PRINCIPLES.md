@@ -110,7 +110,7 @@ information that improves the system.
 
 | Pattern | Why |
 |---|---|
-| One constant, many readers | A number stated in copy and enforced in code must be the *same* value. `FREE_SHIPPING_AT`, `DISPATCH_BUSINESS_DAYS`, `SITEWIDE_DISCOUNT` are single knobs on purpose. |
+| One constant, many readers | A number stated in copy and enforced in code must be the *same* value. `FREE_SHIPPING_AT`, `NO_DISPATCH_DAY`, `SITEWIDE_DISCOUNT` are single knobs on purpose. |
 | Flags gate evidence, not claims | `COAS_PUBLISHED` and `PRODUCT_PAGES_LIVE` let true statements ship before their supporting documents do, without either drifting. |
 | Claims are derived, never hardcoded | Stock status, prices and dispatch dates are computed from data. If the data can't support the sentence, the sentence changes on its own. |
 | `node tools/check-claims.js` | The audit is automated so a broken promise fails the build instead of reaching a customer. Every new promise gets a check. |

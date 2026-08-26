@@ -43,12 +43,13 @@ It currently checks that:
 
 - the free-shipping threshold in the marquee equals `FREE_SHIPPING_AT` in
   `cart.js` **and** `freeOver` in `checkout.js`. Three places, one number
-- `DISPATCH_LABEL` reads as the window `DISPATCH_BUSINESS_DAYS` actually sets,
-  the estimate counts business days rather than calendar days, and it is
-  computed in Pacific time, which is what the copy claims. Dispatch was a
-  2 PM PST cutoff until August 2026, so the same section also fails the build
-  if any clock-time cutoff or same-day-shipping wording returns to a page or a
-  script. Comments are stripped before that scan, since a note recording what
+- `DISPATCH_LABEL` names the one day `NO_DISPATCH_DAY` actually skips, the
+  estimate counts plain days rather than business days, skips Sunday at both
+  the dispatch and the delivery end, and is computed in Pacific time, which is
+  what the copy claims. Dispatch was a 2 PM PST cutoff, then briefly "one
+  business day", so the same section fails the build if a clock-time cutoff,
+  same-day-shipping wording, or "business day" (which would exclude the
+  Saturday this operation ships and delivers on) returns to dispatch copy. Comments are stripped before that scan, since a note recording what
   the copy used to say is not itself a claim. The scripts are scanned as well
   as the pages: the product page states the window in a string it renders at
   runtime, and a claim is a claim whichever file it was typed into

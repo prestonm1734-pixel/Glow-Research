@@ -12,7 +12,7 @@
   // does too rather than keeping its own .toFixed(2) that always shows cents.
   const money = fmtPrice;
 
-  // DISPATCH_BUSINESS_DAYS, DISPATCH_LABEL and TRANSIT_DAYS come from
+  // NO_DISPATCH_DAY, NO_DELIVERY_DAY, DISPATCH_LABEL and TRANSIT_DAYS come from
   // js/products-data.js. The shipping page and the marquee state the same
   // figures in words, so they are sitewide constants rather than ones this
   // file owns and the others restate.
@@ -53,33 +53,34 @@
   }
 
   const anchor = p => new Date(Date.UTC(+p.year, +p.month - 1, +p.day, 12));
-  const isWeekend = d => d.getUTCDay() === 0 || d.getUTCDay() === 6;
-
-  function addBusinessDays(date, n) {
+  const addDays = (date, n) => {
     const out = new Date(date);
-    while (n > 0) {
-      out.setUTCDate(out.getUTCDate() + 1);
-      if (!isWeekend(out)) n--;
-    }
+    out.setUTCDate(out.getUTCDate() + n);
     return out;
-  }
+  };
 
   const fmtDay = d => new Intl.DateTimeFormat('en-US', {
     timeZone: 'UTC', weekday: 'long', month: 'short', day: 'numeric',
   }).format(d);
 
+  // Plain days, not business days. Saturday is a dispatch day here and FedEx
+  // runs Saturday delivery, so stepping over the whole weekend would push
+  // every late-week estimate out by two days it does not actually take.
+  //
+  // Counted inclusively from the day the page is being read: a Tuesday visitor
+  // sees Thursday. Sunday is handled at both ends and for two different
+  // reasons — nothing is dispatched on a Sunday, so a Sunday visitor is quoted
+  // from Monday, and nothing is delivered on a Sunday, so an estimate that
+  // lands there moves to the Monday rather than naming a date on which no
+  // box arrives.
   function deliveryEstimate() {
-    const today = anchor(pacificParts(new Date()));
+    let d = anchor(pacificParts(new Date()));
+    if (d.getUTCDay() === NO_DISPATCH_DAY) d = addDays(d, 1);
 
-    // DISPATCH_BUSINESS_DAYS is a window, not a deadline: the order leaves
-    // within it, possibly sooner. The arrival estimate is built from the far
-    // edge of that window rather than the near one, so the date on the page is
-    // the latest the box should go out and not the earliest it might. Ordering
-    // on a weekend starts the count on Monday, which addBusinessDays already
-    // does by stepping over Sat/Sun.
-    const shipDate = addBusinessDays(today, DISPATCH_BUSINESS_DAYS);
+    d = addDays(d, TRANSIT_DAYS);
+    if (d.getUTCDay() === NO_DELIVERY_DAY) d = addDays(d, 1);
 
-    return { arrivalDate: addBusinessDays(shipDate, TRANSIT_DAYS) };
+    return { arrivalDate: d };
   }
 
   // Dispatch and delivery are only claims we can make about something we can

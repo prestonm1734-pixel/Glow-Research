@@ -12,7 +12,7 @@
      with EXPRESS_SHIPPING in js/express-pay.js, so that drift fails the build
      rather than reaching a shopper. */
   const SHIPPING = [
-    { id: '2day', label: 'FedEx 2-Day Express', note: 'Arrives in 2 business days', cost: 14.99, freeOver: 400 },
+    { id: '2day', label: 'FedEx 2-Day Express', note: 'Arrives in 2 days', cost: 14.99, freeOver: 400 },
   ];
 
   /* Card only for now. Add entries here to offer more (bank transfer, crypto);

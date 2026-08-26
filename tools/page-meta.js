@@ -35,7 +35,7 @@ const PAGE_META = {
   'index.html': {
     name: 'Glow Research | Research-Grade Peptides',
     title: 'Glow Research | Research-Grade Peptides',
-    desc: 'Glow Research supplies research-grade peptides for laboratory and in-vitro research use only. Manufacturing partner, third-party tested lots, orders shipped within one business day.',
+    desc: 'Glow Research supplies research-grade peptides for laboratory and in-vitro research use only. Manufacturing partner, third-party tested lots, orders shipped within a day.',
   },
   'peptides.html': {
     name: 'Full Catalog',
@@ -45,7 +45,7 @@ const PAGE_META = {
   'product.html': {
     name: 'Product',
     title: t('Product'),
-    desc: 'Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only. Size options, specifications, and shipping within one business day.',
+    desc: 'Third-party tested research-grade peptide, supplied for laboratory and in-vitro research use only. Size options, specifications, and shipping within a day.',
   },
   'how-we-test.html': {
     name: 'How We Test',
@@ -60,7 +60,7 @@ const PAGE_META = {
   'shipping.html': {
     name: 'Shipping',
     title: t('Shipping'),
-    desc: 'Every order ships within one business day on 2-day FedEx Express. Free over $400. All 50 states.',
+    desc: 'Every order ships within a day, Monday to Saturday, on 2-day FedEx Express. Free over $400. All 50 states.',
   },
   'shipping-policy.html': {
     name: 'Shipping Policy',

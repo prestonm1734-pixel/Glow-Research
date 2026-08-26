@@ -30,7 +30,7 @@ const OUT = 'llms.txt';
 
 const {
   GLOW_PRODUCTS, FAQS, productHref, salePrice, onSaleNow, fmtPrice,
-  DISPATCH_LABEL, TRANSIT_DAYS, ANALYSIS_LONG, SOURCE_LONG, COA_COPY,
+  DISPATCH_LABEL, NO_DISPATCH_DAY_NAME, TRANSIT_DAYS, ANALYSIS_LONG, SOURCE_LONG, COA_COPY,
   PRODUCT_PAGES_LIVE, avgPurity, CAT_LABEL, LAB, coaHref, verifyUrl,
   ANALYSIS_NOT_RUN, ANALYSIS_SOME_LOTS, listWords, verifyHost,
 } = require(path.join(ROOT, 'js/products-data.js'));
@@ -94,8 +94,9 @@ benefit.
   links its own, and each one can be checked against the laboratory's records
   at ${verifyHost()} using the report reference printed on it.
 - Fulfilment: US-based climate-controlled facility, stock held by lot.
-- Dispatch: every order ships ${DISPATCH_LABEL} of being placed, then
-  ${TRANSIT_DAYS}-day FedEx Express within the United States.
+- Dispatch: every order ships ${DISPATCH_LABEL}, then ${TRANSIT_DAYS}-day FedEx
+  Express within the United States. FedEx delivers Saturday where it runs it;
+  nothing is delivered on a ${NO_DISPATCH_DAY_NAME}.
 - Average catalog purity: ${avgPurity()}%. Individual figures are per compound.
 
 ## Catalog

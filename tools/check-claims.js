@@ -25,7 +25,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
-  avgPurity, BATCHES_TESTED, TRANSIT_DAYS, DISPATCH_LABEL,
+  avgPurity, BATCHES_TESTED, TRANSIT_DAYS, DISPATCH_LABEL, NO_DISPATCH_DAY_NAME,
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord, PACKAGING_PLAIN, STORAGE_LONG,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
@@ -83,23 +83,24 @@ console.log('\nfree shipping threshold');
 }
 
 /* ---------------------------------------------------------------------------
- * 2. Dispatch window. This was a 2 PM PST cutoff, stated in words on eleven
- *    pages and counted down to on the product page. It is now a window: an
- *    order ships within DISPATCH_BUSINESS_DAYS of being placed. The risk that
- *    replaced "the constant and the copy disagree" is "one page still promises
- *    the old cutoff", which is worse, because a cutoff is a promise about a
- *    specific hour that nothing in the code enforces any more.
+ * 2. Dispatch window. This was a 2 PM PST cutoff, then briefly "one business
+ *    day", which was wrong in the other direction: Saturday is a dispatch day
+ *    here, and Sunday is the only day nothing leaves. Two failures are worth
+ *    guarding now. A page still promising the old cutoff, which is a claim
+ *    about an hour nothing in the code enforces, and a page reverting to
+ *    "business day", which quietly excludes the Saturday this operation ships
+ *    and delivers on.
  * ------------------------------------------------------------------------- */
 console.log('\ndispatch window');
 {
-  const days = constant('js/products-data.js', 'DISPATCH_BUSINESS_DAYS');
-  ok('products-data.js declares DISPATCH_BUSINESS_DAYS', days !== null);
+  const noDispatch = constant('js/products-data.js', 'NO_DISPATCH_DAY');
+  const noDelivery = constant('js/products-data.js', 'NO_DELIVERY_DAY');
+  ok('products-data.js declares NO_DISPATCH_DAY and NO_DELIVERY_DAY',
+    noDispatch !== null && noDelivery !== null);
 
-  // The words a customer reads, checked against the number the estimate is
-  // computed from rather than against the source that builds them.
-  const expected = days === 1
-    ? 'within one business day'
-    : `within ${days} business days`;
+  // The words a customer reads, built from the day the estimate actually
+  // skips rather than written beside it.
+  const expected = `within a day, every day except ${NO_DISPATCH_DAY_NAME}`;
   ok(`DISPATCH_LABEL reads "${expected}"`, DISPATCH_LABEL === expected,
     `expected "${expected}", got "${DISPATCH_LABEL}"`);
 
@@ -149,19 +150,49 @@ console.log('\ndispatch window');
   // The constants are gone; nothing should still be reaching for them.
   const stale = [];
   cutoffSources.forEach(f => {
-    if (/CUTOFF_HOUR|CUTOFF_LABEL/.test(read(f))) stale.push(f);
+    if (/CUTOFF_HOUR|CUTOFF_LABEL|DISPATCH_BUSINESS_DAYS/.test(read(f))) stale.push(f);
   });
-  ok('nothing references the removed cutoff constants', stale.length === 0,
-    stale.join(', '));
+  ok('nothing references the removed cutoff or business-day constants',
+    stale.length === 0, stale.join(', '));
 
-  ok('the product page reads the shared dispatch window, not its own copy',
-    !/const DISPATCH_BUSINESS_DAYS/.test(read('js/product.js')) &&
-    /DISPATCH_BUSINESS_DAYS/.test(read('js/product.js')));
+  // "Business day" excludes Saturday, which is a day this operation both
+  // ships and delivers on, so the phrase understates the service everywhere
+  // it appears. Reply times and refund windows are a different subject and
+  // are allowed to keep it, so only the pages and scripts that state dispatch
+  // are scanned rather than every file on the site.
+  // page-meta.js is deliberately absent: its wholesale entry promises a reply
+  // within one business day, which is a different subject and correct as it
+  // stands. The three descriptions that do state dispatch are baked into the
+  // pages below by build-meta.js, so they are covered there without dragging
+  // the reply-time copy into a dispatch check.
+  const dispatchCopy = ['index.html', 'shipping.html', 'shipping-policy.html',
+    'about.html', 'product.html', 'js/products-data.js', 'api/_place-order.js',
+    'tools/build-llms.js', 'llms.txt'];
+  const businessDay = [];
+  dispatchCopy.forEach(f => {
+    for (const m of bareSrc(f).matchAll(/\bbusiness day\b/gi)) {
+      businessDay.push(`${f}: "${m[0]}"`);
+    }
+  });
+  ok('no dispatch copy says "business day", which would exclude Saturday',
+    businessDay.length === 0, businessDay.join(', '));
 
-  // The window is stated in business days, so the estimate has to step over
-  // weekends rather than adding calendar days.
-  ok('the estimate counts business days, not calendar days',
-    /addBusinessDays\(\s*today\s*,\s*DISPATCH_BUSINESS_DAYS\s*\)/.test(read('js/product.js')));
+  ok('the product page reads the shared dispatch days, not its own copy',
+    !/const NO_DISPATCH_DAY|const NO_DELIVERY_DAY/.test(read('js/product.js')) &&
+    /NO_DISPATCH_DAY/.test(read('js/product.js')) &&
+    /NO_DELIVERY_DAY/.test(read('js/product.js')));
+
+  // Plain days, not business days: stepping over the whole weekend would push
+  // every late-week estimate out by two days the shipment does not take.
+  ok('the estimate counts plain days, not business days',
+    !/addBusinessDays/.test(read('js/product.js')));
+
+  // Both Sundays are handled, and they are separate facts: nothing is
+  // dispatched on one, nothing is delivered on one.
+  const est = read('js/product.js');
+  ok('the estimate skips Sunday at both the dispatch and the delivery end',
+    /getUTCDay\(\)\s*===\s*NO_DISPATCH_DAY/.test(est) &&
+    /getUTCDay\(\)\s*===\s*NO_DELIVERY_DAY/.test(est));
 
   // The estimate must be computed in Pacific, since that is what the copy says.
   ok('the estimate is computed in Pacific time',
