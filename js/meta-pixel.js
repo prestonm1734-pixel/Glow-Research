@@ -19,19 +19,29 @@
   // mean two places could disagree about it. Only touches the DOM when the
   // flag is actually on; the default text already baked into privacy.html
   // covers the off state correctly on its own.
+  //
+  // Automatic Advanced Matching is on for this pixel (Meta Events Manager,
+  // not a setting this codebase controls) — it scans visible page fields for
+  // an email or phone and sends those to Meta too, on top of the hashed
+  // email/phone this codebase deliberately sends via Conversions API on a
+  // purchase. The two live-state notes below cover both: the deliberate
+  // send AND the pixel's own automatic one, since the policy has to describe
+  // what actually happens, not just the part this codebase chose to build.
   if (typeof META_PIXEL_ID !== 'undefined' && META_PIXEL_ID) {
     var note3 = document.getElementById('metaPixelNote3');
     if (note3) note3.textContent = "We run Meta's advertising pixel and Conversions " +
-      'API, which send Meta a record of pages viewed, products viewed, items added ' +
-      'to cart, and completed purchases, together with your hashed email or phone ' +
-      'when we have it, so Meta can measure and target advertising. See section 4 ' +
-      'for what that involves and section 5 for the cookies it sets.';
+      'API. Together they send Meta a record of pages viewed, products viewed, items ' +
+      'added to cart, and completed purchases, together with your hashed email or ' +
+      'phone when we have it or when the pixel finds one on the page you are on, so ' +
+      'Meta can measure and target advertising. See section 4 for what that involves ' +
+      'and section 5 for the cookies it sets.';
 
     var note4 = document.getElementById('metaPixelNote4');
     if (note4) note4.textContent = 'receives page views, products viewed, items ' +
       'added to cart, and completed purchases, together with your hashed email or ' +
-      "phone when we have it, so Meta can measure and target advertising. This " +
-      "leaves this site and is governed by Meta's own privacy policy.";
+      'phone when we have it or when the pixel finds one visible on the page you are ' +
+      "on (a checkout or sign-in field, for example), so Meta can measure and target " +
+      "advertising. This leaves this site and is governed by Meta's own privacy policy.";
 
     var note5 = document.getElementById('metaPixelNote5');
     if (note5) note5.textContent = "Meta's advertising pixel sets two cookies of " +
