@@ -8,6 +8,14 @@
 // from script (instead of hiding the page from CSS) also means a failure to
 // load leaves the site usable rather than blanked out.
 (function () {
+  // Temporarily disabled to test whether this gate is suppressing conversion
+  // from paid traffic: real ad-click data showed 5 of 12 genuine visitors
+  // bouncing at this screen before ever seeing the site, and the required
+  // attestation still happens at checkout (#coTerms in checkout.html) before
+  // any order can be placed, so removing this earlier browsewall does not
+  // remove legal coverage. Revert by deleting this early return.
+  return;
+
   var KEY = 'glow-age-ok';
 
   // Bump when the wording below changes materially. A stored acceptance of an
