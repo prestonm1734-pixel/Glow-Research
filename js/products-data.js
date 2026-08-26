@@ -540,15 +540,19 @@ const DISPATCH_LABEL = DISPATCH_BUSINESS_DAYS === 1
 // pins every "FedEx <n>-Day" on the site to this number.
 const TRANSIT_DAYS = 2;
 
-// What the box actually looks like. Written when the footer on every page
+// What the package actually looks like. Written when the footer on every page
 // still promised "discreetly shipped" without anywhere saying what that meant,
 // which is a promise a reader cannot check. The footer says something else
 // now, but the question is still one people ask before ordering, so the answer
-// stays and this is the one place the box is described. check-claims.js holds
-// the other half: if that wording ever returns to a page, it has to be
+// stays and this is the one place the package is described. check-claims.js
+// holds the other half: if that wording ever returns to a page, it has to be
 // explained here again.
-const PACKAGING_PLAIN = 'A plain box, no branding, nothing on the outside naming ' +
-  'what is inside';
+//
+// Said "box" until August 2026, which was simply wrong: vials go out in a
+// padded envelope. The discretion half of the sentence is the part that has to
+// stay true either way, so it leads and the container follows it.
+const PACKAGING_PLAIN = 'A plain padded envelope, no branding, nothing on the ' +
+  'outside naming what is inside';
 
 // Storage, as laboratory chemistry. Clause 04 of the RUO agreement draws the
 // line this sits on: handling and reconstitution information is publishable,
