@@ -424,6 +424,10 @@ button[disabled].si-forgot{ cursor: progress; }
    phone included. Left to wrap on its own it breaks after "Research"
    instead, orphaning "Peptides." on its own line. */
 .hero-br{ display:inline; }
+/* Outline treatment shared with 404.html's stub-hero heading: same idea,
+   thin stroke instead of a fill, for a headline word that should read as
+   a second weight rather than a second color. */
+.hero-title .outline{ color: transparent; -webkit-text-stroke: 1.4px rgba(255,255,255,.82); }
 /* Back to a flowing paragraph, but not at the plain-paragraph default
    (400 weight, --text-dim): semibold at a shade lighter than the headline's
    full white reads as confident supporting copy rather than body text.
