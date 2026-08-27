@@ -29,25 +29,29 @@
   var variant = document.body.getAttribute('data-launch-offer');
   if (variant !== 'bar' && variant !== 'modal') return;
 
-  // Two records, because they answer different questions. "Already has the
-  // code" is permanent and worth restoring on sight. "Said no" only means not
-  // now, so it lapses: a fortnight is long enough not to nag and short enough
-  // that a promotion is not silenced for a returning visitor forever.
+  // Three records, because they answer three different questions.
+  //
+  //   UNLOCKED   they have the code. Permanent.
+  //   DISMISSED  they closed it. Permanent: being asked twice for something
+  //              you have already declined is the thing that makes these
+  //              hateful, and no discount is worth that.
+  //   SEEN       it has been on screen once this visit. Session-scoped, so
+  //              walking homepage to catalog to a product page is asked once,
+  //              not three times. It lapses with the tab, which is the point:
+  //              someone who ignored it today may want it next week, and
+  //              ignoring is not the same act as refusing.
   var UNLOCKED = 'glow-offer-code';
   var DISMISSED = 'glow-offer-dismissed';
-  var DISMISS_DAYS = 14;
+  var SEEN = 'glow-offer-seen';
 
-  // localStorage throws in Safari private mode rather than returning null, and
+  // Both stores throw in Safari private mode rather than returning null, and
   // an offer popup is never worth taking the page down over.
   function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* session only */ } }
+  function sGet(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+  function sSet(k, v) { try { sessionStorage.setItem(k, v); } catch (e) { /* page only */ } }
 
-  function dismissedRecently() {
-    var at = Number(get(DISMISSED) || 0);
-    return at > 0 && (Date.now() - at) < DISMISS_DAYS * 864e5;
-  }
-
-  if (get(UNLOCKED) || dismissedRecently()) return;
+  if (get(UNLOCKED) || get(DISMISSED) || sGet(SEEN)) return;
 
   var el = null;
   var shown = false;
@@ -67,7 +71,7 @@
       '<form class="lo-form" novalidate>' +
         '<label class="lo-sr" for="loEmail">Email address</label>' +
         '<input type="email" id="loEmail" class="lo-input" required ' +
-               'autocomplete="email" inputmode="email" placeholder="you@lab.com" />' +
+               'autocomplete="email" inputmode="email" placeholder="Enter your email" />' +
         // Honeypot, matched by the check in api/unlock-offer.js. Off-screen
         // rather than display:none, which some bots skip, and hidden from
         // assistive tech so nobody is asked to fill it.
@@ -126,6 +130,9 @@
     if (shown || get(UNLOCKED)) return;
     if (screenIsBusy()) { setTimeout(open, 4000); return; }
     shown = true;
+    // Recorded as it opens, not as it closes: navigating away mid-popup still
+    // counts as having been asked.
+    sSet(SEEN, '1');
 
     el = build();
     document.body.appendChild(el);
@@ -154,6 +161,9 @@
 
   function close(remember) {
     if (!el) return;
+    // remember=true is a deliberate close (the X, Escape, a click outside).
+    // Closing the reveal passes false: they took the code, which UNLOCKED
+    // already records, and that is not a refusal.
     if (remember) set(DISMISSED, String(Date.now()));
     document.documentElement.classList.remove('lo-locked');
     el.classList.remove('is-open');
