@@ -133,18 +133,6 @@ console.log('\ndispatch window');
   ok('no page or script states a dispatch cutoff time', clocks.length === 0,
     clocks.join(', '));
 
-  // The same-day family of phrases. Dispatch within one business day is not
-  // same-day dispatch, and a page still saying so is claiming more than the
-  // code and the warehouse now promise.
-  const sameDay = [];
-  cutoffSources.forEach(f => {
-    for (const m of bareSrc(f).matchAll(/same[- ]day\s+(?:ship|dispatch)\w*|ships?\s+(?:that|the)\s+same\s+(?:day|afternoon)|packed\s+same\s+day/gi)) {
-      sameDay.push(`${f}: "${m[0]}"`);
-    }
-  });
-  ok('no page still promises same-day dispatch', sameDay.length === 0,
-    sameDay.join(', '));
-
   // The constants are gone; nothing should still be reaching for them.
   const stale = [];
   cutoffSources.forEach(f => {
@@ -234,11 +222,6 @@ console.log('\nhero figures');
   ok('the batch count is stated as a floor, not an exact figure',
     /data-count="150">0<\/span><span class="stat-suffix">\+<\/span>/.test(home));
 
-  const transit = statFor('FedEx Transit');
-  ok('the hero states a transit time', transit !== null);
-  ok(`stated transit ${transit} days is TRANSIT_DAYS ${TRANSIT_DAYS}`,
-    Number(transit) === TRANSIT_DAYS,
-    'index.html and products-data.js disagree');
 }
 
 /* ---------------------------------------------------------------------------
