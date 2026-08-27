@@ -78,6 +78,10 @@ export default async function handler(req, res) {
     // to a click by hashed email/phone alone.
     fbc: (analytics && String(analytics.fbc || '')) || '',
     fbp: (analytics && String(analytics.fbp || '')) || '',
+    // TikTok's own cookie and click ID, same reasoning as fbc/fbp above, for
+    // api/_tiktok-capi.js.
+    ttclid: (analytics && String(analytics.ttclid || '')) || '',
+    ttp: (analytics && String(analytics.ttp || '')) || '',
   };
 
   // Only present on the final pricing call, right before confirmPayment() —

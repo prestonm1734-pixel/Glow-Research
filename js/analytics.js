@@ -71,23 +71,24 @@
       utmCampaign: get('utm_campaign'),
       utmContent: get('utm_content'),
       utmTerm: get('utm_term'),
-      // Meta and Google's own click identifiers, present on the landing URL
-      // when an ad was clicked through to get here. Read once at landing like
-      // the UTMs above, and left null the rest of the time rather than
-      // re-read from a URL that no longer carries them.
+      // Meta, Google and TikTok's own click identifiers, present on the
+      // landing URL when an ad was clicked through to get here. Read once at
+      // landing like the UTMs above, and left null the rest of the time
+      // rather than re-read from a URL that no longer carries them.
       fbclid: get('fbclid'),
       gclid: get('gclid'),
+      ttclid: get('ttclid'),
     };
     try { sessionStorage.setItem(CTX_KEY, JSON.stringify(ctx)); } catch (e) { /* private mode */ }
     return ctx;
   }
 
-  // Meta sets these two cookies itself once the pixel below has loaded
-  // (_fbp always, _fbc only after an ad click carrying fbclid). Read here
-  // rather than duplicated: this is the one place any caller — the pixel
-  // forward below, or api/create-payment-intent.js via ids() — gets them
-  // from, so there is one implementation of "how to read a cookie" in this
-  // file, not several slightly different ones.
+  // Meta and TikTok set these cookies themselves once their pixels have
+  // loaded (_fbp/_ttp always, _fbc only after an ad click carrying fbclid).
+  // Read here rather than duplicated: this is the one place any caller — the
+  // pixel forwards below, or api/create-payment-intent.js via ids() — gets
+  // them from, so there is one implementation of "how to read a cookie" in
+  // this file, not several slightly different ones.
   function cookie(name) {
     var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
     return m ? decodeURIComponent(m[1]) : '';
@@ -125,12 +126,34 @@
     }
   }
 
-  // metaEventId is only ever passed by the purchase call sites (js/checkout.js,
+  // Same mapping as forwardToMeta() above, TikTok's pixel and event names in
+  // place of Meta's. eventId is the same Stripe PaymentIntent ID passed to
+  // forwardToMeta — TikTok's Events API dedupes on it exactly the same way,
+  // via api/_tiktok-capi.js.
+  function forwardToTikTok(eventType, properties, eventId) {
+    if (typeof window.ttq !== 'function' && !(window.ttq && window.ttq.track)) return;
+    var p = properties || {};
+    var opts = eventId ? { event_id: eventId } : undefined;
+    var contents = p.sku ? [{ content_id: p.sku, content_type: 'product', content_name: p.name }] : undefined;
+
+    if (eventType === 'product_viewed') {
+      ttq.track('ViewContent', { contents: contents, value: p.price || undefined, currency: 'USD' }, opts);
+    } else if (eventType === 'cart_add') {
+      ttq.track('AddToCart', { contents: contents, value: p.price || undefined, currency: 'USD' }, opts);
+    } else if (eventType === 'checkout_started') {
+      ttq.track('InitiateCheckout', { quantity: p.itemCount || undefined }, opts);
+    } else if (eventType === 'purchase_completed') {
+      ttq.track('CompletePayment', { value: p.revenue || 0, currency: 'USD' }, opts);
+    }
+  }
+
+  // eventId is only ever passed by the purchase call sites (js/checkout.js,
   // js/express-pay.js), set to the Stripe PaymentIntent ID — the one value
-  // both this browser call and the server-side Conversions API call for the
-  // same purchase already agree on, which is what lets Meta deduplicate the
-  // two into one event instead of double-counting a sale.
-  function track(eventType, properties, metaEventId) {
+  // this browser call and both server-side Conversions API calls (Meta's and
+  // TikTok's) for the same purchase already agree on, which is what lets
+  // each platform deduplicate its own browser and server events into one
+  // instead of double-counting a sale.
+  function track(eventType, properties, eventId) {
     try {
       var v = visitor();
       var ctx = sessionContext(v.isNew);
@@ -151,27 +174,36 @@
           utmTerm: ctx.utmTerm || null,
           fbclid: ctx.fbclid || null,
           gclid: ctx.gclid || null,
+          ttclid: ctx.ttclid || null,
           eventType: eventType,
           properties: properties || null,
         }),
         keepalive: true,
       }).catch(function () {});
     } catch (e) {}
-    try { forwardToMeta(eventType, properties, metaEventId); } catch (e) {}
+    try { forwardToMeta(eventType, properties, eventId); } catch (e) {}
+    try { forwardToTikTok(eventType, properties, eventId); } catch (e) {}
   }
 
   // Read by js/checkout.js and js/express-pay.js so the PaymentIntent
   // metadata carries the same IDs an order's earlier funnel events used,
   // which is what lets the dashboard tie a completed purchase back to the
   // session that produced it instead of counting orders on their own, and
-  // separately lets api/_meta-capi.js send fbc/fbp along with the
-  // server-side Purchase event for better match quality with Meta.
+  // separately lets api/_meta-capi.js and api/_tiktok-capi.js send fbc/fbp
+  // and ttclid/ttp along with the server-side Purchase event for better
+  // match quality with each platform. ttclid is read from the same landing
+  // session context fbclid/gclid come from — unlike Meta's fbc cookie, which
+  // is set by the pixel from fbclid automatically, TikTok's Events API wants
+  // the raw click ID itself rather than deriving it from a cookie.
   function ids() {
+    var ctx = sessionContext(false);
     return {
       sessionId: sessionId(),
       anonId: visitor().id,
       fbc: cookie('_fbc') || null,
       fbp: cookie('_fbp') || null,
+      ttclid: (ctx && ctx.ttclid) || null,
+      ttp: cookie('_ttp') || null,
     };
   }
 

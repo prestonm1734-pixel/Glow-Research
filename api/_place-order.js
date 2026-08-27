@@ -16,7 +16,8 @@
 import { wc, stripe, findCustomerByEmail } from './_lib.js';
 import { emailShell, heading, paragraph, eyebrow, fine, esc, sendEmail, money } from './_email.js';
 import { sendMetaPurchaseEvent } from './_meta-capi.js';
-import { META_PIXEL_ID } from '../js/products-data.js';
+import { sendTikTokPurchaseEvent } from './_tiktok-capi.js';
+import { META_PIXEL_ID, TIKTOK_PIXEL_ID } from '../js/products-data.js';
 
 const ADMIN_TO = 'preston@glowresearch.shop';
 const SUPPORT = 'support@glowresearch.shop';
@@ -182,6 +183,22 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
       phone: (customer && customer.phone) || '',
       fbc: (intent.metadata && intent.metadata.fbc) || '',
       fbp: (intent.metadata && intent.metadata.fbp) || '',
+      clientIp,
+      userAgent,
+      value: intent.amount_received / 100,
+    }).catch(() => {});
+
+    // Same call, same reasoning, TikTok's Events API in place of Meta's.
+    // ttclid/ttp ride on the same PaymentIntent metadata as fbc/fbp above.
+    await sendTikTokPurchaseEvent({
+      pixelId: TIKTOK_PIXEL_ID,
+      accessToken: process.env.TIKTOK_CAPI_ACCESS_TOKEN,
+      eventId: paymentIntentId,
+      eventSourceUrl: 'https://glowresearch.shop/checkout.html',
+      email,
+      phone: (customer && customer.phone) || '',
+      ttclid: (intent.metadata && intent.metadata.ttclid) || '',
+      ttp: (intent.metadata && intent.metadata.ttp) || '',
       clientIp,
       userAgent,
       value: intent.amount_received / 100,

@@ -217,6 +217,13 @@ const LAUNCH_OFFER = {
 // checked in — see api/_meta-capi.js.
 const META_PIXEL_ID = '895737919981822';
 
+// TikTok's Pixel code, same reasoning and the same shape as META_PIXEL_ID
+// above: not secret, safe to ship client-side, and js/tiktok-pixel.js no-ops
+// entirely while this is empty. The matching server-side piece,
+// TIKTOK_CAPI_ACCESS_TOKEN, is a Vercel environment variable and must never
+// be checked in — see api/_tiktok-capi.js.
+const TIKTOK_PIXEL_ID = 'DA8CR2BC77U6VIRE2UQG';
+
 // What the confirmation page says about payment, keyed off the same flag that
 // decides whether payment is actually taken. Hand-written copy here was the
 // exact failure this guards against: thank-you.html told shoppers "card
@@ -1655,6 +1662,7 @@ if (typeof module !== 'undefined' && module.exports) {
     PAYMENT_COPY,
     STRIPE_PUBLISHABLE_KEY,
     META_PIXEL_ID,
+    TIKTOK_PIXEL_ID,
     LAUNCH_OFFER_LIVE,
     LAUNCH_OFFER,
     round2,

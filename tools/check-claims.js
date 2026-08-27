@@ -2798,6 +2798,16 @@ console.log('\nprivacy disclosure');
     ok('the runtime disclosure spans exist for meta-pixel.js to correct if the flag ever flips',
       ['metaPixelNote3', 'metaPixelNote4', 'metaPixelNote5'].every(id => privacy.includes(id)));
   }
+
+  // Same reasoning, TikTok's pixel/Events API in place of Meta's.
+  if (/ttq\.load\(/.test(read('js/tiktok-pixel.js'))) {
+    ok('the privacy policy accounts for the TikTok pixel/Events API capability',
+      /tiktok/i.test(privacy) && /pixel|events api/i.test(privacy));
+    ok('and no longer claims there are no advertising pixels on the site',
+      !/no advertising pixels?\b/i.test(privacy));
+    ok('the runtime disclosure spans exist for tiktok-pixel.js to correct if the flag ever flips',
+      ['tiktokPixelNote3', 'tiktokPixelNote4', 'tiktokPixelNote5'].every(id => privacy.includes(id)));
+  }
 }
 
 /* ---------------------------------------------------------------------------
