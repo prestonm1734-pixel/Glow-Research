@@ -880,7 +880,8 @@ button[disabled].si-forgot{ cursor: progress; }
   display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
 }
 .standard-card{
-  position:relative; overflow:hidden; border-radius: var(--radius-sm);
+  /* square corners, same as .btn: nothing on this site is rounded */
+  position:relative; overflow:hidden; border-radius: 0;
   border: 1px solid var(--border); background: var(--surface);
   display:flex; flex-direction:column;
   min-height: 520px;
@@ -896,7 +897,15 @@ button[disabled].si-forgot{ cursor: progress; }
    off the parent to sit between the art and the copy. */
 .standard-card::after{
   content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
-  background: linear-gradient(180deg, rgba(0,0,0,0) 34%, rgba(0,0,0,.72) 66%, rgba(0,0,0,.94) 100%);
+  /* Starts earlier and lands fully black: the copy sits on the lower half and
+     the art behind it is busy, so the scrim has to carry the contrast rather
+     than hope for a dark patch of image under the text. */
+  background: linear-gradient(180deg,
+    rgba(0,0,0,.30) 0%,
+    rgba(0,0,0,.42) 24%,
+    rgba(0,0,0,.72) 48%,
+    rgba(0,0,0,.92) 68%,
+    #000 88%);
 }
 .standard-body{
   position:relative; z-index:1; margin-top:auto; padding: 30px 28px 28px;
