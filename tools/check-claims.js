@@ -2375,6 +2375,24 @@ console.log('\npromo codes');
 
   ok('checkout.html carries the discount summary row',
     /id="coPromoRow"/.test(coHtml) && /id="coPromoRowAmount"/.test(coHtml));
+
+  // A promo code and the quantity ladder are never allowed to combine: the
+  // rule lives once, in resolvePromoCodeForOrder(), and both endpoints that
+  // can turn a code into a real discount have to call it rather than the
+  // bare resolvePromoCode() that knows nothing about the cart's tiers.
+  ok('priceOrder() reports whether the cart already earned a quantity discount',
+    /hasBulkDiscount/.test(lib) && /bulkOff\(l\.qty\) > 0/.test(lib));
+  ok('resolvePromoCodeForOrder() refuses a code on a cart with a quantity discount',
+    /resolvePromoCodeForOrder/.test(lib) && /priced\.hasBulkDiscount/.test(lib));
+  ok('api/apply-promo.js checks the combination before a code is ever applied',
+    /resolvePromoCodeForOrder/.test(applyPromo));
+  ok('priceOrderWithTax() checks the same combination before the charge is set',
+    /resolvePromoCodeForOrder\(promoCode, priced\)/.test(lib));
+
+  // Told once, plainly, before anyone reaches the promo box — not just as an
+  // error after they have already typed a code.
+  ok('the checkout page tells a bulk-discounted cart the promo box will not apply',
+    /coPromoNote/.test(coHtml) && /coPromoNote/.test(coJs) && /bulkOff\(i\.qty\)/.test(coJs));
 }
 
 /* ---------------------------------------------------------------------------

@@ -6,7 +6,7 @@
 // ever set by api/create-payment-intent.js, which re-validates the same code
 // itself rather than trusting whatever this endpoint said a moment earlier.
 
-import { readBody, priceOrder, resolvePromoCode } from './_lib.js';
+import { readBody, priceOrder, resolvePromoCodeForOrder } from './_lib.js';
 import { PAYMENTS_LIVE } from '../js/products-data.js';
 
 export default async function handler(req, res) {
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: err.message });
   }
 
-  const resolved = await resolvePromoCode(code, Math.round(priced.subtotal * 100));
+  const resolved = await resolvePromoCodeForOrder(code, priced);
   if (!resolved.ok) {
     return res.status(200).json({ valid: false, error: resolved.error });
   }

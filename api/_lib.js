@@ -6,7 +6,7 @@
 // toolchain for what the standard library already does correctly.
 
 import crypto from 'node:crypto';
-import { GLOW_PRODUCTS, unitPriceAt, round2, sizeInStock } from '../js/products-data.js';
+import { GLOW_PRODUCTS, unitPriceAt, bulkOff, round2, sizeInStock } from '../js/products-data.js';
 
 /* ============================ Stripe ============================ */
 // No SDK: the site has no package.json and installs nothing, so this talks to
@@ -154,8 +154,13 @@ export function priceOrder(items, shippingMethodId) {
   const subtotal = round2(lines.reduce((n, l) => n + l.total, 0));
   const rate = SHIPPING_RATES.find(s => s.id === shippingMethodId) || SHIPPING_RATES[0];
   const shipping = (rate.freeOver !== null && subtotal >= rate.freeOver) ? 0 : rate.cost;
+  // A promo code and the quantity ladder are never allowed to combine — see
+  // resolvePromoCodeForOrder() below, which is the one place that rule is
+  // enforced. Derived from the same qty each line already priced against, so
+  // it can never drift from what the tier ladder actually gave the line.
+  const hasBulkDiscount = lines.some(l => bulkOff(l.qty) > 0);
 
-  return { lines, subtotal, shipping, total: round2(subtotal + shipping), shippingMethodId: rate.id };
+  return { lines, subtotal, shipping, hasBulkDiscount, total: round2(subtotal + shipping), shippingMethodId: rate.id };
 }
 
 /* ============================ promo codes ============================ */
@@ -251,6 +256,18 @@ export async function resolvePromoCode(rawCode, subtotalCents) {
   };
 }
 
+// A promo code never stacks with the quantity ladder: someone at a bulk tier
+// is already getting a rate the launch code was never priced to sit on top
+// of. api/apply-promo.js and priceOrderWithTax() both price a cart before
+// they know whether a code will be involved, so this is the one place both
+// call rather than each growing its own copy of the same refusal.
+export async function resolvePromoCodeForOrder(rawCode, priced) {
+  if (priced.hasBulkDiscount) {
+    return { ok: false, error: 'This cart already has a quantity discount applied. Promo codes can’t be combined with it.' };
+  }
+  return resolvePromoCode(rawCode, Math.round(priced.subtotal * 100));
+}
+
 /* ============================ sales tax ============================ */
 // Computed through Stripe Tax, not WooCommerce — WooCommerce never sees a
 // tax rate table for this store, only the dollar figure Stripe already
@@ -337,7 +354,7 @@ export async function priceOrderWithTax(items, shippingMethodId, address, promoC
   let promo = null;
   let discount = 0;
   if (promoCode) {
-    const resolved = await resolvePromoCode(promoCode, Math.round(priced.subtotal * 100));
+    const resolved = await resolvePromoCodeForOrder(promoCode, priced);
     if (!resolved.ok) throw new Error(resolved.error);
     promo = { id: resolved.id, code: resolved.code };
     discount = resolved.discount;

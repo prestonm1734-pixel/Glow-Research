@@ -162,11 +162,17 @@ const STRIPE_PUBLISHABLE_KEY = 'pk_live_51U3kUmHjOd9MaH5sNxBU6C1neJypFeZGunq4CUy
    api/unlock-offer.js never hands the code out on the strength of this object:
    it resolves the promotion against Stripe first and reveals the discount
    Stripe reports, refusing if the code is dead. A stale figure here shows up
-   as a mismatch in the logs rather than as a promise the checkout breaks. */
+   as a mismatch in the logs rather than as a promise the checkout breaks.
+
+   Not valid with the quantity ladder in QTY_TIERS above: a code discounting a
+   price the tiers already discounted would let the two combine into a rate
+   neither was priced for. api/_lib.js is what actually refuses the
+   combination (resolvePromoCodeForOrder(), checked before any code is
+   applied or re-priced) — facts below only has to say so, not enforce it. */
 const LAUNCH_OFFER_LIVE = true;
 const LAUNCH_OFFER = {
-  code: 'GLOW20',
-  percentOff: 20,
+  code: 'GLOW15',
+  percentOff: 15,
 
   // Two surfaces, because the same interruption does not suit both. The
   // homepage is where someone is still deciding whether this is a real
@@ -185,10 +191,12 @@ const LAUNCH_OFFER = {
 
   // Copy. Both surfaces share the offer's own words and differ only in frame.
   eyebrow: 'Launch Offer',
-  barTitle: 'New to Glow? Take 20% off your first order.',
-  modalTitle: 'Get 20% off your first order.',
+  barTitle: 'New to Glow? Take 15% off your first order.',
+  modalTitle: 'Get 15% off your first order.',
   ask: 'Enter your email to unlock your launch code.',
-  facts: 'Lot-level records. Third-party tested. Research use only.',
+  // "Not valid with quantity discounts" belongs here, not just in checkout,
+  // so nobody reaches the promo box having already assumed both apply.
+  facts: 'Lot-level records. Third-party tested. Research use only. Not valid with quantity discounts.',
   cta: 'Unlock Offer',
 
   // Shown only after the address is in and Stripe has confirmed the code.

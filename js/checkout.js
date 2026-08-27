@@ -236,6 +236,20 @@
       }
     }
 
+    // A promo code never stacks with the quantity ladder — api/_lib.js refuses
+    // it server-side either way, but asking someone to type a code just to be
+    // told no is a worse way to say the same thing. hasBulk is derived from
+    // the same bulkOff() the cart itself priced each line against, so this can
+    // never disagree with what the tier ladder actually gave the order.
+    const hasBulk = items.some(i => bulkOff(i.qty) > 0);
+    const promoToggle = $('coPromoToggle');
+    const promoNote = $('coPromoNote');
+    if (promoToggle && promoNote) {
+      promoToggle.hidden = hasBulk;
+      promoNote.hidden = !hasBulk;
+      if (hasBulk) $('coPromoBox').hidden = true;
+    }
+
     $('coTotal').textContent = money(sub - promoDiscount + ship + taxAmount);
 
     const saveRow = $('coSaveRow');

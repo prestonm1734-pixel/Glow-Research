@@ -3,15 +3,15 @@
 // that address.
 //
 // The code is deliberately not in the page. js/launch-offer.js ships the offer
-// copy but not the value, so the only way GLOW20 reaches a browser is through
+// copy but not the value, so the only way GLOW15 reaches a browser is through
 // this endpoint, after an address has been given. That is the whole point of
 // the popup: the code is the thing being traded for.
 //
 // It is also why this endpoint asks Stripe rather than trusting
 // LAUNCH_OFFER.code. PRINCIPLES.md rules out claiming what the system cannot
-// show is true, and "your code is GLOW20, that's 20% off" is exactly such a
+// show is true, and "your code is GLOW15, that's 15% off" is exactly such a
 // claim: the catalog cannot know whether that promotion is still live, still
-// within its redemption cap, or still worth 20%. Stripe can. So the reveal is
+// within its redemption cap, or still worth 15%. Stripe can. So the reveal is
 // built from Stripe's answer, and a dead code produces an honest failure
 // instead of a code that gets rejected at checkout an hour later.
 

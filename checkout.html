@@ -248,6 +248,7 @@
     text-decoration:underline; text-underline-offset:3px;
   }
   .co-promo-toggle:hover{ color:#0a0a0a; }
+  .co-promo-note{ margin: 16px 0 0; font-size:.88rem; color:#6e6e73; }
   .co-promo{ display:flex; margin-top:12px; }
   .co-promo input{
     flex:1; min-width:0; padding: 12px 13px; border-radius:0;
@@ -520,6 +521,7 @@
           <button type="button" class="co-promo-toggle" id="coPromoToggle" aria-expanded="false" aria-controls="coPromoBox">
             Add a discount code
           </button>
+          <p class="co-promo-note" id="coPromoNote" hidden>Quantity discount applied. Promo codes can’t be combined with it.</p>
           <div id="coPromoBox" hidden>
             <div class="co-promo">
               <input type="text" id="coPromo" placeholder="Code" aria-label="Discount code" />
