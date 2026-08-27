@@ -1014,6 +1014,22 @@ button[disabled].si-forgot{ cursor: progress; }
 html:not(.js) .faq-a{ max-height: none; }
 .faq-a p{ padding: 0 4px 22px; font-size:0.92rem; }
 
+/* The homepage FAQ sits on white. Everything above is written for a dark
+   section, so the rules that name a light colour outright, rather than
+   inheriting one, are inverted here. The open marker keeps the same
+   figure/ground flip it has on dark: a filled disc with the page colour
+   showing through the glyph. */
+.section-light .faq-item{ border-bottom-color: rgba(0,0,0,0.12); }
+.section-light .faq-q{ color:#0a0a0a; }
+.section-light .faq-q:hover{ color:#000; }
+.section-light .faq-q .icon{ border-color: rgba(0,0,0,0.22); }
+.section-light .faq-q:hover .icon{
+  border-color: rgba(0,0,0,0.45); background: rgba(0,0,0,.06);
+}
+.section-light .faq-item.open .faq-q .icon{
+  background:#0a0a0a; border-color:#0a0a0a; color:#fff;
+}
+
 /* ---------- footer newsletter band ---------- */
 .footer-newsletter{
   display:flex; align-items:center; justify-content:space-between; gap: 24px; flex-wrap:wrap;
@@ -1039,7 +1055,7 @@ html:not(.js) .faq-a{ max-height: none; }
 }
 
 /* ---------- footer ---------- */
-.site-footer{ background: var(--bg-2); border-top:1px solid var(--border); padding: 80px 0 30px; }
+.site-footer{ background:#000; border-top:1px solid var(--border); padding: 80px 0 30px; }
 .site-footer .logo{ color: var(--text); }
 .site-footer .spark{ color: var(--text); }
 .footer-top{ display:grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; margin: 44px 0 50px; }
