@@ -311,7 +311,7 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/glp-3-rt-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [
-      { mg: '10mg', price: 104.99, list: 130, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg-v3.webp' },
+      { mg: '10mg', price: 69.99, list: 78, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg-v3.webp' },
     ],
     blurb: 'A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile.',
     about: [
@@ -326,7 +326,7 @@ const GLOW_PRODUCTS = [
   { name: 'GLP-1 (SM)', alias: 'Semaglutide', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:'Popular',
     coa: 'assets/coas/glp-1-sm-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.96 mg' },
-    sizes: [{ mg: '10mg', price: 79.99, list: 100, sku: 'GLO-SM10', image: 'assets/products/glp-1-sm-10mg-v3.webp' }],
+    sizes: [{ mg: '10mg', price: 49.99, list: 56, sku: 'GLO-SM10', image: 'assets/products/glp-1-sm-10mg-v3.webp' }],
     blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
     about: [
       'GLP-1 (SM) is Glow’s designation for semaglutide, a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
@@ -340,7 +340,7 @@ const GLOW_PRODUCTS = [
   { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.815%', lot: '5567', badge:'Best Value',
     coa: 'assets/coas/ghk-cu-lot-5567.pdf', coaRef: 'D69A-YY5F', tested: '6 July 2026',
     results: { Identity: 'Conforms', Quantity: '56.93 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
-    sizes: [{ mg: '50mg', price: 54.99, list: 70, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
+    sizes: [{ mg: '50mg', price: 39.99, list: 44, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
     blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
     about: [
       'GHK-Cu is the tripeptide glycyl-L-histidyl-L-lysine complexed with copper(II). The tripeptide occurs naturally in plasma and binds copper with high affinity, and it is the complex rather than the bare peptide that most research uses.',
@@ -355,7 +355,7 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/bpc-157-lot-1400.pdf', coaRef: 'X9RM-SMBN', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.13 mg' },
     sizes: [
-      { mg: '10mg', price: 64.99, list: 80, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg-v3.webp' },
+      { mg: '10mg', price: 39.99, list: 44, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg-v3.webp' },
     ],
     blurb: 'A synthetic pentadecapeptide derived from a protein found in gastric juice. Studied in vitro for angiogenic signalling.',
     about: [
@@ -371,7 +371,7 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/bpc-157-tb-500-lot-5615.pdf', coaRef: '7STD-6SRY', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '9.73 mg' },
     sizes: [
-      { mg: '10mg', price: 84.99, list: 105, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg-v3.webp' },
+      { mg: '10mg', price: 59.99, list: 67, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg-v3.webp' },
     ],
     blurb: 'A combined BPC-157 and TB-500 formulation. Supplied for research using both peptides together in one vial.',
     about: [
@@ -386,7 +386,7 @@ const GLOW_PRODUCTS = [
   { name: 'GLOW', alias: 'GHK-Cu/BPC-157/TB-500', tag: 'Peptide Blend', cat: 'tissue', purity: '99.61%', lot: '1035', badge:null,
     coa: 'assets/coas/glow-lot-1035.pdf', coaRef: 'X7MB-H2H8', tested: '13 June 2026',
     results: { Identity: 'Conforms', Quantity: '65.63 mg' },
-    sizes: [{ mg: '70mg', price: 124.99, list: 155, sku: 'GLO-BBG70', image: 'assets/products/glow-70mg-v3.webp' }],
+    sizes: [{ mg: '70mg', price: 89.99, list: 100, sku: 'GLO-BBG70', image: 'assets/products/glow-70mg-v3.webp' }],
     blurb: 'A compounded blend of GHK-Cu, BPC-157 and TB-500. Supplied for research using all three peptides together in one vial.',
     about: [
       'GLOW is Glow Research’s designation for a compounded blend of three research peptides, GHK-Cu, BPC-157 and TB-500, supplied together in one 70mg vial rather than as separate compounds. It is commonly referred to by its components, GHK-Cu/BPC-157/TB-500, within the peptide research community.',
@@ -399,7 +399,7 @@ const GLOW_PRODUCTS = [
   { name: 'CJC-1295 No DAC/Ipamorelin', tag: 'Peptide Blend', cat: 'growth', purity: '99.08%', lot: '005', badge:null,
     coa: 'assets/coas/cjc-1295-no-dac-ipamorelin-lot-005.pdf', coaRef: 'MHCU-CDXL', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.18 mg' },
-    sizes: [{ mg: '5/5mg', price: 89.99, list: 110, sku: 'GLO-CP10', image: 'assets/products/cjc-1295-ipamorelin-5-5mg-v3.webp' }],
+    sizes: [{ mg: '5/5mg', price: 59.99, list: 67, sku: 'GLO-CP10', image: 'assets/products/cjc-1295-ipamorelin-5-5mg-v3.webp' }],
     blurb: 'A combined CJC-1295 (No DAC) and Ipamorelin formulation. Supplied for research examining GHRH and ghrelin receptor co-agonism.',
     about: [
       'This blend combines CJC-1295 without DAC and Ipamorelin in a single vial, 5/5 mg of each for 10mg total, pairing a GHRH receptor analogue with a selective ghrelin receptor agonist.',
@@ -413,7 +413,7 @@ const GLOW_PRODUCTS = [
   { name: 'Tesamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.36%', lot: '1002', badge:null,
     coa: 'assets/coas/tesamorelin-lot-1002.pdf', coaRef: 'R934-S6U9', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.59 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
-    sizes: [{ mg: '10mg', price: 98.99, list: 125, sku: 'GLO-TSM10', image: 'assets/products/tesamorelin-10mg-v3.webp' }],
+    sizes: [{ mg: '10mg', price: 64.99, list: 72, sku: 'GLO-TSM10', image: 'assets/products/tesamorelin-10mg-v3.webp' }],
     blurb: 'A synthetic growth hormone releasing hormone analogue with a stabilised N-terminus. Studied for pituitary receptor engagement.',
     about: [
       'Tesamorelin is a synthetic analogue of growth hormone releasing hormone carrying a trans-3-hexenoic acid modification at the N-terminus that slows enzymatic degradation by DPP-4.',
@@ -427,7 +427,7 @@ const GLOW_PRODUCTS = [
   { name: 'GLP-2 (TR)', alias: 'Tirzepatide', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
     coa: 'assets/coas/glp-2-tr-lot-1600.pdf', coaRef: '7RRU-W2LV', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '12.49 mg' },
-    sizes: [{ mg: '10mg', price: 89.99, list: 110, sku: 'GLO-T10', image: 'assets/products/glp-2-tr-10mg-v3.webp' }],
+    sizes: [{ mg: '10mg', price: 59.99, list: 67, sku: 'GLO-T10', image: 'assets/products/glp-2-tr-10mg-v3.webp' }],
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
     about: [
       'GLP-2 (TR) is Glow’s designation for tirzepatide, a dual receptor co-agonist peptide, active at both the GIP and the GLP-1 receptor from a single molecule.',
@@ -441,7 +441,7 @@ const GLOW_PRODUCTS = [
   { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.84%', lot: '1025', badge:null,
     coa: 'assets/coas/mots-c-lot-1025.pdf', coaRef: 'N8VT-H88T', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.45 mg' },
-    sizes: [{ mg: '10mg', price: 74.99, list: 95, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg-v3.webp' }],
+    sizes: [{ mg: '10mg', price: 44.99, list: 50, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg-v3.webp' }],
     blurb: 'A mitochondrial-derived peptide encoded within the mitochondrial genome. Studied for its role in metabolic signalling.',
     about: [
       'MOTS-C is a 16 amino acid peptide encoded in the mitochondrial 12S rRNA region rather than the nuclear genome, one of a small class of mitochondrial-derived peptides identified in the last two decades.',
@@ -1149,20 +1149,20 @@ const SITEWIDE_DISCOUNT = 0;
 // line, unitPriceAt() and api/_lib.js work from, so `list` cannot change what
 // anyone is billed: adding, editing or deleting it moves the number on screen
 // and nothing else. That is the whole reason it is a separate field rather
-// than a raised `price` with SITEWIDE_DISCOUNT taking 20% back off — that
+// than a raised `price` with SITEWIDE_DISCOUNT taking 10% back off — that
 // route would have made every charged total a rounding artefact of the
 // markdown, and the launch prices are fixed figures, not derived ones.
 //
-// It also cannot be exactly 20% off and a round number at the same time: 20%
-// off $131.25 is $105, and $105 off a round $130 is 19.2%. The catalog holds
-// round list prices, so the real markdown runs 18% to 21% by size. Nothing on
+// It also cannot be exactly 10% off and a round number at the same time: 10%
+// off $77.77 is $69.99, and $69.99 off a round $78 is 10.3%. The catalog holds
+// round list prices, so the real markdown runs 9% to 11% by size. Nothing on
 // the site states a percentage for it — the struck price is the entire signal,
 // which is also why bulkSavingPct() below suppresses "Save N%" badges for it —
 // so there is no figure anywhere that rounding could make untrue.
 //
 // check-claims.js enforces the two properties that keep it honest: every list
 // price is above the price actually charged, and the implied markdown stays
-// inside a band that "about 20% off" describes without stretching.
+// inside a band that "about 10% off" describes without stretching.
 const hasList = size => !!(size && size.list && size.list > size.price);
 const listPriceOf = size => (hasList(size) ? size.list : 0);
 

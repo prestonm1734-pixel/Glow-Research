@@ -1884,8 +1884,8 @@ console.log('\nbulk pricing');
  *     A struck-through price is a claim about what something otherwise costs.
  *     These do not make that claim true, which is a business matter, but they
  *     do stop it drifting into arithmetic nobody meant: a reference below the
- *     price actually charged, or a markdown so far off the intended 20% that
- *     "about 20% off" stops describing it.
+ *     price actually charged, or a markdown so far off the intended 10% that
+ *     "about 10% off" stops describing it.
  * ------------------------------------------------------------------------- */
 console.log('\nlaunch pricing');
 {
@@ -1902,11 +1902,11 @@ console.log('\nlaunch pricing');
     notAbove.length === 0,
     notAbove.map(({ s }) => `${s.sku} lists ${s.list} against ${s.price}`).join('; '));
 
-  // 18-22%: wide enough for round list prices (20% off exactly would force
-  // figures like $131.25), tight enough that "about 20% off" stays true.
+  // 8-12%: wide enough for round list prices (10% off exactly would force
+  // figures like $77.77), tight enough that "about 10% off" stays true.
   const band = withList.map(({ s }) => ({ s, pct: (1 - s.price / s.list) * 100 }));
-  const outside = band.filter(b => b.pct < 18 || b.pct > 22);
-  ok('every markdown lands inside the band "about 20% off" describes',
+  const outside = band.filter(b => b.pct < 8 || b.pct > 12);
+  ok('every markdown lands inside the band "about 10% off" describes',
     outside.length === 0,
     outside.map(b => `${b.s.sku} is ${b.pct.toFixed(1)}% off`).join('; '));
 
