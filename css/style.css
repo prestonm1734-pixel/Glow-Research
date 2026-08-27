@@ -549,32 +549,29 @@ button[disabled].si-forgot{ cursor: progress; }
    search bar so the last row of cards isn't sitting under it. */
 .catalog-page{ padding: 34px 0 90px; }
 .catalog-page .section-head{ margin-bottom: 20px; }
-/* Wider than the 640 the shared .section-head caps at: the fact row wants to
-   run on one line rather than wrap under itself. */
-.catalog-intro{ max-width: 760px; margin-bottom: 26px; }
+/* Wider than the 640 the shared .section-head caps at, so the subtitle runs on
+   one line at desktop widths rather than breaking after two of its three
+   statements, which reads as a dropped thought rather than a list. */
+.catalog-intro{ max-width: 760px; margin-bottom: 24px; }
 .catalog-intro h1{
-  font-size: clamp(2rem, 4vw, 3rem);
-  margin: 0 0 16px;
-  letter-spacing: -0.03em;
+  /* 36px, held flat rather than scaled: this is a catalog header, not a hero,
+     and the search field is the thing the page is actually for. */
+  font-size: 2.25rem;
+  margin: 0 0 10px;
+  letter-spacing: -0.025em;
 }
-/* The three facts read as a specification, not a sentence, so they are set as
-   discrete items in the mono face the eyebrows already use, divided by a rule
-   rather than punctuation. They wrap to their own lines on a phone, where a
-   single row would either overflow or shrink past reading size. */
-.catalog-facts{
-  list-style:none; margin:0; padding:0;
-  display:flex; flex-wrap:wrap; align-items:center; gap: 0 18px;
-  font-family:'JetBrains Mono', monospace;
-  font-size: 0.7rem; font-weight:600; letter-spacing:.12em;
-  text-transform:uppercase; color:#6f6f6a;
-}
-.catalog-facts li{ display:flex; align-items:center; gap:18px; }
-.catalog-facts li + li::before{
-  content:''; width:1px; height:11px; background: rgba(0,0,0,0.2);
+/* Scoped to the section so it outweighs `.section-light p`, which would
+   otherwise set the body colour here. */
+.section-light .catalog-sub{
+  margin: 0;
+  font-size: 1.0625rem;   /* 17px */
+  font-weight: 500;
+  line-height: 1.5;
+  color: #6f6f6a;
 }
 @media (max-width: 560px){
-  .catalog-facts{ gap: 8px 0; flex-direction:column; align-items:flex-start; }
-  .catalog-facts li + li::before{ display:none; }
+  .catalog-intro h1{ font-size: 1.75rem; }
+  .section-light .catalog-sub{ font-size: 0.98rem; }
 }
 .catalog-page .filter-row{ margin-bottom: 26px; }
 
