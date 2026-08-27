@@ -886,23 +886,16 @@ button[disabled].si-forgot{ cursor: progress; }
   position:relative; overflow:hidden; border-radius: 0;
   border: 1px solid var(--border); background: var(--surface);
   display:flex; flex-direction:column;
-  /* The copy is bottom-anchored, so this sets how much image band sits above
-     it. Below about 470 the clear part of the card is too short for the vial
-     to read at all: the label falls into the scrim and only the cap shows. */
-  min-height: 480px;
+  /* The copy is bottom-anchored, so this trims the image band above it rather
+     than the text. The scrim is already solid black across everything being
+     cut, so nothing of the vial is lost. */
+  min-height: 440px;
 }
 /* The art fills the card and the copy sits over its lower half, so the media
    is a background layer rather than a block above the text. */
 .standard-media{
   position:absolute; inset:0; width:100%; height:100%;
   object-fit: cover; object-position: center top;
-  /* The renders carry a lot of empty bench around the vial, which left the
-     subject small in a card this size. Scaled up and pulled toward the vial so
-     it fills the clear band, and lifted slightly: these are dark-on-dark shots
-     sitting under a scrim, and at 1.0 they read as a black rectangle. */
-  transform: scale(1.12);
-  transform-origin: 50% 26%;
-  filter: brightness(1.12);
 }
 /* The scrim lives on the card, not on the image: a pseudo-element on a
    replaced element like <img> is not rendered, so the gradient has to hang
@@ -915,11 +908,11 @@ button[disabled].si-forgot{ cursor: progress; }
      a dark patch of image happening to fall behind it. */
   background: linear-gradient(180deg,
     rgba(0,0,0,0) 0%,
-    rgba(0,0,0,.03) 32%,
-    rgba(0,0,0,.22) 44%,
-    rgba(0,0,0,.70) 52%,
-    rgba(0,0,0,.95) 57%,
-    #000 66%);
+    rgba(0,0,0,.06) 20%,
+    rgba(0,0,0,.34) 32%,
+    rgba(0,0,0,.76) 42%,
+    rgba(0,0,0,.94) 50%,
+    #000 60%);
 }
 .standard-body{
   position:relative; z-index:1; margin-top:auto; padding: 26px 28px 22px;
