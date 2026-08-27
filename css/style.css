@@ -549,29 +549,32 @@ button[disabled].si-forgot{ cursor: progress; }
    search bar so the last row of cards isn't sitting under it. */
 .catalog-page{ padding: 34px 0 90px; }
 .catalog-page .section-head{ margin-bottom: 20px; }
-/* Wider than the 640 the shared .section-head caps at, so the subtitle runs on
-   one line at desktop widths rather than breaking after two of its three
-   statements, which reads as a dropped thought rather than a list. */
-.catalog-intro{ max-width: 760px; margin-bottom: 24px; }
+/* Matched to the header on coa.html, value for value. That page starts from
+   the sitewide .lp-hero and scales it down, because it sits directly above a
+   search box and a grid rather than being the reason you are on the page. The
+   catalog is the same shape of page, so it takes the same treatment: centred,
+   the same clamped title and lede, the same white-surface greys. Kept as its
+   own rules rather than reusing .lp-hero, which is colour-bound to the dark
+   .lp-page those styles were written for. */
+.catalog-intro{
+  text-align:center;
+  padding: clamp(40px, 5.5vw, 64px) 0 clamp(26px, 3.5vw, 38px);
+}
+.catalog-eyebrow{
+  display:block; margin-bottom: 14px;
+  font-family:'Sora', system-ui, sans-serif; font-size:.98rem; font-weight:500;
+  letter-spacing:0; text-transform:none; color:#55554f;
+}
 .catalog-intro h1{
-  /* 36px, held flat rather than scaled: this is a catalog header, not a hero,
-     and the search field is the thing the page is actually for. */
-  font-size: 2.25rem;
-  margin: 0 0 10px;
-  letter-spacing: -0.025em;
+  font-size: clamp(1.9rem, 3.6vw, 2.6rem); line-height:1.04;
+  letter-spacing:-.035em; color:#0a0a0a;
+  max-width:none; margin: 0 0 14px;
 }
 /* Scoped to the section so it outweighs `.section-light p`, which would
-   otherwise set the body colour here. */
+   otherwise set its own body colour here. */
 .section-light .catalog-sub{
-  margin: 0;
-  font-size: 1.0625rem;   /* 17px */
-  font-weight: 500;
-  line-height: 1.5;
-  color: #6f6f6a;
-}
-@media (max-width: 560px){
-  .catalog-intro h1{ font-size: 1.75rem; }
-  .section-light .catalog-sub{ font-size: 0.98rem; }
+  font-size: clamp(.98rem, 1.1vw, 1.05rem); line-height:1.5;
+  max-width: 48ch; margin: 0 auto; color:#55554f;
 }
 .catalog-page .filter-row{ margin-bottom: 26px; }
 
