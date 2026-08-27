@@ -1048,6 +1048,12 @@ html:not(.js) .faq-a{ max-height: none; }
 .footer-offer .lo-copy-btn{ margin-top: 12px; }
 @media (max-width: 640px){
   .footer-offer{ flex-direction:column; align-items:flex-start; }
+  /* Both were sized with flex:_ _ 320px/420px for the row layout above, where
+     that number sets a width. In this column layout the same flex-basis sets
+     a height instead, which is what stretched .lo-copy to 320px tall and
+     opened the huge gap before the input on mobile. flex-basis:auto lets each
+     block size to its own content again. */
+  .footer-offer .lo-copy{ width:100%; flex-basis:auto; }
   .footer-offer .lo-body{ width:100%; flex-basis:auto; }
 }
 
