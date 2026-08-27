@@ -897,15 +897,17 @@ button[disabled].si-forgot{ cursor: progress; }
    off the parent to sit between the art and the copy. */
 .standard-card::after{
   content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
-  /* Starts earlier and lands fully black: the copy sits on the lower half and
-     the art behind it is busy, so the scrim has to carry the contrast rather
-     than hope for a dark patch of image under the text. */
+  /* Weighted to the bottom: the art stays open at the top and the scrim does
+     almost all its work over the lower half, where the copy sits. It reaches
+     solid black rather than stopping short, so the text never has to rely on
+     a dark patch of image happening to fall behind it. */
   background: linear-gradient(180deg,
-    rgba(0,0,0,.30) 0%,
-    rgba(0,0,0,.42) 24%,
-    rgba(0,0,0,.72) 48%,
-    rgba(0,0,0,.92) 68%,
-    #000 88%);
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,.06) 26%,
+    rgba(0,0,0,.34) 40%,
+    rgba(0,0,0,.74) 50%,
+    rgba(0,0,0,.93) 58%,
+    #000 68%);
 }
 .standard-body{
   position:relative; z-index:1; margin-top:auto; padding: 30px 28px 28px;
@@ -915,11 +917,30 @@ button[disabled].si-forgot{ cursor: progress; }
   font-size: 0.68rem; font-weight:600; letter-spacing:.14em;
   text-transform:uppercase; color: var(--text-dim); margin-bottom: 12px;
 }
+/* The row reads as one band only if the three cards break their text the same
+   way, so both blocks are floored at the line count the copy is written to:
+   one line of heading, three of body. A card whose copy runs shorter still
+   occupies the same height, and the eyebrows, headings and links stay on a
+   shared baseline instead of drifting by a line. Copy that outgrows the floor
+   pushes the card taller, which is the visible signal to cut it back. */
 .standard-card h3{
   font-size: 1.4rem; font-weight:600; color: var(--text); margin: 0 0 12px;
+  line-height: 1.2; min-height: 1.2em;
 }
 .standard-card p{
   font-size: 0.94rem; color: var(--text-dim); line-height:1.62; margin: 0 0 20px;
+  /* four lines, which is what all three bodies wrap to at full column width */
+  min-height: 6.48em;
+}
+/* Between the single-column breakpoint and full width the columns narrow
+   enough that the shortest body drops to five lines while the others hold at
+   six, which pulls that card's heading up a line. Floor all three at the
+   tallest of them through that range so the row stays level. */
+@media (min-width: 901px) and (max-width: 1150px){
+  .standard-card p{ min-height: 9.72em; }
+  /* the two longer headings wrap to a second line down here, the short one
+     does not, so it is floored to match rather than riding a line higher */
+  .standard-card h3{ min-height: 2.4em; }
 }
 .standard-link{
   display:inline-flex; align-items:center; gap:8px;
