@@ -85,12 +85,10 @@ window.addEventListener('resize', () => {
   if (open) open.style.maxHeight = open.scrollHeight + 'px';
 });
 
-/* ---------- newsletter ---------- */
-document.getElementById('newsletterForm').addEventListener('submit', e => {
-  e.preventDefault();
-  document.getElementById('newsletterMsg').textContent = "You're on the list. Welcome to the Glow research community.";
-  e.target.reset();
-});
+/* The newsletter form that used to sit here is gone. It claimed "You're on the
+   list" without sending the address anywhere, which is the plainest kind of
+   thing PRINCIPLES.md rules out. The footer now carries the launch offer,
+   built and submitted by js/launch-offer.js against a real endpoint. */
 
 /* ---------- counters ---------- */
 function animateCount(el) {

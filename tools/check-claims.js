@@ -2464,6 +2464,58 @@ console.log('\nlaunch offer');
     LAUNCH_OFFER.barDelayMs >= 12000 && LAUNCH_OFFER.modalDelayMs >= 8000);
   ok('the homepage waits longer than the catalog does',
     LAUNCH_OFFER.barDelayMs > LAUNCH_OFFER.modalDelayMs);
+
+  // The footer form is not an interruption, so none of the popup's suppression
+  // applies to it: someone who dismissed the popup must still be able to ask
+  // for the code later.
+  ok('the footer carries the offer rather than a second, separate form',
+    /id="offerFooter"/.test(read('index.html')));
+  ok('and the newsletter form that acknowledged addresses it never sent is gone',
+    !/newsletterForm/.test(read('index.html')) &&
+    !/newsletterForm/.test(read('js/script.js')));
+
+  // Six events, one funnel. Named here so a rename on one side shows up as a
+  // failure rather than as a metric that quietly stops counting.
+  const events = [
+    'email_capture_viewed', 'email_capture_closed', 'email_capture_submitted',
+    'email_capture_error', 'discount_code_revealed', 'discount_code_copied',
+  ];
+  const missing = events.filter(e => !offerJs.includes(`'${e}'`));
+  ok('every event in the capture funnel is fired', missing.length === 0,
+    `not fired: ${missing.join(', ')}`);
+
+  // Each event carries what the funnel is sliced by. Without form_location and
+  // trigger_type there is no "submit rate by page" or "by trigger" to report.
+  ok('the events carry the page and the trigger they came from',
+    /form_location:/.test(offerJs) && /trigger_type:/.test(offerJs) &&
+    /page_path:/.test(offerJs) && /form_id:/.test(offerJs));
+  ok('a close reports how long it was on screen',
+    /time_visible_seconds:/.test(offerJs));
+  ok('a product-page capture reports which product it came from',
+    /product_sku:/.test(offerJs) && /product_name:/.test(offerJs));
+
+  // js/analytics.js already stamps every beacon with the session and the
+  // session's UTMs. Repeating them per event is how the two copies drift.
+  ok('the events leave session and campaign to the analytics envelope',
+    !/utm_source:/.test(offerJs) && /GlowAnalytics\.track/.test(offerJs));
+
+  // The address is the one piece of personal data the system holds. It must
+  // not travel on analytics beacons, which are anonymous rows by design.
+  ok('no capture event carries the address itself',
+    !/track\([^)]*email:/.test(offerJs));
+
+  // An address captured and not stored is the popup's whole purpose thrown
+  // away, so the endpoint has to do something with it beyond mailing it.
+  ok('a captured address is recorded, not only emailed',
+    /recordLead\(/.test(unlock) &&
+    unlock.indexOf('recordLead(') < unlock.indexOf('sendEmail('));
+  ok('the lead is stored with the page and the campaign that produced it',
+    /sourcePage/.test(unlock) && /formLocation/.test(unlock) &&
+    /utmCampaign/.test(unlock) && /utmSource/.test(unlock));
+  ok('and with the ids that join it back to the funnel and to an order',
+    /sessionId/.test(unlock) && /anonId/.test(unlock));
+  ok('storing a lead never costs the visitor the code they were promised',
+    /never throws/i.test(unlock) || /catch \(e\) \{\s*console\.error\('unlock-offer: could not reach/.test(unlock));
 }
 
 console.log('\ncatalog shape');

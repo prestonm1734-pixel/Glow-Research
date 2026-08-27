@@ -75,6 +75,13 @@ export default async function handler(req, res) {
 
   const code = resolved.code;
 
+  // Record the lead before the mail goes out. Neither step is allowed to fail
+  // the request, but of the two this is the one that must not be lost: an
+  // address that was captured and never stored is the whole point of the popup
+  // thrown away, while an email that did not arrive still leaves a lead with
+  // the code on screen.
+  await recordLead({ email, code, body });
+
   // Not fatal. The address was given in exchange for the code, and the code is
   // in the response either way, so a mail failure must not read to the visitor
   // as though the trade did not happen.
@@ -92,6 +99,59 @@ export default async function handler(req, res) {
     percentOff: percentOff || null,
     amountOffCents: resolved.amountOffCents || null,
   });
+}
+
+/* Stores the address, and with it the page and the campaign that produced it,
+   in the dashboard's leads table. That join is the reason the popup exists:
+   "which ad created this email, and did that person later buy" is only
+   answerable if the lead row carries the session and the UTMs alongside the
+   address, since `visits` holds the funnel for that session and `orders` holds
+   the session that produced a purchase.
+
+   Never throws. The visitor has already given their address and is owed the
+   code; a storage outage is ours to see in the logs, not theirs to be refused
+   over. It is logged loudly because a silent failure here is an invisible hole
+   in the lead list. */
+async function recordLead({ email, code, body }) {
+  const endpoint = process.env.LEADS_ENDPOINT;
+  const secret = process.env.LEADS_INGEST_SECRET;
+  if (!endpoint || !secret) {
+    console.error(
+      'unlock-offer: LEADS_ENDPOINT or LEADS_INGEST_SECRET is not set — ' +
+      `lead for ${email} was NOT stored. Set both in Vercel.`
+    );
+    return;
+  }
+
+  const utm = body.utm || {};
+  const ids = body.analytics || {};
+
+  try {
+    const resp = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${secret}` },
+      body: JSON.stringify({
+        email,
+        sourcePage: body.sourcePage || null,
+        formLocation: body.formLocation || null,
+        formId: body.formId || null,
+        triggerType: body.triggerType || null,
+        utmSource: utm.source || null,
+        utmMedium: utm.medium || null,
+        utmCampaign: utm.campaign || null,
+        utmContent: utm.content || null,
+        // The two IDs that join this address back to its funnel rows.
+        sessionId: ids.sessionId || null,
+        anonId: ids.anonId || null,
+        discountCode: code,
+      }),
+    });
+    if (!resp.ok) {
+      console.error('unlock-offer: leads endpoint rejected the lead', email, resp.status, await resp.text().catch(() => ''));
+    }
+  } catch (e) {
+    console.error('unlock-offer: could not reach the leads endpoint', email, e.message);
+  }
 }
 
 // Both bodies say the same two sentences the popup does, from the same strings,

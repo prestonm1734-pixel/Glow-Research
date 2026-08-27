@@ -420,17 +420,13 @@
 <!-- FOOTER -->
 <footer class="site-footer">
   <div class="container">
-    <div class="footer-newsletter">
-      <div class="footer-newsletter-copy">
-        <h3>Join our weekly newsletter</h3>
-        <p>New drops, restock alerts &amp; subscriber-only pricing, every week.</p>
-      </div>
-      <form id="newsletterForm" class="newsletter-form">
-        <input type="email" placeholder="you@lab.com" required aria-label="Email address" />
-        <button type="submit" class="btn btn-primary">Join</button>
-      </form>
-      <p class="newsletter-msg" id="newsletterMsg"></p>
-    </div>
+    <!-- The standing offer form. Built by js/launch-offer.js from the same
+         copy and wired to the same endpoint as the popup, so the two cannot
+         say different things. Empty here on purpose: with no script there is
+         no form to submit, which is better than a form that silently does
+         nothing. It replaced a newsletter sign-up that answered "You're on
+         the list" without sending the address anywhere at all. -->
+    <div class="footer-offer" id="offerFooter"></div>
 
     <div class="footer-top">
       <div class="footer-brand">

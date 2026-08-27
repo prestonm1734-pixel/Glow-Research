@@ -1030,28 +1030,25 @@ html:not(.js) .faq-a{ max-height: none; }
   background:#0a0a0a; border-color:#0a0a0a; color:#fff;
 }
 
-/* ---------- footer newsletter band ---------- */
-.footer-newsletter{
-  display:flex; align-items:center; justify-content:space-between; gap: 24px; flex-wrap:wrap;
+/* ---------- footer offer band ----------
+   The standing launch-offer form, built by js/launch-offer.js. Shares the
+   .lo-* type and control styles with the popup so the two are one component
+   wearing two frames; only the band around it is defined here. */
+.footer-offer:empty{ display:none; }
+.footer-offer{
+  display:flex; align-items:center; justify-content:space-between;
+  gap: 24px 32px; flex-wrap:wrap;
   padding: 28px 0 44px; border-bottom: 1px solid var(--border);
 }
-.footer-newsletter-copy h3{ font-size: 1.15rem; margin: 0 0 4px; color: var(--text); }
-.footer-newsletter-copy p{ font-size: 0.88rem; margin:0; color: var(--text-dimmer); }
-.newsletter-form{ display:flex; gap: 10px; flex-wrap:wrap; }
-.newsletter-form input{
-  padding: 12px 18px; border-radius: 0; border:1px solid var(--border); background: var(--surface);
-  color: var(--text); min-width: 240px; font-size: 0.92rem;
-}
-.newsletter-form input{ transition: border-color .18s ease; }
-.newsletter-form input:hover{ border-color: rgba(255,255,255,.3); }
-.newsletter-form input:focus{ outline:none; border-color: var(--pink); }
-.newsletter-msg{ width:100%; margin: 10px 0 0; font-size:0.85rem; color: var(--teal); min-height: 1em; text-align:right; }
-.newsletter-msg:empty{ margin:0; min-height:0; }
+.footer-offer .lo-copy{ flex:1 1 320px; min-width:0; }
+.footer-offer .lo-body{ flex:0 1 420px; }
+.footer-offer .lo-title{ font-size: 1.15rem; margin: 0 0 4px; }
+.footer-offer .lo-facts{ flex:1 1 100%; margin: 0; }
+.footer-offer .lo-reveal{ text-align:left; }
+.footer-offer .lo-copy-btn{ margin-top: 12px; }
 @media (max-width: 640px){
-  .footer-newsletter{ flex-direction:column; align-items:flex-start; }
-  .newsletter-form{ width:100%; }
-  .newsletter-form input{ flex:1; min-width: 0; }
-  .newsletter-msg{ text-align:left; }
+  .footer-offer{ flex-direction:column; align-items:flex-start; }
+  .footer-offer .lo-body{ width:100%; flex-basis:auto; }
 }
 
 /* ---------- footer ---------- */
@@ -1144,8 +1141,7 @@ html:not(.js) .faq-a{ max-height: none; }
   /* footer runs very tall stacked on mobile — tighten every gap in the
      chain so it reads as one compact column instead of a scroll marathon */
   .site-footer{ padding: 48px 0 24px; }
-  .footer-newsletter{ padding: 20px 0; gap: 16px; }
-  .newsletter-msg{ text-align:left; }
+  .footer-offer{ padding: 20px 0; gap: 16px; }
   .footer-top{ gap: 26px 14px; margin: 30px 0; }
   /* the disclaimer is the tallest thing down here. Nothing is removed from
      it — the leading just comes in so it takes fewer screens to scroll past. */
