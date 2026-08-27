@@ -177,14 +177,34 @@ export async function resolvePromoCode(rawCode, subtotalCents) {
   try {
     list = await stripeGet(`/promotion_codes?code=${encodeURIComponent(code)}&active=true&limit=1`);
   } catch (e) {
+    console.error('resolvePromoCode: promotion_codes lookup failed', code, e.status, e.code, e.message);
     return { ok: false, error: 'Could not check that code right now. Try again in a moment.' };
   }
 
   const promo = Array.isArray(list.data) ? list.data[0] : null;
-  if (!promo) return { ok: false, error: 'That code doesn’t exist.' };
-  if (!promo.coupon || promo.coupon.valid === false) {
+  if (!promo) {
+    console.error('resolvePromoCode: no active promotion code matched', code, JSON.stringify(list));
+    return { ok: false, error: 'That code doesn’t exist.' };
+  }
+
+  // promo.coupon is documented as the full Coupon object, but this has been
+  // seen coming back as a bare coupon ID string in the wild — logged and
+  // fetched explicitly rather than trusted, so a shape Stripe's docs don't
+  // predict can't silently read a stale/undefined .valid as falsy.
+  let coupon = promo.coupon;
+  if (coupon && typeof coupon === 'string') {
+    try {
+      coupon = await stripeGet(`/coupons/${encodeURIComponent(coupon)}`);
+    } catch (e) {
+      console.error('resolvePromoCode: coupon fetch failed', code, coupon, e.message);
+      coupon = null;
+    }
+  }
+  if (!coupon || coupon.valid === false) {
+    console.error('resolvePromoCode: coupon missing or invalid', code, JSON.stringify(promo));
     return { ok: false, error: 'That code is no longer active.' };
   }
+  promo.coupon = coupon;
 
   if (promo.expires_at && promo.expires_at * 1000 < Date.now()) {
     return { ok: false, error: 'That code has expired.' };
