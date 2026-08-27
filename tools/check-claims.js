@@ -552,12 +552,23 @@ console.log('\nthe batch analysis panel');
     /VIAL_ART_NOTICE/.test(read('js/product.js')) &&
     /VIAL_ART_NOTICE/.test(read('tools/build-products.js')));
 
-  // The homepage's Glow Standard cards show the same branded renders, so they
-  // carry the same disclosure. index.html is hand-written rather than generated
-  // from the constant, so the two are compared here instead.
-  ok('the homepage vial renders carry the same disclosure, word for word',
-    read('index.html').includes(VIAL_ART_NOTICE),
-    `index.html must contain "${VIAL_ART_NOTICE}"`);
+  // The homepage's Glow Standard cards use the same branded renders, but at the
+  // size, brightness and scrim they are set to, the label on the vial is not
+  // legible: there is no label being shown, so there is nothing to disclose and
+  // the cards carry no notice.
+  //
+  // That holds only while the art stays as dark and as small as it currently
+  // is. Scaling the image up or lifting its brightness, both of which have been
+  // tried, brings the label back into view and puts the claim back on the page.
+  // So the absence of the notice is tied to the absence of those two rules
+  // rather than left to whoever next edits the stylesheet to remember.
+  const mediaRule = (read('css/style.css').match(/\.standard-media\{([^}]*)\}/) || [, ''])[1];
+  const zoomed = /transform:\s*[^;]*scale\(\s*(?!0?\.|1\s*\))/.test(mediaRule);
+  const brightened = /filter:\s*[^;]*brightness\(\s*(?!0?\.|1\s*\))/.test(mediaRule);
+  ok('the homepage renders stay too dark to show a label, or else disclose it',
+    !(zoomed || brightened) || read('index.html').includes(VIAL_ART_NOTICE),
+    `.standard-media is ${zoomed ? 'scaled up' : ''}${zoomed && brightened ? ' and ' : ''}` +
+    `${brightened ? 'brightened' : ''}, so index.html must carry "${VIAL_ART_NOTICE}"`);
 
   // The Product schema uses about[0], the first paragraph of the compound's
   // description, not the catalog's summary blurb. It is a real per-compound

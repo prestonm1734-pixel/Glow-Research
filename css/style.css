@@ -955,8 +955,9 @@ button[disabled].si-forgot{ cursor: progress; }
   transition: border-color .2s ease, gap .2s ease;
 }
 .standard-link:hover{ border-bottom-color: var(--text); gap: 12px; }
-/* The cards show branded labels the shipped vial does not carry, same as the
-   product pages, so the same disclosure runs under them. */
+/* Kept for the disclosure that has to reappear under the cards if the art is
+   ever scaled or brightened enough to make the vial label readable again.
+   check-claims.js enforces the pairing. */
 .standard-note{
   margin: 26px 0 0; text-align:center;
   font-family:'JetBrains Mono', monospace; font-size:0.68rem;
