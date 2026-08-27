@@ -872,6 +872,58 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 
 
+/* ---------- the glow standard ---------- */
+/* True black rather than --bg-2, so the card art reads as lit against the page
+   instead of sitting in a lighter box on a dark one. */
+.standard-sec{ background:#000; }
+.standard-grid{
+  display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+}
+.standard-card{
+  position:relative; overflow:hidden; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--surface);
+  display:flex; flex-direction:column;
+  min-height: 520px;
+}
+/* The art fills the card and the copy sits over its lower half, so the media
+   is a background layer rather than a block above the text. */
+.standard-media{
+  position:absolute; inset:0;
+  background: radial-gradient(120% 90% at 50% 22%, #23262b 0%, #14161a 45%, #0b0c0e 100%);
+  background-size: cover; background-position: center;
+}
+.standard-media::after{
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 34%, rgba(0,0,0,.72) 66%, rgba(0,0,0,.94) 100%);
+}
+.standard-body{
+  position:relative; z-index:1; margin-top:auto; padding: 30px 28px 28px;
+}
+.standard-eyebrow{
+  display:block; font-family:'JetBrains Mono', monospace;
+  font-size: 0.68rem; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color: var(--text-dim); margin-bottom: 12px;
+}
+.standard-card h3{
+  font-size: 1.4rem; font-weight:600; color: var(--text); margin: 0 0 12px;
+}
+.standard-card p{
+  font-size: 0.94rem; color: var(--text-dim); line-height:1.62; margin: 0 0 20px;
+}
+.standard-link{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:'JetBrains Mono', monospace; font-size:0.7rem; font-weight:600;
+  letter-spacing:.12em; text-transform:uppercase; color: var(--text);
+  padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,.32);
+  transition: border-color .2s ease, gap .2s ease;
+}
+.standard-link:hover{ border-bottom-color: var(--text); gap: 12px; }
+
+@media (max-width: 900px){
+  .standard-grid{ grid-template-columns: 1fr; gap: 16px; }
+  .standard-card{ min-height: 420px; }
+}
+
 /* ---------- faq ---------- */
 .faq-list{ max-width: 780px; margin: 0 auto; }
 /* Eleven questions in one column is a long scroll of nothing but headings, and
