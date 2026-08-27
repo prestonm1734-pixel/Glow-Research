@@ -929,15 +929,15 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 .standard-card p{
   font-size: 0.94rem; color: var(--text-dim); line-height:1.62; margin: 0 0 20px;
-  /* four lines, which is what all three bodies wrap to at full column width */
-  min-height: 6.48em;
+  /* three lines, which is what all three bodies wrap to at full column width */
+  min-height: 4.86em;
 }
 /* Between the single-column breakpoint and full width the columns narrow
-   enough that the shortest body drops to five lines while the others hold at
-   six, which pulls that card's heading up a line. Floor all three at the
-   tallest of them through that range so the row stays level. */
+   enough to push the bodies to a fourth line, and the shortest of them can
+   still fit in three, which would pull that card's heading up a line. Floor
+   all three at the tallest through that range so the row stays level. */
 @media (min-width: 901px) and (max-width: 1150px){
-  .standard-card p{ min-height: 9.72em; }
+  .standard-card p{ min-height: 6.48em; }
   /* the two longer headings wrap to a second line down here, the short one
      does not, so it is floored to match rather than riding a line higher */
   .standard-card h3{ min-height: 2.4em; }
