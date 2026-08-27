@@ -519,7 +519,10 @@ button[disabled].si-forgot{ cursor: progress; }
 
 /* ---------- sections ---------- */
 .section{ padding: 110px 0; }
-#peptides{ padding-top: 78px; }
+/* Half the sitewide band at both ends. The grid is dense and reads as its own
+   block, so the section does not need the full 110 to separate from the hero
+   above it or the standard cards below. */
+#peptides{ padding-top: 39px; padding-bottom: 55px; }
 .section-dark{ background: var(--bg-2); }
 .section-light{ background:#fff; color:#0a0a0a; }
 .section-light p{ color:#55554f; }
