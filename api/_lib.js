@@ -187,11 +187,15 @@ export async function resolvePromoCode(rawCode, subtotalCents) {
     return { ok: false, error: 'That code doesn’t exist.' };
   }
 
-  // promo.coupon is documented as the full Coupon object, but this has been
-  // seen coming back as a bare coupon ID string in the wild — logged and
-  // fetched explicitly rather than trusted, so a shape Stripe's docs don't
-  // predict can't silently read a stale/undefined .valid as falsy.
-  let coupon = promo.coupon;
+  // The account's default API version (2026-07-29.dahlia, a preview version)
+  // moved the coupon reference off the promotion code's own top-level
+  // "coupon" field and into "promotion.coupon" instead, as a bare coupon ID
+  // rather than an expanded object — confirmed from a live production log
+  // (GLOW20 always had "promotion":{"coupon":"WlLdrWR1","type":"coupon"} and
+  // no top-level "coupon" at all, which is what made every real, valid code
+  // read as "no longer active"). Both shapes are checked so this keeps
+  // working if the account's default API version changes again later.
+  let coupon = promo.coupon || (promo.promotion && promo.promotion.coupon);
   if (coupon && typeof coupon === 'string') {
     try {
       coupon = await stripeGet(`/coupons/${encodeURIComponent(coupon)}`);
