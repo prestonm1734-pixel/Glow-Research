@@ -1209,11 +1209,13 @@ function bulkSavingPct(original, sale) {
 // states the rest in words so nothing is hidden — a discount you only find by
 // guessing a number is not an offer.
 //
-// 20% at ten vials is the ceiling for a single compound in one order. Above
-// that the answer is wholesale, priced on volume per month rather than per
-// order and starting at 40% for 10 vials a month, so the richer rate is what
-// separates the two rather than the quantity: the same ten vials earns 20% as
-// a one-time retail order or 40% as a standing monthly account.
+// 15% at five vials is the ceiling for a single compound in one order,
+// confirmed against margin on the lowest-priced SKUs in the catalog rather
+// than the highest: a discount that only works on the $89.99 products would
+// quietly lose money on the $39.99 ones every time someone bought in bulk.
+// Above the ceiling the answer is wholesale, priced on volume per month
+// rather than per order and starting at 40% for 10 vials a month, so the
+// richer rate is what separates the two rather than the quantity.
 //
 // The published tiers, confirmed against supplier margin. Every bulk price on
 // the site is derived from these rows, so a rate change here is the whole
@@ -1224,7 +1226,6 @@ const QTY_TIERS = [
   { qty: 2, off: 0.05, card: true },
   { qty: 3, off: 0.10, card: true },
   { qty: 5, off: 0.15 },
-  { qty: 10, off: 0.20 },
 ];
 
 // The most a single compound can be discounted before wholesale. Derived, so

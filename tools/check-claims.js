@@ -1776,10 +1776,10 @@ console.log('\nbulk pricing');
   ok('every quantity gets the rate of the tier it reaches',
     wrongTier.length === 0, wrongTier.join('; '));
 
-  // 20% on one compound is the ceiling, and wholesale picks up above it. If a
+  // 15% on one compound is the ceiling, and wholesale picks up above it. If a
   // retail tier ever went past what wholesale opens at, the two ladders would
   // be advertising against each other.
-  ok('the bulk ceiling is 20%', BULK_MAX_OFF === 0.20, `${BULK_MAX_OFF * 100}%`);
+  ok('the bulk ceiling is 15%', BULK_MAX_OFF === 0.15, `${BULK_MAX_OFF * 100}%`);
   ok('wholesale still starts richer than the retail ceiling',
     /(2[5-9]|[3-9][0-9])% off starting at/.test(read('wholesale.html')),
     'wholesale.html must open above the retail bulk ceiling');
