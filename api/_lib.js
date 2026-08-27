@@ -238,7 +238,17 @@ export async function resolvePromoCode(rawCode, subtotalCents) {
   // the cart's own value rather than paying someone to take vials away.
   discountCents = Math.min(discountCents, subtotalCents);
 
-  return { ok: true, id: promo.id, code: promo.code, discount: round2(discountCents / 100) };
+  // percentOff/amountOffCents are the coupon's own terms rather than what this
+  // particular subtotal works out to. api/unlock-offer.js states the discount
+  // before there is a cart to price, so it needs the rate, not an amount.
+  return {
+    ok: true,
+    id: promo.id,
+    code: promo.code,
+    discount: round2(discountCents / 100),
+    percentOff: percent_off > 0 ? percent_off : null,
+    amountOffCents: amount_off > 0 ? amount_off : null,
+  };
 }
 
 /* ============================ sales tax ============================ */

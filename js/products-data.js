@@ -148,6 +148,57 @@ const PAYMENTS_LIVE = true;
 // silently take test-mode payments, or a live payment will find no webhook.
 const STRIPE_PUBLISHABLE_KEY = 'pk_live_51U3kUmHjOd9MaH5sNxBU6C1neJypFeZGunq4CUybpTBrzWRC0dA4XY72By2DFkWDwIz8RPdHUhXHZlu6M0dgcTjW00ufOBrU9S';
 
+/* ---------------------------- launch offer ----------------------------
+   The one description of the launch discount. The percentage, the code, when
+   each surface appears, and every sentence either the popup or the email says
+   are all read from here, so no page can quote a discount the next one
+   contradicts, and none can outlive the promotion.
+
+   LAUNCH_OFFER_LIVE is the master switch: false and no surface renders, the
+   endpoint refuses, and check-claims.js stops requiring the copy anywhere.
+
+   What this object cannot do is make the code work. `code` and `percentOff`
+   are what the site *says*; Stripe is what actually happens at checkout. So
+   api/unlock-offer.js never hands the code out on the strength of this object:
+   it resolves the promotion against Stripe first and reveals the discount
+   Stripe reports, refusing if the code is dead. A stale figure here shows up
+   as a mismatch in the logs rather than as a promise the checkout breaks. */
+const LAUNCH_OFFER_LIVE = true;
+const LAUNCH_OFFER = {
+  code: 'GLOW20',
+  percentOff: 20,
+
+  // Two surfaces, because the same interruption does not suit both. The
+  // homepage is where someone is still deciding whether this is a real
+  // supplier, so it gets a bar along the bottom that leaves the page readable.
+  // The catalog and the product pages are further down the intent curve, where
+  // a dialog is worth its cost.
+  //
+  // Delays are the midpoints of the windows this was specified with (12-18s on
+  // the homepage, 8-12s elsewhere): long enough to land and read something
+  // first, which is the whole point of not firing on load.
+  barDelayMs: 15000,
+  modalDelayMs: 10000,
+  // The catalog and product pages also open on depth, whichever comes first.
+  // Someone a third of the way down a page has already decided to look.
+  modalScrollAt: 0.35,
+
+  // Copy. Both surfaces share the offer's own words and differ only in frame.
+  eyebrow: 'Launch Offer',
+  barTitle: 'New to Glow? Take 20% off your first order.',
+  modalTitle: 'Get 20% off your first order.',
+  ask: 'Enter your email to unlock your launch code.',
+  facts: 'Lot-level records. Third-party tested. Research use only.',
+  cta: 'Unlock Offer',
+
+  // Shown only after the address is in and Stripe has confirmed the code.
+  revealTitle: code => `Your launch code: ${code}`,
+  revealBody: pct => `Use it at checkout for ${pct}% off your first order.`,
+
+  emailSubject: 'Your Glow launch code',
+  emailBody: code => `Your launch code is ${code}.`,
+};
+
 // Meta's Pixel ID, not secret — it identifies which pixel a browser event
 // belongs to, the same way a Google Analytics measurement ID would, and
 // Meta's own docs say it is safe to ship client-side. Read by
@@ -1595,6 +1646,8 @@ if (typeof module !== 'undefined' && module.exports) {
     PAYMENT_COPY,
     STRIPE_PUBLISHABLE_KEY,
     META_PIXEL_ID,
+    LAUNCH_OFFER_LIVE,
+    LAUNCH_OFFER,
     round2,
   };
 }

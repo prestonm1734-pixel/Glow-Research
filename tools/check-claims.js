@@ -35,7 +35,7 @@ const {
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
-  hasList, listPriceOf, SITEWIDE_DISCOUNT, VIAL_ART_NOTICE,
+  hasList, listPriceOf, SITEWIDE_DISCOUNT, VIAL_ART_NOTICE, LAUNCH_OFFER, LAUNCH_OFFER_LIVE,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -2375,6 +2375,95 @@ console.log('\npromo codes');
 
   ok('checkout.html carries the discount summary row',
     /id="coPromoRow"/.test(coHtml) && /id="coPromoRowAmount"/.test(coHtml));
+}
+
+/* ---------------------------------------------------------------------------
+ * The launch offer. A popup that says "20% off with GLOW20" is two claims the
+ * catalog cannot keep true on its own: the promotion is Stripe's to end, and
+ * the rate is Stripe's to change. So the value is never in the page, and the
+ * endpoint that hands it out asks Stripe first.
+ * ------------------------------------------------------------------------- */
+console.log('\nlaunch offer');
+{
+  const offerJs = read('js/launch-offer.js');
+  const unlock = read('api/unlock-offer.js');
+  const offerPages = ['index.html', 'peptides.html', 'product.html'];
+  // Pages where an interruption can only cost an order.
+  const quietPages = ['checkout.html', 'thank-you.html', 'cart.html'].filter(f =>
+    fs.existsSync(path.join(ROOT, f)));
+
+  ok('the offer is described in one place, not typed into a page',
+    typeof LAUNCH_OFFER === 'object' && !!LAUNCH_OFFER.code && LAUNCH_OFFER.percentOff > 0);
+
+  // The whole point of the popup. If the code ships in the markup or the
+  // script, the address is being asked for in exchange for something the
+  // visitor already has.
+  const leaked = [];
+  [...pages, 'js/launch-offer.js', 'css/style.css'].forEach(f => {
+    if (!fs.existsSync(path.join(ROOT, f))) return;
+    if (read(f).includes(LAUNCH_OFFER.code)) leaked.push(f);
+  });
+  ok(`the code is never served to the browser before the address is given`,
+    leaked.length === 0,
+    `${LAUNCH_OFFER.code} appears in: ${leaked.join(', ')}`);
+
+  ok('js/launch-offer.js reads the offer from the catalog rather than restating it',
+    /LAUNCH_OFFER/.test(offerJs) && !/percentOff:\s*\d/.test(offerJs));
+
+  // Stripe is the authority on whether the promotion is still live and what it
+  // is worth. Handing out LAUNCH_OFFER.code without asking would be exactly
+  // the "claim we cannot show is true" PRINCIPLES.md rules out.
+  ok('api/unlock-offer.js resolves the code against Stripe before revealing it',
+    /resolvePromoCode\(/.test(unlock) &&
+    unlock.indexOf('resolvePromoCode(') < unlock.indexOf('sendEmail('));
+  ok('and refuses rather than revealing one Stripe would not honour',
+    /if\s*\(!resolved\.ok\)/.test(unlock) && /return res\.status\(503\)/.test(unlock));
+  ok('the revealed discount is the rate Stripe reports, not the catalog’s copy',
+    /resolved\.percentOff/.test(unlock));
+  ok('resolvePromoCode() reports the coupon’s own rate for it to use',
+    /percentOff:\s*percent_off\s*>\s*0/.test(read('api/_lib.js')));
+
+  // Both, for the same reason the checkout endpoints gate: a code is worth
+  // nothing while no order can be taken.
+  ok('api/unlock-offer.js gates on the offer flag and on PAYMENTS_LIVE',
+    /!LAUNCH_OFFER_LIVE\s*\|\|\s*!PAYMENTS_LIVE/.test(unlock));
+  ok('and validates the address rather than mailing whatever it is sent',
+    /isEmail\(email\)/.test(unlock));
+
+  // The offer only appears where it was asked for, and never over a page
+  // someone is trying to buy on.
+  offerPages.forEach(f => {
+    ok(`${f} loads the offer and names which surface it wants`,
+      /js\/launch-offer\.js/.test(read(f)) &&
+      /<body data-launch-offer="(bar|modal)"/.test(read(f)));
+  });
+  quietPages.forEach(f => {
+    ok(`${f} carries no offer popup`,
+      !/launch-offer/.test(read(f)));
+  });
+
+  ok('the homepage takes the quieter surface of the two',
+    /<body data-launch-offer="bar"/.test(read('index.html')));
+
+  // The email and the popup say the same thing because they read the same
+  // strings. A second copy of the sentence is how the two drift.
+  ok('the email is built from the same strings the popup shows',
+    /LAUNCH_OFFER\.emailSubject/.test(unlock) &&
+    /LAUNCH_OFFER\.emailBody/.test(unlock) &&
+    /LAUNCH_OFFER\.facts/.test(unlock));
+
+  // The three facts are the ones the rest of the site is already held to.
+  ok('the offer’s supporting line claims nothing new',
+    /third-party tested/i.test(LAUNCH_OFFER.facts) &&
+    /research use only/i.test(LAUNCH_OFFER.facts) &&
+    !/\d+\s*%/.test(LAUNCH_OFFER.facts));
+
+  // Specified as "let them land, breathe, then show it". A popup on load is
+  // the failure this timing exists to avoid.
+  ok('neither surface opens on arrival',
+    LAUNCH_OFFER.barDelayMs >= 12000 && LAUNCH_OFFER.modalDelayMs >= 8000);
+  ok('the homepage waits longer than the catalog does',
+    LAUNCH_OFFER.barDelayMs > LAUNCH_OFFER.modalDelayMs);
 }
 
 console.log('\ncatalog shape');

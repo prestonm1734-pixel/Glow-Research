@@ -268,9 +268,15 @@ function buildProduct(p, donor) {
 <script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd(p, url))}</script>`;
   html = required(html, /<\/head>/, '</head>').replace('</head>', headExtra + '\n</head>');
 
-  /* --- slug, baked in so the page needs no query string --- */
-  html = required(html, /<body>/, '<body>')
-    .replace('<body>', `<body data-product-slug="${slug}">`);
+  /* --- slug, baked in so the page needs no query string ---
+     The donor's <body> carries attributes of its own (data-launch-offer), so
+     the slug is added to whatever is already there rather than replacing the
+     tag. Matching a bare `<body>` silently dropped those the moment one was
+     added, which is worth failing the build over rather than shipping ten
+     pages missing a behaviour the donor has. */
+  html = required(html, /<body(\s[^>]*)?>/, '<body>')
+    .replace(/<body(\s[^>]*)?>/, (_, attrs) =>
+      `<body${attrs || ''} data-product-slug="${slug}">`);
 
   /* --- content a crawler must see without running scripts --- */
   html = setText(html, 'pdCrumbName', esc(p.name));
