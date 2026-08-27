@@ -549,33 +549,6 @@ button[disabled].si-forgot{ cursor: progress; }
    search bar so the last row of cards isn't sitting under it. */
 .catalog-page{ padding: 34px 0 90px; }
 .catalog-page .section-head{ margin-bottom: 20px; }
-/* Matched to the header on coa.html, value for value. That page starts from
-   the sitewide .lp-hero and scales it down, because it sits directly above a
-   search box and a grid rather than being the reason you are on the page. The
-   catalog is the same shape of page, so it takes the same treatment: centred,
-   the same clamped title and lede, the same white-surface greys. Kept as its
-   own rules rather than reusing .lp-hero, which is colour-bound to the dark
-   .lp-page those styles were written for. */
-.catalog-intro{
-  text-align:center;
-  padding: clamp(40px, 5.5vw, 64px) 0 clamp(26px, 3.5vw, 38px);
-}
-.catalog-eyebrow{
-  display:block; margin-bottom: 14px;
-  font-family:'Sora', system-ui, sans-serif; font-size:.98rem; font-weight:500;
-  letter-spacing:0; text-transform:none; color:#55554f;
-}
-.catalog-intro h1{
-  font-size: clamp(1.9rem, 3.6vw, 2.6rem); line-height:1.04;
-  letter-spacing:-.035em; color:#0a0a0a;
-  max-width:none; margin: 0 0 14px;
-}
-/* Scoped to the section so it outweighs `.section-light p`, which would
-   otherwise set its own body colour here. */
-.section-light .catalog-sub{
-  font-size: clamp(.98rem, 1.1vw, 1.05rem); line-height:1.5;
-  max-width: 48ch; margin: 0 auto; color:#55554f;
-}
 .catalog-page .filter-row{ margin-bottom: 26px; }
 
 .product-grid-empty{
