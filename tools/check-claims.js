@@ -35,7 +35,7 @@ const {
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
-  hasList, listPriceOf, SITEWIDE_DISCOUNT,
+  hasList, listPriceOf, SITEWIDE_DISCOUNT, VIAL_ART_NOTICE,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -551,6 +551,13 @@ console.log('\nthe batch analysis panel');
     /id="pdRenderNote"/.test(pd) &&
     /VIAL_ART_NOTICE/.test(read('js/product.js')) &&
     /VIAL_ART_NOTICE/.test(read('tools/build-products.js')));
+
+  // The homepage's Glow Standard cards show the same branded renders, so they
+  // carry the same disclosure. index.html is hand-written rather than generated
+  // from the constant, so the two are compared here instead.
+  ok('the homepage vial renders carry the same disclosure, word for word',
+    read('index.html').includes(VIAL_ART_NOTICE),
+    `index.html must contain "${VIAL_ART_NOTICE}"`);
 
   // The Product schema uses about[0], the first paragraph of the compound's
   // description, not the catalog's summary blurb. It is a real per-compound

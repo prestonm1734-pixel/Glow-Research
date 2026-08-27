@@ -318,10 +318,9 @@
 
     <div class="standard-grid">
       <article class="standard-card reveal">
-        <!-- Placeholder art until the product photography lands. Replaced by an
-             <img> in the same slot; the gradient is only here so the card has
-             its full shape in the meantime. -->
-        <div class="standard-media" aria-hidden="true"></div>
+        <img class="standard-media" src="assets/products/standard-tested.jpg"
+             alt="A Glow Research vial on a laboratory bench beside a microscope."
+             width="760" height="950" loading="lazy" decoding="async" />
         <div class="standard-body">
           <span class="standard-eyebrow">Independently Verified</span>
           <h3>Three analyses per lot</h3>
@@ -335,7 +334,9 @@
       </article>
 
       <article class="standard-card reveal">
-        <div class="standard-media" aria-hidden="true"></div>
+        <img class="standard-media" src="assets/products/standard-dispatch.jpg"
+             alt="A Glow Research vial beside sealed packaging and tape, ready to go out."
+             width="760" height="950" loading="lazy" decoding="async" />
         <div class="standard-body">
           <span class="standard-eyebrow">Dispatch</span>
           <h3>Out in one business day</h3>
@@ -349,7 +350,9 @@
       </article>
 
       <article class="standard-card reveal">
-        <div class="standard-media" aria-hidden="true"></div>
+        <img class="standard-media" src="assets/products/standard-coa.jpg"
+             alt="A Glow Research vial photographed beside its paperwork."
+             width="760" height="950" loading="lazy" decoding="async" />
         <div class="standard-body">
           <span class="standard-eyebrow">Backed by COA</span>
           <h3>Matched to its lot</h3>
@@ -361,6 +364,11 @@
         </div>
       </article>
     </div>
+
+    <!-- Must stay word for word VIAL_ART_NOTICE in js/products-data.js, which
+         is what the product pages print under the same renders.
+         check-claims.js compares the two. -->
+    <p class="standard-note reveal">Vials ship with generic labeling, not the label shown.</p>
   </div>
 </section>
 

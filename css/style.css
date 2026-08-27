@@ -888,12 +888,14 @@ button[disabled].si-forgot{ cursor: progress; }
 /* The art fills the card and the copy sits over its lower half, so the media
    is a background layer rather than a block above the text. */
 .standard-media{
-  position:absolute; inset:0;
-  background: radial-gradient(120% 90% at 50% 22%, #23262b 0%, #14161a 45%, #0b0c0e 100%);
-  background-size: cover; background-position: center;
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit: cover; object-position: center top;
 }
-.standard-media::after{
-  content:''; position:absolute; inset:0;
+/* The scrim lives on the card, not on the image: a pseudo-element on a
+   replaced element like <img> is not rendered, so the gradient has to hang
+   off the parent to sit between the art and the copy. */
+.standard-card::after{
+  content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
   background: linear-gradient(180deg, rgba(0,0,0,0) 34%, rgba(0,0,0,.72) 66%, rgba(0,0,0,.94) 100%);
 }
 .standard-body{
@@ -918,6 +920,13 @@ button[disabled].si-forgot{ cursor: progress; }
   transition: border-color .2s ease, gap .2s ease;
 }
 .standard-link:hover{ border-bottom-color: var(--text); gap: 12px; }
+/* The cards show branded labels the shipped vial does not carry, same as the
+   product pages, so the same disclosure runs under them. */
+.standard-note{
+  margin: 26px 0 0; text-align:center;
+  font-family:'JetBrains Mono', monospace; font-size:0.68rem;
+  letter-spacing:.06em; color: var(--text-dimmer);
+}
 
 @media (max-width: 900px){
   .standard-grid{ grid-template-columns: 1fr; gap: 16px; }
