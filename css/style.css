@@ -671,17 +671,18 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 
 /* ---------- product grid ----------
-   No card: no border, no background box, no hover lift. Two tiles per row at
-   every width with a hairline of white between them and a wide gap between
-   rows, so the page reads as a run of large photographs with plain text
-   underneath rather than a grid of boxed products — the split is the gutter
-   itself, not a rule drawn on top of it. */
+   No card: no border, no background box, no hover lift. A hairline of white
+   between tiles and a wide gap between rows, so the page reads as a run of
+   large photographs with plain text underneath rather than a grid of boxed
+   products — the split is the gutter itself, not a rule drawn on top of it.
+   Two tiles per row on phones, four on desktop, where there is width to
+   spare for more per row without shrinking them past readable. */
 .product-grid{
   display:grid; grid-template-columns: repeat(2, minmax(0,1fr));
   column-gap: 2px; row-gap: 56px;
 }
 @media (min-width: 981px){
-  .product-grid{ column-gap: 3px; row-gap: 72px; }
+  .product-grid{ grid-template-columns: repeat(4, minmax(0,1fr)); column-gap: 3px; row-gap: 56px; }
 }
 .product-card{
   position: relative;
