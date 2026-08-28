@@ -405,7 +405,7 @@ const GLOW_PRODUCTS = [
       { t: 'Fibroblast migration', d: 'Used in scratch and outgrowth assays examining how tendon and ligament fibroblasts migrate and organise.' },
       { t: 'Gut epithelial models', d: 'Examined in gastrointestinal tissue models, reflecting the gastric origin of the parent protein.' }
     ] },
-  { name: 'BPC-157/TB-500', alias: 'Wolverine', tag: 'Peptide Blend', cat: 'tissue', purity: '98.63%', lot: '5615', badge:null, saleBadge: true,
+  { name: 'BPC-157/TB-500', alias: 'Wolverine', tag: 'Peptide Blend', cat: 'tissue', purity: '98.63%', lot: '5615', badge:null,
     coa: 'assets/coas/bpc-157-tb-500-lot-5615.pdf', coaRef: '7STD-6SRY', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '9.73 mg' },
     sizes: [
@@ -448,7 +448,7 @@ const GLOW_PRODUCTS = [
       { t: 'Co-formulation stability', d: 'Studied for how the two peptides behave when reconstituted and stored from a single vial.' },
       { t: 'Comparative pulse studies', d: 'Applied alongside single-compound vials in models comparing combined and separate administration protocols.' }
     ] },
-  { name: 'Tesamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.36%', lot: '1002', badge:null, saleBadge: true,
+  { name: 'Tesamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.36%', lot: '1002', badge:null,
     coa: 'assets/coas/tesamorelin-lot-1002.pdf', coaRef: 'R934-S6U9', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.59 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [{ mg: '10mg', price: 89.99, list: 100, sku: 'GLO-TSM10', image: 'assets/products/tesamorelin-10mg-v3.webp' }],
@@ -476,7 +476,7 @@ const GLOW_PRODUCTS = [
       { t: 'Biased signalling', d: 'Studied for the balance between G-protein coupling and beta-arrestin recruitment at each receptor.' },
       { t: 'Receptor crosstalk', d: 'Applied in models examining how engaging both receptors at once differs from either alone.' }
     ] },
-  { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.84%', lot: '1025', badge:null, saleBadge: true,
+  { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.84%', lot: '1025', badge:null,
     coa: 'assets/coas/mots-c-lot-1025.pdf', coaRef: 'N8VT-H88T', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.45 mg' },
     sizes: [{ mg: '10mg', price: 59.99, list: 67, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg-v3.webp' }],
@@ -1444,7 +1444,7 @@ function productCardHtml(p, i) {
       <div class="product-card reveal" style="transition-delay:${(i % 3) * 60}ms">
         <a class="product-visual" href="${href}">
           <span class="product-badges">
-            ${stocked && hasList(p) && p.saleBadge ? '<span class="product-badge sale">Sale</span>' : ''}
+            ${stocked && hasList(p) ? '<span class="product-badge sale">Sale</span>' : ''}
             ${!stocked
               ? '<span class="product-badge status is-out">Out of stock</span>'
               : p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
