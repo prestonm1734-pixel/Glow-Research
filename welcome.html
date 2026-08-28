@@ -386,6 +386,28 @@
   </div>
 </footer>
 
+<!-- Sticky call to action, this page only.
+     It is hidden while the hero's own Shop now button is on screen and
+     appears once that scrolls away, so the page never shows the same action
+     twice. js/welcome.js does that with an observer on .wl-cta.
+
+     Deliberately says nothing with a number in it. Every other standing term
+     on this page (the threshold, the discount, the cutoff) is a figure pinned
+     to a constant somewhere, and a bar that follows the reader down the whole
+     page is the worst place to leave a fourth copy of one to drift. What is
+     left is true on every lot with nothing to keep in sync.
+
+     Starts [hidden] rather than merely translated off screen: with no
+     JavaScript the observer never runs, and a bar that is only visually
+     off-canvas would still be in the tab order and read out by a screen
+     reader as a second Shop now. -->
+<div class="wl-sticky" id="wlSticky" hidden>
+  <div class="container wl-sticky-in">
+    <p class="wl-sticky-copy">Every lot third-party tested, with a published certificate of analysis.</p>
+    <a href="peptides.html" class="btn btn-primary wl-sticky-btn">Shop now <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+  </div>
+</div>
+
 <script src="js/products-data.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/cart-modal.js"></script>

@@ -92,6 +92,23 @@
     if (open) open.style.maxHeight = `${open.scrollHeight}px`;
   });
 
+  /* ---------- sticky call to action ----------
+     Shown only once the hero's own Shop now button has scrolled off, so the
+     page never offers the same action twice at once. Watching the hero CTA
+     rather than a scroll offset means the handoff happens at the right moment
+     at any viewport height, with no magic number to re-tune. */
+  const sticky = document.getElementById('wlSticky');
+  const heroCta = document.querySelector('.wl-cta');
+  if (sticky && heroCta) {
+    // Removing [hidden] is what opts the bar in, and it happens only here:
+    // with no JavaScript the observer never runs and the bar stays out of the
+    // document entirely rather than sitting off screen in the tab order.
+    sticky.hidden = false;
+    new IntersectionObserver(entries => {
+      entries.forEach(e => sticky.classList.toggle('is-shown', !e.isIntersecting));
+    }, { threshold: 0 }).observe(heroCta);
+  }
+
   /* ---------- dispatch cutoff ----------
      States the real cutoff against the reader's own clock. The hour is
      DISPATCH_CUTOFF_HOUR from js/products-data.js, never typed here, so this
