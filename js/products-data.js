@@ -673,15 +673,6 @@ const TRANSIT_DAYS = 2;
 const PACKAGING_PLAIN = 'A plain padded envelope, no branding, nothing on the ' +
   'outside naming what is inside';
 
-// Storage, as laboratory chemistry. Clause 04 of the RUO agreement draws the
-// line this sits on: handling and reconstitution information is publishable,
-// a quantity to use or a route of administration is not. Deliberately no
-// figures. A temperature written here becomes a specification we are held to
-// on every lot, and the vial label and the certificate are what actually
-// govern the material in someone's hand.
-const STORAGE_LONG = 'Cold and out of the light. Freezer if you are keeping it a ' +
-  'while, fridge once it is reconstituted, and use it up reasonably soon after that';
-
 // ---------------------------------------------------------------------------
 // What the site is allowed to say about how a lot is verified and where it is
 // made. Both claims are already made at length on how-we-test.html and about.html.
@@ -868,8 +859,8 @@ const FAQS = [
     // ANALYSIS_LONG says the same thing at length for llms.txt, where being
     // exhaustive is the point. Here it read like a specification sheet, so
     // this states it the way a person would say it out loud.
-    q: 'What gets tested before my vial ships?',
-    a: `${sentenceCase(numberWord(ANALYSIS_TESTS.length))} analyses on every lot before it ships: ` +
+    q: 'Is every compound third-party tested?',
+    a: `Yes. ${sentenceCase(numberWord(ANALYSIS_TESTS.length))} analyses on every lot before it ships: ` +
        `${listWords(ANALYSIS_TESTS.map(t =>
          t.method ? `${t.name.toLowerCase()} by ${t.method}` : t.name.toLowerCase()), 'and')}. ` +
        (ANALYSIS_SOME_LOTS.length
@@ -882,48 +873,22 @@ const FAQS = [
        'An outside lab does all of it, so the certificate is not ours to write.',
   },
   {
-    // Answer comes from COA_COPY, which keys off COAS_PUBLISHED. While
-    // certificates are not hosted this offers the route that works, and it
-    // upgrades itself the moment they are, with no edit here.
-    id: 'faqCoa',
-    q: 'How do I get the COA for my vial?',
-    a: COA_COPY.faq,
-  },
-  {
-    // The answer told a reader to take the reference to the laboratory, on a
-    // site that gave them no way to do it. The laboratory publishes one, and
-    // it is the same link the panel and the certificate dialog offer, built
-    // from LAB.verify rather than typed here.
-    q: 'How do I know you did not write the certificate yourselves?',
-    a: 'Do not take our word for it. Every certificate carries the lab\u2019s own report ' +
-       `reference, and you can check it at ${verifyHost()}. Those are their records, not ` +
-       'ours. We link it on every product page and every certificate.',
-  },
-  {
-    q: 'Where do I find the lot number on my vial?',
-    a: 'Printed on the label. Quote it when you ask for a certificate, and check it matches the lot the certificate names.',
-  },
-  {
     // Every figure here is the constant the rest of the site quotes: the
     // dispatch rule from NO_DISPATCH_DAY, the transit from
     // TRANSIT_DAYS. check-claims.js pins both sitewide, so this answer cannot
     // drift from the shipping page.
-    q: 'How quickly does an order go out?',
+    q: 'How fast does my order ship?',
     a: `Every order ships ${DISPATCH_LABEL} on FedEx ${TRANSIT_DAYS}-Day. ` +
        'Tracking follows within a day. United States only.',
   },
   {
-    // Reads PACKAGING_PLAIN rather than describing the box a second time.
-    q: 'What does the package look like when it arrives?',
-    a: `${PACKAGING_PLAIN}. The carrier label is the only thing on it.`,
-  },
-  {
-    // STORAGE_LONG rather than a sentence typed here: the same guidance is
-    // laboratory chemistry, which clause 04 of the RUO agreement permits, and
-    // keeping it in one constant is what stops a figure creeping into one copy
-    // of it later. The deferral to the label is the honest half of the answer.
-    q: 'How should a vial be stored?',
-    a: `${STORAGE_LONG}. The vial label is what governs, not this page.`,
+    // Reads PACKAGING_PLAIN rather than describing the envelope a second
+    // time, and states the one payment method create-payment-intent.js
+    // actually requests rather than a generic "secure checkout" claim.
+    q: 'Is checkout discreet and secure?',
+    a: `Always. Orders ship in ${PACKAGING_PLAIN.charAt(0).toLowerCase()}${PACKAGING_PLAIN.slice(1)}, ` +
+       'and checkout runs on Stripe\u2019s own encrypted payment form, card only. ' +
+       'Stripe handles and stores the card details, not us.',
   },
   {
     // No hedging and no softening. This is the one answer on the site where
@@ -1669,7 +1634,6 @@ if (typeof module !== 'undefined' && module.exports) {
     DISPATCH_LABEL,
     TRANSIT_DAYS,
     PACKAGING_PLAIN,
-    STORAGE_LONG,
     ANALYSIS_TESTS,
     TESTS_PER_BATCH,
     numberWord,

@@ -27,7 +27,7 @@ const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, DISPATCH_LABEL, NO_DISPATCH_DAY_NAME,
   DISPATCH_CUTOFF_HOUR, DISPATCH_CUTOFF_LABEL, DISPATCH_CUTOFF_TICKER, DISPATCH_CUTOFF_PDP_LABEL,
-  ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord, PACKAGING_PLAIN, STORAGE_LONG,
+  ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord, PACKAGING_PLAIN,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
   productMetaDesc, productSlug,
@@ -1382,13 +1382,6 @@ console.log('\nhomepage FAQ');
   // a reader with scripting off gets five questions and no answers.
   ok('the answers are readable with no JavaScript',
     /html:not\(\.js\) \.faq-a\{[^}]*max-height:\s*none/.test(read('css/style.css')));
-
-  // The COA answer keys off COAS_PUBLISHED like every other certificate
-  // surface, so a flag flip without a rebuild leaves the FAQ contradicting the
-  // cart and the product page.
-  ok('the certificate answer is the current COA_COPY state',
-    served.includes(COA_COPY.faq.replace(/&/g, '&amp;')) || served.includes(COA_COPY.faq),
-    'COAS_PUBLISHED changed without running `node tools/build-faq.js`');
 }
 
 console.log('\nwhat the FAQ is allowed to say about testing');
@@ -1531,15 +1524,9 @@ console.log('\nwhat the FAQ is allowed to say about the box and the vial');
   // actually describes the box, in the same words the constant holds.
   const claimsDiscreet = pages.some(f => /discreetly shipped/i.test(read(f)));
   ok('the "discreetly shipped" footer claim is explained somewhere the reader can find it',
-    !claimsDiscreet || answers.includes(PACKAGING_PLAIN),
+    !claimsDiscreet || answers.toLowerCase().includes(PACKAGING_PLAIN.toLowerCase()),
     'pages promise discreet shipping but no FAQ answer says what arrives');
 
-  // A temperature in the storage answer stops being guidance and becomes a
-  // specification, held on every lot, verifiable by nobody once the vial is
-  // out of the building. STORAGE_LONG carries none deliberately; this is what
-  // stops a helpful-looking figure being added to it later.
-  const storage = FAQS.filter(f => f.a.includes(STORAGE_LONG));
-  ok('the storage answer exists and comes from STORAGE_LONG', storage.length === 1);
   // No leading \b: a boundary between a space and the minus of "-20C" does not
   // exist, so anchoring on one let exactly the figure this is here to catch
   // through. Matched on the digits and the unit instead. "C" and "F" only
