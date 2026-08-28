@@ -282,13 +282,16 @@ const PAYMENT_COPY = PAYMENTS_LIVE ? {
 // own browser can open the sheet, which is what js/express-pay.js gates on
 // canMakePayment(). The row footnotes that rather than implying every visitor
 // will see them.
+// Order is display order, and check-claims.js holds the row to it, so the
+// sequence is decided here rather than by whoever last edited the markup.
+// Wallets lead: they are the one-tap options and the reason the row converts.
 const PAYMENT_METHODS = [
+  { name: 'Apple Pay', wallet: true },
+  { name: 'Google Pay', wallet: true },
   { name: 'Visa', wallet: false },
   { name: 'Mastercard', wallet: false },
   { name: 'Amex', wallet: false },
   { name: 'Discover', wallet: false },
-  { name: 'Apple Pay', wallet: true },
-  { name: 'Google Pay', wallet: true },
 ];
 
 // The certificate copy, in one place. Both branches describe the same

@@ -1477,12 +1477,23 @@ console.log('\nwelcome landing page');
   // repo cannot read. Pinning the markup to PAYMENT_METHODS at least makes the
   // list one place to correct, so a method switched off is deleted once rather
   // than left on the page nobody edits.
+  // Read off data-pay rather than the tile's contents: the mark itself is now
+  // drawn artwork with no text node to compare, and the order is part of what
+  // is being pinned, not just the set.
   const payRow = (wl.match(/<ul class="wl-pay-list">([\s\S]*?)<\/ul>/) || [, ''])[1];
-  const shownMarks = [...payRow.matchAll(/<li class="wl-pay-mark">([\s\S]*?)<\/li>/g)]
-    .map(m => m[1].replace(/&nbsp;/g, ' ').trim());
-  ok('the payment row lists exactly what PAYMENT_METHODS holds',
+  const shownMarks = [...payRow.matchAll(/<li class="wl-pay-mark" data-pay="([^"]+)"/g)].map(m => m[1]);
+  ok('the payment row shows exactly what PAYMENT_METHODS holds, in that order',
     shownMarks.join(' | ') === PAYMENT_METHODS.map(p => p.name).join(' | '),
     `page has [${shownMarks.join(', ')}], PAYMENT_METHODS has [${PAYMENT_METHODS.map(p => p.name).join(', ')}]`);
+
+  // Drawn artwork carries no text, so without a label each mark is a blank to
+  // a screen reader. The data-pay attribute the check above reads is for the
+  // build, not the browser, and does not announce anything.
+  const unlabelled = [...payRow.matchAll(/<li class="wl-pay-mark" data-pay="([^"]+)"[\s\S]*?<\/li>/g)]
+    .filter(m => !/role="img"/.test(m[0]) || !/aria-label="[^"]+"/.test(m[0]))
+    .map(m => m[1]);
+  ok('and every mark is labelled for a screen reader',
+    unlabelled.length === 0, unlabelled.join(', '));
 
   // Advertising card brands on a site that cannot take a card is the same
   // defect as any other unbacked claim, and PAYMENTS_LIVE is the flag that

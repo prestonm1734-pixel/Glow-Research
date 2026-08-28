@@ -200,12 +200,17 @@
      in the Stripe Dashboard is removed here by deleting one line rather than
      by remembering this row exists.
 
-     Set as monochrome marks rather than the brand artwork. Partly because the
-     official marks are full colour on a site that has no colour anywhere, and
-     partly because the artwork is not in assets/ and is not mine to invent: a
-     hand-drawn approximation of a trademark is worse than a clean wordmark.
-     Dropping the real SVGs into assets/ and swapping the spans is a small
-     change if the colour versions are wanted.
+     Drawn inline rather than loaded as files. There is no brand artwork in
+     assets/ and none can be fetched from here, so these are hand-authored
+     approximations sized to a 40x26 tile: at that size the letterforms are a
+     few pixels tall and read as the mark rather than as a copy of it. If the
+     official SVGs are ever added to assets/, each <svg> below swaps out for
+     an <img> with no other change.
+
+     The one place colour is allowed on this site. Everything else is
+     monochrome by choice, but these are third-party trust marks rather than
+     Glow's own brand, and a payment strip in greyscale reads as decoration
+     instead of as the recognisable set it is doing a job by being.
 
      The wallets carry a footnote instead of being stated flat. Apple Pay and
      Google Pay appear at checkout only when the shopper's own browser can
@@ -216,12 +221,63 @@
   <div class="container wl-pay-in">
     <span class="wl-pay-label">We accept</span>
     <ul class="wl-pay-list">
-      <li class="wl-pay-mark">Visa</li>
-      <li class="wl-pay-mark">Mastercard</li>
-      <li class="wl-pay-mark">Amex</li>
-      <li class="wl-pay-mark">Discover</li>
-      <li class="wl-pay-mark">Apple&nbsp;Pay</li>
-      <li class="wl-pay-mark">Google&nbsp;Pay</li>
+      <li class="wl-pay-mark" data-pay="Apple Pay">
+        <svg viewBox="0 0 40 26" role="img" aria-label="Apple Pay">
+          <rect width="40" height="26" rx="3" fill="#000"/>
+          <g fill="#fff">
+            <path d="M12.9 9.3c-.34.4-.88.72-1.42.67-.07-.54.2-1.12.5-1.47.34-.41.93-.7 1.41-.73.06.56-.16 1.12-.49 1.53z"/>
+            <path d="M13.38 10.08c-.79-.05-1.46.44-1.83.44-.38 0-.95-.43-1.57-.42-.81.01-1.55.47-1.97 1.2-.84 1.45-.22 3.6.6 4.78.4.58.88 1.23 1.51 1.21.6-.02.83-.39 1.56-.39s.93.39 1.57.38c.65-.01 1.06-.59 1.45-1.18.46-.67.65-1.31.66-1.35-.01-.01-1.27-.49-1.28-1.93-.01-1.21.98-1.79 1.03-1.82-.56-.83-1.44-.92-1.73-.92z"/>
+            <text x="17.6" y="17.6" font-family="Helvetica,Arial,sans-serif" font-size="9.4" font-weight="600">Pay</text>
+          </g>
+        </svg>
+      </li>
+      <li class="wl-pay-mark" data-pay="Google Pay">
+        <svg viewBox="0 0 40 26" role="img" aria-label="Google Pay">
+          <rect width="40" height="26" rx="3" fill="#fff"/>
+          <g transform="translate(7 6.6) scale(.535)">
+            <path fill="#4285F4" d="M23.5 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.47a5.53 5.53 0 0 1-2.4 3.58v3h3.86c2.26-2.09 3.57-5.17 3.57-8.82z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.96-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09A11.99 11.99 0 0 0 12 24z"/>
+            <path fill="#FBBC05" d="M5.27 14.29a7.2 7.2 0 0 1 0-4.58V6.62H1.29a12 12 0 0 0 0 10.76l3.98-3.09z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.69 1.29 6.62l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75z"/>
+          </g>
+          <text x="21.5" y="17.4" font-family="Helvetica,Arial,sans-serif" font-size="9" font-weight="500" fill="#5F6368">Pay</text>
+        </svg>
+      </li>
+      <li class="wl-pay-mark" data-pay="Visa">
+        <svg viewBox="0 0 40 26" role="img" aria-label="Visa">
+          <rect width="40" height="26" rx="3" fill="#fff"/>
+          <text x="20" y="17.4" text-anchor="middle" font-family="Helvetica,Arial,sans-serif"
+                font-size="11.4" font-weight="700" font-style="italic"
+                letter-spacing="-.4" fill="#1434CB">VISA</text>
+        </svg>
+      </li>
+      <li class="wl-pay-mark" data-pay="Mastercard">
+        <svg viewBox="0 0 40 26" role="img" aria-label="Mastercard">
+          <rect width="40" height="26" rx="3" fill="#fff"/>
+          <circle cx="16.2" cy="13" r="6.6" fill="#EB001B"/>
+          <circle cx="23.8" cy="13" r="6.6" fill="#F79E1B"/>
+          <!-- the lens where the two discs meet, which is the part that makes
+               the mark read as Mastercard rather than as two dots -->
+          <path fill="#FF5F00" d="M20 7.79a6.6 6.6 0 0 0 0 10.42 6.6 6.6 0 0 0 0-10.42z"/>
+        </svg>
+      </li>
+      <li class="wl-pay-mark" data-pay="Amex">
+        <svg viewBox="0 0 40 26" role="img" aria-label="American Express">
+          <rect width="40" height="26" rx="3" fill="#006FCF"/>
+          <text x="20" y="16.6" text-anchor="middle" font-family="Helvetica,Arial,sans-serif"
+                font-size="8.2" font-weight="700" letter-spacing=".2" fill="#fff">AMEX</text>
+        </svg>
+      </li>
+      <li class="wl-pay-mark" data-pay="Discover">
+        <svg viewBox="0 0 40 26" role="img" aria-label="Discover">
+          <rect width="40" height="26" rx="3" fill="#fff"/>
+          <!-- Sized off the measured bbox, not by eye: at 5.2 the wordmark ran
+               to x=31.2 and the ball sat on top of the final R. -->
+          <text x="3.4" y="15" font-family="Helvetica,Arial,sans-serif"
+                font-size="4.6" font-weight="700" letter-spacing=".05" fill="#231F20">DISCOVER</text>
+          <circle cx="33.2" cy="13.2" r="3.1" fill="#FF6000"/>
+        </svg>
+      </li>
     </ul>
     <p class="wl-pay-note">Wallets appear at checkout where your browser supports them.</p>
   </div>
