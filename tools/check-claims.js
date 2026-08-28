@@ -3126,39 +3126,59 @@ console.log('\ndeploy headers');
    already begun. */
 console.log('\nhero video');
 {
-  const home = read('index.html');
-  const tag = (home.match(/<video[^>]*id="heroVisual"[\s\S]*?<\/video>/) || [''])[0];
-  ok('the homepage hero carries the video', !!tag);
-  if (tag) {
-    ok('it is muted and inline, so no phone hijacks the page with it',
+  // [page, the id on its <video>, the script that starts it]
+  const heroes = [
+    ['index.html', 'heroVisual', 'js/script.js'],
+    ['welcome.html', 'wlHeroVideo', 'js/welcome.js'],
+  ];
+  const clips = new Set();
+
+  heroes.forEach(([page, id, starter]) => {
+    const tag = (read(page).match(new RegExp(`<video[^>]*id="${id}"[\\s\\S]*?</video>`)) || [''])[0];
+    ok(`${page} carries its hero video`, !!tag);
+    if (!tag) return;
+
+    ok(`${page}: muted and inline, so no phone hijacks the page with it`,
       /\bmuted\b/.test(tag) && /\bplaysinline\b/.test(tag));
-    ok('it loops', /\bloop\b/.test(tag));
+    ok(`${page}: it loops`, /\bloop\b/.test(tag));
+
     const poster = (tag.match(/poster="([^"]+)"/) || [])[1];
-    ok('it posters the still, so the hero is never blank while it buffers',
+    ok(`${page}: posters a still, so the hero is never blank while it buffers`,
       !!poster && fs.existsSync(path.join(ROOT, poster)),
       poster ? `poster ${poster} is not in the repo` : 'no poster attribute');
-    ok('it declares width and height, so the box is reserved before metadata',
+    ok(`${page}: declares width and height, so the box is reserved before metadata`,
       /\bwidth="\d+"/.test(tag) && /\bheight="\d+"/.test(tag));
-    ok('it does not autoplay from markup, which would ignore reduced motion',
+    ok(`${page}: does not autoplay from markup, which would ignore reduced motion`,
       !/\bautoplay\b/.test(tag),
-      'remove autoplay: js/script.js starts it, gated on prefers-reduced-motion');
-    ok('and js/script.js starts it only when reduced motion is not requested',
-      /prefers-reduced-motion: reduce/.test(read('js/script.js')) &&
-      /heroVideo/.test(read('js/script.js')));
+      `remove autoplay: ${starter} starts it, gated on prefers-reduced-motion`);
+    ok(`${page}: ${starter} starts it only when reduced motion is not requested`,
+      /prefers-reduced-motion: reduce/.test(read(starter)) &&
+      new RegExp(`getElementById\\('${id}'\\)`).test(read(starter)));
 
     const src = (tag.match(/<source src="([^"]+)"/) || [])[1];
-    ok('its source is in the repo', !!src && fs.existsSync(path.join(ROOT, src)),
+    ok(`${page}: its source is in the repo`, !!src && fs.existsSync(path.join(ROOT, src)),
       src ? `${src} is missing` : 'no <source>');
-    // A hero that autoplays is downloaded by every visitor before they have
-    // decided to stay, paid traffic included. No hard rule on the number, but
-    // it should be a deliberate figure rather than whatever came out of the
-    // render.
-    if (src && fs.existsSync(path.join(ROOT, src))) {
-      const mb = fs.statSync(path.join(ROOT, src)).size / 1048576;
-      ok(`the clip is ${mb.toFixed(1)}MB, within the 6MB a hero should cost`, mb <= 6,
-        'compress it or shorten the loop before this ships to paid traffic');
-    }
-  }
+    if (src) clips.add(src);
+  });
+
+  // A hero that plays on arrival is downloaded by every visitor before they
+  // have decided to stay, paid traffic included. No hard rule on the number,
+  // but it should be a deliberate figure rather than whatever came out of the
+  // render.
+  [...clips].filter(s => fs.existsSync(path.join(ROOT, s))).forEach(s => {
+    const mb = fs.statSync(path.join(ROOT, s)).size / 1048576;
+    ok(`${s} is ${mb.toFixed(1)}MB, within the 6MB a hero should cost`, mb <= 6,
+      'compress it or shorten the loop before this ships to paid traffic');
+  });
+
+  // /assets/ is served immutable for a year (vercel.json), so a clip edited in
+  // place never reaches anyone who has already visited. The only way to ship a
+  // new cut is a new filename, and the only way to notice you forgot is this:
+  // every referenced clip has to actually be a file in the repo, and nothing
+  // may reference a name that is no longer there.
+  const orphaned = [...clips].filter(s => !fs.existsSync(path.join(ROOT, s)));
+  ok('every hero clip referenced is a file that exists, so no page points at a cut that was replaced',
+    orphaned.length === 0, orphaned.join(', '));
 }
 
 /* The masthead logo goes home from everywhere. index.html is the one page

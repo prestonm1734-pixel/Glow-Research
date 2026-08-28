@@ -219,7 +219,10 @@
          poster="assets/vial-trio-black-v2.jpg"
          width="1280" height="720"
          muted loop playsinline preload="auto" aria-hidden="true">
-    <source src="assets/hero-vial-loop.mp4" type="video/mp4" />
+    <!-- -v2 in the filename is doing real work: /assets/ is served immutable
+         for a year, so replacing a clip in place would leave every returning
+         visitor on the old one. New content, new name. -->
+    <source src="assets/hero-vial-loop-v2.mp4" type="video/mp4" />
   </video>
   <div class="hero-copy-scrim" aria-hidden="true"></div>
 

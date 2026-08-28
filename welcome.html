@@ -114,8 +114,18 @@
      Centre-set rather than the homepage's left-set grid: this page has one job
      and one action, so the column is narrow and everything stacks under it. -->
 <section class="wl-hero">
-  <img class="wl-hero-img" src="assets/vial-trio-black-v2.jpg" alt=""
-       aria-hidden="true" fetchpriority="high" />
+  <!-- Same clip as the homepage hero, same rules: no autoplay attribute, so
+       js/welcome.js is what starts it and can decline to when the visitor has
+       reduced motion switched on. The poster is the still that was here
+       before, so the scrim always has something under it, script or not.
+       object-fit on .wl-hero-img crops the clip exactly as it cropped the
+       still, which is why the two are interchangeable. -->
+  <video class="wl-hero-img" id="wlHeroVideo"
+         poster="assets/vial-trio-black-v2.jpg"
+         width="1920" height="1080"
+         muted loop playsinline preload="auto" aria-hidden="true">
+    <source src="assets/hero-vial-loop-v2.mp4" type="video/mp4" />
+  </video>
   <div class="wl-hero-scrim" aria-hidden="true"></div>
 
   <div class="container wl-hero-inner">
