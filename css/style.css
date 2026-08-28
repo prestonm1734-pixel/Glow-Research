@@ -670,40 +670,58 @@ button[disabled].si-forgot{ cursor: progress; }
   .catalog-head .btn-outline{ width:100%; text-align:center; }
 }
 
-/* ---------- product grid ----------
-   No card: no border, no background box, no hover lift. Two tiles per row at
-   every width with a hairline of white between them and a wide gap between
-   rows, so the page reads as a run of large photographs with plain text
-   underneath rather than a grid of boxed products — the split is the gutter
-   itself, not a rule drawn on top of it. */
+/* ---------- product grid ---------- */
 .product-grid{
-  display:grid; grid-template-columns: repeat(2, minmax(0,1fr));
-  column-gap: 2px; row-gap: 56px;
+  display:grid; grid-template-columns: repeat(auto-fill, minmax(310px,1fr)); gap: 24px;
 }
+/* Four across on the full desktop nav width. auto-fill only reaches 3 at
+   this container width with a 310px floor, so pin it explicitly rather than
+   shrinking the floor sitewide (which would also shrink the 2-column tablet
+   range below, where 3-per-row auto-fill still reads better). */
 @media (min-width: 981px){
-  .product-grid{ column-gap: 3px; row-gap: 72px; }
+  .product-grid{ grid-template-columns: repeat(4, minmax(0,1fr)); }
 }
+/* squared off with a defined edge so each tile reads as an actual box on the
+   page, matching the sharp-cornered language the buttons already use — the
+   12px radius was rounding them into soft blobs */
+/* A grid row stretches every card in it to the height of the tallest one
+   (a two-line name from a longer product like a blend, most often) — that's
+   the grid, not this rule. Without flex-column here, only .product-visual's
+   fixed aspect-ratio and .product-footer's own content claimed any of that
+   extra height, leaving the difference as blank white .product-card
+   background below the black footer. flex + .product-footer{flex:1} below
+   gives that space to the footer instead, so the black block always reaches
+   the card's bottom edge. */
 .product-card{
+  background:#fff;
+  border: 1px solid rgba(0,0,0,0.16);
+  border-radius: 0;
+  overflow:hidden;
   position: relative;
   display:flex; flex-direction:column;
+  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+}
+.product-card:hover{
+  transform: translateY(-5px);
+  border-color: rgba(0,0,0,.38);
+  box-shadow: 0 20px 40px -20px rgba(0,0,0,.35);
 }
 
-/* A vial is a tall, narrow subject; a taller-than-square tile gives it more
-   frame to fill, the way the reference's portrait photography does. */
+/* A vial is a tall, narrow subject, so a short wide tile letterboxes it and
+   the bottle ends up tiny. Keeping the tile roughly square gives the vial the
+   height it needs to fill the frame. */
 .product-visual{
-  aspect-ratio: 4 / 5; flex-shrink:0;
+  aspect-ratio: 1 / 1; flex-shrink:0;
   display:flex; align-items:center; justify-content:center;
   position:relative; overflow:hidden;
-  background:#f6f6f4;
+  background: linear-gradient(180deg,#f6f6f4,#e7e7e4);
 }
 /* Every product shot ships photographed on white, which is already what
-   .product-visual is — so it drops straight in with no card or border
-   around it, and multiply drops the shot's white backdrop out entirely.
-   No side padding: the tile is meant to fill, the way the reference's
-   full-bleed photography does, with the vial's own vertical margin the only
-   air left around it. */
+   .product-visual fades to — so it drops straight in with no card or border
+   around it, and multiply drops the shot's white backdrop out entirely
+   rather than sitting on top of the gradient as its own visible rectangle. */
 .product-photo{
-  height:100%; width:100%; object-fit:contain;
+  height:100%; width:100%; object-fit:contain; padding: 2% 0;
   mix-blend-mode: multiply;
 }
 /* the small square thumb used by search, the cart drawer and checkout — they
@@ -792,18 +810,26 @@ button[disabled].si-forgot{ cursor: progress; }
 /* Out of stock replaces the promo badge rather than sitting beside it —
    two badges on one card is the clutter the badge was meant to cut through. */
 .product-badge.status.is-out{ background:#8a8a86; color:#fff; }
-/* Plain text under the photo, on the page's own white — no panel, no seam,
-   no rule between the name and the price. Left-aligned like a caption. */
 .product-footer{
-  color:#0a0a0a; padding: 16px 2px 0; position:relative;
+  background:#0a0a0a; color:#fff; padding: 20px 22px 22px; position:relative;
   flex:1; display:flex; flex-direction:column;
 }
-.card-divider{ display:none; }
-.product-card h3{ font-size: 1.05rem; font-weight:600; margin: 0; color:#0a0a0a; }
+/* fades out at each edge instead of a hard-edged rule, so it reads as a
+   seam rather than a box border. Used both at the top of the footer (where
+   the tag line used to sit) and between the name and the price. */
+.product-footer::before{
+  content:''; position:absolute; top:0; left:22px; right:22px; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+}
+.card-divider{
+  display:block; height:1px; margin: 2px 0 14px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+}
+.product-card h3{ font-size: 1.15rem; margin: 4px 0 0; color:#fff; }
 /* The catalog name is Glow's own shorthand ("GLP-3 (RT)"), not what most
    people searching for the compound type. Namesake in plain words, once,
    directly under the name it belongs to. */
-.product-alias{ font-size:.85rem; color:rgba(10,10,10,.55); margin: 3px 0 0; }
+.product-alias{ font-size:.82rem; color:rgba(255,255,255,.55); margin: 2px 0 10px; }
 /* The card's one number, so it is sized to be read as one. It carried a
    "/ vial" qualifier until the sizes moved onto the product page, where the
    tier cards state a per-vial rate against a quantity and the words are
@@ -811,9 +837,9 @@ button[disabled].si-forgot{ cursor: progress; }
    smaller. Tabular figures so the prices line up down a column of cards
    rather than drifting with the width of a 1 against a 9. */
 .price{
-  display:block; font-family:var(--font-display); font-size:1.05rem;
-  color:#0a0a0a; font-weight:500; letter-spacing:-.01em;
-  font-variant-numeric: tabular-nums; margin: 10px 0 14px;
+  display:block; font-family:var(--font-display); font-size:1.45rem;
+  color:#fff; font-weight:600; letter-spacing:-.01em;
+  font-variant-numeric: tabular-nums; margin-bottom:14px;
 }
 /* the struck list price sits a step back from the live one — dimmer, lighter
    and a size down, so the eye lands on what you actually pay */
@@ -823,22 +849,29 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 .search-row-meta s{ color:#6f6f6c; margin-left:4px; }
 
-/* A plain outlined line, not a filled slab — the page is quiet now, and a
-   solid black button on every tile would be the one loud thing left on it.
-   Inverts on hover, the same treatment every outline button on the site
-   already uses. */
+/* white on the card's black footer, flips to the reverse on hover — the same
+   invert every button on the site does, plus a lift so the hover has a
+   little life to it */
 .add-btn{
-  width:100%; height:44px; border-radius:0; border:1px solid rgba(10,10,10,.25);
-  background:transparent; color:#0a0a0a; font-family:'Sora', sans-serif; font-size:.85rem; font-weight:700;
+  width:100%; height:44px; border-radius:0; border:1px solid #fff;
+  background:#fff; color:#0a0a0a; font-family:'Sora', sans-serif; font-size:.85rem; font-weight:700;
   cursor:pointer; display:flex; align-items:center; justify-content:center;
-  transition: background .2s ease, color .2s ease, border-color .2s ease;
+  transition: background .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
+  /* footer is a flex column now, so a taller neighbour's title no longer
+     leaves this button floating above a gap of black — it stays put and the
+     gap (if any) opens up above the price instead, right below the divider */
   margin-top:auto;
 }
-.add-btn:hover{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
-.add-btn.added{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+.add-btn:hover{
+  background:#0a0a0a; color:#fff; border-color: rgba(255,255,255,.5);
+  transform: translateY(-2px); box-shadow: 0 8px 18px -8px rgba(0,0,0,.6);
+}
+.add-btn.added{ background:#0a0a0a; color:#fff; border-color: rgba(255,255,255,.5); }
+/* the card footer is black, so a disabled button reads as recessed rather
+   than greyed — it must not still look like the primary action */
 .add-btn:disabled{
-  background:transparent; color:#b7b7b3; border-color:rgba(10,10,10,.12);
-  cursor:not-allowed;
+  background:transparent; color:#8a8a86; border-color:#3a3a38;
+  cursor:not-allowed; transform:none; box-shadow:none;
 }
 
 
@@ -1077,14 +1110,20 @@ html:not(.js) .faq-a{ max-height: none; }
   .footer-top{ grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 640px){
-  /* Already two per row at every width (see .product-grid above) — this
-     just tightens the row gap and the text under each photo to suit the
-     narrower column. */
-  .product-grid{ row-gap: 40px; }
-  .product-footer{ padding: 12px 2px 0; }
-  .product-card h3{ font-size: .92rem; }
-  .product-alias{ font-size:.76rem; margin-top:2px; }
-  .price{ font-size: .95rem; margin: 8px 0 10px; }
+  /* Two products per row on phones. auto-fill with a 260px floor collapses
+     to one column here, which wastes most of the screen on a single tile
+     and turns the catalog into a long scroll. Forcing two columns needs
+     minmax(0,1fr) rather than 1fr, or a long compound name refuses to
+     shrink below its content width and overflows the row. */
+  .product-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); gap: 6px; }
+
+  /* everything inside the tile steps down to suit the narrower column */
+  .product-footer{ padding: 14px 13px 15px; }
+  .product-footer::before{ left:13px; right:13px; }
+  .product-card h3{ font-size: .92rem; margin: 3px 0 0; }
+  .product-alias{ font-size:.74rem; margin: 1px 0 7px; }
+  .card-divider{ margin: 2px 0 10px; }
+  .price{ font-size: 1.18rem; margin-bottom: 10px; }
   .add-btn{ height: 38px; font-size: .78rem; }
   /* Both badges cannot coexist on a half-width tile: "recovery" + "Best
      Seller" measures 139px against a 130px card at 320px, so they collide.
@@ -1654,6 +1693,7 @@ html{ scrollbar-color: #3a3a38 #0a0a0a; }
 .jr-lead:active,
 .jr-row > a:active{ transform: translateY(-2px) scale(.995); transition-duration:.09s; }
 .blog-card:active{ transform: translateY(-2px) scale(.992); transition-duration:.08s; }
+.product-card:active{ transition-duration:.08s; }
 
 /* keyboard focus for the blog surfaces, which the earlier pass missed */
 .jr-lead:focus-visible,
