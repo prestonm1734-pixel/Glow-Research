@@ -3077,6 +3077,29 @@ console.log('\ndeploy headers');
  * that had already been captured and turned into an order redirected the
  * buyer to /peptides/<slug>/thank-you.html and showed them a 404.
  * ------------------------------------------------------------------------- */
+/* The masthead logo goes home from everywhere. index.html is the one page
+   allowed to point it at its own "#top", because on the homepage that is home;
+   every other page has to leave. This is worth pinning because of how the
+   mistake is made: a new page starts as a copy of index.html, and the logo is
+   the one link in that markup whose href is correct on the page it was copied
+   from and silently wrong everywhere else. welcome.html shipped that way. A
+   dead logo is not a visible defect, it just quietly does nothing. */
+console.log('\nmasthead');
+{
+  const homeward = /^\/?index\.html$/;
+  const strayLogos = [];
+  pages.forEach(f => {
+    for (const m of read(f).matchAll(/<a href="([^"]*)" class="logo"/g)) {
+      const href = m[1];
+      if (f === 'index.html' ? href !== '#top' : !homeward.test(href)) {
+        strayLogos.push(`${f}: "${href}"`);
+      }
+    }
+  });
+  ok('every page\'s logo links home, and only the homepage anchors to itself',
+    strayLogos.length === 0, strayLogos.join(', '));
+}
+
 console.log('\nclient-side navigation');
 {
   const navScripts = fs.readdirSync(path.join(ROOT, 'js')).filter(f => f.endsWith('.js'));
