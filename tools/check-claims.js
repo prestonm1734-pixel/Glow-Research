@@ -238,34 +238,41 @@ console.log('\nstock');
  * ------------------------------------------------------------------------- */
 console.log('\nhero figures');
 {
-  const home = read('index.html');
-  const statFor = label => {
-    // The <p> label identifies the stat; the count it animates to is the claim.
-    // The gap must not swallow another data-count, or every lookup returns the
-    // first figure in the row and the check passes on the wrong number.
-    const m = home.match(
-      new RegExp(`data-count="([\\d.]+)"(?:(?!data-count)[\\s\\S]){0,220}?<p>${label}</p>`));
-    return m && m[1];
-  };
+  // Both heroes that state these figures, not just the homepage's.
+  // welcome.html is the unlisted ad landing page and it repeats the same two
+  // numbers; a landing page quoting a purity the catalog has moved past is the
+  // same defect wherever it is printed, and paid traffic is the worst audience
+  // to print it to.
+  ['index.html', 'welcome.html'].forEach(page => {
+    const html = read(page);
+    const statFor = label => {
+      // The <p> label identifies the stat; the count it animates to is the
+      // claim. The gap must not swallow another data-count, or every lookup
+      // returns the first figure in the row and the check passes on the wrong
+      // number.
+      const m = html.match(
+        new RegExp(`data-count="([\\d.]+)"(?:(?!data-count)[\\s\\S]){0,220}?<p>${label}</p>`));
+      return m && m[1];
+    };
 
-  const purity = statFor('Avg\\. Purity');
-  ok('the hero states an average purity', purity !== null);
-  ok(`stated purity ${purity} is the catalog average ${avgPurity()}`,
-    purity === avgPurity(),
-    'index.html and avgPurity() disagree: edit the catalog, not the hero');
+    const purity = statFor('Avg\\. Purity');
+    ok(`${page} states an average purity`, purity !== null);
+    ok(`${page}: stated purity ${purity} is the catalog average ${avgPurity()}`,
+      purity === avgPurity(),
+      `${page} and avgPurity() disagree: edit the catalog, not the hero`);
 
-  const batches = statFor('Batches Tested');
-  ok('the hero states a batch count', batches !== null);
-  ok(`stated batch count ${batches} is BATCHES_TESTED ${BATCHES_TESTED}`,
-    Number(batches) === BATCHES_TESTED,
-    'index.html and products-data.js disagree');
+    const batches = statFor('Batches Tested');
+    ok(`${page} states a batch count`, batches !== null);
+    ok(`${page}: stated batch count ${batches} is BATCHES_TESTED ${BATCHES_TESTED}`,
+      Number(batches) === BATCHES_TESTED,
+      `${page} and products-data.js disagree`);
 
-  // Stated as a floor, so the copy stays true as the real number climbs past
-  // it. Without the "+" the site would be claiming an exact count it does not
-  // hold, which is the failure this whole section exists to prevent.
-  ok('the batch count is stated as a floor, not an exact figure',
-    /data-count="150">0<\/span><span class="stat-suffix">\+<\/span>/.test(home));
-
+    // Stated as a floor, so the copy stays true as the real number climbs past
+    // it. Without the "+" the site would be claiming an exact count it does
+    // not hold, which is the failure this whole section exists to prevent.
+    ok(`${page}: the batch count is stated as a floor, not an exact figure`,
+      new RegExp(`data-count="${BATCHES_TESTED}">0</span><span class="stat-suffix">\\+</span>`).test(html));
+  });
 }
 
 /* ---------------------------------------------------------------------------
@@ -1382,6 +1389,83 @@ console.log('\nhomepage FAQ');
   // a reader with scripting off gets five questions and no answers.
   ok('the answers are readable with no JavaScript',
     /html:not\(\.js\) \.faq-a\{[^}]*max-height:\s*none/.test(read('css/style.css')));
+}
+
+/* ---------------------------------------------------------------------------
+ * 7c-iii. welcome.html, the unlisted ad landing page.
+ *
+ *     Everything a visitor reads there they read having clicked an ad, which
+ *     makes it the page with the least patience for a claim that has drifted
+ *     and the one nobody browsing the site will ever stumble over and notice.
+ *     It is also the only page deliberately kept out of the sitemap and the
+ *     navigation, and "hidden" is a property that decays silently: one link
+ *     added in a footer template and it is not hidden any more.
+ *
+ *     So both halves are checked here. That it stays unlisted, and that the
+ *     three things it states which the rest of the site also states are read
+ *     from the same constants rather than typed into it.
+ * ------------------------------------------------------------------------- */
+console.log('\nwelcome landing page');
+{
+  const wl = read('welcome.html');
+  const wlJs = read('js/welcome.js');
+
+  // --- it stays unlisted -------------------------------------------------
+  ok('welcome.html is noindex', /<meta name="robots"[^>]*noindex/.test(wl));
+
+  const { STATIC_PAGES: SITEMAP } = require('./build-sitemap.js');
+  ok('welcome.html is not in the sitemap',
+    !SITEMAP.some(([p]) => p === 'welcome.html'),
+    'remove it from STATIC_PAGES in tools/build-sitemap.js');
+
+  // The whole point of the page is that traffic arrives from an ad, not from
+  // the site. A link anywhere else makes it a normal page with a strange name.
+  const linksIn = pages.filter(f => f !== 'welcome.html' && /href="\/?welcome(\.html)?"/.test(read(f)));
+  ok('no other page links to welcome.html', linksIn.length === 0, linksIn.join(', '));
+
+  // robots.txt must NOT block it: a Disallow stops a crawler fetching the page
+  // at all, so it never reads the noindex above, and the URL can still be
+  // indexed bare. It would also stop the ad platforms rendering a preview.
+  ok('robots.txt does not disallow it, which would hide the noindex from crawlers',
+    !/Disallow:\s*\/welcome/i.test(read('robots.txt')));
+
+  // --- what it says ------------------------------------------------------
+  // Same contract as the homepage: the copy is served, not injected, and it is
+  // the copy faqHtml() renders rather than a second edit of the same answers.
+  const servedFaq = (wl.match(/<div class="faq-list" id="faqList">([\s\S]*?)<\/div>\s*<\/div>\s*<\/section>/) || [, ''])[1];
+  ok('the landing page FAQ matches what faqHtml() renders',
+    servedFaq.trim() === faqHtml().trim(),
+    'run `node tools/build-faq.js`');
+  ok(`all ${FAQS.length} answers are in its served HTML`,
+    (wl.match(/class="faq-q"/g) || []).length === FAQS.length);
+
+  // The value bar restates the two standing terms the cart and Stripe enforce.
+  // Typed into the page, they are two more numbers to remember; pinned here,
+  // they fail the build the day either one moves.
+  const freeAt = constant('js/cart.js', 'FREE_SHIPPING_AT');
+  ok(`its value bar states the enforced free-shipping threshold ($${freeAt})`,
+    wl.includes(`over $${freeAt}`),
+    `welcome.html does not say "over $${freeAt}"`);
+  ok(`its value bar states the live launch discount (${LAUNCH_OFFER.percentOff}%)`,
+    wl.includes(`<strong>${LAUNCH_OFFER.percentOff}% off</strong>`),
+    `welcome.html does not state ${LAUNCH_OFFER.percentOff}% off, which is LAUNCH_OFFER.percentOff`);
+
+  // The countdown is the one element on the site that could most easily become
+  // a lie, so it gets the most specific check: the hour has to be read from the
+  // constant, and the expired branch has to exist. A countdown that silently
+  // restarts at 24 hours the moment it runs out is a manufactured deadline,
+  // which is exactly what PRINCIPLES.md forbids.
+  ok('the cutoff banner reads DISPATCH_CUTOFF_HOUR rather than typing its own hour',
+    /DISPATCH_CUTOFF_HOUR/.test(wlJs) &&
+    !/\b(?:1?\d|2[0-3]):00\s*(?:AM|PM)?\s*(?:Pacific|PT|P[SD]T)\b/.test(
+      wlJs.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '')),
+    'js/welcome.js must derive the hour, not restate it');
+  ok('and says so past the cutoff rather than restarting the clock',
+    /next dispatch day/i.test(wlJs),
+    'js/welcome.js has no expired branch: a countdown that resets is a prop');
+  ok('and the page ships no cutoff time of its own for that script to contradict',
+    !/\d{1,2}(?::\d{2})?\s*(?:AM|PM)\s*(?:Pacific|PT|P[SD]T)/i.test(
+      (wl.match(/<div class="wl-cutoff"[\s\S]*?<\/div>/) || [''])[0]));
 }
 
 console.log('\nwhat the FAQ is allowed to say about testing');
