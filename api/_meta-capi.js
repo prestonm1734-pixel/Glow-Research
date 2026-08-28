@@ -68,6 +68,14 @@ export async function sendMetaEvent({
           user_data: userData,
           ...(customData ? { custom_data: customData } : {}),
         }],
+        // Meta's Test Events tool only displays a server-side event if the
+        // request carries the code that tool hands out, which is why a real,
+        // working integration can look empty there without this. Set only as
+        // a Vercel environment variable, only for as long as someone is
+        // actively watching that tab — a code left in place has no effect on
+        // production traffic beyond tagging it, but there is no reason to
+        // leave it set once verification is done.
+        ...(process.env.META_CAPI_TEST_EVENT_CODE ? { test_event_code: process.env.META_CAPI_TEST_EVENT_CODE } : {}),
       }),
     });
     if (!resp.ok) {
