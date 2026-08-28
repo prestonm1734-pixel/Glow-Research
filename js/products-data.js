@@ -244,7 +244,7 @@ const X_EVENT_IDS = {
   viewContent: '',
   addToCart: '',
   initiateCheckout: '',
-  purchase: '',
+  purchase: 'tw-repwj-rer6c',
 };
 
 // What the confirmation page says about payment, keyed off the same flag that
