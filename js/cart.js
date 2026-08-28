@@ -8,7 +8,7 @@
 // pages, which is the whole point of a header cart on a multi-page site.
 (function () {
   const KEY = 'glow-cart-v1';
-  const FREE_SHIPPING_AT = 400;   // matches the "FREE SHIPPING OVER $400" marquee
+  const FREE_SHIPPING_AT = 250;   // matches the "FREE SHIPPING OVER $250" marquee
 
   let items = load();
   let drawer, overlay, lastFocused;

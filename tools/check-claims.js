@@ -63,7 +63,7 @@ function constant(file, name) {
 /* ---------------------------------------------------------------------------
  * 1. Free shipping. Stated in the marquee on every page, enforced in the cart
  *    drawer, and enforced again in the checkout shipping table. Three places,
- *    one number. A customer who adds $400 of product because the marquee said
+ *    one number. A customer who adds $250 of product because the marquee said
  *    so and then gets charged shipping never comes back.
  * ------------------------------------------------------------------------- */
 console.log('\nfree shipping threshold');
