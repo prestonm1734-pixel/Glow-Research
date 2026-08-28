@@ -227,7 +227,7 @@ const META_PIXEL_ID = '1071929978858561';
 // verified one right up until Aggregated Event Measurement stops
 // attributing iOS conversions. tools/build-meta.js writes both copies from
 // here now.
-const META_DOMAIN_VERIFICATION = 'ntwszx0m4fi9t5lmw7z1jckzhjd0hb';
+const META_DOMAIN_VERIFICATION = 'vdj6rixbn41crbnftd0jlpbjbzzjxj';
 
 // TikTok's Pixel code, same reasoning and the same shape as META_PIXEL_ID
 // above: not secret, safe to ship client-side, and js/tiktok-pixel.js no-ops
