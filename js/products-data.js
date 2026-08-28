@@ -215,7 +215,7 @@ const LAUNCH_OFFER = {
 // Meta Events Manager replaces it. The matching server-side piece,
 // META_CAPI_ACCESS_TOKEN, is a Vercel environment variable and must never be
 // checked in — see api/_meta-capi.js.
-const META_PIXEL_ID = '895737919981822';
+const META_PIXEL_ID = '1071929978858561';
 
 // The token Meta issues to prove this domain belongs to our business
 // portfolio, served in the page source by design, so not secret either.
