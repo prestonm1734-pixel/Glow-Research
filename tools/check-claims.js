@@ -3114,6 +3114,53 @@ console.log('\ndeploy headers');
  * that had already been captured and turned into an order redirected the
  * buyer to /peptides/<slug>/thank-you.html and showed them a 404.
  * ------------------------------------------------------------------------- */
+/* The homepage hero video. Four properties, each of which is the difference
+   between a background and a nuisance:
+
+   muted and playsinline, or a phone takes the clip fullscreen and plays audio
+   at someone; a poster, so the hero is never a black rectangle while 2.8MB
+   buffers, and so a reader with no JavaScript still gets the still the hero
+   used before the clip existed; and no autoplay attribute, because
+   js/script.js is what starts it and that is the only place
+   prefers-reduced-motion can be honoured. CSS cannot stop a video that has
+   already begun. */
+console.log('\nhero video');
+{
+  const home = read('index.html');
+  const tag = (home.match(/<video[^>]*id="heroVisual"[\s\S]*?<\/video>/) || [''])[0];
+  ok('the homepage hero carries the video', !!tag);
+  if (tag) {
+    ok('it is muted and inline, so no phone hijacks the page with it',
+      /\bmuted\b/.test(tag) && /\bplaysinline\b/.test(tag));
+    ok('it loops', /\bloop\b/.test(tag));
+    const poster = (tag.match(/poster="([^"]+)"/) || [])[1];
+    ok('it posters the still, so the hero is never blank while it buffers',
+      !!poster && fs.existsSync(path.join(ROOT, poster)),
+      poster ? `poster ${poster} is not in the repo` : 'no poster attribute');
+    ok('it declares width and height, so the box is reserved before metadata',
+      /\bwidth="\d+"/.test(tag) && /\bheight="\d+"/.test(tag));
+    ok('it does not autoplay from markup, which would ignore reduced motion',
+      !/\bautoplay\b/.test(tag),
+      'remove autoplay: js/script.js starts it, gated on prefers-reduced-motion');
+    ok('and js/script.js starts it only when reduced motion is not requested',
+      /prefers-reduced-motion: reduce/.test(read('js/script.js')) &&
+      /heroVideo/.test(read('js/script.js')));
+
+    const src = (tag.match(/<source src="([^"]+)"/) || [])[1];
+    ok('its source is in the repo', !!src && fs.existsSync(path.join(ROOT, src)),
+      src ? `${src} is missing` : 'no <source>');
+    // A hero that autoplays is downloaded by every visitor before they have
+    // decided to stay, paid traffic included. No hard rule on the number, but
+    // it should be a deliberate figure rather than whatever came out of the
+    // render.
+    if (src && fs.existsSync(path.join(ROOT, src))) {
+      const mb = fs.statSync(path.join(ROOT, src)).size / 1048576;
+      ok(`the clip is ${mb.toFixed(1)}MB, within the 6MB a hero should cost`, mb <= 6,
+        'compress it or shorten the loop before this ships to paid traffic');
+    }
+  }
+}
+
 /* The masthead logo goes home from everywhere. index.html is the one page
    allowed to point it at its own "#top", because on the homepage that is home;
    every other page has to leave. This is worth pinning because of how the

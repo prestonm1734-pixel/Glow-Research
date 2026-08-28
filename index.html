@@ -197,8 +197,30 @@
   <div class="hero-glow glow-3"></div>
   <canvas id="particleCanvas"></canvas>
 
-  <img class="hero-visual-img reveal" id="heroVisual" src="assets/vial-trio-black-v2.jpg"
-       alt="Three Glow Research peptide vials, GLP3-RT, Tesamorelin, and GHK-CU, on a pure black backdrop" />
+  <!-- Same slot, classes and mask the still occupied, so the hero's geometry
+       is unchanged: the clip is 1280x720 and the still it replaces was
+       1672x941, which is the same 16:9 to within a rounding error.
+
+       No autoplay attribute on purpose. js/script.js starts it, and only when
+       the visitor has not asked for reduced motion, so a looping video is
+       never forced on someone who has switched motion off at the OS. With no
+       JavaScript, or before the clip has buffered, the poster is the still
+       that used to be here, which means the hero has never had a blank frame
+       to fall back to.
+
+       aria-hidden, where the still carried alt text: it sits behind a scrim
+       under the copy and is decoration. A video element cannot take alt, and
+       describing ambience to a screen reader that already has the h1 is
+       noise rather than access.
+
+       width/height are declared so the box is reserved from the aspect ratio
+       before metadata arrives, rather than collapsing and shifting the hero. -->
+  <video class="hero-visual-img reveal" id="heroVisual"
+         poster="assets/vial-trio-black-v2.jpg"
+         width="1280" height="720"
+         muted loop playsinline preload="auto" aria-hidden="true">
+    <source src="assets/hero-vial-loop.mp4" type="video/mp4" />
+  </video>
   <div class="hero-copy-scrim" aria-hidden="true"></div>
 
   <div class="container hero-grid">
