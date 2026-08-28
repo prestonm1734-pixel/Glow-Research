@@ -17,7 +17,8 @@ import { wc, stripe, findCustomerByEmail } from './_lib.js';
 import { emailShell, heading, paragraph, eyebrow, fine, esc, sendEmail, money } from './_email.js';
 import { sendMetaPurchaseEvent } from './_meta-capi.js';
 import { sendTikTokPurchaseEvent } from './_tiktok-capi.js';
-import { META_PIXEL_ID, TIKTOK_PIXEL_ID } from '../js/products-data.js';
+import { sendXPurchaseEvent } from './_x-capi.js';
+import { META_PIXEL_ID, TIKTOK_PIXEL_ID, X_PIXEL_ID, X_EVENT_IDS } from '../js/products-data.js';
 
 const ADMIN_TO = 'preston@glowresearch.shop';
 const SUPPORT = 'support@glowresearch.shop';
@@ -199,6 +200,26 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
       phone: (customer && customer.phone) || '',
       ttclid: (intent.metadata && intent.metadata.ttclid) || '',
       ttp: (intent.metadata && intent.metadata.ttp) || '',
+      clientIp,
+      userAgent,
+      value: intent.amount_received / 100,
+    }).catch(() => {});
+
+    // Same call, same reasoning, X's Conversion API in place of Meta's/
+    // TikTok's. twclid rides on the same PaymentIntent metadata as fbc/fbp
+    // and ttclid/ttp above. conversionId is the dedup key (matched against
+    // the browser pixel's own conversion_id in js/analytics.js); xEventId is
+    // the separate per-event tracking ID X Ads Manager assigns to the named
+    // "Purchase" web event, and is empty (a no-op) until that event exists.
+    await sendXPurchaseEvent({
+      pixelId: X_PIXEL_ID,
+      accessToken: process.env.X_CAPI_ACCESS_TOKEN,
+      xEventId: X_EVENT_IDS.purchase,
+      conversionId: paymentIntentId,
+      eventSourceUrl: 'https://glowresearch.shop/checkout.html',
+      email,
+      phone: (customer && customer.phone) || '',
+      twclid: (intent.metadata && intent.metadata.twclid) || '',
       clientIp,
       userAgent,
       value: intent.amount_received / 100,

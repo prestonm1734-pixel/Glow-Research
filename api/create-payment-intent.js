@@ -82,6 +82,8 @@ export default async function handler(req, res) {
     // api/_tiktok-capi.js.
     ttclid: (analytics && String(analytics.ttclid || '')) || '',
     ttp: (analytics && String(analytics.ttp || '')) || '',
+    // X's own click ID, same reasoning, for api/_x-capi.js.
+    twclid: (analytics && String(analytics.twclid || '')) || '',
   };
 
   // Only present on the final pricing call, right before confirmPayment() —

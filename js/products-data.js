@@ -233,11 +233,12 @@ const TIKTOK_PIXEL_ID = 'DA8CR2BC77U6VIRE2UQG';
 // Purchase) needs its own per-event tracking ID, created separately in X
 // Ads Manager's Events Manager and only known once that is done. X_EVENT_IDS
 // holds those; any entry left empty means js/analytics.js's forwardToX()
-// skips that one event rather than firing a call X has no definition for.
-// There is no server-side Conversions API mirror for X yet (api/_meta-capi.js
-// and api/_tiktok-capi.js both have one) — X's equivalent needs OAuth
-// request-signing, not just a bearer token, and nothing calls for it until
-// the browser-only setup is confirmed working.
+// skips that one event rather than firing a call X has no definition for,
+// and api/_x-capi.js does the same for the server-side Purchase mirror.
+// X's Conversion API takes a bearer-style X-Pixel-Token header, the same
+// difficulty as Meta's and TikTok's — see api/_x-capi.js. The matching
+// server-side piece, X_CAPI_ACCESS_TOKEN, is a Vercel environment variable
+// and must never be checked in.
 const X_PIXEL_ID = 'repwj';
 const X_EVENT_IDS = {
   viewContent: '',

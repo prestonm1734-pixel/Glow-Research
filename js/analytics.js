@@ -71,13 +71,14 @@
       utmCampaign: get('utm_campaign'),
       utmContent: get('utm_content'),
       utmTerm: get('utm_term'),
-      // Meta, Google and TikTok's own click identifiers, present on the
+      // Meta, Google, TikTok and X's own click identifiers, present on the
       // landing URL when an ad was clicked through to get here. Read once at
       // landing like the UTMs above, and left null the rest of the time
       // rather than re-read from a URL that no longer carries them.
       fbclid: get('fbclid'),
       gclid: get('gclid'),
       ttclid: get('ttclid'),
+      twclid: get('twclid'),
     };
     try { sessionStorage.setItem(CTX_KEY, JSON.stringify(ctx)); } catch (e) { /* private mode */ }
     return ctx;
@@ -170,7 +171,11 @@
     if (typeof window.twq !== 'function') return;
     if (typeof X_EVENT_IDS === 'undefined') return;
     var p = properties || {};
-    var opts = eventId ? { conversion_id: eventId } : undefined;
+    // twq takes exactly three arguments — conversion_id for dedup rides
+    // inside the event data object itself, unlike Meta's/TikTok's separate
+    // options argument, so every branch below merges it in rather than
+    // passing it alongside.
+    var dedup = eventId ? { conversion_id: eventId } : {};
     var xEventId;
 
     if (eventType === 'product_viewed') xEventId = X_EVENT_IDS.viewContent;
@@ -182,15 +187,15 @@
     if (!xEventId) return; // that event has not been created in X Ads Manager yet
 
     if (eventType === 'product_viewed' || eventType === 'cart_add') {
-      twq('event', xEventId, { content_ids: p.sku ? [p.sku] : undefined, value: p.price || undefined, currency: 'USD' }, opts);
+      twq('event', xEventId, Object.assign({ content_ids: p.sku ? [p.sku] : undefined, value: p.price || undefined, currency: 'USD' }, dedup));
     } else if (eventType === 'checkout_started') {
-      twq('event', xEventId, {
+      twq('event', xEventId, Object.assign({
         content_ids: (p.items || []).map(function (i) { return i.sku; }).filter(Boolean),
         value: p.value || undefined,
         currency: 'USD',
-      }, opts);
+      }, dedup));
     } else if (eventType === 'purchase_completed') {
-      twq('event', xEventId, { value: p.revenue || 0, currency: 'USD' }, opts);
+      twq('event', xEventId, Object.assign({ value: p.revenue || 0, currency: 'USD' }, dedup));
     }
   }
 
@@ -237,12 +242,13 @@
   // metadata carries the same IDs an order's earlier funnel events used,
   // which is what lets the dashboard tie a completed purchase back to the
   // session that produced it instead of counting orders on their own, and
-  // separately lets api/_meta-capi.js and api/_tiktok-capi.js send fbc/fbp
-  // and ttclid/ttp along with the server-side Purchase event for better
-  // match quality with each platform. ttclid is read from the same landing
-  // session context fbclid/gclid come from — unlike Meta's fbc cookie, which
-  // is set by the pixel from fbclid automatically, TikTok's Events API wants
-  // the raw click ID itself rather than deriving it from a cookie.
+  // separately lets api/_meta-capi.js, api/_tiktok-capi.js and api/_x-capi.js
+  // send fbc/fbp, ttclid/ttp and twclid along with the server-side Purchase
+  // event for better match quality with each platform. ttclid/twclid are
+  // read from the same landing session context fbclid/gclid come from —
+  // unlike Meta's fbc cookie, which is set by the pixel from fbclid
+  // automatically, TikTok's and X's APIs want the raw click ID itself
+  // rather than deriving it from a cookie.
   function ids() {
     var ctx = sessionContext(false);
     return {
@@ -252,6 +258,7 @@
       fbp: cookie('_fbp') || null,
       ttclid: (ctx && ctx.ttclid) || null,
       ttp: cookie('_ttp') || null,
+      twclid: (ctx && ctx.twclid) || null,
     };
   }
 
