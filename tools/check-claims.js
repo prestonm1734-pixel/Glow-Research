@@ -3007,6 +3007,59 @@ console.log('\nprivacy disclosure');
       `pages say ${[...tokens].join('/')}, products-data.js says ${META_DOMAIN_VERIFICATION}`);
   }
 
+  // The server-side relay. js/analytics.js sends each funnel event twice, once
+  // through the pixel and once through api/meta-event.js, and Meta collapses
+  // the pair using a shared event id. Two lists decide what may travel that
+  // second path, one in the browser and one on the server, and they have to
+  // be the same list: an event the browser relays that the server rejects is
+  // silently lost, and an event the server accepts that the browser never
+  // sends is an open door nothing on this site walks through.
+  {
+    const relay = read('js/analytics.js');
+    const endpoint = read('api/meta-event.js');
+
+    const browserList = (relay.match(/var RELAYED = \{([^}]*)\}/) || [, ''])[1]
+      .split(',').map(x => x.split(':')[0].trim()).filter(Boolean);
+    const serverList = (endpoint.match(/const ALLOWED = new Set\(\[([^\]]*)\]/) || [, ''])[1]
+      .split(',').map(x => x.trim().replace(/^'|'$/g, '')).filter(Boolean);
+
+    ok('the browser and the server agree on which events may be relayed',
+      browserList.length > 0 && browserList.join(',') === serverList.join(','),
+      `browser [${browserList}] vs server [${serverList}]`);
+
+    // A relayed event is one a stranger can post: the endpoint is public
+    // because it is called by anonymous visitors before they have any
+    // identity. Optimisation signal can survive that. Revenue cannot, and
+    // ROAS is the number every bid is made against. Purchase reaches Meta
+    // only from api/_place-order.js, behind a Stripe PaymentIntent the server
+    // verified itself.
+    ok('Purchase is not relayable through the public endpoint',
+      !browserList.includes('Purchase') && !serverList.includes('Purchase'),
+      'a forged Purchase would post revenue straight into the ad account');
+    ok('Purchase still reaches Meta from the verified order path',
+      /sendMetaPurchaseEvent/.test(read('api/_place-order.js')));
+
+    // Relaying without a shared id would double every count rather than
+    // improve coverage, so both ends have to insist on one.
+    ok('the relay refuses an event with no id to deduplicate against',
+      /eventId required/.test(endpoint) && /!metaEventId\) return/.test(relay));
+
+    ok('the browser posts to the endpoint that actually exists',
+      /'\/api\/meta-event'/.test(relay) && fs.existsSync(path.join(ROOT, 'api/meta-event.js')));
+
+    // Same-origin is the entire point: connect.facebook.net is blocked for a
+    // real share of traffic, and a relay on any other host would be blocked
+    // with it.
+    ok('the relay is first-party, not another third-party host',
+      !/fetch\('https?:\/\/[^']*\/api\/meta-event/.test(relay));
+
+    // PageView is the one relayed event the pixel fires from a different
+    // file, so its id is handed across rather than minted at the call site.
+    ok('the PageView id is minted where the pixel fires it',
+      /GlowMetaPageViewId/.test(read('js/meta-pixel.js')) &&
+      /GlowMetaPageViewId/.test(relay));
+  }
+
   // Same reasoning, TikTok's pixel/Events API in place of Meta's.
   if (/ttq\.load\(/.test(read('js/tiktok-pixel.js'))) {
     ok('the privacy policy accounts for the TikTok pixel/Events API capability',

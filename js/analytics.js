@@ -96,41 +96,93 @@
   }
 
   // Our own event names mapped to Meta's standard ones, with just enough of
-  // each event's own properties translated into the fields Meta's Pixel
-  // expects. Not every internal event has a Meta equivalent — pageview is
-  // skipped because js/meta-pixel.js already sends its own PageView on load,
-  // and everything else (scroll depth, form funnel, errors) has no standard
-  // ads event to map to, so it simply never reaches fbq at all.
-  function forwardToMeta(eventType, properties, metaEventId) {
-    if (typeof window.fbq !== 'function') return;
+  // each event's own properties translated into the fields Meta expects.
+  // Not every internal event has a Meta equivalent: scroll depth, form
+  // funnel and errors have no standard ads event to map to, so they simply
+  // never reach Meta at all.
+  //
+  // Returns the mapping rather than sending it, because two things now send
+  // the same event and they must not disagree about what it says. The pixel
+  // copy goes out through fbq below; the server copy goes out through
+  // api/meta-event.js. One mapping, two transports.
+  //
+  // pageview is absent on purpose: js/meta-pixel.js fires Meta's PageView
+  // itself on load, and relayMeta() below pairs with that one directly.
+  function metaEventFor(eventType, properties) {
     var p = properties || {};
-    var opts = metaEventId ? { eventID: metaEventId } : undefined;
-
     if (eventType === 'product_viewed') {
-      fbq('track', 'ViewContent', {
+      return { name: 'ViewContent', data: {
         content_ids: p.sku ? [p.sku] : undefined,
         content_type: 'product',
         value: p.price || undefined,
         currency: 'USD',
-      }, opts);
-    } else if (eventType === 'cart_add') {
-      fbq('track', 'AddToCart', {
+      } };
+    }
+    if (eventType === 'cart_add') {
+      return { name: 'AddToCart', data: {
         content_ids: p.sku ? [p.sku] : undefined,
         content_type: 'product',
         value: p.price || undefined,
         currency: 'USD',
-      }, opts);
-    } else if (eventType === 'checkout_started') {
-      fbq('track', 'InitiateCheckout', {
+      } };
+    }
+    if (eventType === 'checkout_started') {
+      return { name: 'InitiateCheckout', data: {
         content_ids: (p.items || []).map(function (i) { return i.sku; }).filter(Boolean),
         content_type: 'product',
         num_items: p.itemCount || undefined,
         value: p.value || undefined,
         currency: 'USD',
-      }, opts);
-    } else if (eventType === 'purchase_completed') {
-      fbq('track', 'Purchase', { value: p.revenue || 0, currency: 'USD' }, opts);
+      } };
     }
+    if (eventType === 'purchase_completed') {
+      return { name: 'Purchase', data: { value: p.revenue || 0, currency: 'USD' } };
+    }
+    return null;
+  }
+
+  function forwardToMeta(mapped, metaEventId) {
+    if (typeof window.fbq !== 'function') return;
+    fbq('track', mapped.name, mapped.data, metaEventId ? { eventID: metaEventId } : undefined);
+  }
+
+  // The server-side copy of the same event, posted to our own domain instead
+  // of Meta's. connect.facebook.net and facebook.com are on every mainstream
+  // blocklist, so the fbq call above is simply gone for a good share of real
+  // visitors; this one is same-origin, so it leaves, and api/meta-event.js
+  // completes the trip server to server where no extension can reach it.
+  //
+  // The shared event_id is what makes two copies safe: Meta collapses the
+  // pair into one event. Without it this would double every count, which is
+  // why api/meta-event.js rejects an event that arrives without one.
+  //
+  // Purchase is not relayed here even though it maps above. It already goes
+  // server-side from api/_place-order.js, off a Stripe PaymentIntent the
+  // server verified itself, and a public endpoint that accepted a Purchase
+  // would let a stranger post revenue into the ad account. api/meta-event.js
+  // enforces the same list; this is the near half of it.
+  var RELAYED = { PageView: 1, ViewContent: 1, AddToCart: 1, InitiateCheckout: 1 };
+
+  function relayMeta(name, data, metaEventId) {
+    if (!RELAYED[name] || !metaEventId) return;
+    try {
+      fetch('/api/meta-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventName: name,
+          eventId: metaEventId,
+          eventSourceUrl: location.href,
+          // Read here rather than on the server: these are first-party
+          // cookies on this document, and the server sees them only if the
+          // browser hands them over.
+          fbc: cookie('_fbc') || null,
+          fbp: cookie('_fbp') || null,
+          customData: data || null,
+        }),
+        keepalive: true,
+      }).catch(function () {});
+    } catch (e) {}
   }
 
   // Same mapping as forwardToMeta() above, TikTok's pixel and event names in
@@ -233,7 +285,19 @@
         keepalive: true,
       }).catch(function () {});
     } catch (e) {}
-    try { forwardToMeta(eventType, properties, eventId); } catch (e) {}
+    // One id per event, shared by the pixel copy and the server copy so Meta
+    // can pair them. A purchase already has one that both ends agree on (the
+    // Stripe PaymentIntent, passed in by the caller); everything else has no
+    // natural shared key, so one is minted here, at the single point both
+    // transports are dispatched from.
+    try {
+      var mapped = metaEventFor(eventType, properties);
+      if (mapped) {
+        var metaId = eventId || randomId();
+        forwardToMeta(mapped, metaId);
+        relayMeta(mapped.name, mapped.data, metaId);
+      }
+    } catch (e) {}
     try { forwardToTikTok(eventType, properties, eventId); } catch (e) {}
     try { forwardToX(eventType, properties, eventId); } catch (e) {}
   }
@@ -288,6 +352,13 @@
 
   window.GlowAnalytics = { track: track, ids: ids, variant: variant };
   track('pageview');
+
+  // Meta's PageView is sent by js/meta-pixel.js, not by track() above, so its
+  // server-side copy is paired here against the id that file minted for it.
+  // Loaded before this one on every page, so the id is already there; absent
+  // only when META_PIXEL_ID is empty and the pixel no-ops, which is exactly
+  // when there is nothing to mirror.
+  if (window.GlowMetaPageViewId) relayMeta('PageView', null, window.GlowMetaPageViewId);
 
   // Content/education pages (about, how-we-test, ruo-agreement, coa, terms)
   // carry a <body data-content-page="..."> the same way a product page

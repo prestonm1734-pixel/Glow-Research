@@ -4,8 +4,10 @@
 // ID from Meta Events Manager replaces it.
 //
 // js/analytics.js is what actually fires the funnel events (ViewContent,
-// AddToCart, InitiateCheckout, Purchase) through window.fbq once it exists —
-// this file only sets fbq up and sends the automatic PageView. Kept separate
+// AddToCart, InitiateCheckout, Purchase): through window.fbq once it exists,
+// and a second time through api/meta-event.js so the event still arrives when
+// this file's script is blocked. This file only sets fbq up and sends the
+// automatic PageView, minting the id that pairs the two copies of it. Separate
 // from analytics.js on purpose: that file is the first-party beacon
 // privacy.html describes as staying on our own dashboard, and this one is
 // third-party by definition, sending data to Meta. Two files means the
@@ -68,5 +70,18 @@
   /* eslint-enable */
 
   fbq('init', META_PIXEL_ID);
-  fbq('track', 'PageView');
+
+  // PageView carries an explicit event id so the server-side copy sent by
+  // js/analytics.js through api/meta-event.js can be paired with this one and
+  // counted once. Every other funnel event mints its id inside analytics.js,
+  // at the point it dispatches both copies; PageView is the exception because
+  // it is fired here, and only this file knows when.
+  //
+  // Published on window rather than passed, because analytics.js is a
+  // separate file loaded after this one and js/ takes no imports. The name is
+  // deliberately specific: it is a handoff between two known files, not an
+  // API.
+  var pageViewId = 'pv-' + Date.now().toString(36) + Math.random().toString(36).slice(2);
+  window.GlowMetaPageViewId = pageViewId;
+  fbq('track', 'PageView', {}, { eventID: pageViewId });
 })();
