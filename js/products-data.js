@@ -608,11 +608,17 @@ const BATCHES_TESTED = 150;
 // which meant the evidence panel could only quote them by typing them out
 // again, and a string typed into a template is not a number the audit can pin.
 //
-// This was a 2:00 PM PST cutoff, then briefly "one business day", which was
-// wrong in the other direction: Saturday is a dispatch day here, and Sunday is
-// the only day nothing leaves. Stated in plain days rather than business days
-// for exactly that reason, since a business day excludes the Saturday this
-// operation actually ships on.
+// This was a 2:00 PM PST cutoff, then briefly "one business day" (wrong in
+// the other direction: Saturday is a dispatch day here, and Sunday is the
+// only day nothing leaves), then no cutoff at all once the old one turned
+// out to be a claim nothing in the code actually kept.
+//
+// The fulfilment partner has since confirmed a real one: an order placed by
+// DISPATCH_CUTOFF_HOUR ships that same day; placed after, it ships the next
+// dispatch day. Unlike the old cutoff, js/product.js's deliveryEstimate()
+// actually branches on this hour rather than only being told about it in
+// copy, and check-claims.js pins every stated cutoff time on the site to
+// this constant so it cannot drift the way the 2:00 PM one did.
 //
 // NO_DISPATCH_DAY and NO_DELIVERY_DAY are getUTCDay() indexes, so the estimate
 // on the product page and the words on ten others read the same values rather
@@ -623,7 +629,21 @@ const BATCHES_TESTED = 150;
 const NO_DISPATCH_DAY = 0;                    // Sunday, in getUTCDay() terms
 const NO_DELIVERY_DAY = 0;                    // FedEx does not deliver Sundays
 const NO_DISPATCH_DAY_NAME = 'Sunday';
-const DISPATCH_LABEL = `within one business day`;
+// 24-hour, Pacific wall-clock — js/product.js reads Pacific parts the same
+// way it already does for the day-of-week check, so the two never disagree
+// about what "now" means.
+const DISPATCH_CUTOFF_HOUR = 13;
+const DISPATCH_CUTOFF_LABEL = '1:00 PM Pacific';
+// The marquee ticker's shorter form of the same fact — same hour as
+// DISPATCH_CUTOFF_LABEL, just without spelling out "Pacific". Its own
+// constant rather than a second hand-typed "1:00 PM PT" in thirty static
+// pages, so check-claims.js can pin every ticker to this one string.
+const DISPATCH_CUTOFF_TICKER = '1:00 PM PT';
+// "dispatch day", not "business day": Saturday is a real dispatch day here,
+// and "business day" carries a Mon-Fri connotation strong enough that saying
+// it would leave a Friday-afternoon order thinking it goes out Monday when
+// it actually goes out Saturday. Sunday is the only day that isn't one.
+const DISPATCH_LABEL = `the same day when ordered by ${DISPATCH_CUTOFF_LABEL}, otherwise the next dispatch day`;
 
 // FedEx transit. Also the span the product page's arrival estimate counts
 // forward, inclusively: the day the page is being read is day one, so a
@@ -1635,6 +1655,9 @@ if (typeof module !== 'undefined' && module.exports) {
     NO_DISPATCH_DAY,
     NO_DELIVERY_DAY,
     NO_DISPATCH_DAY_NAME,
+    DISPATCH_CUTOFF_HOUR,
+    DISPATCH_CUTOFF_LABEL,
+    DISPATCH_CUTOFF_TICKER,
     DISPATCH_LABEL,
     TRANSIT_DAYS,
     PACKAGING_PLAIN,

@@ -26,6 +26,7 @@ const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, DISPATCH_LABEL, NO_DISPATCH_DAY_NAME,
+  DISPATCH_CUTOFF_HOUR, DISPATCH_CUTOFF_LABEL, DISPATCH_CUTOFF_TICKER,
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord, PACKAGING_PLAIN, STORAGE_LONG,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
@@ -84,12 +85,16 @@ console.log('\nfree shipping threshold');
 
 /* ---------------------------------------------------------------------------
  * 2. Dispatch window. This was a 2 PM PST cutoff, then briefly "one business
- *    day", which was wrong in the other direction: Saturday is a dispatch day
- *    here, and Sunday is the only day nothing leaves. Two failures are worth
- *    guarding now. A page still promising the old cutoff, which is a claim
- *    about an hour nothing in the code enforces, and a page reverting to
- *    "business day", which quietly excludes the Saturday this operation ships
- *    and delivers on.
+ *    day" (wrong in the other direction: Saturday is a dispatch day here, and
+ *    Sunday is the only day nothing leaves), then no cutoff at all once the
+ *    2 PM one turned out to be a claim nothing in the code kept.
+ *
+ *    The fulfilment partner has since confirmed a real one: DISPATCH_CUTOFF_HOUR,
+ *    1:00 PM Pacific. Unlike the old cutoff, js/product.js's deliveryEstimate()
+ *    actually branches on it, so this section now checks the opposite of what
+ *    it used to: not that no page states a cutoff, but that every page which
+ *    does states exactly this one, and that the code genuinely enforces it
+ *    rather than only being told about it in copy.
  * ------------------------------------------------------------------------- */
 console.log('\ndispatch window');
 {
@@ -98,53 +103,79 @@ console.log('\ndispatch window');
   ok('products-data.js declares NO_DISPATCH_DAY and NO_DELIVERY_DAY',
     noDispatch !== null && noDelivery !== null);
 
-  const expected = `within one business day`;
+  const expected = `the same day when ordered by ${DISPATCH_CUTOFF_LABEL}, otherwise the next dispatch day`;
   ok(`DISPATCH_LABEL reads "${expected}"`, DISPATCH_LABEL === expected,
     `expected "${expected}", got "${DISPATCH_LABEL}"`);
 
-  // Nothing may state a clock-time cutoff any more. The old guard checked that
-  // every "<n> AM|PM PST" matched CUTOFF_HOUR; there is no such hour now, so
-  // any surviving one is a promise about a deadline the code does not keep.
-  // Scripts are scanned alongside pages for the same reason as before: a claim
-  // rendered from a template literal is still a claim a customer reads.
-  const cutoffSources = pages.concat(
-    ['js/product.js', 'js/products-data.js', 'js/cart.js', 'js/checkout.js',
-     'api/_place-order.js', 'tools/build-llms.js', 'tools/page-meta.js']);
+  // "dispatch day", never "business day": Saturday is a real dispatch day
+  // here, and "business day" carries enough of a Mon-Fri connotation that a
+  // Friday-afternoon order would read it as going out Monday when it
+  // actually goes out Saturday. Scoped to dispatch/shipping phrasing
+  // specifically — wholesale.html and contact.html's own "business day"
+  // describes reply times, a genuinely different fact with no Saturday
+  // question attached, and is not what this guards against.
+  const staleBusinessDayShipping = [];
+  pages.forEach(f => {
+    if (/ships? within (?:a|one) business day|out in (?:a|one) business day|within one business day (?:of being placed|on)/i
+      .test(read(f))) staleBusinessDayShipping.push(f);
+  });
+  ok('no page describes dispatch in "business days" any more',
+    staleBusinessDayShipping.length === 0, staleBusinessDayShipping.join(', '));
+
+  // Every clock-time cutoff claim sitewide has to be one of the two approved
+  // strings — DISPATCH_CUTOFF_LABEL in prose, DISPATCH_CUTOFF_TICKER in the
+  // marquee — and both are read from DISPATCH_CUTOFF_HOUR, so a mismatched
+  // one is either a typo or a claim about a different hour than the code
+  // enforces. Scripts are scanned alongside pages for the same reason as
+  // before: a claim rendered from a template literal is still a claim a
+  // customer reads.
+  const cutoffSources = pages.concat(['js/product.js', 'js/products-data.js']);
 
   // Comments stripped, the same rule the privacy and navigation sections use:
   // a note recording what the copy used to say is not itself a claim anyone
-  // reads. The constant's own comment explains why the cutoff was dropped, and
-  // it has to be able to quote the hour it dropped without failing this.
-  // &nbsp; is folded to a space first: it is a typographic choice, not a
-  // different claim, and about.html read "2:00&nbsp;PM PST" and was invisible
-  // to exactly this scan once before.
+  // reads. &nbsp; is folded to a space first: it is a typographic choice, not
+  // a different claim.
   const bareSrc = f => read(f)
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^[ \t]*\/\/.*$/gm, '')
     .replace(/&nbsp;|&#160;| /g, ' ');
 
-  const clocks = [];
+  const approved = [DISPATCH_CUTOFF_LABEL, DISPATCH_CUTOFF_TICKER];
+  const wrongClocks = [];
+  const foundAny = { label: false, ticker: false };
   cutoffSources.forEach(f => {
-    for (const m of bareSrc(f).matchAll(/\b\d{1,2}(?::\d{2})?\s*(?:AM|PM)\s*P[SD]T\b/gi)) {
-      clocks.push(`${f}: "${m[0]}"`);
+    for (const m of bareSrc(f).matchAll(/\b\d{1,2}(?::\d{2})?\s*(?:AM|PM)\s*(?:Pacific|PT|P[SD]T)\b/gi)) {
+      if (m[0] === DISPATCH_CUTOFF_LABEL) foundAny.label = true;
+      else if (m[0] === DISPATCH_CUTOFF_TICKER) foundAny.ticker = true;
+      else wrongClocks.push(`${f}: "${m[0]}"`);
     }
   });
-  ok('no page or script states a dispatch cutoff time', clocks.length === 0,
-    clocks.join(', '));
+  ok('every stated dispatch cutoff time matches DISPATCH_CUTOFF_LABEL or DISPATCH_CUTOFF_TICKER exactly',
+    wrongClocks.length === 0, wrongClocks.join(', '));
+  ok('the full cutoff label and the marquee ticker are each stated somewhere',
+    foundAny.label && foundAny.ticker,
+    `label seen: ${foundAny.label}, ticker seen: ${foundAny.ticker}`);
 
-  // The constants are gone; nothing should still be reaching for them.
-  const stale = [];
-  cutoffSources.forEach(f => {
-    if (/CUTOFF_HOUR|CUTOFF_LABEL|DISPATCH_BUSINESS_DAYS/.test(read(f))) stale.push(f);
+  // The marquee is hand-duplicated across every page rather than built from
+  // one template, so the only way to catch a page that kept the old ticker
+  // text is to check each one that has a marquee at all.
+  const staleTicker = [];
+  pages.forEach(f => {
+    const html = read(f);
+    if (/marquee-track/.test(html) && !html.includes(DISPATCH_CUTOFF_TICKER)) staleTicker.push(f);
   });
-  ok('nothing references the removed cutoff or business-day constants',
-    stale.length === 0, stale.join(', '));
+  ok('every page with a marquee states the current cutoff ticker',
+    staleTicker.length === 0, staleTicker.join(', '));
 
   ok('the product page reads the shared dispatch days, not its own copy',
     !/const NO_DISPATCH_DAY|const NO_DELIVERY_DAY/.test(read('js/product.js')) &&
     /NO_DISPATCH_DAY/.test(read('js/product.js')) &&
     /NO_DELIVERY_DAY/.test(read('js/product.js')));
+
+  ok('the product page reads the shared cutoff hour, not its own copy',
+    !/const DISPATCH_CUTOFF_HOUR/.test(read('js/product.js')) &&
+    /DISPATCH_CUTOFF_HOUR/.test(read('js/product.js')));
 
   // Plain days, not business days: stepping over the whole weekend would push
   // every late-week estimate out by two days the shipment does not take.
@@ -157,6 +188,12 @@ console.log('\ndispatch window');
   ok('the estimate skips Sunday at both the dispatch and the delivery end',
     /getUTCDay\(\)\s*===\s*NO_DISPATCH_DAY/.test(est) &&
     /getUTCDay\(\)\s*===\s*NO_DELIVERY_DAY/.test(est));
+
+  // The cutoff has to actually gate something, or DISPATCH_CUTOFF_HOUR is
+  // just a number sitting next to the logic rather than inside it — the
+  // exact failure mode the old 2 PM PST cutoff had.
+  ok('the estimate branches on the cutoff hour rather than only quoting it',
+    /nowParts\.hour\)\s*>=\s*DISPATCH_CUTOFF_HOUR/.test(est));
 
   // The estimate must be computed in Pacific, since that is what the copy says.
   ok('the estimate is computed in Pacific time',

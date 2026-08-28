@@ -12,7 +12,8 @@
   // does too rather than keeping its own .toFixed(2) that always shows cents.
   const money = fmtPrice;
 
-  // NO_DISPATCH_DAY, NO_DELIVERY_DAY, DISPATCH_LABEL and TRANSIT_DAYS come from
+  // NO_DISPATCH_DAY, NO_DELIVERY_DAY, DISPATCH_CUTOFF_HOUR,
+  // DISPATCH_CUTOFF_LABEL, DISPATCH_LABEL and TRANSIT_DAYS come from
   // js/products-data.js. The shipping page and the marquee state the same
   // figures in words, so they are sitewide constants rather than ones this
   // file owns and the others restate.
@@ -67,20 +68,31 @@
   // runs Saturday delivery, so stepping over the whole weekend would push
   // every late-week estimate out by two days it does not actually take.
   //
-  // Counted inclusively from the day the page is being read: a Tuesday visitor
-  // sees Thursday. Sunday is handled at both ends and for two different
-  // reasons — nothing is dispatched on a Sunday, so a Sunday visitor is quoted
-  // from Monday, and nothing is delivered on a Sunday, so an estimate that
-  // lands there moves to the Monday rather than naming a date on which no
-  // box arrives.
+  // Counted inclusively from the day dispatch actually happens: a Tuesday
+  // dispatch sees Thursday. Sunday is handled at both ends and for two
+  // different reasons — nothing is dispatched on a Sunday, so a Sunday
+  // visitor is quoted from Monday, and nothing is delivered on a Sunday, so
+  // an estimate that lands there moves to the Monday rather than naming a
+  // date on which no box arrives.
+  //
+  // Dispatch day is no longer always "today": DISPATCH_CUTOFF_HOUR
+  // (js/products-data.js) is a real fulfilment-partner cutoff, confirmed
+  // against their actual same-day process rather than assumed the way the
+  // old, since-removed 2:00 PM PST one was. A visitor reading the page after
+  // that Pacific hour is quoted from tomorrow, the same as a Sunday visitor
+  // is quoted from Monday.
   function deliveryEstimate() {
-    let d = anchor(pacificParts(new Date()));
+    const nowParts = pacificParts(new Date());
+    const today = anchor(nowParts);
+    let d = today;
+    if (Number(nowParts.hour) >= DISPATCH_CUTOFF_HOUR) d = addDays(d, 1);
     if (d.getUTCDay() === NO_DISPATCH_DAY) d = addDays(d, 1);
+    const dispatchesToday = d.getTime() === today.getTime();
 
     d = addDays(d, TRANSIT_DAYS);
     if (d.getUTCDay() === NO_DELIVERY_DAY) d = addDays(d, 1);
 
-    return { arrivalDate: d };
+    return { arrivalDate: d, dispatchesToday };
   }
 
   // Dispatch and delivery are only claims we can make about something we can
@@ -99,7 +111,13 @@
         return;
       }
       const e = deliveryEstimate();
-      cutEl.innerHTML = `In stock, <strong>ships ${DISPATCH_LABEL}</strong>`;
+      // Stated relative to where this particular visitor actually is against
+      // the cutoff, not the general policy sentence FAQS reads — "ships
+      // today" is a stronger, truer thing to say than DISPATCH_LABEL's
+      // if/otherwise phrasing once the answer is already known.
+      cutEl.innerHTML = e.dispatchesToday
+        ? `In stock, <strong>ships today</strong> if ordered by ${DISPATCH_CUTOFF_LABEL}`
+        : `In stock, <strong>ships the next dispatch day</strong>`;
       arrEl.innerHTML = `Estimated delivery <strong>${fmtDay(e.arrivalDate)}</strong>`;
     }
 
