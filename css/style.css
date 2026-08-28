@@ -993,42 +993,37 @@ button[disabled].si-forgot{ cursor: progress; }
     max-width: 780px; grid-template-columns: 1fr;
   }
 }
-.faq-item{ border-bottom: 1px solid var(--border); }
+/* Boxed rows: each question is its own bordered card rather than a shared
+   list with dividers, so .faq-col supplies the gap a border-bottom list
+   didn't need. */
+.faq-col{ display:flex; flex-direction:column; gap: 14px; }
+.faq-item{ border: 1px solid var(--border); border-radius: 12px; }
 .faq-q{
   width:100%; text-align:left; background:none; border:none; color: var(--text);
-  padding: 22px 4px; font-size: 1.02rem; font-weight:600; cursor:pointer;
+  padding: 22px 24px; font-size: 1.02rem; font-weight:600; cursor:pointer;
   display:flex; justify-content:space-between; align-items:center; gap: 20px;
   font-family:var(--font-display);
 }
-.faq-q .icon{ flex-shrink:0; width:26px;height:26px; border-radius:50%; border:1px solid var(--border); display:flex;align-items:center;justify-content:center; transition: transform .3s ease, background .3s ease, border-color .3s ease; }
+.faq-q .icon{ flex-shrink:0; width:20px;height:20px; display:flex;align-items:center;justify-content:center; transition: transform .3s ease, color .2s ease; }
 /* the row is a button but gave no feedback at all before it was clicked */
 .faq-q{ transition: color .2s ease; }
 .faq-q:hover{ color:#fff; }
-.faq-q:hover .icon{ border-color: rgba(255,255,255,.5); background: rgba(255,255,255,.08); }
-.faq-item.open .faq-q .icon{ transform: rotate(45deg); background: var(--grad-main); border-color: transparent; color:#0a0a0a; }
+.faq-item.open .faq-q .icon{ transform: rotate(180deg); }
 .faq-a{ max-height:0; overflow:hidden; transition: max-height .4s ease; }
 /* Collapsed only when there is script to open it again. The answers are in the
    served markup either way, which is what a crawler needs, but a reader with no
    JavaScript would otherwise get five questions and no way to reach an answer.
    `js` is set on <html> by an inline script in the head, so there is no flash. */
 html:not(.js) .faq-a{ max-height: none; }
-.faq-a p{ padding: 0 4px 22px; font-size:0.92rem; }
+.faq-a p{ padding: 0 24px 22px; font-size:0.92rem; }
 
 /* The homepage FAQ sits on white. Everything above is written for a dark
    section, so the rules that name a light colour outright, rather than
-   inheriting one, are inverted here. The open marker keeps the same
-   figure/ground flip it has on dark: a filled disc with the page colour
-   showing through the glyph. */
-.section-light .faq-item{ border-bottom-color: rgba(0,0,0,0.12); }
+   inheriting one, are inverted here. The chevron just inherits .faq-q's
+   color, so it needs no override of its own. */
+.section-light .faq-item{ border-color: rgba(0,0,0,0.12); }
 .section-light .faq-q{ color:#0a0a0a; }
 .section-light .faq-q:hover{ color:#000; }
-.section-light .faq-q .icon{ border-color: rgba(0,0,0,0.22); }
-.section-light .faq-q:hover .icon{
-  border-color: rgba(0,0,0,0.45); background: rgba(0,0,0,.06);
-}
-.section-light .faq-item.open .faq-q .icon{
-  background:#0a0a0a; border-color:#0a0a0a; color:#fff;
-}
 
 /* ---------- footer offer band ----------
    The standing launch-offer form, built by js/launch-offer.js. Shares the
