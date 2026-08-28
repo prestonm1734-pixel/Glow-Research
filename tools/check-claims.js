@@ -3142,10 +3142,16 @@ console.log('\nhero video');
       /\bmuted\b/.test(tag) && /\bplaysinline\b/.test(tag));
     ok(`${page}: it loops`, /\bloop\b/.test(tag));
 
-    const poster = (tag.match(/poster="([^"]+)"/) || [])[1];
-    ok(`${page}: posters a still, so the hero is never blank while it buffers`,
-      !!poster && fs.existsSync(path.join(ROOT, poster)),
-      poster ? `poster ${poster} is not in the repo` : 'no poster attribute');
+    // No poster, by decision: the clip is the hero rather than a decoration
+    // over a photograph, so the empty state is the black the section already
+    // paints and not a substitute image. Paired with the section-colour check
+    // below, which is what makes "no poster" mean black rather than whatever
+    // happens to be behind it.
+    ok(`${page}: no poster, so the fallback is black rather than a still`,
+      !/poster=/.test(tag),
+      'the hero falls back to the black section; a poster would reinstate the photograph');
+    ok(`${page}: preloads, since the fallback is meant to be brief and not an experience`,
+      /preload="auto"/.test(tag));
     ok(`${page}: declares width and height, so the box is reserved before metadata`,
       /\bwidth="\d+"/.test(tag) && /\bheight="\d+"/.test(tag));
     ok(`${page}: does not autoplay from markup, which would ignore reduced motion`,
@@ -3179,6 +3185,18 @@ console.log('\nhero video');
   const orphaned = [...clips].filter(s => !fs.existsSync(path.join(ROOT, s)));
   ok('every hero clip referenced is a file that exists, so no page points at a cut that was replaced',
     orphaned.length === 0, orphaned.join(', '));
+
+  // The other half of dropping the posters. With no poster the fallback is
+  // whatever the section paints, so both sections have to actually be black,
+  // or "falls back to black" is just a sentence in a comment.
+  const css = read('css/style.css');
+  const sectionIsBlack = sel => {
+    const block = (css.match(new RegExp(`\\${sel}\\{[^}]*\\}`)) || [''])[0];
+    return /background:\s*#000(000)?\s*;/.test(block);
+  };
+  ok('both hero sections paint pure black, which is what the clips fall back to',
+    sectionIsBlack('.hero') && sectionIsBlack('.wl-hero'),
+    'a hero with no poster and a non-black section falls back to the wrong colour');
 }
 
 /* The masthead logo goes home from everywhere. index.html is the one page

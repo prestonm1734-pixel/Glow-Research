@@ -203,10 +203,14 @@
 
        No autoplay attribute on purpose. js/script.js starts it, and only when
        the visitor has not asked for reduced motion, so a looping video is
-       never forced on someone who has switched motion off at the OS. With no
-       JavaScript, or before the clip has buffered, the poster is the still
-       that used to be here, which means the hero has never had a blank frame
-       to fall back to.
+       never forced on someone who has switched motion off at the OS.
+
+       No poster either, deliberately. It used to fall back to the vial still,
+       and the fallback is now just the black the .hero section already paints:
+       the clip is the hero, not a decoration over a photograph, so the honest
+       empty state is nothing rather than a substitute image. preload="auto"
+       is the other half of that decision, since the fallback is meant to be
+       a few hundred milliseconds and not an experience.
 
        aria-hidden, where the still carried alt text: it sits behind a scrim
        under the copy and is decoration. A video element cannot take alt, and
@@ -216,7 +220,6 @@
        width/height are declared so the box is reserved from the aspect ratio
        before metadata arrives, rather than collapsing and shifting the hero. -->
   <video class="hero-visual-img reveal" id="heroVisual"
-         poster="assets/vial-trio-black-v2.jpg"
          width="1280" height="720"
          muted loop playsinline preload="auto" aria-hidden="true">
     <!-- -v2 in the filename is doing real work: /assets/ is served immutable

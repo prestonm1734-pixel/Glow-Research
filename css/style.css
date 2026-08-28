@@ -489,18 +489,23 @@ button[disabled].si-forgot{ cursor: progress; }
    sitting boxed inside it. Left edge fades to black so the copy stays legible. */
 .hero-visual-img{
   position:absolute; z-index:0;
-  /* Moved left from -6%. Not further: past about 4% the clip stops reaching
-     the right edge and leaves a wedge of dead black there, which loses the
-     "continues past the section" read the crop is for. At 2% the gap is
-     ~25px and the mask's own edge fade covers it. */
-  right: 2%; bottom: -9%;
+  /* Moved left again, -6% to 2% to 8%. What made 8% possible is the second
+     stop added to the mask below: at 8% the clip no longer reaches the right
+     edge, and previously that read as a photograph cut off short. Fading its
+     right edge out instead turns the same gap into the frame dissolving into
+     the section, which is what the left edge has always done. */
+  right: 8%; bottom: -9%;
   width: min(1240px, 88vw); height:auto; max-width:none;
   border-radius: 0;
-  -webkit-mask-image: linear-gradient(100deg, transparent 0%, transparent 6%, #000 46%, #000 100%),
-                       radial-gradient(ellipse 95% 90% at 62% 45%, #000 55%, transparent 98%);
+  /* Both edges now: transparent until 4%, solid across the middle, then back
+     out from 68% so the right side blends into black rather than ending. The
+     radial pulls in with it, recentred from 62% to 55% to follow the clip
+     left, so the vignette still sits over the vials and not beside them. */
+  -webkit-mask-image: linear-gradient(100deg, transparent 0%, transparent 4%, #000 40%, #000 68%, transparent 100%),
+                       radial-gradient(ellipse 92% 90% at 55% 45%, #000 48%, transparent 96%);
   -webkit-mask-composite: source-in;
-          mask-image: linear-gradient(100deg, transparent 0%, transparent 6%, #000 46%, #000 100%),
-                       radial-gradient(ellipse 95% 90% at 62% 45%, #000 55%, transparent 98%);
+          mask-image: linear-gradient(100deg, transparent 0%, transparent 4%, #000 40%, #000 68%, transparent 100%),
+                       radial-gradient(ellipse 92% 90% at 55% 45%, #000 48%, transparent 96%);
           mask-composite: intersect;
   opacity: .82;
 }
@@ -983,7 +988,9 @@ button[disabled].si-forgot{ cursor: progress; }
    rather than the homepage's left-set grid. Prefixed .wl- so none of it can
    reach another page by accident. */
 .wl-hero{
-  position:relative; overflow:hidden; background: var(--bg);
+  /* #000, not var(--bg)'s #0a0a0a: the clip has no poster, so this colour is
+     literally the hero's fallback and it should match the homepage's. */
+  position:relative; overflow:hidden; background: #000;
   padding: clamp(72px, 11vw, 132px) 0 clamp(64px, 9vw, 104px);
 }
 /* The art is a backdrop, not a subject. Cropped hard to the right so the trio
