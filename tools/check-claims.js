@@ -3132,6 +3132,45 @@ console.log('\nhero video');
     ['welcome.html', 'wlHeroVideo', 'js/welcome.js'],
   ];
   const clips = new Set();
+  const posters = new Set();
+  const declared = {};
+
+  // Dimensions straight out of the file headers, so the check compares the
+  // real assets rather than two numbers typed into the markup. JPEG: walk the
+  // segment chain to the SOFn frame header. MP4: the tkhd box, whose last two
+  // 32-bit words are the track's 16.16 fixed-point width and height.
+  const jpegSize = f => {
+    const b = fs.readFileSync(path.join(ROOT, f));
+    let o = 2;
+    while (o + 9 < b.length) {
+      if (b[o] !== 0xFF) { o++; continue; }
+      const m = b[o + 1], len = b.readUInt16BE(o + 2);
+      // SOFn, excluding DHT/JPG/DAC which share the C4/C8/CC codes
+      if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) {
+        return { h: b.readUInt16BE(o + 5), w: b.readUInt16BE(o + 7) };
+      }
+      o += 2 + len;
+    }
+    return null;
+  };
+  const mp4Size = f => {
+    const b = fs.readFileSync(path.join(ROOT, f));
+    const CONT = new Set(['moov', 'trak', 'mdia', 'minf', 'stbl']);
+    let found = null;
+    (function walk(s, e) {
+      let o = s;
+      while (o + 8 <= e) {
+        const size = b.readUInt32BE(o), type = b.toString('ascii', o + 4, o + 8);
+        if (size < 8) break;
+        if (type === 'tkhd' && !found) {
+          found = { w: b.readUInt32BE(o + size - 8) / 65536, h: b.readUInt32BE(o + size - 4) / 65536 };
+        }
+        if (CONT.has(type)) walk(o + 8, o + size);
+        o += size;
+      }
+    })(0, b.length);
+    return found;
+  };
 
   heroes.forEach(([page, id, starter]) => {
     const tag = (read(page).match(new RegExp(`<video[^>]*id="${id}"[\\s\\S]*?</video>`)) || [''])[0];
@@ -3142,18 +3181,25 @@ console.log('\nhero video');
       /\bmuted\b/.test(tag) && /\bplaysinline\b/.test(tag));
     ok(`${page}: it loops`, /\bloop\b/.test(tag));
 
-    // No poster, by decision: the clip is the hero rather than a decoration
-    // over a photograph, so the empty state is the black the section already
-    // paints and not a substitute image. Paired with the section-colour check
-    // below, which is what makes "no poster" mean black rather than whatever
-    // happens to be behind it.
-    ok(`${page}: no poster, so the fallback is black rather than a still`,
-      !/poster=/.test(tag),
-      'the hero falls back to the black section; a poster would reinstate the photograph');
-    ok(`${page}: preloads, since the fallback is meant to be brief and not an experience`,
+    // The poster is the clip's own first frame. A poster that is a separate
+    // render pops the moment playback starts, which is worse than no poster
+    // at all, so what is checked is not that one exists but that it is the
+    // same shape as the clip it stands in for. Dimensions are read out of
+    // both files below.
+    const poster = (tag.match(/poster="([^"]+)"/) || [])[1];
+    ok(`${page}: posters the clip's own frame, so there is no pop when it starts`,
+      !!poster && fs.existsSync(path.join(ROOT, poster)),
+      poster ? `poster ${poster} is not in the repo` : 'no poster attribute');
+    ok(`${page}: preloads, since the poster is meant to be brief and not the experience`,
       /preload="auto"/.test(tag));
     ok(`${page}: declares width and height, so the box is reserved before metadata`,
       /\bwidth="\d+"/.test(tag) && /\bheight="\d+"/.test(tag));
+    if (poster) posters.add(poster);
+    declared[page] = {
+      w: +(tag.match(/\bwidth="(\d+)"/) || [])[1],
+      h: +(tag.match(/\bheight="(\d+)"/) || [])[1],
+      poster,
+    };
     ok(`${page}: does not autoplay from markup, which would ignore reduced motion`,
       !/\bautoplay\b/.test(tag),
       `remove autoplay: ${starter} starts it, gated on prefers-reduced-motion`);
@@ -3186,17 +3232,63 @@ console.log('\nhero video');
   ok('every hero clip referenced is a file that exists, so no page points at a cut that was replaced',
     orphaned.length === 0, orphaned.join(', '));
 
-  // The other half of dropping the posters. With no poster the fallback is
-  // whatever the section paints, so both sections have to actually be black,
-  // or "falls back to black" is just a sentence in a comment.
+  // Still black underneath. The poster covers the buffering window, but this
+  // is what shows for the instant before even that paints, and behind the
+  // clip's own masked edges on the homepage.
   const css = read('css/style.css');
   const sectionIsBlack = sel => {
     const block = (css.match(new RegExp(`\\${sel}\\{[^}]*\\}`)) || [''])[0];
     return /background:\s*#000(000)?\s*;/.test(block);
   };
-  ok('both hero sections paint pure black, which is what the clips fall back to',
-    sectionIsBlack('.hero') && sectionIsBlack('.wl-hero'),
-    'a hero with no poster and a non-black section falls back to the wrong colour');
+  ok('both hero sections paint pure black behind the clip',
+    sectionIsBlack('.hero') && sectionIsBlack('.wl-hero'));
+
+  // The three shapes that have to agree, or the hero jumps when the clip
+  // starts: the poster, the clip, and the width/height the markup declares.
+  // Compared as aspect ratios read from the files themselves, because the
+  // homepage sizes its clip with height:auto off exactly these numbers.
+  const clip = [...clips][0];
+  if (clip && fs.existsSync(path.join(ROOT, clip))) {
+    const v = mp4Size(clip);
+    ok(`${clip} reports its dimensions`, !!v);
+    posters.forEach(pf => {
+      const j = jpegSize(pf);
+      ok(`${pf} reports its dimensions`, !!j);
+      if (j && v) {
+        ok(`${pf} is the same shape as the clip (${j.w}x${j.h} vs ${v.w}x${v.h})`,
+          Math.abs(j.w / j.h - v.w / v.h) < 0.01,
+          'a poster of a different aspect letterboxes or crops against the video');
+      }
+    });
+    Object.entries(declared).forEach(([page, d]) => {
+      ok(`${page}: its declared ${d.w}x${d.h} matches the clip`,
+        v && Math.abs(d.w / d.h - v.w / v.h) < 0.01,
+        'the reserved box is a different shape from the video that fills it');
+    });
+  }
+
+  // A poster that loads slower than it saves is not doing its job.
+  posters.forEach(pf => {
+    if (!fs.existsSync(path.join(ROOT, pf))) return;
+    const kb = fs.statSync(path.join(ROOT, pf)).size / 1024;
+    ok(`${pf} is ${Math.round(kb)}KB, light enough to beat the clip to the screen`, kb <= 500);
+  });
+
+  // faststart: moov has to sit ahead of mdat or the browser downloads the
+  // whole clip before it can show frame one, which defeats having a hero
+  // video at all on a slow connection. `ffmpeg -c copy -movflags +faststart`.
+  clips.forEach(c => {
+    if (!fs.existsSync(path.join(ROOT, c))) return;
+    const b = fs.readFileSync(path.join(ROOT, c));
+    const order = []; let o = 0;
+    while (o + 8 <= b.length) {
+      const s = b.readUInt32BE(o); if (s < 8) break;
+      order.push(b.toString('ascii', o + 4, o + 8)); o += s;
+    }
+    ok(`${c} is faststart, so playback can begin before the file finishes`,
+      order.indexOf('moov') !== -1 && order.indexOf('moov') < order.indexOf('mdat'),
+      `box order is ${order.join(' ')}; remux with -c copy -movflags +faststart`);
+  });
 }
 
 /* The masthead logo goes home from everywhere. index.html is the one page
