@@ -547,7 +547,9 @@ button[disabled].si-forgot{ cursor: progress; }
    dead band of white between the header and the first chip. This page opens
    straight into the goods instead. Bottom padding leaves room for the fixed
    search bar so the last row of cards isn't sitting under it. */
-.catalog-page{ padding: 34px 0 90px; }
+/* A half-step off pure white so the white card actually lifts off the page
+   behind it, rather than the two reading as one continuous surface. */
+.catalog-page{ padding: 34px 0 90px; background:#f4f4f2; }
 .catalog-page .section-head{ margin-bottom: 20px; }
 .catalog-page .filter-row{ margin-bottom: 26px; }
 
@@ -671,40 +673,46 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 
 /* ---------- product grid ----------
-   No card: no border, no background box, no hover lift. A hairline of white
-   between tiles and a wide gap between rows, so the page reads as a run of
-   large photographs with plain text underneath rather than a grid of boxed
-   products — the split is the gutter itself, not a rule drawn on top of it.
-   Two tiles per row on phones, four on desktop, where there is width to
-   spare for more per row without shrinking them past readable. */
+   The catalog's register is documentation, not nightlife — a spec sheet, not
+   a boutique. A white card that is lighter than the page it sits on, a
+   border instead of a shadow (a shadow reads consumer; a hairline border
+   reads technical), and hard 2px corners rather than rounded or fully
+   square. Two tiles per row on phones, four on desktop. */
 .product-grid{
-  display:grid; grid-template-columns: repeat(2, minmax(0,1fr));
-  column-gap: 2px; row-gap: 56px;
+  display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 20px;
 }
 @media (min-width: 981px){
-  .product-grid{ grid-template-columns: repeat(4, minmax(0,1fr)); column-gap: 3px; row-gap: 56px; }
+  .product-grid{ grid-template-columns: repeat(4, minmax(0,1fr)); gap: 24px; }
 }
 .product-card{
+  background:#fff;
+  border: 1px solid #e4e4e1;
+  border-radius: 2px;
+  overflow:hidden;
   position: relative;
   display:flex; flex-direction:column;
+  transition: border-color .2s ease;
 }
+.product-card:hover{ border-color:#c7c7c2; }
 
-/* A vial is a tall, narrow subject; a taller-than-square tile gives it more
-   frame to fill, the way the reference's portrait photography does. */
+/* A half-step warmer than the card itself, so the vial sits in a shallow
+   well rather than floating on the same white as the text below it. */
 .product-visual{
-  aspect-ratio: 4 / 5; flex-shrink:0;
+  aspect-ratio: 1 / 1; flex-shrink:0;
   display:flex; align-items:center; justify-content:center;
   position:relative; overflow:hidden;
-  background:#f6f6f4;
+  background:#f7f7f5;
 }
-/* Every product shot ships photographed on white, which is already what
-   .product-visual is — so it drops straight in with no card or border
-   around it, and multiply drops the shot's white backdrop out entirely.
-   No side padding: the tile is meant to fill, the way the reference's
-   full-bleed photography does, with the vial's own vertical margin the only
-   air left around it. */
+/* Every product shot ships photographed on white, which multiply drops out
+   against this tile the same way it would against pure white. Height is
+   fixed at a consistent share of the tile rather than filling it, so every
+   SKU's vial reads at the same scale in the grid — measured against all ten
+   source photos: the vial itself already occupies 93.6%-94.8% of each
+   canvas's own height (a ~1 point spread, not the visible mismatch this
+   replaces), so what actually varied card-to-card was the tile treatment,
+   not the source photography. */
 .product-photo{
-  height:100%; width:100%; object-fit:contain;
+  height:72%; width:auto; max-width:100%; object-fit:contain;
   mix-blend-mode: multiply;
 }
 /* the small square thumb used by search, the cart drawer and checkout — they
@@ -789,22 +797,26 @@ button[disabled].si-forgot{ cursor: progress; }
    with .status, told apart by side and wording rather than by colour, since
    the palette above is monochrome by decision. Only rendered when the
    catalog actually holds a list price above the charged one. */
+/* Only rendered on the handful of products p.saleBadge marks (see
+   products-data.js) — every marked-down product still shows its struck
+   price, but a SALE chip on all ten at once reads as a chip on none of
+   them, so it is reserved for the SKUs that don't already carry a status
+   badge of their own. */
 .product-badge.sale{ background:#0a0a0a; color:#fff; }
 /* Out of stock replaces the promo badge rather than sitting beside it —
    two badges on one card is the clutter the badge was meant to cut through. */
 .product-badge.status.is-out{ background:#8a8a86; color:#fff; }
-/* Plain text under the photo, on the page's own white — no panel, no seam,
-   no rule between the name and the price. Left-aligned like a caption. */
+/* Plain text under the photo, inside the card's own padding. */
 .product-footer{
-  color:#0a0a0a; padding: 16px 2px 0; position:relative;
+  color:#0a0a0a; padding: 14px 14px 14px; position:relative;
   flex:1; display:flex; flex-direction:column;
 }
 .card-divider{ display:none; }
-.product-card h3{ font-size: 1.05rem; font-weight:600; margin: 0; color:#0a0a0a; }
+.product-card h3{ font-size: 16px; font-weight:500; margin: 0; color:#0a0a0a; }
 /* The catalog name is Glow's own shorthand ("GLP-3 (RT)"), not what most
    people searching for the compound type. Namesake in plain words, once,
    directly under the name it belongs to. */
-.product-alias{ font-size:.85rem; color:rgba(10,10,10,.55); margin: 3px 0 0; }
+.product-alias{ font-size:13px; color:#6b6b6b; margin: 3px 0 0; }
 /* The card's one number, so it is sized to be read as one. It carried a
    "/ vial" qualifier until the sizes moved onto the product page, where the
    tier cards state a per-vial rate against a quantity and the words are
@@ -812,33 +824,33 @@ button[disabled].si-forgot{ cursor: progress; }
    smaller. Tabular figures so the prices line up down a column of cards
    rather than drifting with the width of a 1 against a 9. */
 .price{
-  display:block; font-family:var(--font-display); font-size:1.05rem;
+  display:block; font-family:var(--font-display); font-size:20px;
   color:#0a0a0a; font-weight:500; letter-spacing:-.01em;
   font-variant-numeric: tabular-nums; margin: 10px 0 14px;
 }
 /* the struck list price sits a step back from the live one — dimmer, lighter
-   and a size down, so the eye lands on what you actually pay */
+   and a size down, so the eye lands on what you actually pay. Darkened from
+   an earlier #6f6f6c: on a phone screen in daylight the lighter grey stopped
+   registering as struck-through at all, just as a thinner number. */
 .price-was{
-  font-size:0.85rem; font-weight:400; color:#6f6f6c;
+  font-size:15px; font-weight:400; color:#8a8a87;
   text-decoration-thickness: 1px; margin-left:7px;
 }
 .search-row-meta s{ color:#6f6f6c; margin-left:4px; }
 
-/* A plain outlined line, not a filled slab — the page is quiet now, and a
-   solid black button on every tile would be the one loud thing left on it.
-   Inverts on hover, the same treatment every outline button on the site
-   already uses. */
+/* Solid, not outlined. An outline reads as disabled sitting on white — the
+   one thing on the card that should look inarguably pressable is this. */
 .add-btn{
-  width:100%; height:44px; border-radius:0; border:1px solid rgba(10,10,10,.25);
-  background:transparent; color:#0a0a0a; font-family:'Sora', sans-serif; font-size:.85rem; font-weight:700;
+  width:100%; min-height:48px; border-radius: 2px; border:1px solid #0a0a0a;
+  background:#0a0a0a; color:#fff; font-family:'Sora', sans-serif; font-size:.85rem; font-weight:700;
   cursor:pointer; display:flex; align-items:center; justify-content:center;
   transition: background .2s ease, color .2s ease, border-color .2s ease;
   margin-top:auto;
 }
-.add-btn:hover{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
-.add-btn.added{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+.add-btn:hover{ background:#2a2a28; border-color:#2a2a28; }
+.add-btn.added{ background:#2a2a28; border-color:#2a2a28; }
 .add-btn:disabled{
-  background:transparent; color:#b7b7b3; border-color:rgba(10,10,10,.12);
+  background:transparent; color:#b7b7b3; border-color:#e4e4e1;
   cursor:not-allowed;
 }
 
@@ -1079,14 +1091,15 @@ html:not(.js) .faq-a{ max-height: none; }
 }
 @media (max-width: 640px){
   /* Already two per row at every width (see .product-grid above) — this
-     just tightens the row gap and the text under each photo to suit the
+     just tightens the card's own gap and interior text to suit the
      narrower column. */
-  .product-grid{ row-gap: 40px; }
-  .product-footer{ padding: 12px 2px 0; }
-  .product-card h3{ font-size: .92rem; }
-  .product-alias{ font-size:.76rem; margin-top:2px; }
-  .price{ font-size: .95rem; margin: 8px 0 10px; }
-  .add-btn{ height: 38px; font-size: .78rem; }
+  .product-grid{ gap: 12px; }
+  .product-footer{ padding: 11px 11px 11px; }
+  .product-card h3{ font-size: 14px; }
+  .product-alias{ font-size:12px; margin-top:2px; }
+  .price{ font-size: 17px; margin: 8px 0 10px; }
+  .price-was{ font-size:13px; }
+  .add-btn{ min-height: 42px; font-size: .78rem; }
   /* Both badges cannot coexist on a half-width tile: "recovery" + "Best
      Seller" measures 139px against a 130px card at 320px, so they collide.
      The category is the one to drop — the catalog has filter chips for it

@@ -1969,24 +1969,33 @@ console.log('\nlaunch pricing');
       badged.every(p => p.sizes.some(sizeInStock)));
   }
 
-  // The SALE badge is a claim in two words, and the only thing making it true
-  // is that the same hasList() gate drew the struck price beside it. These
-  // check the badge cannot appear without one, on a sold-out card, or on a
-  // different number of cards than the catalog has marked-down products.
+  // The SALE badge is a claim in two words, and the only thing making it
+  // true is that the same hasList() gate drew the struck price beside it —
+  // that part still has to hold for every card that carries the badge. But
+  // every product on the site carries a struck price, and a SALE chip on
+  // ten of ten cards reads as a chip on none of them, so p.saleBadge is a
+  // second, deliberate gate on top: a small, named set of SKUs the badge is
+  // reserved for, never a claim about which products are actually marked
+  // down (the struck price on every card already says that on its own).
   {
-    const onSale = GLOW_PRODUCTS.filter(p => hasList(p) && p.sizes.some(sizeInStock));
+    const badgeable = GLOW_PRODUCTS.filter(p => p.saleBadge);
     const cards = GLOW_PRODUCTS.map((p, i) => productCardHtml(p, i));
     const badged = cards.filter(c => /product-badge sale/.test(c));
-    ok('a SALE badge appears on exactly the marked-down products',
-      badged.length === onSale.length,
-      `${badged.length} badges against ${onSale.length} marked-down products`);
+    ok('every product marked for a SALE badge actually has a struck price to back it',
+      badgeable.every(p => hasList(p)), badgeable.filter(p => !hasList(p)).map(p => p.name).join(', '));
+    ok('the SALE badge is reserved for a small, named set of products, not every marked-down one',
+      badgeable.length > 0 && badgeable.length <= 3,
+      `${badgeable.length} products carry saleBadge`);
+    ok('a SALE badge appears on exactly the products marked for one, and none out of stock',
+      badged.length === badgeable.filter(p => p.sizes.some(sizeInStock)).length,
+      `${badged.length} badges against ${badgeable.filter(p => p.sizes.some(sizeInStock)).length} eligible`);
     ok('no card shows SALE without a struck price beside it',
       cards.every(c => !/product-badge sale/.test(c) || /price-was/.test(c)));
     ok('a sold-out card advertises no sale',
       GLOW_PRODUCTS.every((p, i) => p.sizes.some(sizeInStock) ||
         !/product-badge sale/.test(productCardHtml(p, i))));
     ok('the served catalog page carries the same number of SALE badges',
-      (read('peptides.html').match(/product-badge sale/g) || []).length === onSale.length);
+      (read('peptides.html').match(/product-badge sale/g) || []).length === badged.length);
   }
 
   // The struck figure and the charged figure come from different fields, so
