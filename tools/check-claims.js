@@ -35,7 +35,7 @@ const {
   FAQS, faqHtml,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
-  CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY,
+  CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY, PAYMENT_METHODS,
   hasList, listPriceOf, SITEWIDE_DISCOUNT, VIAL_ART_NOTICE, LAUNCH_OFFER, LAUNCH_OFFER_LIVE,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
@@ -1472,6 +1472,32 @@ console.log('\nwelcome landing page');
   ok(`its value bar states the live launch discount (${LAUNCH_OFFER.percentOff}%)`,
     wl.includes(`<strong>${LAUNCH_OFFER.percentOff}% off</strong>`),
     `welcome.html does not state ${LAUNCH_OFFER.percentOff}% off, which is LAUNCH_OFFER.percentOff`);
+
+  // The accepted-payment row states six facts about a Stripe Dashboard this
+  // repo cannot read. Pinning the markup to PAYMENT_METHODS at least makes the
+  // list one place to correct, so a method switched off is deleted once rather
+  // than left on the page nobody edits.
+  const payRow = (wl.match(/<ul class="wl-pay-list">([\s\S]*?)<\/ul>/) || [, ''])[1];
+  const shownMarks = [...payRow.matchAll(/<li class="wl-pay-mark">([\s\S]*?)<\/li>/g)]
+    .map(m => m[1].replace(/&nbsp;/g, ' ').trim());
+  ok('the payment row lists exactly what PAYMENT_METHODS holds',
+    shownMarks.join(' | ') === PAYMENT_METHODS.map(p => p.name).join(' | '),
+    `page has [${shownMarks.join(', ')}], PAYMENT_METHODS has [${PAYMENT_METHODS.map(p => p.name).join(', ')}]`);
+
+  // Advertising card brands on a site that cannot take a card is the same
+  // defect as any other unbacked claim, and PAYMENTS_LIVE is the flag that
+  // decides it.
+  ok('and only claims them while PAYMENTS_LIVE is true',
+    PAYMENTS_LIVE || shownMarks.length === 0,
+    'payments are switched off but the landing page still advertises card brands');
+
+  // A wallet is offered only where the browser can open the sheet, which
+  // js/express-pay.js gates on canMakePayment(). The row has to say so rather
+  // than listing Apple Pay flat beside Visa, which reads as a guarantee.
+  ok('and footnotes the wallets rather than promising them to every visitor',
+    !PAYMENT_METHODS.some(p => p.wallet) ||
+    /where your browser supports them/i.test(wl),
+    'PAYMENT_METHODS lists a wallet but welcome.html states it unconditionally');
 
   // The countdown is the one element on the site that could most easily become
   // a lie, so it gets the most specific check: the hour has to be read from the

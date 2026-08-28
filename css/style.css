@@ -1111,6 +1111,40 @@ button[disabled].si-forgot{ cursor: progress; }
   .wl-value{ font-size:0.8rem; }
 }
 
+/* Accepted payment methods, under the value bar. Sits on the page background
+   rather than the bar's surface so it reads as a footnote to it rather than a
+   fourth term in it. */
+.wl-pay{ background: var(--bg); padding: 22px 0 4px; }
+.wl-pay-in{
+  display:flex; flex-direction:column; align-items:center; gap:12px;
+}
+.wl-pay-label{
+  font-family:'JetBrains Mono', monospace; font-size:0.64rem; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase; color: var(--text-dimmer);
+}
+.wl-pay-list{
+  list-style:none; margin:0; padding:0;
+  display:flex; flex-wrap:wrap; justify-content:center; gap:10px;
+}
+/* Wordmarks in the display face inside the same bordered chip the rest of the
+   page uses, so six brands read as one set instead of six pieces of borrowed
+   artwork at six different weights. */
+.wl-pay-mark{
+  border:1px solid var(--border); background: var(--surface);
+  padding: 8px 14px; min-width: 78px; text-align:center;
+  font-family: var(--font-display); font-size:0.78rem; font-weight:600;
+  letter-spacing:-0.01em; color: var(--text-dim); white-space:nowrap;
+}
+.wl-pay-note{
+  margin:0; font-size:0.72rem; color: var(--text-dimmer); text-align:center;
+}
+@media (max-width: 560px){
+  .wl-pay{ padding: 18px 0 2px; }
+  .wl-pay-list{ gap:8px; }
+  .wl-pay-mark{ padding: 7px 11px; min-width:0; font-size:0.72rem; }
+  .wl-pay-note{ font-size:0.66rem; }
+}
+
 /* The section head on this page carries a lede under the heading, which the
    homepage's does not. .section-head caps at 640px and centres; this widens
    the sentence a little and keeps it centred with it. */

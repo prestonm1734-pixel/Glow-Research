@@ -263,6 +263,34 @@ const PAYMENT_COPY = PAYMENTS_LIVE ? {
             'email above to take payment before anything ships.',
 };
 
+// What the site is allowed to display as an accepted payment method.
+//
+// Every entry here is a claim about a system this repo does not control.
+// api/create-payment-intent.js asks Stripe for payment_method_types: ['card'],
+// and which card networks that resolves to is decided by what is switched on
+// in the Stripe Dashboard. Apple Pay needs the domain registered with Apple
+// through that same dashboard before it works for anyone, and Google Pay needs
+// wallets enabled on the account. None of that is checkable from here, which
+// is exactly why the list is one constant rather than six logos typed into a
+// page: switching a method off is deleting a line, not hunting markup.
+//
+// The precedent is GLOW20. Copy that assumed a dashboard state, and a
+// dashboard that had moved on, is how the launch code ended up telling
+// customers the offer had ended.
+//
+// `wallet` marks the two that are shown at checkout only when the shopper's
+// own browser can open the sheet, which is what js/express-pay.js gates on
+// canMakePayment(). The row footnotes that rather than implying every visitor
+// will see them.
+const PAYMENT_METHODS = [
+  { name: 'Visa', wallet: false },
+  { name: 'Mastercard', wallet: false },
+  { name: 'Amex', wallet: false },
+  { name: 'Discover', wallet: false },
+  { name: 'Apple Pay', wallet: true },
+  { name: 'Google Pay', wallet: true },
+];
+
 // The certificate copy, in one place. Both branches describe the same
 // operation — third-party tested lots, a certificate per batch — and differ
 // only in how the reader gets hold of the document.
@@ -1681,6 +1709,7 @@ if (typeof module !== 'undefined' && module.exports) {
     COA_COPY,
     PAYMENTS_LIVE,
     PAYMENT_COPY,
+    PAYMENT_METHODS,
     STRIPE_PUBLISHABLE_KEY,
     META_PIXEL_ID,
     TIKTOK_PIXEL_ID,

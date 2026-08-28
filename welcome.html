@@ -194,6 +194,39 @@
   </div>
 </div>
 
+<!-- Accepted payment methods.
+     The six names are PAYMENT_METHODS in js/products-data.js and
+     check-claims.js holds this markup to that list, so a method switched off
+     in the Stripe Dashboard is removed here by deleting one line rather than
+     by remembering this row exists.
+
+     Set as monochrome marks rather than the brand artwork. Partly because the
+     official marks are full colour on a site that has no colour anywhere, and
+     partly because the artwork is not in assets/ and is not mine to invent: a
+     hand-drawn approximation of a trademark is worse than a clean wordmark.
+     Dropping the real SVGs into assets/ and swapping the spans is a small
+     change if the colour versions are wanted.
+
+     The wallets carry a footnote instead of being stated flat. Apple Pay and
+     Google Pay appear at checkout only when the shopper's own browser can
+     open the sheet, which is what js/express-pay.js gates on
+     canMakePayment(), so the row says so rather than implying everyone sees
+     them. -->
+<div class="wl-pay">
+  <div class="container wl-pay-in">
+    <span class="wl-pay-label">We accept</span>
+    <ul class="wl-pay-list">
+      <li class="wl-pay-mark">Visa</li>
+      <li class="wl-pay-mark">Mastercard</li>
+      <li class="wl-pay-mark">Amex</li>
+      <li class="wl-pay-mark">Discover</li>
+      <li class="wl-pay-mark">Apple&nbsp;Pay</li>
+      <li class="wl-pay-mark">Google&nbsp;Pay</li>
+    </ul>
+    <p class="wl-pay-note">Wallets appear at checkout where your browser supports them.</p>
+  </div>
+</div>
+
 <!-- THE GLOW STANDARD
      The homepage's promises section, verbatim: three cards, one per thing the
      site can actually back up. Retitled for this page's question, which is why
