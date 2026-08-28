@@ -1102,8 +1102,12 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 .wl-value strong{ color: var(--text); font-weight:600; }
 .wl-value svg{ color: var(--text-dimmer); flex:0 0 auto; }
+/* Stacked below 640px, and centred with everything else. It was flush left,
+   which left it the only left-aligned block on a page whose hero, stats,
+   section heading and lede are all centre-set, so the three rows read as
+   though they belonged to a different page. */
 @media (max-width: 640px){
-  .wl-valuebar-inner{ gap: 12px; flex-direction:column; align-items:flex-start; }
+  .wl-valuebar-inner{ gap: 12px; flex-direction:column; align-items:center; }
   .wl-value{ font-size:0.8rem; }
 }
 
