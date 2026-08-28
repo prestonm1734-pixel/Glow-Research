@@ -489,7 +489,11 @@ button[disabled].si-forgot{ cursor: progress; }
    sitting boxed inside it. Left edge fades to black so the copy stays legible. */
 .hero-visual-img{
   position:absolute; z-index:0;
-  right: -6%; bottom: -9%;
+  /* Moved left from -6%. Not further: past about 4% the clip stops reaching
+     the right edge and leaves a wedge of dead black there, which loses the
+     "continues past the section" read the crop is for. At 2% the gap is
+     ~25px and the mask's own edge fade covers it. */
+  right: 2%; bottom: -9%;
   width: min(1240px, 88vw); height:auto; max-width:none;
   border-radius: 0;
   -webkit-mask-image: linear-gradient(100deg, transparent 0%, transparent 6%, #000 46%, #000 100%),
