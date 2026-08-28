@@ -271,7 +271,10 @@ const COA_COPY = COAS_PUBLISHED ? {
   short: 'Batch-matched COA',
   // the box on the product page
   boxTitle: 'View certificate of analysis',
-  boxSub: 'HPLC purity and mass-spec identity, matched to the lot number on your vial',
+  // Named the identity technique ("mass-spec") until the guard's method list
+  // learned the short spelling and caught it. The Identity row in
+  // ANALYSIS_TESTS carries no method for a reason, so neither does this.
+  boxSub: 'HPLC purity, identity and quantity, matched to the lot number on your vial',
   // footer of each order in the account area
   orderNote: 'Batch COA linked on every order',
   // the document row of the evidence panel. panelLink is the label on the row's

@@ -1520,7 +1520,14 @@ console.log('\nwhat the FAQ is allowed to say about testing');
   // And no answer may name an instrument ANALYSIS_LONG does not. "LC-MS" reads
   // like shorthand for the same two runs and is a different measurement; the
   // rest are analyses a peptide COA can carry that these lots are not given.
-  const methods = ['hplc', 'uplc', 'lc-ms', 'gc-ms', 'nmr', 'mass spectrometry',
+  // "mass spec" and "mass-spec" are here because the list held only the full
+  // "mass spectrometry" and the short forms walked straight past it. Two
+  // surfaces were naming an instrument for the identity row for exactly that
+  // reason, long after ANALYSIS_TESTS had emptied that row's method on the
+  // grounds that the certificate names no technique for it. A guard that
+  // catches only the formal spelling of a claim does not catch the claim.
+  const methods = ['hplc', 'uplc', 'lc-ms', 'gc-ms', 'nmr',
+    'mass spectrometry', 'mass spec', 'mass-spec',
     'lal', 'karl fischer', 'amino acid analysis', 'elemental analysis'];
   const backing = `${ANALYSIS_SHORT} ${ANALYSIS_LONG}`.toLowerCase();
   const invented = methods.filter(m =>
