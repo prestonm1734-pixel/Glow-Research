@@ -217,6 +217,18 @@ const LAUNCH_OFFER = {
 // checked in — see api/_meta-capi.js.
 const META_PIXEL_ID = '895737919981822';
 
+// The token Meta issues to prove this domain belongs to our business
+// portfolio, served in the page source by design, so not secret either.
+//
+// Issued per business portfolio, not per pixel and not per ad account: it
+// changes when the portfolio does, and only then. It was hand-typed into
+// index.html and welcome.html before this, where nothing stopped the two
+// from drifting apart, and a half-verified domain looks exactly like a
+// verified one right up until Aggregated Event Measurement stops
+// attributing iOS conversions. tools/build-meta.js writes both copies from
+// here now.
+const META_DOMAIN_VERIFICATION = 'ntwszx0m4fi9t5lmw7z1jckzhjd0hb';
+
 // TikTok's Pixel code, same reasoning and the same shape as META_PIXEL_ID
 // above: not secret, safe to ship client-side, and js/tiktok-pixel.js no-ops
 // entirely while this is empty. The matching server-side piece,
@@ -1715,6 +1727,7 @@ if (typeof module !== 'undefined' && module.exports) {
     PAYMENT_METHODS,
     STRIPE_PUBLISHABLE_KEY,
     META_PIXEL_ID,
+    META_DOMAIN_VERIFICATION,
     TIKTOK_PIXEL_ID,
     X_PIXEL_ID,
     X_EVENT_IDS,

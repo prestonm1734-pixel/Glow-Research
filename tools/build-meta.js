@@ -36,6 +36,13 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const SITE = 'https://glowresearch.shop';
 const { PAGE_META } = require(path.join(__dirname, 'page-meta.js'));
+const { META_DOMAIN_VERIFICATION } = require(path.join(ROOT, 'js/products-data.js'));
+
+// The pages carrying Meta's domain-verification tag. Not PAGE_META's list:
+// welcome.html is noindex so it has no share card to keep honest and no entry
+// there, but it is the page paid traffic actually lands on, which makes it the
+// one page that most needs the domain verified.
+const VERIFY_PAGES = ['index.html', 'welcome.html'];
 
 // Attribute values are written into "..." so a stray quote would break the tag.
 // The strings in page-meta.js already carry HTML entities where they need them
@@ -91,6 +98,25 @@ function buildPage(file) {
   return { changed: html !== before, added };
 }
 
+// Meta reads this tag off the served HTML to confirm the domain is ours. The
+// token belongs to the business portfolio, so every page that carries it must
+// carry the same one: two pages disagreeing means one of them verifies and the
+// other silently does not.
+function buildDomainVerification() {
+  let changed = 0;
+  for (const file of VERIFY_PAGES) {
+    const full = path.join(ROOT, file);
+    if (!fs.existsSync(full)) {
+      throw new Error(`tools/build-meta.js expects ${file}, which does not exist.`);
+    }
+    const before = fs.readFileSync(full, 'utf8');
+    const html = setMeta(before, 'name="facebook-domain-verification"',
+      META_DOMAIN_VERIFICATION, []);
+    if (html !== before) { fs.writeFileSync(full, html); changed++; }
+  }
+  return changed;
+}
+
 function build() {
   let changed = 0;
   const notes = [];
@@ -102,7 +128,9 @@ function build() {
     if (r.changed) changed++;
     if (r.added.length) notes.push(`${file}: added ${r.added.join(', ')}`);
   }
+  const verified = buildDomainVerification();
   console.log(`  ${Object.keys(PAGE_META).length} pages checked, ${changed} rewritten`);
+  console.log(`  ${VERIFY_PAGES.length} domain-verification tags checked, ${verified} rewritten`);
   notes.forEach(n => console.log(`    ${n}`));
 }
 

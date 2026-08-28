@@ -37,6 +37,7 @@ const {
   QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY, PAYMENT_METHODS,
   hasList, listPriceOf, SITEWIDE_DISCOUNT, VIAL_ART_NOTICE, LAUNCH_OFFER, LAUNCH_OFFER_LIVE,
+  META_PIXEL_ID, META_DOMAIN_VERIFICATION,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 let failures = 0;
@@ -2981,6 +2982,29 @@ console.log('\nprivacy disclosure');
       !/no advertising pixels?\b/i.test(privacy));
     ok('the runtime disclosure spans exist for meta-pixel.js to correct if the flag ever flips',
       ['metaPixelNote3', 'metaPixelNote4', 'metaPixelNote5'].every(id => privacy.includes(id)));
+  }
+
+  // Meta's domain verification. The token belongs to the business portfolio,
+  // and every page carrying the tag has to carry the same one: two pages
+  // disagreeing means one verifies and the other silently does not, which
+  // shows up much later as iOS conversions going unattributed rather than as
+  // anything that looks like a fault. tools/build-meta.js writes both copies
+  // from js/products-data.js; this is what catches a hand-edit of either page.
+  {
+    const tagged = pages.filter(f => /facebook-domain-verification/.test(read(f)));
+    ok('a domain-verification tag is present for the Meta pixel to be attributed',
+      !META_PIXEL_ID || tagged.length > 0,
+      'META_PIXEL_ID is set but no page carries facebook-domain-verification');
+    ok('META_DOMAIN_VERIFICATION is filled in wherever the tag is served',
+      !tagged.length || !!META_DOMAIN_VERIFICATION,
+      'pages carry the tag but js/products-data.js has no token to write into it');
+    const tokens = new Set(tagged.map(f =>
+      read(f).match(/name="facebook-domain-verification"\s+content="([^"]*)"/)[1]));
+    ok('every page states one domain-verification token', tokens.size <= 1,
+      `found ${[...tokens].join(', ')}`);
+    ok('the served token is the one in js/products-data.js',
+      !tokens.size || tokens.has(META_DOMAIN_VERIFICATION),
+      `pages say ${[...tokens].join('/')}, products-data.js says ${META_DOMAIN_VERIFICATION}`);
   }
 
   // Same reasoning, TikTok's pixel/Events API in place of Meta's.
