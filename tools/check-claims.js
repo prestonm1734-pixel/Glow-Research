@@ -1429,6 +1429,29 @@ console.log('\nwelcome landing page');
   ok('robots.txt does not disallow it, which would hide the noindex from crawlers',
     !/Disallow:\s*\/welcome/i.test(read('robots.txt')));
 
+  // --- the URL the ads point at actually resolves ------------------------
+  // This site has no cleanUrls and no trailing-slash handling: every other
+  // page is only ever linked as "<name>.html", so Vercel is never asked for an
+  // extensionless path and nothing here needed a rewrite before. The landing
+  // page is the exception, because the URL that goes into an ad is
+  // glowresearch.shop/welcome, and without the rewrite below that path is not
+  // a file, not a route, and 404s. It did, on the first deploy.
+  //
+  // A broken landing page is the most expensive 404 on the site: it is the one
+  // URL that costs money every time it is requested. Pinned rather than
+  // remembered, and pinned as a rewrite specifically. A redirect would work
+  // too but would bounce every paid click through an extra hop, and
+  // cleanUrls:true would fix this one page by changing the address of all
+  // eighteen others, breaking every canonical and sitemap entry on the site.
+  const vercel = JSON.parse(read('vercel.json'));
+  const rewrite = (vercel.rewrites || [])
+    .find(r => r.source === '/welcome' && r.destination === '/welcome.html');
+  ok('vercel.json rewrites /welcome to the page, so the ad URL is not a 404',
+    !!rewrite,
+    'add { "source": "/welcome", "destination": "/welcome.html" } to rewrites in vercel.json');
+  ok('and does not fix it with cleanUrls, which would rewrite every other URL on the site',
+    vercel.cleanUrls !== true);
+
   // --- what it says ------------------------------------------------------
   // Same contract as the homepage: the copy is served, not injected, and it is
   // the copy faqHtml() renders rather than a second edit of the same answers.
@@ -2969,7 +2992,16 @@ console.log('\ndeploy headers');
 
   // One representative of every URL shape the site actually serves, taken from
   // the catalog rather than typed, so a new page shape is covered too.
-  const htmlUrls = ['/', '/coa.html', '/peptides.html'].concat(
+  //
+  // "/welcome" is its own shape and is here for a reason. Every other page on
+  // this site is only ever addressed with its .html extension, so the
+  // "/(.*).html" rule below covers them all. The landing page is the one URL
+  // handed out without one, which means it matches neither that rule nor "/",
+  // and it fell straight through to the catch-all that sets security headers
+  // and no Cache-Control at all. An HTML page with no cache rule is the defect
+  // the two checks under this one exist to catch, so the shape has to be
+  // listed here for them to see it.
+  const htmlUrls = ['/', '/coa.html', '/peptides.html', '/welcome'].concat(
     PRODUCT_PAGES_LIVE ? ['/peptides/' + productSlug(GLOW_PRODUCTS[0].name) + '/'] : []
   );
   const assetUrls = ['/assets/fonts/sora.woff2'].concat(
