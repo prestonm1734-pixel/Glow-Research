@@ -345,7 +345,7 @@ const GLOW_PRODUCTS = [
   // Ranked by the badge each product already carries (Best Seller, then
   // Popular, then Best Value), which is the one popularity signal already in
   // the data rather than a second, separate ranking to keep in sync with it.
-  { name: 'GLP-3 (RT)', alias: 'Retatrutide', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:'Best Seller',
+  { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:'Best Seller',
     coa: 'assets/coas/glp-3-rt-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [
@@ -353,7 +353,7 @@ const GLOW_PRODUCTS = [
     ],
     blurb: 'A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile.',
     about: [
-      'GLP-3 (RT) is Glow’s designation for retatrutide, a synthetic peptide agonist active at three receptors from one molecule: the GIP receptor, the GLP-1 receptor and the glucagon receptor.',
+      'GLP-3 (RT) is Glow’s designation for a synthetic peptide agonist active at three receptors from one molecule: the GIP receptor, the GLP-1 receptor and the glucagon receptor.',
       'Engaging the glucagon receptor alongside the two incretin receptors is what separates it from earlier co-agonists, and is why it is studied as a distinct pharmacological class rather than a variant of existing GLP-1 or GIP agonists.'
     ],
     research: [
@@ -361,13 +361,13 @@ const GLOW_PRODUCTS = [
       { t: 'Glucagon receptor signalling', d: 'Studied in hepatocyte and cAMP assays for activity at the glucagon receptor, a target the two-receptor co-agonists do not engage.' },
       { t: 'Comparative incretin pharmacology', d: 'Applied as a comparator when characterising newer multi-receptor agonists against single- and dual-receptor peptides.' }
     ] },
-  { name: 'GLP-1 (SM)', alias: 'Semaglutide', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:'Popular',
+  { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:'Popular',
     coa: 'assets/coas/glp-1-sm-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.96 mg' },
     sizes: [{ mg: '10mg', price: 64.99, list: 72, sku: 'GLO-SM10', image: 'assets/products/glp-1-sm-10mg-v3.webp' }],
     blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
     about: [
-      'GLP-1 (SM) is Glow’s designation for semaglutide, a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
+      'GLP-1 (SM) is Glow’s designation for a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
       'Those two modifications are why it behaves so differently from native GLP-1 across a time course, and usually why it is the chosen comparator.'
     ],
     research: [
@@ -462,13 +462,13 @@ const GLOW_PRODUCTS = [
       { t: 'DPP-4 resistance', d: 'Studied for resistance to enzymatic cleavage relative to native GHRH, and how that changes assay-window duration.' },
       { t: 'Comparative secretagogue pharmacology', d: 'Run as a reference GHRH analogue when newer compounds in the class are characterised.' }
     ] },
-  { name: 'GLP-2 (TR)', alias: 'Tirzepatide', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
+  { name: 'GLP-2 (TR)', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
     coa: 'assets/coas/glp-2-tr-lot-1600.pdf', coaRef: '7RRU-W2LV', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '12.49 mg' },
     sizes: [{ mg: '10mg', price: 72.99, list: 81, sku: 'GLO-T10', image: 'assets/products/glp-2-tr-10mg-v3.webp' }],
     blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
     about: [
-      'GLP-2 (TR) is Glow’s designation for tirzepatide, a dual receptor co-agonist peptide, active at both the GIP and the GLP-1 receptor from a single molecule.',
+      'GLP-2 (TR) is Glow’s designation for a dual receptor co-agonist peptide, active at both the GIP and the GLP-1 receptor from a single molecule.',
       'Single-molecule co-agonists are studied precisely because the two receptors can be engaged at different relative potencies, which is difficult to reproduce by simply combining two separate agonists.'
     ],
     research: [

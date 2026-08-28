@@ -2554,7 +2554,7 @@ console.log('\ncatalog shape');
   ok(`all ${GLOW_PRODUCTS.length} products carry every field the site reads`,
     bad.length === 0, bad.join(', '));
 
-  // alias ("Retatrutide" under "GLP-3 (RT)") is a claim that this is what
+  // alias ("Wolverine" under "BPC-157/TB-500") is a claim that this is what
   // the compound is commonly called. It can only ever say what the
   // product's own about copy already says, not a second, independent claim.
   const aliasDrift = GLOW_PRODUCTS
