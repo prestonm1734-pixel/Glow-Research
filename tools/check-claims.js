@@ -1548,10 +1548,12 @@ console.log('\nwhat the FAQ is allowed to say about the box and the vial');
 
   // The research-use-only answer is the one place on the site where the reader
   // is asking the question directly. It has to say no, and point at the
-  // agreement they already accepted, rather than hedge.
-  const ruo = FAQS.find(f => /humans or animals/i.test(f.q));
+  // agreement they already accepted, rather than hedge. The question is now
+  // titled after the term itself rather than the human/animal case, so the
+  // no-human-or-animal-use statement is checked in the answer, not the title.
+  const ruo = FAQS.find(f => /research use only/i.test(f.q));
   ok('the research-use-only answer says no and names the agreement',
-    !!ruo && /^No\./.test(ruo.a) && /RUO Agreement/.test(ruo.a));
+    !!ruo && /^No\./.test(ruo.a) && /humans or animals/i.test(ruo.a) && /RUO Agreement/.test(ruo.a));
 }
 
 /* ---------------------------------------------------------------------------

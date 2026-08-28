@@ -997,7 +997,10 @@ button[disabled].si-forgot{ cursor: progress; }
    list with dividers, so .faq-col supplies the gap a border-bottom list
    didn't need. */
 .faq-col{ display:flex; flex-direction:column; gap: 14px; }
-.faq-item{ border: 1px solid var(--border); border-radius: 12px; }
+/* Same edge as .btn-outline, not the faint var(--border) list dividers use
+   elsewhere: asked to read as an actual box, like the buttons on the site,
+   rather than a subtle rule. Square corners for the same reason. */
+.faq-item{ border: 1.5px solid rgba(255,255,255,0.55); border-radius: 0; }
 .faq-q{
   width:100%; text-align:left; background:none; border:none; color: var(--text);
   padding: 22px 24px; font-size: 1.02rem; font-weight:600; cursor:pointer;
@@ -1021,7 +1024,7 @@ html:not(.js) .faq-a{ max-height: none; }
    section, so the rules that name a light colour outright, rather than
    inheriting one, are inverted here. The chevron just inherits .faq-q's
    color, so it needs no override of its own. */
-.section-light .faq-item{ border-color: rgba(0,0,0,0.12); }
+.section-light .faq-item{ border-color: rgba(0,0,0,0.35); }
 .section-light .faq-q{ color:#0a0a0a; }
 .section-light .faq-q:hover{ color:#000; }
 

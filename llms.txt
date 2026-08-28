@@ -69,9 +69,9 @@ Every order ships the same day when ordered by 1:00 PM Pacific, otherwise the ne
 
 Always. Orders ship in a plain padded envelope, no branding, nothing on the outside naming what is inside, and checkout runs on Stripe’s own encrypted payment form, card only. Stripe handles and stores the card details, not us.
 
-**Can these be used in humans or animals?**
+**What does "research use only" mean?**
 
-No. Laboratory and in-vitro research only, sold to qualified buyers and institutions. Not a drug, not a supplement, not for human or veterinary use. We do not publish dosing or administration guidance and will not supply it if asked. The RUO Agreement covers what you accepted on the way in.
+No. Not for use in humans or animals. Laboratory and in-vitro research only, sold to qualified buyers and institutions, not a drug or a supplement. We do not publish dosing or administration guidance and will not supply it if asked. The RUO Agreement covers what you accepted on the way in.
 
 ## Pages
 

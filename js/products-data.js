@@ -894,11 +894,11 @@ const FAQS = [
     // No hedging and no softening. This is the one answer on the site where
     // being liked matters less than being unambiguous, and the RUO agreement
     // it points at is the document the buyer already accepted at the gate.
-    q: 'Can these be used in humans or animals?',
-    a: 'No. Laboratory and in-vitro research only, sold to qualified buyers and ' +
-       'institutions. Not a drug, not a supplement, not for human or veterinary use. We ' +
-       'do not publish dosing or administration guidance and will not supply it if asked. ' +
-       'The RUO Agreement covers what you accepted on the way in.',
+    q: 'What does "research use only" mean?',
+    a: 'No. Not for use in humans or animals. Laboratory and in-vitro research only, sold ' +
+       'to qualified buyers and institutions, not a drug or a supplement. We do not ' +
+       'publish dosing or administration guidance and will not supply it if asked. The ' +
+       'RUO Agreement covers what you accepted on the way in.',
   },
 ];
 
