@@ -639,6 +639,13 @@ const DISPATCH_CUTOFF_LABEL = '1:00 PM Pacific';
 // constant rather than a second hand-typed "1:00 PM PT" in thirty static
 // pages, so check-claims.js can pin every ticker to this one string.
 const DISPATCH_CUTOFF_TICKER = '1:00 PM PT';
+// The product page's own wording of the same hour. "PST" rather than
+// "Pacific" was asked for specifically here — worth flagging that "PST" names
+// standard time only, and this hour is genuinely Pacific time year-round,
+// including the half of the year the zone is actually observing PDT. Kept
+// separate from DISPATCH_CUTOFF_LABEL rather than overloading it, since only
+// the product page's live cutoff line uses this exact phrasing.
+const DISPATCH_CUTOFF_PDP_LABEL = '1:00 PM PST';
 // "dispatch day", not "business day": Saturday is a real dispatch day here,
 // and "business day" carries a Mon-Fri connotation strong enough that saying
 // it would leave a Friday-afternoon order thinking it goes out Monday when
@@ -1658,6 +1665,7 @@ if (typeof module !== 'undefined' && module.exports) {
     DISPATCH_CUTOFF_HOUR,
     DISPATCH_CUTOFF_LABEL,
     DISPATCH_CUTOFF_TICKER,
+    DISPATCH_CUTOFF_PDP_LABEL,
     DISPATCH_LABEL,
     TRANSIT_DAYS,
     PACKAGING_PLAIN,

@@ -13,7 +13,7 @@
   const money = fmtPrice;
 
   // NO_DISPATCH_DAY, NO_DELIVERY_DAY, DISPATCH_CUTOFF_HOUR,
-  // DISPATCH_CUTOFF_LABEL, DISPATCH_LABEL and TRANSIT_DAYS come from
+  // DISPATCH_CUTOFF_PDP_LABEL, DISPATCH_LABEL and TRANSIT_DAYS come from
   // js/products-data.js. The shipping page and the marquee state the same
   // figures in words, so they are sitewide constants rather than ones this
   // file owns and the others restate.
@@ -114,10 +114,12 @@
       // Stated relative to where this particular visitor actually is against
       // the cutoff, not the general policy sentence FAQS reads — "ships
       // today" is a stronger, truer thing to say than DISPATCH_LABEL's
-      // if/otherwise phrasing once the answer is already known.
+      // if/otherwise phrasing once the answer is already known. "In stock"
+      // dropped: sizeInStock(size()) already gated this whole branch, so the
+      // line above it is redundant with the fact that got you here.
       cutEl.innerHTML = e.dispatchesToday
-        ? `In stock, <strong>ships today</strong> if ordered by ${DISPATCH_CUTOFF_LABEL}`
-        : `In stock, <strong>ships the next dispatch day</strong>`;
+        ? `<strong>Ships today</strong> if ordered by ${DISPATCH_CUTOFF_PDP_LABEL}`
+        : `<strong>Ships the next dispatch day</strong>`;
       arrEl.innerHTML = `Estimated delivery <strong>${fmtDay(e.arrivalDate)}</strong>`;
     }
 

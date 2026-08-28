@@ -26,7 +26,7 @@ const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, DISPATCH_LABEL, NO_DISPATCH_DAY_NAME,
-  DISPATCH_CUTOFF_HOUR, DISPATCH_CUTOFF_LABEL, DISPATCH_CUTOFF_TICKER,
+  DISPATCH_CUTOFF_HOUR, DISPATCH_CUTOFF_LABEL, DISPATCH_CUTOFF_TICKER, DISPATCH_CUTOFF_PDP_LABEL,
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord, PACKAGING_PLAIN, STORAGE_LONG,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
@@ -122,13 +122,13 @@ console.log('\ndispatch window');
   ok('no page describes dispatch in "business days" any more',
     staleBusinessDayShipping.length === 0, staleBusinessDayShipping.join(', '));
 
-  // Every clock-time cutoff claim sitewide has to be one of the two approved
+  // Every clock-time cutoff claim sitewide has to be one of three approved
   // strings — DISPATCH_CUTOFF_LABEL in prose, DISPATCH_CUTOFF_TICKER in the
-  // marquee — and both are read from DISPATCH_CUTOFF_HOUR, so a mismatched
-  // one is either a typo or a claim about a different hour than the code
-  // enforces. Scripts are scanned alongside pages for the same reason as
-  // before: a claim rendered from a template literal is still a claim a
-  // customer reads.
+  // marquee, DISPATCH_CUTOFF_PDP_LABEL on the product page — all three read
+  // from DISPATCH_CUTOFF_HOUR, so a mismatched one is either a typo or a
+  // claim about a different hour than the code enforces. Scripts are scanned
+  // alongside pages for the same reason as before: a claim rendered from a
+  // template literal is still a claim a customer reads.
   const cutoffSources = pages.concat(['js/product.js', 'js/products-data.js']);
 
   // Comments stripped, the same rule the privacy and navigation sections use:
@@ -141,21 +141,28 @@ console.log('\ndispatch window');
     .replace(/^[ \t]*\/\/.*$/gm, '')
     .replace(/&nbsp;|&#160;| /g, ' ');
 
-  const approved = [DISPATCH_CUTOFF_LABEL, DISPATCH_CUTOFF_TICKER];
+  // DISPATCH_CUTOFF_PDP_LABEL is not looked for in this scan: the product
+  // page's cutoff line is built at runtime from a template literal, so the
+  // resolved string never appears in any file's source text the way the
+  // other two do — it is checked below instead, by confirming js/product.js
+  // reads the constant itself rather than typing its own hour.
   const wrongClocks = [];
   const foundAny = { label: false, ticker: false };
   cutoffSources.forEach(f => {
     for (const m of bareSrc(f).matchAll(/\b\d{1,2}(?::\d{2})?\s*(?:AM|PM)\s*(?:Pacific|PT|P[SD]T)\b/gi)) {
       if (m[0] === DISPATCH_CUTOFF_LABEL) foundAny.label = true;
       else if (m[0] === DISPATCH_CUTOFF_TICKER) foundAny.ticker = true;
+      else if (m[0] === DISPATCH_CUTOFF_PDP_LABEL) { /* its own definition, in products-data.js */ }
       else wrongClocks.push(`${f}: "${m[0]}"`);
     }
   });
-  ok('every stated dispatch cutoff time matches DISPATCH_CUTOFF_LABEL or DISPATCH_CUTOFF_TICKER exactly',
+  ok('every stated dispatch cutoff time matches an approved DISPATCH_CUTOFF_* constant exactly',
     wrongClocks.length === 0, wrongClocks.join(', '));
   ok('the full cutoff label and the marquee ticker are each stated somewhere',
     foundAny.label && foundAny.ticker,
     `label seen: ${foundAny.label}, ticker seen: ${foundAny.ticker}`);
+  ok('the product page reads DISPATCH_CUTOFF_PDP_LABEL rather than typing its own hour',
+    /DISPATCH_CUTOFF_PDP_LABEL/.test(read('js/product.js')));
 
   // The marquee is hand-duplicated across every page rather than built from
   // one template, so the only way to catch a page that kept the old ticker
