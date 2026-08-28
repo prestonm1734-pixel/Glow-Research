@@ -224,6 +224,28 @@ const META_PIXEL_ID = '895737919981822';
 // be checked in — see api/_tiktok-capi.js.
 const TIKTOK_PIXEL_ID = 'DA8CR2BC77U6VIRE2UQG';
 
+// X's (Twitter's) base Pixel ID, same reasoning as META_PIXEL_ID and
+// TIKTOK_PIXEL_ID above: not secret, safe to ship client-side, and
+// js/x-pixel.js no-ops entirely while this is empty.
+//
+// Unlike Meta and TikTok, a single Pixel ID is not enough to fire X's named
+// funnel events — each one (ViewContent, AddToCart, InitiateCheckout,
+// Purchase) needs its own per-event tracking ID, created separately in X
+// Ads Manager's Events Manager and only known once that is done. X_EVENT_IDS
+// holds those; any entry left empty means js/analytics.js's forwardToX()
+// skips that one event rather than firing a call X has no definition for.
+// There is no server-side Conversions API mirror for X yet (api/_meta-capi.js
+// and api/_tiktok-capi.js both have one) — X's equivalent needs OAuth
+// request-signing, not just a bearer token, and nothing calls for it until
+// the browser-only setup is confirmed working.
+const X_PIXEL_ID = 'repwj';
+const X_EVENT_IDS = {
+  viewContent: '',
+  addToCart: '',
+  initiateCheckout: '',
+  purchase: '',
+};
+
 // What the confirmation page says about payment, keyed off the same flag that
 // decides whether payment is actually taken. Hand-written copy here was the
 // exact failure this guards against: thank-you.html told shoppers "card
@@ -1663,6 +1685,8 @@ if (typeof module !== 'undefined' && module.exports) {
     STRIPE_PUBLISHABLE_KEY,
     META_PIXEL_ID,
     TIKTOK_PIXEL_ID,
+    X_PIXEL_ID,
+    X_EVENT_IDS,
     LAUNCH_OFFER_LIVE,
     LAUNCH_OFFER,
     round2,

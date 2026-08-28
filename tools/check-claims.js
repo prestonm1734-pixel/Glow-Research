@@ -2808,6 +2808,16 @@ console.log('\nprivacy disclosure');
     ok('the runtime disclosure spans exist for tiktok-pixel.js to correct if the flag ever flips',
       ['tiktokPixelNote3', 'tiktokPixelNote4', 'tiktokPixelNote5'].every(id => privacy.includes(id)));
   }
+
+  // Same reasoning again, X's pixel in place of Meta's/TikTok's.
+  if (/twq\('config'/.test(read('js/x-pixel.js'))) {
+    ok('the privacy policy accounts for the X pixel capability',
+      /twitter/i.test(privacy) && /pixel/i.test(privacy));
+    ok('and no longer claims there are no advertising pixels on the site',
+      !/no advertising pixels?\b/i.test(privacy));
+    ok('the runtime disclosure spans exist for x-pixel.js to correct if the flag ever flips',
+      ['xPixelNote3', 'xPixelNote4', 'xPixelNote5'].every(id => privacy.includes(id)));
+  }
 }
 
 /* ---------------------------------------------------------------------------

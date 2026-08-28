@@ -161,6 +161,39 @@
     }
   }
 
+  // X (Twitter) needs a per-event tracking ID, not just the base Pixel ID —
+  // set in X_EVENT_IDS (js/products-data.js) once each named event exists in
+  // X Ads Manager's Events Manager. An event with no ID assigned yet is
+  // skipped rather than calling twq with nothing to point it at, the same
+  // way js/x-pixel.js no-ops entirely while X_PIXEL_ID itself is empty.
+  function forwardToX(eventType, properties, eventId) {
+    if (typeof window.twq !== 'function') return;
+    if (typeof X_EVENT_IDS === 'undefined') return;
+    var p = properties || {};
+    var opts = eventId ? { conversion_id: eventId } : undefined;
+    var xEventId;
+
+    if (eventType === 'product_viewed') xEventId = X_EVENT_IDS.viewContent;
+    else if (eventType === 'cart_add') xEventId = X_EVENT_IDS.addToCart;
+    else if (eventType === 'checkout_started') xEventId = X_EVENT_IDS.initiateCheckout;
+    else if (eventType === 'purchase_completed') xEventId = X_EVENT_IDS.purchase;
+    else return;
+
+    if (!xEventId) return; // that event has not been created in X Ads Manager yet
+
+    if (eventType === 'product_viewed' || eventType === 'cart_add') {
+      twq('event', xEventId, { content_ids: p.sku ? [p.sku] : undefined, value: p.price || undefined, currency: 'USD' }, opts);
+    } else if (eventType === 'checkout_started') {
+      twq('event', xEventId, {
+        content_ids: (p.items || []).map(function (i) { return i.sku; }).filter(Boolean),
+        value: p.value || undefined,
+        currency: 'USD',
+      }, opts);
+    } else if (eventType === 'purchase_completed') {
+      twq('event', xEventId, { value: p.revenue || 0, currency: 'USD' }, opts);
+    }
+  }
+
   // eventId is only ever passed by the purchase call sites (js/checkout.js,
   // js/express-pay.js), set to the Stripe PaymentIntent ID — the one value
   // this browser call and both server-side Conversions API calls (Meta's and
@@ -197,6 +230,7 @@
     } catch (e) {}
     try { forwardToMeta(eventType, properties, eventId); } catch (e) {}
     try { forwardToTikTok(eventType, properties, eventId); } catch (e) {}
+    try { forwardToX(eventType, properties, eventId); } catch (e) {}
   }
 
   // Read by js/checkout.js and js/express-pay.js so the PaymentIntent
