@@ -120,7 +120,13 @@
         currency: 'USD',
       }, opts);
     } else if (eventType === 'checkout_started') {
-      fbq('track', 'InitiateCheckout', { num_items: p.itemCount || undefined }, opts);
+      fbq('track', 'InitiateCheckout', {
+        content_ids: (p.items || []).map(function (i) { return i.sku; }).filter(Boolean),
+        content_type: 'product',
+        num_items: p.itemCount || undefined,
+        value: p.value || undefined,
+        currency: 'USD',
+      }, opts);
     } else if (eventType === 'purchase_completed') {
       fbq('track', 'Purchase', { value: p.revenue || 0, currency: 'USD' }, opts);
     }
@@ -141,7 +147,15 @@
     } else if (eventType === 'cart_add') {
       ttq.track('AddToCart', { contents: contents, value: p.price || undefined, currency: 'USD' }, opts);
     } else if (eventType === 'checkout_started') {
-      ttq.track('InitiateCheckout', { quantity: p.itemCount || undefined }, opts);
+      var lineContents = (p.items || []).filter(function (i) { return i.sku; }).map(function (i) {
+        return { content_id: i.sku, content_type: 'product', quantity: i.qty || 1, price: i.price || undefined };
+      });
+      ttq.track('InitiateCheckout', {
+        contents: lineContents.length ? lineContents : undefined,
+        quantity: p.itemCount || undefined,
+        value: p.value || undefined,
+        currency: 'USD',
+      }, opts);
     } else if (eventType === 'purchase_completed') {
       ttq.track('CompletePayment', { value: p.revenue || 0, currency: 'USD' }, opts);
     }

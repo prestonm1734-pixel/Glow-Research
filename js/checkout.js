@@ -813,8 +813,15 @@
     // Not on the resumed path: a 3D Secure redirect return is a continuation
     // of a checkout that already started, not a fresh one landing on the page.
     if (!resumed && window.GlowAnalytics && cartItems().length) {
+      // sku/price/qty per line, not just the total count: Meta and TikTok's
+      // InitiateCheckout both expect a contents list with a content_id per
+      // line, and TikTok's own event debugger flags the event outright
+      // without one.
+      const startItems = cartItems();
       window.GlowAnalytics.track('checkout_started', {
-        itemCount: cartItems().reduce((n, i) => n + (i.qty || 1), 0),
+        itemCount: startItems.reduce((n, i) => n + (i.qty || 1), 0),
+        items: startItems.map(i => ({ sku: i.sku, qty: i.qty, price: i.unitSale })),
+        value: startItems.reduce((n, i) => n + i.unitSale * i.qty, 0),
       });
     }
 
