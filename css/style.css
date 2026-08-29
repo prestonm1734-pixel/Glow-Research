@@ -2391,23 +2391,19 @@ body.qa-open .cart-toast{ opacity:0; pointer-events:none; }
   position: fixed; inset: 0; z-index: 400;
   display: flex; align-items: center; justify-content: center;
   padding: 24px 20px;
-  background: rgba(6,6,6,.68);
-  -webkit-backdrop-filter: blur(14px) saturate(.85);
-          backdrop-filter: blur(14px) saturate(.85);
+  background-color: #000; /* shows before the JS-set image decodes */
   overflow-y: auto;
   transition: opacity .25s ease;
 }
 .age-gate.is-going{ opacity: 0; pointer-events: none; }
 html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
 
-/* the panel carries its own surface now, since the backdrop is see-through */
+/* No card, no border: content sits directly on the gate's own background
+   image, matching the reference this screen is built from. */
 .age-gate-panel{
-  width: 100%; max-width: 380px; margin: auto;
+  width: 100%; max-width: 460px; margin: auto;
   text-align: center;
-  background: rgba(12,12,12,.94);
-  border: 1px solid rgba(255,255,255,.16);
   padding: 30px 26px 26px;
-  box-shadow: 0 40px 90px -28px rgba(0,0,0,.95);
   animation: ageGateIn .3s cubic-bezier(.2,.8,.2,1) both;
 }
 @keyframes ageGateIn{
@@ -2430,57 +2426,38 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
   color: var(--text-dimmer); margin-bottom: 10px;
 }
 .age-gate-title{
-  font-size: clamp(1.2rem, 4.4vw, 1.4rem);
+  font-size: clamp(1.6rem, 5.6vw, 2.1rem);
   font-weight: 600; color: var(--text);
-  letter-spacing: -.02em; line-height: 1.2; margin: 0 0 12px;
+  letter-spacing: -.02em; line-height: 1.15; margin: 0 0 14px;
 }
 .age-gate-copy{
-  font-size: .84rem; line-height: 1.6; color: var(--text-dim);
-  margin: 0 0 22px;
+  font-size: .9rem; line-height: 1.65; color: var(--text-dim);
+  margin: 0 0 26px;
 }
 .age-gate-copy a{ color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
 
 /* full-width stacked buttons, matching the reference layout */
-/* Attestation rows. Bordered and full width so each reads as a control to be
-   acted on rather than a line of small print with a tick beside it. */
-.age-gate-check{
-  display:flex; align-items:flex-start; gap:11px; text-align:left;
-  border:1px solid var(--border); padding:13px 14px; margin-bottom:9px;
-  cursor:pointer; transition: border-color .15s ease, background .15s ease;
-}
-.age-gate-check:hover{ border-color: rgba(255,255,255,.24); }
-.age-gate-check:has(input:checked){ border-color: rgba(255,255,255,.4); background: rgba(255,255,255,.04); }
-.age-gate-check input{
-  appearance:none; -webkit-appearance:none; flex:none;
-  width:19px; height:19px; margin:1px 0 0; border:1.5px solid rgba(255,255,255,.4);
-  background:transparent; cursor:pointer; display:grid; place-content:center;
-}
-.age-gate-check input:checked{ background: var(--text); border-color: var(--text); }
-.age-gate-check input:checked::after{
-  content:''; width:10px; height:6px;
-  border-left:2px solid var(--bg); border-bottom:2px solid var(--bg);
-  transform: rotate(-45deg) translate(1px,-1px);
-}
-.age-gate-check input:focus-visible{ outline:2px solid var(--text); outline-offset:2px; }
-.age-gate-check span{ font-size:.86rem; line-height:1.5; color: var(--text-dim); }
-.age-gate-check b{ color: var(--text); font-weight:600; }
-.age-gate-check a{ color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
-
-.age-gate-fine{
-  margin: 12px 0 0; font-size:.72rem; line-height:1.5; color: var(--text-dimmer);
-}
-
 .age-gate .btn{ width: 100%; justify-content: center; }
-.age-gate-enter:disabled{ opacity:.38; cursor:not-allowed; }
-.age-gate-enter{ padding: 13px 22px; font-size: .92rem; }
+.age-gate-enter{ padding: 15px 22px; font-size: .95rem; }
 .age-gate-exit{ margin-top: 9px; padding: 12px 22px; font-size: .88rem; color: var(--text-dim); }
 .age-gate-exit:hover{ color: var(--text); }
 
+/* The same three facts the marquee and FAQ already state, restated small:
+   the one screen where a first-time visitor has nothing else on the page
+   yet telling them this is a real lab supplier. */
+.age-gate-badges{
+  margin: 22px 0 0; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.1);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 8px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .64rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-dimmer);
+}
+
 @media (max-width: 480px){
   .age-gate-panel{ padding: 26px 22px 22px; }
-  .age-gate-copy{ font-size: .82rem; }
-  .age-gate-check{ padding: 11px 12px; }
-  .age-gate-check span{ font-size: .82rem; }
+  .age-gate-copy{ font-size: .84rem; }
+  .age-gate-badges{ gap: 6px 12px; font-size: .6rem; }
 }
 @media (prefers-reduced-motion: reduce){
   .age-gate{ transition: none; }

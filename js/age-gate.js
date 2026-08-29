@@ -6,23 +6,18 @@
 // at the bottom: the overlay has to be in the DOM before the page below it
 // paints, otherwise the site flashes into view behind the gate. Building it
 // from script (instead of hiding the page from CSS) also means a failure to
-// load leaves the site usable rather than blanked out.
+// load leaves the site usable rather than blanked out. That same ordering is
+// why the copy below is written out by hand rather than read from
+// js/products-data.js: that file loads near the foot of the page, well after
+// this one has already run.
 (function () {
-  // Temporarily disabled to test whether this gate is suppressing conversion
-  // from paid traffic: real ad-click data showed 5 of 12 genuine visitors
-  // bouncing at this screen before ever seeing the site, and the required
-  // attestation still happens at checkout (#coTerms in checkout.html) before
-  // any order can be placed, so removing this earlier browsewall does not
-  // remove legal coverage. Revert by deleting this early return.
-  return;
-
   var KEY = 'glow-age-ok';
 
   // Bump when the wording below changes materially. A stored acceptance of an
   // older version does not carry forward: someone who agreed to a weaker
   // statement has not agreed to this one, and the whole point of recording an
   // attestation is that it says what was actually attested to.
-  var ATTESTATION_VERSION = 2;
+  var ATTESTATION_VERSION = 3;
 
   // localStorage throws in Safari private mode rather than returning null, and
   // a gate that hard-fails there would lock the whole site behind an exception
@@ -30,9 +25,6 @@
     try {
       var raw = localStorage.getItem(KEY);
       if (!raw) return false;
-      // v1 stored the string '1' and attested only to age. It is deliberately
-      // not honoured here, so those visitors are asked the research-use
-      // question once rather than never.
       if (raw.charAt(0) !== '{') return false;
       return JSON.parse(raw).v === ATTESTATION_VERSION;
     } catch (e) { return false; }
@@ -54,9 +46,9 @@
 
   if (accepted()) return;
 
-  // The blog posts sit two directories deep, so a bare "about.html" would 404
-  // from there. The nav's own depthed links aren't parsed yet at this point in
-  // the document, so work the depth out from the path instead.
+  // The product pages sit two directories deep, so a bare "terms.html" would
+  // 404 from there. The nav's own depthed links aren't parsed yet at this
+  // point in the document, so work the depth out from the path instead.
   function prefix() {
     var segs = location.pathname.split('/').filter(Boolean);
     var last = segs[segs.length - 1] || '';
@@ -71,6 +63,15 @@
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
     el.setAttribute('aria-labelledby', 'ageGateTitle');
+    // A still frame of the homepage hero's vial, not the video: the gate has
+    // to render instantly on first paint, before js/script.js exists to
+    // decide whether motion is even allowed, so a static image is the only
+    // honest choice here. Layered under a near-opaque wash rather than shown
+    // at full strength — "subtle" is the point, not another hero moment.
+    el.style.backgroundImage =
+      'linear-gradient(rgba(4,4,4,.92), rgba(4,4,4,.95)), url("' + root + 'assets/hero-vial-poster.jpg")';
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
     el.innerHTML =
       // focus lands on the panel rather than the Enter button: focusing a
       // control programmatically trips :focus-visible in Chromium, so the
@@ -78,35 +79,27 @@
       '<div class="age-gate-panel" id="ageGatePanel" tabindex="-1">' +
         '<span class="age-gate-logo">Glow<span class="spark">✦</span></span>' +
         '<span class="age-gate-eyebrow">Research Use Only</span>' +
-        '<h2 class="age-gate-title" id="ageGateTitle">Researcher verification</h2>' +
+        '<h2 class="age-gate-title" id="ageGateTitle">You must be 21 or older to enter</h2>' +
         '<p class="age-gate-copy">' +
-          'Glow Research supplies research compounds to qualified researchers and ' +
-          'laboratories for in-vitro use only. Please confirm both before continuing.' +
+          'Glow Research supplies research compounds strictly for in-vitro laboratory use, ' +
+          'not for human or veterinary consumption. By entering you confirm you are at least ' +
+          '21 and agree to our <a href="' + root + 'terms.html">Terms</a> &amp; ' +
+          '<a href="' + root + 'ruo-agreement.html">RUO Agreement</a>.' +
         '</p>' +
-        // Two separate boxes, neither ticked, because the point of an
-        // attestation is the affirmative act. A pre-ticked box records that
-        // someone did nothing. The second one is the one that matters here:
-        // age has no bearing on whether a compound is a research chemical,
-        // and it was the only thing the previous gate actually asked.
-        '<label class="age-gate-check">' +
-          '<input type="checkbox" id="ageGateAge" />' +
-          '<span>I am at least <b>21 years of age</b>.</span>' +
-        '</label>' +
-        '<label class="age-gate-check">' +
-          '<input type="checkbox" id="ageGateRuo" />' +
-          '<span>I am purchasing for <b>in-vitro laboratory research only</b>, ' +
-            'not for human or veterinary use, and I agree to the ' +
-            '<a href="' + root + 'ruo-agreement.html">Research Use Only Agreement</a>.</span>' +
-        '</label>' +
-        '<button type="button" class="btn btn-primary age-gate-enter" id="ageGateEnter" disabled>' +
-          'Enter Glow Research' +
+        '<button type="button" class="btn btn-primary age-gate-enter" id="ageGateEnter">' +
+          'I am 21 or older' +
         '</button>' +
-        '<p class="age-gate-fine">' +
-          'By proceeding you affirm the statements above are true. These products are ' +
-          'not for human or veterinary use, not for use in diagnostic procedures, and ' +
-          'have not been evaluated by the U.S. Food and Drug Administration.' +
-        '</p>' +
         '<button type="button" class="btn btn-outline age-gate-exit" id="ageGateExit">Exit</button>' +
+        // Three of the same facts the marquee and the FAQ already state in
+        // these words, restated small underneath rather than argued for
+        // again: this is the one screen where a first-time visitor has
+        // nothing else on the page yet to tell them Glow is a real lab
+        // supplier and not a storefront that vanishes with their card number.
+        '<p class="age-gate-badges">' +
+          '<span>HPLC + Identity + Quantity Tested</span>' +
+          '<span>COA on Every Batch</span>' +
+          '<span>Discreet Shipping</span>' +
+        '</p>' +
       '</div>';
     return el;
   }
@@ -118,19 +111,8 @@
 
     var enter = el.querySelector('#ageGateEnter');
     var exit = el.querySelector('#ageGateExit');
-    var age = el.querySelector('#ageGateAge');
-    var ruo = el.querySelector('#ageGateRuo');
-
-    // Enter stays disabled until both are ticked. The button is the record of
-    // the attestation, so it must not be pressable before the attestation has
-    // been made.
-    function sync() { enter.disabled = !(age.checked && ruo.checked); }
-    age.addEventListener('change', sync);
-    ruo.addEventListener('change', sync);
-    sync();
 
     enter.addEventListener('click', function () {
-      if (enter.disabled) return;
       remember();
       document.documentElement.classList.remove('age-gate-open');
       el.classList.add('is-going');
@@ -147,7 +129,7 @@
     // it so a keyboard user can't tab into the page they haven't agreed to.
     el.addEventListener('keydown', function (e) {
       if (e.key !== 'Tab') return;
-      var focusable = el.querySelectorAll('a[href], button, input[type=checkbox]');
+      var focusable = el.querySelectorAll('a[href], button');
       var first = focusable[0];
       var last = focusable[focusable.length - 1];
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
