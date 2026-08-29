@@ -81,16 +81,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://glowresearch.shop/peptides/glp-1-sm/</loc>
-    <lastmod>2026-08-29</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://glowresearch.shop/peptides/glp-2-tr/</loc>
-    <lastmod>2026-08-29</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://glowresearch.shop/peptides/glp-3-rt/</loc>
     <lastmod>2026-08-29</lastmod>
     <priority>0.8</priority>
@@ -101,7 +91,17 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://glowresearch.shop/peptides/glp-1-sm/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://glowresearch.shop/peptides/tesamorelin/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://glowresearch.shop/peptides/glp-2-tr/</loc>
     <lastmod>2026-08-29</lastmod>
     <priority>0.8</priority>
   </url>

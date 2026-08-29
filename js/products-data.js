@@ -390,14 +390,15 @@ const GLOW_PRODUCTS = [
   // sort, so it is the actual answer to "what does a visitor see first."
   //
   // Leads with the tissue-repair peptides and their blend, then the GLP
-  // metabolic-research compounds, then the two-item secretagogue group and
-  // MOTS-C on its own. Same reasoning as dropping "Metabolic Research" from
-  // the catalog's category chips on peptides.html: three GLP receptor
-  // agonists first, above everything else, reads like a weight-loss
-  // storefront rather than a peptide research supplier. The badge each
-  // product carries (Best Seller, Popular, Best Value) is editorial and no
-  // longer double as a ranking signal for this order; it still has to stay
-  // rare enough to mean something, which tools/check-claims.js enforces
+  // compounds interleaved with the secretagogue and longevity products
+  // rather than run together. Three GLP receptor agonists back to back in
+  // the grid reads as a weight-loss storefront's product line, the same
+  // concern behind dropping "Metabolic Research" from the catalog's chips
+  // and the per-product research-category tag; spacing them out is the same
+  // decision applied to layout instead of labeling. The badge each product
+  // carries (Best Seller, Popular, Best Value) is editorial and does not
+  // double as a ranking signal for this order; it still has to stay rare
+  // enough to mean something, which tools/check-claims.js enforces
   // separately.
   { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.815%', lot: '5567', badge:'Best Value',
     coa: 'assets/coas/ghk-cu-lot-5567.pdf', coaRef: 'D69A-YY5F', tested: '6 July 2026',
@@ -458,34 +459,6 @@ const GLOW_PRODUCTS = [
       { t: 'Co-formulation research', d: 'Used by laboratories studying multiple compounded peptides delivered from a single vial rather than several discrete kits.' },
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials when comparing blended and separately administered research protocols.' }
     ] },
-  { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:'Popular',
-    coa: 'assets/coas/glp-1-sm-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
-    results: { Identity: 'Conforms', Quantity: '11.96 mg' },
-    sizes: [{ mg: '10mg', price: 64.99, list: 72, sku: 'GLO-SM10', image: 'assets/products/glp-1-sm-10mg-v3.webp' }],
-    blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
-    about: [
-      'GLP-1 (SM) is Glow’s designation for a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
-      'Those two modifications are why it behaves so differently from native GLP-1 across a time course, and usually why it is the chosen comparator.'
-    ],
-    research: [
-      { t: 'Incretin receptor signalling', d: 'Used in cAMP accumulation and beta-arrestin recruitment assays at the GLP-1 receptor.' },
-      { t: 'Albumin binding', d: 'Studied for how the fatty acid chain alters distribution and persistence in model systems.' },
-      { t: 'Metabolic pathway research', d: 'Applied in islet and hepatocyte culture models examining downstream incretin signalling.' }
-    ] },
-  { name: 'GLP-2 (TR)', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
-    coa: 'assets/coas/glp-2-tr-lot-1600.pdf', coaRef: '7RRU-W2LV', tested: '29 July 2026',
-    results: { Identity: 'Conforms', Quantity: '12.49 mg' },
-    sizes: [{ mg: '10mg', price: 72.99, list: 81, sku: 'GLO-T10', image: 'assets/products/glp-2-tr-10mg-v3.webp' }],
-    blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
-    about: [
-      'GLP-2 (TR) is Glow’s designation for a dual receptor co-agonist peptide, active at both the GIP and the GLP-1 receptor from a single molecule.',
-      'Single-molecule co-agonists are studied precisely because the two receptors can be engaged at different relative potencies, which is difficult to reproduce by simply combining two separate agonists.'
-    ],
-    research: [
-      { t: 'Co-agonist pharmacology', d: 'Used to characterise relative potency at the GIP and GLP-1 receptors from one molecule.' },
-      { t: 'Biased signalling', d: 'Studied for the balance between G-protein coupling and beta-arrestin recruitment at each receptor.' },
-      { t: 'Receptor crosstalk', d: 'Applied in models examining how engaging both receptors at once differs from either alone.' }
-    ] },
   { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:'Best Seller',
     coa: 'assets/coas/glp-3-rt-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
@@ -516,6 +489,20 @@ const GLOW_PRODUCTS = [
       { t: 'Co-formulation stability', d: 'Studied for how the two peptides behave when reconstituted and stored from a single vial.' },
       { t: 'Comparative pulse studies', d: 'Applied alongside single-compound vials in models comparing combined and separate administration protocols.' }
     ] },
+  { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:'Popular',
+    coa: 'assets/coas/glp-1-sm-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
+    results: { Identity: 'Conforms', Quantity: '11.96 mg' },
+    sizes: [{ mg: '10mg', price: 64.99, list: 72, sku: 'GLO-SM10', image: 'assets/products/glp-1-sm-10mg-v3.webp' }],
+    blurb: 'A GLP-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
+    about: [
+      'GLP-1 (SM) is Glow’s designation for a GLP-1 receptor agonist analogue. Two structural differences from native GLP-1 matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
+      'Those two modifications are why it behaves so differently from native GLP-1 across a time course, and usually why it is the chosen comparator.'
+    ],
+    research: [
+      { t: 'Incretin receptor signalling', d: 'Used in cAMP accumulation and beta-arrestin recruitment assays at the GLP-1 receptor.' },
+      { t: 'Albumin binding', d: 'Studied for how the fatty acid chain alters distribution and persistence in model systems.' },
+      { t: 'Metabolic pathway research', d: 'Applied in islet and hepatocyte culture models examining downstream incretin signalling.' }
+    ] },
   { name: 'Tesamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.36%', lot: '1002', badge:null,
     coa: 'assets/coas/tesamorelin-lot-1002.pdf', coaRef: 'R934-S6U9', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.59 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
@@ -529,6 +516,20 @@ const GLOW_PRODUCTS = [
       { t: 'GHRH receptor binding', d: 'Used in receptor occupancy and activation assays at the pituitary GHRH receptor, alongside other GHRH analogues.' },
       { t: 'DPP-4 resistance', d: 'Studied for resistance to enzymatic cleavage relative to native GHRH, and how that changes assay-window duration.' },
       { t: 'Comparative secretagogue pharmacology', d: 'Run as a reference GHRH analogue when newer compounds in the class are characterised.' }
+    ] },
+  { name: 'GLP-2 (TR)', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
+    coa: 'assets/coas/glp-2-tr-lot-1600.pdf', coaRef: '7RRU-W2LV', tested: '29 July 2026',
+    results: { Identity: 'Conforms', Quantity: '12.49 mg' },
+    sizes: [{ mg: '10mg', price: 72.99, list: 81, sku: 'GLO-T10', image: 'assets/products/glp-2-tr-10mg-v3.webp' }],
+    blurb: 'A dual GIP and GLP-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
+    about: [
+      'GLP-2 (TR) is Glow’s designation for a dual receptor co-agonist peptide, active at both the GIP and the GLP-1 receptor from a single molecule.',
+      'Single-molecule co-agonists are studied precisely because the two receptors can be engaged at different relative potencies, which is difficult to reproduce by simply combining two separate agonists.'
+    ],
+    research: [
+      { t: 'Co-agonist pharmacology', d: 'Used to characterise relative potency at the GIP and GLP-1 receptors from one molecule.' },
+      { t: 'Biased signalling', d: 'Studied for the balance between G-protein coupling and beta-arrestin recruitment at each receptor.' },
+      { t: 'Receptor crosstalk', d: 'Applied in models examining how engaging both receptors at once differs from either alone.' }
     ] },
   { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.84%', lot: '1025', badge:null,
     coa: 'assets/coas/mots-c-lot-1025.pdf', coaRef: 'N8VT-H88T', tested: '5 July 2026',
