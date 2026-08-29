@@ -10,7 +10,7 @@ No dependencies to install. Everything here is plain Node.
 node tools/build.js          # the usual one: FAQ + products (when live) + sitemap + audit
 node tools/build-meta.js     # every copy of each page's title + description
 node tools/build-faq.js      # homepage FAQ markup + FAQPage schema
-node tools/build-catalog.js  # peptides.html grid + CollectionPage schema
+node tools/build-catalog.js  # shop.html grid + CollectionPage schema
 node tools/build-llms.js     # llms.txt
 node tools/build-products.js # one page per compound
 node tools/build-sitemap.js  # sitemap.xml on its own
@@ -166,7 +166,7 @@ to keep honest.
 
 ## `build-catalog.js`
 
-Bakes the product grid into `peptides.html` from `productCardHtml()`, the same
+Bakes the product grid into `shop.html` from `productCardHtml()`, the same
 function `renderProductGrid()` uses, plus `CollectionPage` + `ItemList`
 structured data.
 

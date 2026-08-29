@@ -39,10 +39,11 @@ function lastCommitDate(relPath) {
   }
 }
 
-// [path, priority] — path is relative to the site root, '' being the homepage.
+// [path, priority] — path is relative to the site root and to the actual
+// filename on disk, '' being the homepage.
 const STATIC_PAGES = [
   ['', '1.0'],
-  ['peptides.html', '0.9'],
+  ['shop.html', '0.9'],
   // The certificate index. Missing from this list until the certificates were
   // actually hosted, when it stopped being a page with nothing on it.
   ['coa.html', '0.8'],
@@ -56,6 +57,13 @@ const STATIC_PAGES = [
   ['ruo-agreement.html', '0.3'],
   ['shipping-policy.html', '0.3'],
 ];
+
+// A file on disk can serve at a different, extensionless address — shop.html
+// is /shop, the same rewrite vercel.json uses to route the request there.
+// STATIC_PAGES keeps the real filename throughout (existsSync and the git
+// lastmod lookup both need it); only the <loc> written to the sitemap reads
+// this map, so the one page with a clean URL gets it there too.
+const CLEAN_URL = { 'shop.html': 'shop' };
 
 function url(loc, lastmod, priority) {
   return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n` +
@@ -82,7 +90,7 @@ function build() {
 
   const urls = [
     ...STATIC_PAGES.map(([p, pri]) =>
-      url(`${SITE}/${p}`, lastCommitDate(p || 'index.html') || today, pri)),
+      url(`${SITE}/${CLEAN_URL[p] || p}`, lastCommitDate(p || 'index.html') || today, pri)),
     // Products rank above articles: they are the pages the catalog exists for.
     // Listed only once the pages are actually published — advertising nine URLs
     // that are not in the repo would be nine 404s handed straight to Google.
@@ -105,7 +113,7 @@ function write() {
   return (xml.match(/<url>/g) || []).length;
 }
 
-module.exports = { build, write, STATIC_PAGES };
+module.exports = { build, write, STATIC_PAGES, CLEAN_URL };
 
 // Runnable on its own as well as importable.
 if (require.main === module) {

@@ -37,7 +37,7 @@ const PAGE_META = {
     title: 'Glow Research | Research-Grade Peptides',
     desc: 'You must be 21 or older to enter. Glow Research supplies research compounds strictly for in-vitro laboratory use, not for human or veterinary consumption.',
   },
-  'peptides.html': {
+  'shop.html': {
     name: 'Full Catalog',
     title: t('Full Catalog'),
     desc: 'Browse the full Glow Research peptide catalog: growth, tissue, cognitive, and metabolic research compounds. Every lot is tested by an independent third-party laboratory.',

@@ -1,6 +1,6 @@
 // ===================== Glow Research — shared product catalog =====================
 // Used by both the homepage catalog preview (index.html) and the full
-// catalog page (peptides.html) so the product list only lives in one place.
+// catalog page (shop.html, served at /shop) so the product list only lives in one place.
 
 // `blurb` describes what each compound *is* and how it is studied, in two short
 // sentences. It must stay structural and in-vitro framed: no dosing, no human
@@ -1202,12 +1202,12 @@ function batchPanelHtml(p) {
 // category (CAT_LABEL) and link back to it. Kept as a named chokepoint
 // rather than every caller reading p.cat directly, so a future split (e.g.
 // two flavors of "growth") only has to change one place. No longer read by
-// peptides.html's own chip row — see productKind() below for that.
+// shop.html's own chip row — see productKind() below for that.
 function catFilterGroup(cat) {
   return cat;
 }
 
-// Which chip on peptides.html a product falls under. Two groups, both
+// Which chip on shop.html a product falls under. Two groups, both
 // visible in the data already rather than invented for this: a blend is
 // exactly a product tagged 'Peptide Blend', the same tag its product card
 // already shows. Kept to two groups on purpose — the four research
@@ -1469,8 +1469,11 @@ function pageHref(file) {
   if (typeof document === 'undefined') return file;
   // A full URL is already absolute and must not be walked up out of.
   if (/^(https?:)?\/\//.test(file) || /^(mailto:|tel:|data:|#|\/)/.test(file)) return file;
-  const link = document.querySelector('#mainNav a[href$="peptides.html"]');
-  const prefix = link ? link.getAttribute('href').replace(/peptides\.html$/, '') : '';
+  // The catalog link is the one nav item with no .html extension (it serves
+  // through the /shop rewrite in vercel.json), so it is the one link whose
+  // own href can be stripped down to the depth prefix every other page needs.
+  const link = document.querySelector('#mainNav a[href$="shop"]');
+  const prefix = link ? link.getAttribute('href').replace(/shop$/, '') : '';
   return prefix + file;
 }
 
@@ -1639,7 +1642,7 @@ function renderProductGrid(gridEl, filter, opts) {
   if (opts.limit) list = list.slice(0, opts.limit);
 
   // Rendered as one string so the same function can produce the markup
-  // tools/build-catalog.js bakes into peptides.html. Behaviour is bound below,
+  // tools/build-catalog.js bakes into shop.html. Behaviour is bound below,
   // to cards that already exist, rather than arriving with them.
   gridEl.innerHTML = list.map((p, i) => productCardHtml(p, i)).join('');
 

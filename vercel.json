@@ -1,7 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/welcome", "destination": "/welcome.html" }
+    { "source": "/welcome", "destination": "/welcome.html" },
+    { "source": "/shop", "destination": "/shop.html" }
   ],
   "headers": [
     {
@@ -18,6 +19,12 @@
     },
     {
       "source": "/welcome",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/shop",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]

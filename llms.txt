@@ -75,7 +75,7 @@ No. Not for use in humans or animals. Laboratory and in-vitro research only, sol
 
 ## Pages
 
-- [Products](https://glowresearch.shop/peptides.html): the full catalog
+- [Products](https://glowresearch.shop/shop): the full catalog
 - [Certificates](https://glowresearch.shop/coa.html): every compound's certificate of analysis, searchable by compound or lot
 - [Our process](https://glowresearch.shop/how-we-test.html): what is tested on every lot, who runs it, and what is not tested
 - [About](https://glowresearch.shop/about.html): where Glow sits in the chain, and the five published principles

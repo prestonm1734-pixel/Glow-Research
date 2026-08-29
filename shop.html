@@ -10,12 +10,12 @@
 <title>Full Catalog | Glow Research</title>
 <meta name="description" content="Browse the full Glow Research peptide catalog: growth, tissue, cognitive, and metabolic research compounds. Every lot is tested by an independent third-party laboratory." />
 <meta name="robots" content="index,follow" />
-<link rel="canonical" href="https://glowresearch.shop/peptides.html" />
+<link rel="canonical" href="https://glowresearch.shop/shop" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
 <meta property="og:title" content="Full Catalog" />
 <meta property="og:description" content="Browse the full Glow Research peptide catalog: growth, tissue, cognitive, and metabolic research compounds. Every lot is tested by an independent third-party laboratory." />
-<meta property="og:url" content="https://glowresearch.shop/peptides.html" />
+<meta property="og:url" content="https://glowresearch.shop/shop" />
 <meta property="og:image" content="https://glowresearch.shop/assets/vial-trio-black-v2.jpg" />
 <meta property="og:image:width" content="1672" />
 <meta property="og:image:height" content="941" />
@@ -34,8 +34,8 @@
 {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  "@id": "https://glowresearch.shop/peptides.html#webpage",
-  "url": "https://glowresearch.shop/peptides.html",
+  "@id": "https://glowresearch.shop/shop#webpage",
+  "url": "https://glowresearch.shop/shop",
   "name": "Full Catalog",
   "description": "Browse the full Glow Research peptide catalog: growth, tissue, cognitive, and metabolic research compounds. Every lot is tested by an independent third-party laboratory.",
   "isPartOf": {
@@ -57,7 +57,7 @@
         "@type": "ListItem",
         "position": 2,
         "name": "Catalog",
-        "item": "https://glowresearch.shop/peptides.html"
+        "item": "https://glowresearch.shop/shop"
       }
     ]
   },
@@ -157,7 +157,7 @@
     <a href="index.html" class="logo" aria-label="Glow Research home">Glow<span class="spark">✦</span></a>
 
     <nav class="main-nav" id="mainNav">
-      <a href="peptides.html" class="active">Catalog</a>
+      <a href="shop" class="active">Catalog</a>
       <a href="coa.html">COA</a>
       <a href="shipping.html">Shipping</a>
       <a href="wholesale.html">Wholesale</a>
@@ -428,7 +428,7 @@
       </div>
       <div class="footer-col">
         <h4>Catalog</h4>
-        <a href="peptides.html">All Peptides</a>
+        <a href="shop">All Peptides</a>
         <a href="wholesale.html">Wholesale</a>
       </div>
       <div class="footer-col">
@@ -526,7 +526,7 @@
   if (qParam) searchInput.value = qParam;
 
   // ?cat= is the other half of that promise: every product page's breadcrumb
-  // links its category back here as peptides.html?cat=<group>, which only
+  // links its category back here as shop?cat=<group>, which only
   // means something if this page actually lands on that filter.
   const catParam = new URLSearchParams(location.search).get('cat');
   if (catParam) {

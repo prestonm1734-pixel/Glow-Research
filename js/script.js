@@ -28,7 +28,7 @@ hamburger.addEventListener('click', () => {
 });
 mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mainNav.classList.remove('open')));
 
-/* ---------- product data (shared with peptides.html via products-data.js) ---------- */
+/* ---------- product data (shared with shop.html via products-data.js) ---------- */
 const grid = document.getElementById('productGrid');
 
 function renderProducts(filter) {

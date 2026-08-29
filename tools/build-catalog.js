@@ -3,8 +3,8 @@
 //
 //   node tools/build-catalog.js
 //
-// Bakes the product grid into peptides.html, plus CollectionPage + ItemList
-// structured data.
+// Bakes the product grid into shop.html (served at /shop), plus
+// CollectionPage + ItemList structured data.
 //
 // Why. The catalog page was 1,037 characters of text to anyone who did not run
 // JavaScript, and named none of the nine compounds: the grid was drawn into an
@@ -22,14 +22,18 @@
 //   js/products-data.js   GLOW_PRODUCTS and productCardHtml()
 //
 // Output (rewritten in place):
-//   peptides.html         #productGrid contents, and the CollectionPage script
+//   shop.html              #productGrid contents, and the CollectionPage script
 
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const SITE = 'https://glowresearch.shop';
-const PAGE = 'peptides.html';
+const PAGE = 'shop.html';
+// The clean address the page is actually served at (vercel.json rewrites
+// /shop to shop.html) — every URL this file writes into structured data uses
+// this, not PAGE, which stays the on-disk filename for reads and writes.
+const URL_PATH = 'shop';
 const MARK = 'catalog-jsonld';
 
 const {
@@ -55,8 +59,8 @@ function catalogJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    '@id': `${SITE}/${PAGE}#webpage`,
-    url: `${SITE}/${PAGE}`,
+    '@id': `${SITE}/${URL_PATH}#webpage`,
+    url: `${SITE}/${URL_PATH}`,
     name: PAGE_META[PAGE].name,
     description: PAGE_META[PAGE].desc,
     isPartOf: { '@id': `${SITE}/#website` },
@@ -65,7 +69,7 @@ function catalogJsonLd() {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
-        { '@type': 'ListItem', position: 2, name: 'Catalog', item: `${SITE}/${PAGE}` },
+        { '@type': 'ListItem', position: 2, name: 'Catalog', item: `${SITE}/${URL_PATH}` },
       ],
     },
     mainEntity: {

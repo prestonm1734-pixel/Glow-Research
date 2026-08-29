@@ -108,7 +108,7 @@ ${faq}
 
 ## Pages
 
-- [Products](${SITE}/peptides.html): the full catalog
+- [Products](${SITE}/shop): the full catalog
 - [Certificates](${SITE}/coa.html): every compound's certificate of analysis, searchable by compound or lot
 - [Our process](${SITE}/how-we-test.html): what is tested on every lot, who runs it, and what is not tested
 - [About](${SITE}/about.html): where Glow sits in the chain, and the five published principles

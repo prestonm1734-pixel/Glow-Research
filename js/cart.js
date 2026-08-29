@@ -280,11 +280,11 @@
   // 404 from there. The nav already carries a correctly-depthed link, so lift
   // its prefix rather than tracking depth separately.
   function pageHref(file) {
-    const link = document.querySelector('#mainNav a[href$="peptides.html"]');
-    const prefix = link ? link.getAttribute('href').replace(/peptides\.html$/, '') : '';
+    const link = document.querySelector('#mainNav a[href$="shop"]');
+    const prefix = link ? link.getAttribute('href').replace(/shop$/, '') : '';
     return prefix + file;
   }
-  const catalogHref = () => pageHref('peptides.html');
+  const catalogHref = () => pageHref('shop');
 
   /* ---------- events ---------- */
 
