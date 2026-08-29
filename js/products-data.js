@@ -389,17 +389,30 @@ const GLOW_PRODUCTS = [
   // homepage's limit:8 preview slice and the catalog's default "Featured"
   // sort, so it is the actual answer to "what does a visitor see first."
   //
-  // Leads with the tissue-repair peptides and their blend, then the GLP
-  // compounds interleaved with the secretagogue and longevity products
-  // rather than run together. Three GLP receptor agonists back to back in
-  // the grid reads as a weight-loss storefront's product line, the same
-  // concern behind dropping "Metabolic Research" from the catalog's chips
-  // and the per-product research-category tag; spacing them out is the same
-  // decision applied to layout instead of labeling. The badge each product
-  // carries (Best Seller, Popular, Best Value) is editorial and does not
-  // double as a ranking signal for this order; it still has to stay rare
-  // enough to mean something, which tools/check-claims.js enforces
-  // separately.
+  // GLP-3 (RT) leads: the top product on the homepage. The other two GLP
+  // compounds stay spread through the rest of the list rather than grouped
+  // with it or each other, same reasoning as before, three GLP receptor
+  // agonists back to back reads as a weight-loss storefront's product line,
+  // which one leading card does not. The badge each product carries (Best
+  // Seller, Popular, Best Value) is editorial and does not double as a
+  // ranking signal for this order; it still has to stay rare enough to mean
+  // something, which tools/check-claims.js enforces separately.
+  { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:'Best Seller',
+    coa: 'assets/coas/glp-3-rt-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
+    results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
+    sizes: [
+      { mg: '10mg', price: 84.99, list: 94, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg-v3.webp' },
+    ],
+    blurb: 'A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile.',
+    about: [
+      'GLP-3 (RT) is Glow’s designation for a synthetic peptide agonist active at three receptors from one molecule: the GIP receptor, the GLP-1 receptor and the glucagon receptor.',
+      'Engaging the glucagon receptor alongside the two incretin receptors is what separates it from earlier co-agonists, and is why it is studied as a distinct pharmacological class rather than a variant of existing GLP-1 or GIP agonists.'
+    ],
+    research: [
+      { t: 'Triple receptor pharmacology', d: 'Used to characterise relative potency and selectivity across the GIP, GLP-1 and glucagon receptors from a single molecule.' },
+      { t: 'Glucagon receptor signalling', d: 'Studied in hepatocyte and cAMP assays for activity at the glucagon receptor, a target the two-receptor co-agonists do not engage.' },
+      { t: 'Comparative incretin pharmacology', d: 'Applied as a comparator when characterising newer multi-receptor agonists against single- and dual-receptor peptides.' }
+    ] },
   { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.815%', lot: '5567', badge:'Best Value',
     coa: 'assets/coas/ghk-cu-lot-5567.pdf', coaRef: 'D69A-YY5F', tested: '6 July 2026',
     results: { Identity: 'Conforms', Quantity: '56.93 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
@@ -458,22 +471,6 @@ const GLOW_PRODUCTS = [
     research: [
       { t: 'Co-formulation research', d: 'Used by laboratories studying multiple compounded peptides delivered from a single vial rather than several discrete kits.' },
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials when comparing blended and separately administered research protocols.' }
-    ] },
-  { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:'Best Seller',
-    coa: 'assets/coas/glp-3-rt-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
-    results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
-    sizes: [
-      { mg: '10mg', price: 84.99, list: 94, sku: 'GLO-RT10', image: 'assets/products/retatrutide-10mg-v3.webp' },
-    ],
-    blurb: 'A triple GIP, GLP-1 and glucagon receptor agonist peptide. Studied for its combined incretin and glucagon signalling profile.',
-    about: [
-      'GLP-3 (RT) is Glow’s designation for a synthetic peptide agonist active at three receptors from one molecule: the GIP receptor, the GLP-1 receptor and the glucagon receptor.',
-      'Engaging the glucagon receptor alongside the two incretin receptors is what separates it from earlier co-agonists, and is why it is studied as a distinct pharmacological class rather than a variant of existing GLP-1 or GIP agonists.'
-    ],
-    research: [
-      { t: 'Triple receptor pharmacology', d: 'Used to characterise relative potency and selectivity across the GIP, GLP-1 and glucagon receptors from a single molecule.' },
-      { t: 'Glucagon receptor signalling', d: 'Studied in hepatocyte and cAMP assays for activity at the glucagon receptor, a target the two-receptor co-agonists do not engage.' },
-      { t: 'Comparative incretin pharmacology', d: 'Applied as a comparator when characterising newer multi-receptor agonists against single- and dual-receptor peptides.' }
     ] },
   { name: 'CJC-1295 No DAC/Ipamorelin', tag: 'Peptide Blend', cat: 'growth', purity: '99.08%', lot: '005', badge:null,
     coa: 'assets/coas/cjc-1295-no-dac-ipamorelin-lot-005.pdf', coaRef: 'MHCU-CDXL', tested: '5 July 2026',
