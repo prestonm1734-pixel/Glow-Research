@@ -35,7 +35,7 @@ const PAGE_META = {
   'index.html': {
     name: 'Glow Research | Research-Grade Peptides',
     title: 'Glow Research | Research-Grade Peptides',
-    desc: 'Glow Research supplies research-grade peptides for laboratory and in-vitro research use only. Manufacturing partner, third-party tested lots, orders shipped within a day.',
+    desc: 'You must be 21 or older to enter. Glow Research supplies research compounds strictly for in-vitro laboratory use, not for human or veterinary consumption.',
   },
   'peptides.html': {
     name: 'Full Catalog',
