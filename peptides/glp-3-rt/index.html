@@ -182,13 +182,6 @@
   }
 
   /* ---------- buy box ---------- */
-  /* A light badge, not the bold black label the size/lot fields below use —
-     this is orientation (which shelf this is on), not a spec being asserted. */
-  .pd-tag{
-    font-size:0.68rem; color:#8a8a86; text-transform:uppercase; letter-spacing:.12em; font-weight:700;
-    display:inline-block; font-family:'JetBrains Mono', monospace; margin-bottom:12px;
-    background:#f4f4f2; border:1px solid rgba(0,0,0,.08); padding:5px 10px;
-  }
   .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:600; margin: 0 0 2px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
   .pd-alias{ font-size: 1rem; color:#8a8a86; margin: 0 0 10px; }
   .pd-alias:empty{ display:none; }
@@ -816,7 +809,6 @@
            is, what it costs, which size, buy. Everything else is reference
            material and sits underneath. -->
       <div class="pd-right">
-        <span class="pd-tag" id="pdTag">Metabolic Research</span>
         <h1 class="pd-name" id="pdName">GLP-3 (RT)</h1>
         <!-- Glow's own shorthand, not what most people searching for the
              compound type into a search bar. Empty and collapsed for a

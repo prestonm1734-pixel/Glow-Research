@@ -18,8 +18,6 @@
   // figures in words, so they are sitewide constants rather than ones this
   // file owns and the others restate.
 
-  // CAT_LABEL comes from js/products-data.js, loaded before this file.
-
   let product = null;
   let sizeIndex = 0;
   let qty = 1;
@@ -138,11 +136,6 @@
   }
 
   function renderHeader(p) {
-    // The research category (Metabolic, Tissue…), not p.tag — p.tag is only
-    // set on blends ("Peptide Blend") and is null for most single compounds,
-    // which used to leave this badge silently blank. CAT_LABEL always has an
-    // entry (check-claims.js enforces it), so this is never empty.
-    $('pdTag').textContent = CAT_LABEL[p.cat];
     $('pdName').textContent = p.name;
     $('pdAlias').textContent = p.alias || '';
     $('pdDesc').textContent = p.blurb;

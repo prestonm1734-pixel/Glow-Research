@@ -280,7 +280,6 @@ function buildProduct(p, donor) {
 
   /* --- content a crawler must see without running scripts --- */
   html = setText(html, 'pdCrumbName', esc(p.name));
-  html = setText(html, 'pdTag', esc(CAT_LABEL[p.cat]));
   html = fillEmpty(html, 'pdRenderNote', esc(VIAL_ART_NOTICE));
   html = setText(html, 'pdName', esc(p.name));
   html = fillEmpty(html, 'pdAlias', p.alias ? esc(p.alias) : '');
