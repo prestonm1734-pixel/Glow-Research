@@ -34,7 +34,7 @@ const MARK = 'catalog-jsonld';
 
 const {
   GLOW_PRODUCTS, productCardHtml, productHref, salePrice, onSaleNow,
-  sizeInStock, PRODUCT_PAGES_LIVE, CAT_LABEL, catFilterGroup,
+  sizeInStock, PRODUCT_PAGES_LIVE, productKind,
 } = require(path.join(ROOT, 'js/products-data.js'));
 // The page's name and description come from the one place every other copy of
 // them comes from, so this block cannot describe the catalog differently from
@@ -84,19 +84,20 @@ function catalogJsonLd() {
   };
 }
 
-// One chip per research category actually in the catalog, ranked by how many
-// compounds sit in it — the category the catalog is deepest in reads first,
-// same reasoning as the GLP-3 (RT) reorder in GLOW_PRODUCTS itself. "All"
-// always leads regardless of count.
+// "All", then "Blends" only if the catalog actually has one. Deliberately
+// not one chip per research category (CAT_LABEL): with under a dozen SKUs,
+// four intent labels (Tissue Research, Metabolic Research, and so on) read
+// as the catalog interpreting what its own products are for rather than
+// helping anyone browse, and specifically put every GLP compound under a
+// label sitting next to "Metabolic," which reads more like a therapeutic
+// storefront than a research supplier. What a co-formulation actually is —
+// a blend, tagged 'Peptide Blend' on its own card already — needs no
+// interpretation, so that is the one split kept.
 function filterChipsHtml() {
-  const counts = {};
-  GLOW_PRODUCTS.forEach(p => { counts[p.cat] = (counts[p.cat] || 0) + 1; });
-  const cats = [...new Set(GLOW_PRODUCTS.map(p => p.cat))]
-    .sort((a, b) => counts[b] - counts[a]);
-  const chips = cats
-    .map(c => `<button class="chip" data-cat="${catFilterGroup(c)}" aria-pressed="false">${CAT_LABEL[c]}</button>`)
-    .join('\n      ');
-  return `<button class="chip active" data-cat="all" aria-pressed="true">All</button>\n      ${chips}`;
+  const blendCount = GLOW_PRODUCTS.filter(p => productKind(p) === 'blends').length;
+  const all = `<button class="chip active" data-cat="all" aria-pressed="true">All</button>`;
+  if (!blendCount) return all;
+  return `${all}\n      <button class="chip" data-cat="blends" aria-pressed="false">Blends</button>`;
 }
 
 function build() {
