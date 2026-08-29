@@ -32,7 +32,10 @@ mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mai
 const grid = document.getElementById('productGrid');
 
 function renderProducts(filter) {
-  renderProductGrid(grid, filter, { observeReveal, limit: 8 });
+  // The homepage leads with GLP-3 (RT) specifically, which is not the same
+  // thing as GLOW_PRODUCTS' own curated order — that order is the catalog
+  // page's default sort, and the two pages want different first impressions.
+  renderProductGrid(grid, filter, { observeReveal, limit: 8, featureFirst: 'GLP-3 (RT)' });
 }
 
 renderProducts('all');
