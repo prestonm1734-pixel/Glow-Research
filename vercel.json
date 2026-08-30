@@ -4,6 +4,10 @@
     { "source": "/welcome", "destination": "/welcome.html" },
     { "source": "/shop", "destination": "/shop.html" }
   ],
+  "redirects": [
+    { "source": "/peptides/:slug/", "destination": "/product/:slug/", "permanent": true },
+    { "source": "/peptides/:slug", "destination": "/product/:slug", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -36,7 +40,7 @@
       ]
     },
     {
-      "source": "/peptides/(.*)",
+      "source": "/product/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]

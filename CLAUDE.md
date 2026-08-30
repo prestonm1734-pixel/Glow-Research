@@ -40,7 +40,7 @@ node tools/check-claims.js   # promise audit, run before every commit
 
 All three live in `js/products-data.js` and are read by browser and build alike.
 
-- **`PRODUCT_PAGES_LIVE`:** gates the generated `peptides/<slug>/` pages. False
+- **`PRODUCT_PAGES_LIVE`:** gates the generated `product/<slug>/` pages. False
   until the supplier import lands. While false, catalog and search links point
   at `product.html?p=<slug>` and the sitemap omits product URLs.
 - **`COAS_PUBLISHED`:** gates *certificate evidence*, not the testing claim.

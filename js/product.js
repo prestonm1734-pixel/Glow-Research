@@ -26,7 +26,7 @@
 
   const size = () => product.sizes[sizeIndex];
 
-  // Generated pages (peptides/<slug>/index.html, built by
+  // Generated pages (product/<slug>/index.html, built by
   // tools/build-products.js) carry their slug on <body data-product-slug> and
   // have the content already in the markup — this render hydrates it in place.
   // The bare product.html?p=<slug> URL still works and is the fallback.
@@ -560,14 +560,14 @@
   /* ================= canonical =================
      Generated pages ship a static canonical pointing at themselves, so this
      does nothing there. It exists for the legacy product.html?p=<slug> URL,
-     which serves the same content as /peptides/<slug>/ and would otherwise
+     which serves the same content as /product/<slug>/ and would otherwise
      compete with it in the index. */
 
   function setCanonical(p) {
     if (document.querySelector('link[rel="canonical"]')) return;
     const link = document.createElement('link');
     link.rel = 'canonical';
-    link.href = new URL(`peptides/${productSlug(p.name)}/`, location.origin).href;
+    link.href = new URL(`product/${productSlug(p.name)}/`, location.origin).href;
     document.head.appendChild(link);
   }
 

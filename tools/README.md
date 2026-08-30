@@ -155,7 +155,7 @@ Writes every copy of a page's title and description from the one entry in
 `WebPage`-family structured data. Four to six copies of two strings, written
 once.
 
-They had already drifted: the structured data added to peptides, shipping,
+They had already drifted: the structured data added to shop, shipping,
 wholesale, product and contact described those pages differently from their own
 meta tags, on the day it was written. Edit `page-meta.js`, run the build.
 
@@ -188,7 +188,7 @@ it is ever the only place something is stated, that is a bug.
 
 ## `build-products.js`
 
-Generates one real, crawlable page per compound at `peptides/<slug>/index.html`.
+Generates one real, crawlable page per compound at `product/<slug>/index.html`.
 
 Reads the catalog from `js/products-data.js`, the same file the browser loads,
 through the CommonJS guard at the foot of it, and lifts the whole of
@@ -245,7 +245,7 @@ sitemap and the generator can never disagree.
    stock field behaves exactly as the site does today.
 5. Add `sku` to the `Product` schema once the fulfilment partner supplies them.
 6. Set `PRODUCT_PAGES_LIVE = true`, run `node tools/build.js`, and commit
-   `peptides/**` along with the updated `sitemap.xml`.
+   `product/**` along with the updated `sitemap.xml`.
 7. Check the generated pages (prices, sizes, purity, images, certificate
    links) before anything is submitted for indexing.
 8. Submit the sitemap in Search Console.
@@ -282,7 +282,7 @@ href exists.
 
 One hand edit comes with the flip: `product.html` is the donor every generated
 page is cut from, so it cannot regenerate its own evidence panel the way
-`peptides/<slug>/` does. `check-claims.js` catches the stale panel and prints
+`product/<slug>/` does. `check-claims.js` catches the stale panel and prints
 the exact markup to paste into `<dl id="pdEvidence">`, so it is a copy out of
 the build output rather than something to work out.
 

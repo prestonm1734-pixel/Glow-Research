@@ -17,7 +17,7 @@
 //                         one place and a change there propagates on rebuild
 //
 // Outputs:
-//   peptides/<slug>/index.html   -> clean /peptides/<slug>/ URLs
+//   product/<slug>/index.html   -> clean /product/<slug>/ URLs
 //
 // The generated page still loads js/product.js and hydrates exactly as before
 // — the size picker, bulk tiers and delivery estimate are all still live. The
@@ -31,7 +31,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const SITE = 'https://glowresearch.shop';
 const SHELL_DONOR = 'product.html';
-const OUT_DIR = 'peptides';
+const OUT_DIR = 'product';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, hasList, listPriceOf, PRODUCT_PAGES_LIVE,
@@ -114,7 +114,7 @@ function setInner(html, id, tag, content) {
   return html.replace(re, (m, open, close) => open + content + close);
 }
 
-// Prefix root-relative URLs so they resolve from peptides/<slug>/.
+// Prefix root-relative URLs so they resolve from product/<slug>/.
 // Rewrites root-relative asset paths for pages nested a directory deep.
 function rewriteDepth(html, depth) {
   if (depth === 0) return html;
@@ -291,7 +291,7 @@ function buildProduct(p, donor) {
   // nothing else, the same gap build-catalog.js exists to close for the
   // catalog grid. Baked in root-relative, like every other asset path here,
   // so the rewriteDepth() pass at the end of this function still prefixes it
-  // correctly for peptides/<slug>/.
+  // correctly for product/<slug>/.
   html = required(html, /<img class="pd-photo" id="pdPhoto"[^>]*\/>/, '#pdPhoto')
     .replace(/<img class="pd-photo" id="pdPhoto"[^>]*\/>/,
       `<img class="pd-photo" id="pdPhoto" src="${esc((s && s.image) || p.image)}" alt="${esc(p.name)} ${esc(s.mg)} vial" />`);
@@ -351,7 +351,7 @@ if (!PRODUCT_PAGES_LIVE) {
     'product.html?p=<slug>, which serves the same product from the same data.\n' +
     '\n' +
     'To launch: import the real catalog, fill COA_URL (or a per-product `coa`),\n' +
-    'set PRODUCT_PAGES_LIVE = true, re-run this build, and commit peptides/**.'
+    'set PRODUCT_PAGES_LIVE = true, re-run this build, and commit product/**.'
   );
   // Still refresh the sitemap: the flag governs it too, so this keeps the
   // committed sitemap honest whichever build was run last.

@@ -97,8 +97,8 @@ function build() {
     // See PRODUCT_PAGES_LIVE in js/products-data.js.
     ...(PRODUCT_PAGES_LIVE
       ? GLOW_PRODUCTS.map(p => {
-          const rel = `peptides/${productSlug(p.name)}/index.html`;
-          return url(`${SITE}/peptides/${productSlug(p.name)}/`, lastCommitDate(rel) || today, '0.8');
+          const rel = `product/${productSlug(p.name)}/index.html`;
+          return url(`${SITE}/product/${productSlug(p.name)}/`, lastCommitDate(rel) || today, '0.8');
         })
       : []),
   ];

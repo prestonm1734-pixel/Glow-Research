@@ -239,7 +239,7 @@
     }
     if (cfg.onPlaced) cfg.onPlaced();
     // Depth-aware, and it has to be. This runs on the product page as well as
-    // checkout, and the product pages now live at /peptides/<slug>/, two
+    // checkout, and the product pages now live at /product/<slug>/, two
     // directories down. A bare "thank-you.html" resolved against that path,
     // so a wallet payment that had already been captured and already become an
     // order landed the buyer on a 404 instead of their confirmation. Nobody

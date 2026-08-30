@@ -24,7 +24,7 @@
 //     still one source.
 //   - Organization and WebSite on the homepage. They describe the company, not
 //     the page, and their description is a different sentence on purpose.
-//   - peptides/<slug>/ pages. build-products.js derives their metadata from the
+//   - product/<slug>/ pages. build-products.js derives their metadata from the
 //     catalog, which is the same principle applied to data that already exists.
 //
 // Pages with no entry are skipped, not failed: noindex pages have no share card

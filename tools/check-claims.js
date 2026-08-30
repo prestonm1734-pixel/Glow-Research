@@ -639,7 +639,7 @@ console.log('\nthe batch analysis panel');
   // differently from the generated string, and only the content has to match.
   const norm = s => s.replace(/\s+/g, ' ').replace(/> </g, '><').trim();
   // product.html is the donor every generated page is cut from, so it cannot
-  // regenerate itself the way peptides/<slug>/ does. Rather than leave that as
+  // regenerate itself the way product/<slug>/ does. Rather than leave that as
   // a step someone has to remember after flipping COAS_PUBLISHED or naming the
   // laboratory, the failure prints the markup to paste. Either stays a one-line
   // change plus a paste the build hands you, not a hunt.
@@ -1139,7 +1139,7 @@ console.log('\ncanonical addresses');
  * The generated product pages, once they are live.
  *
  *     Turning PRODUCT_PAGES_LIVE on gives every compound a second address:
- *     /peptides/<slug>/ and product.html?p=<slug> render the same content from
+ *     /product/<slug>/ and product.html?p=<slug> render the same content from
  *     the same catalog. That is fine as a fallback and a duplicate-content
  *     problem as an indexable page, so which of the two search engines are
  *     told to keep is checked rather than remembered.
@@ -1148,17 +1148,17 @@ if (PRODUCT_PAGES_LIVE) {
   console.log('\ngenerated product pages');
 
   const slugs = GLOW_PRODUCTS.map(p => productSlug(p.name));
-  const built = slugs.filter(sl => fs.existsSync(path.join(ROOT, 'peptides', sl, 'index.html')));
+  const built = slugs.filter(sl => fs.existsSync(path.join(ROOT, 'product', sl, 'index.html')));
   ok(`every compound has a generated page (${built.length}/${slugs.length})`,
     built.length === slugs.length,
     `missing: ${slugs.filter(sl => !built.includes(sl)).join(', ')}. Run node tools/build.js`);
 
-  const readPage = sl => read(path.join('peptides', sl, 'index.html'));
+  const readPage = sl => read(path.join('product', sl, 'index.html'));
 
   // The renderer must not compete with the pages generated from it.
   ok('product.html is noindex now that every compound has its own URL',
     /<meta name="robots" content="noindex/.test(read('product.html')),
-    'product.html?p=<slug> serves the same content as /peptides/<slug>/');
+    'product.html?p=<slug> serves the same content as /product/<slug>/');
 
   const notIndexed = built.filter(sl => !/<meta name="robots" content="index,follow"/.test(readPage(sl)));
   ok('every generated page is indexable',
@@ -1168,7 +1168,7 @@ if (PRODUCT_PAGES_LIVE) {
   // A canonical pointing at itself is what tells a crawler this address is the
   // one to keep, and it is the only thing separating these from the fallback.
   const badCanonical = built.filter(sl =>
-    !readPage(sl).includes(`<link rel="canonical" href="https://glowresearch.shop/peptides/${sl}/" />`));
+    !readPage(sl).includes(`<link rel="canonical" href="https://glowresearch.shop/product/${sl}/" />`));
   ok('every generated page is canonical to itself',
     badCanonical.length === 0, badCanonical.join(', '));
 
@@ -1212,7 +1212,7 @@ if (PRODUCT_PAGES_LIVE) {
   built.forEach(sl => {
     const html = readPage(sl);
     for (const m of html.matchAll(/(?:href|src)="((?!https?:|\/\/|mailto:|tel:|data:|#)[^"]+)"/g)) {
-      const target = path.join(ROOT, 'peptides', sl, m[1].split(/[?#]/)[0]);
+      const target = path.join(ROOT, 'product', sl, m[1].split(/[?#]/)[0]);
       if (/\.(png|jpe?g|webp|svg|css|js|pdf|woff2?)$/i.test(m[1]) && !fs.existsSync(target)) {
         brokenAsset.push(`${sl}: ${m[1]}`);
       }
@@ -3113,7 +3113,7 @@ console.log('\nprivacy disclosure');
  * invisible locally: nothing in the repo serves through it, so a source
  * pattern that quietly matches nothing looks identical to one that works.
  * The first version shipped with "/(.*).html", which matches /coa.html but
- * not "/" or /peptides/<slug>/, because those are directory URLs with no
+ * not "/" or /product/<slug>/, because those are directory URLs with no
  * ".html" anywhere in the path. The homepage and all ten product pages, the
  * pages that matter most, fell through with no cache rule at all.
  * ------------------------------------------------------------------------- */
@@ -3150,7 +3150,7 @@ console.log('\ndeploy headers');
   // the two checks under this one exist to catch, so the shape has to be
   // listed here for them to see it.
   const htmlUrls = ['/', '/coa.html', '/shop', '/welcome'].concat(
-    PRODUCT_PAGES_LIVE ? ['/peptides/' + productSlug(GLOW_PRODUCTS[0].name) + '/'] : []
+    PRODUCT_PAGES_LIVE ? ['/product/' + productSlug(GLOW_PRODUCTS[0].name) + '/'] : []
   );
   const assetUrls = ['/assets/fonts/sora.woff2'].concat(
     GLOW_PRODUCTS.filter(p => coaHref(p)).slice(0, 1).map(p => '/' + p.coa)
@@ -3214,9 +3214,9 @@ console.log('\ndeploy headers');
  * JavaScript is checked by neither, and js/express-pay.js carried a bare
  * "thank-you.html" that was correct for as long as it only ran on
  * checkout.html at the root. The product pages then moved to
- * /peptides/<slug>/ and started running the same file, so a wallet payment
+ * /product/<slug>/ and started running the same file, so a wallet payment
  * that had already been captured and turned into an order redirected the
- * buyer to /peptides/<slug>/thank-you.html and showed them a 404.
+ * buyer to /product/<slug>/thank-you.html and showed them a 404.
  * ------------------------------------------------------------------------- */
 /* The homepage hero video. Four properties, each of which is the difference
    between a background and a nuisance:
@@ -3451,7 +3451,7 @@ console.log('\nclient-side navigation');
   });
   ok('no script redirects to a bare relative page name',
     bare.length === 0,
-    bare.length ? `${bare.join(', ')} — route it through pageHref() so it resolves from /peptides/<slug>/ too` : '');
+    bare.length ? `${bare.join(', ')} — route it through pageHref() so it resolves from /product/<slug>/ too` : '');
 
   // The two that matter by name, checked positively rather than by absence, so
   // deleting the redirect does not read as a pass.
@@ -3495,7 +3495,7 @@ console.log('\nsitemap');
   ok('sitemap is not empty', locs.length > 0);
   ok('no duplicate URLs', new Set(locs).size === locs.length);
 
-  const products = locs.filter(u => /\/peptides\/[^/]+\/$/.test(u));
+  const products = locs.filter(u => /\/product\/[^/]+\/$/.test(u));
   ok(PRODUCT_PAGES_LIVE ? 'product URLs are listed' : 'held product URLs are not listed',
     PRODUCT_PAGES_LIVE ? products.length === GLOW_PRODUCTS.length : products.length === 0,
     `${products.length} product URLs`);

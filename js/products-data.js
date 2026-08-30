@@ -356,7 +356,7 @@ const COA_COPY = COAS_PUBLISHED ? {
 function coaHref(p) {
   if (!COAS_PUBLISHED) return '';
   // Through pageHref(), because the generated pages live at
-  // /peptides/<slug>/ and every caller puts this straight into the DOM. The
+  // /product/<slug>/ and every caller puts this straight into the DOM. The
   // static markup was rewritten to depth by the generator and then js/
   // product.js re-rendered the panel on load with the catalog's own root
   // paths, so a certificate that resolved for a crawler 404'd for a reader.
@@ -1427,7 +1427,7 @@ function findProductBySlug(slug) {
 // Launch switch for the per-compound pages.
 //
 // tools/build-products.js generates a real static page per product at
-// /peptides/<slug>/: its own URL, its own content in the served markup, its
+// /product/<slug>/: its own URL, its own content in the served markup, its
 // own Product schema. It was held back because crawlable pages carrying
 // placeholder prices and placeholder purity figures are worse than no pages.
 // The generator was never the missing part. The data was.
@@ -1450,7 +1450,7 @@ const PRODUCT_PAGES_LIVE = true;
 // so flipping the constant above moves the whole site at once.
 function productHref(p) {
   const slug = productSlug(p.name);
-  return pageHref(PRODUCT_PAGES_LIVE ? `peptides/${slug}/` : `product.html?p=${slug}`);
+  return pageHref(PRODUCT_PAGES_LIVE ? `product/${slug}/` : `product.html?p=${slug}`);
 }
 
 // Blog articles live two directories deep, so a bare "product.html" would
