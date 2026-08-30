@@ -1881,7 +1881,7 @@ console.log('\ncrawlable content');
   // A replacement *string* reads "$1" as a backreference, and every price the
   // site prints starts with a dollar: fmtPrice() emits "$116.10". That shipped
   // a catalog card reading `<div class="product-grid" id="productGrid">29` and
-  // a generated GLP3-RT page reading `id="pdPrice">16.10`. Replacer functions
+  // a generated product page reading `id="pdPrice">16.10`. Replacer functions
   // only, in every tool, forever.
   const unsafe = fs.readdirSync(path.join(ROOT, 'tools'))
     .filter(f => f.endsWith('.js'))

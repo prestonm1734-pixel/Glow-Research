@@ -86,7 +86,7 @@ function required(html, re, label) {
 // All three of these take a replacer function rather than a replacement
 // string. "$1" and "$2" in a replacement string are backreferences, and every
 // price starts with a dollar sign: fmtPrice() emits "$116.10", whose "$1" was
-// being substituted with capture group 1, so the generated GLP3-RT page read
+// being substituted with capture group 1, so a generated product page once read
 // `id="pdPrice">16.10` where its price should have been. A function receives
 // the groups as arguments and inserts the text literally, which is the only
 // form that is correct for arbitrary copy.

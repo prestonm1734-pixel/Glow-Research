@@ -92,7 +92,7 @@ function catalogJsonLd() {
 // not one chip per research category (CAT_LABEL): with under a dozen SKUs,
 // four intent labels (Tissue Research, Metabolic Research, and so on) read
 // as the catalog interpreting what its own products are for rather than
-// helping anyone browse, and specifically put every GLP compound under a
+// helping anyone browse, and specifically put every metabolic-receptor compound under a
 // label sitting next to "Metabolic," which reads more like a therapeutic
 // storefront than a research supplier. What a co-formulation actually is —
 // a blend, tagged 'Peptide Blend' on its own card already — needs no
