@@ -30,8 +30,8 @@ way through), then `check-claims.js`.
 prints starts with a dollar sign. `fmtPrice()` emits `$116.10`, whose `$1` was
 being substituted with capture group 1. That shipped a catalog card reading
 `<div class="product-grid" id="productGrid">29` and would have shipped a
-GLP3-RT page reading `id="pdPrice">16.10`. `check-claims.js` now fails on the
-pattern anywhere in `tools/`.
+generated product page reading `id="pdPrice">16.10`. `check-claims.js` now
+fails on the pattern anywhere in `tools/`.
 
 ## `check-claims.js`
 

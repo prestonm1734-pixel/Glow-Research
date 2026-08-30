@@ -786,9 +786,9 @@ button[disabled].si-forgot{ cursor: progress; }
   background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
 }
 .product-card h3{ font-size: 1.15rem; margin: 4px 0 0; color:#fff; }
-/* The catalog name is Glow's own shorthand ("GLP-3 (RT)"), not what most
-   people searching for the compound type. Namesake in plain words, once,
-   directly under the name it belongs to. */
+/* The catalog name is Glow's own shorthand (BPC-157/TB-500 is "Wolverine"
+   among researchers), not what most people searching for the compound type.
+   Namesake in plain words, once, directly under the name it belongs to. */
 .product-alias{ font-size:.82rem; color:rgba(255,255,255,.55); margin: 2px 0 10px; }
 /* The card's one number, so it is sized to be read as one. It carried a
    "/ vial" qualifier until the sizes moved onto the product page, where the
