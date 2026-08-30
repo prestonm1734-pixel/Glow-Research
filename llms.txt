@@ -42,9 +42,9 @@ benefit.
 
 ### Metabolic Research
 
-- **G3-R** (https://glowresearch.shop/peptides/g3-r/): A triple-receptor incretin and glucagon agonist peptide. Studied for its combined incretin and glucagon signalling profile. Sizes: 10mg. From $84.99 per vial. Current lot 1032, 99.9% purity. COA: https://glowresearch.shop/assets/coas/g3-r-lot-1032.pdf.
-- **G1-S** (https://glowresearch.shop/peptides/g1-s/): A glucagon-like peptide-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling. Sizes: 10mg. From $64.99 per vial. Current lot 1050, 99.57% purity. COA: https://glowresearch.shop/assets/coas/g1-s-lot-1050.pdf.
-- **G2-T** (https://glowresearch.shop/peptides/g2-t/): A dual GIP and glucagon-like peptide-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology. Sizes: 10mg. From $72.99 per vial. Current lot 1600, 99.75% purity. COA: https://glowresearch.shop/assets/coas/g2-t-lot-1600.pdf.
+- **G3-R** (https://glowresearch.shop/peptides/g3-r/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $84.99 per vial. Current lot 1032, 99.9% purity. COA: https://glowresearch.shop/assets/coas/g3-r-lot-1032.pdf.
+- **G1-S** (https://glowresearch.shop/peptides/g1-s/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $64.99 per vial. Current lot 1050, 99.57% purity. COA: https://glowresearch.shop/assets/coas/g1-s-lot-1050.pdf.
+- **G2-T** (https://glowresearch.shop/peptides/g2-t/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $72.99 per vial. Current lot 1600, 99.75% purity. COA: https://glowresearch.shop/assets/coas/g2-t-lot-1600.pdf.
 
 ### Secretagogue Research
 

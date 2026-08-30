@@ -392,11 +392,12 @@ const GLOW_PRODUCTS = [
   // catalog want different first impressions and used to fight over the one
   // order both pages shared.
   //
-  // Leads with the tissue-repair peptides and their blend, then the metabolic-receptor
-  // compounds interleaved with the secretagogue and longevity products
-  // rather than run together. Three receptor agonists targeting the same incretin pathway back to back in
-  // the grid reads as a weight-loss storefront's product line, the same
-  // concern behind dropping "Metabolic Research" from the catalog's chips
+  // Leads with the tissue-repair peptides and their blend, then the three
+  // "metabolic" compounds (G3-R, G1-S, G2-T) interleaved with the
+  // secretagogue and longevity products rather than run together. Three of
+  // them back to back in the grid reads as a weight-loss storefront's
+  // product line, the same concern behind dropping "Metabolic Research"
+  // from the catalog's chips
   // and the per-product research-category tag; spacing them out is the same
   // decision applied to layout instead of labeling. The badge each product
   // carries (Best Seller, Popular, Best Value) is editorial and does not
@@ -468,15 +469,12 @@ const GLOW_PRODUCTS = [
     sizes: [
       { mg: '10mg', price: 84.99, list: 94, sku: 'GLO-RT10', image: 'assets/products/g3-r-10mg-v3.webp' },
     ],
-    blurb: 'A triple-receptor incretin and glucagon agonist peptide. Studied for its combined incretin and glucagon signalling profile.',
+    blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'G3-R is Glow’s designation for a synthetic peptide agonist active at three receptors from one molecule: the GIP receptor, the glucagon-like peptide-1 receptor and the glucagon receptor.',
-      'Engaging the glucagon receptor alongside the two incretin receptors is what separates it from earlier co-agonists, and is why it is studied as a distinct pharmacological class rather than a variant of existing glucagon-like peptide-1 or GIP agonists.'
+      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
     ],
     research: [
-      { t: 'Triple receptor pharmacology', d: 'Used to characterise relative potency and selectivity across the GIP, glucagon-like peptide-1 and glucagon receptors from a single molecule.' },
-      { t: 'Glucagon receptor signalling', d: 'Studied in hepatocyte and cAMP assays for activity at the glucagon receptor, a target the two-receptor co-agonists do not engage.' },
-      { t: 'Comparative incretin pharmacology', d: 'Applied as a comparator when characterising newer multi-receptor agonists against single- and dual-receptor peptides.' }
+      { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
   { name: 'CJC-1295 No DAC/Ipamorelin', tag: 'Peptide Blend', cat: 'growth', purity: '99.08%', lot: '005', badge:null,
     coa: 'assets/coas/cjc-1295-no-dac-ipamorelin-lot-005.pdf', coaRef: 'MHCU-CDXL', tested: '5 July 2026',
@@ -496,15 +494,12 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/g1-s-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.96 mg' },
     sizes: [{ mg: '10mg', price: 64.99, list: 72, sku: 'GLO-SM10', image: 'assets/products/g1-s-10mg-v3.webp' }],
-    blurb: 'A glucagon-like peptide-1 receptor agonist analogue. Supplied for laboratory investigation of incretin receptor signalling.',
+    blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'G1-S is Glow’s designation for a glucagon-like peptide-1 receptor agonist analogue. Two structural differences from the native hormone matter in the laboratory: an alpha-aminoisobutyric acid substitution at position 8 that resists DPP-4 cleavage, and a C18 fatty diacid chain at position 26 that promotes albumin binding.',
-      'Those two modifications are why it behaves so differently from the native hormone across a time course, and usually why it is the chosen comparator.'
+      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
     ],
     research: [
-      { t: 'Incretin receptor signalling', d: 'Used in cAMP accumulation and beta-arrestin recruitment assays at the glucagon-like peptide-1 receptor.' },
-      { t: 'Albumin binding', d: 'Studied for how the fatty acid chain alters distribution and persistence in model systems.' },
-      { t: 'Metabolic pathway research', d: 'Applied in islet and hepatocyte culture models examining downstream incretin signalling.' }
+      { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
   { name: 'Tesamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.36%', lot: '1002', badge:null,
     coa: 'assets/coas/tesamorelin-lot-1002.pdf', coaRef: 'R934-S6U9', tested: '23 June 2026',
@@ -524,15 +519,12 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/g2-t-lot-1600.pdf', coaRef: '7RRU-W2LV', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '12.49 mg' },
     sizes: [{ mg: '10mg', price: 72.99, list: 81, sku: 'GLO-T10', image: 'assets/products/g2-t-10mg-v3.webp' }],
-    blurb: 'A dual GIP and glucagon-like peptide-1 receptor agonist peptide. Used in research examining co-agonist receptor pharmacology.',
+    blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'G2-T is Glow’s designation for a dual receptor co-agonist peptide, active at both the GIP and the glucagon-like peptide-1 receptor from a single molecule.',
-      'Single-molecule co-agonists are studied precisely because the two receptors can be engaged at different relative potencies, which is difficult to reproduce by simply combining two separate agonists.'
+      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
     ],
     research: [
-      { t: 'Co-agonist pharmacology', d: 'Used to characterise relative potency at the GIP and glucagon-like peptide-1 receptors from one molecule.' },
-      { t: 'Biased signalling', d: 'Studied for the balance between G-protein coupling and beta-arrestin recruitment at each receptor.' },
-      { t: 'Receptor crosstalk', d: 'Applied in models examining how engaging both receptors at once differs from either alone.' }
+      { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
   { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.84%', lot: '1025', badge:null,
     coa: 'assets/coas/mots-c-lot-1025.pdf', coaRef: 'N8VT-H88T', tested: '5 July 2026',
