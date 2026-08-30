@@ -139,40 +139,22 @@
     $('pdName').textContent = p.name;
     $('pdAlias').textContent = p.alias || '';
     $('pdDesc').textContent = p.blurb;
-    $('pdVialName').textContent = p.name;
     $('pdRenderNote').textContent = VIAL_ART_NOTICE;
 
     renderPhoto(p, size());
     renderCoa(p);
   }
 
-  // A handful of products ship with a real product photo; everything else
-  // falls back to the illustrated CSS vial so the page never shows a gap.
-  // Some of those photos are shot per size, since the label itself prints a
-  // different mg — sizes[].image overrides the product's own p.image (already
-  // defaulted to the first size's photo in js/products-data.js), so switching
-  // the mg picker swaps the vial shown along with everything else that reads
-  // the selected size.
+  // Every product now ships with a real photo, so this only ever picks
+  // which one: sizes[].image overrides the product's own p.image (already
+  // defaulted to the first size's photo in js/products-data.js) for the
+  // few products photographed per size, since the label itself prints a
+  // different mg. Switching the mg picker swaps the photo along with
+  // everything else that reads the selected size.
   function renderPhoto(p, s) {
     const img = (s && s.image) || p.image;
-    if (img) {
-      // A path that fails to actually load (a slow CDN edge right after a
-      // deploy, a dropped request) is not the same as having no photo, but
-      // it should end up looking like it: the drawn vial, never the
-      // browser's broken-image icon. Armed before src is set so a load that
-      // fails immediately still catches.
-      $('pdPhoto').onerror = () => {
-        $('pdPhoto').hidden = true;
-        $('pdVialArt').hidden = false;
-      };
-      $('pdPhoto').src = pageHref(img);
-      $('pdPhoto').alt = `${p.name}${s ? ' ' + s.mg : ''} vial`;
-      $('pdPhoto').hidden = false;
-      $('pdVialArt').hidden = true;
-    } else {
-      $('pdPhoto').hidden = true;
-      $('pdVialArt').hidden = false;
-    }
+    $('pdPhoto').src = pageHref(img);
+    $('pdPhoto').alt = `${p.name}${s ? ' ' + s.mg : ''} vial`;
   }
 
   /* ================= certificate =================
@@ -309,9 +291,6 @@
 
     renderPrice();
     renderPhoto(product, s);
-    $('pdVialMg').textContent = s.mg.toUpperCase();
-    $('pdVialFine').innerHTML =
-      `${product.purity} Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.shop`;
 
     document.title = `${product.name} ${s.mg} | Glow Research`;
     const desc = document.querySelector('meta[name="description"]');
@@ -538,9 +517,7 @@
 
     // one vial per unit, but three is enough to read as "several" — past that
     // they just overlap into a smudge, and the label already says the count
-    const vialArt = product.image
-      ? `<img src="${pageHref(product.image)}" alt="" loading="lazy" />`
-      : '<span class="vial"></span>';
+    const vialArt = `<img src="${pageHref(product.image)}" alt="" loading="lazy" />`;
 
     // Only the tiers that get a card. The ladder is longer, and bulkNote()
     // below states the rest, so the cards stay the three-way decision most

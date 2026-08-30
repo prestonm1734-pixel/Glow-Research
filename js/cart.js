@@ -151,7 +151,7 @@
     const off = bulkSavingPct(item.unitOriginal, unit);
     return `
       <div class="cart-row" data-i="${i}">
-        <span class="cart-thumb">${typeof productThumb === 'function' ? productThumb(item.name) : '<span class="vial"></span>'}</span>
+        <span class="cart-thumb">${typeof productThumb === 'function' ? productThumb(item.name) : ''}</span>
         <div class="cart-row-main">
           <div class="cart-row-top">
             <div>
@@ -199,7 +199,7 @@
     const u = cartUpsell();
     if (!u || items.some(i => i.name === u.product.name)) return '';
     const thumb = typeof productThumb === 'function'
-      ? productThumb(u.product.name) : '<span class="vial"></span>';
+      ? productThumb(u.product.name) : '';
     return `
       <div class="cart-upsell">
         <span class="cart-upsell-thumb">${thumb}</span>

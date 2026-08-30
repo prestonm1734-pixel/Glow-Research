@@ -104,81 +104,13 @@
   }
   .pd-photo[hidden]{ display:none; }
 
-  /* A caption under the stage, not an overlay on it — the illustrated vial's
-     own printed label already sits near the bottom of the box, and on the
+  /* A caption under the stage, not an overlay on it — the vial's own printed
+     label in the shot already sits near the bottom of the box, and on the
      shorter mobile stage the two blocks of text collided. Normal flow costs
      a little height instead. */
   .pd-render-note{
     margin: 10px 4px 0; text-align:center; font-size:.68rem;
     color:rgba(10,10,10,.45); letter-spacing:.01em;
-  }
-
-  /* --- the vial --- */
-  /* The vial is drawn at a fixed pixel size but the stage is much larger than
-     a catalog tile, so it is scaled up as a whole — that keeps the cap, collar
-     and printed label in proportion instead of re-tuning eight numbers. */
-  .pd-vial-wrap{
-    position:relative; z-index:2; display:flex; flex-direction:column; align-items:center;
-    transform: scale(1.1);
-  }
-  .pd-vial-wrap[hidden]{ display:none; }
-  /* glass on a light stage: near-opaque white body with specular edges, so it
-     still reads as a vial rather than dissolving into the background */
-  .pd-vial{
-    width: 134px; height: 272px; border-radius: 30px 30px 6px 6px;
-    background:
-      linear-gradient(100deg,
-        rgba(255,255,255,.30) 0%,
-        rgba(255,255,255,.98) 9%,
-        rgba(255,255,255,.62) 26%,
-        rgba(255,255,255,.45) 52%,
-        rgba(255,255,255,.66) 76%,
-        rgba(255,255,255,.98) 92%,
-        rgba(255,255,255,.32) 100%);
-    border: 1px solid rgba(0,0,0,.13);
-    position: relative;
-    box-shadow: 0 26px 44px -20px rgba(0,0,0,.45);
-  }
-  .pd-vial-cap{
-    position:absolute; top:-32px; left:50%; transform:translateX(-50%);
-    width: 60px; height: 30px; border-radius:3px 3px 0 0;
-    background: linear-gradient(100deg,#39414f,#1b2029 30%,#11151c 70%,#2a313c);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
-  }
-  /* aluminium crimp collar, sitting on the vial's shoulder */
-  .pd-vial-collar{
-    position:absolute; top:-4px; left:50%; transform:translateX(-50%);
-    width: 72px; height: 22px;
-    background: linear-gradient(100deg,#8f8f8b,#f4f4f2 18%,#c3c3bf 42%,#8b8b87 58%,#e4e4e1 82%,#9a9a96);
-    box-shadow: 0 1px 2px rgba(0,0,0,.3);
-  }
-  .pd-vial-label{
-    position:absolute; left:-1px; right:-1px; bottom:14px; top:104px;
-    background: linear-gradient(180deg,#1e2735,#111722);
-    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-    padding: 12px 10px; text-align:center; color:#eef1f5;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
-  }
-  .pd-vial-brand{
-    font-family:'Fraunces', Georgia, serif; font-size:.72rem; font-weight:600;
-    letter-spacing:.02em; margin-bottom:9px; color:#fff;
-  }
-  .pd-vial-name{
-    font-family:var(--font-display); font-weight:700; font-size:.98rem;
-    line-height:1.15; letter-spacing:-.01em; color:#fff; word-break:break-word;
-  }
-  .pd-vial-mg{
-    margin-top:8px; font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:600;
-    letter-spacing:.08em; padding: 3px 8px; border:1px solid rgba(255,255,255,.4); color:#fff;
-  }
-  .pd-vial-fine{
-    margin-top:auto; font-size:.5rem; line-height:1.6; color: rgba(238,241,245,.72);
-    letter-spacing:.02em;
-  }
-  .pd-vial-shadow{
-    width: 168px; height: 20px; margin-top: 16px;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,.30), transparent 70%);
-    filter: blur(3px);
   }
 
   /* ---------- buy box ---------- */
@@ -328,11 +260,7 @@
   .pd-tier-vials img{
     width: 58px; height:86px; object-fit:contain; mix-blend-mode: multiply;
   }
-  .pd-tier-vials .vial{ width:22px; height:44px; box-shadow:none; }
-  /* photos carry their own whitespace, so they overlap; the drawn vial is a
-     bare 22px shape and would merge into one block, so it gets a real gap */
   .pd-tier-vials img + img{ margin-left:-16px; }
-  .pd-tier-vials .vial + .vial{ margin-left:4px; }
 
   /* The vial count is the heading of the card, so it is set like one rather
      than in the mono label style the old three-across layout needed. */
@@ -787,20 +715,7 @@
 
       <div class="pd-visual-col">
         <div class="pd-visual">
-          <img class="pd-photo" id="pdPhoto" alt="" hidden />
-          <div class="pd-vial-wrap" id="pdVialArt">
-            <div class="pd-vial">
-              <span class="pd-vial-cap"></span>
-              <span class="pd-vial-collar"></span>
-              <span class="pd-vial-label">
-                <span class="pd-vial-brand">Glow ✦ Research</span>
-                <span class="pd-vial-name" id="pdVialName">BPC-157</span>
-                <span class="pd-vial-mg" id="pdVialMg">10MG</span>
-                <span class="pd-vial-fine" id="pdVialFine">98.2% Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.shop</span>
-              </span>
-            </div>
-            <div class="pd-vial-shadow" aria-hidden="true"></div>
-          </div>
+          <img class="pd-photo" id="pdPhoto" src="../../assets/products/bpc-157-10mg-v3.webp" alt="BPC-157 10mg vial" />
         </div>
         <p class="pd-render-note" id="pdRenderNote">Vials ship with generic labeling, not the label shown.</p>
       </div>

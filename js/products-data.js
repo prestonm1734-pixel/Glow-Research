@@ -1470,18 +1470,12 @@ function pageHref(file) {
 }
 
 // Thumbnail markup for a product, looked up by name so the cart and checkout
-// can call it with nothing but a stored line item. Falls back to the drawn
-// vial for products that have no photo yet.
+// can call it with nothing but a stored line item. Every product carries a
+// real photo (tools/check-claims.js pins this), so there is no drawn-vial
+// fallback to reach for here any more.
 function productThumb(name) {
   const p = GLOW_PRODUCTS.find(x => x.name === name);
-  if (p && p.image) {
-    // onerror is inline, not wired up after the fact, because this markup
-    // ships baked into static HTML too: a load that fails should collapse
-    // to the same drawn vial used when a product has no photo at all
-    // (below), not the browser's broken-image icon.
-    return `<img class="thumb-photo" src="${pageHref(p.image)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'vial'}))" />`;
-  }
-  return '<span class="vial"></span>';
+  return p ? `<img class="thumb-photo" src="${pageHref(p.image)}" alt="" loading="lazy" />` : '';
 }
 
 // One product card, as markup. Shared by renderProductGrid below and by
@@ -1507,9 +1501,7 @@ function productCardHtml(p, i) {
               ? '<span class="product-badge status is-out">Out of stock</span>'
               : p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
           </span>
-          ${p.image
-            ? `<img class="product-photo" src="${pageHref(p.image)}" alt="${p.name} vial" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'vial'}))" />`
-            : '<div class="vial"></div>'}
+          <img class="product-photo" src="${pageHref(p.image)}" alt="${p.name} vial" loading="lazy" />
         </a>
         <div class="product-footer">
           <h3><a href="${href}">${name}</a></h3>
@@ -1550,9 +1542,7 @@ function coaCardHtml(p) {
       <article class="coa-card" data-name="${escHtml(p.name.toLowerCase())}" data-type="${escHtml(CAT_LABEL[p.cat].toLowerCase())}" data-lot="${escHtml((p.lot || '').toLowerCase())}" data-alias="${escHtml((p.alias || '').toLowerCase())}">
         <div class="coa-card-visual">
           ${held ? '<span class="coa-card-flag">PDF</span>' : ''}
-          ${p.image
-            ? `<img src="${pageHref(p.image)}" alt="${escHtml(p.name)} vial" loading="lazy" />`
-            : '<span class="vial" aria-hidden="true"></span>'}
+          <img src="${pageHref(p.image)}" alt="${escHtml(p.name)} vial" loading="lazy" />
         </div>
         <div class="coa-card-body">
           <span class="coa-card-type">${escHtml(CAT_LABEL[p.cat])}</span>

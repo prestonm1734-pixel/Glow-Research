@@ -284,10 +284,17 @@ function buildProduct(p, donor) {
   html = setText(html, 'pdName', esc(p.name));
   html = fillEmpty(html, 'pdAlias', p.alias ? esc(p.alias) : '');
   html = fillEmpty(html, 'pdDesc', esc(p.blurb));
-  html = setText(html, 'pdVialName', esc(p.name));
-  html = setText(html, 'pdVialMg', esc(s.mg.toUpperCase()));
-  html = fillEmpty(html, 'pdVialFine',
-    `${esc(p.purity)} Purity<br />FOR RESEARCH USE ONLY<br />glowresearch.shop`);
+
+  // The donor ships #pdPhoto with no src: js/product.js fills it in at
+  // runtime, which used to mean a crawler that does not execute JavaScript —
+  // most of the ones feeding AI answer engines — saw an empty <img> and
+  // nothing else, the same gap build-catalog.js exists to close for the
+  // catalog grid. Baked in root-relative, like every other asset path here,
+  // so the rewriteDepth() pass at the end of this function still prefixes it
+  // correctly for peptides/<slug>/.
+  html = required(html, /<img class="pd-photo" id="pdPhoto"[^>]*\/>/, '#pdPhoto')
+    .replace(/<img class="pd-photo" id="pdPhoto"[^>]*\/>/,
+      `<img class="pd-photo" id="pdPhoto" src="${esc((s && s.image) || p.image)}" alt="${esc(p.name)} ${esc(s.mg)} vial" />`);
 
   // Not setText: with a launch list price the markup is a struck-through
   // figure beside the charged one, and setText stops at the first "<".

@@ -2755,6 +2755,17 @@ console.log('\ncatalog shape');
   ok(`all ${GLOW_PRODUCTS.length} products carry every field the site reads`,
     bad.length === 0, bad.join(', '));
 
+  // productThumb() and the catalog card in js/products-data.js, the product
+  // page's #pdPhoto, and the og:image build-products.js writes all assume
+  // p.image resolves to a real file with no fallback left to catch a miss —
+  // the drawn CSS vial that used to stand in for a missing photo was removed
+  // once every product had a real one. A product added without a photo would
+  // otherwise render a broken image everywhere at once, silently.
+  const noPhoto = GLOW_PRODUCTS.filter(p => !p.image || !fs.existsSync(path.join(ROOT, p.image)));
+  ok('every product has a real photo file on disk',
+    noPhoto.length === 0,
+    noPhoto.map(p => `${p.name}: ${p.image || '(no image field)'}`).join(', '));
+
   // alias ("Wolverine" under "BPC-157/TB-500") is a claim that this is what
   // the compound is commonly called. It can only ever say what the
   // product's own about copy already says, not a second, independent claim.
