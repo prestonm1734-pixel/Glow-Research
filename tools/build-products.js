@@ -209,8 +209,8 @@ function buildProduct(p, donor) {
   // the same description at runtime on product.html?p=<slug>, and the two
   // copies had already drifted once. Both read the catalog now.
   const desc = productMetaDesc(p, s);
-  const ogImage = p.image ? `${SITE}/${p.image}` : `${SITE}/assets/vial-trio-black-v2.jpg`;
-  const ogSize = imageSize(p.image) || { width: 1672, height: 941 };
+  const ogImage = p.image ? `${SITE}/${p.image}` : `${SITE}/assets/hero-vial-poster.jpg`;
+  const ogSize = imageSize(p.image) || { width: 1920, height: 1080 };
 
   let html = donor;
 

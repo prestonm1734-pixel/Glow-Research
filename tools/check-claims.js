@@ -1191,7 +1191,7 @@ if (PRODUCT_PAGES_LIVE) {
     const src = (html.match(/og:image" content="[^"]*\/([^"/]+)"/) || [])[1];
     if (!w || !h || !src) { wrongShape.push(`${p.name}: no og:image dimensions`); return; }
     if (!p.image || !p.image.endsWith(src)) wrongShape.push(`${p.name}: og:image is ${src}`);
-    if (w === '1672' && h === '941') wrongShape.push(`${p.name}: still the donor's dimensions`);
+    if (w === '1920' && h === '1080') wrongShape.push(`${p.name}: still the donor's dimensions`);
   });
   ok('every share card states its own image and that image’s real size',
     wrongShape.length === 0, wrongShape.join(', '));
