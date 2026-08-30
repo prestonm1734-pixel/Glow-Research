@@ -467,7 +467,7 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/g3-r-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [
-      { mg: '10mg', price: 84.99, list: 94, sku: 'GLO-RT10', image: 'assets/products/g3-r-10mg-v3.webp' },
+      { mg: '10mg', price: 84.99, list: 94, sku: 'GLO-RT10', image: 'assets/products/g3-r-10mg-v4.webp' },
     ],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
@@ -493,7 +493,7 @@ const GLOW_PRODUCTS = [
   { name: 'G1-S', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:'Popular',
     coa: 'assets/coas/g1-s-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.96 mg' },
-    sizes: [{ mg: '10mg', price: 64.99, list: 72, sku: 'GLO-SM10', image: 'assets/products/g1-s-10mg-v3.webp' }],
+    sizes: [{ mg: '10mg', price: 64.99, list: 72, sku: 'GLO-SM10', image: 'assets/products/g1-s-10mg-v4.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
       'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
@@ -518,7 +518,7 @@ const GLOW_PRODUCTS = [
   { name: 'G2-T', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
     coa: 'assets/coas/g2-t-lot-1600.pdf', coaRef: '7RRU-W2LV', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '12.49 mg' },
-    sizes: [{ mg: '10mg', price: 72.99, list: 81, sku: 'GLO-T10', image: 'assets/products/g2-t-10mg-v3.webp' }],
+    sizes: [{ mg: '10mg', price: 72.99, list: 81, sku: 'GLO-T10', image: 'assets/products/g2-t-10mg-v4.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
       'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
