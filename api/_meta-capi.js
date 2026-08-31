@@ -53,13 +53,41 @@ function sha256(value) {
 //
 //   name, city   letters only. Punctuation and spaces stripped, so
 //                "St. Louis" and "saint louis" at least agree with
-//                themselves across events.
+//                themselves across events. Accented letters are kept as
+//                letters rather than deleted: see nameVariants.
 //   state        two-letter code, lowercased. A spelled-out state name is
 //                dropped rather than guessed at.
 //   zip          first five digits, so a ZIP+4 matches a plain ZIP.
 //   country      ISO two-letter, lowercased.
 const clean = v => (typeof v === 'string' ? v.trim() : '');
-const hashName = v => (clean(v) ? sha256(clean(v).toLowerCase().replace(/[^a-z]/g, '')) : '');
+
+// Names and cities, hashed under every normalization Meta might be using.
+//
+// This used to strip to [a-z], which does not normalize an accented letter,
+// it deletes it: "Núñez" became "nez" and "Chloé" became "chlo". Whatever
+// Meta does on its side, it is certainly not that, so those customers were
+// matching on nothing.
+//
+// Which of the two remaining readings is right is genuinely unclear. Meta
+// says values should be "lowercase Roman alphabet characters (a-z)" and also
+// that "in cases where special characters are required, the text must be
+// encoded in UTF-8", which points at keeping the accent; plenty of
+// implementations fold it to ASCII instead. Meta's own documentation was not
+// reachable to settle it.
+//
+// So both are sent. user_data takes an array per key and Meta matches against
+// any entry, which is what makes hedging free rather than clever: for a name
+// with no accent in it the two normalizations are identical and collapse to
+// one hash, so this only ever differs for the customers the old rule was
+// silently failing. Punctuation and spacing are stripped either way, which is
+// unambiguous: "O'Brien" and "Mary-Jane" already normalized correctly.
+const nameVariants = v => {
+  const base = clean(v).toLowerCase();
+  if (!base) return [];
+  const preserved = base.replace(/[^\p{L}]/gu, '');
+  const folded = base.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z]/g, '');
+  return [...new Set([preserved, folded].filter(Boolean))].map(sha256);
+};
 const hashZip = v => {
   const digits = clean(v).replace(/[^\d]/g, '').slice(0, 5);
   return digits.length === 5 ? sha256(digits) : '';
@@ -131,9 +159,9 @@ export async function sendMetaEvent({
   // Anything already carrying a country code is left exactly as it is.
   const phoneDigits = phone ? phone.replace(/[^\d]/g, '') : '';
   const hashedPhone = phoneDigits.length === 10 ? `1${phoneDigits}` : phoneDigits;
-  const fnHash = hashName(firstName);
-  const lnHash = hashName(lastName);
-  const ctHash = hashName(city);
+  const fnHashes = nameVariants(firstName);
+  const lnHashes = nameVariants(lastName);
+  const ctHashes = nameVariants(city);
   const stHash = hashState(state);
   const zpHash = hashZip(zip);
   const countryHash = hashCountry(country);
@@ -143,9 +171,9 @@ export async function sendMetaEvent({
     ...(email ? { em: [sha256(email)] } : {}),
     ...(hashedPhone ? { ph: [sha256(hashedPhone)] } : {}),
     ...(externalIdHash ? { external_id: [externalIdHash] } : {}),
-    ...(fnHash ? { fn: [fnHash] } : {}),
-    ...(lnHash ? { ln: [lnHash] } : {}),
-    ...(ctHash ? { ct: [ctHash] } : {}),
+    ...(fnHashes.length ? { fn: fnHashes } : {}),
+    ...(lnHashes.length ? { ln: lnHashes } : {}),
+    ...(ctHashes.length ? { ct: ctHashes } : {}),
     ...(stHash ? { st: [stHash] } : {}),
     ...(zpHash ? { zp: [zpHash] } : {}),
     ...(countryHash ? { country: [countryHash] } : {}),

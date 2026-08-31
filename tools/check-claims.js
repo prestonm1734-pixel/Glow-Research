@@ -3184,7 +3184,7 @@ console.log('\nprivacy disclosure');
         !['fbc', 'fbp', 'client_ip_address', 'client_user_agent'].includes(key) &&
         // Either hashed right here, or the value of a binding named for the
         // hash it holds. Anything else is a raw field reaching Meta.
-        !/sha256\(|\w+Hash\b/.test(value))
+        !/sha256\(|\w+Hash(es)?\b|nameVariants/.test(value))
       .map(([, key]) => key);
     ok('every person-level match key is hashed before it leaves the server',
       unhashed.length === 0, `sent in the clear: ${unhashed.join(', ')}`);
@@ -3354,6 +3354,41 @@ console.log('\nprivacy disclosure');
         !/crossOrigin|crossorigin=/.test(noComments(relay)) &&
         !/crossOrigin|crossorigin=/.test(noComments(read('js/meta-pixel.js'))),
         'that trades a working pixel for a better log line');
+    }
+
+    // Names and cities must not lose letters. Stripping to [a-z] deletes an
+    // accented character rather than normalizing it, so "Núñez" hashed as
+    // "nez" and matched nothing at all.
+    ok('an accented name is normalized, not truncated',
+      /nameVariants/.test(capi) && !/hashName/.test(capi) &&
+      /\[\^\\p\{L\}\]/.test(capi),
+      'stripping to [a-z] deletes the letter instead of folding it');
+
+    // Only Meta's own standard event names. A typo does not error, it silently
+    // creates a custom event that no standard optimisation goal can use.
+    {
+      const STANDARD = new Set(['PageView', 'ViewContent', 'AddToCart', 'InitiateCheckout',
+        'Purchase', 'AddPaymentInfo', 'Search', 'CompleteRegistration', 'Lead',
+        'Subscribe', 'StartTrial', 'Contact', 'AddToWishlist', 'CustomizeProduct',
+        'Donate', 'FindLocation', 'Schedule', 'SubmitApplication']);
+      // metaEventFor() is the one place browser event names are decided. The
+      // web-vitals names in the same file are a different function entirely.
+      const block = (relay.match(/function metaEventFor\(\)?[\s\S]*?\n  \}/) || [''])[0];
+      const names = [...block.matchAll(/name: '([A-Za-z]+)'/g)].map(m => m[1]);
+      const unknown = names.filter(n => !STANDARD.has(n));
+      ok('every event name is one Meta actually recognises',
+        names.length > 0 && unknown.length === 0,
+        `not standard events: ${unknown.join(', ')}`);
+    }
+
+    // external_id is hashed server-side and sent raw by the pixel, which only
+    // agrees if the ID never contains an uppercase character, since the hash
+    // helper lowercases. Base36 guarantees that; anything else would not.
+    {
+      const gen = (identity.match(/function randomId\(\)[\s\S]*?\n  \}/) || [''])[0];
+      ok('the device id cannot contain a character that breaks external_id',
+        gen.length > 0 && /toString\(36\)/.test(gen) && !/toUpperCase/.test(gen),
+        'a mixed-case id would hash differently on the two transports');
     }
 
     // identity.js has to be on the page, and ahead of both consumers: it is
