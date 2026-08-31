@@ -715,7 +715,48 @@
       $('coMakeAcct').checked = false;
       $('coPass').required = false;
       if (signedInUser.email) $('coEmail').value = signedInUser.email;
+
+      // A signed-in shopper is identified before they type anything, so the
+      // InitiateCheckout fired further down carries a real email rather than
+      // a device ID alone. js/identity.js persists it, so every later event
+      // on every later page carries it too.
+      if (window.GlowIdentity) {
+        var parts = String(signedInUser.name || '').trim().split(/\s+/).filter(Boolean);
+        GlowIdentity.setProfile({
+          email: signedInUser.email || '',
+          firstName: parts[0] || '',
+          lastName: parts.length > 1 ? parts[parts.length - 1] : '',
+        });
+      }
     } catch (e) { /* network hiccup — proceed as guest */ }
+  }
+
+  // Identity as it is typed, not only once the order is placed. Every one of
+  // these is a Meta match key, and an abandoned checkout is exactly the visit
+  // where knowing them matters: the purchase event that would have carried
+  // them never happens, but the retargetable page views afterwards still do.
+  //
+  // 'change' rather than 'input', so a half-typed email is not stored as the
+  // shopper's address, and blur-time is soon enough for an event fired on a
+  // later page.
+  function watchIdentityFields() {
+    var map = {
+      coEmail: 'email', coFirst: 'firstName', coLast: 'lastName',
+      coCity: 'city', coState: 'state', coZip: 'zip',
+    };
+    Object.keys(map).forEach(function (id) {
+      var el = $(id);
+      if (!el) return;
+      el.addEventListener('change', function () {
+        if (!window.GlowIdentity) return;
+        var patch = {};
+        patch[map[id]] = el.value || '';
+        // Country is stated only alongside a real address, and this form
+        // only ever ships to the US (fillStates() offers nothing else).
+        if (id === 'coZip' && el.value) patch.country = 'US';
+        GlowIdentity.setProfile(patch);
+      });
+    });
   }
 
   /* ---------- optional account ---------- */
@@ -799,7 +840,10 @@
     fillStates();
     renderPayMethods();
     renderSummary();
-    checkSession();
+    // Not awaited here, so the payment setup below is not held up by it, but
+    // kept so InitiateCheckout can wait on it specifically. See below.
+    const sessionReady = checkSession();
+    watchIdentityFields();
 
     // A return trip from a 3D Secure redirect lands back on this exact page
     // with Stripe's own query params attached. That has to be handled before
@@ -812,6 +856,14 @@
     if (!resumed) initExpressPay();
     // Not on the resumed path: a 3D Secure redirect return is a continuation
     // of a checkout that already started, not a fresh one landing on the page.
+    // InitiateCheckout is the event with the most identity available to it
+    // short of the purchase itself, and it was firing with none: the session
+    // check that knows the shopper's email had not necessarily come back
+    // yet. Waiting on it costs one already-in-flight request and is the
+    // difference between an event Meta can attribute to a person and one it
+    // can only attribute to a browser. checkSession() swallows its own
+    // failures, so this cannot hang the page on a bad network.
+    await sessionReady;
     if (!resumed && window.GlowAnalytics && cartItems().length) {
       // sku/price/qty per line, not just the total count: Meta and TikTok's
       // InitiateCheckout both expect a contents list with a content_id per

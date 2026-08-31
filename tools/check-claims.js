@@ -3087,6 +3087,158 @@ console.log('\nprivacy disclosure');
       /GlowMetaPageViewId/.test(relay));
   }
 
+  /* ---- Advanced Matching -------------------------------------------------
+   * Meta scores every event on how well it can tie it to a person, and an
+   * event carrying only an IP and a User-Agent sits at the bottom of that
+   * scale. js/identity.js is the single source for what this site knows about
+   * a visitor; three files consume it and all three have to agree, because a
+   * key that one of them drops is not an error anywhere, just a quietly worse
+   * score in a dashboard nobody reads daily.
+   * --------------------------------------------------------------------- */
+  {
+    const identity = read('js/identity.js');
+    const endpoint = read('api/meta-event.js');
+    const capi = read('api/_meta-capi.js');
+    const pixel = read('js/meta-pixel.js');
+    const relay = read('js/analytics.js');
+
+    // The three key lists, pulled from the source rather than restated here,
+    // so this guard cannot drift from the thing it is guarding.
+    const keysIn = (src, re, drop) => {
+      const block = (src.match(re) || [, ''])[1];
+      return block.split(/[,\n]/)
+        .map(x => x.trim().replace(/:.*$/, '').replace(/^\.\.\./, ''))
+        .filter(x => /^[A-Za-z_]\w*$/.test(x))
+        .filter(x => !drop.includes(x))
+        .sort();
+    };
+    const PLUMBING = ['pixelId', 'accessToken', 'eventName', 'eventId',
+      'eventSourceUrl', 'clientIp', 'userAgent', 'customData'];
+
+    const identityKeys = keysIn(identity, /function matchPayload\(\)[\s\S]*?return \{([\s\S]*?)\n {4}\};/, PLUMBING);
+    // Read from the sendMetaEvent() call, not from the destructure above it:
+    // a key can be accepted off the body and then quietly not passed on, and
+    // that is the failure with no symptom. What is in the call is what Meta
+    // gets.
+    const endpointKeys = keysIn(endpoint, /await sendMetaEvent\(\{([\s\S]*?)\n {2}\}\);/, PLUMBING);
+    const capiKeys = keysIn(capi, /export async function sendMetaEvent\(\{([\s\S]*?)\}\)/, PLUMBING);
+
+    ok('the browser sends every match key the relay endpoint forwards',
+      identityKeys.length > 0 && identityKeys.join(',') === endpointKeys.join(','),
+      `identity.js [${identityKeys}] vs meta-event.js [${endpointKeys}]`);
+    ok('and the Conversions API sender takes every one of them',
+      capiKeys.length > 0 && endpointKeys.join(',') === capiKeys.join(','),
+      `meta-event.js [${endpointKeys}] vs _meta-capi.js [${capiKeys}]`);
+    // The call above references these by bare identifier, so one missing from
+    // the destructure is a ReferenceError on a live endpoint, not a bad score.
+    {
+      const declared = keysIn(endpoint, /const \{([\s\S]*?)\} = body;/, PLUMBING);
+      const undeclared = endpointKeys.filter(k => !declared.includes(k));
+      ok('and every key it forwards is one it actually read off the body',
+        undeclared.length === 0, `forwarded but never destructured: ${undeclared.join(', ')}`);
+    }
+
+    // The whole point of the relay is the visitor whose browser blocks the
+    // pixel. Meta's own script is what writes _fbc and _fbp, so for exactly
+    // that visitor the cookies never exist, and reading them off
+    // document.cookie sends nothing. identity.js reconstructs both.
+    ok('the relay reads fbc/fbp from identity.js, which reconstructs them when the pixel is blocked',
+      /GlowIdentity\.matchPayload\(\)/.test(relay) &&
+      !/fbc: cookie\('_fbc'\)/.test(relay),
+      'reading the cookie directly sends nothing for the traffic this relay exists to recover');
+    ok('a reconstructed fbc is only ever built from a real fbclid',
+      /if \(fbclid\) setCookie\('_fbc'/.test(identity),
+      'inventing a click ID would claim an ad click that never happened');
+
+    // privacy.html's off-state says this site sets no advertising cookies,
+    // and identity.js writes two. One flag has to govern both.
+    ok('the fb cookies are written only when the pixel is actually live',
+      /META_PIXEL_ID[^\n]*\)\s*ensureFbCookies\(\)/.test(identity),
+      'privacy.html states no advertising cookies are set while META_PIXEL_ID is empty');
+
+    // Advanced Matching on the pixel itself. A bare fbq('init', ID) leaves
+    // Meta to scrape the page for a contact field, which finds nothing at all
+    // on a product page.
+    // Both halves matter. The second is what actually catches a regression:
+    // the re-init inside the identity-change listener satisfies the first on
+    // its own, so a first init that lost its matching object would otherwise
+    // pass while every page-load event went out unmatched.
+    ok('the pixel initialises with the identity this site holds, not a bare id',
+      /fbq\('init', META_PIXEL_ID, [^)]*GlowIdentity/.test(pixel) &&
+      !/fbq\('init', META_PIXEL_ID\)/.test(pixel));
+    ok('and re-initialises when an identity is learned mid-visit',
+      /glow-identity-change/.test(pixel) && /glow-identity-change/.test(identity));
+
+    // Nothing person-level may reach Meta in the clear. Each key in the
+    // Conversions API user_data block has to be the output of a hash.
+    const userData = (capi.match(/const userData = \{([\s\S]*?)\n {2}\};/) || [, ''])[1];
+    const unhashed = userData.split('\n')
+      .map(l => l.match(/\{ (\w+): (.+?) \}/))
+      .filter(Boolean)
+      .filter(([, key, value]) =>
+        !['fbc', 'fbp', 'client_ip_address', 'client_user_agent'].includes(key) &&
+        // Either hashed right here, or the value of a binding named for the
+        // hash it holds. Anything else is a raw field reaching Meta.
+        !/sha256\(|\w+Hash\b/.test(value))
+      .map(([, key]) => key);
+    ok('every person-level match key is hashed before it leaves the server',
+      unhashed.length === 0, `sent in the clear: ${unhashed.join(', ')}`);
+
+    // The purchase is the event with the most identity available and the one
+    // Meta optimises bidding against, so it is the one that must not be
+    // matched on an email alone.
+    const order = read('api/_place-order.js');
+    // Scoped to the Meta call itself. Slicing from the first mention of the
+    // function would start at its import and sweep in TikTok's and X's
+    // purchase calls further down, which carry a city of their own and would
+    // satisfy this while Meta's had lost it.
+    const metaPurchase = (order.match(/await sendMetaPurchaseEvent\(\{([\s\S]*?)\n {4}\}\)/) || [, ''])[1];
+    const missing = ['externalId', 'firstName', 'lastName', 'city', 'state', 'zip', 'country']
+      .filter(k => !new RegExp(`\\b${k}:`).test(metaPurchase));
+    ok('the Purchase event carries the full address identity the order holds',
+      metaPurchase.length > 0 && missing.length === 0,
+      `a purchase knows the buyer completely; this one omits ${missing.join(', ')}`);
+    // external_id only joins the sale to the funnel if it is the same string
+    // the browser sent on the views and adds that led to it. Both order paths
+    // read it from the PaymentIntent, which is the only place the webhook
+    // backstop can find it with no browser left to ask.
+    ok('the Purchase external_id is the same device id the funnel events used',
+      /externalId: \(intent\.metadata && intent\.metadata\.anon_id\)/.test(order) &&
+      /anon_id: \(analytics && String\(analytics\.anonId/.test(read('api/create-payment-intent.js')) &&
+      /anonId: visitor\(\)\.id/.test(relay));
+
+    // identity.js has to be on the page, and ahead of both consumers: it is
+    // read at init by the pixel and delegated to by analytics.js, so a page
+    // that loads it late reports every visitor as unidentified and, worse,
+    // every returning visitor as new.
+    const allPages = [
+      ...pages,
+      ...fs.readdirSync(path.join(ROOT, 'product'), { withFileTypes: true })
+        .filter(d => d.isDirectory())
+        .map(d => `product/${d.name}/index.html`),
+    ];
+    const misordered = allPages.filter(f => {
+      const html = read(f);
+      if (!/js\/meta-pixel\.js/.test(html) && !/js\/analytics\.js/.test(html)) return false;
+      const at = s => html.indexOf(s);
+      if (at('js/identity.js') === -1) return true;
+      const after = ['js/meta-pixel.js', 'js/analytics.js']
+        .filter(s => at(s) !== -1)
+        .every(s => at('js/identity.js') < at(s));
+      return !after;
+    });
+    ok('every page loads identity.js before the pixel and the beacon that read it',
+      misordered.length === 0, misordered.join(', '));
+
+    // Two people, one browser. The saved profile outlives a session, so
+    // signing out has to take it with it.
+    ok('signing out clears the advertising identity',
+      /GlowIdentity\.clearProfile\(\)/.test(read('js/account.js')) &&
+      /function clearProfile/.test(identity));
+    ok('and a different signed-in email discards the previous one saved here',
+      /session\.email && saved\.email/.test(identity));
+  }
+
   // Same reasoning, TikTok's pixel/Events API in place of Meta's.
   if (/ttq\.load\(/.test(read('js/tiktok-pixel.js'))) {
     ok('the privacy policy accounts for the TikTok pixel/Events API capability',

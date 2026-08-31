@@ -10,7 +10,6 @@
 (function () {
   var DASHBOARD_ORIGIN = 'https://glow-dashboard-ruby.vercel.app';
   var SESSION_KEY = 'glow-session-id';
-  var VISITOR_KEY = 'glow-visitor-id';
   var CTX_KEY = 'glow-session-ctx';
 
   function randomId() {
@@ -35,18 +34,18 @@
   // Device-scoped: persists across sessions in localStorage, so "new vs
   // returning" and cohort/repeat-visit questions can be answered without any
   // name or email. isNew is only true the one time this ID is minted.
+  //
+  // Owned by js/identity.js, which loads first on every page and needs the
+  // same ID to send Meta as external_id. Delegated rather than reimplemented
+  // so there is exactly one answer to "which visitor is this": if this file
+  // minted its own, the dashboard and the ad account would be counting two
+  // different populations off the same browser. The fallback covers only the
+  // case where identity.js failed to load at all, and is deliberately not a
+  // second copy of the minting logic: a per-page ID is obviously wrong in the
+  // data rather than quietly half-right.
   function visitor() {
-    try {
-      var id = localStorage.getItem(VISITOR_KEY);
-      var isNew = !id;
-      if (!id) {
-        id = randomId();
-        localStorage.setItem(VISITOR_KEY, id);
-      }
-      return { id: id, isNew: isNew };
-    } catch (e) {
-      return { id: 'no-storage', isNew: false };
-    }
+    if (window.GlowIdentity) return GlowIdentity.visitor();
+    return { id: 'no-identity', isNew: false };
   }
 
   // Landing page, referrer, UTM parameters and ad click IDs only exist on the
@@ -166,20 +165,31 @@
   function relayMeta(name, data, metaEventId) {
     if (!RELAYED[name] || !metaEventId) return;
     try {
+      // Every match key js/identity.js holds, on all four of these events
+      // rather than only on the purchase. This is what the server copy is
+      // scored on: without it the event arrives carrying an IP and a
+      // User-Agent, which is the bottom of Meta's match quality scale, and a
+      // poorly matched event is worth a fraction of a well matched one to
+      // both attribution and optimisation.
+      //
+      // fbc/fbp come from identity.js rather than straight off the cookie
+      // jar because it reconstructs them when Meta's pixel was blocked and
+      // never wrote them, which is precisely the visitor this relay exists
+      // for. Reading document.cookie here instead would send nothing for
+      // them, on exactly the traffic that most needs the server copy.
+      var match = window.GlowIdentity ? GlowIdentity.matchPayload() : {};
+      var payload = {
+        eventName: name,
+        eventId: metaEventId,
+        eventSourceUrl: location.href,
+        customData: data || null,
+      };
+      Object.keys(match).forEach(function (k) { payload[k] = match[k]; });
+
       fetch('/api/meta-event', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          eventName: name,
-          eventId: metaEventId,
-          eventSourceUrl: location.href,
-          // Read here rather than on the server: these are first-party
-          // cookies on this document, and the server sees them only if the
-          // browser hands them over.
-          fbc: cookie('_fbc') || null,
-          fbp: cookie('_fbp') || null,
-          customData: data || null,
-        }),
+        body: JSON.stringify(payload),
         keepalive: true,
       }).catch(function () {});
     } catch (e) {}
@@ -317,9 +327,14 @@
     var ctx = sessionContext(false);
     return {
       sessionId: sessionId(),
+      // Also what api/_place-order.js sends Meta as external_id on the
+      // Purchase event, which is what ties a sale back to the anonymous
+      // page views and add-to-carts that led to it. Both paths read it from
+      // the PaymentIntent's metadata, so the webhook backstop carries it too
+      // even with no browser left to ask.
       anonId: visitor().id,
-      fbc: cookie('_fbc') || null,
-      fbp: cookie('_fbp') || null,
+      fbc: (window.GlowIdentity ? GlowIdentity.fbc() : cookie('_fbc')) || null,
+      fbp: (window.GlowIdentity ? GlowIdentity.fbp() : cookie('_fbp')) || null,
       ttclid: (ctx && ctx.ttclid) || null,
       ttp: cookie('_ttp') || null,
       twclid: (ctx && ctx.twclid) || null,

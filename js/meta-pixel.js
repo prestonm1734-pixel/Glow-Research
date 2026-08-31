@@ -22,34 +22,42 @@
   // flag is actually on; the default text already baked into privacy.html
   // covers the off state correctly on its own.
   //
-  // Automatic Advanced Matching is on for this pixel (Meta Events Manager,
-  // not a setting this codebase controls) — it scans visible page fields for
-  // an email or phone and sends those to Meta too, on top of the hashed
-  // email/phone this codebase deliberately sends via Conversions API on a
-  // purchase. The two live-state notes below cover both: the deliberate
-  // send AND the pixel's own automatic one, since the policy has to describe
-  // what actually happens, not just the part this codebase chose to build.
+  // Both the pixel and the Conversions API now send Advanced Matching
+  // parameters this codebase assembles itself (js/identity.js), on every
+  // event rather than only on a purchase: a random per-device identifier
+  // always, and hashed contact and address details once a customer has
+  // entered them. Automatic Advanced Matching in Events Manager, which scans
+  // visible page fields, is on top of that and is not a setting this codebase
+  // controls. The notes below have to describe all of it, since the policy
+  // states what actually happens and not just the part built here.
   if (typeof META_PIXEL_ID !== 'undefined' && META_PIXEL_ID) {
     var note3 = document.getElementById('metaPixelNote3');
     if (note3) note3.textContent = "We run Meta's advertising pixel and Conversions " +
       'API. Together they send Meta a record of pages viewed, products viewed, items ' +
-      'added to cart, and completed purchases, together with your hashed email or ' +
-      'phone when we have it or when the pixel finds one on the page you are on, so ' +
-      'Meta can measure and target advertising. See section 4 for what that involves ' +
-      'and section 5 for the cookies it sets.';
+      'added to cart, and completed purchases, each one tagged with a random ' +
+      'identifier for your device, and with your hashed email, phone, name and ' +
+      'delivery city, state and postcode once you have entered them or when the ' +
+      'pixel finds a contact field on the page you are on, so Meta can measure and ' +
+      'target advertising. See section 4 for what that involves and section 5 for ' +
+      'the cookies it sets.';
 
     var note4 = document.getElementById('metaPixelNote4');
     if (note4) note4.textContent = 'receives page views, products viewed, items ' +
-      'added to cart, and completed purchases, together with your hashed email or ' +
-      'phone when we have it or when the pixel finds one visible on the page you are ' +
-      "on (a checkout or sign-in field, for example), so Meta can measure and target " +
-      "advertising. This leaves this site and is governed by Meta's own privacy policy.";
+      'added to cart, and completed purchases, each tagged with a random identifier ' +
+      'for your device, and with your hashed email, phone, name and delivery city, ' +
+      'state and postcode once you have entered them or when the pixel finds a ' +
+      'contact field visible on the page you are on (a checkout or sign-in field, ' +
+      'for example), so Meta can measure and target advertising. None of it reaches ' +
+      'Meta in readable form: the pixel hashes these details in your browser, and the ' +
+      'copy that goes by way of our own server is hashed there before it is passed ' +
+      "on. This leaves this site and is governed by Meta's own privacy policy.";
 
     var note5 = document.getElementById('metaPixelNote5');
-    if (note5) note5.textContent = "Meta's advertising pixel sets two cookies of " +
-      'its own (_fbc and _fbp) once enabled, used to match your visit to an ad ' +
-      "click and identify your browser to Meta. These are governed by Meta's own " +
-      'privacy policy, not ours.';
+    if (note5) note5.textContent = "Meta's advertising pixel uses two cookies " +
+      '(_fbc and _fbp), used to match your visit to an ad click and identify your ' +
+      'browser to Meta. We set these ourselves when the pixel has not, so that the ' +
+      'same identifiers reach Meta from our server when your browser blocks the ' +
+      "pixel. Their contents are governed by Meta's own privacy policy, not ours.";
   }
 
   if (typeof META_PIXEL_ID === 'undefined' || !META_PIXEL_ID) return;
@@ -69,7 +77,28 @@
   }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
   /* eslint-enable */
 
-  fbq('init', META_PIXEL_ID);
+  // Advanced Matching, passed explicitly rather than left to the Automatic
+  // Advanced Matching setting in Events Manager. That setting works by
+  // scanning the page for anything that looks like an email or a phone, so it
+  // finds nothing at all on a product page or a home page, and on a checkout
+  // page it only finds a field once it has been filled. js/identity.js knows
+  // what this site actually knows about the visitor: a stable per-device
+  // external_id on every single page view, plus a real email, phone, name and
+  // address once a customer has given them, still there on the next visit.
+  //
+  // Meta's script hashes every one of these with SHA-256 before it leaves the
+  // browser. Plaintext goes in, only hashes go out.
+  fbq('init', META_PIXEL_ID, window.GlowIdentity ? GlowIdentity.advancedMatching() : {});
+
+  // An identity learned mid-visit is the common case, not the exception: the
+  // visitor types an email at checkout on a page whose pixel initialised
+  // while they were still anonymous. Re-initialising with the richer set
+  // means the events after that point carry it. Meta treats a repeat init on
+  // the same pixel ID as an update to the matching parameters, not a second
+  // pixel, so this does not double anything.
+  document.addEventListener('glow-identity-change', function () {
+    if (window.GlowIdentity) fbq('init', META_PIXEL_ID, GlowIdentity.advancedMatching());
+  });
 
   // PageView carries an explicit event id so the server-side copy sent by
   // js/analytics.js through api/meta-event.js can be paired with this one and

@@ -175,6 +175,13 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
     // (api/create-order.js); the webhook path sends the event without them,
     // which lowers Meta's match quality for that one order but does not
     // prevent it from counting.
+    // Every match key the order already contains. A purchase is the one event
+    // where the full set is genuinely known, and it is also the event Meta
+    // optimises bidding against, so leaving name and address off it was
+    // leaving the most valuable event in the funnel matched on email alone.
+    // Read from the shipping address rather than the billing one because
+    // that is the address that always exists here; billing is optional and
+    // falls back to it anyway when creating the order above.
     await sendMetaPurchaseEvent({
       pixelId: META_PIXEL_ID,
       accessToken: process.env.META_CAPI_ACCESS_TOKEN,
@@ -182,6 +189,19 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
       eventSourceUrl: 'https://glowresearch.shop/checkout.html',
       email,
       phone: (customer && customer.phone) || '',
+      // The same per-device ID the browser sends as external_id on every
+      // funnel event (js/identity.js), carried here on the PaymentIntent's
+      // metadata so the webhook backstop has it too. This is what lets Meta
+      // join the sale to the anonymous views and adds that preceded it.
+      externalId: (intent.metadata && intent.metadata.anon_id) || '',
+      firstName: (shipping && shipping.firstName) || '',
+      lastName: (shipping && shipping.lastName) || '',
+      city: (shipping && shipping.city) || '',
+      state: (shipping && shipping.state) || '',
+      zip: (shipping && shipping.zip) || '',
+      // Stated, not guessed: addr() above hardcodes US on every order this
+      // store creates, so this is the country the sale actually shipped to.
+      country: 'US',
       fbc: (intent.metadata && intent.metadata.fbc) || '',
       fbp: (intent.metadata && intent.metadata.fbp) || '',
       clientIp,

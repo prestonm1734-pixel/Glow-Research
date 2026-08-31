@@ -62,6 +62,25 @@ function cleanCustomData(raw) {
   return Object.keys(out).length ? out : undefined;
 }
 
+// The match keys, taken from the body because only the browser knows them:
+// what the visitor typed at checkout, what their signed-in session says, and
+// the per-device external_id js/identity.js mints. Everything is plaintext
+// on the way in and hashed by api/_meta-capi.js on the way out, so nothing
+// identifying is stored here and nothing identifying leaves in the clear.
+//
+// Bounded, not validated for truth. A stranger can post a made-up email to
+// this endpoint, the same way they can post a made-up AddToCart, and the
+// answer is the same: these four events are optimisation signal, a forged one
+// degrades targeting and cannot touch reported revenue. Purchase, which can,
+// is not accepted here at all. The length caps exist so the forgery cannot
+// also be a way to push megabytes through our egress into Meta's API.
+function str(v, max) {
+  if (typeof v !== 'string') return undefined;
+  const trimmed = v.trim();
+  if (!trimmed || trimmed.length > max) return undefined;
+  return trimmed;
+}
+
 // Meta records event_source_url as the page the event happened on, so it has
 // to be one of our pages. A caller-supplied URL is otherwise a way to make
 // our pixel report traffic on a site we do not own.
@@ -82,7 +101,10 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
   const body = req.body && typeof req.body === 'object' ? req.body : {};
-  const { eventName, eventId, eventSourceUrl, fbc, fbp, customData } = body;
+  const {
+    eventName, eventId, eventSourceUrl, fbc, fbp, customData,
+    email, phone, externalId, firstName, lastName, city, state, zip, country,
+  } = body;
 
   if (!ALLOWED.has(eventName)) return res.status(400).json({ error: 'unsupported event' });
   // Without an event_id this cannot be paired with the browser's copy, and an
@@ -101,6 +123,15 @@ export default async function handler(req, res) {
     eventName,
     eventId,
     eventSourceUrl: ownUrl(eventSourceUrl, req.headers.host),
+    email: str(email, 254),
+    phone: str(phone, 32),
+    externalId: str(externalId, 100),
+    firstName: str(firstName, 64),
+    lastName: str(lastName, 64),
+    city: str(city, 64),
+    state: str(state, 32),
+    zip: str(zip, 16),
+    country: str(country, 2),
     fbc: typeof fbc === 'string' && fbc.length <= 200 ? fbc : undefined,
     fbp: typeof fbp === 'string' && fbp.length <= 200 ? fbp : undefined,
     clientIp: (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress,

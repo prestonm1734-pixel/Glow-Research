@@ -334,6 +334,9 @@
 
     document.getElementById('acSignOut').addEventListener('click', function () {
       drop(SESSION);
+      // The advertising identity too, or the next person to use this browser
+      // carries the last one's hashed email to Meta on every page.
+      if (window.GlowIdentity) GlowIdentity.clearProfile();
       // clear the real session too — dropping the local flag only changes the
       // header label, it does not sign anyone out
       var go = function () { location.href = root() + 'index.html'; };

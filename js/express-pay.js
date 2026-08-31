@@ -124,6 +124,24 @@
     const email = ev.payerEmail || '';
     const items = cfg.items();
 
+    // The wallet sheet hands over a verified name, email, phone and address
+    // in one step, which is the richest identity this site ever receives and
+    // the only one an express buyer gives it: they never touch the checkout
+    // form, so nothing else would ever record who they are. Stored before the
+    // charge rather than after, so the events either side of it carry it too.
+    if (window.GlowIdentity) {
+      GlowIdentity.setProfile({
+        email,
+        phone: ev.payerPhone || '',
+        firstName: shipping.firstName,
+        lastName: shipping.lastName,
+        city: shipping.city,
+        state: shipping.state,
+        zip: shipping.zip,
+        country: 'US', // express checkout rejects any other country, see onshippingaddresschange
+      });
+    }
+
     // One more price call with the full address the sheet just handed over
     // (street and city included, unlike the address-change preview above),
     // so the amount confirmed below is priced from exactly what is about to
