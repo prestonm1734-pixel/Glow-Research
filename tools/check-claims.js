@@ -3331,6 +3331,31 @@ console.log('\nprivacy disclosure');
       /excluded from ads reporting/.test(capi),
       'an unnoticed test code is an integration that looks healthy and counts for nothing');
 
+    // "Script error." with no file and no line is a cross-origin script
+    // throwing, and the browser withholds everything else about it. It is
+    // never our own code, since everything in js/ is same-origin and reports
+    // properly, so filing it as a site error buries the real ones underneath
+    // rows that say nothing.
+    {
+      const kinds = ['exception', 'cross_origin', 'resource_load', 'unhandled_rejection']
+        .filter(k => !new RegExp(`kind: '${k}'`).test(relay));
+      ok('every reported error says what kind of failure it was',
+        kinds.length === 0, `missing: ${kinds.join(', ')}`);
+      // Resource load failures fire on the element, not on window, and do not
+      // bubble. Without capture they are invisible.
+      ok('and the listener captures, so a failed resource load is seen at all',
+        /addEventListener\('error', function \(e\) \{[\s\S]*?\}, true\);/.test(relay),
+        'a script that never loaded fires only in the capture phase');
+      // Adding crossorigin to a third-party tag unmasks the message only if
+      // that CDN also sends Access-Control-Allow-Origin, and breaks the script
+      // outright if it does not.
+      const noComments = src => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+      ok('no third-party script tag was given crossorigin to unmask it',
+        !/crossOrigin|crossorigin=/.test(noComments(relay)) &&
+        !/crossOrigin|crossorigin=/.test(noComments(read('js/meta-pixel.js'))),
+        'that trades a working pixel for a better log line');
+    }
+
     // identity.js has to be on the page, and ahead of both consumers: it is
     // read at init by the pixel and delegated to by analytics.js, so a page
     // that loads it late reports every visitor as unidentified and, worse,

@@ -578,16 +578,79 @@
   // Safari also throws twice as often" rather than guessed at. Message and
   // filename only, never the full stack: a stack trace can echo query-string
   // values or other page state into a column with no auth in front of it.
+  // Which third-party scripts are actually on this page. The only clue
+  // available for a cross-origin error, since the browser withholds
+  // everything else about it.
+  function thirdPartyHosts() {
+    var seen = {};
+    var scripts = document.getElementsByTagName('script');
+    for (var i = 0; i < scripts.length; i++) {
+      var src = scripts[i].src;
+      if (!src || src.indexOf(location.origin) === 0) continue;
+      try { seen[new URL(src).host] = 1; } catch (e2) { /* malformed src */ }
+    }
+    return Object.keys(seen).join(' ');
+  }
+
+  // Three different failures arrive on this one event and they were all being
+  // filed as the same thing, which is why the dashboard fills up with rows
+  // that say "Script error." and nothing else.
+  //
+  //   resource_load   a script, image or stylesheet that failed to load at
+  //                   all. Fires on the element rather than on window, with
+  //                   no message and no line, and only in the capture phase,
+  //                   which is why this listener now captures. Previously
+  //                   recorded as an empty error saying nothing whatsoever.
+  //   cross_origin    a script from another origin threw. The browser gives
+  //                   "Script error." and deliberately withholds the message,
+  //                   the file and the line. This is never our own code:
+  //                   everything in js/ is same-origin and reports properly,
+  //                   so filing it as a site error buries the real ones.
+  //                   Recorded with the third-party hosts present instead,
+  //                   which is the only thing there is to go on.
+  //   exception       an actual error in our own code, reported as before.
+  //
+  // All three stay on the js_error event rather than becoming new event
+  // types, because the dashboard is a separate repo and a new type would land
+  // somewhere nothing reads. kind is what tells them apart.
+  //
+  // Deliberately not attempted: adding crossorigin="anonymous" to the
+  // third-party tags to unmask the real message. That only works if the CDN
+  // also sends Access-Control-Allow-Origin, and if it does not, the attribute
+  // stops the script loading at all. Trading a working pixel for a better log
+  // line is the wrong way round.
   window.addEventListener('error', function (e) {
+    var el = e.target;
+    if (el && el !== window && el.tagName &&
+        /^(SCRIPT|IMG|LINK|VIDEO|SOURCE)$/.test(el.tagName)) {
+      track('js_error', {
+        kind: 'resource_load',
+        message: el.tagName.toLowerCase() + ' failed to load',
+        source: (el.src || el.href || '').slice(0, 300),
+        line: null,
+      });
+      return;
+    }
+    if (!e.filename && /^Script error/.test(e.message || '')) {
+      track('js_error', {
+        kind: 'cross_origin',
+        message: 'Script error. Thrown by a third-party script; the browser withholds the detail.',
+        source: thirdPartyHosts(),
+        line: null,
+      });
+      return;
+    }
     track('js_error', {
+      kind: 'exception',
       message: (e.message || '').slice(0, 200),
       source: (e.filename || '').replace(location.origin, ''),
       line: e.lineno || null,
     });
-  });
+  }, true);
   window.addEventListener('unhandledrejection', function (e) {
     var reason = e.reason;
     track('js_error', {
+      kind: 'unhandled_rejection',
       message: ('' + ((reason && reason.message) || reason)).slice(0, 200),
       source: 'unhandledrejection',
       line: null,
