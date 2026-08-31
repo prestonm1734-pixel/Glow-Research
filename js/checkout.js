@@ -624,6 +624,11 @@
         // actually charged once tax, shipping and discounts are applied.
         revenue: data.total,
         itemCount: payload.items.reduce((n, i) => n + (i.qty || 1), 0),
+        // Per line, not just a count: Meta's Purchase takes the same
+        // content_ids/contents the earlier funnel events carry, and without
+        // them a sale cannot be tied to the products in it. Same shape as the
+        // checkout_started call further down.
+        items: payload.items.map(i => ({ sku: i.sku, qty: i.qty, price: i.unitSale })),
       }, stripePaymentIntentId);
     }
     if (window.GlowCart) window.GlowCart.clear();

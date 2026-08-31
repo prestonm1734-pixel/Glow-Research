@@ -3225,6 +3225,36 @@ console.log('\nprivacy disclosure');
       /source_url: ownPageUrl\(/.test(read('api/create-payment-intent.js')),
       'an unchecked URL from a request body attributes our conversions to somebody else\'s site');
 
+    // A Purchase carrying only a value tells Meta a sale happened and not
+    // what was in it, which is what rules out per-product return on ad spend,
+    // suppressing a buyer from ads for the thing they just bought, and any
+    // catalog campaign closing its loop. Every other funnel event already
+    // carried products; this one has to match them.
+    ok('the Purchase event says which products were bought',
+      ['contentIds', 'contents', 'numItems'].every(k => new RegExp(`\\b${k},?$`, 'm').test(metaPurchase)),
+      'value and currency alone cannot be tied to a catalog');
+    ok('and the browser copy of Purchase names them too',
+      /content_ids: bought\.length/.test(relay) && /contents: bought\.length/.test(relay),
+      'the pixel copy would describe a different sale than the server copy');
+
+    // The one that protects revenue reporting. priced.lines is what the
+    // server priced and Stripe verified; the request body is a claim. A
+    // Purchase built from the body could report products that were never
+    // bought, into the same reports every bid is made against.
+    ok('the products on a Purchase come from the priced order, not the request',
+      /const soldLines = priced\.lines\.filter\(l => l\.sku\)/.test(order) &&
+      /const contentIds = soldLines\.map/.test(order),
+      'a Purchase assembled from the request body is a forgeable revenue report');
+
+    // content_ids only means something if the same string identifies the
+    // product everywhere: on the view, on the add, on the sale, and in the
+    // catalog once there is one. SKU is that string.
+    {
+      const skus = (read('js/products-data.js').match(/sku: '[^']+'/g) || []).length;
+      ok('every catalog line has the SKU those ids are drawn from', skus > 0,
+        'content_ids would be empty for a product with no SKU');
+    }
+
     // identity.js has to be on the page, and ahead of both consumers: it is
     // read at init by the pixel and delegated to by analytics.js, so a page
     // that loads it late reports every visitor as unidentified and, worse,

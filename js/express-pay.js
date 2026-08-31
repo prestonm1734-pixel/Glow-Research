@@ -253,6 +253,11 @@
         orderNumber: orderData.orderNumber,
         revenue: orderData.total,
         itemCount: items.reduce((n, i) => n + (i.qty || 1), 0),
+        // Per line, same reasoning as the identical line in js/checkout.js.
+        // Both cart sources (js/cart.js and the buy box in js/product.js)
+        // hand back sku/qty/unitSale, so this shape holds wherever the wallet
+        // sheet was opened from.
+        items: items.map(i => ({ sku: i.sku, qty: i.qty, price: i.unitSale })),
       }, piData.paymentIntentId);
     }
     if (cfg.onPlaced) cfg.onPlaced();

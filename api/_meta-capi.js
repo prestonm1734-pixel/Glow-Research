@@ -162,10 +162,37 @@ export async function sendMetaEvent({
 // wrapper rather than folded into its call site so the money event reads as
 // its own thing: value and currency are required for Purchase in a way they
 // are not for a page view, and this is where that is stated once.
-export function sendMetaPurchaseEvent({ value, currency, ...rest }) {
+// contentIds/contents/numItems are what make this event usable for anything
+// beyond a revenue total. Without them Meta knows a sale happened and what it
+// was worth but not what was in it, which rules out per-product return on ad
+// spend, excluding a buyer from ads for the thing they just bought, and any
+// catalog campaign closing its loop. Every other funnel event already carries
+// them; this one was the exception.
+//
+// The IDs must be the same SKUs the browser sends as content_ids on
+// ViewContent and AddToCart, and the same IDs the product catalog is keyed
+// on, or the three describe unrelated sets of products.
+//
+// orderId is separate from eventId on purpose. eventId is the Stripe
+// PaymentIntent, which is what the browser copy and this one deduplicate
+// against; order_id is the WooCommerce order number, which is what a human
+// reconciling Meta's reporting against the store's own orders would search
+// for. Meta also uses it to reject a genuine duplicate sale.
+export function sendMetaPurchaseEvent({ value, currency, contentIds, contents, numItems, orderId, ...rest }) {
+  const ids = Array.isArray(contentIds) ? contentIds.filter(Boolean) : [];
+  const lines = Array.isArray(contents) ? contents.filter(c => c && c.id) : [];
   return sendMetaEvent({
     ...rest,
     eventName: 'Purchase',
-    customData: { value, currency: currency || 'USD' },
+    customData: {
+      value,
+      currency: currency || 'USD',
+      // content_type only means anything alongside content_ids, so the two
+      // travel together or neither is sent.
+      ...(ids.length ? { content_ids: ids, content_type: 'product' } : {}),
+      ...(lines.length ? { contents: lines } : {}),
+      ...(numItems > 0 ? { num_items: numItems } : {}),
+      ...(orderId ? { order_id: String(orderId) } : {}),
+    },
   });
 }

@@ -135,7 +135,23 @@
       } };
     }
     if (eventType === 'purchase_completed') {
-      return { name: 'Purchase', data: { value: p.revenue || 0, currency: 'USD' } };
+      // The same shape AddToCart and InitiateCheckout already send, so the
+      // funnel describes one set of products end to end. The server copy
+      // (api/_place-order.js) builds the same fields from the priced order
+      // rather than from here, since this one is only as trustworthy as the
+      // page it runs on; both carry the same SKUs, which is what matters.
+      var bought = (p.items || []).filter(function (i) { return i && i.sku; });
+      return { name: 'Purchase', data: {
+        content_ids: bought.length ? bought.map(function (i) { return i.sku; }) : undefined,
+        content_type: bought.length ? 'product' : undefined,
+        contents: bought.length ? bought.map(function (i) {
+          return { id: i.sku, quantity: i.qty || 1, item_price: i.price };
+        }) : undefined,
+        num_items: p.itemCount || undefined,
+        order_id: p.orderNumber ? String(p.orderNumber) : undefined,
+        value: p.revenue || 0,
+        currency: 'USD',
+      } };
     }
     return null;
   }

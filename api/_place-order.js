@@ -190,6 +190,21 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
     const purchaseUrl = (intent.metadata && intent.metadata.source_url)
       || 'https://glowresearch.shop/checkout.html';
 
+    // What was actually bought, taken from priced.lines rather than from
+    // anything the browser said. Same reasoning as the confirmation email
+    // above: these figures are reported as a completed sale, so they have to
+    // be the ones the server priced and Stripe verified, not a cart the
+    // request could have made up. It also means the webhook backstop reports
+    // the same contents as the browser path, with no browser present.
+    //
+    // Lines with no SKU are dropped rather than sent with a blank id: those
+    // are the defensive fee_lines fallback above, and a content_id that
+    // matches nothing in the catalog is worse than one fewer.
+    const soldLines = priced.lines.filter(l => l.sku);
+    const contentIds = soldLines.map(l => l.sku);
+    const contents = soldLines.map(l => ({ id: l.sku, quantity: l.qty, item_price: l.unitSale }));
+    const numItems = soldLines.reduce((n, l) => n + l.qty, 0);
+
     // Read from the shipping address rather than the billing one because
     // that is the address that always exists here; billing is optional and
     // falls back to it anyway when creating the order above.
@@ -218,6 +233,10 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
       clientIp,
       userAgent,
       value: intent.amount_received / 100,
+      contentIds,
+      contents,
+      numItems,
+      orderId: data.number,
     }).catch(() => {});
 
     // Same call, same reasoning, TikTok's Events API in place of Meta's.
