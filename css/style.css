@@ -2327,6 +2327,94 @@ body.qa-open .cart-toast{ opacity:0; pointer-events:none; }
   .cart-ship-bar span{ transition:none; }
 }
 
+/* ---------- age / RUO gate ----------
+   Once per browser session (sessionStorage): a new tab confirms again, a
+   closed-and-reopened session confirms again. Sits above the cart drawer and
+   search overlay (z-index 300-340) so nothing can surface over it, and locks
+   the page behind it from scrolling. */
+/* A dimmed, blurred backdrop rather than solid black: the site stays visible
+   behind the dialog, so it reads as a gate over the page instead of a wall
+   in front of it. */
+.age-gate{
+  position: fixed; inset: 0; z-index: 400;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px 20px;
+  background-color: #000; /* shows before the JS-set image decodes */
+  overflow-y: auto;
+  transition: opacity .25s ease;
+}
+.age-gate.is-going{ opacity: 0; pointer-events: none; }
+html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
+
+/* No card, no border: content sits directly on the gate's own background
+   image, matching the reference this screen is built from. */
+.age-gate-panel{
+  width: 100%; max-width: 460px; margin: auto;
+  text-align: center;
+  padding: 30px 26px 26px;
+  animation: ageGateIn .3s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes ageGateIn{
+  from{ opacity:0; transform: translateY(10px) scale(.98); }
+  to{ opacity:1; transform:none; }
+}
+.age-gate-logo{
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.45rem; font-weight: 600; color: var(--text);
+  display: inline-flex; align-items: center; gap: 3px;
+  margin-bottom: 16px;
+}
+/* .spark is near-black for the light header; on this overlay it needs the
+   same inversion the footer logo gets */
+.age-gate-logo .spark{ font-size: .62em; color: var(--text); }
+.age-gate-eyebrow{
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--text-dimmer); margin-bottom: 10px;
+}
+.age-gate-title{
+  font-size: clamp(1.6rem, 5.6vw, 2.1rem);
+  font-weight: 600; color: var(--text);
+  letter-spacing: -.02em; line-height: 1.15; margin: 0 0 14px;
+}
+.age-gate-copy{
+  font-size: .9rem; line-height: 1.65; color: var(--text-dim);
+  margin: 0 0 26px;
+}
+.age-gate-copy a{ color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+
+/* full-width stacked buttons, matching the reference layout */
+.age-gate .btn{ width: 100%; justify-content: center; }
+.age-gate-enter{ padding: 15px 22px; font-size: .95rem; }
+.age-gate-exit{ margin-top: 9px; padding: 12px 22px; font-size: .88rem; color: var(--text-dim); }
+.age-gate-exit:hover{ color: var(--text); }
+
+/* The same three facts the marquee and FAQ already state, restated small:
+   the one screen where a first-time visitor has nothing else on the page
+   yet telling them this is a real lab supplier. */
+.age-gate-badges{
+  margin: 22px 0 0; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.1);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 8px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .64rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-dimmer);
+}
+
+@media (max-width: 480px){
+  .age-gate-panel{ padding: 26px 22px 22px; }
+  .age-gate-copy{ font-size: .84rem; }
+  .age-gate-badges{ gap: 6px 12px; font-size: .6rem; }
+}
+@media (prefers-reduced-motion: reduce){
+  .age-gate{ transition: none; }
+  .age-gate-panel{ animation: none; }
+}
+/* the panel is only a focus target, never an outlined control */
+.age-gate-panel:focus{ outline: none; }
+
+
 /* the account panels reuse the sign-in field styling */
 .ac-page .si-field{ margin-bottom:16px; }
 .ac-page .si-field label{

@@ -365,7 +365,7 @@
   // the offer waits and tries again rather than competing for the screen.
   function screenIsBusy() {
     return !!document.querySelector(
-      '.cart-overlay.open, .search-overlay.open, .qa-overlay.open'
+      '.cart-overlay.open, .search-overlay.open, .qa-overlay.open, .age-gate'
     );
   }
 
@@ -407,8 +407,8 @@
       el.querySelector('.lo-modal').focus();
       el.addEventListener('keydown', trap);
       el.addEventListener('mousedown', function (e) {
-        // click-outside closes: this is an offer, not a condition of entry,
-        // so it must always be escapable
+        // click-outside closes: unlike the age gate this is an offer, not a
+        // condition of entry, so it must always be escapable
         if (e.target === el) close(true);
       });
     }
