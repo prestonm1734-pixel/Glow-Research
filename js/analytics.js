@@ -333,6 +333,15 @@
       // the PaymentIntent's metadata, so the webhook backstop carries it too
       // even with no browser left to ask.
       anonId: visitor().id,
+      // The page the purchase is actually being made on, which is not always
+      // the checkout: js/express-pay.js runs the wallet sheet on product
+      // pages too, and a sale started there ends there. Both server-side
+      // order paths report this to Meta, TikTok and X as the event's source
+      // URL, so a wallet purchase from /product/<slug>/ is no longer filed
+      // under checkout.html. Query string dropped rather than sent: it can
+      // carry the click IDs and UTMs, which have their own fields already and
+      // have no business sitting in Stripe metadata.
+      sourceUrl: location.origin + location.pathname,
       fbc: (window.GlowIdentity ? GlowIdentity.fbc() : cookie('_fbc')) || null,
       fbp: (window.GlowIdentity ? GlowIdentity.fbp() : cookie('_fbp')) || null,
       ttclid: (ctx && ctx.ttclid) || null,

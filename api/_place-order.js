@@ -179,6 +179,17 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
     // where the full set is genuinely known, and it is also the event Meta
     // optimises bidding against, so leaving name and address off it was
     // leaving the most valuable event in the funnel matched on email alone.
+    // The page the sale actually happened on, recorded on the intent when it
+    // was created (api/create-payment-intent.js, which validates it is one of
+    // ours). Not always the checkout: js/express-pay.js runs the wallet sheet
+    // on product pages, so a tapped Apple Pay purchase can begin and end at
+    // /product/<slug>/. Reported per-order rather than hardcoded so the ad
+    // platforms are told where the conversion happened instead of a page the
+    // buyer may never have opened. The fallback covers an intent created
+    // before this field existed.
+    const purchaseUrl = (intent.metadata && intent.metadata.source_url)
+      || 'https://glowresearch.shop/checkout.html';
+
     // Read from the shipping address rather than the billing one because
     // that is the address that always exists here; billing is optional and
     // falls back to it anyway when creating the order above.
@@ -186,7 +197,7 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
       pixelId: META_PIXEL_ID,
       accessToken: process.env.META_CAPI_ACCESS_TOKEN,
       eventId: paymentIntentId,
-      eventSourceUrl: 'https://glowresearch.shop/checkout.html',
+      eventSourceUrl: purchaseUrl,
       email,
       phone: (customer && customer.phone) || '',
       // The same per-device ID the browser sends as external_id on every
@@ -215,7 +226,7 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
       pixelId: TIKTOK_PIXEL_ID,
       accessToken: process.env.TIKTOK_CAPI_ACCESS_TOKEN,
       eventId: paymentIntentId,
-      eventSourceUrl: 'https://glowresearch.shop/checkout.html',
+      eventSourceUrl: purchaseUrl,
       email,
       phone: (customer && customer.phone) || '',
       ttclid: (intent.metadata && intent.metadata.ttclid) || '',
@@ -236,7 +247,7 @@ export async function placeOrder({ paymentIntentId, intent, priced, email, custo
       accessToken: process.env.X_CAPI_ACCESS_TOKEN,
       xEventId: X_EVENT_IDS.purchase,
       conversionId: paymentIntentId,
-      eventSourceUrl: 'https://glowresearch.shop/checkout.html',
+      eventSourceUrl: purchaseUrl,
       email,
       phone: (customer && customer.phone) || '',
       twclid: (intent.metadata && intent.metadata.twclid) || '',

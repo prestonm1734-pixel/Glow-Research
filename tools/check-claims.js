@@ -3207,6 +3207,24 @@ console.log('\nprivacy disclosure');
       /anon_id: \(analytics && String\(analytics\.anonId/.test(read('api/create-payment-intent.js')) &&
       /anonId: visitor\(\)\.id/.test(relay));
 
+    // A purchase is reported to Meta as having happened on a page, and the
+    // wallet sheet runs on product pages as well as the checkout, so a
+    // hardcoded checkout URL is wrong for every express sale started from a
+    // product page. All three platforms are fed from one value for the same
+    // reason the match keys are: three hardcoded copies is three places to
+    // forget.
+    ok('the purchase source URL is the page the sale happened on, not a hardcoded one',
+      !/eventSourceUrl: 'https:\/\/glowresearch\.shop\/checkout\.html'/.test(order) &&
+      /const purchaseUrl = \(intent\.metadata && intent\.metadata\.source_url\)/.test(order),
+      'express checkout runs on product pages, so checkout.html is not where every sale happens');
+    ok('and the browser reports it without the query string it arrived with',
+      /sourceUrl: location\.origin \+ location\.pathname/.test(relay),
+      'click IDs and UTMs have their own fields and do not belong in Stripe metadata');
+    ok('and the server takes it only if it is one of our own pages',
+      /function ownPageUrl/.test(read('api/create-payment-intent.js')) &&
+      /source_url: ownPageUrl\(/.test(read('api/create-payment-intent.js')),
+      'an unchecked URL from a request body attributes our conversions to somebody else\'s site');
+
     // identity.js has to be on the page, and ahead of both consumers: it is
     // read at init by the pixel and delegated to by analytics.js, so a page
     // that loads it late reports every visitor as unidentified and, worse,

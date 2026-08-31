@@ -14,6 +14,25 @@ import { readBody, isEmail, stripe, encodeOrderMetadata } from './_lib.js';
 import { priceOrderWithTax } from './_lib.js';
 import { PAYMENTS_LIVE } from '../js/products-data.js';
 
+// Accepts only a page on our own site, and returns '' for anything else. Same
+// reasoning as ownUrl() in api/meta-event.js: this value is reported to Meta,
+// TikTok and X as the page a purchase happened on, and a URL taken on trust
+// from a request body would let a caller attribute our conversions to a site
+// we do not own. Kept to origin and path, both because that is all the ad
+// platforms need and because Stripe metadata values are capped at 500
+// characters.
+function ownPageUrl(raw) {
+  if (typeof raw !== 'string' || !raw) return '';
+  try {
+    const u = new URL(raw);
+    if (u.protocol !== 'https:') return '';
+    if (u.hostname !== 'glowresearch.shop') return '';
+    return (u.origin + u.pathname).slice(0, 500);
+  } catch (e) {
+    return '';
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -72,6 +91,14 @@ export default async function handler(req, res) {
     // and compared as text.
     session_id: (analytics && String(analytics.sessionId || '')) || '',
     anon_id: (analytics && String(analytics.anonId || '')) || '',
+    // The page the sale is being made on, reported to Meta/TikTok/X as the
+    // event source URL by api/_place-order.js. Carried on the intent rather
+    // than passed at order time because the webhook backstop has no browser
+    // to ask. Validated to one of our own pages for the same reason
+    // api/meta-event.js validates its own: an unchecked URL from a request
+    // body is a way to make our pixels report traffic on a site we do not
+    // own. Anything else falls back to '' and the caller's own default.
+    source_url: ownPageUrl(analytics && analytics.sourceUrl),
     // Meta's own cookies (js/analytics.js reads them), carried the same way
     // so api/_meta-capi.js can send them with the server-side Purchase event
     // for better match quality — without these, Meta can only match a sale
