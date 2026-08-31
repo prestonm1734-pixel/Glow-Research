@@ -69,16 +69,43 @@
     return { id: id, isNew: isNew };
   }
 
+  // Verbatim, with no decodeURIComponent. Meta compares fbc byte for byte
+  // against the click ID it issued, so decoding a value that contains a
+  // percent escape changes it into one that matches nothing, which is exactly
+  // what Meta's "modified fbclid value in fbc parameter" diagnostic reports.
+  // These cookies hold opaque identifiers, never text, so there is nothing
+  // here that decoding could legitimately be for.
   function cookie(name) {
     var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
-    return m ? decodeURIComponent(m[1]) : '';
+    return m ? m[1] : '';
+  }
+
+  // The query value exactly as it arrived, without the decoding
+  // URLSearchParams applies. URLSearchParams turns a "+" into a space and
+  // "%3D" into "=", either of which produces a click ID Meta never issued.
+  function rawParam(name) {
+    var q = location.search;
+    if (!q) return '';
+    var parts = q.charAt(0) === '?' ? q.slice(1).split('&') : q.split('&');
+    for (var i = 0; i < parts.length; i++) {
+      var eq = parts[i].indexOf('=');
+      if (eq > 0 && parts[i].slice(0, eq) === name) return parts[i].slice(eq + 1);
+    }
+    return '';
   }
 
   // 90 days, matching what Meta's own pixel sets these to, so a reconstructed
   // cookie does not expire sooner than the real one would have.
+  // Written verbatim rather than percent-encoded, for the same reason the
+  // read above does not decode: Meta's own pixel reuses an existing _fbc
+  // instead of overwriting it, so an encoded value here becomes an encoded
+  // value in the pixel's own event too. A value carrying a character that
+  // cannot legally sit in a cookie is not stored at all, since storing a
+  // stripped version of a click ID is storing the wrong click ID.
   function setCookie(name, value) {
+    if (/[;,\s\\"]/.test(value)) return;
     try {
-      document.cookie = name + '=' + encodeURIComponent(value) +
+      document.cookie = name + '=' + value +
         ';path=/;max-age=' + (90 * 24 * 60 * 60) + ';SameSite=Lax' +
         (location.protocol === 'https:' ? ';Secure' : '');
     } catch (e) {}
@@ -112,8 +139,7 @@
       setCookie('_fbp', 'fb.1.' + Date.now() + '.' + Math.floor(Math.random() * 1e10));
     }
     if (!cookie('_fbc')) {
-      var fbclid = '';
-      try { fbclid = new URLSearchParams(location.search).get('fbclid') || ''; } catch (e) {}
+      var fbclid = rawParam('fbclid');
       // Only from a real click ID. With no fbclid there is nothing to encode,
       // and a made-up one would be a claim about an ad click that never
       // happened.

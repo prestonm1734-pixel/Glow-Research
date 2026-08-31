@@ -14,6 +14,18 @@ import { readBody, isEmail, stripe, encodeOrderMetadata } from './_lib.js';
 import { priceOrderWithTax } from './_lib.js';
 import { PAYMENTS_LIVE } from '../js/products-data.js';
 
+// Stripe rejects a metadata value over 500 characters, and rejecting it fails
+// the whole PaymentIntent, which would be a broken checkout rather than a
+// missing analytics field. Click IDs are the only values here whose length we
+// do not control: a modern fbclid can run to several hundred characters.
+// Dropped rather than cut to fit, because a truncated click ID matches nothing
+// on the ad platform's side and gets reported as a modified value, which is
+// worse than sending none at all.
+function clickId(v) {
+  const s = v == null ? '' : String(v);
+  return s.length <= 500 ? s : '';
+}
+
 // Accepts only a page on our own site, and returns '' for anything else. Same
 // reasoning as ownUrl() in api/meta-event.js: this value is reported to Meta,
 // TikTok and X as the page a purchase happened on, and a URL taken on trust
@@ -103,14 +115,14 @@ export default async function handler(req, res) {
     // so api/_meta-capi.js can send them with the server-side Purchase event
     // for better match quality — without these, Meta can only match a sale
     // to a click by hashed email/phone alone.
-    fbc: (analytics && String(analytics.fbc || '')) || '',
-    fbp: (analytics && String(analytics.fbp || '')) || '',
+    fbc: clickId(analytics && analytics.fbc),
+    fbp: clickId(analytics && analytics.fbp),
     // TikTok's own cookie and click ID, same reasoning as fbc/fbp above, for
     // api/_tiktok-capi.js.
-    ttclid: (analytics && String(analytics.ttclid || '')) || '',
-    ttp: (analytics && String(analytics.ttp || '')) || '',
+    ttclid: clickId(analytics && analytics.ttclid),
+    ttp: clickId(analytics && analytics.ttp),
     // X's own click ID, same reasoning, for api/_x-capi.js.
-    twclid: (analytics && String(analytics.twclid || '')) || '',
+    twclid: clickId(analytics && analytics.twclid),
   };
 
   // Only present on the final pricing call, right before confirmPayment() —

@@ -132,8 +132,18 @@ export default async function handler(req, res) {
     state: str(state, 32),
     zip: str(zip, 16),
     country: str(country, 2),
-    fbc: typeof fbc === 'string' && fbc.length <= 200 ? fbc : undefined,
-    fbp: typeof fbp === 'string' && fbp.length <= 200 ? fbp : undefined,
+    // 200 was too small and was silently discarding the best signal we have.
+    // A modern fbclid runs past 200 characters on its own, and fbc wraps it as
+    // fb.1.<13 digit timestamp>.<fbclid>, so a real ad click routinely
+    // produced a value this rejected outright. For a visitor arriving on an ad
+    // with the pixel blocked, that click ID was the only match key on the
+    // event. Bounded, still, because this endpoint is public: the cap exists
+    // to stop somebody pushing megabytes through our egress, not to police the
+    // shape of a click ID. Over-long values are dropped rather than cut down,
+    // here and everywhere else: a truncated click ID matches nothing and Meta
+    // reports it as modified, which is worse than sending none.
+    fbc: typeof fbc === 'string' && fbc.length <= 1024 ? fbc : undefined,
+    fbp: typeof fbp === 'string' && fbp.length <= 1024 ? fbp : undefined,
     clientIp: (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress,
     userAgent: req.headers['user-agent'],
     customData: cleanCustomData(customData),

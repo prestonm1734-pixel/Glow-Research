@@ -3105,7 +3105,12 @@ console.log('\nprivacy disclosure');
     // The three key lists, pulled from the source rather than restated here,
     // so this guard cannot drift from the thing it is guarding.
     const keysIn = (src, re, drop) => {
-      const block = (src.match(re) || [, ''])[1];
+      const block = (src.match(re) || [, ''])[1]
+        // Comments first. A comma in prose ("Bounded, still, because...")
+        // otherwise parses as a key and fails the comparison for a reason
+        // that has nothing to do with the code.
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/\/\/.*$/gm, '');
       return block.split(/[,\n]/)
         .map(x => x.trim().replace(/:.*$/, '').replace(/^\.\.\./, ''))
         .filter(x => /^[A-Za-z_]\w*$/.test(x))
@@ -3253,6 +3258,47 @@ console.log('\nprivacy disclosure');
       const skus = (read('js/products-data.js').match(/sku: '[^']+'/g) || []).length;
       ok('every catalog line has the SKU those ids are drawn from', skus > 0,
         'content_ids would be empty for a product with no SKU');
+    }
+
+    // Click IDs are opaque and Meta compares them byte for byte against what
+    // it issued. Every transform is a corruption, and Meta reports one as
+    // "modified fbclid value in fbc parameter" rather than as a missing field,
+    // so it degrades attribution while still looking like the value is there.
+    // Three ways this codebase could reintroduce it, all guarded.
+    ok('the fb cookies are read verbatim, never URL-decoded',
+      !/decodeURIComponent\(/.test(identity) && !/decodeURIComponent\(/.test(relay),
+      'decoding a percent escape inside a click ID produces one Meta never issued');
+    ok('and written verbatim, never URL-encoded',
+      !/encodeURIComponent\(/.test(identity) &&
+      /document\.cookie = name \+ '=' \+ value/.test(identity),
+      "Meta's pixel reuses an existing _fbc, so an encoded cookie becomes an encoded pixel event");
+    ok('the fbclid is read raw, not through URLSearchParams',
+      /function rawParam/.test(identity) && /rawParam\('fbclid'\)/.test(identity) &&
+      !/URLSearchParams[^\n]*fbclid/.test(identity),
+      'URLSearchParams turns a + into a space and %3D into =, changing the click ID');
+
+    // A modern fbclid is longer than the cap this endpoint originally carried,
+    // so real ad clicks were being dropped outright. The cap has to clear a
+    // realistic click ID with room to spare.
+    {
+      const cap = Number((endpoint.match(/fbc: typeof fbc === 'string' && fbc\.length <= (\d+)/) || [])[1]);
+      ok('the relay accepts a modern fbclid rather than dropping it',
+        cap >= 512, `cap is ${cap}, and fb.1.<timestamp>.<fbclid> passes 230 characters routinely`);
+    }
+
+    // Stripe rejects a metadata value over 500 characters and fails the whole
+    // PaymentIntent with it, so an unbounded click ID here is a broken
+    // checkout, not a missing analytics field.
+    {
+      const cpi = read('api/create-payment-intent.js');
+      const raw = ['fbc', 'fbp', 'ttclid', 'ttp', 'twclid']
+        .filter(k => !new RegExp(`${k}: clickId\\(`).test(cpi));
+      ok('every click ID is bounded before it reaches Stripe metadata',
+        /function clickId/.test(cpi) && raw.length === 0,
+        `unbounded: ${raw.join(', ')}`);
+      ok('and an over-long one is dropped rather than truncated',
+        /return s\.length <= 500 \? s : ''/.test(cpi),
+        'a truncated click ID matches nothing and Meta reports it as modified');
     }
 
     // identity.js has to be on the page, and ahead of both consumers: it is

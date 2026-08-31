@@ -89,9 +89,13 @@
   // pixel forwards below, or api/create-payment-intent.js via ids() — gets
   // them from, so there is one implementation of "how to read a cookie" in
   // this file, not several slightly different ones.
+  // Verbatim, no decodeURIComponent: every cookie read here holds an opaque
+  // advertising identifier that the platform compares byte for byte against
+  // the one it issued. Decoding a percent escape inside one produces an ID
+  // that matches nothing. See the same note in js/identity.js.
   function cookie(name) {
     var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
-    return m ? decodeURIComponent(m[1]) : '';
+    return m ? m[1] : '';
   }
 
   // Our own event names mapped to Meta's standard ones, with just enough of
