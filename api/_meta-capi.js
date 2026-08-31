@@ -30,6 +30,18 @@
 
 import crypto from 'node:crypto';
 
+// Meta sunsets each Graph API version roughly two years after release, and a
+// call to a sunset version fails outright. This was pinned to v20.0, which
+// Meta retires on 24 September 2026: every server-side event would have
+// stopped on that date, silently, because sendMetaEvent swallows its own
+// failures by design. v25.0 shipped in February 2026 and runs to roughly the
+// same point in 2028.
+//
+// Named here rather than inlined in the URL so the next person has one place
+// to change and one date to check. When updating, confirm the new version's
+// own sunset date rather than assuming two years.
+const GRAPH_API_VERSION = 'v25.0';   // sunsets approximately February 2028
+
 function sha256(value) {
   return crypto.createHash('sha256').update(value.trim().toLowerCase()).digest('hex');
 }
@@ -74,6 +86,23 @@ const hashCountry = v => {
 // same ID, which is why js/identity.js is the only thing that mints one.
 const hashId = v => (clean(v) ? sha256(clean(v)) : '');
 
+// Logged once per cold start rather than per event, so it is visible in the
+// Vercel logs without burying them. There is no way to guard an environment
+// variable at build time, and the failure it causes is invisible from the
+// outside: events keep arriving, Events Manager keeps saying active, and the
+// campaigns quietly optimise against nothing.
+let warnedAboutTestCode = false;
+function warnIfTestMode() {
+  if (warnedAboutTestCode || !process.env.META_CAPI_TEST_EVENT_CODE) return;
+  warnedAboutTestCode = true;
+  console.warn(
+    '[meta-capi] META_CAPI_TEST_EVENT_CODE is set. Every server-side event is ' +
+    'being sent as a TEST event and is excluded from ads reporting and delivery ' +
+    'optimisation. Unset it in the Vercel environment unless a debugging ' +
+    'session is actively running.'
+  );
+}
+
 // Never throws, and never awaited by its caller for anything but logging: a
 // Meta API hiccup must not affect whether an order gets created, a
 // confirmation email goes out, or a page finishes loading. The thing being
@@ -84,6 +113,7 @@ export async function sendMetaEvent({
   fbc, fbp, clientIp, userAgent, customData,
 }) {
   if (!pixelId || !accessToken) return; // not configured yet — see META_PIXEL_ID / META_CAPI_ACCESS_TOKEN
+  warnIfTestMode();
 
   // Every key Meta will accept, sent whenever we hold it and omitted entirely
   // when we do not. An absent key costs match quality; an empty or unmatchable
@@ -126,7 +156,7 @@ export async function sendMetaEvent({
   };
 
   try {
-    const resp = await fetch(`https://graph.facebook.com/v20.0/${pixelId}/events`, {
+    const resp = await fetch(`https://graph.facebook.com/${GRAPH_API_VERSION}/${pixelId}/events`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -142,11 +172,17 @@ export async function sendMetaEvent({
         }],
         // Meta's Test Events tool only displays a server-side event if the
         // request carries the code that tool hands out, which is why a real,
-        // working integration can look empty there without this. Set only as
-        // a Vercel environment variable, only for as long as someone is
-        // actively watching that tab — a code left in place has no effect on
-        // production traffic beyond tagging it, but there is no reason to
-        // leave it set once verification is done.
+        // working integration can look empty there without this.
+        //
+        // Leaving it set is not harmless, which an earlier version of this
+        // comment wrongly claimed. Meta treats an event carrying a
+        // test_event_code as a test: it is excluded from ads reporting and
+        // from delivery optimisation. A code left in place after a debugging
+        // session therefore takes every server-side event out of the numbers
+        // the campaigns are optimised against, while Events Manager still
+        // shows the integration as active and receiving. Set it as a Vercel
+        // environment variable only while someone is watching that tab, and
+        // remove it immediately afterwards. See the warning logged below.
         ...(process.env.META_CAPI_TEST_EVENT_CODE ? { test_event_code: process.env.META_CAPI_TEST_EVENT_CODE } : {}),
       }),
     });

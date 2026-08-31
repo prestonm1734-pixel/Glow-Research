@@ -3301,6 +3301,36 @@ console.log('\nprivacy disclosure');
         'a truncated click ID matches nothing and Meta reports it as modified');
     }
 
+    // Meta retires each Graph API version about two years after release, and a
+    // call to a retired one fails outright. sendMetaEvent swallows its own
+    // failures on purpose, so the day that happens every server-side event
+    // stops with no error anywhere a person would see. This was pinned to
+    // v20.0, which Meta retires on 24 September 2026.
+    {
+      const m = capi.match(/const GRAPH_API_VERSION = 'v(\d+)\.0'/);
+      const version = m ? Number(m[1]) : 0;
+      ok('the Graph API version is pinned in one named place',
+        !!m, 'inlining it in the URL means the next person has to go find it');
+      // A floor, not a ceiling. v20 and below are retired or retiring; this
+      // catches a downgrade or a version left to rot, without pretending to
+      // know a release schedule that has not happened yet.
+      ok('and it is not a version Meta has already retired',
+        version >= 21, `pinned to v${version}.0, which Meta has sunset or is about to`);
+      ok('and no call bypasses it with a hardcoded version',
+        !/graph\.facebook\.com\/v\d/.test(capi),
+        'a second hardcoded version is one that will not get updated');
+    }
+
+    // A test_event_code left set after a debugging session takes every
+    // server-side event out of reporting and out of delivery optimisation,
+    // while Events Manager still shows the integration as active. Nothing at
+    // build time can read a Vercel environment variable, so the requirement is
+    // that the code says so and warns at runtime.
+    ok('the test event code warns loudly rather than failing silently',
+      /function warnIfTestMode/.test(capi) && /warnIfTestMode\(\);/.test(capi) &&
+      /excluded from ads reporting/.test(capi),
+      'an unnoticed test code is an integration that looks healthy and counts for nothing');
+
     // identity.js has to be on the page, and ahead of both consumers: it is
     // read at init by the pixel and delegated to by analytics.js, so a page
     // that loads it late reports every visitor as unidentified and, worse,
