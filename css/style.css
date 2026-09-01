@@ -1025,15 +1025,6 @@ button[disabled].si-forgot{ cursor: progress; }
   display:flex; align-items:center; gap: 28px; flex-wrap:wrap;
   justify-content:center; margin-bottom: 44px;
 }
-/* The quiet second action: existing customers, who do not need persuading and
-   should not be given a second button competing with the first. */
-.wl-cta-quiet{
-  font-family: var(--font-display); font-weight:600; font-size:0.98rem;
-  color: var(--text-dim); padding-bottom: 3px;
-  border-bottom: 1px solid transparent; transition: color .2s ease, border-color .2s ease;
-}
-.wl-cta-quiet:hover{ color: var(--text); border-bottom-color: rgba(255,255,255,.5); }
-
 /* The figures sit in a ruled box here rather than under a single top rule as
    they do on the homepage, because centred and unboxed they read as three
    loose captions. Overrides .hero-stats, which this shares for the count-up
