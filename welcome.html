@@ -115,20 +115,18 @@
      Centre-set rather than the homepage's left-set grid: this page has one job
      and one action, so the column is narrow and everything stacks under it. -->
 <section class="wl-hero">
-  <!-- The same file as the homepage hero, cropped differently rather than
-       rendered again: object-fit and object-position on .wl-hero-img are what
-       turn one wide trio shot into a backdrop for a centre-set column, and
-       one file means one download for a visitor who sees both pages.
-
-       alt="" and aria-hidden, unlike the homepage's copy of the same image.
-       There it is the hero's subject and carries a description; here it sits
-       under a three-pass scrim behind centred copy, and describing it a
-       second time to a screen reader that has already been given the h1 is
-       noise rather than access. -->
-  <img class="wl-hero-img" id="wlHeroImage"
-       src="assets/vial-trio-black-v3.jpg"
-       width="1686" height="933" fetchpriority="high" decoding="async"
-       alt="" aria-hidden="true" />
+  <!-- Same clip as the homepage hero, same rules: no autoplay attribute, so
+       js/welcome.js is what starts it and can decline to when the visitor has
+       reduced motion switched on. The poster is the still that was here
+       before, so the scrim always has something under it, script or not.
+       object-fit on .wl-hero-img crops the clip exactly as it cropped the
+       still, which is why the two are interchangeable. -->
+  <video class="wl-hero-img" id="wlHeroVideo"
+         poster="assets/hero-vial-poster.jpg"
+         width="1920" height="1080"
+         muted loop playsinline preload="auto" aria-hidden="true">
+    <source src="assets/hero-vial-loop-v3.mp4" type="video/mp4" />
+  </video>
   <div class="wl-hero-scrim" aria-hidden="true"></div>
 
   <div class="container wl-hero-inner">

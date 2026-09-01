@@ -489,29 +489,22 @@ button[disabled].si-forgot{ cursor: progress; }
    sitting boxed inside it. Left edge fades to black so the copy stays legible. */
 .hero-visual-img{
   position:absolute; z-index:0;
-  /* Pushed hard right and sized past the viewport so the third vial is cut by
-     the section's own overflow:hidden. The trio render carries roughly 230px
-     of black to the right of that vial, so anything short of this leaves the
-     photograph ending in mid-air with a gap after it, which is what the
-     previous 8% and its right-edge fade were working around. Cutting the vial
-     instead reads as a frame that continues past the page rather than one
-     that ran out, and it is what the shot was composed for.
-
-     Right offset in percent, width in vw with a ceiling: the two scale
-     together, so the vial stays cut at 1024 and at 1920 without a breakpoint
-     between them. The ceiling is the file's own width, since past that it
-     would be upscaled. */
-  right: -23%; bottom: -10%;
-  width: min(1686px, 118vw); height:auto; max-width:none;
+  /* Moved left again, -6% to 2% to 8%. What made 8% possible is the second
+     stop added to the mask below: at 8% the clip no longer reaches the right
+     edge, and previously that read as a photograph cut off short. Fading its
+     right edge out instead turns the same gap into the frame dissolving into
+     the section, which is what the left edge has always done. */
+  right: 8%; bottom: -9%;
+  width: min(1240px, 88vw); height:auto; max-width:none;
   border-radius: 0;
-  /* Left edge only. Transparent until 4%, solid from 42% on: the right side
-     has to stay solid all the way out now, because the edge that used to need
-     fading is off screen and being cropped instead. The radial keeps the
-     vignette over the vials so the middle of the shot carries the light. */
-  -webkit-mask-image: linear-gradient(100deg, transparent 0%, transparent 4%, #000 42%, #000 100%),
+  /* Both edges now: transparent until 4%, solid across the middle, then back
+     out from 68% so the right side blends into black rather than ending. The
+     radial pulls in with it, recentred from 62% to 55% to follow the clip
+     left, so the vignette still sits over the vials and not beside them. */
+  -webkit-mask-image: linear-gradient(100deg, transparent 0%, transparent 4%, #000 40%, #000 68%, transparent 100%),
                        radial-gradient(ellipse 92% 90% at 55% 45%, #000 48%, transparent 96%);
   -webkit-mask-composite: source-in;
-          mask-image: linear-gradient(100deg, transparent 0%, transparent 4%, #000 42%, #000 100%),
+          mask-image: linear-gradient(100deg, transparent 0%, transparent 4%, #000 40%, #000 68%, transparent 100%),
                        radial-gradient(ellipse 92% 90% at 55% 45%, #000 48%, transparent 96%);
           mask-composite: intersect;
   opacity: .82;
@@ -951,21 +944,14 @@ button[disabled].si-forgot{ cursor: progress; }
   position:relative; overflow:hidden; background: #000;
   padding: clamp(72px, 11vw, 132px) 0 clamp(64px, 9vw, 104px);
 }
-/* The art is a backdrop, not a subject, and this page sets its copy down the
-   middle rather than to one side, so the crop is centred to match: the trio
-   sits symmetrically behind a symmetrical column, one vial either side of the
-   headline and the third directly behind it. Dimmed, because the headline is
-   set over it and the labels are light enough at full brightness to compete
-   with the type. alt="" and aria-hidden because it carries no information the
-   copy does not.
-
-   72% rather than dead centre. On a wide screen the frame and the section are
-   near enough the same shape that cover crops almost nothing and this barely
-   registers; on a phone it is the whole picture, and it is what keeps a whole
-   vial in the crop instead of the gap between two of them. */
+/* The art is a backdrop, not a subject. Cropped hard to the right so the trio
+   reads as one vial entering frame beside the copy rather than three sitting
+   behind it, and dimmed, because the headline is set over it and the vial
+   labels are light enough at full brightness to compete with the type.
+   alt="" and aria-hidden because it carries no information the copy does not. */
 .wl-hero-img{
   position:absolute; inset:0; width:100%; height:100%;
-  object-fit: cover; object-position: 72% center;
+  object-fit: cover; object-position: 92% center;
   /* .62 was dimming the clip to the point where the vial barely registered.
      .8 is as far as this goes: past about .9 the sub-headline starts losing
      contrast where it crosses the glass. */
@@ -1407,22 +1393,19 @@ html:not(.js) .faq-a{ max-height: none; }
      what made everything (buttons, nav) look flush against the edges */
   .hero-grid{ min-height: 0; padding-top: 26px; padding-bottom: 34px; }
   .hero-copy{ max-width: none; }
-  /* object-fit:cover on a portrait phone crops a 16:9 frame down to roughly a
-     quarter of its width, so which quarter is the whole decision. The wide
-     desktop treatment above is off: three vials at this width would each be a
-     sliver. One vial, framed whole, is what a phone has room for.
-
-     86%, not the 100% the single-vial clip used. 100% aligns the frame's right
-     edge with the element's, and this render carries black out past the third
-     vial, so 100% put that black on screen and sliced the vial down its
-     middle at the left edge. 86% brings the whole of it in. The scale is what
-     it was: it crops the empty top and bottom of the frame back off after
-     cover has fit the height. */
+  /* The vial sits at about 78% across the 16:9 frame, and object-fit:cover on
+     a portrait phone crops the sides off hard. At the old 50% that crop was
+     centred, which cut the vial out of the picture entirely: the hero was
+     rendering a starfield and nothing else. 100% aligns the frame's right
+     edge with the element's, which brings the vial in and lands it left of
+     centre on screen, behind the copy where the scrim can hold it down.
+     Opacity up from .14 with it, since none of this is worth cropping
+     correctly if it is still invisible. */
   .hero-visual-img{
     display:block;
     position:absolute; inset:0; z-index:0;
     width:100%; height:100%; max-width:none;
-    object-fit:cover; object-position: 86% 40%;
+    object-fit:cover; object-position: 100% 40%;
     transform: scale(1.3);
     opacity:.38;
     -webkit-mask-image: radial-gradient(ellipse 130% 85% at 50% 40%, #000 42%, transparent 92%);

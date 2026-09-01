@@ -3598,24 +3598,31 @@ console.log('\ndeploy headers');
  * that had already been captured and turned into an order redirected the
  * buyer to /product/<slug>/thank-you.html and showed them a 404.
  * ------------------------------------------------------------------------- */
-/* The hero still, on both pages that carry one. It replaced a 4MB clip, and
-   what has to be checked changed with it: nothing plays, so there is no
-   autoplay attribute to police and no reduced-motion gate to require. What is
-   left is an image every visitor downloads before deciding to stay, and three
-   product labels printed inside it. The labels are why this block is longer
-   than it looks like it should be. See HERO_LABELS. */
-console.log('\nhero image');
-{
-  // [page, the id on its <img>, whether that copy is the described one]
-  const heroes = [
-    ['index.html', 'heroVisual', true],
-    ['welcome.html', 'wlHeroImage', false],
-  ];
-  const sources = new Set();
+/* The homepage hero video. Four properties, each of which is the difference
+   between a background and a nuisance:
 
-  // Dimensions straight out of the file header, so the check compares the real
-  // asset rather than two numbers typed into the markup: walk the JPEG segment
-  // chain to the SOFn frame header.
+   muted and playsinline, or a phone takes the clip fullscreen and plays audio
+   at someone; a poster, so the hero is never a black rectangle while 2.8MB
+   buffers, and so a reader with no JavaScript still gets the still the hero
+   used before the clip existed; and no autoplay attribute, because
+   js/script.js is what starts it and that is the only place
+   prefers-reduced-motion can be honoured. CSS cannot stop a video that has
+   already begun. */
+console.log('\nhero video');
+{
+  // [page, the id on its <video>, the script that starts it]
+  const heroes = [
+    ['index.html', 'heroVisual', 'js/script.js'],
+    ['welcome.html', 'wlHeroVideo', 'js/welcome.js'],
+  ];
+  const clips = new Set();
+  const posters = new Set();
+  const declared = {};
+
+  // Dimensions straight out of the file headers, so the check compares the
+  // real assets rather than two numbers typed into the markup. JPEG: walk the
+  // segment chain to the SOFn frame header. MP4: the tkhd box, whose last two
+  // 32-bit words are the track's 16.16 fixed-point width and height.
   const jpegSize = f => {
     const b = fs.readFileSync(path.join(ROOT, f));
     let o = 2;
@@ -3630,117 +3637,142 @@ console.log('\nhero image');
     }
     return null;
   };
+  const mp4Size = f => {
+    const b = fs.readFileSync(path.join(ROOT, f));
+    const CONT = new Set(['moov', 'trak', 'mdia', 'minf', 'stbl']);
+    let found = null;
+    (function walk(s, e) {
+      let o = s;
+      while (o + 8 <= e) {
+        const size = b.readUInt32BE(o), type = b.toString('ascii', o + 4, o + 8);
+        if (size < 8) break;
+        if (type === 'tkhd' && !found) {
+          found = { w: b.readUInt32BE(o + size - 8) / 65536, h: b.readUInt32BE(o + size - 4) / 65536 };
+        }
+        if (CONT.has(type)) walk(o + 8, o + size);
+        o += size;
+      }
+    })(0, b.length);
+    return found;
+  };
 
-  heroes.forEach(([page, id, described]) => {
-    const tag = (read(page).match(new RegExp(`<img[^>]*id="${id}"[^>]*>`)) || [''])[0];
-    ok(`${page} carries its hero image`, !!tag);
+  heroes.forEach(([page, id, starter]) => {
+    const tag = (read(page).match(new RegExp(`<video[^>]*id="${id}"[\\s\\S]*?</video>`)) || [''])[0];
+    ok(`${page} carries its hero video`, !!tag);
     if (!tag) return;
 
-    const src = (tag.match(/src="([^"]+)"/) || [])[1];
-    ok(`${page}: its source is in the repo`,
-      !!src && fs.existsSync(path.join(ROOT, src)),
-      src ? `${src} is missing` : 'no src attribute');
-    if (src) sources.add(src);
+    ok(`${page}: muted and inline, so no phone hijacks the page with it`,
+      /\bmuted\b/.test(tag) && /\bplaysinline\b/.test(tag));
+    ok(`${page}: it loops`, /\bloop\b/.test(tag));
 
-    // The box has to be reserved before the bytes arrive or the hero shifts
-    // under the copy, and reserved at the file's real shape or it shifts
-    // twice. Checked against the header rather than against itself.
-    const w = +(tag.match(/\bwidth="(\d+)"/) || [])[1];
-    const h = +(tag.match(/\bheight="(\d+)"/) || [])[1];
-    ok(`${page}: declares width and height, so the box is reserved before it loads`, !!w && !!h);
-    if (w && h && src && fs.existsSync(path.join(ROOT, src))) {
-      const j = jpegSize(src);
-      ok(`${page}: its declared ${w}x${h} is the file's real size`,
-        !!j && j.w === w && j.h === h,
-        j ? `${src} is actually ${j.w}x${j.h}` : `could not read ${src}`);
-    }
+    // The poster is the clip's own first frame. A poster that is a separate
+    // render pops the moment playback starts, which is worse than no poster
+    // at all, so what is checked is not that one exists but that it is the
+    // same shape as the clip it stands in for. Dimensions are read out of
+    // both files below.
+    const poster = (tag.match(/poster="([^"]+)"/) || [])[1];
+    ok(`${page}: posters the clip's own frame, so there is no pop when it starts`,
+      !!poster && fs.existsSync(path.join(ROOT, poster)),
+      poster ? `poster ${poster} is not in the repo` : 'no poster attribute');
+    ok(`${page}: preloads, since the poster is meant to be brief and not the experience`,
+      /preload="auto"/.test(tag));
+    ok(`${page}: declares width and height, so the box is reserved before metadata`,
+      /\bwidth="\d+"/.test(tag) && /\bheight="\d+"/.test(tag));
+    if (poster) posters.add(poster);
+    declared[page] = {
+      w: +(tag.match(/\bwidth="(\d+)"/) || [])[1],
+      h: +(tag.match(/\bheight="(\d+)"/) || [])[1],
+      poster,
+    };
+    ok(`${page}: does not autoplay from markup, which would ignore reduced motion`,
+      !/\bautoplay\b/.test(tag),
+      `remove autoplay: ${starter} starts it, gated on prefers-reduced-motion`);
+    ok(`${page}: ${starter} starts it only when reduced motion is not requested`,
+      /prefers-reduced-motion: reduce/.test(read(starter)) &&
+      new RegExp(`getElementById\\('${id}'\\)`).test(read(starter)));
 
-    // The largest paint in the viewport on the page it sits on. Left at the
-    // default it is discovered behind the stylesheet and the fonts.
-    ok(`${page}: fetches its hero at high priority`, /fetchpriority="high"/.test(tag));
-
-    // One copy describes the shot; the other is backdrop under a scrim on a
-    // page whose h1 has already said it. Both are defensible. An img carrying
-    // neither is not, and that is what this catches.
-    ok(described
-      ? `${page}: its hero carries alt text`
-      : `${page}: its hero is marked decorative, since the homepage copy describes it`,
-      described
-        ? /alt="[^"]{20,}"/.test(tag)
-        : /alt=""/.test(tag) && /aria-hidden="true"/.test(tag));
+    const src = (tag.match(/<source src="([^"]+)"/) || [])[1];
+    ok(`${page}: its source is in the repo`, !!src && fs.existsSync(path.join(ROOT, src)),
+      src ? `${src} is missing` : 'no <source>');
+    if (src) clips.add(src);
   });
 
-  // Still black underneath: this is what shows behind the masked edges on the
-  // homepage, and for the instant before the image paints on both.
+  // A hero that plays on arrival is downloaded by every visitor before they
+  // have decided to stay, paid traffic included. No hard rule on the number,
+  // but it should be a deliberate figure rather than whatever came out of the
+  // render.
+  [...clips].filter(s => fs.existsSync(path.join(ROOT, s))).forEach(s => {
+    const mb = fs.statSync(path.join(ROOT, s)).size / 1048576;
+    ok(`${s} is ${mb.toFixed(1)}MB, within the 6MB a hero should cost`, mb <= 6,
+      'compress it or shorten the loop before this ships to paid traffic');
+  });
+
+  // /assets/ is served immutable for a year (vercel.json), so a clip edited in
+  // place never reaches anyone who has already visited. The only way to ship a
+  // new cut is a new filename, and the only way to notice you forgot is this:
+  // every referenced clip has to actually be a file in the repo, and nothing
+  // may reference a name that is no longer there.
+  const orphaned = [...clips].filter(s => !fs.existsSync(path.join(ROOT, s)));
+  ok('every hero clip referenced is a file that exists, so no page points at a cut that was replaced',
+    orphaned.length === 0, orphaned.join(', '));
+
+  // Still black underneath. The poster covers the buffering window, but this
+  // is what shows for the instant before even that paints, and behind the
+  // clip's own masked edges on the homepage.
   const css = read('css/style.css');
   const sectionIsBlack = sel => {
     const block = (css.match(new RegExp(`\\${sel}\\{[^}]*\\}`)) || [''])[0];
     return /background:\s*#000(000)?\s*;/.test(block);
   };
-  ok('both hero sections paint pure black behind the image',
+  ok('both hero sections paint pure black behind the clip',
     sectionIsBlack('.hero') && sectionIsBlack('.wl-hero'));
 
-  // /assets/ is served immutable for a year (vercel.json), so an image edited
-  // in place never reaches anyone who has already visited. The only way to
-  // ship a new render is a new filename, and the only way to notice you forgot
-  // is this.
-  const orphaned = [...sources].filter(s => !fs.existsSync(path.join(ROOT, s)));
-  ok('every hero image referenced is a file that exists, so no page points at a render that was replaced',
-    orphaned.length === 0, orphaned.join(', '));
+  // The three shapes that have to agree, or the hero jumps when the clip
+  // starts: the poster, the clip, and the width/height the markup declares.
+  // Compared as aspect ratios read from the files themselves, because the
+  // homepage sizes its clip with height:auto off exactly these numbers.
+  const clip = [...clips][0];
+  if (clip && fs.existsSync(path.join(ROOT, clip))) {
+    const v = mp4Size(clip);
+    ok(`${clip} reports its dimensions`, !!v);
+    posters.forEach(pf => {
+      const j = jpegSize(pf);
+      ok(`${pf} reports its dimensions`, !!j);
+      if (j && v) {
+        ok(`${pf} is the same shape as the clip (${j.w}x${j.h} vs ${v.w}x${v.h})`,
+          Math.abs(j.w / j.h - v.w / v.h) < 0.01,
+          'a poster of a different aspect letterboxes or crops against the video');
+      }
+    });
+    Object.entries(declared).forEach(([page, d]) => {
+      ok(`${page}: its declared ${d.w}x${d.h} matches the clip`,
+        v && Math.abs(d.w / d.h - v.w / v.h) < 0.01,
+        'the reserved box is a different shape from the video that fills it');
+    });
+  }
 
-  // Downloaded by every visitor before they have decided to stay, paid traffic
-  // included. No hard rule on the number, but it should be a deliberate figure
-  // rather than whatever came out of the render.
-  [...sources].filter(s => fs.existsSync(path.join(ROOT, s))).forEach(s => {
-    const kb = fs.statSync(path.join(ROOT, s)).size / 1024;
-    ok(`${s} is ${Math.round(kb)}KB, within the 400KB a hero should cost`, kb <= 400,
-      'recompress it before this ships to paid traffic');
+  // A poster that loads slower than it saves is not doing its job.
+  posters.forEach(pf => {
+    if (!fs.existsSync(path.join(ROOT, pf))) return;
+    const kb = fs.statSync(path.join(ROOT, pf)).size / 1024;
+    ok(`${pf} is ${Math.round(kb)}KB, light enough to beat the clip to the screen`, kb <= 500);
   });
 
-  /* What the three vial labels in the hero photograph actually print,
-     transcribed here because nothing can read them out of a JPEG.
-
-     This list exists because of how the last one failed. The shot this
-     replaces printed "GLP-3 (RT)" on a label and stayed up as the sitewide
-     share image for weeks after that compound left the catalog and every
-     mention of it was stripped from the copy. Every other check in this file
-     reads text, and a claim baked into a photograph is invisible to all of
-     them.
-
-     So the claim is written down somewhere a check can reach. A printed
-     milligram figure and a printed purity are assertions exactly as a
-     sentence is, and these three are now held to the catalog: change a size,
-     drop a product, or let a lot come back below what is printed, and this
-     fails naming the photograph that has to be re-rendered. If the image is
-     re-rendered, this list is what has to move with it, and it is
-     deliberately the only place to do that.
-
-     Purity is a floor rather than an equality: the labels print a whole 99%,
-     and a lot testing higher does not make the photograph wrong. A lot
-     testing lower does. */
-  const HERO_LABELS = [
-    { name: 'MOTS-C', mg: '10mg', purityFloor: 99 },
-    { name: 'Tesamorelin', mg: '10mg', purityFloor: 99 },
-    { name: 'GHK-Cu', mg: '50mg', purityFloor: 99 },
-  ];
-  HERO_LABELS.forEach(label => {
-    const prod = GLOW_PRODUCTS.find(p => p.name === label.name);
-    ok(`the hero photograph's ${label.name} label names a product the catalog carries`, !!prod);
-    if (!prod) return;
-    ok(`and ${label.name} is sold in the ${label.mg} printed on it`,
-      prod.sizes.some(s => s.mg === label.mg),
-      `catalog carries ${prod.sizes.map(s => s.mg).join(', ')}`);
-    ok(`and its ${prod.purity} is at or above the ${label.purityFloor}% printed on it`,
-      parseFloat(prod.purity) >= label.purityFloor,
-      'the photograph prints a purity this lot does not reach');
+  // faststart: moov has to sit ahead of mdat or the browser downloads the
+  // whole clip before it can show frame one, which defeats having a hero
+  // video at all on a slow connection. `ffmpeg -c copy -movflags +faststart`.
+  clips.forEach(c => {
+    if (!fs.existsSync(path.join(ROOT, c))) return;
+    const b = fs.readFileSync(path.join(ROOT, c));
+    const order = []; let o = 0;
+    while (o + 8 <= b.length) {
+      const s = b.readUInt32BE(o); if (s < 8) break;
+      order.push(b.toString('ascii', o + 4, o + 8)); o += s;
+    }
+    ok(`${c} is faststart, so playback can begin before the file finishes`,
+      order.indexOf('moov') !== -1 && order.indexOf('moov') < order.indexOf('mdat'),
+      `box order is ${order.join(' ')}; remux with -c copy -movflags +faststart`);
   });
-
-  // And the alt text has to name the same three, since that is what a screen
-  // reader is handed in place of the photograph.
-  const heroAlt = (read('index.html').match(/id="heroVisual"[^>]*alt="([^"]*)"/) || [, ''])[1];
-  const unnamed = HERO_LABELS.filter(l => !heroAlt.toLowerCase().includes(l.name.toLowerCase()));
-  ok('the homepage alt text names every vial in the photograph',
-    unnamed.length === 0, `missing: ${unnamed.map(l => l.name).join(', ')}`);
 }
 
 /* The masthead logo goes home from everywhere. index.html is the one page
