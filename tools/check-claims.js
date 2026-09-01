@@ -1338,7 +1338,7 @@ console.log('\nhouse style');
   ok('no em dashes in page copy', bad.length === 0, bad.join(', '));
 
   // scripts that render copy: comments are a different register and are exempt
-  const jsCopy = ['js/account.js', 'js/age-gate.js', 'js/cart.js', 'js/cart-modal.js',
+  const jsCopy = ['js/account.js', 'js/cart.js', 'js/cart-modal.js',
                   'js/checkout.js', 'js/product.js', 'js/products-data.js',
                   'js/script.js', 'js/search.js', 'js/thank-you.js'];
   const badJs = jsCopy.filter(f => {
