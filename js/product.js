@@ -12,7 +12,7 @@
   // does too rather than keeping its own .toFixed(2) that always shows cents.
   const money = fmtPrice;
 
-  // NO_DISPATCH_DAY, NO_DELIVERY_DAY, DISPATCH_CUTOFF_HOUR,
+  // NO_DISPATCH_DAYS, NO_DELIVERY_DAY, DISPATCH_CUTOFF_HOUR,
   // DISPATCH_CUTOFF_PDP_LABEL, DISPATCH_LABEL and TRANSIT_DAYS come from
   // js/products-data.js. The shipping page and the marquee state the same
   // figures in words, so they are sitewide constants rather than ones this
@@ -84,7 +84,10 @@
     const today = anchor(nowParts);
     let d = today;
     if (Number(nowParts.hour) >= DISPATCH_CUTOFF_HOUR) d = addDays(d, 1);
-    if (d.getUTCDay() === NO_DISPATCH_DAY) d = addDays(d, 1);
+    // A while, not an if: Saturday and Sunday are consecutive non-dispatch
+    // days, so landing on Saturday needs two steps forward to reach Monday,
+    // not one.
+    while (NO_DISPATCH_DAYS.includes(d.getUTCDay())) d = addDays(d, 1);
     const dispatchesToday = d.getTime() === today.getTime();
 
     d = addDays(d, TRANSIT_DAYS);

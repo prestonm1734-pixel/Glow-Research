@@ -659,9 +659,9 @@ const BATCHES_TESTED = 150;
 // again, and a string typed into a template is not a number the audit can pin.
 //
 // This was a 2:00 PM PST cutoff, then briefly "one business day" (wrong in
-// the other direction: Saturday is a dispatch day here, and Sunday is the
-// only day nothing leaves), then no cutoff at all once the old one turned
-// out to be a claim nothing in the code actually kept.
+// the other direction, at the time: Saturday was a dispatch day, and Sunday
+// was the only day nothing left), then no cutoff at all once the old one
+// turned out to be a claim nothing in the code actually kept.
 //
 // The fulfilment partner has since confirmed a real one: an order placed by
 // DISPATCH_CUTOFF_HOUR ships that same day; placed after, it ships the next
@@ -670,15 +670,17 @@ const BATCHES_TESTED = 150;
 // copy, and check-claims.js pins every stated cutoff time on the site to
 // this constant so it cannot drift the way the 2:00 PM one did.
 //
-// NO_DISPATCH_DAY and NO_DELIVERY_DAY are getUTCDay() indexes, so the estimate
-// on the product page and the words on ten others read the same values rather
-// than each carrying their own idea of which day is the exception. They are
-// deliberately two constants that happen to share a value: "we do not ship on
-// Sunday" and "FedEx does not deliver on Sunday" are separate facts, and if
-// either changes it should be changeable on its own.
-const NO_DISPATCH_DAY = 0;                    // Sunday, in getUTCDay() terms
+// Dispatch is Monday through Friday only as of September 2026 — the
+// fulfilment partner does not run Saturday pickups. NO_DISPATCH_DAYS and
+// NO_DELIVERY_DAY are getUTCDay() values, so the estimate on the product
+// page and the words on shipping-policy.html read the same values rather
+// than each carrying their own idea of which days those are. They are
+// deliberately separate facts, not one list reused twice: nothing leaves the
+// warehouse on a Saturday or a Sunday, but a package already in transit can
+// still be delivered on a Saturday, only not a Sunday. Either can change on
+// its own without the other needing to.
+const NO_DISPATCH_DAYS = [0, 6];              // Sunday and Saturday, in getUTCDay() terms
 const NO_DELIVERY_DAY = 0;                    // FedEx does not deliver Sundays
-const NO_DISPATCH_DAY_NAME = 'Sunday';
 // 24-hour, Pacific wall-clock — js/product.js reads Pacific parts the same
 // way it already does for the day-of-week check, so the two never disagree
 // about what "now" means.
@@ -696,10 +698,9 @@ const DISPATCH_CUTOFF_TICKER = '1:00 PM PT';
 // separate from DISPATCH_CUTOFF_LABEL rather than overloading it, since only
 // the product page's live cutoff line uses this exact phrasing.
 const DISPATCH_CUTOFF_PDP_LABEL = '1:00 PM PST';
-// "dispatch day", not "business day": Saturday is a real dispatch day here,
-// and "business day" carries a Mon-Fri connotation strong enough that saying
-// it would leave a Friday-afternoon order thinking it goes out Monday when
-// it actually goes out Saturday. Sunday is the only day that isn't one.
+// "dispatch day" rather than "business day" purely for consistency with the
+// rest of the site's wording, even though the two now name the same five
+// days: Monday through Friday.
 const DISPATCH_LABEL = `the same day when ordered by ${DISPATCH_CUTOFF_LABEL}, otherwise the next dispatch day`;
 
 // FedEx transit. Also the span the product page's arrival estimate counts
@@ -924,7 +925,7 @@ const FAQS = [
   },
   {
     // Every figure here is the constant the rest of the site quotes: the
-    // dispatch rule from NO_DISPATCH_DAY, the transit from
+    // dispatch rule from DISPATCH_LABEL, the transit from
     // TRANSIT_DAYS. check-claims.js pins both sitewide, so this answer cannot
     // drift from the shipping page.
     q: 'How fast does my order ship?',
@@ -1690,9 +1691,8 @@ if (typeof module !== 'undefined' && module.exports) {
     cartUpsell,
     avgPurity,
     BATCHES_TESTED,
-    NO_DISPATCH_DAY,
+    NO_DISPATCH_DAYS,
     NO_DELIVERY_DAY,
-    NO_DISPATCH_DAY_NAME,
     DISPATCH_CUTOFF_HOUR,
     DISPATCH_CUTOFF_LABEL,
     DISPATCH_CUTOFF_TICKER,

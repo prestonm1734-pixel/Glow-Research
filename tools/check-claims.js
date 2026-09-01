@@ -25,7 +25,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
-  avgPurity, BATCHES_TESTED, TRANSIT_DAYS, DISPATCH_LABEL, NO_DISPATCH_DAY_NAME,
+  avgPurity, BATCHES_TESTED, TRANSIT_DAYS, DISPATCH_LABEL,
   DISPATCH_CUTOFF_HOUR, DISPATCH_CUTOFF_LABEL, DISPATCH_CUTOFF_TICKER, DISPATCH_CUTOFF_PDP_LABEL,
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord, PACKAGING_PLAIN,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
@@ -86,9 +86,9 @@ console.log('\nfree shipping threshold');
 
 /* ---------------------------------------------------------------------------
  * 2. Dispatch window. This was a 2 PM PST cutoff, then briefly "one business
- *    day" (wrong in the other direction: Saturday is a dispatch day here, and
- *    Sunday is the only day nothing leaves), then no cutoff at all once the
- *    2 PM one turned out to be a claim nothing in the code kept.
+ *    day" (wrong at the time: Saturday was a dispatch day, and Sunday was the
+ *    only day nothing left), then no cutoff at all once the 2 PM one turned
+ *    out to be a claim nothing in the code kept.
  *
  *    The fulfilment partner has since confirmed a real one: DISPATCH_CUTOFF_HOUR,
  *    1:00 PM Pacific. Unlike the old cutoff, js/product.js's deliveryEstimate()
@@ -96,25 +96,35 @@ console.log('\nfree shipping threshold');
  *    it used to: not that no page states a cutoff, but that every page which
  *    does states exactly this one, and that the code genuinely enforces it
  *    rather than only being told about it in copy.
+ *
+ *    Dispatch itself moved to Monday-Friday only in September 2026 (the
+ *    fulfilment partner stopped running Saturday pickups), so NO_DISPATCH_DAYS
+ *    now holds two days instead of one — the section below checks the array
+ *    rather than a single value.
  * ------------------------------------------------------------------------- */
 console.log('\ndispatch window');
 {
-  const noDispatch = constant('js/products-data.js', 'NO_DISPATCH_DAY');
+  const noDispatchMatch = read('js/products-data.js').match(/NO_DISPATCH_DAYS\s*=\s*\[([^\]]+)\]/);
+  const noDispatchDays = noDispatchMatch
+    ? noDispatchMatch[1].split(',').map(n => parseInt(n.trim(), 10))
+    : null;
   const noDelivery = constant('js/products-data.js', 'NO_DELIVERY_DAY');
-  ok('products-data.js declares NO_DISPATCH_DAY and NO_DELIVERY_DAY',
-    noDispatch !== null && noDelivery !== null);
+  ok('products-data.js declares NO_DISPATCH_DAYS and NO_DELIVERY_DAY',
+    noDispatchDays !== null && noDelivery !== null);
+  ok('NO_DISPATCH_DAYS covers exactly Saturday and Sunday',
+    !!noDispatchDays && noDispatchDays.length === 2 &&
+    noDispatchDays.includes(0) && noDispatchDays.includes(6),
+    noDispatchDays ? noDispatchDays.join(',') : 'not found');
 
   const expected = `the same day when ordered by ${DISPATCH_CUTOFF_LABEL}, otherwise the next dispatch day`;
   ok(`DISPATCH_LABEL reads "${expected}"`, DISPATCH_LABEL === expected,
     `expected "${expected}", got "${DISPATCH_LABEL}"`);
 
-  // "dispatch day", never "business day": Saturday is a real dispatch day
-  // here, and "business day" carries enough of a Mon-Fri connotation that a
-  // Friday-afternoon order would read it as going out Monday when it
-  // actually goes out Saturday. Scoped to dispatch/shipping phrasing
-  // specifically — wholesale.html and contact.html's own "business day"
-  // describes reply times, a genuinely different fact with no Saturday
-  // question attached, and is not what this guards against.
+  // "dispatch day", not "business day", purely for consistency with the rest
+  // of the site's wording — the two now name the same five days. Scoped to
+  // dispatch/shipping phrasing specifically — wholesale.html and
+  // contact.html's own "business day" describes reply times, an unrelated
+  // fact, and is not what this guards against.
   const staleBusinessDayShipping = [];
   pages.forEach(f => {
     if (/ships? within (?:a|one) business day|out in (?:a|one) business day|within one business day (?:of being placed|on)/i
@@ -177,8 +187,8 @@ console.log('\ndispatch window');
     staleTicker.length === 0, staleTicker.join(', '));
 
   ok('the product page reads the shared dispatch days, not its own copy',
-    !/const NO_DISPATCH_DAY|const NO_DELIVERY_DAY/.test(read('js/product.js')) &&
-    /NO_DISPATCH_DAY/.test(read('js/product.js')) &&
+    !/const NO_DISPATCH_DAYS|const NO_DELIVERY_DAY/.test(read('js/product.js')) &&
+    /NO_DISPATCH_DAYS/.test(read('js/product.js')) &&
     /NO_DELIVERY_DAY/.test(read('js/product.js')));
 
   ok('the product page reads the shared cutoff hour, not its own copy',
@@ -190,11 +200,12 @@ console.log('\ndispatch window');
   ok('the estimate counts plain days, not business days',
     !/addBusinessDays/.test(read('js/product.js')));
 
-  // Both Sundays are handled, and they are separate facts: nothing is
-  // dispatched on one, nothing is delivered on one.
+  // Dispatch skips Saturday and Sunday; delivery skips only Sunday. Those are
+  // deliberately different checks: a package already moving can still be
+  // delivered on a Saturday.
   const est = read('js/product.js');
-  ok('the estimate skips Sunday at both the dispatch and the delivery end',
-    /getUTCDay\(\)\s*===\s*NO_DISPATCH_DAY/.test(est) &&
+  ok('the estimate skips Saturday and Sunday at dispatch, and Sunday at delivery',
+    /NO_DISPATCH_DAYS\.includes\(d\.getUTCDay\(\)\)/.test(est) &&
     /getUTCDay\(\)\s*===\s*NO_DELIVERY_DAY/.test(est));
 
   // The cutoff has to actually gate something, or DISPATCH_CUTOFF_HOUR is
@@ -206,6 +217,22 @@ console.log('\ndispatch window');
   // The estimate must be computed in Pacific, since that is what the copy says.
   ok('the estimate is computed in Pacific time',
     /America\/Los_Angeles/.test(read('js/product.js')));
+
+  // A single "if" instead of a loop would silently mis-skip a Saturday
+  // order: stepping forward one day from Saturday lands on Sunday, still a
+  // non-dispatch day, and an "if" stops there instead of continuing to
+  // Monday. This is exactly the bug a Wednesday-vs-something-else date would
+  // hide rather than error on.
+  ok('dispatch skip is a loop, not a single "if" that cannot clear two days in a row',
+    /while \(NO_DISPATCH_DAYS\.includes\(d\.getUTCDay\(\)\)\)/.test(est),
+    'an "if" cannot step over two consecutive non-dispatch days');
+
+  // shipping-policy.html states the dispatch schedule in prose, not from a
+  // constant, so nothing above catches a return to claiming Saturday is a
+  // dispatch day short of reading the sentence itself.
+  ok('shipping-policy.html states the real Monday-through-Friday dispatch schedule',
+    /Monday through\s*\n?\s*Friday/.test(read('shipping-policy.html')) &&
+    !/Saturday is a dispatch day/i.test(read('shipping-policy.html')));
 }
 
 /* ---------------------------------------------------------------------------
