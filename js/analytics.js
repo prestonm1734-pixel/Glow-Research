@@ -596,11 +596,27 @@
   // filed as the same thing, which is why the dashboard fills up with rows
   // that say "Script error." and nothing else.
   //
-  //   resource_load   a script, image or stylesheet that failed to load at
-  //                   all. Fires on the element rather than on window, with
-  //                   no message and no line, and only in the capture phase,
-  //                   which is why this listener now captures. Previously
-  //                   recorded as an empty error saying nothing whatsoever.
+  //   resource_load   one of OUR OWN files failed to load at all. Fires on
+  //                   the element rather than on window, with no message and
+  //                   no line, and only in the capture phase, which is why
+  //                   this listener captures. A real defect: the page asked
+  //                   for something on this origin and did not get it.
+  //   third_party_blocked
+  //                   the same event, for a file on somebody else's origin.
+  //                   Split out because it is almost never a fault here: it
+  //                   is an ad blocker or Safari's tracking prevention
+  //                   stopping a pixel, which is what those are for. Filed as
+  //                   resource_load it was indistinguishable from a genuine
+  //                   404 of ours, and since blocked pixels are constant and
+  //                   real 404s are rare, the dashboard's error panel was
+  //                   entirely made of them. That is the same burying problem
+  //                   cross_origin was split out to solve.
+  //
+  //                   Recorded rather than dropped: the rate is the
+  //                   measurement that justifies the server-side Conversions
+  //                   API, since it is the share of traffic the browser
+  //                   pixels never see. The host is put in the message so it
+  //                   is legible without needing to read the source column.
   //   cross_origin    a script from another origin threw. The browser gives
   //                   "Script error." and deliberately withholds the message,
   //                   the file and the line. This is never our own code:
@@ -619,14 +635,33 @@
   // also sends Access-Control-Allow-Origin, and if it does not, the attribute
   // stops the script loading at all. Trading a working pixel for a better log
   // line is the wrong way round.
+  // Whose file it was. A relative or same-origin URL is ours and a failure to
+  // load it is a defect here; anything else belongs to somebody we do not
+  // control. A resource with no URL at all is counted as ours deliberately:
+  // that is the case this cannot judge, and staying loud is the safer way to
+  // be wrong about it.
+  function isOwnResource(url) {
+    if (!url) return true;
+    if (url.charAt(0) === '/' && url.charAt(1) !== '/') return true;
+    return url.indexOf(location.origin + '/') === 0;
+  }
+  function hostOf(url) {
+    try { return new URL(url, location.href).host; } catch (e2) { return ''; }
+  }
+
   window.addEventListener('error', function (e) {
     var el = e.target;
     if (el && el !== window && el.tagName &&
         /^(SCRIPT|IMG|LINK|VIDEO|SOURCE)$/.test(el.tagName)) {
+      var url = el.src || el.href || '';
+      var tag = el.tagName.toLowerCase();
+      var own = isOwnResource(url);
       track('js_error', {
-        kind: 'resource_load',
-        message: el.tagName.toLowerCase() + ' failed to load',
-        source: (el.src || el.href || '').slice(0, 300),
+        kind: own ? 'resource_load' : 'third_party_blocked',
+        message: own
+          ? tag + ' failed to load'
+          : tag + ' blocked or unreachable: ' + (hostOf(url) || 'unknown host'),
+        source: url.slice(0, 300),
         line: null,
       });
       return;

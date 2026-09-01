@@ -3364,10 +3364,26 @@ console.log('\nprivacy disclosure');
     // properly, so filing it as a site error buries the real ones underneath
     // rows that say nothing.
     {
-      const kinds = ['exception', 'cross_origin', 'resource_load', 'unhandled_rejection']
-        .filter(k => !new RegExp(`kind: '${k}'`).test(relay));
+      // Matched as bare quoted values rather than as `kind: 'x'`, because two
+      // of them are now chosen by a ternary on the property rather than
+      // written out as a literal pair. Comments are stripped first, or the
+      // block above explaining each kind would satisfy this on its own.
+      const relayCode = relay.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+      const kinds = ['exception', 'cross_origin', 'resource_load',
+        'third_party_blocked', 'unhandled_rejection']
+        .filter(k => !relayCode.includes(`'${k}'`));
       ok('every reported error says what kind of failure it was',
         kinds.length === 0, `missing: ${kinds.join(', ')}`);
+
+      // A failed load is only this site's defect when the file was this
+      // site's. Third-party pixels are blocked constantly and genuine 404s of
+      // ours are rare, so filing both as resource_load meant the error panel
+      // was made entirely of ad blockers working correctly, which is the same
+      // way "Script error." used to bury everything. The split is only worth
+      // anything if the origin is actually what decides it.
+      ok('and a failed load is judged by whose origin it came from',
+        /isOwnResource/.test(relay) && /location\.origin/.test(relay),
+        'without an origin test, a blocked pixel is indistinguishable from our own 404');
       // Resource load failures fire on the element, not on window, and do not
       // bubble. Without capture they are invisible.
       ok('and the listener captures, so a failed resource load is seen at all',
