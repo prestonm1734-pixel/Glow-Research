@@ -3598,7 +3598,7 @@ console.log('\ndeploy headers');
  * that had already been captured and turned into an order redirected the
  * buyer to /product/<slug>/thank-you.html and showed them a 404.
  * ------------------------------------------------------------------------- */
-/* The homepage hero video. Four properties, each of which is the difference
+/* The welcome hero's video. Four properties, each of which is the difference
    between a background and a nuisance:
 
    muted and playsinline, or a phone takes the clip fullscreen and plays audio
@@ -3611,8 +3611,13 @@ console.log('\ndeploy headers');
 console.log('\nhero video');
 {
   // [page, the id on its <video>, the script that starts it]
+  //
+  // welcome.html alone. The homepage carried the same clip until the trio
+  // still went back into that slot, and the two heroes want different things
+  // now: this page sets its copy down the middle over a full-bleed backdrop,
+  // where the homepage is a left-set grid with a right half to fill. The
+  // homepage's own guards are in the block below this one.
   const heroes = [
-    ['index.html', 'heroVisual', 'js/script.js'],
     ['welcome.html', 'wlHeroVideo', 'js/welcome.js'],
   ];
   const clips = new Set();
@@ -3724,7 +3729,9 @@ console.log('\nhero video');
     const block = (css.match(new RegExp(`\\${sel}\\{[^}]*\\}`)) || [''])[0];
     return /background:\s*#000(000)?\s*;/.test(block);
   };
-  ok('both hero sections paint pure black behind the clip',
+  // Both sections, not just this one: whatever art each carries, the ground
+  // behind it has to be the same black or the two heroes read as two sites.
+  ok('both hero sections paint pure black behind their art',
     sectionIsBlack('.hero') && sectionIsBlack('.wl-hero'));
 
   // The three shapes that have to agree, or the hero jumps when the clip
@@ -3773,6 +3780,124 @@ console.log('\nhero video');
       order.indexOf('moov') !== -1 && order.indexOf('moov') < order.indexOf('mdat'),
       `box order is ${order.join(' ')}; remux with -c copy -movflags +faststart`);
   });
+}
+
+
+/* The homepage hero's still, which the welcome hero's clip above is no longer
+   shared with. Nothing plays, so there is no autoplay attribute to police and
+   no reduced-motion gate to require; what is left is an image every visitor
+   downloads before deciding to stay, and three product labels printed inside
+   it. The labels are why this block is longer than it looks like it should be.
+   See HERO_LABELS. */
+console.log('\nhero image');
+{
+  const tag = (read('index.html').match(/<img[^>]*id="heroVisual"[^>]*>/) || [''])[0];
+  ok('index.html carries its hero image', !!tag);
+
+  // Dimensions straight out of the file header, so the check compares the real
+  // asset rather than two numbers typed into the markup: walk the JPEG segment
+  // chain to the SOFn frame header.
+  const jpegSize = f => {
+    const b = fs.readFileSync(path.join(ROOT, f));
+    let o = 2;
+    while (o + 9 < b.length) {
+      if (b[o] !== 0xFF) { o++; continue; }
+      const m = b[o + 1], len = b.readUInt16BE(o + 2);
+      // SOFn, excluding DHT/JPG/DAC which share the C4/C8/CC codes
+      if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) {
+        return { h: b.readUInt16BE(o + 5), w: b.readUInt16BE(o + 7) };
+      }
+      o += 2 + len;
+    }
+    return null;
+  };
+
+  const src = tag && (tag.match(/src="([^"]+)"/) || [])[1];
+  // /assets/ is served immutable for a year (vercel.json), so an image edited
+  // in place never reaches anyone who has already visited. The only way to ship
+  // a new render is a new filename, and this is the only way to notice you
+  // pointed at one that is not there.
+  ok('index.html: its hero image is a file that exists',
+    !!src && fs.existsSync(path.join(ROOT, src)),
+    src ? `${src} is missing` : 'no src attribute');
+
+  if (tag) {
+    // The box has to be reserved before the bytes arrive or the hero shifts
+    // under the copy, and reserved at the file's real shape or it shifts twice.
+    // Checked against the header rather than against itself.
+    const w = +(tag.match(/\bwidth="(\d+)"/) || [])[1];
+    const h = +(tag.match(/\bheight="(\d+)"/) || [])[1];
+    ok('index.html: declares width and height, so the box is reserved before it loads',
+      !!w && !!h);
+    if (w && h && src && fs.existsSync(path.join(ROOT, src))) {
+      const j = jpegSize(src);
+      ok(`index.html: its declared ${w}x${h} is the file's real size`,
+        !!j && j.w === w && j.h === h,
+        j ? `${src} is actually ${j.w}x${j.h}` : `could not read ${src}`);
+
+      // Downloaded by every visitor before they have decided to stay, paid
+      // traffic included. No hard rule on the number, but it should be a
+      // deliberate figure rather than whatever came out of the render.
+      const kb = fs.statSync(path.join(ROOT, src)).size / 1024;
+      ok(`${src} is ${Math.round(kb)}KB, within the 400KB a hero should cost`, kb <= 400,
+        'recompress it before this ships to paid traffic');
+    }
+
+    // The largest paint in the viewport on the page paid traffic lands on.
+    // Left at the default it is discovered behind the stylesheet and the fonts.
+    ok('index.html: fetches its hero at high priority', /fetchpriority="high"/.test(tag));
+
+    // An img can carry what the video element it replaced could not. This is
+    // the reason the swap is an improvement rather than a sideways move, so it
+    // is worth failing over rather than trusting to habit.
+    ok('index.html: its hero carries alt text, which the clip could not',
+      /alt="[^"]{20,}"/.test(tag));
+  }
+
+  /* What the three vial labels in the hero photograph actually print,
+     transcribed here because nothing can read them out of a JPEG.
+
+     This list exists because of how the last one failed. The shot this
+     replaces printed "GLP-3 (RT)" on a label and stayed up as the sitewide
+     share image for weeks after that compound left the catalog and every
+     mention of it was stripped from the copy. Every other check in this file
+     reads text, and a claim baked into a photograph is invisible to all of
+     them.
+
+     So the claim is written down somewhere a check can reach. A printed
+     milligram figure and a printed purity are assertions exactly as a sentence
+     is, and these three are now held to the catalog: change a size, drop a
+     product, or let a lot come back below what is printed, and this fails
+     naming the photograph that has to be re-rendered. If the image itself is
+     re-rendered, this list is what has to move with it, and it is deliberately
+     the only place to do that.
+
+     Purity is a floor rather than an equality: the labels print a whole 99%,
+     and a lot testing higher does not make the photograph wrong. A lot testing
+     lower does. */
+  const HERO_LABELS = [
+    { name: 'MOTS-C', mg: '10mg', purityFloor: 99 },
+    { name: 'Tesamorelin', mg: '10mg', purityFloor: 99 },
+    { name: 'GHK-Cu', mg: '50mg', purityFloor: 99 },
+  ];
+  HERO_LABELS.forEach(label => {
+    const prod = GLOW_PRODUCTS.find(p => p.name === label.name);
+    ok(`the hero photograph's ${label.name} label names a product the catalog carries`, !!prod);
+    if (!prod) return;
+    ok(`and ${label.name} is sold in the ${label.mg} printed on it`,
+      prod.sizes.some(s => s.mg === label.mg),
+      `catalog carries ${prod.sizes.map(s => s.mg).join(', ')}`);
+    ok(`and its ${prod.purity} is at or above the ${label.purityFloor}% printed on it`,
+      parseFloat(prod.purity) >= label.purityFloor,
+      'the photograph prints a purity this lot does not reach');
+  });
+
+  // And the alt text has to name the same three, since that is what a screen
+  // reader is handed in place of the photograph.
+  const heroAlt = (read('index.html').match(/id="heroVisual"[^>]*alt="([^"]*)"/) || [, ''])[1];
+  const unnamed = HERO_LABELS.filter(l => !heroAlt.toLowerCase().includes(l.name.toLowerCase()));
+  ok('the homepage alt text names every vial in the photograph',
+    unnamed.length === 0, `missing: ${unnamed.map(l => l.name).join(', ')}`);
 }
 
 /* The masthead logo goes home from everywhere. index.html is the one page

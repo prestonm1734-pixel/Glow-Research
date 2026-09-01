@@ -489,23 +489,29 @@ button[disabled].si-forgot{ cursor: progress; }
    sitting boxed inside it. Left edge fades to black so the copy stays legible. */
 .hero-visual-img{
   position:absolute; z-index:0;
-  /* Moved left again, -6% to 2% to 8%. What made 8% possible is the second
-     stop added to the mask below: at 8% the clip no longer reaches the right
-     edge, and previously that read as a photograph cut off short. Fading its
-     right edge out instead turns the same gap into the frame dissolving into
-     the section, which is what the left edge has always done. */
-  right: 8%; bottom: -9%;
+  /* Held to the right half and bled off the right edge, which is the treatment
+     this shot was composed for and the one that was here before the clip
+     briefly took the slot. The hero grid is left-set, so the copy owns the
+     left and this owns what is left over: anything that creeps under the
+     headline is fighting it rather than filling the page.
+
+     Two masks, intersected, and between them they are the whole blend. The
+     linear one is the important one: transparent to 6%, fully solid only by
+     46%, so the left side of the photograph does not end anywhere, it
+     dissolves into the section long before it reaches the copy. The radial
+     is a vignette over the vials themselves, pulling the light into the
+     middle of the shot and taking the corners down to nothing.
+
+     Note the angle. 100deg rather than 90deg tilts the fade off vertical so it
+     runs with the vials, which stand at a slight lean of their own. */
+  right: -6%; bottom: -9%;
   width: min(1240px, 88vw); height:auto; max-width:none;
   border-radius: 0;
-  /* Both edges now: transparent until 4%, solid across the middle, then back
-     out from 68% so the right side blends into black rather than ending. The
-     radial pulls in with it, recentred from 62% to 55% to follow the clip
-     left, so the vignette still sits over the vials and not beside them. */
-  -webkit-mask-image: linear-gradient(100deg, transparent 0%, transparent 4%, #000 40%, #000 68%, transparent 100%),
-                       radial-gradient(ellipse 92% 90% at 55% 45%, #000 48%, transparent 96%);
+  -webkit-mask-image: linear-gradient(100deg, transparent 0%, transparent 6%, #000 46%, #000 100%),
+                       radial-gradient(ellipse 95% 90% at 62% 45%, #000 55%, transparent 98%);
   -webkit-mask-composite: source-in;
-          mask-image: linear-gradient(100deg, transparent 0%, transparent 4%, #000 40%, #000 68%, transparent 100%),
-                       radial-gradient(ellipse 92% 90% at 55% 45%, #000 48%, transparent 96%);
+          mask-image: linear-gradient(100deg, transparent 0%, transparent 6%, #000 46%, #000 100%),
+                       radial-gradient(ellipse 95% 90% at 62% 45%, #000 55%, transparent 98%);
           mask-composite: intersect;
   opacity: .82;
 }
@@ -1393,19 +1399,22 @@ html:not(.js) .faq-a{ max-height: none; }
      what made everything (buttons, nav) look flush against the edges */
   .hero-grid{ min-height: 0; padding-top: 26px; padding-bottom: 34px; }
   .hero-copy{ max-width: none; }
-  /* The vial sits at about 78% across the 16:9 frame, and object-fit:cover on
-     a portrait phone crops the sides off hard. At the old 50% that crop was
-     centred, which cut the vial out of the picture entirely: the hero was
-     rendering a starfield and nothing else. 100% aligns the frame's right
-     edge with the element's, which brings the vial in and lands it left of
-     centre on screen, behind the copy where the scrim can hold it down.
-     Opacity up from .14 with it, since none of this is worth cropping
-     correctly if it is still invisible. */
+  /* object-fit:cover on a portrait phone crops this frame down to roughly a
+     quarter of its width, so which quarter is the whole decision. The right-
+     half treatment above is off here: three vials at this width would each be
+     a sliver. One vial, framed whole, is what a phone has room for, sitting
+     behind the copy where the scrim can hold it down.
+
+     86%, not the 100% the single-vial clip wanted. 100% aligns the frame's
+     right edge with the element's, and this render carries black out past the
+     third vial, so 100% puts that black on screen and slices the vial down its
+     middle at the left edge. 86% brings the whole of it in. Opacity is what it
+     was: none of this is worth cropping correctly if it is invisible. */
   .hero-visual-img{
     display:block;
     position:absolute; inset:0; z-index:0;
     width:100%; height:100%; max-width:none;
-    object-fit:cover; object-position: 100% 40%;
+    object-fit:cover; object-position: 86% 40%;
     transform: scale(1.3);
     opacity:.38;
     -webkit-mask-image: radial-gradient(ellipse 130% 85% at 50% 40%, #000 42%, transparent 92%);
