@@ -33,18 +33,18 @@ benefit.
 
 ## Catalog
 
+### Metabolic Research
+
+- **G3-R** (https://glowresearch.shop/product/g3-r/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $84.99 per vial. Current lot 1032, 99.9% purity. COA: https://glowresearch.shop/assets/coas/g3-r-lot-1032.pdf.
+- **G1-S** (https://glowresearch.shop/product/g1-s/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $64.99 per vial. Current lot 1050, 99.57% purity. COA: https://glowresearch.shop/assets/coas/g1-s-lot-1050.pdf.
+- **G2-T** (https://glowresearch.shop/product/g2-t/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $72.99 per vial. Current lot 1600, 99.75% purity. COA: https://glowresearch.shop/assets/coas/g2-t-lot-1600.pdf.
+
 ### Tissue Research
 
 - **GHK-Cu** (https://glowresearch.shop/product/ghk-cu/): A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling. Sizes: 50mg. From $44.99 per vial. Current lot 5567, 99.815% purity. COA: https://glowresearch.shop/assets/coas/ghk-cu-lot-5567.pdf.
 - **BPC-157** (https://glowresearch.shop/product/bpc-157/): A synthetic pentadecapeptide derived from a protein found in gastric juice. Studied in vitro for angiogenic signalling. Sizes: 10mg. From $54.99 per vial. Current lot 1400, 98.2% purity. COA: https://glowresearch.shop/assets/coas/bpc-157-lot-1400.pdf.
 - **BPC-157/TB-500** (https://glowresearch.shop/product/bpc-157-tb-500/): A combined BPC-157 and TB-500 formulation. Supplied for research using both peptides together in one vial. Sizes: 10mg. From $69.99 per vial. Current lot 5615, 98.63% purity. COA: https://glowresearch.shop/assets/coas/bpc-157-tb-500-lot-5615.pdf.
 - **GLOW** (https://glowresearch.shop/product/glow/): A compounded blend of GHK-Cu, BPC-157 and TB-500. Supplied for research using all three peptides together in one vial. Sizes: 70mg. From $99.99 per vial. Current lot 1035, 99.61% purity. COA: https://glowresearch.shop/assets/coas/glow-lot-1035.pdf.
-
-### Metabolic Research
-
-- **G3-R** (https://glowresearch.shop/product/g3-r/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $84.99 per vial. Current lot 1032, 99.9% purity. COA: https://glowresearch.shop/assets/coas/g3-r-lot-1032.pdf.
-- **G1-S** (https://glowresearch.shop/product/g1-s/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $64.99 per vial. Current lot 1050, 99.57% purity. COA: https://glowresearch.shop/assets/coas/g1-s-lot-1050.pdf.
-- **G2-T** (https://glowresearch.shop/product/g2-t/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $72.99 per vial. Current lot 1600, 99.75% purity. COA: https://glowresearch.shop/assets/coas/g2-t-lot-1600.pdf.
 
 ### Secretagogue Research
 

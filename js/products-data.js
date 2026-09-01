@@ -385,6 +385,19 @@ function coaHref(p) {
 // a single `sizes[]` row matching the one size the launch list states; add a
 // second size only once the supplier confirms a SKU for it.
 const GLOW_PRODUCTS = [
+  { name: 'G3-R', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:'Best Seller',
+    coa: 'assets/coas/g3-r-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
+    results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
+    sizes: [
+      { mg: '10mg', price: 84.99, list: 94, sku: 'GLO-RT10', image: 'assets/products/g3-r-10mg-v5.webp' },
+    ],
+    blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
+    about: [
+      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
+    ],
+    research: [
+      { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
+    ] },
   // Order is curated, not alphabetical or by add date: it drives the
   // catalog's default "Featured" sort. The homepage does not read this order
   // directly any more — js/script.js features G3-R first there via
@@ -462,19 +475,6 @@ const GLOW_PRODUCTS = [
     research: [
       { t: 'Co-formulation research', d: 'Used by laboratories studying multiple compounded peptides delivered from a single vial rather than several discrete kits.' },
       { t: 'Comparative protocols', d: 'Applied alongside single-compound vials when comparing blended and separately administered research protocols.' }
-    ] },
-  { name: 'G3-R', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:'Best Seller',
-    coa: 'assets/coas/g3-r-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
-    results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
-    sizes: [
-      { mg: '10mg', price: 84.99, list: 94, sku: 'GLO-RT10', image: 'assets/products/g3-r-10mg-v5.webp' },
-    ],
-    blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
-    about: [
-      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
-    ],
-    research: [
-      { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
   { name: 'CJC-1295 No DAC/Ipamorelin', tag: 'Peptide Blend', cat: 'growth', purity: '99.08%', lot: '005', badge:null,
     coa: 'assets/coas/cjc-1295-no-dac-ipamorelin-lot-005.pdf', coaRef: 'MHCU-CDXL', tested: '5 July 2026',
