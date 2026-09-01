@@ -27,6 +27,20 @@ function sha256(value) {
   return crypto.createHash('sha256').update(value.trim().toLowerCase()).digest('hex');
 }
 
+// X specifies E.164 before hashing: digits only, a country code, and a
+// literal leading "+" — "+16195550142", not "6195550142". This used to hash
+// digits alone with no country code and no "+" at all, which is not a
+// format X ever issues a phone number in, so every hashed_phone_number this
+// store sent matched nothing. Ten digits means a US number here, not a
+// guess: this store ships to the US only, and express checkout rejects a
+// non-US shipping address outright, same reasoning as the equivalent fix in
+// api/_meta-capi.js.
+function e164(phone) {
+  let digits = phone.replace(/[^\d]/g, '');
+  if (digits.length === 10) digits = `1${digits}`;
+  return digits ? `+${digits}` : '';
+}
+
 // Never throws, and never awaited by its caller for anything but logging:
 // an X API hiccup must not affect whether an order gets created or a
 // confirmation email goes out. The purchase already happened either way.
@@ -42,14 +56,22 @@ export async function sendXPurchaseEvent({
   // ip_address/user_agent pair is required by X's API — sending none of
   // them would be a request X rejects outright, so there is nothing worth
   // sending rather than a guaranteed-failing call.
+  // twclid, hashed_email or hashed_phone_number is what X actually matches
+  // an event against; ip_address and user_agent are supplementary and X's
+  // own documentation says a second identifier is required alongside them.
+  // Checked before either is added, so a call carrying only IP and user
+  // agent is never sent: X has nothing to match it against, and it is a
+  // wasted request rather than a fallback worth keeping.
+  const hasPrimary = !!(twclid || email || (phone && e164(phone)));
+  if (!hasPrimary) return;
+
   const identifier = {
     ...(twclid ? { twclid } : {}),
     ...(email ? { hashed_email: sha256(email) } : {}),
-    ...(phone ? { hashed_phone_number: sha256(phone.replace(/[^\d]/g, '')) } : {}),
+    ...(phone && e164(phone) ? { hashed_phone_number: sha256(e164(phone)) } : {}),
     ...(clientIp ? { ip_address: clientIp } : {}),
     ...(userAgent ? { user_agent: userAgent } : {}),
   };
-  if (!Object.keys(identifier).length) return;
 
   try {
     const resp = await fetch(`https://ads-api.x.com/12/measurement/conversions/${pixelId}`, {

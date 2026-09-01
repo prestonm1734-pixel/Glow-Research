@@ -3423,6 +3423,23 @@ console.log('\nprivacy disclosure');
       /session\.email && saved\.email/.test(identity));
   }
 
+  // X's own Conversion API, same reasoning as Meta's and TikTok's normalization
+  // audits above: X's documentation specifies E.164 before hashing a phone
+  // number, digits plus a literal leading "+", and this codebase's own
+  // helper has to actually produce that shape.
+  {
+    const xcapi = read('api/_x-capi.js');
+    ok("X's phone identifier is E.164 with a leading + before hashing",
+      /function e164/.test(xcapi) && /return digits \? `\+\$\{digits\}` : ''/.test(xcapi),
+      'X issues no phone number in the shape digits-only-no-plus, so a bare digit hash matches nothing');
+    ok('a bare 10-digit number gets a country code the same way as everywhere else',
+      /if \(digits\.length === 10\) digits = `1\$\{digits\}`/.test(xcapi));
+    ok("ip_address/user_agent alone are never sent as X's own docs say they cannot match on their own",
+      /const hasPrimary = !!\(twclid \|\| email \|\| \(phone && e164\(phone\)\)\)/.test(xcapi) &&
+      /if \(!hasPrimary\) return;/.test(xcapi),
+      'a request naming only IP and user agent is one X has nothing to match against');
+  }
+
   // Same reasoning, TikTok's pixel/Events API in place of Meta's.
   if (/ttq\.load\(/.test(read('js/tiktok-pixel.js'))) {
     ok('the privacy policy accounts for the TikTok pixel/Events API capability',
