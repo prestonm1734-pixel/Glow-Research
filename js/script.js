@@ -113,23 +113,9 @@ function animateCount(el) {
 document.querySelectorAll('.reveal').forEach(observeReveal);
 
 
-/* ---------- hero video ----------
-   index.html ships the clip with no autoplay attribute, so nothing plays
-   until this runs. That is the whole point: it is the only way to honour
-   prefers-reduced-motion, since CSS cannot stop a video that has already
-   started and pausing one after the fact still shows the visitor the motion
-   they asked not to see. Whoever has it switched on keeps the poster, which
-   is the still the hero used before the clip existed.
-
-   play() is a promise that rejects on its own if the browser blocks it (a
-   data-saver setting, or a muted-autoplay policy this does not satisfy).
-   Caught and ignored: the poster is already the right thing to be looking at,
-   so there is nothing to recover. */
-const heroVideo = document.getElementById('heroVisual');
-if (heroVideo && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  const play = heroVideo.play();
-  if (play && play.catch) play.catch(() => {});
-}
+/* The hero clip's starter stood here. The hero is a still again, so there is
+   nothing to start and nothing to gate on prefers-reduced-motion: an image
+   does not move, which is the only reason that code existed. */
 
 /* ---------- header shrink ---------- */
 const header = document.getElementById('siteHeader');
