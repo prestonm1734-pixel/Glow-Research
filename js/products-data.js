@@ -253,9 +253,9 @@ const TIKTOK_PIXEL_ID = 'DA8CR2BC77U6VIRE2UQG';
 // and must never be checked in.
 const X_PIXEL_ID = 'repwj';
 const X_EVENT_IDS = {
-  viewContent: '',
-  addToCart: '',
-  initiateCheckout: '',
+  viewContent: 'tw-repwj-reuew',
+  addToCart: 'tw-repwj-reuex',
+  initiateCheckout: 'tw-repwj-reuez',
   purchase: 'tw-repwj-rer6c',
 };
 
