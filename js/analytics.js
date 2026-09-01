@@ -635,18 +635,31 @@
   // also sends Access-Control-Allow-Origin, and if it does not, the attribute
   // stops the script loading at all. Trading a working pixel for a better log
   // line is the wrong way round.
-  // Whose file it was. A relative or same-origin URL is ours and a failure to
-  // load it is a defect here; anything else belongs to somebody we do not
-  // control. A resource with no URL at all is counted as ours deliberately:
-  // that is the case this cannot judge, and staying loud is the safer way to
-  // be wrong about it.
-  function isOwnResource(url) {
-    if (!url) return true;
-    if (url.charAt(0) === '/' && url.charAt(1) !== '/') return true;
-    return url.indexOf(location.origin + '/') === 0;
-  }
+  // The advertising pixels, named rather than inferred from the origin.
+  //
+  // Being third-party is not what makes a failed load unremarkable, which is
+  // what an earlier version of this got wrong. js.stripe.com is third-party
+  // too, and if it fails to load the checkout does not work: that is the
+  // loudest thing this file could possibly report, and an origin test would
+  // have quietly filed it as somebody else's problem.
+  //
+  // What these three have in common is not their origin but their
+  // consequence. A blocker stops them on a large share of visits by design,
+  // and losing one costs measurement rather than function, because
+  // api/_meta-capi.js and its siblings send the same events from the server.
+  // Anything not on this list is treated as load-bearing until someone
+  // decides otherwise, which is the safer direction to be wrong in.
+  var PIXEL_HOSTS = [
+    'connect.facebook.net',
+    'analytics.tiktok.com',
+    'static.ads-twitter.com',
+  ];
   function hostOf(url) {
     try { return new URL(url, location.href).host; } catch (e2) { return ''; }
+  }
+  function isPixelHost(url) {
+    // No URL at all cannot be judged, so it is not waved through.
+    return !!url && PIXEL_HOSTS.indexOf(hostOf(url)) !== -1;
   }
 
   window.addEventListener('error', function (e) {
@@ -655,12 +668,12 @@
         /^(SCRIPT|IMG|LINK|VIDEO|SOURCE)$/.test(el.tagName)) {
       var url = el.src || el.href || '';
       var tag = el.tagName.toLowerCase();
-      var own = isOwnResource(url);
+      var pixel = isPixelHost(url);
       track('js_error', {
-        kind: own ? 'resource_load' : 'third_party_blocked',
-        message: own
-          ? tag + ' failed to load'
-          : tag + ' blocked or unreachable: ' + (hostOf(url) || 'unknown host'),
+        kind: pixel ? 'third_party_blocked' : 'resource_load',
+        message: pixel
+          ? tag + ' blocked: ' + hostOf(url)
+          : tag + ' failed to load',
         source: url.slice(0, 300),
         line: null,
       });

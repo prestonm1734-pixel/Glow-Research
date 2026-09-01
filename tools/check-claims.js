@@ -3375,15 +3375,33 @@ console.log('\nprivacy disclosure');
       ok('every reported error says what kind of failure it was',
         kinds.length === 0, `missing: ${kinds.join(', ')}`);
 
-      // A failed load is only this site's defect when the file was this
-      // site's. Third-party pixels are blocked constantly and genuine 404s of
-      // ours are rare, so filing both as resource_load meant the error panel
-      // was made entirely of ad blockers working correctly, which is the same
-      // way "Script error." used to bury everything. The split is only worth
-      // anything if the origin is actually what decides it.
-      ok('and a failed load is judged by whose origin it came from',
-        /isOwnResource/.test(relay) && /location\.origin/.test(relay),
-        'without an origin test, a blocked pixel is indistinguishable from our own 404');
+      // Pixels are blocked constantly and genuine failures are rare, so
+      // filing both as resource_load meant the error panel was made entirely
+      // of ad blockers working correctly, the same way "Script error." used
+      // to bury everything.
+      //
+      // Named hosts, not an origin test. The first attempt at this asked
+      // whether the file came from our own origin, which quietly put
+      // js.stripe.com on the ignorable side: it is third-party, and if it
+      // fails the checkout is broken. What makes a blocked pixel unremarkable
+      // is its consequence, not its origin, so the list is explicit and
+      // anything absent from it stays loud. That is also why this pins the
+      // list against the pixel scripts the site actually loads: a fourth
+      // platform added to the site and forgotten here would flood the panel
+      // again, which is the failure this whole split exists to prevent.
+      const pixelList = (relay.match(/var PIXEL_HOSTS = \[([\s\S]*?)\]/) || [, ''])[1];
+      ok('and a failed load is judged against a named list of pixel hosts',
+        !!pixelList && !/isOwnResource/.test(relay),
+        'an origin test also hides js.stripe.com, whose failure breaks checkout');
+
+      const pixelFiles = ['js/meta-pixel.js', 'js/tiktok-pixel.js', 'js/x-pixel.js'];
+      const unlisted = pixelFiles.filter(f => {
+        const host = (read(f).match(/https:\/\/([a-z0-9.-]+)\/[^'"]*\.js/i) || [, ''])[1];
+        return host && !pixelList.includes(host);
+      });
+      ok('and every pixel script the site loads is on that list',
+        unlisted.length === 0,
+        `not in PIXEL_HOSTS: ${unlisted.join(', ')}`);
       // Resource load failures fire on the element, not on window, and do not
       // bubble. Without capture they are invisible.
       ok('and the listener captures, so a failed resource load is seen at all',
