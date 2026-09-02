@@ -1188,41 +1188,6 @@ html:not(.js) .faq-a{ max-height: none; }
 .section-light .faq-q{ color:#0a0a0a; }
 .section-light .faq-q:hover{ color:#000; }
 
-/* The in-app browser bar (js/iab-breakout.js), shown only inside Facebook and
-   Instagram's iOS webview. Pinned to the bottom rather than the top: the top
-   of this site is a marquee and a sticky header, and a third band up there
-   reads as chrome to scroll past. The bottom is where a phone expects a
-   system-ish offer, and it is thumb height.
-
-   welcome.html has its own sticky bar at the bottom, which is why this one
-   lifts it. Two bars stacked is the honest arrangement here, because they say
-   different things and only one of them is ever present. */
-.iab-bar{
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 160;
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 14px calc(11px + env(safe-area-inset-bottom));
-  background: rgba(12,12,12,.96);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-  border-top: 1px solid var(--border);
-}
-.iab-bar-open{
-  flex: 0 0 auto; padding: 9px 14px; border-radius: 0;
-  background: var(--text); color: #0a0a0a;
-  font-size: .85rem; font-weight: 600; text-decoration: none; white-space: nowrap;
-}
-.iab-bar-why{
-  flex: 1 1 auto; min-width: 0;
-  font-size: .76rem; line-height: 1.35; color: var(--text-dim);
-}
-.iab-bar-close{
-  flex: 0 0 auto; width: 30px; height: 30px; padding: 0;
-  background: none; border: 0; color: var(--text-dimmer);
-  font-size: 1.3rem; line-height: 1; cursor: pointer;
-}
-/* welcome.html's own sticky bar sits at the same edge, so it moves up out of
-   the way rather than the two overlapping. */
-.has-iab-bar .wl-sticky{ bottom: 58px; }
-
 /* ---------- footer offer band ----------
    The standing launch-offer form, built by js/launch-offer.js. Shares the
    .lo-* type and control styles with the popup so the two are one component

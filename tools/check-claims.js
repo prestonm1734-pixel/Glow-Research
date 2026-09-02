@@ -3800,201 +3800,25 @@ console.log('\nhero image');
   });
 }
 
-/* The in-app browser breakout. It redirects real visitors off the page before
-   anything else runs, which makes it the highest-consequence script on the
-   site: everything checked here is a way it could send the wrong person, or
-   the wrong request, somewhere it should not.
+/* The in-app browser breakout stood here: js/iab-breakout.js, loaded first and
+   undeferred on every page, with fourteen guards pinning its crawler exemption,
+   its once-per-session lock, its empty-cart and checkout early returns, the
+   Android intent target, and the script tag sitting ahead of identity.js.
 
-   Worth stating what it cannot do, since the temptation is to assume it
-   works. Android's intent:// escape is supported and reliable. iOS has no
-   Apple-approved equivalent; x-safari-https is undocumented, Apple can drop
-   it, and inside Meta's apps it is reported to fire only through window.open.
-   It is attempted, in that order, and nothing depends on it succeeding. */
-console.log('\nin-app browser breakout');
-{
-  const iab = read('js/iab-breakout.js');
-  // Comment-stripped copy for the checks that assert something is ABSENT: the
-  // file explains at length why it does not name a browser package, and a bare
-  // search would find that explanation and fail on it.
-  const iabCode = iab.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
+   It was removed because the premise did not survive checking. The case for it
+   was that competitors open the real browser instantly and we did not. Reading
+   a competitor's served markup settled that: no x-safari, no intent://, no
+   breakout of any kind. What looked like their escape was Meta's own browser,
+   which no site controls. On iOS the script only ever produced Facebook's
+   "this web page is trying to open an app outside of Facebook" dialog, and a
+   security warning in front of paid traffic is worse than doing nothing.
 
-  // The three conditions that decide whether a visitor is redirected are
-  // checked by running the script rather than by searching it for the strings
-  // it happens to contain. Both spellings of that were tried: searching found
-  // "sessionStorage" and "glow-cart-v1" still present in the file after the
-  // early returns using them had been deleted, and passed. A guard that cannot
-  // fail is worse than none, because it reads as coverage.
-  //
-  // The script is a bare IIFE touching only browser globals, so handing it
-  // stubs is enough to watch what it decides.
-  const breakout = (ua, url, opts) => {
-    const o = opts || {};
-    const calls = [];      // redirects the script asked for
-    const mounted = [];    // elements it appended to the page
-    const sess = {};
-    if (o.tried) sess['glow-iab-tried'] = o.tried;
-    if (o.hidden) sess['glow-iab-hidden'] = o.hidden;
-    const local = o.cart ? { 'glow-cart-v1': o.cart } : {};
-    const loc = {
-      pathname: new URL(url).pathname,
-      protocol: new URL(url).protocol,
-      replace: v => calls.push(v),
-    };
-    Object.defineProperty(loc, 'href', { get: () => url, set: v => calls.push(v) });
-
-    // Enough of a DOM for the iOS path, which builds a bar rather than
-    // redirecting. Records what it made so the shape can be asserted.
-    // href and className are assigned as properties by the script, not through
-    // setAttribute, so both spellings have to land in the same place or the
-    // assertions below read an empty attrs bag. Caught by exactly that.
-    const el = (tag) => ({
-      tag, children: [], attrs: {},
-      set className(v) { this.attrs.class = v; }, get className() { return this.attrs.class; },
-      set href(v) { this.attrs.href = v; }, get href() { return this.attrs.href; },
-      setAttribute(k, v) { this.attrs[k] = v; },
-      addEventListener() {}, appendChild(c) { this.children.push(c); },
-      get parentNode() { return null; },
-    });
-    const body = el('body');
-    const listeners = [];
-    const doc = {
-      body,
-      documentElement: { classList: { add() {}, remove() {} } },
-      createElement: el,
-      addEventListener(evt) { listeners.push(evt); },
-    };
-    doc.listeners = listeners;
-    body.appendChild = c => { body.children.push(c); mounted.push(c); };
-
-    new Function('navigator', 'location', 'sessionStorage', 'localStorage', 'window', 'document',
-      read('js/iab-breakout.js'))(
-      { userAgent: ua }, loc,
-      { getItem: k => (k in sess ? sess[k] : null), setItem: (k, v) => { sess[k] = v; } },
-      { getItem: k => (k in local ? local[k] : null) },
-      { open: v => { calls.push(v); return null; } }, doc);
-    return { calls, mounted, listeners };
-  };
-  const acted = r => r.calls.length > 0 || r.mounted.length > 0;
-  const barLink = r => {
-    const bar = r.mounted[0];
-    if (!bar) return null;
-    return bar.children.find(c => c.tag === 'a') || null;
-  };
-
-  const FB_IOS = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5) [FBAN/FBIOS;FBAV/470.0;]';
-  const FB_AND = 'Mozilla/5.0 (Linux; Android 14) Chrome/126 Mobile Safari/537.36 [FBAN/EMA;FBAV/470.0;]';
-  const IG_IOS = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5) Instagram 329.0.0.41.93';
-  const CRAWLER = 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)';
-  const SAFARI = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5) Version/17.5 Mobile/15E148 Safari/604.1';
-  const LANDING = 'https://glowresearch.shop/welcome?utm_source=meta&fbclid=ABC123';
-
-  ok('it acts on a Facebook webview on both platforms, and on Instagram',
-    acted(breakout(FB_IOS, LANDING)) && acted(breakout(FB_AND, LANDING)) &&
-    acted(breakout(IG_IOS, LANDING)));
-  ok('and leaves an ordinary browser alone',
-    !acted(breakout(SAFARI, LANDING)));
-
-  // Meta fetches the landing page to build a link preview and again to review
-  // the ad. Redirect those and the preview is generated from an intent:// URL,
-  // which is the one failure here that costs an ad account rather than a
-  // session.
-  ok('and never touches a crawler, only a real visitor',
-    !acted(breakout(CRAWLER, LANDING)),
-    'a redirected crawler breaks link previews and ad review');
-  ok('and acts once per session, so a partial escape cannot loop',
-    !acted(breakout(FB_IOS, LANDING, { tried: '1' })));
-  ok('and not once the cart has anything in it, which the other browser cannot see',
-    !acted(breakout(FB_IOS, LANDING, { cart: '[{"sku":"GLO-RT10"}]' })) &&
-    acted(breakout(FB_IOS, LANDING, { cart: '[]' })),
-    'breaking out mid-session strands the cart in the webview');
-  ok('and never from the checkout or the receipt',
-    !acted(breakout(FB_IOS, 'https://glowresearch.shop/checkout.html')) &&
-    !acted(breakout(FB_IOS, 'https://glowresearch.shop/thank-you.html')));
-
-  // The heart of the iOS fix. WKWebView reports a genuine tap on an anchor as
-  // .linkActivated and anything script did as .other, and Facebook gates
-  // .other behind "this web page is trying to open an app outside of
-  // Facebook". Redirecting from script therefore cannot avoid the prompt; a
-  // real link the visitor taps is the case already trusted.
-  const iosRun = breakout(FB_IOS, LANDING);
-  ok('on iOS it redirects nothing and offers a link instead, which is what skips the prompt',
-    iosRun.calls.length === 0 && iosRun.mounted.length === 1,
-    'a scripted navigation is navigationType .other, which Facebook gates');
-  const link = barLink(iosRun);
-  ok('and that link is a real anchor carrying the scheme, not a scripted handler',
-    !!link && link.tag === 'a' && /^x-safari-https:\/\//.test(link.attrs.href || ''),
-    'a button calling window.open lands back on .other and the prompt returns');
-  ok('and it can be dismissed, and stays dismissed for the session',
-    !acted(breakout(FB_IOS, LANDING, { hidden: '1' })));
-
-  // The bar is the visible fallback; this is what makes it feel automatic. A
-  // synthetic click on the same anchor, fired from the visitor's first touch
-  // anywhere on the page, is an anchor activation carrying a real gesture,
-  // which is a different case from the same call on page load with nothing
-  // behind it. Costs nothing if it fails: the bar is still there to tap.
-  ok('and it also fires that link on the first touch, which is what feels automatic',
-    iosRun.listeners.indexOf('touchstart') !== -1,
-    'without a gesture listener the visitor has to aim at the bar');
-
-  // Android is unchanged: intent:// is a supported OS handoff rather than an
-  // app launch to be vetted, so it still goes straight through.
-  const andRun = breakout(FB_AND, LANDING);
-  ok('Android still redirects outright, since its escape is not gated',
-    andRun.calls.length === 1 && andRun.mounted.length === 0);
-
-  // The click ID is what ties the sale back to the ad. If the escape dropped
-  // the query string, every broken-out visitor would arrive unattributed.
-  // Checked against the intent's target, the part before #Intent, because the
-  // fallback URL carries its own encoded copy and hides a stripped query.
-  const androidTarget = andRun.calls[0].split('#Intent')[0];
-  ok('and both routes carry the click ID and UTMs through',
-    androidTarget.includes('fbclid') && androidTarget.includes('utm_source') &&
-    (link.attrs.href || '').includes('fbclid'),
-    `android target was: ${androidTarget}`);
-
-  // Without the fallback, a device that cannot handle the intent gets an
-  // error page instead of the site. With it, Android loads the URL normally.
-  ok('the Android intent carries a fallback URL, so a failed escape still lands',
-    /S\.browser_fallback_url=/.test(iab));
-
-  // Names a package on purpose. Without one the intent is ambiguous, every
-  // installed browser has registered for https, and Android has to ask, which
-  // put "this web page is trying to open an app outside of Facebook" in front
-  // of the visitor at the moment the point was to be gone already. This was
-  // built the other way first and the prompt is what corrected it.
-  ok('the Android intent names Chrome, so it opens instantly instead of prompting',
-    /package=com\.android\.chrome/.test(iabCode) &&
-    /category=android\.intent\.category\.BROWSABLE/.test(iabCode),
-    'an unnamed package makes Android show a chooser instead of just going');
-
-  // The scheme swap is a string replace anchored on https://. On any other
-  // protocol it returns the URL unchanged and the escape navigates the page to
-  // where it already is.
-  ok('and the iOS swap is guarded on https, since the replace no-ops otherwise',
-    /location\.protocol !== 'https:'/.test(iab));
-
-  // The stray-window cleanup that stood here went with window.open. Nothing on
-  // the iOS path navigates any more, so there is no window to strand.
-
-  // Every page, first, and not deferred: a deferred breakout runs after the
-  // pixels have fired and the page has painted, which is a page load and a set
-  // of events spent on a visitor who is about to leave.
-  const missing = [];
-  const deferred = [];
-  const late = [];
-  pages.forEach(f => {
-    const html = read(f);
-    if (!/js\/identity\.js/.test(html)) return;   // pages without the script block
-    const tag = (html.match(/<script src="[^"]*js\/iab-breakout\.js"[^>]*>/) || [''])[0];
-    if (!tag) { missing.push(f); return; }
-    if (/\bdefer\b/.test(tag)) deferred.push(f);
-    if (html.indexOf('iab-breakout.js') > html.indexOf('js/identity.js')) late.push(f);
-  });
-  ok('every page carrying the script block runs the breakout', missing.length === 0, missing.join(', '));
-  ok('and runs it undeferred', deferred.length === 0, deferred.join(', '));
-  ok('and runs it before identity.js, so nothing is minted for a visitor about to leave',
-    late.length === 0, late.join(', '));
-}
+   Android's intent:// escape did work, and is the half worth rebuilding if this
+   ever comes back. Everything listed above has to come back with it. A
+   breakout is the highest-consequence script on the site: it runs before
+   anything else and decides whether a real visitor stays, and getting the
+   crawler exemption wrong redirects Meta's ad reviewer instead of a customer,
+   which costs the ad account rather than the session. */
 
 /* The masthead logo goes home from everywhere. index.html is the one page
    allowed to point it at its own "#top", because on the homepage that is home;
