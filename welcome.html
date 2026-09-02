@@ -196,6 +196,32 @@
 </section>
 
 
+<!-- PEPTIDES / PRODUCTS
+     index.html's catalog section, and the same grid renderer behind it, so the
+     two pages cannot show the same compound two ways.
+
+     What differs is the slice: WELCOME_CATALOG_EXCLUDE (js/products-data.js)
+     holds the coded GLP-1 compounds out of this one grid. They are still in
+     the catalog, in search and on their own pages; this is a landing page for
+     paid social and that is a decision about the first screen, not about the
+     store. The link out goes to the full catalog either way, which is where
+     someone who came for one of them will find it. -->
+<section class="section section-light" id="peptides">
+  <div class="container">
+    <div class="section-head catalog-head reveal">
+      <div class="catalog-head-copy">
+        <span class="eyebrow">The Catalog</span>
+        <h2>Peptides</h2>
+      </div>
+      <a href="shop" class="btn btn-outline">Shop all Peptides <span aria-hidden="true">&rarr;</span></a>
+    </div>
+
+    <div class="product-grid" id="productGrid">
+      <!-- injected by js/welcome.js -->
+    </div>
+  </div>
+</section>
+
 <!-- THE GLOW STANDARD
      The homepage's promises section, verbatim: three cards, one per thing the
      site can actually back up. Retitled for this page's question, which is why

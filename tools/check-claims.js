@@ -25,6 +25,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
+  WELCOME_CATALOG_EXCLUDE,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, DISPATCH_LABEL,
   DISPATCH_CUTOFF_HOUR, DISPATCH_CUTOFF_LABEL, DISPATCH_CUTOFF_TICKER, DISPATCH_CUTOFF_PDP_LABEL,
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord, PACKAGING_PLAIN,
@@ -1488,6 +1489,31 @@ console.log('\nwelcome landing page');
   // the site. A link anywhere else makes it a normal page with a strange name.
   const linksIn = pages.filter(f => f !== 'welcome.html' && /href="\/?welcome(\.html)?"/.test(read(f)));
   ok('no other page links to welcome.html', linksIn.length === 0, linksIn.join(', '));
+
+  // --- the catalog it carries, and what it leaves out --------------------
+  // The grid mirrors the homepage's, minus WELCOME_CATALOG_EXCLUDE. Three
+  // things can rot here, so three guards: a name in the list that matches no
+  // product (a rename, and the compound quietly comes back), the page
+  // filtering by a list written into itself instead of the shared one, and
+  // the exclusion silently emptying out.
+  ok('welcome.html carries the catalog grid',
+    /id="productGrid"/.test(wl) && /renderProductGrid\(/.test(wlJs));
+
+  const strays = WELCOME_CATALOG_EXCLUDE.filter(
+    n => !GLOW_PRODUCTS.some(p => p.name === n));
+  ok('every compound the welcome catalog excludes is one the catalog has',
+    strays.length === 0,
+    `no such product: ${strays.join(', ')}`);
+
+  ok('and the page reads that list rather than naming compounds itself',
+    /exclude:\s*WELCOME_CATALOG_EXCLUDE/.test(wlJs) &&
+    !WELCOME_CATALOG_EXCLUDE.some(n => wlJs.includes(`'${n}'`) || wl.includes(`>${n}<`)));
+
+  // An empty list is a legitimate state (nothing to hold back), but it is
+  // also what a botched edit leaves behind, so it has to be deliberate: the
+  // day it should be empty, this line is the one that says so.
+  ok('and it is holding something back, which is the only reason it exists',
+    WELCOME_CATALOG_EXCLUDE.length > 0);
 
   // robots.txt must NOT block it: a Disallow stops a crawler fetching the page
   // at all, so it never reads the noindex above, and the URL can still be

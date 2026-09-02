@@ -46,6 +46,21 @@
     })(started);
   }
 
+  /* ---------- catalog ----------
+     index.html's grid, drawn by the same renderer, minus the compounds
+     WELCOME_CATALOG_EXCLUDE names. The exclusion is read from that list
+     rather than written here: a fourth coded compound added to the catalog
+     has to drop off this page on its own, without anyone remembering to
+     come back and edit it. */
+  const grid = document.getElementById('productGrid');
+  if (grid) {
+    renderProductGrid(grid, 'all', {
+      observeReveal: el => revealObserver.observe(el),
+      limit: 8,
+      exclude: WELCOME_CATALOG_EXCLUDE,
+    });
+  }
+
   /* ---------- mobile nav ---------- */
   const hamburger = document.getElementById('hamburger');
   const mainNav = document.getElementById('mainNav');
