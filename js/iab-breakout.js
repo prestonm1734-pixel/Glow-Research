@@ -113,47 +113,73 @@
     return;
   }
 
-  // iOS. Only from https, and this is a guard rather than a formality: the
-  // scheme swap below is a string replace anchored on "https://", so on any
-  // other protocol it silently returns the URL unchanged and the two calls
-  // underneath would navigate the page to exactly where it already is. Caught
-  // by testing against a local http server, where it did precisely that.
-  // Production is https throughout, so this only ever skips a case that cannot
-  // reach a real visitor.
+  // ---------------------------------------------------------------------
+  // iOS. Not a redirect, a link the visitor taps. That difference is the
+  // whole fix.
+  //
+  // Firing the escape from script produced Facebook's own gate: "this web
+  // page is trying to open an app outside of Facebook". The reason is in
+  // WKWebView's navigation delegate, which hands the host app a
+  // navigationType with every navigation. A genuine tap on an anchor arrives
+  // as .linkActivated. Anything script did, window.open and a location
+  // assignment alike, arrives as .other. Facebook gates .other and lets
+  // .linkActivated through, which is a reasonable thing for them to do: one
+  // of those is the visitor asking to leave and the other is a page deciding
+  // for them.
+  //
+  // So the page stops deciding. A real anchor carrying the scheme, tapped by
+  // a real finger, is the case Facebook already trusts, and it is why other
+  // sites appear to open instantly: they are not redirecting, they are being
+  // clicked.
+  //
+  // Android keeps its automatic redirect above, because intent:// is a
+  // supported OS handoff rather than an app launch to be vetted.
   if (location.protocol !== 'https:') return;
 
-  // window.open first, because that is the call reported to work inside Meta's
-  // apps; the location assignment the spec specified is the fallback rather
-  // than the first attempt, since on its own it tends to no-op.
-  //
-  // Not attempted: the hidden anchor with target="_blank" and a synthetic
-  // click. Inside a WKWebView that opens another tab of the same in-app
-  // browser rather than Safari, so it does not reach the objective, and
-  // without a real user gesture it is blocked as a popup anyway. It would have
-  // added a failure mode that looks like success.
-  var safari = href.replace(/^https:\/\//, 'x-safari-https://');
-  try {
-    var w = window.open(safari, '_blank');
-    if (w) {
-      // The one way this fails badly rather than harmlessly. Every other
-      // outcome leaves the visitor exactly where they were, which is the
-      // webview they were already in; this one can leave them looking at a
-      // blank tab, because window.open can hand back a real window even when
-      // the scheme inside it never resolves.
-      //
-      // So the window is closed again unless leaving actually happened. If it
-      // did, this page is backgrounded and the timer does not run at all, or
-      // runs against a stub that is already gone and close() is a no-op.
-      // Judged on visibilityState rather than on anything about the window
-      // itself, since a blank cross-scheme window tells us nothing when read
-      // from here.
-      setTimeout(function () {
-        try {
-          if (document.visibilityState === 'visible' && !w.closed) w.close();
-        } catch (e2) { /* cross-origin or already gone */ }
-      }, 900);
-      return;
-    }
-  } catch (e) { /* fall through */ }
-  location.href = safari;
+  // Dismissal is its own key. TRIED above is set on arrival and would hide the
+  // bar on the second page view, when the visitor has neither used it nor
+  // refused it.
+  var HIDDEN = 'glow-iab-hidden';
+  try { if (sessionStorage.getItem(HIDDEN)) return; } catch (e) {}
+
+  var safari = location.href.replace(/^https:\/\//, 'x-safari-https://');
+
+  function mount() {
+    var bar = document.createElement('div');
+    bar.className = 'iab-bar';
+
+    // An <a> with a real href, not a button with a handler. A handler would
+    // call window.open and land back on .other, which is the gate this exists
+    // to avoid.
+    var link = document.createElement('a');
+    link.className = 'iab-bar-open';
+    link.href = safari;
+    link.innerHTML = 'Open in Safari <span aria-hidden="true">&rarr;</span>';
+
+    var why = document.createElement('span');
+    why.className = 'iab-bar-why';
+    // Short enough to hold one line at 390px. The longer version of this wrapped
+    // and padded the bar taller than the thing it was explaining.
+    why.textContent = 'Your tab stays open';
+
+    var close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'iab-bar-close';
+    close.setAttribute('aria-label', 'Dismiss');
+    close.innerHTML = '&times;';
+    close.addEventListener('click', function () {
+      try { sessionStorage.setItem(HIDDEN, '1'); } catch (e) {}
+      bar.parentNode && bar.parentNode.removeChild(bar);
+      document.documentElement.classList.remove('has-iab-bar');
+    });
+
+    bar.appendChild(link);
+    bar.appendChild(why);
+    bar.appendChild(close);
+    document.body.appendChild(bar);
+    document.documentElement.classList.add('has-iab-bar');
+  }
+
+  if (document.body) mount();
+  else document.addEventListener('DOMContentLoaded', mount);
 })();

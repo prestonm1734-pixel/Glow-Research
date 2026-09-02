@@ -3829,8 +3829,11 @@ console.log('\nin-app browser breakout');
   // stubs is enough to watch what it decides.
   const breakout = (ua, url, opts) => {
     const o = opts || {};
-    const calls = [];
-    const sess = o.tried ? { 'glow-iab-tried': o.tried } : {};
+    const calls = [];      // redirects the script asked for
+    const mounted = [];    // elements it appended to the page
+    const sess = {};
+    if (o.tried) sess['glow-iab-tried'] = o.tried;
+    if (o.hidden) sess['glow-iab-hidden'] = o.hidden;
     const local = o.cart ? { 'glow-cart-v1': o.cart } : {};
     const loc = {
       pathname: new URL(url).pathname,
@@ -3838,14 +3841,44 @@ console.log('\nin-app browser breakout');
       replace: v => calls.push(v),
     };
     Object.defineProperty(loc, 'href', { get: () => url, set: v => calls.push(v) });
-    new Function('navigator', 'location', 'sessionStorage', 'localStorage', 'window',
+
+    // Enough of a DOM for the iOS path, which builds a bar rather than
+    // redirecting. Records what it made so the shape can be asserted.
+    // href and className are assigned as properties by the script, not through
+    // setAttribute, so both spellings have to land in the same place or the
+    // assertions below read an empty attrs bag. Caught by exactly that.
+    const el = (tag) => ({
+      tag, children: [], attrs: {},
+      set className(v) { this.attrs.class = v; }, get className() { return this.attrs.class; },
+      set href(v) { this.attrs.href = v; }, get href() { return this.attrs.href; },
+      setAttribute(k, v) { this.attrs[k] = v; },
+      addEventListener() {}, appendChild(c) { this.children.push(c); },
+      get parentNode() { return null; },
+    });
+    const body = el('body');
+    const doc = {
+      body,
+      documentElement: { classList: { add() {}, remove() {} } },
+      createElement: el,
+      addEventListener() {},
+    };
+    body.appendChild = c => { body.children.push(c); mounted.push(c); };
+
+    new Function('navigator', 'location', 'sessionStorage', 'localStorage', 'window', 'document',
       read('js/iab-breakout.js'))(
       { userAgent: ua }, loc,
       { getItem: k => (k in sess ? sess[k] : null), setItem: (k, v) => { sess[k] = v; } },
       { getItem: k => (k in local ? local[k] : null) },
-      { open: v => { calls.push(v); return null; } });
-    return calls;
+      { open: v => { calls.push(v); return null; } }, doc);
+    return { calls, mounted };
   };
+  const acted = r => r.calls.length > 0 || r.mounted.length > 0;
+  const barLink = r => {
+    const bar = r.mounted[0];
+    if (!bar) return null;
+    return bar.children.find(c => c.tag === 'a') || null;
+  };
+
   const FB_IOS = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5) [FBAN/FBIOS;FBAV/470.0;]';
   const FB_AND = 'Mozilla/5.0 (Linux; Android 14) Chrome/126 Mobile Safari/537.36 [FBAN/EMA;FBAV/470.0;]';
   const IG_IOS = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5) Instagram 329.0.0.41.93';
@@ -3853,41 +3886,59 @@ console.log('\nin-app browser breakout');
   const SAFARI = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5) Version/17.5 Mobile/15E148 Safari/604.1';
   const LANDING = 'https://glowresearch.shop/welcome?utm_source=meta&fbclid=ABC123';
 
-  ok('it redirects a Facebook webview on both platforms, and Instagram',
-    breakout(FB_IOS, LANDING).length > 0 &&
-    breakout(FB_AND, LANDING).length > 0 &&
-    breakout(IG_IOS, LANDING).length > 0);
+  ok('it acts on a Facebook webview on both platforms, and on Instagram',
+    acted(breakout(FB_IOS, LANDING)) && acted(breakout(FB_AND, LANDING)) &&
+    acted(breakout(IG_IOS, LANDING)));
   ok('and leaves an ordinary browser alone',
-    breakout(SAFARI, LANDING).length === 0);
+    !acted(breakout(SAFARI, LANDING)));
+
   // Meta fetches the landing page to build a link preview and again to review
   // the ad. Redirect those and the preview is generated from an intent:// URL,
   // which is the one failure here that costs an ad account rather than a
   // session.
-  ok('and never redirects a crawler, only a real visitor',
-    breakout(CRAWLER, LANDING).length === 0,
+  ok('and never touches a crawler, only a real visitor',
+    !acted(breakout(CRAWLER, LANDING)),
     'a redirected crawler breaks link previews and ad review');
-  ok('and attempts it once per session, so a partial escape cannot loop',
-    breakout(FB_IOS, LANDING, { tried: '1' }).length === 0);
+  ok('and acts once per session, so a partial escape cannot loop',
+    !acted(breakout(FB_IOS, LANDING, { tried: '1' })));
   ok('and not once the cart has anything in it, which the other browser cannot see',
-    breakout(FB_IOS, LANDING, { cart: '[{"sku":"GLO-RT10"}]' }).length === 0 &&
-    breakout(FB_IOS, LANDING, { cart: '[]' }).length > 0,
+    !acted(breakout(FB_IOS, LANDING, { cart: '[{"sku":"GLO-RT10"}]' })) &&
+    acted(breakout(FB_IOS, LANDING, { cart: '[]' })),
     'breaking out mid-session strands the cart in the webview');
   ok('and never from the checkout or the receipt',
-    breakout(FB_IOS, 'https://glowresearch.shop/checkout.html').length === 0 &&
-    breakout(FB_IOS, 'https://glowresearch.shop/thank-you.html').length === 0);
+    !acted(breakout(FB_IOS, 'https://glowresearch.shop/checkout.html')) &&
+    !acted(breakout(FB_IOS, 'https://glowresearch.shop/thank-you.html')));
+
+  // The heart of the iOS fix. WKWebView reports a genuine tap on an anchor as
+  // .linkActivated and anything script did as .other, and Facebook gates
+  // .other behind "this web page is trying to open an app outside of
+  // Facebook". Redirecting from script therefore cannot avoid the prompt; a
+  // real link the visitor taps is the case already trusted.
+  const iosRun = breakout(FB_IOS, LANDING);
+  ok('on iOS it redirects nothing and offers a link instead, which is what skips the prompt',
+    iosRun.calls.length === 0 && iosRun.mounted.length === 1,
+    'a scripted navigation is navigationType .other, which Facebook gates');
+  const link = barLink(iosRun);
+  ok('and that link is a real anchor carrying the scheme, not a scripted handler',
+    !!link && link.tag === 'a' && /^x-safari-https:\/\//.test(link.attrs.href || ''),
+    'a button calling window.open lands back on .other and the prompt returns');
+  ok('and it can be dismissed, and stays dismissed for the session',
+    !acted(breakout(FB_IOS, LANDING, { hidden: '1' })));
+
+  // Android is unchanged: intent:// is a supported OS handoff rather than an
+  // app launch to be vetted, so it still goes straight through.
+  const andRun = breakout(FB_AND, LANDING);
+  ok('Android still redirects outright, since its escape is not gated',
+    andRun.calls.length === 1 && andRun.mounted.length === 0);
 
   // The click ID is what ties the sale back to the ad. If the escape dropped
-  // the query string, every broken-out visitor would arrive unattributed and
-  // the breakout would cost more than the webview did.
-  // Checked against the intent's target, the part before #Intent, not the whole
-  // string. The fallback URL carries its own encoded copy of the query, so a
-  // naive search finds "fbclid" there and passes even when the target that
-  // actually opens has been stripped of it. Confirmed by stripping it and
-  // watching the loose version stay green.
-  const androidTarget = (breakout(FB_AND, LANDING)[0] || '').split('#Intent')[0];
-  ok('and carries the click ID and UTMs through the escape',
+  // the query string, every broken-out visitor would arrive unattributed.
+  // Checked against the intent's target, the part before #Intent, because the
+  // fallback URL carries its own encoded copy and hides a stripped query.
+  const androidTarget = andRun.calls[0].split('#Intent')[0];
+  ok('and both routes carry the click ID and UTMs through',
     androidTarget.includes('fbclid') && androidTarget.includes('utm_source') &&
-    breakout(FB_IOS, LANDING).every(v => v.includes('fbclid')),
+    (link.attrs.href || '').includes('fbclid'),
     `android target was: ${androidTarget}`);
 
   // Without the fallback, a device that cannot handle the intent gets an
@@ -3911,13 +3962,8 @@ console.log('\nin-app browser breakout');
   ok('and the iOS swap is guarded on https, since the replace no-ops otherwise',
     /location\.protocol !== 'https:'/.test(iab));
 
-  // Every failure mode here leaves the visitor where they already were, which
-  // is the whole reason this is safe to attempt blind. The exception is
-  // window.open handing back a real window whose scheme never resolves, which
-  // leaves a blank tab open in front of them. That one is cleaned up.
-  ok('and closes the stray window if the escape did not actually happen',
-    /visibilityState === 'visible'/.test(iabCode) && /\.close\(\)/.test(iabCode),
-    'a window.open that opens but does not resolve leaves the visitor on a blank tab');
+  // The stray-window cleanup that stood here went with window.open. Nothing on
+  // the iOS path navigates any more, so there is no window to strand.
 
   // Every page, first, and not deferred: a deferred breakout runs after the
   // pixels have fired and the page has painted, which is a page load and a set
