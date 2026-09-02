@@ -90,6 +90,11 @@
 <meta property="og:url" content="https://glowresearch.shop/privacy.html" />
 </head>
 <body>
+<!-- Breaks out of Facebook and Instagram's in-app browser into the real
+     browser before anything else runs. Not deferred and loaded first on
+     purpose: everything below it is work thrown away if the visitor is
+     about to be sent elsewhere. Does nothing outside a Meta webview. -->
+<script src="js/iab-breakout.js"></script>
 <script src="js/identity.js" defer></script>
 <script src="js/meta-pixel.js" defer></script>
 <script src="js/analytics.js" defer></script>
