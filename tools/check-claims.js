@@ -3895,12 +3895,15 @@ console.log('\nin-app browser breakout');
   ok('the Android intent carries a fallback URL, so a failed escape still lands',
     /S\.browser_fallback_url=/.test(iab));
 
-  // Naming Chrome sends every Samsung Internet and Firefox user down the
-  // fallback branch instead of out to the browser they use. Category BROWSABLE
-  // with no package routes to whatever the default is, which is the point.
-  ok('and names no browser package, so it opens the default rather than only Chrome',
-    !/package=com\.android\.chrome/.test(iabCode) &&
-    /category=android\.intent\.category\.BROWSABLE/.test(iabCode));
+  // Names a package on purpose. Without one the intent is ambiguous, every
+  // installed browser has registered for https, and Android has to ask, which
+  // put "this web page is trying to open an app outside of Facebook" in front
+  // of the visitor at the moment the point was to be gone already. This was
+  // built the other way first and the prompt is what corrected it.
+  ok('the Android intent names Chrome, so it opens instantly instead of prompting',
+    /package=com\.android\.chrome/.test(iabCode) &&
+    /category=android\.intent\.category\.BROWSABLE/.test(iabCode),
+    'an unnamed package makes Android show a chooser instead of just going');
 
   // The scheme swap is a string replace anchored on https://. On any other
   // protocol it returns the URL unchanged and the escape navigates the page to

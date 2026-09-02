@@ -79,21 +79,35 @@
   var isAndroid = /Android/i.test(ua);
 
   if (isAndroid) {
-    // Deliberately no package=com.android.chrome, which the spec called for.
-    // Naming Chrome sends every Samsung Internet and Firefox user down the
-    // fallback branch instead of out to the browser they actually use, and
-    // Samsung Internet is not a rounding error on Samsung hardware. Without
-    // the package, action VIEW plus category BROWSABLE routes to whatever the
-    // device's default browser is, which is what the objective asks for and a
-    // superset of what naming Chrome would have got.
+    // package=com.android.chrome, which an earlier version of this file
+    // deliberately left out and was wrong to.
     //
-    // S.browser_fallback_url is what makes this safe to fire blind: if nothing
-    // can handle the intent, Android loads that URL instead of erroring.
+    // The reasoning for omitting it was that naming Chrome ignores whichever
+    // browser the visitor actually prefers, and Samsung Internet is not a
+    // rounding error on Samsung hardware. That is still true. What it missed
+    // is what an unnamed package does in practice: with no target, the intent
+    // is ambiguous, every installed browser has registered for https, and
+    // Android has to ask. The visitor gets "this web page is trying to open an
+    // app outside of Facebook" and a decision to make, at the exact moment the
+    // point of the exercise was to be somewhere else already. Chrome's own
+    // documentation is explicit that naming the package "ensures exactly the
+    // same behavior as if the user had selected Chrome from the chooser list",
+    // which is to say: no chooser.
+    //
+    // A prompt most people decline is worth less than a browser some people
+    // did not choose, so this now names Chrome and opens instantly. Chrome
+    // ships with Play Services, so it is present on effectively every Android
+    // device this store will see, including the Samsung ones.
+    //
+    // S.browser_fallback_url is what makes it safe anyway: on a device with no
+    // Chrome, Android loads that URL instead of erroring, which leaves the
+    // visitor in the webview exactly as if none of this had run.
     var target = href.replace(/^https?:\/\//, '');
     location.replace(
       'intent://' + target +
       '#Intent;scheme=https;action=android.intent.action.VIEW;' +
       'category=android.intent.category.BROWSABLE;' +
+      'package=com.android.chrome;' +
       'S.browser_fallback_url=' + encodeURIComponent(href) + ';end'
     );
     return;
