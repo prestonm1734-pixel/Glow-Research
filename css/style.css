@@ -1338,6 +1338,11 @@ html:not(.js) .faq-a{ max-height: none; }
      one screen the photograph fills. Scoped to the hero so the sticky bar
      and the interior pages keep the stacked buttons that suit them. */
   .hero-cta{ flex-direction:row; align-items:stretch; gap: 12px; margin-bottom: 24px; }
+  /* The scroll cue goes at this width. It is a skip link to the catalog, and
+     the catalog is already the next thing a thumb reaches; what it actually
+     did here was sit on top of the photograph. The link stays on wide screens
+     where the hero is tall enough to hide the section under it. */
+  .scroll-cue{ display:none; }
   .hero-cta .btn-lg{ width:auto; flex:1 1 0; padding: 13px 14px; font-size: 0.9rem; }
   /* The desktop treatment compacted, not a different one: the photograph
      fills the section edge to edge and the copy sits on top of it, exactly
@@ -1372,8 +1377,8 @@ html:not(.js) .faq-a{ max-height: none; }
     width: min(132%, 560px);
     left: calc((100% - min(132%, 560px)) / 2);
     height:100%; max-width:none; margin:0;
-    object-fit:contain; object-position: 50% 46%;
-    opacity:.9;
+    object-fit:contain; object-position: 50% 34%;
+    opacity:.62;
     /* No mask. The frame fades to its own black on every side, so there is no
        edge here to hide, and the vignette that used to be here is most of what
        swallowed the vial. */
@@ -1384,9 +1389,11 @@ html:not(.js) .faq-a{ max-height: none; }
      the eyebrow is smallest and the crop is brightest. */
   .hero-copy-scrim{
     display:block;
-    background: linear-gradient(180deg,
-      rgba(0,0,0,.9) 0%, rgba(0,0,0,.72) 20%, rgba(0,0,0,.4) 44%,
-      rgba(0,0,0,.3) 66%, rgba(0,0,0,.62) 88%, rgba(0,0,0,.8) 100%);
+    background:
+      radial-gradient(ellipse 120% 70% at 50% 34%, transparent 0%, rgba(0,0,0,.55) 72%, rgba(0,0,0,.85) 100%),
+      linear-gradient(180deg,
+        rgba(0,0,0,.82) 0%, rgba(0,0,0,.5) 22%, rgba(0,0,0,.38) 46%,
+        rgba(0,0,0,.6) 74%, rgba(0,0,0,.88) 92%, #000 100%);
   }
 
   /* the bigger button size added for the desktop CTAs was inflating every
