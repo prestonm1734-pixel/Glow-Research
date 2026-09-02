@@ -231,6 +231,9 @@
     try {
       sessionStorage.setItem('glow-last-order', JSON.stringify({
         number: orderData.orderNumber,
+        // Same figure the purchase_completed analytics call below reports as
+        // revenue, and what thank-you.js hands to GoAffPro.
+        total: orderData.total,
         status: orderData.status || '',
         date: new Date().toISOString(),
         email,

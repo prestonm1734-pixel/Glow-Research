@@ -589,6 +589,10 @@
     try {
       sessionStorage.setItem('glow-last-order', JSON.stringify({
         number: data.orderNumber,
+        // Stripe's own collected amount, the same figure the purchase_completed
+        // analytics call below reports as revenue. thank-you.js hands this to
+        // GoAffPro rather than re-summing the cart, for the same reason.
+        total: data.total,
         // WooCommerce's own status, already mapped to prose by the API. Absent
         // on the idempotent path (a retry that found the order already made),
         // where thank-you.js simply shows no status rather than guessing one.

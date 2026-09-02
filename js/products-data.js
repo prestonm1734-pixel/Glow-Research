@@ -241,6 +241,12 @@ const TIKTOK_PIXEL_ID = 'DA8CR2BC77U6VIRE2UQG';
 // difficulty as Meta's and TikTok's — see api/_x-capi.js. The matching
 // server-side piece, X_CAPI_ACCESS_TOKEN, is a Vercel environment variable
 // and must never be checked in.
+// GoAffPro's shop identifier for the affiliate program, from the app's own
+// setup screen. Not secret, it only names which shop a browser event belongs
+// to, same reasoning as META_PIXEL_ID above. js/goaffpro.js no-ops entirely
+// while this is empty, so nothing loads until a real ID replaces it.
+const GOAFFPRO_SHOP_ID = 'regkhwnoue';
+
 const X_PIXEL_ID = 'repwj';
 const X_EVENT_IDS = {
   viewContent: 'tw-repwj-reuew',
@@ -1742,6 +1748,7 @@ if (typeof module !== 'undefined' && module.exports) {
     TIKTOK_PIXEL_ID,
     X_PIXEL_ID,
     X_EVENT_IDS,
+    GOAFFPRO_SHOP_ID,
     LAUNCH_OFFER_LIVE,
     LAUNCH_OFFER,
     round2,

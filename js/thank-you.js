@@ -114,8 +114,29 @@
   rows += '<div><span>' + esc(order.shippingLabel || 'Shipping') + '</span><span>' +
     (ship === 0 ? 'Free' : money(ship)) + '</span></div>';
   if (tax > 0) rows += '<div><span>Sales tax</span><span>' + money(tax) + '</span></div>';
-  rows += '<div class="ty-grand"><span>Total</span><span>' + money(sub - discount + ship + tax) + '</span></div>';
+  var grandTotal = sub - discount + ship + tax;
+  rows += '<div class="ty-grand"><span>Total</span><span>' + money(grandTotal) + '</span></div>';
   document.getElementById('tyTotals').innerHTML = rows;
+
+  // GoAffPro's conversion event. order.total is Stripe's own collected
+  // amount (see js/checkout.js and js/express-pay.js), the same figure
+  // purchase_completed reports as revenue; grandTotal above is a fallback
+  // for an order stored before that field existed, not the preferred source.
+  // Guarded by order number in localStorage rather than firing whenever this
+  // page loads: a refresh of this same receipt must not report the sale to
+  // GoAffPro twice.
+  if (typeof window.goaffproTrackConversion !== 'undefined') {
+    var goaffproKey = 'glow-goaffpro-sent';
+    var alreadySent = false;
+    try { alreadySent = localStorage.getItem(goaffproKey) === String(order.number); } catch (e) {}
+    if (!alreadySent) {
+      window.goaffproTrackConversion({
+        number: '#' + order.number,
+        total: order.total != null ? order.total : grandTotal,
+      });
+      try { localStorage.setItem(goaffproKey, String(order.number)); } catch (e) {}
+    }
+  }
 
   /* ---------- address ---------- */
 
