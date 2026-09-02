@@ -1329,62 +1329,64 @@ html:not(.js) .faq-a{ max-height: none; }
   /* padding-top/bottom only — this element is also .container, and a
      shorthand here was wiping out its 24px left/right padding, which is
      what made everything (buttons, nav) look flush against the edges */
-  .hero-grid{ min-height: 0; padding-top: 20px; padding-bottom: clamp(150px, 20vw, 180px); }
-  /* .wl-hero .hero-grid takes this down to 14px at 760, from an earlier trim
-     of the gap over wl-standard made when nothing sat in that gap. Restated
-     at the two-class specificity that trim used, or the welcome hero gives
-     the photograph no floor and the vials come up through the stat row. */
-  .wl-hero .hero-grid{ padding-bottom: clamp(150px, 20vw, 180px); }
+  .hero-grid{ min-height: 0; padding-top: 26px; padding-bottom: 34px; }
   .hero-copy{ max-width: none; }
   /* Side by side, against the sitewide mobile rule further up that stacks
      every .btn-lg full width. Two stacked full-width buttons cost about 70px
-     of height and left the photograph below nothing to sit in; paired, the
-     hero holds the eyebrow, the headline, the sub, both calls to action and
-     the stat row on one screen with the image behind them. Scoped to the
-     hero so the sticky bar and the interior pages keep the stacked buttons
-     that suit them. */
+     of height, and the whole point at this width is that the eyebrow, the
+     headline, the sub, both calls to action and the stat row all sit on the
+     one screen the photograph fills. Scoped to the hero so the sticky bar
+     and the interior pages keep the stacked buttons that suit them. */
   .hero-cta{ flex-direction:row; align-items:stretch; gap: 12px; margin-bottom: 24px; }
   .hero-cta .btn-lg{ width:auto; flex:1 1 0; padding: 13px 14px; font-size: 0.9rem; }
-  /* The desktop treatment, compacted, rather than a different idea: the
-     photograph still sits behind the copy and runs under the CTA row, it is
-     just shrunk to what a portrait phone has room for instead of cropped to
-     a slice of itself.
+  /* The desktop treatment compacted, not a different one: the photograph
+     fills the section edge to edge and the copy sits on top of it, exactly
+     as it does on a wide screen. All that changes is which part of the frame
+     survives the crop, because the section is portrait here and the shot is
+     landscape.
 
-     contain, not cover. cover at this aspect keeps roughly a quarter of the
-     frame and throws the rest away, which is what had a single vial filling
-     the section at 38% opacity and reading as texture. contain fits the whole
-     trio across the width, and the height it then needs (a little over half
-     the width, this frame being 1686x933) is what leaves the copy its room.
-
-     Anchored low, so the vials land under the buttons and the stat row rather
-     than behind the headline. Opacity is near solid now: at a third it was
-     not a photograph, it was a smudge. */
+     contain, and it still reads as full bleed: this frame is pure black to
+     its own edges and the section behind it is the same black, so the bands
+     contain leaves above and below the photograph are invisible. That is the
+     whole trick, and it is why cover is the wrong tool here. cover fills the
+     box by throwing away half the width, which at this aspect zooms so far in
+     that the vials pass behind the copy as a wall of labels. What was wrong
+     before was that, plus scale(1.3) pushing past it and .38 opacity leaving
+     a smudge where the product should be. */
   .hero-visual-img{
     display:block;
     /* No transform: this element also carries .reveal, whose .in state sets
        transform: translateY(0) at two-class specificity and silently wins
-       over anything set here. Centering is done with the box instead. */
-    position:absolute; left:0; right:0; top:0; bottom:14px; z-index:0;
-    width:min(100%, 460px); height:100%; max-width:none; margin:0 auto;
-    object-fit:contain; object-position: 50% 100%;
-    opacity:.95;
-    /* Softens the frame's own edges into the section. The top stop matters
-       most: it is what keeps the vial caps from ending on a hard line under
-       the sub-heading. */
-    -webkit-mask-image: linear-gradient(180deg, transparent 46%, #000 62%, #000 100%);
-    -webkit-mask-composite: source-in;
-            mask-image: linear-gradient(180deg, transparent 46%, #000 62%, #000 100%);
-            mask-composite: intersect;
+       over anything set here. */
+    /* Wider than the section on purpose. contain sizes to the box, so a box
+       the width of the phone draws the trio at about 210px tall and the vials
+       read as small. Overhanging each side lets them come up to something
+       like the presence they have on a wide screen, and what runs off the
+       edges is the frame's own black.
+
+       Capped in pixels as well as percent, and centred off the same figure:
+       132% of a 900px-wide screen would draw the vials half again the size
+       they are on a desktop, which is where they stop being the backdrop and
+       start crowding the words in front of them. */
+    position:absolute; right:auto; top:0; bottom:0; z-index:0;
+    width: min(132%, 560px);
+    left: calc((100% - min(132%, 560px)) / 2);
+    height:100%; max-width:none; margin:0;
+    object-fit:contain; object-position: 50% 56%;
+    opacity:.9;
+    /* No mask. The frame fades to its own black on every side, so there is no
+       edge here to hide, and the vignette that used to be here is most of what
+       swallowed the vial. */
   }
-  /* Dark at both ends rather than the desktop scrim's left-to-right: the copy
-     stacks down the middle here, so the two bands that need holding down are
-     the headline at the top and the stat row at the foot, and the image is
-     left alone through the middle where the buttons sit over it. */
+  /* Even cover rather than the desktop scrim's left-to-right fade: the copy
+     stacks down the middle at this width, so every line of it is over the
+     photograph and needs the same backing. Heaviest at the very top, where
+     the eyebrow is smallest and the crop is brightest. */
   .hero-copy-scrim{
     display:block;
     background: linear-gradient(180deg,
-      #000 0%, rgba(0,0,0,.9) 34%, rgba(0,0,0,.55) 52%,
-      rgba(0,0,0,.3) 66%, transparent 82%);
+      rgba(0,0,0,.9) 0%, rgba(0,0,0,.72) 20%, rgba(0,0,0,.4) 44%,
+      rgba(0,0,0,.3) 66%, rgba(0,0,0,.62) 88%, rgba(0,0,0,.8) 100%);
   }
 
   /* the bigger button size added for the desktop CTAs was inflating every
