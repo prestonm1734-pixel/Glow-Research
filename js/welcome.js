@@ -120,10 +120,16 @@
      banner cannot outlive a change to the window the fulfilment partner
      actually keeps. tools/check-claims.js pins that.
 
-     Past the cutoff, and on the one day nothing goes out, it says so. The
-     usual version of this widget restarts at 24 hours the moment it expires,
-     which turns a real deadline into a prop, and is the thing PRINCIPLES.md
-     calls claiming more than we can prove. */
+     Past the cutoff, and on the days nothing goes out, it says so. The usual
+     version of this widget restarts at 24 hours the moment it expires, which
+     turns a real deadline into a prop, and is the thing PRINCIPLES.md calls
+     claiming more than we can prove.
+
+     This used to be a chip in the hero that stayed hidden until the first
+     render, because a cutoff banner showing a stale time is worse than one
+     showing nothing. It is a cell in the terms strip now, holding a column
+     open beside two others, so the markup states the standing fact and this
+     upgrades it to the live one. Nothing to unhide. */
   const cutEl = document.getElementById('wlCutoff');
   if (cutEl && typeof DISPATCH_CUTOFF_HOUR === 'number') {
     // hourCycle h23 rather than hour12:false: the latter is specified to allow
@@ -156,7 +162,6 @@
     }
 
     render();
-    cutEl.hidden = false;
     setInterval(render, 1000);
   }
 })();

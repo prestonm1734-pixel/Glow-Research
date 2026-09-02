@@ -956,16 +956,10 @@ button[disabled].si-forgot{ cursor: progress; }
    and the footer as they are. Prefixed .wl- so none of it can reach another
    page by accident. */
 
-.wl-cutoff{
-  display:inline-block; text-align:center;
-  border:1px solid var(--border); background: rgba(255,255,255,.03);
-  padding: 11px 18px; margin-bottom: 30px;
-  font-family:'JetBrains Mono', monospace; font-size:0.8rem; line-height:1.7;
-  color: var(--text-dim);
-}
-.wl-cutoff strong{ color: var(--text); font-weight:600; white-space:nowrap; }
-/* Monochrome, like everything else here: a green "live" dot would be the only
-   colour on the site. The pulse carries the same meaning without it. */
+/* The live dot the cutoff cell draws before its text. Monochrome, like
+   everything else here: a green "live" dot would be the only colour on the
+   site, and the pulse carries the same meaning without it. Written by
+   js/welcome.js, which is why the markup has no trace of it. */
 .wl-dot{
   display:inline-block; vertical-align:middle;
   width:8px; height:8px; margin: -2px 9px 0 0; background: var(--text-dimmer);
@@ -973,64 +967,66 @@ button[disabled].si-forgot{ cursor: progress; }
 .wl-dot-live{ background: var(--text); animation: wl-pulse 2.4s ease-in-out infinite; }
 @keyframes wl-pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
 
-/* Nothing but a hook now: js/welcome.js watches this row to know when the
-   hero's own button has scrolled away and the sticky bar should take over.
-   The layout is .hero-cta's, shared with index.html. */
-/* The figures sit in a ruled box here rather than under a single top rule as
-   they do on the homepage, because centred and unboxed they read as three
-/* The stat row is .hero-stats unmodified now, shared with index.html: the
-   boxed, centred variant that used to live here went with the centred hero. */
+/* .wl-cta is nothing but a hook now: js/welcome.js watches that row to know
+   when the hero buttons have scrolled away and the sticky bar should take
+   over. Its layout is .hero-cta's, shared with index.html. The stat row is
+   likewise .hero-stats unmodified. */
 
-@media (max-width: 560px){
-  .wl-cutoff{ font-size: 0.72rem; padding: 10px 14px; }
+/* The terms strip under the hero: dispatch, shipping, first order.
+
+   It was a centred row of three sentences on a white band. Two things were
+   wrong with that. The white, because index.html earns its light section by
+   putting the whole catalog in it, where this was a thin slab between two
+   black ones and read as a seam. And the shape, because three sentences in a
+   row is a paragraph broken into pieces, not a set of facts.
+
+   A bordered three-cell module instead, each cell a mono label over its value.
+   That is the shape of a line on a certificate, which is the document this
+   whole brand is built around, and it lets a visitor take all three in at a
+   glance rather than reading them. The 1px gap over a border-coloured ground
+   is the same way the catalog grid draws its dividers, so the hairlines match
+   the ones everywhere else. */
+/* Top padding of its own rather than leaning on the hero's: the module is
+   bordered, and a bordered box needs air above it or it reads as attached to
+   the section before it rather than as the next thing on the page. */
+.wl-terms{ background:#000; padding: 34px 0 38px; }
+.wl-terms-grid{
+  display:grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border);
+}
+.wl-term{ background:#000; padding: 22px clamp(18px, 2.4vw, 30px) 24px; }
+.wl-term-label{
+  display:block; margin-bottom: 9px;
+  font-family:'JetBrains Mono', monospace; font-size:0.62rem; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase; color: var(--text-dimmer);
+}
+.wl-term-value{
+  margin:0; font-size:0.92rem; line-height:1.55; color: var(--text-dim);
+}
+.wl-term-value strong{ color: var(--text); font-weight:600; }
+
+/* The live cell wraps its text in a dot the other two do not have, so the row
+   never has to say which of the three is counting. */
+#wlCutoff .wl-dot{ margin-right: 9px; }
+
+@media (max-width: 760px){
+  /* One column rather than three cramped ones: at this width each value wraps
+     to three lines and the labels stop lining up with anything. */
+  .wl-terms-grid{ grid-template-columns: 1fr; }
+  .wl-term{ padding: 16px 18px 18px; }
 }
 
-/* The standing-terms band between the hero and the cards, and the first of
-   the two light sections this page now has.
-   
-   The page used to run black from the masthead to the footer, which is the
-   single thing that made it read as somebody else's page: index.html alternates
-   black hero, white catalog, black standard, white FAQ, and that rhythm is more
-   of the brand than any one component is. This band and the FAQ are the two
-   white beats. Both borders come off, because it is continuous with .wl-pay
-   below it rather than a bar with a rule under it. */
-.wl-valuebar{
-  background:#fff; color:#0a0a0a; border:0; padding: 26px 0 4px;
-}
-.wl-valuebar-inner{
-  display:flex; align-items:center; justify-content:center;
-  gap: clamp(20px, 4vw, 56px); flex-wrap:wrap;
-}
-.wl-value{
-  display:inline-flex; align-items:center; gap:10px;
-  font-size:0.88rem; color:#55554f;
-}
-.wl-value strong{ color:#0a0a0a; font-weight:600; }
-.wl-value svg{ color:#8a8a86; flex:0 0 auto; }
-/* Stacked below 640px, and centred with everything else. It was flush left,
-   which left it the only left-aligned block on a page whose hero, stats,
-   section heading and lede are all centre-set, so the three rows read as
-   though they belonged to a different page. */
-@media (max-width: 640px){
-  .wl-valuebar-inner{ gap: 12px; flex-direction:column; align-items:center; }
-  .wl-value{ font-size:0.8rem; }
-}
-
-/* Accepted payment methods, closing the light band the value bar opens. Same
-   white, no rule between them: the terms and the marks are one block of
-   housekeeping, not two.
-
-   Worth noting what this fixes beyond the rhythm. Four of these six marks are
-   drawn on white by their own brand guidelines, and the hairline below existed
-   to stop them glowing against a black page. On white they simply sit
-   correctly, which is the tell that this was always the ground they wanted. */
-.wl-pay{ background:#fff; padding: 20px 0 32px; }
-.wl-pay-in{
+/* Accepted payment methods, under the terms module and quieter than it: a
+   footnote to the strip rather than a fourth term in it. */
+.wl-pay{ padding: 26px 0 0; }
+.wl-pay-in,
+.wl-pay{
   display:flex; flex-direction:column; align-items:center; gap:12px;
 }
 .wl-pay-label{
   font-family:'JetBrains Mono', monospace; font-size:0.64rem; font-weight:600;
-  letter-spacing:.16em; text-transform:uppercase; color:#8a8a86;
+  letter-spacing:.16em; text-transform:uppercase; color: var(--text-dimmer);
 }
 .wl-pay-list{
   list-style:none; margin:0; padding:0;
@@ -1042,24 +1038,14 @@ button[disabled].si-forgot{ cursor: progress; }
    while the dark ones (Apple Pay, Amex) would otherwise float unbounded. */
 .wl-pay-mark{
   display:block; width:44px; height:29px; line-height:0;
-  border:1px solid rgba(0,0,0,.14); border-radius:3px; overflow:hidden;
+  border:1px solid rgba(255,255,255,.14); border-radius:3px; overflow:hidden;
 }
 .wl-pay-mark svg{ display:block; width:100%; height:100%; }
 .wl-pay-note{
-  margin:0; font-size:0.72rem; color:#7a7a76; text-align:center;
+  margin:0; font-size:0.72rem; color: var(--text-dimmer); text-align:center;
 }
 @media (max-width: 560px){
-  .wl-pay{ padding: 18px 0 2px; }
   .wl-pay-list{ gap:7px; }
-  .wl-pay-mark{ width:40px; height:26px; }
-  .wl-pay-note{ font-size:0.66rem; }
-}
-
-/* The section head on this page carries a lede under the heading, which the
-   homepage's does not. .section-head caps at 640px and centres; this widens
-   the sentence a little and keeps it centred with it. */
-.wl-lede{
-  max-width: 52ch; margin: 16px auto 0; font-size: 0.98rem; color: var(--text-dim);
 }
 
 .wl-trust{
