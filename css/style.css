@@ -685,9 +685,23 @@ button[disabled].si-forgot{ cursor: progress; }
 .catalog-head .eyebrow{ margin-bottom: 10px; }
 .catalog-head h2{ margin:0; }
 .catalog-head .btn-outline{ flex-shrink:0; white-space:nowrap; }
+/* Stays a row on a phone rather than stacking, which is what the wider
+   layout above already does and what the heading is short enough to allow:
+   "Peptides" and the link fit one line together at 360px once the link stops
+   claiming the full width. It is the same relationship either way then,
+   heading left and the way out of the section on the right, instead of a
+   full-width button reading as the section's own call to action. */
 @media (max-width: 640px){
-  .catalog-head{ flex-direction:column; align-items:flex-start; }
-  .catalog-head .btn-outline{ width:100%; text-align:center; }
+  .catalog-head{ align-items:flex-end; gap: 12px; margin-bottom: 34px; }
+  .catalog-head .btn-outline{ width:auto; padding: 10px 13px; font-size: 0.76rem; }
+}
+/* The row is 16px too wide for a 320px screen at the sizes above, and what
+   overflows is the arrow on the end of the link. Both sides give a little
+   rather than the heading alone, which would leave it smaller than the h2
+   on every other section. */
+@media (max-width: 359px){
+  .catalog-head h2{ font-size: 1.6rem; }
+  .catalog-head .btn-outline{ padding: 9px 10px; font-size: 0.72rem; }
 }
 
 /* ---------- product grid ---------- */
