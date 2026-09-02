@@ -1329,34 +1329,62 @@ html:not(.js) .faq-a{ max-height: none; }
   /* padding-top/bottom only — this element is also .container, and a
      shorthand here was wiping out its 24px left/right padding, which is
      what made everything (buttons, nav) look flush against the edges */
-  .hero-grid{ min-height: 0; padding-top: 26px; padding-bottom: 34px; }
+  .hero-grid{ min-height: 0; padding-top: 20px; padding-bottom: clamp(150px, 20vw, 180px); }
+  /* .wl-hero .hero-grid takes this down to 14px at 760, from an earlier trim
+     of the gap over wl-standard made when nothing sat in that gap. Restated
+     at the two-class specificity that trim used, or the welcome hero gives
+     the photograph no floor and the vials come up through the stat row. */
+  .wl-hero .hero-grid{ padding-bottom: clamp(150px, 20vw, 180px); }
   .hero-copy{ max-width: none; }
-  /* object-fit:cover on a portrait phone crops this frame down to roughly a
-     quarter of its width, so which quarter is the whole decision. The right-
-     half treatment above is off here: three vials at this width would each be
-     a sliver. One vial, framed whole, is what a phone has room for, sitting
-     behind the copy where the scrim can hold it down.
+  /* Side by side, against the sitewide mobile rule further up that stacks
+     every .btn-lg full width. Two stacked full-width buttons cost about 70px
+     of height and left the photograph below nothing to sit in; paired, the
+     hero holds the eyebrow, the headline, the sub, both calls to action and
+     the stat row on one screen with the image behind them. Scoped to the
+     hero so the sticky bar and the interior pages keep the stacked buttons
+     that suit them. */
+  .hero-cta{ flex-direction:row; align-items:stretch; gap: 12px; margin-bottom: 24px; }
+  .hero-cta .btn-lg{ width:auto; flex:1 1 0; padding: 13px 14px; font-size: 0.9rem; }
+  /* The desktop treatment, compacted, rather than a different idea: the
+     photograph still sits behind the copy and runs under the CTA row, it is
+     just shrunk to what a portrait phone has room for instead of cropped to
+     a slice of itself.
 
-     86%, not the 100% the single-vial clip wanted. 100% aligns the frame's
-     right edge with the element's, and this render carries black out past the
-     third vial, so 100% puts that black on screen and slices the vial down its
-     middle at the left edge. 86% brings the whole of it in. Opacity is what it
-     was: none of this is worth cropping correctly if it is invisible. */
+     contain, not cover. cover at this aspect keeps roughly a quarter of the
+     frame and throws the rest away, which is what had a single vial filling
+     the section at 38% opacity and reading as texture. contain fits the whole
+     trio across the width, and the height it then needs (a little over half
+     the width, this frame being 1686x933) is what leaves the copy its room.
+
+     Anchored low, so the vials land under the buttons and the stat row rather
+     than behind the headline. Opacity is near solid now: at a third it was
+     not a photograph, it was a smudge. */
   .hero-visual-img{
     display:block;
-    position:absolute; inset:0; z-index:0;
-    width:100%; height:100%; max-width:none;
-    object-fit:cover; object-position: 86% 40%;
-    transform: scale(1.3);
-    opacity:.38;
-    -webkit-mask-image: radial-gradient(ellipse 130% 85% at 50% 40%, #000 42%, transparent 92%);
+    /* No transform: this element also carries .reveal, whose .in state sets
+       transform: translateY(0) at two-class specificity and silently wins
+       over anything set here. Centering is done with the box instead. */
+    position:absolute; left:0; right:0; top:0; bottom:14px; z-index:0;
+    width:min(100%, 460px); height:100%; max-width:none; margin:0 auto;
+    object-fit:contain; object-position: 50% 100%;
+    opacity:.95;
+    /* Softens the frame's own edges into the section. The top stop matters
+       most: it is what keeps the vial caps from ending on a hard line under
+       the sub-heading. */
+    -webkit-mask-image: linear-gradient(180deg, transparent 46%, #000 62%, #000 100%);
     -webkit-mask-composite: source-in;
-            mask-image: radial-gradient(ellipse 130% 85% at 50% 40%, #000 42%, transparent 92%);
+            mask-image: linear-gradient(180deg, transparent 46%, #000 62%, #000 100%);
             mask-composite: intersect;
   }
+  /* Dark at both ends rather than the desktop scrim's left-to-right: the copy
+     stacks down the middle here, so the two bands that need holding down are
+     the headline at the top and the stat row at the foot, and the image is
+     left alone through the middle where the buttons sit over it. */
   .hero-copy-scrim{
     display:block;
-    background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.8) 55%, #000 100%);
+    background: linear-gradient(180deg,
+      #000 0%, rgba(0,0,0,.9) 34%, rgba(0,0,0,.55) 52%,
+      rgba(0,0,0,.3) 66%, transparent 82%);
   }
 
   /* the bigger button size added for the desktop CTAs was inflating every
