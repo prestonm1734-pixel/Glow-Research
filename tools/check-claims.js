@@ -3856,12 +3856,14 @@ console.log('\nin-app browser breakout');
       get parentNode() { return null; },
     });
     const body = el('body');
+    const listeners = [];
     const doc = {
       body,
       documentElement: { classList: { add() {}, remove() {} } },
       createElement: el,
-      addEventListener() {},
+      addEventListener(evt) { listeners.push(evt); },
     };
+    doc.listeners = listeners;
     body.appendChild = c => { body.children.push(c); mounted.push(c); };
 
     new Function('navigator', 'location', 'sessionStorage', 'localStorage', 'window', 'document',
@@ -3870,7 +3872,7 @@ console.log('\nin-app browser breakout');
       { getItem: k => (k in sess ? sess[k] : null), setItem: (k, v) => { sess[k] = v; } },
       { getItem: k => (k in local ? local[k] : null) },
       { open: v => { calls.push(v); return null; } }, doc);
-    return { calls, mounted };
+    return { calls, mounted, listeners };
   };
   const acted = r => r.calls.length > 0 || r.mounted.length > 0;
   const barLink = r => {
@@ -3924,6 +3926,15 @@ console.log('\nin-app browser breakout');
     'a button calling window.open lands back on .other and the prompt returns');
   ok('and it can be dismissed, and stays dismissed for the session',
     !acted(breakout(FB_IOS, LANDING, { hidden: '1' })));
+
+  // The bar is the visible fallback; this is what makes it feel automatic. A
+  // synthetic click on the same anchor, fired from the visitor's first touch
+  // anywhere on the page, is an anchor activation carrying a real gesture,
+  // which is a different case from the same call on page load with nothing
+  // behind it. Costs nothing if it fails: the bar is still there to tap.
+  ok('and it also fires that link on the first touch, which is what feels automatic',
+    iosRun.listeners.indexOf('touchstart') !== -1,
+    'without a gesture listener the visitor has to aim at the bar');
 
   // Android is unchanged: intent:// is a supported OS handoff rather than an
   // app launch to be vetted, so it still goes straight through.

@@ -178,6 +178,36 @@
     bar.appendChild(close);
     document.body.appendChild(bar);
     document.documentElement.classList.add('has-iab-bar');
+
+    // And the same link, clicked for them on their first touch anywhere on the
+    // page. This is the part that feels automatic.
+    //
+    // The distinction the gate draws is not "did script do it" on its own, it
+    // is what WKWebView reports as navigationType. A synthetic click on an
+    // anchor is an anchor activation, and fired from inside a real gesture it
+    // carries that gesture with it, which is a different case from the same
+    // call on page load with no user interaction behind it. An earlier version
+    // of this file rejected the synthetic click outright; that was right for
+    // firing it on load and wrong as a general rule, which is the distinction
+    // it missed.
+    //
+    // Anything counts as the gesture: a scroll, a tap, a swipe. The visitor
+    // touches the page and is in Safari, without a dialog and without having
+    // aimed at anything. If it does not work, nothing happens and the bar is
+    // still sitting there to be tapped, which is why this is worth trying
+    // rather than reasoning about.
+    var fired = false;
+    function escapeOnGesture(e) {
+      if (fired) return;
+      // Tapping the dismiss control means "no", so it must not be the gesture
+      // that triggers the thing being dismissed.
+      if (e && e.target && e.target.closest && e.target.closest('.iab-bar-close')) return;
+      fired = true;
+      try { link.click(); } catch (e2) {}
+    }
+    ['touchstart', 'pointerdown', 'click'].forEach(function (evt) {
+      document.addEventListener(evt, escapeOnGesture, { once: true, capture: true, passive: true });
+    });
   }
 
   if (document.body) mount();
