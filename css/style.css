@@ -970,10 +970,9 @@ button[disabled].si-forgot{ cursor: progress; }
    and the footer as they are. Prefixed .wl- so none of it can reach another
    page by accident. */
 
-/* .wl-cta is nothing but a hook now: js/welcome.js watches that row to know
-   when the hero buttons have scrolled away and the sticky bar should take
-   over. Its layout is .hero-cta's, shared with index.html. The stat row is
-   likewise .hero-stats unmodified. */
+/* The hero's button row and stat row are .hero-cta and .hero-stats
+   unmodified, shared with index.html. A .wl-cta hook sat on the first of
+   them for a sticky bar to watch; both are gone. */
 
 /* The accepted-payment row stood here, six card marks under a "We accept"
    label, directly beneath the hero. Removed: it sat immediately under the one
@@ -1075,43 +1074,6 @@ button[disabled].si-forgot{ cursor: progress; }
    And it hides with visibility, not just the transform, so that off screen it
    is out of the tab order and the accessibility tree: otherwise the page
    carries two Shop now buttons for anyone not using a mouse. */
-.wl-sticky{
-  position:fixed; left:0; right:0; bottom:0; z-index:150;
-  background: rgba(12,12,12,.94);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-  border-top:1px solid var(--border);
-  padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
-  box-shadow: 0 -8px 26px -16px rgba(0,0,0,.9);
-  transform: translateY(100%); visibility:hidden;
-  transition: transform .22s ease, visibility 0s .22s;
-}
-.wl-sticky[hidden]{ display:none; }
-.wl-sticky.is-shown{
-  transform: translateY(0); visibility:visible;
-  transition: transform .22s ease;
-}
-/* min-width:0 so the copy truncates rather than widening the row past the
-   screen: a flex item's default min-width is auto, which would let the
-   sentence push the button off the edge. */
-.wl-sticky-in{ display:flex; align-items:center; justify-content:space-between; gap:20px; min-width:0; }
-.wl-sticky-copy{
-  margin:0; font-size:0.86rem; color: var(--text-dim); min-width:0;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.wl-sticky-btn{ flex:0 0 auto; padding: 13px 26px; font-size:0.92rem; }
-/* Under 640px the sentence and the button cannot share a row without the
-   button losing its tap target, and the button is the reason the bar exists.
-   The copy goes rather than shrinking both. */
-@media (max-width: 640px){
-  .wl-sticky-copy{ display:none; }
-  .wl-sticky-in{ justify-content:stretch; }
-  .wl-sticky-btn{ flex:1 1 auto; height:50px; }
-}
-@media (prefers-reduced-motion: reduce){
-  .wl-sticky{ transition: none; }
-  .wl-sticky.is-shown{ transition: none; }
-}
-
 /* The FAQ sits on the page background here, not the white section the homepage
    gives it, so it inherits the dark .faq-* rules with nothing to override. */
 /* #000, the same ground as .standard-sec directly above it, rather than

@@ -161,10 +161,10 @@
            not ready, who needs proof before purchase rather than another
            reason to hurry.
 
-           .wl-cta rides along on the row because js/welcome.js watches it to
-           know when the hero buttons have scrolled away and the sticky bar
-           should take over. -->
-      <div class="hero-cta wl-cta reveal">
+           .wl-cta rode along on this row as the hook a sticky bar watched to
+           know when these buttons had scrolled away. The bar is gone and the
+           class with it. -->
+      <div class="hero-cta reveal">
         <a href="shop" class="btn btn-primary btn-lg">Shop now <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
         <a href="coa.html" class="btn btn-outline btn-lg">View COAs</a>
       </div>
@@ -412,28 +412,6 @@
     </div>
   </div>
 </footer>
-
-<!-- Sticky call to action, this page only.
-     It is hidden while the hero's own Shop now button is on screen and
-     appears once that scrolls away, so the page never shows the same action
-     twice. js/welcome.js does that with an observer on .wl-cta.
-
-     Deliberately says nothing with a number in it. Every other standing term
-     on this page (the threshold, the discount, the cutoff) is a figure pinned
-     to a constant somewhere, and a bar that follows the reader down the whole
-     page is the worst place to leave a fourth copy of one to drift. What is
-     left is true on every lot with nothing to keep in sync.
-
-     Starts [hidden] rather than merely translated off screen: with no
-     JavaScript the observer never runs, and a bar that is only visually
-     off-canvas would still be in the tab order and read out by a screen
-     reader as a second Shop now. -->
-<div class="wl-sticky" id="wlSticky" hidden>
-  <div class="container wl-sticky-in">
-    <p class="wl-sticky-copy">Every lot third-party tested, with a published certificate of analysis.</p>
-    <a href="shop" class="btn btn-primary wl-sticky-btn">Shop now <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
-  </div>
-</div>
 
 <script src="js/products-data.js"></script>
 <script src="js/cart.js"></script>
