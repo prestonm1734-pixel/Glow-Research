@@ -145,22 +145,12 @@
 
   <div class="container hero-grid">
     <div class="hero-copy">
-      <span class="hero-eyebrow reveal">Research-Grade Peptides</span>
-      <h1 class="hero-title reveal">Lab-Grade <br class="hero-br" /><span class="outline">Research</span> Peptides.</h1>
-      <!-- "and mass spec" was asked for here and is deliberately not written.
-           ANALYSIS_TESTS records no technique for the identity row: it said
-           LC-MS once and was emptied on purpose, because the certificate reports
-           identity as a pass against the declared compound without naming an
-           instrument. Saying it on the page paid traffic lands on is the last
-           place to assert a fact about someone else's laboratory that their own
-           document does not state. If Accumark confirm identity is run by MS,
-           set method on that row in js/products-data.js and this sentence can
-           name it. -->
-      <p class="hero-sub reveal">
-        Every batch independently tested for purity by HPLC, identity and
-        quantity, with published certificates of analysis. Dispatched the same
-        day when ordered by 1:00 PM PST.
-      </p>
+      <span class="hero-eyebrow reveal">
+        Independently Verified
+      </span>
+      <h1 class="hero-title reveal">
+        Lab-Grade <br class="hero-br" /><span class="outline">Research</span> Peptides.
+      </h1>
 
       <!-- The dispatch cutoff, stated against the clock the visitor is actually
            reading it on. js/welcome.js fills this from DISPATCH_CUTOFF_HOUR, so
@@ -169,34 +159,52 @@
            rather than restarting at 24 hours, which is the whole difference
            between a deadline and a countdown prop. Empty until script runs: a
            cutoff banner that renders a stale time to a reader with no
-           JavaScript is worse than one that renders nothing. -->
+           JavaScript is worse than one that renders nothing.
+
+           Above the paragraph rather than below the buttons, which is where it
+           used to sit. It is the one line on this hero that is true only right
+           now, and burying a live figure under two static ones wastes it: a
+           visitor reading three seconds of the page should meet the deadline
+           before the standing claims, not after them. It is also the only
+           element in this copy column index.html does not have. -->
       <div class="wl-cutoff reveal" id="wlCutoff" hidden></div>
 
-      <!-- One action, where index.html offers two. This is the page paid
-           traffic lands on and there is nothing to weigh up on it yet.
-           .wl-cta stays on the row because js/welcome.js watches it to decide
-           when the sticky bar takes over. -->
+      <p class="hero-sub reveal">
+        High-purity research compounds, backed by third-party testing and clear documentation.
+      </p>
+      <!-- Explore Catalog stays the one dominant action. The second button is
+           deliberately quieter: it is for the visitor who is interested but
+           not ready, who needs proof before purchase rather than another
+           reason to hurry.
+
+           .wl-cta rides along on the row because js/welcome.js watches it to
+           know when the hero buttons have scrolled away and the sticky bar
+           should take over. -->
       <div class="hero-cta wl-cta reveal">
-        <a href="shop" class="btn btn-primary btn-lg">Shop now <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+        <a href="shop" class="btn btn-primary btn-lg">Explore Catalog <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+        <a href="coa.html" class="btn btn-outline btn-lg">View COAs</a>
       </div>
 
-      <!-- The same three figures the homepage hero states, pinned to the same
-           data by the "hero figures" section of tools/check-claims.js. The
-           middle one is a text stat rather than a counted numeral, which is why
-           it carries .stat-text: the reveal observer skips those when it runs
-           the count-up animation. -->
+      <!-- The quality layer: two evidence figures, then one delivery figure.
+           All three sit in the served markup rather than being written by
+           script, so a crawler and a reader see the same numbers.
+
+           They are not free-typed. tools/check-claims.js pins this figure to
+           avgPurity() over the catalog and 150 to BATCHES_TESTED, both in
+           js/products-data.js, and fails the build if either drifts. Editing a
+           number here alone is caught; the figure changes when the data does. -->
       <div class="hero-stats reveal">
         <div class="stat">
           <span class="stat-num" data-count="99.4">0</span><span class="stat-suffix">%</span>
           <p>Avg. Purity</p>
         </div>
         <div class="stat">
-          <span class="stat-num stat-text">Every lot</span>
-          <p>Published COA</p>
-        </div>
-        <div class="stat">
           <span class="stat-num" data-count="150">0</span><span class="stat-suffix">+</span>
           <p>Batches Tested</p>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-count="24">0</span><span class="stat-suffix">hr</span>
+          <p>Same-day Dispatch</p>
         </div>
       </div>
     </div>
