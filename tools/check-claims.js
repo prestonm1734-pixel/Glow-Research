@@ -1553,42 +1553,19 @@ console.log('\nwelcome landing page');
     wlPercents.length === 0,
     `welcome.html hardcodes: ${wlPercents.map(m => m[0]).join(', ')}`);
 
-  // The accepted-payment row states six facts about a Stripe Dashboard this
-  // repo cannot read. Pinning the markup to PAYMENT_METHODS at least makes the
-  // list one place to correct, so a method switched off is deleted once rather
-  // than left on the page nobody edits.
-  // Read off data-pay rather than the tile's contents: the mark itself is now
-  // drawn artwork with no text node to compare, and the order is part of what
-  // is being pinned, not just the set.
-  const payRow = (wl.match(/<ul class="wl-pay-list">([\s\S]*?)<\/ul>/) || [, ''])[1];
-  const shownMarks = [...payRow.matchAll(/<li class="wl-pay-mark" data-pay="([^"]+)"/g)].map(m => m[1]);
-  ok('the payment row shows exactly what PAYMENT_METHODS holds, in that order',
-    shownMarks.join(' | ') === PAYMENT_METHODS.map(p => p.name).join(' | '),
-    `page has [${shownMarks.join(', ')}], PAYMENT_METHODS has [${PAYMENT_METHODS.map(p => p.name).join(', ')}]`);
-
-  // Drawn artwork carries no text, so without a label each mark is a blank to
-  // a screen reader. The data-pay attribute the check above reads is for the
-  // build, not the browser, and does not announce anything.
-  const unlabelled = [...payRow.matchAll(/<li class="wl-pay-mark" data-pay="([^"]+)"[\s\S]*?<\/li>/g)]
-    .filter(m => !/role="img"/.test(m[0]) || !/aria-label="[^"]+"/.test(m[0]))
-    .map(m => m[1]);
-  ok('and every mark is labelled for a screen reader',
-    unlabelled.length === 0, unlabelled.join(', '));
-
-  // Advertising card brands on a site that cannot take a card is the same
-  // defect as any other unbacked claim, and PAYMENTS_LIVE is the flag that
-  // decides it.
-  ok('and only claims them while PAYMENTS_LIVE is true',
-    PAYMENTS_LIVE || shownMarks.length === 0,
-    'payments are switched off but the landing page still advertises card brands');
-
-  // A wallet is offered only where the browser can open the sheet, which
-  // js/express-pay.js gates on canMakePayment(). The row has to say so rather
-  // than listing Apple Pay flat beside Visa, which reads as a guarantee.
-  ok('and footnotes the wallets rather than promising them to every visitor',
-    !PAYMENT_METHODS.some(p => p.wallet) ||
-    /where your browser supports them/i.test(wl),
-    'PAYMENT_METHODS lists a wallet but welcome.html states it unconditionally');
+  // Four guards over the accepted-payment row stood here: the marks matching
+  // PAYMENT_METHODS in name and order, each one carrying a screen-reader label
+  // since the artwork has no text node, the row appearing only while
+  // PAYMENTS_LIVE is true, and the wallets being footnoted as browser
+  // dependent rather than promised. The row was removed from welcome.html for
+  // competing with the one button that page exists to get pressed, and a guard
+  // over markup that no longer exists passes for the wrong reason.
+  //
+  // Bring all four back with it. PAYMENT_METHODS is still in
+  // js/products-data.js, unread by any page now, which is deliberate: it is
+  // the list the row was built from, and rebuilding the row without rebuilding
+  // these checks would put six unverified brand claims back on the page paid
+  // traffic lands on.
 
   // The countdown's three guards stood here: the hour read from
   // DISPATCH_CUTOFF_HOUR rather than typed, an expired branch that says so

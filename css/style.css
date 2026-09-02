@@ -961,44 +961,16 @@ button[disabled].si-forgot{ cursor: progress; }
    over. Its layout is .hero-cta's, shared with index.html. The stat row is
    likewise .hero-stats unmodified. */
 
-/* Accepted payment methods, directly under the hero.
+/* The accepted-payment row stood here, six card marks under a "We accept"
+   label, directly beneath the hero. Removed: it sat immediately under the one
+   button this page exists to get pressed and competed with it for the eye,
+   which is a poor trade for a reassurance nobody has asked for yet at the top
+   of a landing page. Checkout is where that question actually gets asked, and
+   Stripe answers it there.
 
-   A bordered three-cell terms module stood above this: dispatch cutoff, free
-   shipping threshold, launch discount. Removed on request, and it turned out
-   to cost nothing, because every fact in it is stated elsewhere on the page
-   already: the marquee carries the cutoff and the threshold, the footer
-   carries the offer, and the hero's own third figure is the dispatch window.
-
-   The .wl-dot and its pulse went with it. They belonged to the live cutoff,
-   which was the only element on this page that ticked. */
-.wl-pay{ background:#000; padding: 26px 0 40px; }
-.wl-pay-in{
-  display:flex; flex-direction:column; align-items:center; gap:12px;
-}
-.wl-pay-label{
-  font-family:'JetBrains Mono', monospace; font-size:0.64rem; font-weight:600;
-  letter-spacing:.16em; text-transform:uppercase; color: var(--text-dimmer);
-}
-.wl-pay-list{
-  list-style:none; margin:0; padding:0;
-  display:flex; flex-wrap:wrap; justify-content:center; gap:10px;
-}
-/* Uniform tiles, so six marks drawn at six different natural proportions
-   still read as one set. The hairline is what stops the white-backed tiles
-   (Visa, Mastercard, Discover, Google Pay) glowing against the black page
-   while the dark ones (Apple Pay, Amex) would otherwise float unbounded. */
-.wl-pay-mark{
-  display:block; width:44px; height:29px; line-height:0;
-  border:1px solid rgba(255,255,255,.14); border-radius:3px; overflow:hidden;
-}
-.wl-pay-mark svg{ display:block; width:100%; height:100%; }
-.wl-pay-note{
-  margin:0; font-size:0.72rem; color: var(--text-dimmer); text-align:center;
-}
-@media (max-width: 560px){
-  .wl-pay{ padding: 20px 0 32px; }
-  .wl-pay-list{ gap:7px; }
-}
+   PAYMENT_METHODS in js/products-data.js is now unread by any page. Left in
+   place rather than deleted: it is the list this row was built from, and the
+   four guards that held the row to it are described in check-claims.js. */
 
 /* The three facts the cards above do not cover, set as a hairline row rather
    than as boxes.
