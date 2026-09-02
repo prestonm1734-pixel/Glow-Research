@@ -186,6 +186,28 @@ console.log('\ndispatch window');
   ok('every page with a marquee states the current cutoff ticker',
     staleTicker.length === 0, staleTicker.join(', '));
 
+  // The marquee scrolls by animating the track from 0 to -50%, which only
+  // returns to where it started if the track is the same list written twice.
+  // Every page but the homepage and welcome had it written once, so the loop
+  // jumped back visibly every 28 seconds on 28 of 30 pages, for long enough
+  // that nobody had noticed it was a defect rather than the effect.
+  //
+  // Checked rather than fixed and forgotten, because this markup is hand
+  // duplicated into every page: the next new page starts as a copy of one of
+  // these, and half of them were wrong.
+  const brokenLoop = [];
+  pages.forEach(f => {
+    const body = (read(f).match(/<div class="marquee-track">([\s\S]*?)<\/div>/) || [, ''])[1];
+    if (!body.trim()) return;
+    const items = body.split('\n').map(l => l.trim()).filter(l => l.includes('<span>'));
+    const half = items.length / 2;
+    if (items.length % 2 !== 0 ||
+        items.slice(0, half).join('|') !== items.slice(half).join('|')) brokenLoop.push(f);
+  });
+  ok('and its track is the same list twice, so the scroll loops without a jump',
+    brokenLoop.length === 0,
+    `the -50% animation lands mid-list on: ${brokenLoop.join(', ')}`);
+
   ok('the product page reads the shared dispatch days, not its own copy',
     !/const NO_DISPATCH_DAYS|const NO_DELIVERY_DAY/.test(read('js/product.js')) &&
     /NO_DISPATCH_DAYS/.test(read('js/product.js')) &&
