@@ -649,10 +649,22 @@
   // api/_meta-capi.js and its siblings send the same events from the server.
   // Anything not on this list is treated as load-bearing until someone
   // decides otherwise, which is the safer direction to be wrong in.
+  //
+  // Two kinds of host end up here and it is worth knowing which is which. The
+  // first three are the script hosts, the files a wrapper in js/ injects, and
+  // tools/check-claims.js derives those from the wrappers themselves so a
+  // fourth platform cannot be added without landing here. The rest are beacon
+  // hosts: not scripts at all, but the images and requests those scripts fire
+  // once they run, which no wrapper mentions and nothing can derive. t.co is
+  // X's, reached as /i/adsct, and it was missing while static.ads-twitter.com
+  // was present, so every blocked X conversion filed itself as a site fault.
   var PIXEL_HOSTS = [
     'connect.facebook.net',
     'analytics.tiktok.com',
     'static.ads-twitter.com',
+    'api.goaffpro.com',
+    't.co',
+    'analytics.twitter.com',
   ];
   function hostOf(url) {
     try { return new URL(url, location.href).host; } catch (e2) { return ''; }
@@ -695,11 +707,28 @@
       line: e.lineno || null,
     });
   }, true);
+  // A browser extension that injects a script into the page is
+  // indistinguishable from our own code by the time its promise rejects here:
+  // same window, same event, no filename. Filing those as site errors is the
+  // "Script error." problem again, a panel filled with things nobody here can
+  // fix, and a wallet extension on a shopping page rejects on every load.
+  //
+  // Two tests, both narrow. A stack naming an extension URL is conclusive.
+  // The second covers the common case where there is no usable stack and all
+  // that arrives is a sentence with a wallet's name in it: this site has no
+  // crypto code at all, which check-claims.js pins, so such a message cannot
+  // be ours. The day someone adds a wallet, that guard fails and this has to
+  // be thought about again rather than silently swallowing a real error.
+  var EXTENSION_URL = /(?:chrome|moz|safari-web|ms-browser)-extension:\/\//;
+  var INJECTED_WALLET = /\b(?:MetaMask|Phantom|Coinbase Wallet|Trust Wallet|Keplr)\b/i;
   window.addEventListener('unhandledrejection', function (e) {
     var reason = e.reason;
+    var message = ('' + ((reason && reason.message) || reason)).slice(0, 200);
+    var fromExtension = EXTENSION_URL.test((reason && reason.stack) || '') ||
+      INJECTED_WALLET.test(message);
     track('js_error', {
-      kind: 'unhandled_rejection',
-      message: ('' + ((reason && reason.message) || reason)).slice(0, 200),
+      kind: fromExtension ? 'extension' : 'unhandled_rejection',
+      message: fromExtension ? 'extension: ' + message : message,
       source: 'unhandledrejection',
       line: null,
     });

@@ -3429,7 +3429,7 @@ console.log('\nprivacy disclosure');
       // block above explaining each kind would satisfy this on its own.
       const relayCode = relay.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
       const kinds = ['exception', 'cross_origin', 'resource_load',
-        'third_party_blocked', 'unhandled_rejection']
+        'third_party_blocked', 'unhandled_rejection', 'extension']
         .filter(k => !relayCode.includes(`'${k}'`));
       ok('every reported error says what kind of failure it was',
         kinds.length === 0, `missing: ${kinds.join(', ')}`);
@@ -3453,14 +3453,61 @@ console.log('\nprivacy disclosure');
         !!pixelList && !/isOwnResource/.test(relay),
         'an origin test also hides js.stripe.com, whose failure breaks checkout');
 
-      const pixelFiles = ['js/meta-pixel.js', 'js/tiktok-pixel.js', 'js/x-pixel.js'];
-      const unlisted = pixelFiles.filter(f => {
-        const host = (read(f).match(/https:\/\/([a-z0-9.-]+)\/[^'"]*\.js/i) || [, ''])[1];
-        return host && !pixelList.includes(host);
-      });
-      ok('and every pixel script the site loads is on that list',
-        unlisted.length === 0,
-        `not in PIXEL_HOSTS: ${unlisted.join(', ')}`);
+      // Derived from the files themselves rather than from a list of them,
+      // which is the difference between a guard that holds and one that only
+      // looks like it does. This named three wrappers by hand, so when
+      // js/goaffpro.js was added and injected a fourth tracker, the guard
+      // passed and every blocked load of it filed itself as a site fault.
+      //
+      // Every third-party script any file in js/ injects has to land on one
+      // side of the line: a pixel, whose blocking is routine and costs only
+      // measurement, or load-bearing, whose failure is a real error. Neither
+      // list is derivable, but membership of one of them is, and being on
+      // neither is the state that produced the bug.
+      const LOAD_BEARING_HOSTS = ['js.stripe.com'];
+      const stripJs = src => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+      const unclassified = [];
+      fs.readdirSync(path.join(ROOT, 'js'))
+        .filter(f => f.endsWith('.js'))
+        .forEach(f => {
+          const src = stripJs(read(`js/${f}`));
+          // Only files that actually build a <script>. Everything else
+          // mentioning an https host is a link or our own beacon endpoint.
+          if (!/createElement\((?:'script'|"script"|e)\)/.test(src)) return;
+          (src.match(/https:\/\/[a-z0-9.-]+/gi) || []).forEach(u => {
+            const host = u.replace('https://', '');
+            if (!pixelList.includes(host) && !LOAD_BEARING_HOSTS.includes(host)) {
+              unclassified.push(`${f} -> ${host}`);
+            }
+          });
+        });
+      ok('and every third-party script js/ injects is classified as one or the other',
+        unclassified.length === 0,
+        `neither in PIXEL_HOSTS nor load-bearing: ${unclassified.join(', ')}`);
+
+      // The beacon hosts cannot be derived: they are fired by the third-party
+      // script once it runs, so nothing in this repo names them. Pinned by
+      // hand for the platforms actually live, which is the whole reason X's
+      // conversions were showing up as errors while its script host was
+      // listed and fine.
+      const beacons = [['static.ads-twitter.com', 't.co']]
+        .filter(([script]) => pixelList.includes(script))
+        .flatMap(([, ...hosts]) => hosts)
+        .filter(h => !pixelList.includes(h));
+      ok('and the beacon hosts of every live pixel are listed beside its script host',
+        beacons.length === 0,
+        `script host listed but its beacon is not: ${beacons.join(', ')}`);
+
+      // The wallet half of the extension rule is only honest while the site
+      // has no wallet code of its own. If that changes, a real error starts
+      // being filed as somebody's browser extension.
+      const walletish = ['js/analytics.js']
+        .concat(fs.readdirSync(path.join(ROOT, 'js')).filter(f => f.endsWith('.js')).map(f => `js/${f}`))
+        .filter((f, i, a) => a.indexOf(f) === i && f !== 'js/analytics.js')
+        .filter(f => /\b(?:web3|ethereum|MetaMask)\b/i.test(stripJs(read(f))));
+      ok('and the site itself carries no wallet code, which is what makes that rule safe',
+        walletish.length === 0,
+        `names a crypto wallet: ${walletish.join(', ')}`);
       // Resource load failures fire on the element, not on window, and do not
       // bubble. Without capture they are invisible.
       ok('and the listener captures, so a failed resource load is seen at all',
