@@ -1120,7 +1120,10 @@ button[disabled].si-forgot{ cursor: progress; }
 
 /* The FAQ sits on the page background here, not the white section the homepage
    gives it, so it inherits the dark .faq-* rules with nothing to override. */
-.wl-faq-sec{ padding: 96px 0 110px; }
+/* #000, the same ground as .standard-sec directly above it, rather than
+   var(--bg)'s #0a0a0a. The two dark sections meet with nothing between them,
+   and two blacks a shade apart read as a seam where one reads as one page. */
+.wl-faq-sec{ background:#000; padding: 96px 0 110px; }
 .wl-faq-sec .faq-list{ max-width: 860px; }
 /* One column at every width: four questions split into two columns of two
    leaves a short, lopsided pair of stacks rather than a list. */
