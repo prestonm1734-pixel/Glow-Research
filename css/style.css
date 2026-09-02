@@ -1189,9 +1189,10 @@ html:not(.js) .faq-a{ max-height: none; }
 .section-light .faq-q:hover{ color:#000; }
 
 /* ---------- footer offer band ----------
-   The standing launch-offer form, built by js/launch-offer.js. Shares the
-   .lo-* type and control styles with the popup so the two are one component
-   wearing two frames; only the band around it is defined here. */
+   The standing launch-offer form, built by js/launch-offer.js, and the only
+   place the offer is asked for since the popups were removed. The .lo-* type
+   and control styles it uses are further down; only the band around them is
+   defined here. */
 .footer-offer:empty{ display:none; }
 .footer-offer{
   display:flex; align-items:center; justify-content:space-between;
@@ -2322,72 +2323,35 @@ body.qa-open .cart-toast{ opacity:0; pointer-events:none; }
 .disc-body > *:last-child{ margin-bottom: 0 !important; }
 
 /* ---------- launch offer ----------
-   Two surfaces built by js/launch-offer.js, sharing everything but the frame:
-   a bar along the foot of the homepage, and a dialog on the catalog and the
-   product pages. Both are dark panels on light pages, which is the same
-   figure/ground the cart drawer's primary button uses. */
-.lo-bar, .lo-overlay{ --lo-ink:#f7f7f5; --lo-dim:#a3a3a1; }
+   One surface: the standing form in the footer band above. There were two
+   others, a bar along the foot of the homepage and a centred dialog on the
+   catalog and the product pages, and their frames, transitions, scroll lock
+   and close control were all defined here. They went with the popup itself.
+   Almost all of this store's traffic arrives from a Facebook ad, and an offer
+   thrown over a page the visitor landed on seconds ago reads as spam.
 
-/* the dialog. z-index sits under the cart drawer (320) and the search and
-   quick-add layers (300 with their own stacking): an offer must never cover
-   something the visitor deliberately opened. js/launch-offer.js also refuses
-   to open while any of those are up. */
-.lo-overlay{
-  position: fixed; inset:0; z-index: 290;
-  background: rgba(10,10,10,0.55);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  display:flex; align-items:center; justify-content:center; padding: 24px;
-  opacity:0; pointer-events:none; transition: opacity .22s ease;
-}
-.lo-overlay.is-open{ opacity:1; pointer-events:auto; }
-.lo-modal{
-  position:relative; width:100%; max-width: 440px;
-  background:#0a0a0a; color: var(--lo-ink);
-  border:1px solid rgba(255,255,255,.14);
-  /* square, same as .btn and the standard cards */
-  border-radius: 0;
-  padding: 40px 36px 32px; text-align:center;
-  transform: translateY(14px) scale(.98); opacity:0;
-  transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .22s ease;
-}
-.lo-overlay.is-open .lo-modal{ transform:none; opacity:1; }
-.lo-modal:focus{ outline:none; }
-html.lo-locked, html.lo-locked body{ overflow:hidden; }
+   Colours are the site palette now. The popup declared --lo-ink and --lo-dim
+   on its own frames, and those were aliases of --text and --text-dim, so with
+   the frames gone the aliases had nowhere left to live.
 
-/* the bar */
-.lo-bar{
-  position: fixed; left:0; right:0; bottom:0; z-index: 290;
-  background:#0a0a0a; color: var(--lo-ink);
-  border-top:1px solid rgba(255,255,255,.14);
-  padding: 18px 0 16px;
-  transform: translateY(100%); transition: transform .38s cubic-bezier(.2,.8,.2,1);
-}
-.lo-bar.is-open{ transform:none; }
-.lo-bar-inner{
-  position:relative;
-  max-width: var(--container); margin:0 auto; padding: 0 56px 0 24px;
-  display:flex; align-items:center; gap: 28px; flex-wrap:wrap;
-}
-.lo-bar .lo-copy{ flex:1 1 320px; min-width:0; }
-.lo-bar .lo-action{ flex:0 1 400px; }
-.lo-bar .lo-facts{
-  max-width: var(--container); margin: 12px auto 0; padding: 0 56px 0 24px;
-}
+   Worth knowing before touching the greys: .lo-eyebrow, .lo-ask and .lo-msg
+   referenced --lo-dim from outside the selector that defined it, so in the
+   footer they never resolved and have always inherited the footer's own ink.
+   They are written as var(--text) here to keep that exactly as it renders
+   today. Swapping those three to var(--text-dim) is the one-line change if
+   they should read quieter, and is what the popup looked like. */
 
 /* shared type */
 .lo-eyebrow{
   display:block; font-family:'JetBrains Mono', monospace;
   font-size:.66rem; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
-  color: var(--lo-dim); margin-bottom: 10px;
+  color: var(--text); margin-bottom: 10px;
 }
 .lo-title{
   font-family: var(--font-display); font-weight:600; letter-spacing:-.02em;
-  color: var(--lo-ink); margin:0 0 6px; line-height:1.2;
+  color: var(--text); margin:0 0 6px; line-height:1.2;
 }
-.lo-bar .lo-title{ font-size: 1.05rem; }
-.lo-modal .lo-title{ font-size: 1.5rem; margin-bottom: 10px; }
-.lo-ask{ margin:0; font-size:.92rem; line-height:1.55; color: var(--lo-dim); }
-.lo-modal .lo-ask{ margin-bottom: 22px; }
+.lo-ask{ margin:0; font-size:.92rem; line-height:1.55; color: var(--text); }
 .lo-facts{
   margin: 14px 0 0; font-family:'JetBrains Mono', monospace;
   font-size:.62rem; letter-spacing:.08em; color:#6b6b69; line-height:1.7;
@@ -2397,7 +2361,7 @@ html.lo-locked, html.lo-locked body{ overflow:hidden; }
 .lo-form{ display:flex; gap:10px; align-items:stretch; }
 .lo-input{
   flex:1 1 auto; min-width:0;
-  background:#141414; color: var(--lo-ink);
+  background:#141414; color: var(--text);
   border:1px solid rgba(255,255,255,.22); border-radius:0;
   padding: 14px 16px; font-family:inherit; font-size:.95rem; font-weight:500;
 }
@@ -2411,38 +2375,19 @@ html.lo-locked, html.lo-locked body{ overflow:hidden; }
   position:absolute; width:1px; height:1px; padding:0; margin:-1px;
   overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
 }
-.lo-msg{ margin: 10px 0 0; font-size:.82rem; line-height:1.5; color: var(--lo-dim); min-height:0; }
+.lo-msg{ margin: 10px 0 0; font-size:.82rem; line-height:1.5; color: var(--text); min-height:0; }
 .lo-msg.is-error{ color:#ffb4a8; }
-
-/* the close control */
-.lo-close{
-  position:absolute; top:0; right:16px;
-  background:none; border:none; cursor:pointer;
-  color: var(--lo-dim); font-size:1.5rem; line-height:1;
-  width:34px; height:34px; display:flex; align-items:center; justify-content:center;
-  transition: color .18s ease;
-}
-.lo-modal .lo-close{ top:10px; right:10px; }
-.lo-close:hover{ color: var(--lo-ink); }
-.lo-close:focus-visible{ outline:2px solid var(--lo-ink); outline-offset:2px; }
 
 /* after the address is in */
 .lo-reveal{ text-align:center; }
-.lo-bar .lo-reveal{ flex:1 1 auto; padding-right: 24px; }
 .lo-code{
   font-family:'JetBrains Mono', monospace; font-weight:700;
-  font-size: 1.15rem; letter-spacing:.06em; color: var(--lo-ink);
+  font-size: 1.15rem; letter-spacing:.06em; color: var(--text);
   margin: 0 0 8px;
 }
-.lo-modal .lo-code{ font-size: 1.35rem; }
 .lo-copy-btn{ margin-top: 18px; padding: 12px 24px; font-size:.9rem; }
 
 @media (max-width: 780px){
-  .lo-bar{ padding: 16px 0 14px; }
-  .lo-bar-inner{ gap: 14px; padding: 0 44px 0 20px; }
-  .lo-bar .lo-action{ flex:1 1 100%; }
-  .lo-bar .lo-facts{ padding: 0 44px 0 20px; }
-  .lo-modal{ padding: 34px 22px 26px; }
   .lo-form{ flex-direction:column; }
   .lo-submit{ width:100%; }
 }

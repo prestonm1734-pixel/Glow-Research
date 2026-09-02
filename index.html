@@ -130,7 +130,7 @@
 }
 </script>
 </head>
-<body data-launch-offer="bar">
+<body>
 <script src="js/identity.js" defer></script>
 <script src="js/meta-pixel.js" defer></script>
 <script src="js/tiktok-pixel.js" defer></script>
@@ -394,12 +394,12 @@
 <!-- FOOTER -->
 <footer class="site-footer">
   <div class="container">
-    <!-- The standing offer form. Built by js/launch-offer.js from the same
-         copy and wired to the same endpoint as the popup, so the two cannot
-         say different things. Empty here on purpose: with no script there is
-         no form to submit, which is better than a form that silently does
-         nothing. It replaced a newsletter sign-up that answered "You're on
-         the list" without sending the address anywhere at all. -->
+    <!-- The standing offer form, built by js/launch-offer.js. The only place
+         the offer is asked for now: the delayed popups that used to carry it
+         were removed, because ad traffic lands on a page it has not read yet
+         and an offer thrown over that reads as spam. Empty here on purpose:
+         with no script there is no form to submit, which is better than a form
+         that silently does nothing. -->
     <div class="footer-offer" id="offerFooter"></div>
 
     <div class="footer-top">

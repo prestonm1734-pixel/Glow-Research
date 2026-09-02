@@ -55,6 +55,18 @@ function ok(label, cond, detail) {
 const pages = fs.readdirSync(ROOT)
   .filter(f => f.endsWith('.html') && !/^google[0-9a-f]+\.html$/.test(f));
 
+// Every page a visitor can land on, generated ones included. `pages` above is
+// the hand-written top level only, which is the right scope for a guard about
+// a file that lives there and the wrong one for anything about what gets
+// served. The product pages are built from a donor, so a defect reintroduced
+// in the donor lands in ten more files that a top-level list never opens.
+const everyPage = [
+  ...pages,
+  ...fs.readdirSync(path.join(ROOT, 'product'), { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(d => `product/${d.name}/index.html`),
+];
+
 // Pull a numeric literal out of a source file by its identifier.
 function constant(file, name) {
   const m = read(file).match(new RegExp(`${name}\\s*[=:]\\s*([0-9.]+)`));
@@ -2634,7 +2646,7 @@ console.log('\npromo codes');
 }
 
 /* ---------------------------------------------------------------------------
- * The launch offer. A popup that says "20% off with GLOW20" is two claims the
+ * The launch offer. A form that says "20% off with GLOW20" is two claims the
  * catalog cannot keep true on its own: the promotion is Stripe's to end, and
  * the rate is Stripe's to change. So the value is never in the page, and the
  * endpoint that hands it out asks Stripe first.
@@ -2643,7 +2655,6 @@ console.log('\nlaunch offer');
 {
   const offerJs = read('js/launch-offer.js');
   const unlock = read('api/unlock-offer.js');
-  const offerPages = ['index.html', 'shop.html', 'product.html'];
   // Pages where an interruption can only cost an order.
   const quietPages = ['checkout.html', 'thank-you.html', 'cart.html'].filter(f =>
     fs.existsSync(path.join(ROOT, f)));
@@ -2686,24 +2697,40 @@ console.log('\nlaunch offer');
   ok('and validates the address rather than mailing whatever it is sent',
     /isEmail\(email\)/.test(unlock));
 
-  // The offer only appears where it was asked for, and never over a page
-  // someone is trying to buy on.
-  offerPages.forEach(f => {
-    ok(`${f} loads the offer and names which surface it wants`,
-      /js\/launch-offer\.js/.test(read(f)) &&
-      /<body data-launch-offer="(bar|modal)"/.test(read(f)));
+  // One surface, and it is the footer. The two popups were removed because
+  // almost all of this store's traffic arrives from a Facebook ad, and an
+  // offer thrown over a page the visitor landed on seconds ago reads as spam
+  // from a supplier they have not decided to trust. Three ways that can come
+  // undone, so three checks: a page reintroducing a popup surface, a page
+  // loading the script with nothing to render into, and the script growing a
+  // frame back.
+  const footerPages = ['index.html', 'welcome.html'];
+  footerPages.forEach(f => {
+    ok(`${f} hosts the footer form and loads the script that fills it`,
+      /id="offerFooter"/.test(read(f)) && /js\/launch-offer\.js/.test(read(f)));
   });
+  const stray = everyPage.filter(f => /launch-offer\.js/.test(read(f)) && !footerPages.includes(f));
+  ok('no other page loads the offer script, which would have nothing to render',
+    stray.length === 0, stray.join(', '));
+  const declaring = everyPage.filter(f => /data-launch-offer=/.test(read(f)));
+  ok('no page asks for a popup surface', declaring.length === 0, declaring.join(', '));
   quietPages.forEach(f => {
-    ok(`${f} carries no offer popup`,
+    ok(`${f} carries no offer at all`,
       !/launch-offer/.test(read(f)));
   });
 
-  ok('the homepage takes the quieter surface of the two',
-    /<body data-launch-offer="bar"/.test(read('index.html')));
+  // Comments stripped first. The comment in js/launch-offer.js explaining the
+  // removal names every one of these, and would otherwise satisfy the match
+  // for the thing it says is gone.
+  const offerCode = offerJs.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  const frames = ['lo-bar', 'lo-modal', 'lo-overlay', 'lo-close', 'lo-locked', 'popupVariant']
+    .filter(t => offerCode.includes(t));
+  ok('and the script builds no popup frame for a page to ask for',
+    frames.length === 0, frames.join(', '));
 
-  // The email and the popup say the same thing because they read the same
+  // The email and the form say the same thing because they read the same
   // strings. A second copy of the sentence is how the two drift.
-  ok('the email is built from the same strings the popup shows',
+  ok('the email is built from the same strings the form shows',
     /LAUNCH_OFFER\.emailSubject/.test(unlock) &&
     /LAUNCH_OFFER\.emailBody/.test(unlock) &&
     /LAUNCH_OFFER\.facts/.test(unlock));
@@ -2714,16 +2741,11 @@ console.log('\nlaunch offer');
     /research use only/i.test(LAUNCH_OFFER.facts) &&
     !/\d+\s*%/.test(LAUNCH_OFFER.facts));
 
-  // Specified as "let them land, breathe, then show it". A popup on load is
-  // the failure this timing exists to avoid.
-  ok('neither surface opens on arrival',
-    LAUNCH_OFFER.barDelayMs >= 12000 && LAUNCH_OFFER.modalDelayMs >= 8000);
-  ok('the homepage waits longer than the catalog does',
-    LAUNCH_OFFER.barDelayMs > LAUNCH_OFFER.modalDelayMs);
-
-  // The footer form is not an interruption, so none of the popup's suppression
-  // applies to it: someone who dismissed the popup must still be able to ask
-  // for the code later.
+  // Two guards stood here pinning the popup delays: that neither surface
+  // opened on arrival (12s on the homepage, 8s elsewhere) and that the
+  // homepage waited the longer of the two. They went with barDelayMs and
+  // modalDelayMs. A popup that fires on load is the failure that timing
+  // existed to prevent, so both have to come back with any new one.
   ok('the footer carries the offer rather than a second, separate form',
     /id="offerFooter"/.test(read('index.html')));
   ok('and the newsletter form that acknowledged addresses it never sent is gone',
@@ -2732,8 +2754,11 @@ console.log('\nlaunch offer');
 
   // Six events, one funnel. Named here so a rename on one side shows up as a
   // failure rather than as a metric that quietly stops counting.
+  // email_capture_closed went with the popup: there is nothing left to close.
+  // The dashboard still accepts it, so an old row and a new one stay
+  // comparable, and a new popup would report into the same funnel.
   const events = [
-    'email_capture_viewed', 'email_capture_closed', 'email_capture_submitted',
+    'email_capture_viewed', 'email_capture_submitted',
     'email_capture_error', 'discount_code_revealed', 'discount_code_copied',
   ];
   const missing = events.filter(e => !offerJs.includes(`'${e}'`));
@@ -2745,8 +2770,6 @@ console.log('\nlaunch offer');
   ok('the events carry the page and the trigger they came from',
     /form_location:/.test(offerJs) && /trigger_type:/.test(offerJs) &&
     /page_path:/.test(offerJs) && /form_id:/.test(offerJs));
-  ok('a close reports how long it was on screen',
-    /time_visible_seconds:/.test(offerJs));
   ok('a product-page capture reports which product it came from',
     /product_sku:/.test(offerJs) && /product_name:/.test(offerJs));
 
@@ -3466,13 +3489,7 @@ console.log('\nprivacy disclosure');
     // read at init by the pixel and delegated to by analytics.js, so a page
     // that loads it late reports every visitor as unidentified and, worse,
     // every returning visitor as new.
-    const allPages = [
-      ...pages,
-      ...fs.readdirSync(path.join(ROOT, 'product'), { withFileTypes: true })
-        .filter(d => d.isDirectory())
-        .map(d => `product/${d.name}/index.html`),
-    ];
-    const misordered = allPages.filter(f => {
+    const misordered = everyPage.filter(f => {
       const html = read(f);
       if (!/js\/meta-pixel\.js/.test(html) && !/js\/analytics\.js/.test(html)) return false;
       const at = s => html.indexOf(s);

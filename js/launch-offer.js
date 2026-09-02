@@ -1,20 +1,18 @@
 // ===================== Glow Research — launch offer =====================
 // Collects an email address in exchange for the launch discount code.
 //
-// Three surfaces, all sharing one form, one set of copy and one set of events:
+// One surface: the standing form in the footer of index.html and welcome.html.
+// It is not an interruption, so nothing suppresses it. Someone who scrolled
+// past it in March can still ask in June, and the only thing it remembers is
+// whether the address has already been given, so it shows the code back rather
+// than asking twice for something already handed over.
 //
-//   bar     a strip along the foot of the homepage. Someone who has just
-//           arrived is still deciding whether this is a real supplier; taking
-//           the screen away to sell a discount is the wrong trade, so the page
-//           stays readable underneath.
-//   modal   a dialog on the catalog and the product pages, where the visitor
-//           has already chosen to look at what is for sale.
-//   footer  the standing form in the footer. Not an interruption, so none of
-//           the suppression below applies to it: someone who dismissed the
-//           popup in March should still be able to ask for the code in June.
-//
-// Cart and checkout get no popup and the file is not loaded there: interrupting
-// someone who is already buying can only cost an order.
+// There were two popups here, a bar along the foot of the homepage and a
+// dialog on the catalog and the product pages, both on a delay. They were
+// removed because nearly all of this store's traffic arrives from a Facebook
+// ad, and an offer thrown over a page someone landed on seconds ago reads as
+// spam from a supplier they have not decided to trust yet. The footer asks the
+// same question of someone who has read enough of the page to reach it.
 //
 // The code itself is NOT in this file, and must not be put here. The page ships
 // the offer's words and no value; api/unlock-offer.js hands the code back after
@@ -30,34 +28,25 @@
   if (typeof LAUNCH_OFFER === 'undefined' || !LAUNCH_OFFER) return;
   var CFG = LAUNCH_OFFER;
 
-  var popupVariant = document.body.getAttribute('data-launch-offer');
   var footerHost = document.getElementById('offerFooter');
-  if (popupVariant !== 'bar' && popupVariant !== 'modal') popupVariant = null;
-  if (!popupVariant && !footerHost) return;
+  if (!footerHost) return;
 
   /* ---------------- state ---------------- */
 
-  // Three records, because they answer three different questions.
+  // One record, and the only thing this file remembers about anyone. It means
+  // the code has already been handed over, permanently, so the footer shows it
+  // back rather than asking a second time for an address already given.
   //
-  //   UNLOCKED   they have the code. Permanent.
-  //   DISMISSED  they closed the popup. Permanent: being asked twice for
-  //              something you already declined is what makes these hateful.
-  //   SEEN       the popup has been on screen once this visit. Session-scoped,
-  //              so walking homepage to catalog to a product page is asked
-  //              once, not three times. It lapses with the tab, which is the
-  //              point: ignoring is not the same act as refusing.
-  //
-  // None of the three gate the footer form.
+  // The popup kept two more, one permanent and one session-scoped, both to
+  // avoid asking twice. Neither ever gated this form and both went with it.
+  // Whatever those keys still hold in a returning visitor's storage is now
+  // ignored rather than read.
   var UNLOCKED = 'glow-offer-code';
-  var DISMISSED = 'glow-offer-dismissed';
-  var SEEN = 'glow-offer-seen';
 
   // Both stores throw in Safari private mode rather than returning null, and
   // an offer popup is never worth taking the page down over.
   function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* session only */ } }
-  function sGet(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
-  function sSet(k, v) { try { sessionStorage.setItem(k, v); } catch (e) { /* page only */ } }
 
   function esc(s) {
     return String(s).replace(/[&<>"]/g, function (c) {
@@ -85,13 +74,10 @@
   }
 
   // Which page this address came from, in the vocabulary the funnel reports
-  // in. Derived from the surface rather than the URL, so a form is always
-  // labelled by where it actually is.
-  function locationOf(variant) {
-    if (variant === 'footer') return 'footer';
-    if (variant === 'bar') return 'homepage';
-    return document.body.hasAttribute('data-product-slug') ? 'product' : 'catalog';
-  }
+  // in. One surface left, so it is a constant, but it stays a named one: the
+  // dashboard slices the capture funnel by this value, and the same bare
+  // string repeated at five call sites is how those slices drift apart.
+  var FORM_LOCATION = 'footer';
 
   // Only meaningful on a product page. Read from the catalog rather than
   // scraped off the rendered page, so the SKU reported is the one an order
@@ -157,7 +143,7 @@
         msg.className = 'lo-msg is-error';
         track('email_capture_error', {
           form_id: surface.formId,
-          form_location: locationOf(surface.variant),
+          form_location: FORM_LOCATION,
           error_type: type,
         });
       };
@@ -184,7 +170,7 @@
           // Sent so the lead row records which page and which ad produced the
           // address, alongside the code. The beacon carries the same context
           // for the funnel; this is the durable copy attached to the person.
-          formLocation: locationOf(surface.variant),
+          formLocation: FORM_LOCATION,
           formId: surface.formId,
           triggerType: surface.triggerType,
           sourcePage: location.pathname,
@@ -203,7 +189,7 @@
 
           var shared = {
             form_id: surface.formId,
-            form_location: locationOf(surface.variant),
+            form_location: FORM_LOCATION,
             trigger_type: surface.triggerType,
           };
           var withProduct = productProps();
@@ -216,7 +202,7 @@
           track('discount_code_revealed', {
             code: res.d.code,
             reveal_method: 'email_submit',
-            form_location: locationOf(surface.variant),
+            form_location: FORM_LOCATION,
           });
 
           showReveal(surface, res.d.code, res.d.percentOff);
@@ -249,7 +235,7 @@
       var btn = this;
       track('discount_code_copied', {
         code: code,
-        form_location: locationOf(surface.variant),
+        form_location: FORM_LOCATION,
       });
       // Clipboard access is not granted everywhere (insecure origin, older
       // Safari). The code is on screen either way, so a failure is silent
@@ -278,7 +264,7 @@
     footerHost.innerHTML =
       '<div class="lo-copy">' +
         '<span class="lo-eyebrow">' + esc(CFG.eyebrow) + '</span>' +
-        '<h3 class="lo-title">' + esc(CFG.modalTitle) + '</h3>' +
+        '<h3 class="lo-title">' + esc(CFG.title) + '</h3>' +
         '<p class="lo-ask">' + esc(CFG.ask) + '</p>' +
       '</div>' +
       '<div class="lo-body">' + (held ? revealHtml(held, CFG.percentOff) : formHtml('loFoot')) + '</div>' +
@@ -303,175 +289,5 @@
         io.observe(footerHost);
       }
     }
-  }
-
-  /* ---------------- the popup ---------------- */
-
-  if (!popupVariant) return;
-  if (get(UNLOCKED) || get(DISMISSED) || sGet(SEEN)) return;
-
-  var el = null;
-  var shown = false;
-  var openedAt = 0;
-  var lastFocus = null;
-  var triggerType = null;
-
-  var surface = {
-    variant: popupVariant,
-    formId: 'launch-offer-' + popupVariant,
-    triggerType: null,
-    root: null,
-    onRevealed: function () {
-      if (popupVariant === 'modal') el.querySelector('.lo-modal').focus();
-    },
-  };
-
-  function build() {
-    var wrap = document.createElement('div');
-    var head =
-      '<span class="lo-eyebrow">' + esc(CFG.eyebrow) + '</span>' +
-      '<p class="lo-title">' + esc(popupVariant === 'bar' ? CFG.barTitle : CFG.modalTitle) + '</p>' +
-      '<p class="lo-ask">' + esc(CFG.ask) + '</p>';
-
-    if (popupVariant === 'bar') {
-      wrap.className = 'lo-bar';
-      wrap.setAttribute('role', 'region');
-      wrap.setAttribute('aria-label', CFG.eyebrow);
-      wrap.innerHTML =
-        '<div class="lo-bar-inner">' +
-          '<div class="lo-copy">' + head + '</div>' +
-          '<div class="lo-body">' + formHtml('loBar') + '</div>' +
-          '<button type="button" class="lo-close" aria-label="Close">&times;</button>' +
-        '</div>' +
-        '<p class="lo-facts">' + esc(CFG.facts) + '</p>';
-      return wrap;
-    }
-
-    wrap.className = 'lo-overlay';
-    wrap.innerHTML =
-      '<div class="lo-modal" role="dialog" aria-modal="true" aria-labelledby="loTitle" tabindex="-1">' +
-        '<button type="button" class="lo-close" aria-label="Close">&times;</button>' +
-        '<span class="lo-eyebrow">' + esc(CFG.eyebrow) + '</span>' +
-        '<h2 class="lo-title" id="loTitle">' + esc(CFG.modalTitle) + '</h2>' +
-        '<p class="lo-ask">' + esc(CFG.ask) + '</p>' +
-        '<div class="lo-body">' + formHtml('loMod') + '</div>' +
-        '<p class="lo-facts">' + esc(CFG.facts) + '</p>' +
-      '</div>';
-    return wrap;
-  }
-
-  // The cart drawer and the search modal are also full-screen layers. Opening
-  // over one of them would bury whatever the visitor deliberately opened, so
-  // the offer waits and tries again rather than competing for the screen.
-  function screenIsBusy() {
-    return !!document.querySelector(
-      '.cart-overlay.open, .search-overlay.open, .qa-overlay.open'
-    );
-  }
-
-  function open() {
-    if (shown || get(UNLOCKED)) return;
-    if (screenIsBusy()) { setTimeout(open, 4000); return; }
-    shown = true;
-    // Recorded as it opens, not as it closes: navigating away mid-popup still
-    // counts as having been asked.
-    sSet(SEEN, '1');
-    openedAt = Date.now();
-
-    el = build();
-    surface.root = el;
-    surface.triggerType = triggerType;
-    document.body.appendChild(el);
-    // let the element land before the transition class, or it animates from
-    // wherever the browser first painted it
-    requestAnimationFrame(function () { el.classList.add('is-open'); });
-
-    el.querySelector('.lo-close').addEventListener('click', function () { close(true); });
-    wireForm(surface);
-
-    var viewed = {
-      form_id: surface.formId,
-      form_location: locationOf(popupVariant),
-      trigger_type: triggerType,
-    };
-    var prod = productProps();
-    for (var k in prod) viewed[k] = prod[k];
-    track('email_capture_viewed', viewed);
-
-    if (popupVariant === 'modal') {
-      lastFocus = document.activeElement;
-      document.documentElement.classList.add('lo-locked');
-      // focus the panel, not the input: focusing a control programmatically
-      // trips :focus-visible in Chromium, so the dialog would open with a ring
-      // already drawn around the field
-      el.querySelector('.lo-modal').focus();
-      el.addEventListener('keydown', trap);
-      el.addEventListener('mousedown', function (e) {
-        // click-outside closes: this is an offer, not a condition of entry,
-        // so it must always be escapable
-        if (e.target === el) close(true);
-      });
-    }
-  }
-
-  function close(remember) {
-    if (!el) return;
-    // remember=true is a deliberate close (the X, Escape, a click outside).
-    // Closing the reveal passes false: they took the code, which UNLOCKED
-    // already records, and that is not a refusal.
-    if (remember) {
-      set(DISMISSED, String(Date.now()));
-      track('email_capture_closed', {
-        form_id: surface.formId,
-        form_location: locationOf(popupVariant),
-        trigger_type: triggerType,
-        time_visible_seconds: Math.round((Date.now() - openedAt) / 1000),
-      });
-    }
-    document.documentElement.classList.remove('lo-locked');
-    el.classList.remove('is-open');
-    var node = el;
-    el = null;
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
-    // don't leave it in the tree if the transition never fires
-    // (reduced-motion, background tab)
-    setTimeout(function () { if (node.parentNode) node.parentNode.removeChild(node); }, 300);
-  }
-
-  function trap(e) {
-    if (e.key === 'Escape') { close(true); return; }
-    if (e.key !== 'Tab') return;
-    var f = el.querySelectorAll('button, input:not(.lo-hp), a[href]');
-    if (!f.length) return;
-    var first = f[0], last = f[f.length - 1];
-    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-  }
-
-  /* ---------------- triggers ---------------- */
-
-  var fired = false;
-  function fire(how) {
-    if (fired) return;
-    fired = true;
-    triggerType = how;
-    open();
-  }
-
-  if (popupVariant === 'bar') {
-    setTimeout(function () { fire('delay'); }, CFG.barDelayMs);
-  } else {
-    setTimeout(function () { fire('delay'); }, CFG.modalDelayMs);
-    // …or a third of the way down, whichever comes first. Depth is the better
-    // signal of the two: it says the visitor chose to keep going.
-    var onScroll = function () {
-      var h = document.documentElement;
-      var max = h.scrollHeight - h.clientHeight;
-      if (max > 0 && (h.scrollTop || document.body.scrollTop) / max >= CFG.modalScrollAt) {
-        window.removeEventListener('scroll', onScroll);
-        fire('scroll');
-      }
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
   }
 })();

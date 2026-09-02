@@ -174,25 +174,15 @@ const LAUNCH_OFFER = {
   code: 'GLOW15',
   percentOff: 15,
 
-  // Two surfaces, because the same interruption does not suit both. The
-  // homepage is where someone is still deciding whether this is a real
-  // supplier, so it gets a bar along the bottom that leaves the page readable.
-  // The catalog and the product pages are further down the intent curve, where
-  // a dialog is worth its cost.
+  // Copy. One surface reads these now, the standing form in the footer.
   //
-  // Delays are the midpoints of the windows this was specified with (12-18s on
-  // the homepage, 8-12s elsewhere): long enough to land and read something
-  // first, which is the whole point of not firing on load.
-  barDelayMs: 15000,
-  modalDelayMs: 10000,
-  // The catalog and product pages also open on depth, whichever comes first.
-  // Someone a third of the way down a page has already decided to look.
-  modalScrollAt: 0.35,
-
-  // Copy. Both surfaces share the offer's own words and differ only in frame.
+  // The two popups that also read them, a bar on the homepage and a dialog on
+  // the catalog and product pages, were removed along with their delay and
+  // scroll-depth settings. Almost all of this store's traffic arrives from a
+  // Facebook ad, and an offer thrown over a page the visitor landed on seconds
+  // ago reads as spam rather than as a welcome.
   eyebrow: 'Launch Offer',
-  barTitle: 'New to Glow? Take 15% off your first order.',
-  modalTitle: 'Get 15% off your first order.',
+  title: 'Get 15% off your first order.',
   ask: 'Enter your email to unlock your launch code.',
   // "Not valid with quantity discounts" belongs here, not just in checkout,
   // so nobody reaches the promo box having already assumed both apply.

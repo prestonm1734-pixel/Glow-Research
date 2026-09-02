@@ -269,11 +269,13 @@ function buildProduct(p, donor) {
   html = required(html, /<\/head>/, '</head>').replace('</head>', headExtra + '\n</head>');
 
   /* --- slug, baked in so the page needs no query string ---
-     The donor's <body> carries attributes of its own (data-launch-offer), so
-     the slug is added to whatever is already there rather than replacing the
-     tag. Matching a bare `<body>` silently dropped those the moment one was
-     added, which is worth failing the build over rather than shipping ten
-     pages missing a behaviour the donor has. */
+     The donor's <body> may carry attributes of its own, so the slug is added
+     to whatever is already there rather than replacing the tag. Matching a
+     bare `<body>` silently dropped those the moment one was added, which is
+     worth failing the build over rather than shipping ten pages missing a
+     behaviour the donor has. It carried data-launch-offer when this was
+     written and carries nothing today, which is exactly the state in which a
+     regex that assumes a bare tag gets written by mistake. */
   html = required(html, /<body(\s[^>]*)?>/, '<body>')
     .replace(/<body(\s[^>]*)?>/, (_, attrs) =>
       `<body${attrs || ''} data-product-slug="${slug}">`);
