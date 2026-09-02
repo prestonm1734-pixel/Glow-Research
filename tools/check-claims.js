@@ -1506,16 +1506,30 @@ console.log('\nwelcome landing page');
   ok(`all ${FAQS.length} answers are in its served HTML`,
     (wl.match(/class="faq-q"/g) || []).length === FAQS.length);
 
-  // The value bar restates the two standing terms the cart and Stripe enforce.
-  // Typed into the page, they are two more numbers to remember; pinned here,
-  // they fail the build the day either one moves.
+  // The terms strip that restated these two standing terms is gone, so the
+  // checks move to where each one now lives rather than being deleted with it.
+  //
+  // The threshold is still stated, in the marquee, so it is still pinned: the
+  // page says a number the cart enforces and the two have to agree. Matched
+  // case-insensitively because the marquee sets it in capitals.
   const freeAt = constant('js/cart.js', 'FREE_SHIPPING_AT');
-  ok(`its value bar states the enforced free-shipping threshold ($${freeAt})`,
-    wl.includes(`over $${freeAt}`),
+  ok(`it states the enforced free-shipping threshold ($${freeAt})`,
+    wl.toLowerCase().includes(`over $${freeAt}`.toLowerCase()),
     `welcome.html does not say "over $${freeAt}"`);
-  ok(`its value bar states the live launch discount (${LAUNCH_OFFER.percentOff}%)`,
-    wl.includes(`<strong>${LAUNCH_OFFER.percentOff}% off</strong>`),
-    `welcome.html does not state ${LAUNCH_OFFER.percentOff}% off, which is LAUNCH_OFFER.percentOff`);
+
+  // The discount is no longer typed into this page at all: js/launch-offer.js
+  // renders the footer offer from LAUNCH_OFFER.percentOff, so it cannot drift
+  // from the constant. What can go wrong now is the opposite, someone writing a
+  // percentage into the markup that the script then contradicts on the same
+  // screen, so that is what is checked instead.
+  // Comments stripped first, or the note above explaining the removed strip
+  // would itself read as the page hardcoding a percentage.
+  const wlVisible = wl.replace(/<!--[\s\S]*?-->/g, '');
+  const wlPercents = [...wlVisible.matchAll(/(\d{1,2})%\s*off/gi)]
+    .filter(m => Number(m[1]) !== LAUNCH_OFFER.percentOff);
+  ok(`it types no discount of its own to contradict LAUNCH_OFFER (${LAUNCH_OFFER.percentOff}%)`,
+    wlPercents.length === 0,
+    `welcome.html hardcodes: ${wlPercents.map(m => m[0]).join(', ')}`);
 
   // The accepted-payment row states six facts about a Stripe Dashboard this
   // repo cannot read. Pinning the markup to PAYMENT_METHODS at least makes the
@@ -1554,22 +1568,19 @@ console.log('\nwelcome landing page');
     /where your browser supports them/i.test(wl),
     'PAYMENT_METHODS lists a wallet but welcome.html states it unconditionally');
 
-  // The countdown is the one element on the site that could most easily become
-  // a lie, so it gets the most specific check: the hour has to be read from the
-  // constant, and the expired branch has to exist. A countdown that silently
-  // restarts at 24 hours the moment it runs out is a manufactured deadline,
-  // which is exactly what PRINCIPLES.md forbids.
-  ok('the cutoff banner reads DISPATCH_CUTOFF_HOUR rather than typing its own hour',
-    /DISPATCH_CUTOFF_HOUR/.test(wlJs) &&
-    !/\b(?:1?\d|2[0-3]):00\s*(?:AM|PM)?\s*(?:Pacific|PT|P[SD]T)\b/.test(
-      wlJs.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '')),
-    'js/welcome.js must derive the hour, not restate it');
-  ok('and says so past the cutoff rather than restarting the clock',
-    /next dispatch day/i.test(wlJs),
-    'js/welcome.js has no expired branch: a countdown that resets is a prop');
-  ok('and the page ships no cutoff time of its own for that script to contradict',
-    !/\d{1,2}(?::\d{2})?\s*(?:AM|PM)\s*(?:Pacific|PT|P[SD]T)/i.test(
-      (wl.match(/<div class="wl-cutoff"[\s\S]*?<\/div>/) || [''])[0]));
+  // The countdown's three guards stood here: the hour read from
+  // DISPATCH_CUTOFF_HOUR rather than typed, an expired branch that says so
+  // rather than restarting the clock, and no cutoff time in the markup for the
+  // script to contradict. The countdown was removed from welcome.html along
+  // with the terms strip it lived in, and a guard over something that no longer
+  // exists passes for the wrong reason.
+  //
+  // Put them back with it if it returns. The reason they were specific is that
+  // a countdown is the element on this site that could most easily become a
+  // lie: the usual implementation silently resets to 24 hours the moment it
+  // runs out, which is a manufactured deadline and exactly what PRINCIPLES.md
+  // forbids. The remaining sitewide cutoff checks near the top of this file
+  // still hold every stated hour to a DISPATCH_CUTOFF_* constant.
 }
 
 console.log('\nwhat the FAQ is allowed to say about testing');

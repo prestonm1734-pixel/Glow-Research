@@ -956,89 +956,23 @@ button[disabled].si-forgot{ cursor: progress; }
    and the footer as they are. Prefixed .wl- so none of it can reach another
    page by accident. */
 
-/* The live dot the cutoff cell draws before its text. Monochrome, like
-   everything else here: a green "live" dot would be the only colour on the
-   site, and the pulse carries the same meaning without it. Written by
-   js/welcome.js, which is why the markup has no trace of it. */
-.wl-dot{
-  display:inline-block; vertical-align:middle;
-  width:8px; height:8px; margin: -2px 9px 0 0; background: var(--text-dimmer);
-}
-.wl-dot-live{ background: var(--text); animation: wl-pulse 2.4s ease-in-out infinite; }
-@keyframes wl-pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
-
 /* .wl-cta is nothing but a hook now: js/welcome.js watches that row to know
    when the hero buttons have scrolled away and the sticky bar should take
    over. Its layout is .hero-cta's, shared with index.html. The stat row is
    likewise .hero-stats unmodified. */
 
-/* The terms strip under the hero: dispatch, shipping, first order.
+/* Accepted payment methods, directly under the hero.
 
-   It was a centred row of three sentences on a white band. Two things were
-   wrong with that. The white, because index.html earns its light section by
-   putting the whole catalog in it, where this was a thin slab between two
-   black ones and read as a seam. And the shape, because three sentences in a
-   row is a paragraph broken into pieces, not a set of facts.
+   A bordered three-cell terms module stood above this: dispatch cutoff, free
+   shipping threshold, launch discount. Removed on request, and it turned out
+   to cost nothing, because every fact in it is stated elsewhere on the page
+   already: the marquee carries the cutoff and the threshold, the footer
+   carries the offer, and the hero's own third figure is the dispatch window.
 
-   A bordered three-cell module instead, each cell a mono label over its value.
-   That is the shape of a line on a certificate, which is the document this
-   whole brand is built around, and it lets a visitor take all three in at a
-   glance rather than reading them. The 1px gap over a border-coloured ground
-   is the same way the catalog grid draws its dividers, so the hairlines match
-   the ones everywhere else. */
-/* Top padding of its own rather than leaning on the hero's: the module is
-   bordered, and a bordered box needs air above it or it reads as attached to
-   the section before it rather than as the next thing on the page. */
-.wl-terms{ background:#000; padding: 34px 0 38px; }
-.wl-terms-grid{
-  display:grid; grid-template-columns: repeat(3, 1fr);
-  gap: 1px; background: var(--border);
-  border: 1px solid var(--border);
-}
-.wl-term{ background:#000; padding: 22px clamp(18px, 2.4vw, 30px) 24px; }
-.wl-term-label{
-  display:block; margin-bottom: 9px;
-  font-family:'JetBrains Mono', monospace; font-size:0.62rem; font-weight:600;
-  letter-spacing:.16em; text-transform:uppercase; color: var(--text-dimmer);
-}
-.wl-term-value{
-  margin:0; font-size:0.92rem; line-height:1.55; color: var(--text-dim);
-}
-.wl-term-value strong{ color: var(--text); font-weight:600; }
-
-/* The live cell wraps its text in a dot the other two do not have, so the row
-   never has to say which of the three is counting. */
-#wlCutoff .wl-dot{ margin-right: 9px; }
-
-@media (max-width: 760px){
-  /* One column, and each cell turns from a stacked label-over-value block into
-     a single row: label left, value right, hairline between. Three columns do
-     not fit here, but three stacked blocks were worse than the problem, taking
-     most of the first scroll on the device most of this page's traffic arrives
-     on, and reading as three chunky boxes rather than a set of facts. On one
-     line each it is a spec table, which is what it always was.
-
-     Not hidden on mobile, which was the other option. These are the dispatch
-     deadline, the free-shipping threshold and the discount: the three things a
-     visitor who just landed most wants, on the device most of them are on. */
-  .wl-terms-grid{ grid-template-columns: 1fr; }
-  .wl-term{
-    display:flex; align-items:baseline; justify-content:space-between; gap: 14px;
-    padding: 13px 16px;
-  }
-  .wl-term-label{ margin-bottom: 0; flex: 0 0 auto; }
-  .wl-term-value{ font-size: 0.84rem; text-align:right; }
-  /* The live cell is the one that can outgrow its row, since the countdown is
-     the longest of the three values and grows a digit at a time. It wraps
-     under its own label rather than squeezing the label. */
-  #wlCutoff{ flex: 1 1 auto; }
-}
-
-/* Accepted payment methods, under the terms module and quieter than it: a
-   footnote to the strip rather than a fourth term in it. */
-.wl-pay{ padding: 0 0 26px; }
-.wl-pay-in,
-.wl-pay{
+   The .wl-dot and its pulse went with it. They belonged to the live cutoff,
+   which was the only element on this page that ticked. */
+.wl-pay{ background:#000; padding: 26px 0 40px; }
+.wl-pay-in{
   display:flex; flex-direction:column; align-items:center; gap:12px;
 }
 .wl-pay-label{
@@ -1062,6 +996,7 @@ button[disabled].si-forgot{ cursor: progress; }
   margin:0; font-size:0.72rem; color: var(--text-dimmer); text-align:center;
 }
 @media (max-width: 560px){
+  .wl-pay{ padding: 20px 0 32px; }
   .wl-pay-list{ gap:7px; }
 }
 

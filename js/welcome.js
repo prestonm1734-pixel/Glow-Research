@@ -114,54 +114,16 @@
     }, { threshold: 0 }).observe(heroCta);
   }
 
-  /* ---------- dispatch cutoff ----------
-     States the real cutoff against the reader's own clock. The hour is
-     DISPATCH_CUTOFF_HOUR from js/products-data.js, never typed here, so this
-     banner cannot outlive a change to the window the fulfilment partner
-     actually keeps. tools/check-claims.js pins that.
+  /* The dispatch cutoff lived here: a live countdown to DISPATCH_CUTOFF_HOUR,
+     rendered against the visitor's own clock and saying so past the cutoff
+     rather than restarting. Its cell in the terms strip under the hero was
+     removed, and with nothing to render into, the timer went with it.
 
-     Past the cutoff, and on the days nothing goes out, it says so. The usual
-     version of this widget restarts at 24 hours the moment it expires, which
-     turns a real deadline into a prop, and is the thing PRINCIPLES.md calls
-     claiming more than we can prove.
+     Worth knowing if it comes back: the reason it was written this way is that
+     the usual version of this widget resets to 24 hours the moment it expires,
+     which turns a real deadline into a prop. tools/check-claims.js used to pin
+     both halves of that, the hour being read from the constant and the expired
+     branch existing. Those checks were deleted alongside this, so a new
+     countdown needs them written again rather than assumed. */
 
-     This used to be a chip in the hero that stayed hidden until the first
-     render, because a cutoff banner showing a stale time is worse than one
-     showing nothing. It is a cell in the terms strip now, holding a column
-     open beside two others, so the markup states the standing fact and this
-     upgrades it to the live one. Nothing to unhide. */
-  const cutEl = document.getElementById('wlCutoff');
-  if (cutEl && typeof DISPATCH_CUTOFF_HOUR === 'number') {
-    // hourCycle h23 rather than hour12:false: the latter is specified to allow
-    // an "24" for midnight, which would read as past a 13:00 cutoff.
-    const fmt = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'America/Los_Angeles', hourCycle: 'h23',
-      hour: '2-digit', minute: '2-digit', second: '2-digit', weekday: 'short',
-    });
-
-    const pad = n => String(n).padStart(2, '0');
-
-    function render() {
-      const parts = {};
-      fmt.formatToParts(new Date()).forEach(p => { parts[p.type] = p.value; });
-      const h = +parts.hour, m = +parts.minute, s = +parts.second;
-
-      // NO_DISPATCH_DAY is a getUTCDay() index; this is a weekday name, so the
-      // comparison is made in the one place the two can be lined up.
-      const dispatchesToday = parts.weekday !== 'Sun' && h < DISPATCH_CUTOFF_HOUR;
-
-      if (!dispatchesToday) {
-        cutEl.innerHTML = '<span class="wl-dot" aria-hidden="true"></span>' +
-          'Ships on the next dispatch day';
-        return;
-      }
-      const left = (DISPATCH_CUTOFF_HOUR * 3600) - (h * 3600 + m * 60 + s);
-      cutEl.innerHTML = '<span class="wl-dot wl-dot-live" aria-hidden="true"></span>' +
-        `Order within <strong>${Math.floor(left / 3600)}h ${pad(Math.floor(left / 60) % 60)}m ` +
-        `${pad(left % 60)}s</strong> for same-day dispatch`;
-    }
-
-    render();
-    setInterval(render, 1000);
-  }
 })();
