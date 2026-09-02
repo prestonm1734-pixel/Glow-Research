@@ -1000,23 +1000,54 @@ button[disabled].si-forgot{ cursor: progress; }
   .wl-pay-list{ gap:7px; }
 }
 
+/* The three facts the cards above do not cover, set as a hairline row rather
+   than as boxes.
+
+   Four bordered boxes used to sit here, directly under three bordered photo
+   cards, which made seven framed things in one screen and read as a second,
+   weaker grid competing with the first. Nothing about these three needs a
+   frame: one rule above the row and a divider between each is enough to group
+   them, and the row then reads as a footnote to the cards, which is what it
+   is. Modern here means fewer lines, not more.
+
+   Icon and heading share a line now instead of the icon sitting in its own
+   column beside a two-line block. That is what lets the whole row be one
+   short band rather than a second tier of cards. */
 .wl-trust{
-  display:grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 56px;
+  display:grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0; margin-top: 56px;
+  border-top:1px solid var(--border);
 }
 .wl-trust-item{
-  display:flex; align-items:flex-start; gap:14px;
-  border:1px solid var(--border); background: transparent;
-  padding: 20px 20px 22px;
+  padding: 26px clamp(20px, 2.6vw, 34px) 4px;
+  border-left:1px solid var(--border);
 }
-.wl-trust-item svg{ color: var(--text); flex:0 0 auto; margin-top: 2px; }
+.wl-trust-item:first-child{ border-left:0; padding-left:0; }
+.wl-trust-item:last-child{ padding-right:0; }
+.wl-trust-head{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.wl-trust-item svg{ color: var(--text); flex:0 0 auto; }
 .wl-trust-item h4{
-  margin:0 0 6px; font-size:0.95rem; font-weight:600; color: var(--text);
+  margin:0; font-size:0.95rem; font-weight:600; color: var(--text);
   letter-spacing:-0.01em;
 }
-.wl-trust-item p{ margin:0; font-size:0.82rem; line-height:1.5; color: var(--text-dim); }
-@media (max-width: 980px){
-  .wl-trust{ grid-template-columns: repeat(2, 1fr); }
+.wl-trust-item p{ margin:0; font-size:0.82rem; line-height:1.55; color: var(--text-dim); }
+@media (max-width: 760px){
+  /* Stacked, and the dividers turn horizontal with them: three columns at this
+     width give each line two words. */
+  .wl-trust{ grid-template-columns: 1fr; margin-top: 40px; }
+  .wl-trust-item{
+    border-left:0; border-top:1px solid var(--border);
+    padding: 18px 0 4px;
+  }
+  .wl-trust-item:first-child{ border-top:0; padding-top: 22px; }
 }
+
+/* This page's sections run tighter than the sitewide 110/84. Nothing here is a
+   destination the way the homepage's catalog is; it is one scroll from a
+   headline to a button, and the standard band's own air plus a full section
+   gap either side left two runs of nearly 200 blank pixels in the middle of
+   it. Scoped to welcome.html so index.html keeps its own pace. */
+.wl-standard{ padding: 76px 0 84px; }
 @media (max-width: 560px){
   .wl-trust{ grid-template-columns: 1fr; margin-top: 36px; }
 }
@@ -1075,7 +1106,7 @@ button[disabled].si-forgot{ cursor: progress; }
 /* #000, the same ground as .standard-sec directly above it, rather than
    var(--bg)'s #0a0a0a. The two dark sections meet with nothing between them,
    and two blacks a shade apart read as a seam where one reads as one page. */
-.wl-faq-sec{ background:#000; padding: 96px 0 110px; }
+.wl-faq-sec{ background:#000; padding: 78px 0 88px; }
 .wl-faq-sec .faq-list{ max-width: 860px; }
 /* One column at every width: four questions split into two columns of two
    leaves a short, lopsided pair of stacks rather than a list. */
