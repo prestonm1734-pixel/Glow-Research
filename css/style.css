@@ -1372,7 +1372,7 @@ html:not(.js) .faq-a{ max-height: none; }
     width: min(132%, 560px);
     left: calc((100% - min(132%, 560px)) / 2);
     height:100%; max-width:none; margin:0;
-    object-fit:contain; object-position: 50% 56%;
+    object-fit:contain; object-position: 50% 46%;
     opacity:.9;
     /* No mask. The frame fades to its own black on every side, so there is no
        edge here to hide, and the vignette that used to be here is most of what
