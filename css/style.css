@@ -1332,10 +1332,12 @@ html:not(.js) .faq-a{ max-height: none; }
   /* 74px of dead air stood above the eyebrow here: 48 from the section's own
      padding (set at 640, in a shorthand) and 26 more from the grid. The hero
      is the first thing under the header on a phone and does not need to be
-     announced by a gap. The foot comes in with it: 56px of that was holding
-     the scroll cue, which is no longer here. */
-  .hero{ padding-top: 22px; padding-bottom: 36px; }
-  .hero-grid{ min-height: 0; padding-top: 12px; padding-bottom: 28px; }
+     announced by a gap. The foot comes in with it, and further: 56px of that
+     was holding the scroll cue, which is no longer here, and what was left
+     read as the hero trailing off rather than ending. The stat row is the
+     last thing in the section and the catalog should start under it. */
+  .hero{ padding-top: 22px; padding-bottom: 14px; }
+  .hero-grid{ min-height: 0; padding-top: 12px; padding-bottom: 14px; }
   .hero-copy{ max-width: none; }
   /* Side by side, against the sitewide mobile rule further up that stacks
      every .btn-lg full width. Two stacked full-width buttons cost about 70px
