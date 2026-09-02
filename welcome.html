@@ -215,34 +215,6 @@
      invented for the landing page. -->
 <section class="wl-terms">
   <div class="container">
-    <div class="wl-terms-grid">
-      <!-- The dispatch cutoff, which used to sit in the hero as a chip under
-           the headline. It reads better here: in the hero it was the one
-           outlined box interrupting the copy column, and among the other two
-           standing terms it is simply the one of the three that happens to be
-           live.
-
-           The text below is the standing fact and is true whenever it is read.
-           js/welcome.js replaces it with the countdown against the visitor's
-           own clock, and past the cutoff with the next dispatch day, both from
-           DISPATCH_CUTOFF_HOUR. Written into the markup rather than left empty
-           for the script to fill, because this cell now holds a column open:
-           with no JavaScript the old chip rendered nothing, which was fine for
-           a chip and would be a hole here. -->
-      <div class="wl-term">
-        <span class="wl-term-label">Dispatch</span>
-        <p class="wl-term-value" id="wlCutoff">Same day when ordered by 1:00 PM PT</p>
-      </div>
-      <div class="wl-term">
-        <span class="wl-term-label">Shipping</span>
-        <p class="wl-term-value"><strong>Free</strong> on orders over $250</p>
-      </div>
-      <div class="wl-term">
-        <span class="wl-term-label">First order</span>
-        <p class="wl-term-value"><strong>15% off</strong> with a launch code</p>
-      </div>
-    </div>
-
     <div class="wl-pay">
       <span class="wl-pay-label">We accept</span>
     <ul class="wl-pay-list">
@@ -305,6 +277,34 @@
     </li>
     </ul>
       <p class="wl-pay-note">Wallets appear at checkout where your browser supports them.</p>
+    </div>
+
+    <div class="wl-terms-grid">
+      <!-- The dispatch cutoff, which used to sit in the hero as a chip under
+           the headline. It reads better here: in the hero it was the one
+           outlined box interrupting the copy column, and among the other two
+           standing terms it is simply the one of the three that happens to be
+           live.
+
+           The text below is the standing fact and is true whenever it is read.
+           js/welcome.js replaces it with the countdown against the visitor's
+           own clock, and past the cutoff with the next dispatch day, both from
+           DISPATCH_CUTOFF_HOUR. Written into the markup rather than left empty
+           for the script to fill, because this cell now holds a column open:
+           with no JavaScript the old chip rendered nothing, which was fine for
+           a chip and would be a hole here. -->
+      <div class="wl-term">
+        <span class="wl-term-label">Dispatch</span>
+        <p class="wl-term-value" id="wlCutoff">Same day when ordered by 1:00 PM PT</p>
+      </div>
+      <div class="wl-term">
+        <span class="wl-term-label">Shipping</span>
+        <p class="wl-term-value"><strong>Free</strong> on orders over $250</p>
+      </div>
+      <div class="wl-term">
+        <span class="wl-term-label">First order</span>
+        <p class="wl-term-value"><strong>15% off</strong> with a launch code</p>
+      </div>
     </div>
   </div>
 </section>

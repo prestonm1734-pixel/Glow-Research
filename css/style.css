@@ -1011,15 +1011,32 @@ button[disabled].si-forgot{ cursor: progress; }
 #wlCutoff .wl-dot{ margin-right: 9px; }
 
 @media (max-width: 760px){
-  /* One column rather than three cramped ones: at this width each value wraps
-     to three lines and the labels stop lining up with anything. */
+  /* One column, and each cell turns from a stacked label-over-value block into
+     a single row: label left, value right, hairline between. Three columns do
+     not fit here, but three stacked blocks were worse than the problem, taking
+     most of the first scroll on the device most of this page's traffic arrives
+     on, and reading as three chunky boxes rather than a set of facts. On one
+     line each it is a spec table, which is what it always was.
+
+     Not hidden on mobile, which was the other option. These are the dispatch
+     deadline, the free-shipping threshold and the discount: the three things a
+     visitor who just landed most wants, on the device most of them are on. */
   .wl-terms-grid{ grid-template-columns: 1fr; }
-  .wl-term{ padding: 16px 18px 18px; }
+  .wl-term{
+    display:flex; align-items:baseline; justify-content:space-between; gap: 14px;
+    padding: 13px 16px;
+  }
+  .wl-term-label{ margin-bottom: 0; flex: 0 0 auto; }
+  .wl-term-value{ font-size: 0.84rem; text-align:right; }
+  /* The live cell is the one that can outgrow its row, since the countdown is
+     the longest of the three values and grows a digit at a time. It wraps
+     under its own label rather than squeezing the label. */
+  #wlCutoff{ flex: 1 1 auto; }
 }
 
 /* Accepted payment methods, under the terms module and quieter than it: a
    footnote to the strip rather than a fourth term in it. */
-.wl-pay{ padding: 26px 0 0; }
+.wl-pay{ padding: 0 0 26px; }
 .wl-pay-in,
 .wl-pay{
   display:flex; flex-direction:column; align-items:center; gap:12px;
