@@ -124,21 +124,23 @@
        Its fourth ambient layer, the particle constellation, is deliberately
        not here. That one is drawn by js/script.js, which this page does not
        load, and copying eighty lines of canvas into js/welcome.js to decorate
-       a landing page is a poor trade. The clip carries its own starfield. -->
+       a landing page is a poor trade. -->
   <div class="hero-glow glow-1"></div>
   <div class="hero-glow glow-2"></div>
   <div class="hero-glow glow-3"></div>
 
-  <!-- No autoplay attribute, so js/welcome.js is what starts it and can
-       decline to when the visitor has reduced motion switched on. The poster
-       is the clip's own first frame, so there is no pop when playback begins
-       and a reader with no JavaScript still gets the composition as a still. -->
-  <video class="hero-visual-img reveal" id="wlHeroVideo"
-         poster="assets/hero-vial-poster.jpg"
-         width="1920" height="1080"
-         muted loop playsinline preload="auto" aria-hidden="true">
-    <source src="assets/hero-vial-loop-v3.mp4" type="video/mp4" />
-  </video>
+  <!-- index.html's hero image, identically: same file, same dimensions, same
+       priority, and no rule of its own positioning it. This page ran the vial
+       clip here instead, and a different subject shot differently is the one
+       thing that kept the two heroes from reading as the same hero however
+       closely the layout matched.
+
+       One file across both pages also means a visitor arriving on the ad and
+       clicking through to the homepage does not download a second hero. -->
+  <img class="hero-visual-img reveal" id="wlHeroImage"
+       src="assets/vial-trio-black-v3.jpg"
+       width="1686" height="933" fetchpriority="high" decoding="async"
+       alt="Three Glow Research peptide vials, MOTS-C, Tesamorelin and GHK-Cu, on a pure black backdrop" />
   <div class="hero-copy-scrim" aria-hidden="true"></div>
 
   <div class="container hero-grid">

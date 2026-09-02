@@ -92,22 +92,10 @@
     if (open) open.style.maxHeight = `${open.scrollHeight}px`;
   });
 
-  /* ---------- hero video ----------
-     welcome.html ships the clip with no autoplay attribute, so nothing plays
-     until this runs. Same reasoning as the homepage's copy in js/script.js:
-     it is the only way to honour prefers-reduced-motion, because CSS cannot
-     stop a video that has already started and pausing one after the fact
-     still shows the visitor the motion they asked not to see. Anyone with it
-     switched on keeps the poster, which is the still this hero used before
-     the clip existed.
-
-     play() rejects on its own if the browser blocks it. Caught and ignored:
-     the poster is already the right thing to be looking at. */
-  const heroVideo = document.getElementById('wlHeroVideo');
-  if (heroVideo && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const started = heroVideo.play();
-    if (started && started.catch) started.catch(() => {});
-  }
+  /* The hero clip's starter stood here, gated on prefers-reduced-motion
+     because CSS cannot stop a video that has already begun. This hero is
+     index.html's hero now, image and all, so there is nothing to start and
+     nothing to gate. */
 
   /* ---------- sticky call to action ----------
      Shown only once the hero's own Shop now button has scrolled off, so the

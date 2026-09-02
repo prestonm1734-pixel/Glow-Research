@@ -944,55 +944,17 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 
 /* ---------- welcome (ad landing page) ----------
-   welcome.html only. It reuses the header, the promises cards, the FAQ and the
-   footer as they are, and its hero is now index.html's hero: same .hero
-   section, same .hero-grid, same type classes, same .hero-copy-scrim. It was
-   a centre-set column over a full-bleed backdrop, which is a layout nothing
-   else on this site uses, and that alone was most of why the page read as
-   somebody else's work.
+   welcome.html only. Its hero is now index.html's hero outright: same .hero
+   section, same grid, same type classes, same scrim, same image, and nothing
+   scoped here repositioning or resizing any of it. Earlier passes kept a
+   taller section and a crop of its own, and those two overrides were the
+   whole remaining difference between "styled like the homepage" and "is the
+   homepage". What this page still does differently it does in markup, not
+   CSS: one call to action instead of two, and the cutoff line below.
 
-   What is left scoped here is only what this page genuinely does differently:
-   a taller hero, because there is no nav destination under it to hurry down
-   to; a clip in the slot the homepage fills with a still; one call to action;
-   and the cutoff line, which no other hero has. Prefixed .wl- so none of it
-   can reach another page by accident. */
-.wl-hero{
-  /* Taller than index.html's 62/68. That hero is the top of a long page and is
-     meant to be scrolled past; this one is the whole pitch, and the extra air
-     is what stops the single button reading as an afterthought under the
-     paragraph. */
-  padding: clamp(78px, 9vw, 110px) 0 clamp(72px, 8vw, 96px);
-}
-
-/* The clip, in the slot .hero-visual-img defines on the homepage. Two
-   overrides, both because this is a 16:9 video where that rule was measured
-   against a 1686x933 still.
-
-   Pulled back in and down: the trio needs to run off the right edge because
-   its third vial is the thing being cropped, where this clip is one vial with
-   its own margins already in the frame, so the same offset would push the
-   subject off screen and leave the empty half showing.
-
-   Dimmed, which the still does not need. The clip is brighter through its
-   mid-tones and the sub-headline crosses the glass at this width.
-
-   Scoped above 900px on purpose. Below that the shared rule turns the visual
-   into a dimmed full-bleed backdrop behind the copy, which is what index.html
-   does on a phone and what this page should do too; without the query these
-   two lines would outrank it on specificity and leak a desktop crop onto a
-   390px screen. */
-@media (min-width: 901px){
-  .wl-hero .hero-visual-img{
-    right: -8%; bottom: -6%;
-    /* Wide enough that a 16:9 frame is taller than the section and bleeds top
-       and bottom. Sized smaller first, and the frame then sat entirely in the
-       lower right with the top third of the stage empty above it: the vial
-       fills its own frame vertically, so anything that does not overflow the
-       section leaves a band of nothing where the homepage has product. */
-    width: min(1600px, 112vw);
-    filter: brightness(.82);
-  }
-}
+   Everything else on the page reuses the header, the promises cards, the FAQ
+   and the footer as they are. Prefixed .wl- so none of it can reach another
+   page by accident. */
 
 .wl-cutoff{
   display:inline-block; text-align:center;
