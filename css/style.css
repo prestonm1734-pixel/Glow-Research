@@ -1159,6 +1159,27 @@ button[disabled].si-forgot{ cursor: progress; }
 html:not(.js) .faq-a{ max-height: none; }
 .faq-a p{ padding: 0 24px 22px; font-size:0.92rem; }
 
+/* The rows are sized for a desktop column and were carried onto a phone
+   unchanged: 22px of padding above and below a 16px question, which put a
+   one-line row at 67px and a two-line row at 88, and four of them at 373px of
+   a 844px screen for four short questions.
+
+   Padding and type both come down. The type matters as much as the padding
+   here, because at 16px three of these four questions wrap to a second line at
+   390px and at 15 they mostly do not, so the saving compounds: a row that
+   stops wrapping loses a whole line, not just the padding either side of it.
+   The gap between rows tightens with them, since boxes that are shorter need
+   less air between them to stay distinct.
+
+   Sitewide, not scoped to one page. This is the same component on index.html
+   and welcome.html, and it is the same too-large on both. */
+@media (max-width: 640px){
+  .faq-q{ padding: 15px 16px; font-size: 0.94rem; gap: 14px; }
+  .faq-a p{ padding: 0 16px 16px; font-size: 0.87rem; }
+  .faq-col{ gap: 10px; }
+  .faq-q .icon{ width:18px; height:18px; }
+}
+
 /* The homepage FAQ sits on white. Everything above is written for a dark
    section, so the rules that name a light colour outright, rather than
    inheriting one, are inverted here. The chevron just inherits .faq-q's
