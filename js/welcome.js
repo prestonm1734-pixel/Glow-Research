@@ -98,10 +98,22 @@
      nothing to gate. */
 
   /* ---------- sticky call to action ----------
-     Shown only once the hero's own Shop now button has scrolled off, so the
-     page never offers the same action twice at once. Watching the hero CTA
-     rather than a scroll offset means the handoff happens at the right moment
-     at any viewport height, with no magic number to re-tune. */
+     Still watching the hero's own Shop now button rather than a scroll offset,
+     so the handoff happens at the same point of the page at any viewport
+     height with no magic number to re-tune.
+
+     What changed is where that point is. The bar used to wait for the button
+     to leave the viewport completely, which on a tall screen meant scrolling
+     most of the hero before the page offered the action again. The negative
+     top margin below moves the trigger line down from the top edge to 30% of
+     the way into the viewport, so the bar arrives while the button is still in
+     the top strip and on its way out, rather than after it has gone.
+
+     That does mean both are briefly on screen together, which the previous
+     version was written to avoid. It is a fair trade at this distance: by the
+     time the button is up in the top third it is on its way out of the
+     reader's attention, and the two say different things anyway, the bar
+     leading with the testing claim rather than repeating the headline. */
   const sticky = document.getElementById('wlSticky');
   const heroCta = document.querySelector('.wl-cta');
   if (sticky && heroCta) {
@@ -111,7 +123,10 @@
     sticky.hidden = false;
     new IntersectionObserver(entries => {
       entries.forEach(e => sticky.classList.toggle('is-shown', !e.isIntersecting));
-    }, { threshold: 0 }).observe(heroCta);
+      // A percentage, not pixels: the trigger should sit at the same place on a
+      // phone as on a desktop, and a fixed offset would be most of a short
+      // viewport and a sliver of a tall one.
+    }, { threshold: 0, rootMargin: '-30% 0px 0px 0px' }).observe(heroCta);
   }
 
   /* The dispatch cutoff lived here: a live countdown to DISPATCH_CUTOFF_HOUR,
