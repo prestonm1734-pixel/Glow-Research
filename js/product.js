@@ -576,9 +576,10 @@
 
   /* ================= related ================= */
 
-  // renderProductGrid marks every card ".reveal", which starts at opacity:0 and
-  // waits for a scroll observer. This page has no scroll animations, so the
-  // cards are shown outright instead.
+  // renderProductGrid marks every card ".reveal". The stylesheet exempts
+  // .product-card from the fade that class otherwise carries, so cards are
+  // visible wherever they are rendered, and this page runs no scroll
+  // observer at all to add the "in" that would end it.
   // The row is "more from Glow", not "more in this category", so it draws from
   // the whole catalog with siblings floated to the front. Filtering to the
   // category strictly meant a compound in a thin one got a single lonely card

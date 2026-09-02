@@ -1276,6 +1276,19 @@ html:not(.js) .faq-a{ max-height: none; }
 .js .reveal{ opacity:0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
 .reveal.in{ opacity:1; transform: translateY(0); }
 
+/* Product cards are the exception: they are there the moment they are in the
+   frame, no fade and no rise. Everything else revealing is copy, where the
+   animation is the page introducing a new thought. A grid of products is
+   merchandise, and merchandise that fades up as you reach it reads as a shop
+   still loading rather than one showing you what it has, most of all on a
+   phone where a flick puts a whole row on screen at once. The cards still
+   carry .reveal and the observer still marks them, and productCardHtml keeps
+   writing its 60ms-per-column stagger, all of it inert while this rule stands
+   and all of it working again the moment the rule goes. Deleting this line is
+   the whole way back. js/product.js already shows its related row outright
+   for the same reason. */
+.js .product-card.reveal{ opacity:1; transform:none; transition:none; }
+
 /* ---------- responsive ---------- */
 @media (max-width: 980px){
   .main-nav{ display:none; }
