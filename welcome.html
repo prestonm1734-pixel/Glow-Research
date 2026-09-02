@@ -107,72 +107,95 @@
 </header>
 
 <!-- HERO
-     Centre-set rather than the homepage's left-set grid: this page has one job
-     and one action, so the column is narrow and everything stacks under it. -->
-<section class="wl-hero">
-  <!-- Same clip as the homepage hero, same rules: no autoplay attribute, so
-       js/welcome.js is what starts it and can decline to when the visitor has
-       reduced motion switched on. The poster is the still that was here
-       before, so the scrim always has something under it, script or not.
-       object-fit on .wl-hero-img crops the clip exactly as it cropped the
-       still, which is why the two are interchangeable. -->
-  <video class="wl-hero-img" id="wlHeroVideo"
+     index.html's hero, with this page's words in it. It was a centred column
+     over a full-bleed backdrop, which is a layout the rest of the site does
+     not use anywhere: every hero here is the same left-set grid, copy in the
+     left column and the vial entering from the right behind it. Same section
+     class, same grid, same type classes, same scrim. What differs is the
+     wording, the single call to action, and the cutoff line, which no other
+     hero has.
+
+     The clip stays as this page's own visual rather than index.html's trio
+     still. It is positioned by .hero-visual-img now instead of covering the
+     whole section, so it reads as the showpiece on the right of the stage
+     rather than wallpaper behind the words. -->
+<section class="hero wl-hero" id="top">
+  <!-- Pure CSS, no script: the three drifting orbs index.html's hero sits on.
+       Its fourth ambient layer, the particle constellation, is deliberately
+       not here. That one is drawn by js/script.js, which this page does not
+       load, and copying eighty lines of canvas into js/welcome.js to decorate
+       a landing page is a poor trade. The clip carries its own starfield. -->
+  <div class="hero-glow glow-1"></div>
+  <div class="hero-glow glow-2"></div>
+  <div class="hero-glow glow-3"></div>
+
+  <!-- No autoplay attribute, so js/welcome.js is what starts it and can
+       decline to when the visitor has reduced motion switched on. The poster
+       is the clip's own first frame, so there is no pop when playback begins
+       and a reader with no JavaScript still gets the composition as a still. -->
+  <video class="hero-visual-img reveal" id="wlHeroVideo"
          poster="assets/hero-vial-poster.jpg"
          width="1920" height="1080"
          muted loop playsinline preload="auto" aria-hidden="true">
     <source src="assets/hero-vial-loop-v3.mp4" type="video/mp4" />
   </video>
-  <div class="wl-hero-scrim" aria-hidden="true"></div>
+  <div class="hero-copy-scrim" aria-hidden="true"></div>
 
-  <div class="container wl-hero-inner">
-    <span class="wl-badge reveal">Research-Grade Peptides</span>
-    <h1 class="wl-title reveal">Lab-Grade <span class="outline">Research</span> Peptides</h1>
-    <!-- "and mass spec" was asked for here and is deliberately not written.
-         ANALYSIS_TESTS records no technique for the identity row: it said
-         LC-MS once and was emptied on purpose, because the certificate reports
-         identity as a pass against the declared compound without naming an
-         instrument. Saying it on the page paid traffic lands on is the last
-         place to assert a fact about someone else's laboratory that their own
-         document does not state. If Accumark confirm identity is run by MS,
-         set method on that row in js/products-data.js and this sentence can
-         name it. -->
-    <p class="wl-sub reveal">
-      Every batch independently tested for purity by HPLC, identity and
-      quantity, with published certificates of analysis. Dispatched the same
-      day when ordered by 1:00 PM PST.
-    </p>
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="hero-eyebrow reveal">Research-Grade Peptides</span>
+      <h1 class="hero-title reveal">Lab-Grade <br class="hero-br" /><span class="outline">Research</span> Peptides.</h1>
+      <!-- "and mass spec" was asked for here and is deliberately not written.
+           ANALYSIS_TESTS records no technique for the identity row: it said
+           LC-MS once and was emptied on purpose, because the certificate reports
+           identity as a pass against the declared compound without naming an
+           instrument. Saying it on the page paid traffic lands on is the last
+           place to assert a fact about someone else's laboratory that their own
+           document does not state. If Accumark confirm identity is run by MS,
+           set method on that row in js/products-data.js and this sentence can
+           name it. -->
+      <p class="hero-sub reveal">
+        Every batch independently tested for purity by HPLC, identity and
+        quantity, with published certificates of analysis. Dispatched the same
+        day when ordered by 1:00 PM PST.
+      </p>
 
-    <!-- The dispatch cutoff, stated against the clock the visitor is actually
-         reading it on. js/welcome.js fills this from DISPATCH_CUTOFF_HOUR, so
-         the hour here cannot drift from the one the fulfilment partner
-         confirmed and the rest of the site quotes. Past the cutoff it says so
-         rather than restarting at 24 hours, which is the whole difference
-         between a deadline and a countdown prop. Empty until script runs: a
-         cutoff banner that renders a stale time to a reader with no
-         JavaScript is worse than one that renders nothing. -->
-    <div class="wl-cutoff reveal" id="wlCutoff" hidden></div>
+      <!-- The dispatch cutoff, stated against the clock the visitor is actually
+           reading it on. js/welcome.js fills this from DISPATCH_CUTOFF_HOUR, so
+           the hour here cannot drift from the one the fulfilment partner
+           confirmed and the rest of the site quotes. Past the cutoff it says so
+           rather than restarting at 24 hours, which is the whole difference
+           between a deadline and a countdown prop. Empty until script runs: a
+           cutoff banner that renders a stale time to a reader with no
+           JavaScript is worse than one that renders nothing. -->
+      <div class="wl-cutoff reveal" id="wlCutoff" hidden></div>
 
-    <div class="wl-cta reveal">
-      <a href="shop" class="btn btn-primary btn-lg">Shop now <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
-    </div>
-
-    <!-- The same three figures the homepage hero states, pinned to the same
-         data by the "hero figures" section of tools/check-claims.js. The
-         middle one is a text stat rather than a counted numeral, which is why
-         it carries .stat-text: the reveal observer skips those when it runs
-         the count-up animation. -->
-    <div class="wl-stats hero-stats reveal">
-      <div class="stat">
-        <span class="stat-num" data-count="99.4">0</span><span class="stat-suffix">%</span>
-        <p>Avg. Purity</p>
+      <!-- One action, where index.html offers two. This is the page paid
+           traffic lands on and there is nothing to weigh up on it yet.
+           .wl-cta stays on the row because js/welcome.js watches it to decide
+           when the sticky bar takes over. -->
+      <div class="hero-cta wl-cta reveal">
+        <a href="shop" class="btn btn-primary btn-lg">Shop now <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
       </div>
-      <div class="stat">
-        <span class="stat-num stat-text">Every lot</span>
-        <p>Published COA</p>
-      </div>
-      <div class="stat">
-        <span class="stat-num" data-count="150">0</span><span class="stat-suffix">+</span>
-        <p>Batches Tested</p>
+
+      <!-- The same three figures the homepage hero states, pinned to the same
+           data by the "hero figures" section of tools/check-claims.js. The
+           middle one is a text stat rather than a counted numeral, which is why
+           it carries .stat-text: the reveal observer skips those when it runs
+           the count-up animation. -->
+      <div class="hero-stats reveal">
+        <div class="stat">
+          <span class="stat-num" data-count="99.4">0</span><span class="stat-suffix">%</span>
+          <p>Avg. Purity</p>
+        </div>
+        <div class="stat">
+          <span class="stat-num stat-text">Every lot</span>
+          <p>Published COA</p>
+        </div>
+        <div class="stat">
+          <span class="stat-num" data-count="150">0</span><span class="stat-suffix">+</span>
+          <p>Batches Tested</p>
+        </div>
       </div>
     </div>
   </div>

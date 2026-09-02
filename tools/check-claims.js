@@ -3763,10 +3763,16 @@ console.log('\nhero video');
     const block = (css.match(new RegExp(`\\${sel}\\{[^}]*\\}`)) || [''])[0];
     return /background:\s*#000(000)?\s*;/.test(block);
   };
-  // Both sections, not just this one: whatever art each carries, the ground
-  // behind it has to be the same black or the two heroes read as two sites.
-  ok('both hero sections paint pure black behind their art',
-    sectionIsBlack('.hero') && sectionIsBlack('.wl-hero'));
+  // One rule serves both heroes now. welcome.html's section carries .hero
+  // alongside .wl-hero, so it takes the ground from the same declaration
+  // index.html does, and .wl-hero holds only the handful of things that page
+  // does differently. Checked as two facts rather than one, because the way
+  // this breaks is welcome.html quietly losing the shared class and falling
+  // back to the body colour, which is #0a0a0a and looks almost right.
+  ok('the hero paints pure black behind its art', sectionIsBlack('.hero'));
+  ok('and the welcome hero takes that same ground rather than its own',
+    /<section class="hero wl-hero"/.test(read('welcome.html')),
+    'welcome.html must carry .hero for the shared rule to reach it');
 
   // The three shapes that have to agree, or the hero jumps when the clip
   // starts: the poster, the clip, and the width/height the markup declares.

@@ -432,7 +432,7 @@ button[disabled].si-forgot{ cursor: progress; }
    headline reading as flat white was most of why that page looked like it
    belonged to a different brand. */
 .hero-title .outline,
-.wl-title .outline{ color: transparent; -webkit-text-stroke: 1.4px rgba(255,255,255,.82); }
+.hero-title .outline{ color: transparent; -webkit-text-stroke: 1.4px rgba(255,255,255,.82); }
 /* Back to a flowing paragraph, but not at the plain-paragraph default
    (400 weight, --text-dim): semibold at a shade lighter than the headline's
    full white reads as confident supporting copy rather than body text.
@@ -945,81 +945,55 @@ button[disabled].si-forgot{ cursor: progress; }
 
 /* ---------- welcome (ad landing page) ----------
    welcome.html only. It reuses the header, the promises cards, the FAQ and the
-   footer as they are; what is scoped here is the one thing that page does
-   differently, which is a centre-set hero with everything stacked under it
-   rather than the homepage's left-set grid. Prefixed .wl- so none of it can
-   reach another page by accident. */
+   footer as they are, and its hero is now index.html's hero: same .hero
+   section, same .hero-grid, same type classes, same .hero-copy-scrim. It was
+   a centre-set column over a full-bleed backdrop, which is a layout nothing
+   else on this site uses, and that alone was most of why the page read as
+   somebody else's work.
+
+   What is left scoped here is only what this page genuinely does differently:
+   a taller hero, because there is no nav destination under it to hurry down
+   to; a clip in the slot the homepage fills with a still; one call to action;
+   and the cutoff line, which no other hero has. Prefixed .wl- so none of it
+   can reach another page by accident. */
 .wl-hero{
-  /* #000, not var(--bg)'s #0a0a0a: the clip has no poster, so this colour is
-     literally the hero's fallback and it should match the homepage's. */
-  position:relative; overflow:hidden; background: #000;
-  padding: clamp(72px, 11vw, 132px) 0 clamp(64px, 9vw, 104px);
+  /* Taller than index.html's 62/68. That hero is the top of a long page and is
+     meant to be scrolled past; this one is the whole pitch, and the extra air
+     is what stops the single button reading as an afterthought under the
+     paragraph. */
+  padding: clamp(78px, 9vw, 110px) 0 clamp(72px, 8vw, 96px);
 }
-/* The art is a backdrop, not a subject. Cropped hard to the right so the trio
-   reads as one vial entering frame beside the copy rather than three sitting
-   behind it, and dimmed, because the headline is set over it and the vial
-   labels are light enough at full brightness to compete with the type.
-   alt="" and aria-hidden because it carries no information the copy does not. */
-.wl-hero-img{
-  position:absolute; inset:0; width:100%; height:100%;
-  object-fit: cover; object-position: 92% center;
-  /* .62 was dimming the clip to the point where the vial barely registered.
-     .8 is as far as this goes: past about .9 the sub-headline starts losing
-     contrast where it crosses the glass. */
-  filter: brightness(.8);
+
+/* The clip, in the slot .hero-visual-img defines on the homepage. Two
+   overrides, both because this is a 16:9 video where that rule was measured
+   against a 1686x933 still.
+
+   Pulled back in and down: the trio needs to run off the right edge because
+   its third vial is the thing being cropped, where this clip is one vial with
+   its own margins already in the frame, so the same offset would push the
+   subject off screen and leave the empty half showing.
+
+   Dimmed, which the still does not need. The clip is brighter through its
+   mid-tones and the sub-headline crosses the glass at this width.
+
+   Scoped above 900px on purpose. Below that the shared rule turns the visual
+   into a dimmed full-bleed backdrop behind the copy, which is what index.html
+   does on a phone and what this page should do too; without the query these
+   two lines would outrank it on specificity and leak a desktop crop onto a
+   390px screen. */
+@media (min-width: 901px){
+  .wl-hero .hero-visual-img{
+    right: -8%; bottom: -6%;
+    /* Wide enough that a 16:9 frame is taller than the section and bleeds top
+       and bottom. Sized smaller first, and the frame then sat entirely in the
+       lower right with the top third of the stage empty above it: the vial
+       fills its own frame vertically, so anything that does not overflow the
+       section leaves a band of nothing where the homepage has product. */
+    width: min(1600px, 112vw);
+    filter: brightness(.82);
+  }
 }
-/* Three gradients on one layer. The radial sits under the copy column and is
-   what actually buys the headline its contrast; the horizontal one keeps the
-   left edge solid so the crop has somewhere to resolve to; the vertical one
-   seals top and bottom into the page so the section does not read as a
-   pasted-in photograph. */
-/* Lightened across the board. The radial and the horizontal pass were
-   between them putting close to opaque black over the right half, which is
-   where the vial is, so the clip was doing almost nothing. Each is pulled
-   back roughly a fifth: enough that the vial and the starfield read, not so
-   much that the centred copy loses its ground. The vertical pass is
-   unchanged, since that one only seals the section's top and bottom edges
-   and never crosses the type. */
-.wl-hero-scrim{
-  position:absolute; inset:0; pointer-events:none;
-  background:
-    radial-gradient(72% 78% at 38% 50%, rgba(10,10,10,.82) 0%, rgba(10,10,10,.6) 45%, rgba(10,10,10,0) 100%),
-    linear-gradient(90deg, rgba(0,0,0,.92) 0%, rgba(10,10,10,.72) 30%, rgba(10,10,10,.3) 68%, rgba(10,10,10,.14) 100%),
-    linear-gradient(180deg, rgba(10,10,10,.9) 0%, rgba(10,10,10,0) 26%, rgba(10,10,10,0) 68%, #000 100%);
-}
-.wl-hero-inner{
-  position:relative; z-index:1;
-  display:flex; flex-direction:column; align-items:center; text-align:center;
-}
-/* The homepage's hero eyebrow, to the letter: bare mono, full white, no rule
-   around it. This was a bordered pill, and with the cutoff chip below it the
-   hero opened with two outlined boxes stacked over each other before the
-   headline got a word in. index.html states its eyebrow and moves on, and the
-   chip is the one thing here that earns a border, because it is the only
-   element on the page whose text changes with the clock. */
-.wl-badge{
-  display:inline-flex; align-items:center; gap: 8px; margin-bottom: 20px;
-  font-family:'JetBrains Mono', monospace; font-size:0.74rem; font-weight:600;
-  letter-spacing:.18em; text-transform:uppercase; color:#fff;
-}
-/* the square marker the eyebrow carries in place of a bullet */
-.wl-badge::before{
-  content:''; width:7px; height:7px; background: var(--text); flex:0 0 auto;
-}
-.wl-title{
-  font-size: clamp(2.3rem, 6vw, 4.2rem); line-height: 1.03;
-  max-width: 16ch; margin: 0 0 24px;
-}
-.wl-sub{
-  font-size: clamp(0.95rem, 1.5vw, 1.08rem); line-height:1.65;
-  color: var(--text-dim); max-width: 60ch; margin: 0 0 28px;
-}
-/* The dispatch cutoff. Mono because it is a clock reading, and bordered rather
-   than filled so it reads as a status line and not as a second button.
-   inline-block rather than inline-flex: as a flex container the sentence
-   becomes three flex items ("Order within", the clock, "for same-day
-   dispatch") and breaks into three stacked columns on a phone instead of
-   wrapping as one line of text. */
+
 .wl-cutoff{
   display:inline-block; text-align:center;
   border:1px solid var(--border); background: rgba(255,255,255,.03);
@@ -1037,34 +1011,15 @@ button[disabled].si-forgot{ cursor: progress; }
 .wl-dot-live{ background: var(--text); animation: wl-pulse 2.4s ease-in-out infinite; }
 @keyframes wl-pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
 
-.wl-cta{
-  display:flex; align-items:center; gap: 28px; flex-wrap:wrap;
-  justify-content:center; margin-bottom: 44px;
-}
+/* Nothing but a hook now: js/welcome.js watches this row to know when the
+   hero's own button has scrolled away and the sticky bar should take over.
+   The layout is .hero-cta's, shared with index.html. */
 /* The figures sit in a ruled box here rather than under a single top rule as
    they do on the homepage, because centred and unboxed they read as three
-   loose captions. Overrides .hero-stats, which this shares for the count-up
-   observer hook and the stat typography. */
-/* The homepage's own stat row, centred. It was a bordered panel sitting on a
-   translucent fill, which is a component the rest of the site does not have:
-   every other figure set on this site is a bare row under a hairline, and a
-   boxed one read as a widget dropped onto the hero rather than part of it.
-   Same rule, same spacing, same hairline as .hero-stats above; only the
-   alignment differs, because this page's column is centred. */
-.wl-stats.hero-stats{
-  display:flex; gap: clamp(28px, 5vw, 56px); flex-wrap:wrap; justify-content:center;
-  padding-top: 24px; border: 0; border-top: 1px solid var(--border);
-  background: transparent;
-}
-.wl-stats .stat{ text-align:center; padding: 0; border-left: 0; }
+/* The stat row is .hero-stats unmodified now, shared with index.html: the
+   boxed, centred variant that used to live here went with the centred hero. */
 
 @media (max-width: 560px){
-  .wl-stats.hero-stats{ display:flex; gap: 16px; }
-  .wl-stats .stat{ padding: 0; flex:1 1 0; }
-  .wl-stats .stat-num, .wl-stats .stat-suffix{ font-size: 1.35rem; }
-  .wl-stats .stat-num.stat-text{ font-size: 1.05rem; }
-  .wl-stats .stat p{ font-size: 0.62rem; }
-  .wl-cta{ gap: 18px; }
   .wl-cutoff{ font-size: 0.72rem; padding: 10px 14px; }
 }
 
