@@ -1050,29 +1050,6 @@ button[disabled].si-forgot{ cursor: progress; }
    Only the space above. What sits under this section is separating the cards
    from the FAQ and is untouched, and desktop keeps all of it: the same gap
    reads as composure at 900px where it reads as a hole at 844. */
-/* On white, alone among this page's sections. The dark run from the hero down
-   through the FAQ gave the one section that has to answer "why should I trust
-   you" the same weight as everything around it, and a landing page whose whole
-   job is that answer can afford to let it break the page.
-
-   Only the section's own furniture flips. The three cards keep their dark art
-   and their black scrim, because the copy in them sits over a photograph, not
-   over the section, so nothing there changes except a border that has to stop
-   being a white hairline to be visible at all. Values are the literals from
-   .section-light rather than the dark tokens, since the tokens are the dark
-   theme and this is the one place on the page that is not in it. */
-.wl-standard{ background:#fff; }
-.wl-standard .eyebrow{ color:#8a8a86; }
-.wl-standard .section-head h2,
-.wl-standard .section-head.light h2{ color:#0a0a0a; }
-.wl-standard .wl-lede{ color:#55554f; }
-.wl-standard .standard-card{ border-color: rgba(0,0,0,0.14); }
-.wl-standard .wl-trust{ border-top-color: rgba(0,0,0,0.14); }
-.wl-standard .wl-trust-item{ border-left-color: rgba(0,0,0,0.14); }
-.wl-standard .wl-trust-item svg{ color:#0a0a0a; }
-.wl-standard .wl-trust-item h4{ color:#0a0a0a; }
-.wl-standard .wl-trust-item p{ color:#55554f; }
-
 @media (max-width: 760px){
   .wl-standard{ padding-top: 20px; }
   /* .hero.wl-hero, not .wl-hero: the shared mobile .hero rule further down
@@ -1140,7 +1117,10 @@ button[disabled].si-forgot{ cursor: progress; }
 /* #000, the same ground as .standard-sec directly above it, rather than
    var(--bg)'s #0a0a0a. The two dark sections meet with nothing between them,
    and two blacks a shade apart read as a seam where one reads as one page. */
-.wl-faq-sec{ background:#000; padding: 78px 0 88px; }
+/* No background of its own: the section carries .section-light and takes the
+   white from it, the same as index.html's FAQ. A colour here would win on
+   source order and quietly undo that. */
+.wl-faq-sec{ padding: 78px 0 88px; }
 .wl-faq-sec .faq-list{ max-width: 860px; }
 /* One column at every width: four questions split into two columns of two
    leaves a short, lopsided pair of stacks rather than a list. */
