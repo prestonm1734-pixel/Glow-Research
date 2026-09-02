@@ -1020,6 +1020,16 @@ button[disabled].si-forgot{ cursor: progress; }
    gap either side left two runs of nearly 200 blank pixels in the middle of
    it. Scoped to welcome.html so index.html keeps its own pace. */
 .wl-standard{ padding: 76px 0 84px; }
+@media (max-width: 760px){
+  /* Top only, and only here. The hero already ends on 56px of its own padding
+     below the stat row, so the two stacked put 136px of nothing between the
+     last figure and the first word of this section, which is a sixth of an
+     844px phone spent on a gap. Halving this side brings the heading up
+     without touching the air under it, which is doing real work separating
+     the cards from the FAQ. Desktop keeps 76: it has the height to spend and
+     the same gap reads as composure there rather than as a hole. */
+  .wl-standard{ padding-top: 34px; }
+}
 @media (max-width: 560px){
   .wl-trust{ grid-template-columns: 1fr; margin-top: 36px; }
 }
