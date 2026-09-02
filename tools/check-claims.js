@@ -3908,6 +3908,14 @@ console.log('\nin-app browser breakout');
   ok('and the iOS swap is guarded on https, since the replace no-ops otherwise',
     /location\.protocol !== 'https:'/.test(iab));
 
+  // Every failure mode here leaves the visitor where they already were, which
+  // is the whole reason this is safe to attempt blind. The exception is
+  // window.open handing back a real window whose scheme never resolves, which
+  // leaves a blank tab open in front of them. That one is cleaned up.
+  ok('and closes the stray window if the escape did not actually happen',
+    /visibilityState === 'visible'/.test(iabCode) && /\.close\(\)/.test(iabCode),
+    'a window.open that opens but does not resolve leaves the visitor on a blank tab');
+
   // Every page, first, and not deferred: a deferred breakout runs after the
   // pixels have fired and the page has painted, which is a page load and a set
   // of events spent on a visitor who is about to leave.

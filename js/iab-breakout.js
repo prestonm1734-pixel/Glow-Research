@@ -120,7 +120,26 @@
   var safari = href.replace(/^https:\/\//, 'x-safari-https://');
   try {
     var w = window.open(safari, '_blank');
-    if (w) return;
+    if (w) {
+      // The one way this fails badly rather than harmlessly. Every other
+      // outcome leaves the visitor exactly where they were, which is the
+      // webview they were already in; this one can leave them looking at a
+      // blank tab, because window.open can hand back a real window even when
+      // the scheme inside it never resolves.
+      //
+      // So the window is closed again unless leaving actually happened. If it
+      // did, this page is backgrounded and the timer does not run at all, or
+      // runs against a stub that is already gone and close() is a no-op.
+      // Judged on visibilityState rather than on anything about the window
+      // itself, since a blank cross-scheme window tells us nothing when read
+      // from here.
+      setTimeout(function () {
+        try {
+          if (document.visibilityState === 'visible' && !w.closed) w.close();
+        } catch (e2) { /* cross-origin or already gone */ }
+      }, 900);
+      return;
+    }
   } catch (e) { /* fall through */ }
   location.href = safari;
 })();
