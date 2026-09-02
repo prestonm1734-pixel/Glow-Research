@@ -1050,6 +1050,29 @@ button[disabled].si-forgot{ cursor: progress; }
    Only the space above. What sits under this section is separating the cards
    from the FAQ and is untouched, and desktop keeps all of it: the same gap
    reads as composure at 900px where it reads as a hole at 844. */
+/* On white, alone among this page's sections. The dark run from the hero down
+   through the FAQ gave the one section that has to answer "why should I trust
+   you" the same weight as everything around it, and a landing page whose whole
+   job is that answer can afford to let it break the page.
+
+   Only the section's own furniture flips. The three cards keep their dark art
+   and their black scrim, because the copy in them sits over a photograph, not
+   over the section, so nothing there changes except a border that has to stop
+   being a white hairline to be visible at all. Values are the literals from
+   .section-light rather than the dark tokens, since the tokens are the dark
+   theme and this is the one place on the page that is not in it. */
+.wl-standard{ background:#fff; }
+.wl-standard .eyebrow{ color:#8a8a86; }
+.wl-standard .section-head h2,
+.wl-standard .section-head.light h2{ color:#0a0a0a; }
+.wl-standard .wl-lede{ color:#55554f; }
+.wl-standard .standard-card{ border-color: rgba(0,0,0,0.14); }
+.wl-standard .wl-trust{ border-top-color: rgba(0,0,0,0.14); }
+.wl-standard .wl-trust-item{ border-left-color: rgba(0,0,0,0.14); }
+.wl-standard .wl-trust-item svg{ color:#0a0a0a; }
+.wl-standard .wl-trust-item h4{ color:#0a0a0a; }
+.wl-standard .wl-trust-item p{ color:#55554f; }
+
 @media (max-width: 760px){
   .wl-standard{ padding-top: 20px; }
   /* .hero.wl-hero, not .wl-hero: the shared mobile .hero rule further down
@@ -1413,7 +1436,7 @@ html:not(.js) .faq-a{ max-height: none; }
     left: calc((100% - min(132%, 560px)) / 2);
     height:100%; max-width:none; margin:0;
     object-fit:contain; object-position: 50% 34%;
-    opacity:.62;
+    opacity:.42;
     /* No mask. The frame fades to its own black on every side, so there is no
        edge here to hide, and the vignette that used to be here is most of what
        swallowed the vial. */
@@ -1425,10 +1448,10 @@ html:not(.js) .faq-a{ max-height: none; }
   .hero-copy-scrim{
     display:block;
     background:
-      radial-gradient(ellipse 120% 70% at 50% 34%, transparent 0%, rgba(0,0,0,.55) 72%, rgba(0,0,0,.85) 100%),
+      radial-gradient(ellipse 120% 70% at 50% 34%, rgba(0,0,0,.25) 0%, rgba(0,0,0,.7) 70%, rgba(0,0,0,.92) 100%),
       linear-gradient(180deg,
-        rgba(0,0,0,.82) 0%, rgba(0,0,0,.5) 22%, rgba(0,0,0,.38) 46%,
-        rgba(0,0,0,.6) 74%, rgba(0,0,0,.88) 92%, #000 100%);
+        rgba(0,0,0,.88) 0%, rgba(0,0,0,.62) 22%, rgba(0,0,0,.52) 46%,
+        rgba(0,0,0,.72) 74%, rgba(0,0,0,.92) 92%, #000 100%);
   }
 
   /* the bigger button size added for the desktop CTAs was inflating every
