@@ -255,11 +255,9 @@ button[disabled].si-forgot{ cursor: progress; }
 .co-page :focus-visible,
 .cart-drawer :focus-visible,
 .qa-sheet :focus-visible,
-.search-modal :focus-visible,
-.cart-toast-view:focus-visible{
+.search-modal :focus-visible{
   outline: 2px solid #0a0a0a; outline-offset: 3px;
 }
-.cart-toast-view:focus-visible{ outline-offset: 2px; }
 
 /* ---------- marquee ---------- */
 .marquee-bar{
@@ -2098,35 +2096,10 @@ body.search-locked{ overflow:hidden; }
 }
 
 /* ---------- add-to-cart toast ----------
-   z-index sits above .cart-overlay (320) so it is still visible if an add
-   happens to open the drawer at the same moment. */
-.cart-toast{
-  position: fixed; left:50%; bottom:28px; z-index:340;
-  display:flex; align-items:center; gap:12px;
-  background:#0a0a0a; color:#fff; border:1px solid rgba(255,255,255,.14);
-  padding: 13px 14px 13px 18px;
-  transform: translateX(-50%); opacity:0; pointer-events:none;
-  transition: opacity .15s ease;      /* a plain fade, no slide or bounce */
-}
-.cart-toast.is-shown{ opacity:1; pointer-events:auto; }
-/* The toast lives at the bottom of the screen and so does the quick-add
-   sheet, and GlowCart.add() fires the toast in the same tick as the tap —
-   so without this the toast lands straddling a row of the sheet it was
-   triggered from. Held back until the sheet starts leaving, then it fades in
-   as the sheet slides out from under it. */
-body.qa-open .cart-toast{ opacity:0; pointer-events:none; }
-.cart-toast svg{ flex-shrink:0; color:#fff; }
-.cart-toast span{ font-size:.88rem; font-weight:600; white-space:nowrap; }
-.cart-toast-view{
-  font-family:'JetBrains Mono', monospace; font-size:.7rem; font-weight:700; letter-spacing:.04em;
-  text-transform:uppercase; background:#fff; color:#0a0a0a; border:none;
-  padding: 9px 14px; cursor:pointer; white-space:nowrap;
-}
-.cart-toast-view:hover{ background:#e4e4e2; }
-@media (max-width: 480px){
-  .cart-toast{ left:16px; right:16px; transform:none; }
-  .cart-toast span{ white-space:normal; }
-}
+   Stood here: a fixed banner across the bottom of the screen saying "Added
+   to cart" with a button to open the drawer. Removed once js/cart.js started
+   opening the drawer directly on every add — a banner pointing at something
+   already open in front of you has nothing left to point at. */
 
 /* ---------- cart drawer ----------
    Slides in from the right on desktop, fills the screen on mobile. Square
@@ -2167,6 +2140,21 @@ body.qa-open .cart-toast{ opacity:0; pointer-events:none; }
   transition: border-color .15s ease, background .15s ease;
 }
 .cart-close:hover{ border-color:#0a0a0a; background: rgba(0,0,0,0.05); }
+
+/* Deliberately quieter than .cart-ship-msg below it: that one is telling you
+   about a discount within reach, worth a beat of attention, and this one is
+   a fact about the shipping schedule that happens to be true right now. Mono
+   numerals only in the bold span, so the one thing worth a glance at a
+   glance is the time, not the whole sentence. */
+.cart-cutoff{
+  margin:0; padding: 11px 24px; border-bottom:1px solid rgba(0,0,0,0.1);
+  font-size:.78rem; color:#7a7a76; background:#f7f7f5;
+}
+.cart-cutoff strong{
+  font-family:'JetBrains Mono', monospace; font-weight:700; color:#45453f;
+  font-variant-numeric: tabular-nums;
+}
+.cart-cutoff[hidden]{ display:none; }
 
 .cart-body{ flex:1; overflow-y:auto; }
 

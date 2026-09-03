@@ -565,11 +565,10 @@
     /* One row whether or not the wallet is in it, so the reservation is one
        number rather than two. */
     body{ padding-bottom: 74px; }
-    /* The toast is anchored to the bottom of the viewport too. Without this it
-       lands underneath the bar that triggered it, which is the one moment it
-       has to be readable. Follows the bar rather than sitting high all the
-       time, so a toast from the real buy box still appears where it always has. */
-    body.pd-sticky-shown .cart-toast{ bottom: calc(92px + env(safe-area-inset-bottom)); }
+    /* A toast used to be re-anchored here, above the sticky bar rather than
+       underneath it. Gone with the toast itself: js/cart.js opens the cart
+       drawer on every add now, which sits above everything on the page
+       regardless of what else is fixed to the bottom of it. */
   }
 
   /* ---------- no motion ----------

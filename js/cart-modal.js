@@ -77,12 +77,12 @@
           unitSale: sale,
         });
       }
-      // The cart toast fires immediately from GlowCart.add() and sits at the
-      // bottom of the screen, i.e. on top of this sheet. Holding the sheet
-      // open to admire the tick just means the two overlap. So the tick is a
-      // flash at the point of the tap and the sheet starts leaving straight
-      // away — it stays visible through the .28s slide, and by the time it is
-      // gone the toast is standing on its own saying the same thing.
+      // GlowCart.add() opens the cart drawer immediately, over the top of
+      // this sheet. Holding the sheet open to admire the tick just means the
+      // two overlap, so the tick is a flash at the point of the tap and the
+      // sheet starts leaving straight away — it stays visible through the
+      // .28s slide, and by the time it is gone the drawer is standing on its
+      // own with the row already in it.
       el.classList.add('added');
       clearTimeout(dismissTimer);
       dismissTimer = setTimeout(close, 150);

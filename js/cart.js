@@ -10,6 +10,14 @@
   const KEY = 'glow-cart-v1';
   const FREE_SHIPPING_AT = 250;   // matches the "FREE SHIPPING OVER $250" marquee
 
+  // Same duplication as FREE_SHIPPING_AT above, same reason: js/ takes no
+  // imports, so cart.js keeps its own copy of the two figures that decide
+  // same-day dispatch rather than reaching into products-data.js's globals.
+  // tools/check-claims.js pins both against DISPATCH_CUTOFF_HOUR and
+  // NO_DISPATCH_DAYS so the two files cannot quietly disagree.
+  const CUTOFF_HOUR = 13;                        // 1:00 PM Pacific
+  const NO_DISPATCH_WEEKDAYS = ['Sat', 'Sun'];
+
   let items = load();
   let drawer, overlay, lastFocused;
 
@@ -108,6 +116,12 @@
             </svg>
           </button>
         </header>
+        <!-- The real same-day cutoff, not a hold on anything: nothing here is
+             reserved, so the line says what is true (an order placed before
+             this Pacific hour ships today) rather than implying stock is
+             being set aside. Empty cart or past the cutoff, it says nothing
+             at all instead of a countdown to a moment that already passed. -->
+        <p class="cart-cutoff" id="cartCutoff" hidden></p>
         <div class="cart-body" id="cartBody"></div>
         <footer class="cart-foot" id="cartFoot"></footer>
       </aside>
@@ -120,6 +134,13 @@
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && overlay.classList.contains('open')) close();
     });
+
+    // Once a second for the whole life of the page from here on, same as
+    // renderDelivery() in js/product.js ticks its own estimate: cheap text
+    // updates, and the alternative is the line quietly going stale while the
+    // drawer sits open across the moment the cutoff passes.
+    clearInterval(cutoffTimer);
+    cutoffTimer = setInterval(renderCutoff, 1000);
   }
 
   function shippingHtml() {
@@ -237,6 +258,7 @@
     if (!overlay) return;
 
     overlay.querySelector('#cartDrawerCount').textContent = count();
+    renderCutoff();
     const body = overlay.querySelector('#cartBody');
     const foot = overlay.querySelector('#cartFoot');
 
@@ -327,30 +349,53 @@
     if (lastFocused) lastFocused.focus();
   }
 
-  /* ---------- toast ----------
-     One toast for every add-to-cart entry point (product page, quick-add,
-     checkout upsell) since they all funnel through add() below. */
-  let toastEl, toastTimer;
-
-  function toast() {
-    if (!toastEl) {
-      toastEl = document.createElement('div');
-      toastEl.className = 'cart-toast';
-      toastEl.innerHTML = `
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>Added to cart</span>
-        <button type="button" class="cart-toast-view">View cart</button>
-      `;
-      document.body.appendChild(toastEl);
-      toastEl.querySelector('.cart-toast-view').addEventListener('click', () => { open(); hideToast(); });
-    }
-    clearTimeout(toastTimer);
-    toastEl.classList.add('is-shown');
-    toastTimer = setTimeout(hideToast, 2600);
+  /* ---------- same-day cutoff ----------
+     Read wherever the drawer is on screen: opened fresh, or already open and
+     ticking. Only ever states the real cutoff — a Pacific wall-clock hour
+     checked against the actual time, the identical figure the product page's
+     own delivery estimate uses — never a countdown seeded with a fixed
+     number of minutes, which would be the "reserved for you" claim this was
+     built to avoid. */
+  function pacificNow() {
+    const parts = {};
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Los_Angeles', hour12: false,
+      weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }).formatToParts(new Date()).forEach(p => { parts[p.type] = p.value; });
+    return parts;
   }
 
-  function hideToast() {
-    if (toastEl) toastEl.classList.remove('is-shown');
+  // Seconds left before CUTOFF_HOUR today, in Pacific time. null on a
+  // non-dispatch weekday or once the cutoff has already passed, both of
+  // which mean there is nothing true left to count down to today.
+  function secondsToCutoff() {
+    const p = pacificNow();
+    if (NO_DISPATCH_WEEKDAYS.includes(p.weekday)) return null;
+    const now = (+p.hour) * 3600 + (+p.minute) * 60 + (+p.second);
+    const left = CUTOFF_HOUR * 3600 - now;
+    return left > 0 ? left : null;
+  }
+
+  let cutoffTimer;
+
+  function renderCutoff() {
+    const el = overlay && overlay.querySelector('#cartCutoff');
+    if (!el) return;
+    // Nothing to ship, or nothing true to say about shipping it today.
+    if (!items.length) { el.hidden = true; return; }
+    const left = secondsToCutoff();
+    if (left == null) { el.hidden = true; return; }
+
+    const h = Math.floor(left / 3600);
+    const m = Math.floor((left % 3600) / 60);
+    const s = left % 60;
+    // Hours and minutes while there is more than an hour to go, ticking down
+    // to the second only once it is close enough that the second matters.
+    const left2 = left >= 3600
+      ? `${h}h ${String(m).padStart(2, '0')}m`
+      : `${m}:${String(s).padStart(2, '0')}`;
+    el.hidden = false;
+    el.innerHTML = `Order in the next <strong>${left2}</strong> to ship today`;
   }
 
   /* ---------- public surface ---------- */
@@ -390,12 +435,15 @@
     });
     save();
     render();
-    // The toast exists to tell you something happened somewhere you cannot
-    // see, and to offer a way to go look. With the drawer already open you are
-    // looking at it: the row appears, the subtotal moves, the accessory offer
-    // takes itself down. A banner over the top of that saying "view cart" is
-    // covering the thing it is pointing at.
-    if (!overlay || !overlay.classList.contains('open')) toast();
+    // A toast used to stand in here: tell you something happened somewhere
+    // you cannot see, and offer a way to go look. The drawer opening is a
+    // stronger version of the same idea — you are already looking at the row
+    // that appeared, the subtotal that moved, the accessory offer taking
+    // itself down — so there is nothing left for a banner to point at. Only
+    // opens it if it was not already open: with the drawer open, add() above
+    // already updated everything in it, and reopening would just steal focus
+    // back to the close button while someone is mid-interaction with it.
+    if (!overlay || !overlay.classList.contains('open')) open();
   }
 
   function clear() {

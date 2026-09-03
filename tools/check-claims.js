@@ -1155,6 +1155,59 @@ if (!COAS_PUBLISHED) {
     wrongLot.map(p => `${p.name}: lot ${p.lot} vs ${p.coa}`).join(', '));
 }
 
+console.log('\ncart drawer on add');
+{
+  // Add to Cart opens the drawer directly now, everywhere it happens
+  // (product page, catalog quick-add, the quick-add sheet), because all
+  // three funnel through the one add() in js/cart.js. A toast used to stand
+  // in for this; it is gone, and these guards are about what replaced it,
+  // not about resurrecting it.
+  const cartJs = read('js/cart.js');
+  // Strips JS comments and the HTML comments this file's own drawer markup
+  // carries as a template literal, or an explanatory note sitting in either
+  // one (this section has several, deliberately, since this is the feature
+  // PRINCIPLES.md's "never claim more than we can prove" bears on most
+  // directly) reads as the claim itself to a guard that only knows JS syntax.
+  const cartCode = cartJs
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/.*$/gm, '')
+    .replace(/<!--[\s\S]*?-->/g, '');
+  ok('add() opens the drawer rather than showing a toast',
+    /if \(!overlay \|\| !overlay\.classList\.contains\('open'\)\) open\(\);/.test(cartCode));
+
+  const stray = everyPage.filter(f => /cart-toast/.test(read(f)));
+  ok('no page still carries the toast this replaced', stray.length === 0, stray.join(', '));
+
+  // The cutoff line itself: real arithmetic against a real Pacific hour, held
+  // to the same figure the product page's own delivery estimate uses, not a
+  // fixed countdown seeded with a number of minutes. That second shape is
+  // the "reserved for you" claim this whole feature exists to avoid, and it
+  // would still say "Order in the next 15:00" whether or not it were true.
+  const cutoffHour = constant('js/cart.js', 'CUTOFF_HOUR');
+  const dispatchHour = constant('js/products-data.js', 'DISPATCH_CUTOFF_HOUR');
+  ok('js/cart.js reads the same cutoff hour the delivery estimate does',
+    cutoffHour !== null && cutoffHour === dispatchHour,
+    `cart.js ${cutoffHour} vs products-data.js ${dispatchHour}`);
+
+  const weekdays = (cartJs.match(/NO_DISPATCH_WEEKDAYS = (\[[^\]]*\])/) || [, ''])[1];
+  ok('and the same two non-dispatch days, named rather than numbered',
+    weekdays === "['Sat', 'Sun']", weekdays);
+
+  ok('the countdown is computed from that hour, not a fixed span of minutes',
+    /CUTOFF_HOUR \* 3600/.test(cartCode) &&
+    !/\b(?:15|900)\b/.test(cartCode.match(/function secondsToCutoff[\s\S]*?\n  \}/)[0]));
+
+  ok('the line names no hold or reservation, which nothing here performs',
+    !/\b(?:reserved|reserve|held for you|holding)\b/i.test(cartCode));
+
+  // Nothing to ship, or nothing true left to say about shipping it today
+  // (past the cutoff, or a non-dispatch day), and the line says nothing
+  // rather than counting down to a moment that already passed.
+  ok('the line hides itself once there is nothing true to say',
+    /if \(!items\.length\) \{ el\.hidden = true; return; \}/.test(cartCode) &&
+    /if \(left == null\) \{ el\.hidden = true; return; \}/.test(cartCode));
+}
+
 console.log('\nbatch tracking line');
 {
   // The line js/product.js's renderBatch() writes and tools/build-products.js
