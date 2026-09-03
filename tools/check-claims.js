@@ -2964,36 +2964,30 @@ console.log('\nlaunch offer');
 }
 
 /* ---------------------------------------------------------------------------
- * Every transactional email shares one wordmark, drawn by emailShell() in
- * api/_email.js. It used to be the spark character set in the shell's own
- * font stack, Glow&#10022;, which is a request to whatever font an inbox
- * falls back to — Outlook's rendering engine in particular does not carry
- * U+2726 in Segoe UI or Arial, so what actually reached a reader there was
- * not the mark at all. assets/glow-logo.svg's own comment already explains
- * the fix for exactly this failure mode (draw it as pixels, not type), just
- * for a different surface; this holds the email to the same rule.
+ * Transactional emails carry no wordmark of their own. There were two
+ * attempts at one, in order: the spark character set in the shell's own font
+ * stack (Glow&#10022;, unreliable — Outlook's rendering engine does not carry
+ * U+2726 in Segoe UI or Arial), then a rendered image of the same mark once
+ * the glyph proved unreliable. Both are gone: the sender's own avatar next to
+ * "Glow Research" in an inbox's from-line already is the logo a recipient
+ * sees, and repeating it inside the body was a second copy of a mark the
+ * inbox chrome already shows. This guards the absence, the same way the
+ * launch-offer section above guards a popup surface staying gone rather than
+ * describing one that's meant to exist.
  * ------------------------------------------------------------------------- */
 console.log('\nemail wordmark');
 {
   const emailJs = read('api/_email.js');
-  // Comments stripped first: this file's own explanatory comment on the fix
-  // names the old glyph by its entity to describe what it replaced, and would
-  // otherwise satisfy the very check meant to catch it coming back.
+  // Comments stripped first: this file's own explanatory comment on the
+  // removal names both old attempts to describe what is gone, and would
+  // otherwise satisfy the very checks meant to catch either coming back.
   const emailCode = emailJs.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
-  ok('the wordmark is an image, not the spark character set in a font',
+  ok('no email states the spark character in a font',
     !emailCode.includes('&#10022;'));
-  const src = (emailJs.match(/<img src="(https:\/\/[^"]+)"/) || [])[1];
-  ok('served from an absolute https URL, which is the only kind an inbox will load',
-    !!src);
-  ok('and it is a file this repository actually ships',
-    !!src && fs.existsSync(path.join(ROOT, src.replace('https://glowresearch.shop/', ''))),
-    src);
-  // "Glow" beside the mark is plain text, not part of the image, so it always
-  // renders even for the client that blocks the picture. alt="" rather than
-  // alt="Glow" is what keeps a screen reader (or a blocked-image client) from
-  // reading "Glow Glow" once that text cell is right next to it.
-  ok('the word "Glow" beside it is real text, not baked into the picture',
-    />Glow<\/td>/.test(emailJs));
+  ok('and no email renders it as an image either',
+    !/glow-logo/.test(emailCode));
+  ok('the shell opens straight into its cards, with nothing standing in front of them',
+    /<div style="max-width:560px[^>]*>\s*\$\{bands\}/.test(emailCode.replace(/\s+/g, ' ')));
 }
 
 console.log('\ncatalog shape');

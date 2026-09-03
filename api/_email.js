@@ -74,29 +74,16 @@ export function emailShell({ preheader = '', sections = [], footerNote = '' }) {
   ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;height:0;width:0;">${preheader}</div>` : ''}
   <div style="max-width:560px;margin:0 auto;padding:44px 20px;font-family:${FONT};">
 
-    <!-- The mark used to be the character itself, Glow&#10022; set in this
-         file's own FONT stack. assets/glow-logo.svg's own comment already
-         explains why that fails: a glyph is a request to whatever font the
-         recipient's client falls back to, and Outlook's rendering engine in
-         particular does not carry U+2726 in Segoe UI or Arial, so it
-         substitutes something else, a box, a different dingbat, sometimes
-         nothing. That is "the logo that isn't even it." A raster image drawn
-         once and shipped as pixels renders identically everywhere images
-         render at all, which a font glyph can never promise. glow-logo-512.png
-         is the same mark already used for Organization structured data and
-         social cards, so this is the third place drawing it as pixels rather
-         than trusting a glyph, not a one-off fix. alt="" rather than "Glow"
-         because the text cell beside it already says the word; a screen
-         reader or a blocked-image client would otherwise hear "Glow Glow." -->
-    <div style="padding-bottom:30px;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-        <td style="vertical-align:middle;padding-right:6px;line-height:0;">
-          <img src="https://glowresearch.shop/assets/glow-logo-512.png" width="22" height="22"
-               alt="" style="display:block;border-radius:5px;" />
-        </td>
-        <td style="vertical-align:middle;font-size:21px;font-weight:700;letter-spacing:-.02em;color:#0a0a0a;">Glow</td>
-      </tr></table>
-    </div>
+    <!-- No wordmark here. It was the spark character itself, Glow&#10022;,
+         then a rendered image of the same mark once the glyph proved
+         unreliable across email clients (Outlook's rendering engine does not
+         carry U+2726 in Segoe UI or Arial). Removed rather than fixed a
+         second time: the sender's own avatar next to "Glow Research" in an
+         inbox's from-line is the actual logo a recipient sees before they
+         even open the message, and repeating it inside the body was the
+         second copy of a mark the inbox chrome already shows. ${FONT} stays
+         declared above for the body text below, not for a wordmark that no
+         longer exists. -->
     ${bands}
 
     <div style="padding:26px 4px 0;font-size:12px;line-height:1.65;color:#8e8e93;">
