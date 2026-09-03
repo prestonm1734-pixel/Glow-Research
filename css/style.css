@@ -1460,29 +1460,6 @@ html:not(.js) .faq-a{ max-height: none; }
      button site-wide (nav, newsletter, etc.) once it lost the width
      constraint of a wide screen — scale back down for breathing room */
   .btn{ padding: 12px 20px; font-size: 0.88rem; }
-
-  /* welcome.html only, mobile only: this is a one-decision landing page, and
-     the first screen should be that decision and nothing past it. Without
-     this the stat row ends partway down and Why Glow's heading rides in
-     right under it, which reads as the hero trailing off into the next
-     section rather than as a complete first screen someone has to choose to
-     scroll past.
-     vh first as a fallback, then dvh: plain vh in a mobile browser locks to
-     the layout viewport at its largest (chrome collapsed), which can leave a
-     gap under the content when the address bar is actually expanded; dvh
-     tracks whichever is true right now, in browsers that support it. Only
-     .wl-hero, so index.html's hero keeps its own height untouched. */
-  .wl-hero{
-    min-height: 100vh;
-    min-height: 100dvh;
-  }
-  /* Not centred. Centring the copy in a box this much taller than its
-     content pushed the vial photo down with it — the image is positioned
-     relative to .wl-hero's own height, so the same object-position that
-     reads correctly in a content-height box floats noticeably lower in a
-     full-screen one, leaving a dead band of plain black above the eyebrow
-     with no image in it at all. Left top-anchored, the extra height this
-     rule adds just becomes room below the stat row instead. */
 }
 
 /* ---------- reduced motion ---------- */
