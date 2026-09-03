@@ -1095,22 +1095,22 @@ button[disabled].si-forgot{ cursor: progress; }
    only the visible one moved it barely at all, which is what measuring rather
    than guessing at the stack turned up.
 
-   All three come down, to about half the total. Scoped to .wl-hero and
-   .wl-standard so index.html keeps its own spacing: its hero is the top of a
-   long page and can afford the air, where this one is the whole pitch and the
-   proof underneath should arrive before a thumb has to reach for it.
+   Scoped to .wl-standard so index.html keeps its own spacing: its hero is
+   the top of a long page and can afford the air, where this one is the
+   whole pitch and the proof underneath should arrive before a thumb has to
+   reach for it.
+
+   The hero itself is untouched here now: it ran the sitewide mobile .hero
+   padding tightened further, which read as cramped against index.html's
+   own hero rather than merely brisk. It now keeps the same breathing room
+   index.html's hero has, and only this section's own top padding is closed
+   up to remove the blank run below it.
 
    Only the space above. What sits under this section is separating the cards
    from the FAQ and is untouched, and desktop keeps all of it: the same gap
    reads as composure at 900px where it reads as a hole at 844. */
 @media (max-width: 760px){
   .wl-standard{ padding-top: 20px; }
-  /* .hero.wl-hero, not .wl-hero: the shared mobile .hero rule further down
-     this file sets the same property at the same specificity, so on source
-     order alone it wins and this does nothing. Measured before and after,
-     which is the only reason it was caught. */
-  .hero.wl-hero{ padding-bottom: 26px; }
-  .wl-hero .hero-grid{ padding-bottom: 14px; }
 }
 @media (max-width: 560px){
   .wl-trust{ grid-template-columns: 1fr; margin-top: 36px; }
