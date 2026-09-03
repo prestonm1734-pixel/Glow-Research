@@ -1128,20 +1128,28 @@ button[disabled].si-forgot{ cursor: progress; }
    than leaving it as blank padding: bigger eyebrow, headline and subhead,
    more room between them, and the two buttons stacked full-width the way
    the rest of the site's mobile buttons already are, in place of the
-   side-by-side pair the shared hero rule sets for index.html. */
+   side-by-side pair the shared hero rule sets for index.html.
+
+   The block sits top-anchored, close under the header, rather than
+   centred in the tall box: the eyebrow is the first thing a visitor should
+   read, not something they wait for a scroll of black to reach. The title
+   is sized so "Research Peptides." (the <br> after "Lab-Grade" already
+   fixes the first line) fits the second line without wrapping again —
+   three lines read as the headline losing control of its own width, where
+   two read as a decision. */
 @media (max-width: 900px){
   .hero.wl-hero{
     min-height: 100vh;
     min-height: 100dvh;
     display: flex;
-    align-items: center;
-    padding-top: 90px;
+    align-items: flex-start;
+    padding-top: 32px;
     padding-bottom: 40px;
   }
   .wl-hero .hero-grid{ min-height: 0; padding-top: 0; padding-bottom: 0; }
-  .wl-hero .hero-eyebrow{ font-size: 0.86rem; margin-bottom: 22px; }
-  .wl-hero .hero-title{ font-size: clamp(2.7rem, 10vw, 3.6rem); margin-bottom: 26px; }
-  .wl-hero .hero-sub{ font-size: 1.05rem; margin-bottom: 40px; }
+  .wl-hero .hero-eyebrow{ font-size: 0.86rem; margin-bottom: 18px; }
+  .wl-hero .hero-title{ font-size: clamp(2rem, 8.4vw, 3rem); margin-bottom: 22px; }
+  .wl-hero .hero-sub{ font-size: 0.88rem; margin-bottom: 36px; }
   .wl-hero .hero-cta{ flex-direction: column; align-items: stretch; gap: 18px; margin-bottom: 36px; }
   .wl-hero .hero-cta .btn-lg{ width: 100%; flex: none; padding: 16px 24px; font-size: 1rem; }
   .wl-hero .hero-stats{ gap: 32px; }
