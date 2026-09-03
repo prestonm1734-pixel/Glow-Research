@@ -1016,14 +1016,6 @@
         return;
       }
 
-      // The checkbox is `required`, so this only fires if a browser lets the
-      // form submit anyway — belt-and-suspenders before the network round trip.
-      if (!$('coTerms').checked) {
-        $('coPlacedMsg').textContent = 'Please confirm the research-use agreement before placing your order.';
-        $('coPlacedMsg').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-        return;
-      }
-
       const opt = SHIPPING.find(s => s.id === shipId) || SHIPPING[0];
       const sub = items.reduce((n, i) => n + i.unitSale * i.qty, 0);
 
