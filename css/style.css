@@ -1476,13 +1476,33 @@ html:not(.js) .faq-a{ max-height: none; }
     min-height: 100vh;
     min-height: 100dvh;
   }
-  /* Not centred. Centring the copy in a box this much taller than its
-     content pushed the vial photo down with it — the image is positioned
-     relative to .wl-hero's own height, so the same object-position that
-     reads correctly in a content-height box floats noticeably lower in a
-     full-screen one, leaving a dead band of plain black above the eyebrow
-     with no image in it at all. Left top-anchored, the extra height this
-     rule adds just becomes room below the stat row instead. */
+  /* Not centred: centring the copy in a box this much taller than its
+     content pushed the vial photo down with it, leaving a dead band of
+     plain black above the eyebrow instead of below the stats. Top-anchored,
+     the extra height goes below the stat row, which is where the photo
+     below is sized to actually fill it rather than leave it empty. */
+  .wl-hero .hero-visual-img{
+    /* Bigger and lower, so the trio runs from behind the stat row down to
+       the bottom of the screen instead of floating near the text with a
+       band of plain black underneath. contain still, not cover: the frame
+       is 1.8:1, wide enough that covering a box this tall would crop down
+       to a sliver of one label, which is a worse trade than the size this
+       makes elsewhere. Overhang and the cap both scale up from the shared
+       rule for the same reason its own comment gives — big enough to keep
+       the vials' presence, capped so they do not overrun the phone actually
+       holding this screen. */
+    width: min(230%, 900px);
+    left: calc((100% - min(230%, 900px)) / 2);
+    object-position: 50% 74%;
+    opacity: .58;
+  }
+  .wl-hero .hero-copy-scrim{
+    background:
+      radial-gradient(ellipse 120% 60% at 50% 30%, rgba(0,0,0,.35) 0%, rgba(0,0,0,.75) 65%, rgba(0,0,0,.94) 100%),
+      linear-gradient(180deg,
+        rgba(0,0,0,.9) 0%, rgba(0,0,0,.66) 20%, rgba(0,0,0,.4) 40%,
+        rgba(0,0,0,.3) 58%, rgba(0,0,0,.55) 78%, rgba(0,0,0,.85) 100%);
+  }
 }
 
 /* ---------- reduced motion ---------- */
