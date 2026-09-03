@@ -1136,7 +1136,13 @@ button[disabled].si-forgot{ cursor: progress; }
 /* No background of its own: the section carries .section-light and takes the
    white from it, the same as index.html's FAQ. A colour here would win on
    source order and quietly undo that. */
-.wl-faq-sec{ padding: 78px 0 88px; }
+/* Black, not the white index.html's own FAQ carries: this page runs the one
+   dark section (Why Glow) into this one rather than breaking to white for
+   it, so the whole page after the hero reads as one continuous ground until
+   the footer. #000 rather than var(--bg) (#0a0a0a) for the same reason
+   .standard-sec above chose it: they sit back to back, and any visible seam
+   between two near-blacks would read as a mistake rather than a boundary. */
+.wl-faq-sec{ background:#000; padding: 78px 0 88px; }
 .wl-faq-sec .faq-list{ max-width: 860px; }
 /* One column at every width: four questions split into two columns of two
    leaves a short, lopsided pair of stacks rather than a list. */

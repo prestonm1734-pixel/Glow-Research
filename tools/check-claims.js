@@ -1614,6 +1614,20 @@ console.log('\nwelcome landing page');
     /querySelector\('\.wl-cta'\)/.test(wlJs) &&
     /sticky\.hidden = false/.test(wlJs));
 
+  // --- the FAQ runs black on this page alone -----------------------------
+  // index.html's own FAQ stays white (its section-light untouched); this
+  // page's runs the one dark ground from the hero through Why Glow and into
+  // the FAQ without breaking to white, so a change here should never leak
+  // onto the page it was copied from.
+  ok('welcome.html\'s FAQ is not section-light',
+    !/class="section wl-faq-sec"[\s\S]{0,20}section-light|section-light wl-faq-sec/.test(wl) &&
+    /class="section wl-faq-sec"/.test(wl));
+  ok('and index.html\'s FAQ still is',
+    /class="section section-light" id="faq"/.test(read('index.html')));
+  const wlNoComments = wl.replace(/<!--[\s\S]*?-->/g, '');
+  ok('the black FAQ carries a centred, light-on-dark head like the section above it',
+    /id="faq">[\s\S]{0,40}<div class="section-head center reveal light">/.test(wlNoComments));
+
   // robots.txt must NOT block it: a Disallow stops a crawler fetching the page
   // at all, so it never reads the noindex above, and the URL can still be
   // indexed bare. It would also stop the ad platforms rendering a preview.

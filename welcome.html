@@ -300,15 +300,17 @@
      two pages cannot answer the same question differently. No FAQPage block
      beside it: this page is noindex, and structured data on a page no engine
      is allowed to index is markup with no reader. -->
-<section class="section section-light wl-faq-sec" id="faq">
+<section class="section wl-faq-sec" id="faq">
   <div class="container">
-    <!-- Left-set, which is the rule both pages follow: a dark section takes a
+    <!-- Centred, which is the rule both pages follow: a dark section takes a
          centred head (index.html's Glow Standard, this page's Why Glow
          directly above), a light one takes a left-set head. This section is
-         light again, mirroring index.html's own FAQ, so it takes the second
-         half of the rule and drops .light with it: that class colours the
-         heading for a dark ground. -->
-    <div class="section-head reveal">
+         black on this page alone (index.html's own FAQ stays white, its own
+         section-light untouched), so it takes the first half of the rule and
+         carries .light with it: that class is what colours the heading for a
+         dark ground instead of the near-black default it would otherwise
+         inherit. -->
+    <div class="section-head center reveal light">
       <span class="eyebrow">FAQ</span>
       <h2>Questions, answered.</h2>
     </div>
