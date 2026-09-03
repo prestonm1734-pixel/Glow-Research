@@ -146,6 +146,20 @@
 
     renderPhoto(p, size());
     renderCoa(p);
+    renderBatch(p);
+  }
+
+  // The lot p.lot names, stated as a fact rather than as a promise about
+  // supply: no vial count, because js/products-data.js does not hold one —
+  // sizes[].stock is in stock or not, never a number, so there is nothing
+  // true to put beside this. Left empty for a product with no lot on file,
+  // same as pdAlias and pdDesc above.
+  function renderBatch(p) {
+    const el = $('pdBatch');
+    if (!el) return;
+    el.innerHTML = p.lot
+      ? `Current HPLC-tested batch: <strong>Lot #${p.lot}</strong>`
+      : '';
   }
 
   // Every product now ships with a real photo, so this only ever picks

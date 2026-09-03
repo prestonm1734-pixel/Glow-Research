@@ -286,6 +286,11 @@ function buildProduct(p, donor) {
   html = setText(html, 'pdName', esc(p.name));
   html = fillEmpty(html, 'pdAlias', p.alias ? esc(p.alias) : '');
   html = fillEmpty(html, 'pdDesc', esc(p.blurb));
+  // Same rule js/product.js's renderBatch() renders at runtime: a lot number,
+  // stated as a fact, with no vial count beside it because none exists to
+  // state truthfully.
+  html = fillEmpty(html, 'pdBatch',
+    p.lot ? `Current HPLC-tested batch: <strong>Lot #${esc(p.lot)}</strong>` : '');
 
   // The donor ships #pdPhoto with no src: js/product.js fills it in at
   // runtime, which used to mean a crawler that does not execute JavaScript —

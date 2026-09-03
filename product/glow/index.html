@@ -293,6 +293,18 @@
   .pd-price-note[hidden]{ display:none; }
   .pd-note-sep{ color:#b5b5b0; margin: 0 3px; }
 
+  /* The lot number the catalog holds for this compound right now, stated
+     where the decision to buy is actually made rather than left for the
+     certificate section further down the page to be the only place it
+     appears. No count of anything: sizes[].stock in js/products-data.js is a
+     boolean, in stock or not, and this site does not track a number of vials
+     against a lot, so there is no true figure to put beside it. */
+  .pd-batch{
+    margin: 0 0 14px; font-size:.82rem; color:#55554f; line-height:1.5;
+  }
+  .pd-batch:empty{ display:none; }
+  .pd-batch strong{ color:#0a0a0a; font-weight:700; }
+
   /* Fine print under the tiers, explaining that any quantity earns the tier
      it reaches. Someone who steps to 4 should not have to infer the rule. */
   .pd-bulk-note{
@@ -746,6 +758,12 @@
 
         <span class="pd-label">Size</span>
         <div class="pd-sizes" id="pdSizes"><button type="button" class="pd-size is-active" data-i="0">70mg</button></div>
+
+        <!-- The lot currently listed for this compound, read from the same
+             p.lot the certificate box and the batch analysis panel below use.
+             Empty and collapsed for a product with no lot on file yet, same
+             pattern as pd-alias and pd-desc. -->
+        <p class="pd-batch" id="pdBatch">Current HPLC-tested batch: <strong>Lot #1035</strong></p>
 
         <div class="pd-buy">
           <div class="pd-stepper">

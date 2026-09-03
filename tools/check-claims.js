@@ -1155,6 +1155,49 @@ if (!COAS_PUBLISHED) {
     wrongLot.map(p => `${p.name}: lot ${p.lot} vs ${p.coa}`).join(', '));
 }
 
+console.log('\nbatch tracking line');
+{
+  // The line js/product.js's renderBatch() writes and tools/build-products.js
+  // bakes: the catalog's own lot number, stated with no count of vials beside
+  // it. Three ways this can drift, three guards.
+  const productJs = read('js/product.js');
+  // Anchored to the closing backtick and tag, not just a substring match: a
+  // vial count appended after the lot number (the exact shape of the claim
+  // this whole section exists to rule out) still contains the substring
+  // "Lot #${p.lot}", so a loose match would wave it through.
+  ok('js/product.js states the lot with no invented quantity beside it',
+    /function renderBatch/.test(productJs) &&
+    /Lot #\$\{p\.lot\}<\/strong>`/.test(productJs));
+
+  const buildProductsJs = read('tools/build-products.js');
+  ok('and tools/build-products.js bakes the identical line for a crawler',
+    /Current HPLC-tested batch:.*Lot #\$\{esc\(p\.lot\)\}/.test(buildProductsJs));
+
+  // Every generated product page, checked against the catalog's own figure
+  // rather than just for presence: a page baked before a lot turned over
+  // would otherwise keep quoting the old one silently, the same failure the
+  // certificate-filename guard above exists to catch for the COA link.
+  const productPages = fs.readdirSync(path.join(ROOT, 'product'), { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(d => ({ file: `product/${d.name}/index.html`, slug: d.name }));
+  const wrongBatch = productPages.filter(({ file, slug }) => {
+    const prod = GLOW_PRODUCTS.find(p => productSlug(p.name) === slug);
+    if (!prod || !prod.lot) return false;
+    return !read(file).includes(`Lot #${prod.lot}</strong>`);
+  });
+  ok('every generated page states the catalog\'s current lot for that compound',
+    wrongBatch.length === 0, wrongBatch.map(p => p.file).join(', '));
+
+  // The one figure that would make this a promise rather than a fact, ruled
+  // out sitewide rather than only on the product template: a vial count is
+  // not data this site holds anywhere (sizes[].stock is in stock or not,
+  // never a number), so no page, generated or hand-written, may state one
+  // beside a lot or a batch.
+  const vialCount = everyPage.filter(f => /\d+\s+vials?\s+(remaining|left|in stock)/i.test(read(f)));
+  ok('no page states a vial count, which is not a number this site tracks',
+    vialCount.length === 0, vialCount.join(', '));
+}
+
 /* ---------------------------------------------------------------------------
  * Every page we ask to be indexed says which address it is.
  *
