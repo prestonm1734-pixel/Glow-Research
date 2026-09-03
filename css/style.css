@@ -1113,36 +1113,25 @@ button[disabled].si-forgot{ cursor: progress; }
   .wl-standard{ padding-top: 20px; }
 }
 
-/* Welcome-only, mobile-only: the hero fills the screen so a visitor who opens
-   this page sees only the pitch, not a slice of "Why researchers buy from
-   Glow" underneath it. Scoped to .wl-hero at the same 900px breakpoint the
-   shared hero rules use, so index.html's hero (still the top of a longer
-   page, where a bit of the catalog peeking in below is fine) is untouched.
+/* Welcome-only, mobile-only: the hero's copy runs larger and looser than
+   index.html's own hero, and the two buttons stack full-width instead of
+   sitting side by side. Scoped to .wl-hero at the same 900px breakpoint the
+   shared hero rules use, so index.html's hero is untouched.
 
    The photograph is deliberately not part of this: .hero-visual-img keeps
-   the exact rules above, sized and positioned off .hero's own box. Making
-   that box taller is enough on its own, and re-tuning the image to match is
-   a second, separate decision this pass does not make.
+   the exact rules above, sized and positioned off .hero's own box.
 
-   The copy itself runs larger and looser to fill the extra height rather
-   than leaving it as blank padding: bigger eyebrow, headline and subhead,
-   more room between them, and the two buttons stacked full-width the way
-   the rest of the site's mobile buttons already are, in place of the
-   side-by-side pair the shared hero rule sets for index.html.
-
-   The block sits top-anchored, close under the header, rather than
-   centred in the tall box: the eyebrow is the first thing a visitor should
-   read, not something they wait for a scroll of black to reach. The title
-   is sized so "Research Peptides." (the <br> after "Lab-Grade" already
-   fixes the first line) fits the second line without wrapping again —
-   three lines read as the headline losing control of its own width, where
-   two read as a decision. */
+   This block no longer forces the section to the full viewport height.
+   That was tried, and it pinned "Why researchers buy from Glow" off the
+   first screen, but left the actual hero content (eyebrow through stats)
+   floating in the top third of the phone with roughly 340px of plain black
+   under it before that section began — worse than the un-forced height,
+   which sizes the hero to its own content and lets Why Glow follow right
+   after the stat row. The title is still sized so "Research Peptides."
+   (the <br> after "Lab-Grade" already fixes the first line) fits the
+   second line without wrapping again, down to a 320px-wide phone. */
 @media (max-width: 900px){
   .hero.wl-hero{
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    align-items: flex-start;
     padding-top: 56px;
     padding-bottom: 40px;
   }
