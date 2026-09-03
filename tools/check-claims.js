@@ -2963,6 +2963,39 @@ console.log('\nlaunch offer');
     /never throws/i.test(unlock) || /catch \(e\) \{\s*console\.error\('unlock-offer: could not reach/.test(unlock));
 }
 
+/* ---------------------------------------------------------------------------
+ * Every transactional email shares one wordmark, drawn by emailShell() in
+ * api/_email.js. It used to be the spark character set in the shell's own
+ * font stack, Glow&#10022;, which is a request to whatever font an inbox
+ * falls back to — Outlook's rendering engine in particular does not carry
+ * U+2726 in Segoe UI or Arial, so what actually reached a reader there was
+ * not the mark at all. assets/glow-logo.svg's own comment already explains
+ * the fix for exactly this failure mode (draw it as pixels, not type), just
+ * for a different surface; this holds the email to the same rule.
+ * ------------------------------------------------------------------------- */
+console.log('\nemail wordmark');
+{
+  const emailJs = read('api/_email.js');
+  // Comments stripped first: this file's own explanatory comment on the fix
+  // names the old glyph by its entity to describe what it replaced, and would
+  // otherwise satisfy the very check meant to catch it coming back.
+  const emailCode = emailJs.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  ok('the wordmark is an image, not the spark character set in a font',
+    !emailCode.includes('&#10022;'));
+  const src = (emailJs.match(/<img src="(https:\/\/[^"]+)"/) || [])[1];
+  ok('served from an absolute https URL, which is the only kind an inbox will load',
+    !!src);
+  ok('and it is a file this repository actually ships',
+    !!src && fs.existsSync(path.join(ROOT, src.replace('https://glowresearch.shop/', ''))),
+    src);
+  // "Glow" beside the mark is plain text, not part of the image, so it always
+  // renders even for the client that blocks the picture. alt="" rather than
+  // alt="Glow" is what keeps a screen reader (or a blocked-image client) from
+  // reading "Glow Glow" once that text cell is right next to it.
+  ok('the word "Glow" beside it is real text, not baked into the picture',
+    />Glow<\/td>/.test(emailJs));
+}
+
 console.log('\ncatalog shape');
 {
   const required = ['name', 'tag', 'cat', 'purity', 'sizes', 'blurb', 'about', 'research'];
