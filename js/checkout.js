@@ -616,6 +616,14 @@
       sessionStorage.removeItem('glow-pending-order');
     } catch (e) { /* private mode: the fallback message on thank-you.html still shows */ }
 
+    // Durable, unlike glow-last-order above: that one is the receipt for this
+    // page load and is meant to clear at the end of the session, this one is
+    // read by js/launch-offer.js to decide whether a returning customer ever
+    // sees the discount popup again. A real order is the one signal on this
+    // site that a visitor is already a customer, so it is the one thing that
+    // suppresses the popup permanently rather than for a cooldown window.
+    try { localStorage.setItem('glow-has-ordered', '1'); } catch (e) {}
+
     if (window.GlowAnalytics) {
       // stripePaymentIntentId doubles as the Meta event ID (third arg), so
       // the browser pixel's Purchase and the server-side Conversions API

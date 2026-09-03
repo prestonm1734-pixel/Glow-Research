@@ -1,18 +1,36 @@
 // ===================== Glow Research — launch offer =====================
 // Collects an email address in exchange for the launch discount code.
 //
-// One surface: the standing form in the footer of index.html and welcome.html.
-// It is not an interruption, so nothing suppresses it. Someone who scrolled
-// past it in March can still ask in June, and the only thing it remembers is
-// whether the address has already been given, so it shows the code back rather
-// than asking twice for something already handed over.
+// Two surfaces now. The standing form in the footer of index.html and
+// welcome.html is not an interruption, so nothing suppresses it: someone who
+// scrolled past it in March can still ask in June, and the only thing it
+// remembers is whether the address has already been given, so it shows the
+// code back rather than asking twice for something already handed over.
 //
-// There were two popups here, a bar along the foot of the homepage and a
-// dialog on the catalog and the product pages, both on a delay. They were
-// removed because nearly all of this store's traffic arrives from a Facebook
-// ad, and an offer thrown over a page someone landed on seconds ago reads as
-// spam from a supplier they have not decided to trust yet. The footer asks the
-// same question of someone who has read enough of the page to reach it.
+// The second is a popup, on every page except QUIET_PAGES below (an
+// interruption there can only cost an order). There was one here before, a
+// bar on the homepage and a dialog on the catalog and product pages, both on
+// a fixed delay from load, and it was removed because nearly all of this
+// store's traffic arrives from a Facebook ad: an offer thrown over a page
+// someone landed on seconds ago reads as spam from a supplier they have not
+// decided to trust yet. This one is built not to have that problem:
+//
+//   - it never fires on arrival. Desktop waits for exit intent, the cursor
+//     leaving through the top of the viewport, which is the one gesture that
+//     only means "I am about to leave." A touch device has no such gesture,
+//     so mobile instead waits for ten seconds of reading or a scroll past the
+//     halfway point, whichever comes first — a nudge partway through the
+//     page, not a greeting at the door.
+//   - it shows at most once a browser session, and if closed without an
+//     address given, stays quiet for POPUP_COOLDOWN_MS (fourteen days) after.
+//   - it never shows to someone already signed in (SESSION_ACCOUNT) or who
+//     has already bought something (HAS_ORDERED, written by js/checkout.js
+//     and js/express-pay.js the moment an order is placed) — both signals
+//     this site already holds, not new ones invented to gate this.
+//   - it reads the identical LAUNCH_OFFER object the footer does. Same
+//     eyebrow, same title, same 15%, same code. Two surfaces asking the same
+//     honest question is not the problem the old popup had; a fabricated
+//     reason to ask right now would have been.
 //
 // The code itself is NOT in this file, and must not be put here. The page ships
 // the offer's words and no value; api/unlock-offer.js hands the code back after
@@ -28,25 +46,46 @@
   if (typeof LAUNCH_OFFER === 'undefined' || !LAUNCH_OFFER) return;
   var CFG = LAUNCH_OFFER;
 
+  // Not a whole-file gate any more: only index.html and welcome.html carry
+  // this element, and every other page still needs the popup below to run.
   var footerHost = document.getElementById('offerFooter');
-  if (!footerHost) return;
 
   /* ---------------- state ---------------- */
 
-  // One record, and the only thing this file remembers about anyone. It means
-  // the code has already been handed over, permanently, so the footer shows it
-  // back rather than asking a second time for an address already given.
-  //
-  // The popup kept two more, one permanent and one session-scoped, both to
-  // avoid asking twice. Neither ever gated this form and both went with it.
-  // Whatever those keys still hold in a returning visitor's storage is now
-  // ignored rather than read.
+  // The code has already been handed over, permanently, so the footer (and
+  // the popup) show it back rather than asking a second time for an address
+  // already given.
   var UNLOCKED = 'glow-offer-code';
+
+  // Written by js/checkout.js and js/express-pay.js the instant an order is
+  // placed, never read by anything but this file. A real purchase is the one
+  // signal this site holds that a visitor is already a customer, so it is
+  // what suppresses the popup permanently rather than for a cooldown window.
+  var HAS_ORDERED = 'glow-has-ordered';
+
+  // Written by js/account.js and js/checkout.js on sign-in (see
+  // js/identity.js, which reads the same key). Someone already signed in has
+  // already decided to trust this store with an account; asking them to
+  // trade an email for a first-order code is asking the wrong question.
+  var SESSION_ACCOUNT = 'glow-session';
+
+  // The popup's own memory, kept apart from UNLOCKED above: closing the
+  // popup without an address teaches this file nothing about whether the
+  // address has been given, only that this is not the moment to ask again.
+  var POPUP_SHOWN = 'glow-offer-popup-shown';         // sessionStorage: once a tab session
+  var POPUP_DISMISSED_AT = 'glow-offer-popup-dismissed-at'; // localStorage: ms timestamp
+  var POPUP_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;   // 14 days
+
+  // Pages where an interruption can only cost an order, the same list and the
+  // same reasoning tools/check-claims.js holds this file to.
+  var QUIET_PAGES = ['/checkout.html', '/thank-you.html', '/cart.html'];
 
   // Both stores throw in Safari private mode rather than returning null, and
   // an offer popup is never worth taking the page down over.
   function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* session only */ } }
+  function sGet(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+  function sSet(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} }
 
   function esc(s) {
     return String(s).replace(/[&<>"]/g, function (c) {
@@ -73,11 +112,11 @@
     } catch (e) { /* analytics must never break the offer */ }
   }
 
-  // Which page this address came from, in the vocabulary the funnel reports
-  // in. One surface left, so it is a constant, but it stays a named one: the
-  // dashboard slices the capture funnel by this value, and the same bare
-  // string repeated at five call sites is how those slices drift apart.
-  var FORM_LOCATION = 'footer';
+  // Which surface an address came from, in the vocabulary the funnel reports
+  // in. Two now, so it travels on the surface object below (surface.formLocation)
+  // rather than living as one constant, but every call site still reads it
+  // from there rather than writing 'footer' or 'popup' out by hand — the same
+  // reason it was a named constant when there was only one value.
 
   // Only meaningful on a product page. Read from the catalog rather than
   // scraped off the rendered page, so the SKU reported is the one an order
@@ -143,7 +182,7 @@
         msg.className = 'lo-msg is-error';
         track('email_capture_error', {
           form_id: surface.formId,
-          form_location: FORM_LOCATION,
+          form_location: surface.formLocation,
           error_type: type,
         });
       };
@@ -170,7 +209,7 @@
           // Sent so the lead row records which page and which ad produced the
           // address, alongside the code. The beacon carries the same context
           // for the funnel; this is the durable copy attached to the person.
-          formLocation: FORM_LOCATION,
+          formLocation: surface.formLocation,
           formId: surface.formId,
           triggerType: surface.triggerType,
           sourcePage: location.pathname,
@@ -189,7 +228,7 @@
 
           var shared = {
             form_id: surface.formId,
-            form_location: FORM_LOCATION,
+            form_location: surface.formLocation,
             trigger_type: surface.triggerType,
           };
           var withProduct = productProps();
@@ -202,7 +241,7 @@
           track('discount_code_revealed', {
             code: res.d.code,
             reveal_method: 'email_submit',
-            form_location: FORM_LOCATION,
+            form_location: surface.formLocation,
           });
 
           showReveal(surface, res.d.code, res.d.percentOff);
@@ -235,7 +274,7 @@
       var btn = this;
       track('discount_code_copied', {
         code: code,
-        form_location: FORM_LOCATION,
+        form_location: surface.formLocation,
       });
       // Clipboard access is not granted everywhere (insecure origin, older
       // Safari). The code is on screen either way, so a failure is silent
@@ -256,6 +295,7 @@
     var footerSurface = {
       variant: 'footer',
       formId: 'launch-offer-footer',
+      formLocation: 'footer',
       triggerType: 'footer',
       root: footerHost,
       onRevealed: null,
@@ -288,6 +328,157 @@
         }, { threshold: 0.4 });
         io.observe(footerHost);
       }
+    }
+  }
+
+  /* ---------------- the popup ----------------
+     Built entirely here rather than shipped in every page's markup: there is
+     nothing for a crawler or a no-JS visitor to read in an overlay that only
+     ever appears after a behavioural trigger, so baking empty frames into
+     twenty-odd pages would buy nothing check-claims.js could verify against.
+
+     Eligibility is checked once, before anything is armed. Any one of these
+     is enough to never show it at all this page view: */
+  function popupEligible() {
+    if (QUIET_PAGES.indexOf(location.pathname) !== -1) return false;
+    if (get(UNLOCKED)) return false;           // the code is already held
+    if (get(SESSION_ACCOUNT)) return false;    // already signed in
+    if (get(HAS_ORDERED)) return false;        // already a customer
+    if (sGet(POPUP_SHOWN)) return false;       // already shown this session
+    var dismissedAt = parseInt(get(POPUP_DISMISSED_AT), 10);
+    if (dismissedAt && (Date.now() - dismissedAt) < POPUP_COOLDOWN_MS) return false;
+    return true;
+  }
+
+  if (popupEligible()) {
+    var popOverlay, popPanel, popSurface;
+
+    function buildPopup() {
+      popOverlay = document.createElement('div');
+      popOverlay.className = 'lo-pop-overlay';
+      popOverlay.hidden = true;
+      popOverlay.innerHTML =
+        '<div class="lo-pop" role="dialog" aria-modal="true" aria-label="' + esc(CFG.title) + '">' +
+          '<button type="button" class="lo-pop-close" aria-label="Close">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+              '<path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+            '</svg>' +
+          '</button>' +
+          '<div class="lo-copy">' +
+            '<span class="lo-eyebrow">' + esc(CFG.eyebrow) + '</span>' +
+            '<h3 class="lo-title">' + esc(CFG.title) + '</h3>' +
+            '<p class="lo-ask">' + esc(CFG.ask) + '</p>' +
+          '</div>' +
+          '<div class="lo-body">' + formHtml('loPop') + '</div>' +
+          '<p class="lo-facts">' + esc(CFG.facts) + '</p>' +
+        '</div>';
+      document.body.appendChild(popOverlay);
+      popPanel = popOverlay.querySelector('.lo-pop');
+
+      popSurface = {
+        variant: 'popup',
+        formId: 'launch-offer-popup',
+        formLocation: 'popup',
+        triggerType: pendingTriggerType,
+        root: popPanel,
+        onRevealed: null,
+      };
+      wireForm(popSurface);
+
+      popOverlay.querySelector('.lo-pop-close').addEventListener('click', dismissPopup);
+      popOverlay.addEventListener('mousedown', function (e) { if (e.target === popOverlay) dismissPopup(); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && popOverlay.classList.contains('is-shown')) dismissPopup();
+      });
+    }
+
+    function showPopup(triggerType) {
+      // Another overlay (cart, search) already has the page's attention.
+      // Not queued for later: this is a rare edge case, and a popup arriving
+      // the moment someone closes a different one is its own kind of bad
+      // timing, worth skipping rather than working around.
+      if (document.body.classList.contains('search-locked')) return;
+
+      pendingTriggerType = triggerType;
+      if (!popOverlay) buildPopup();
+      popSurface.triggerType = triggerType;
+
+      sSet(POPUP_SHOWN, '1');
+      popOverlay.hidden = false;
+      document.body.classList.add('search-locked');
+      // Two frames, same reasoning as the cart drawer's own open(): one for
+      // the browser to lay the panel out at its hidden transform, one for
+      // that to be the computed style before the class flips, so the
+      // transition has a start state to animate from instead of jumping.
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { popOverlay.classList.add('is-shown'); });
+      });
+
+      track('email_capture_viewed', {
+        form_id: popSurface.formId,
+        form_location: 'popup',
+        trigger_type: triggerType,
+      });
+    }
+
+    function dismissPopup() {
+      popOverlay.classList.remove('is-shown');
+      document.body.classList.remove('search-locked');
+      setTimeout(function () { popOverlay.hidden = true; }, 200);
+      // Only a cooldown if nothing was submitted: showReveal() swaps the
+      // panel's markup on success, so a form still being on screen when this
+      // runs is what "closed without submitting" actually means here.
+      if (popOverlay.querySelector('.lo-form')) {
+        set(POPUP_DISMISSED_AT, String(Date.now()));
+        track('email_capture_closed', {
+          form_id: popSurface.formId,
+          form_location: 'popup',
+          trigger_type: popSurface.triggerType,
+        });
+      }
+    }
+
+    var pendingTriggerType = null;
+
+    /* ---- triggers ----
+       Exactly one of these ever fires per page view: whichever wins calls
+       showPopup() and every listener below tears itself down, armed or not. */
+
+    var canHover = window.matchMedia &&
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    if (canHover) {
+      // Exit intent: the cursor leaving through the top edge of the
+      // viewport, which is the one motion that only means "leaving" rather
+      // than "reaching for a tab, a bookmark, or a second monitor." Armed
+      // after a short delay rather than from the first paint, so the cursor
+      // settling into the page on load cannot itself read as an exit.
+      var armed = false;
+      var armTimer = setTimeout(function () { armed = true; }, 1000);
+      var onExitIntent = function (e) {
+        if (!armed || e.clientY > 0 || e.relatedTarget || e.toElement) return;
+        document.removeEventListener('mouseout', onExitIntent);
+        clearTimeout(armTimer);
+        showPopup('exit_intent');
+      };
+      document.addEventListener('mouseout', onExitIntent);
+    } else {
+      // No cursor to leave through the top of anything, so a touch device
+      // gets a nudge partway through the page instead: ten seconds of
+      // reading, or a scroll past halfway, whichever comes first.
+      var mobileTimer = setTimeout(function () {
+        window.removeEventListener('scroll', onMobileScroll);
+        showPopup('mobile_timer');
+      }, 10000);
+      var onMobileScroll = function () {
+        var doc = document.documentElement;
+        var max = doc.scrollHeight - doc.clientHeight;
+        if (max <= 0 || (scrollY / max) < 0.5) return;
+        window.removeEventListener('scroll', onMobileScroll);
+        clearTimeout(mobileTimer);
+        showPopup('mobile_scroll');
+      };
+      window.addEventListener('scroll', onMobileScroll, { passive: true });
     }
   }
 })();

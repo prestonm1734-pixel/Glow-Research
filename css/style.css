@@ -2426,3 +2426,63 @@ body.search-locked{ overflow:hidden; }
   .lo-form{ flex-direction:column; }
   .lo-submit{ width:100%; }
 }
+
+/* ---------- launch offer popup ----------
+   The behavioural surface: exit intent on desktop, a time-or-scroll nudge on
+   mobile (js/launch-offer.js). Built to spec rather than matched to the
+   site's other overlays on purpose — literal black rather than var(--bg)'s
+   near-black, a border instead of the shadow every other panel here uses,
+   square corners like everything else on the site already is. The shared
+   type and form styles above (.lo-eyebrow, .lo-form, .lo-input and the rest)
+   are untouched: they already render white-on-dark and need no popup-specific
+   override, which is the payoff of the two surfaces sharing one set of
+   classes instead of each carrying its own copy. */
+.lo-pop-overlay{
+  position:fixed; inset:0; z-index:340;
+  background: rgba(0,0,0,.72);
+  display:flex; align-items:center; justify-content:center;
+  padding: 24px;
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition: opacity .2s ease, visibility 0s .2s;
+}
+.lo-pop-overlay[hidden]{ display:none; }
+.lo-pop-overlay.is-shown{
+  opacity:1; visibility:visible; pointer-events:auto;
+  transition: opacity .2s ease;
+}
+.lo-pop{
+  position:relative; width:100%; max-width:440px;
+  background:#000; border:1px solid rgba(255,255,255,.16);
+  border-radius:0; box-shadow:none;
+  padding: 40px 32px 32px;
+  transform: scale(.97);
+  transition: transform .2s ease;
+}
+.lo-pop-overlay.is-shown .lo-pop{ transform: scale(1); }
+.lo-pop-close{
+  position:absolute; top:14px; right:14px; width:32px; height:32px;
+  border:1px solid rgba(255,255,255,.22); border-radius:0; background:transparent;
+  color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+.lo-pop-close:hover{ border-color:#fff; background:rgba(255,255,255,.08); }
+.lo-pop .lo-title{ font-size:1.5rem; }
+
+/* Bottom sheet, not a centred card: the mobile trigger fires mid-scroll or
+   mid-read, so it should read as something sliding up from underneath the
+   page rather than a dialog dropped over the middle of it. Square corners
+   kept even on the top edge, against the usual bottom-sheet convention,
+   because the brief was explicit that nothing here should be rounded. */
+@media (max-width: 640px){
+  .lo-pop-overlay{ align-items:flex-end; padding:0; }
+  .lo-pop{
+    max-width:none; width:100%;
+    border-left:0; border-right:0; border-bottom:0;
+    padding: 30px 22px calc(26px + env(safe-area-inset-bottom));
+    transform: translateY(100%);
+  }
+  .lo-pop-overlay.is-shown .lo-pop{ transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce){
+  .lo-pop-overlay, .lo-pop-overlay .lo-pop{ transition:none; }
+}

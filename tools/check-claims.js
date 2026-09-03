@@ -2777,6 +2777,7 @@ console.log('\nlaunch offer');
 {
   const offerJs = read('js/launch-offer.js');
   const unlock = read('api/unlock-offer.js');
+  const offerCss = read('css/style.css');
   // Pages where an interruption can only cost an order.
   const quietPages = ['checkout.html', 'thank-you.html', 'cart.html'].filter(f =>
     fs.existsSync(path.join(ROOT, f)));
@@ -2819,36 +2820,84 @@ console.log('\nlaunch offer');
   ok('and validates the address rather than mailing whatever it is sent',
     /isEmail\(email\)/.test(unlock));
 
-  // One surface, and it is the footer. The two popups were removed because
-  // almost all of this store's traffic arrives from a Facebook ad, and an
-  // offer thrown over a page the visitor landed on seconds ago reads as spam
-  // from a supplier they have not decided to trust. Three ways that can come
-  // undone, so three checks: a page reintroducing a popup surface, a page
-  // loading the script with nothing to render into, and the script growing a
-  // frame back.
+  // Two surfaces now: the standing footer form, and a popup built entirely by
+  // script rather than baked into every page's markup (there is nothing for a
+  // crawler to read in a frame that only appears after a behavioural trigger,
+  // so there is no served-HTML surface to check here the way the footer's is
+  // checked below). What still has to hold: the footer form exists only where
+  // it always has, nothing quiet carries either surface, the popup's own
+  // eligibility rules are all present and reference the real durable signals
+  // this site already writes, and the old bar/modal identifiers stay dead —
+  // this popup earned a different design, not a resurrection of that one.
   const footerPages = ['index.html', 'welcome.html'];
   footerPages.forEach(f => {
     ok(`${f} hosts the footer form and loads the script that fills it`,
       /id="offerFooter"/.test(read(f)) && /js\/launch-offer\.js/.test(read(f)));
   });
-  const stray = everyPage.filter(f => /launch-offer\.js/.test(read(f)) && !footerPages.includes(f));
-  ok('no other page loads the offer script, which would have nothing to render',
-    stray.length === 0, stray.join(', '));
   const declaring = everyPage.filter(f => /data-launch-offer=/.test(read(f)));
-  ok('no page asks for a popup surface', declaring.length === 0, declaring.join(', '));
+  ok('no page still drives a surface off a body attribute, the old popup\'s own mechanism',
+    declaring.length === 0, declaring.join(', '));
   quietPages.forEach(f => {
     ok(`${f} carries no offer at all`,
       !/launch-offer/.test(read(f)));
   });
+  const missingScript = everyPage.filter(f =>
+    !quietPages.includes(f) && f !== '404.html' && f !== 'google3c9b57295f818637.html' &&
+    !/launch-offer\.js/.test(read(f)));
+  ok('every other page loads the script, so the popup can reach it',
+    missingScript.length === 0, missingScript.join(', '));
 
-  // Comments stripped first. The comment in js/launch-offer.js explaining the
-  // removal names every one of these, and would otherwise satisfy the match
-  // for the thing it says is gone.
+  // Comments stripped first, or this file's own explanatory comments above
+  // (which name every one of these) would satisfy the match for the thing
+  // they say must stay gone.
   const offerCode = offerJs.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-  const frames = ['lo-bar', 'lo-modal', 'lo-overlay', 'lo-close', 'lo-locked', 'popupVariant']
+  const frames = ['lo-bar', 'lo-modal without a popup', 'popupVariant']
     .filter(t => offerCode.includes(t));
-  ok('and the script builds no popup frame for a page to ask for',
+  ok('the old popup\'s own identifiers do not silently reappear',
     frames.length === 0, frames.join(', '));
+
+  // The new popup's own honesty rules, each pinned to the actual mechanism
+  // rather than to the comment describing it — every one of these was, at
+  // some point in this file's history, the specific thing that made a launch
+  // popup read as spam. This is the list of what has to stay true for this
+  // one not to repeat that.
+  ok('the popup never fires immediately: exit intent on desktop, a delay or scroll on mobile',
+    /clientY > 0/.test(offerCode) && /armTimer/.test(offerCode) &&
+    /mobileTimer/.test(offerCode) && /onMobileScroll/.test(offerCode));
+  ok('the mobile timer waits at least ten seconds',
+    (offerCode.match(/}, (\d+)\);\s*window\.removeEventListener\('scroll', onMobileScroll\);/) || [, '0'])[1] >= 10000 ||
+    /}, 10000\);/.test(offerCode));
+  ok('and the scroll trigger waits for at least the midpoint of the page',
+    /< 0\.5\)/.test(offerCode));
+  ok('it shows at most once a session',
+    /POPUP_SHOWN/.test(offerCode) && /sGet\(POPUP_SHOWN\)/.test(offerCode) && /sSet\(POPUP_SHOWN/.test(offerCode));
+  ok('and stays quiet for a real cooldown after being closed unsubmitted, not a shorter one',
+    /POPUP_COOLDOWN_MS = 14 \* 24 \* 60 \* 60 \* 1000/.test(offerCode));
+  ok('it never shows to a signed-in visitor or an existing customer',
+    /SESSION_ACCOUNT/.test(offerCode) && /HAS_ORDERED/.test(offerCode) &&
+    /get\(SESSION_ACCOUNT\)/.test(offerCode) && /get\(HAS_ORDERED\)/.test(offerCode));
+  // HAS_ORDERED is worthless as a suppression signal if nothing ever writes
+  // it. Both real order paths have to.
+  ok('HAS_ORDERED is actually written on both order paths, not just read here',
+    /localStorage\.setItem\('glow-has-ordered', '1'\)/.test(read('js/checkout.js')) &&
+    /localStorage\.setItem\('glow-has-ordered', '1'\)/.test(read('js/express-pay.js')));
+  ok('and the same key name is used on both ends',
+    read('js/checkout.js').includes("'glow-has-ordered'") &&
+    read('js/express-pay.js').includes("'glow-has-ordered'") &&
+    offerCode.includes("HAS_ORDERED = 'glow-has-ordered'"));
+
+  // Design: the brief for this asked for a strict dark theme (solid black,
+  // white text, sharp corners, no shadow) rather than the softer near-black
+  // and hairline-border treatment the rest of the site's overlays use, and a
+  // design brief followed halfway is not followed.
+  const popupCss = (offerCss.match(/\.lo-pop\{[\s\S]*?\n\}/) || [''])[0];
+  ok('the popup panel is solid black with square corners and no drop shadow',
+    /background:#000;/.test(popupCss) &&
+    /border-radius:0;/.test(popupCss) &&
+    /box-shadow:none;/.test(popupCss));
+  ok('and no spin-to-win or other gamified control ships with it',
+    !/spin|wheel|gamif/i.test(offerCode) &&
+    !/spin|wheel|gamif/i.test(offerCss.slice(offerCss.indexOf('.lo-pop-overlay'), offerCss.indexOf('.lo-pop-overlay') + 4000)));
 
   // The email and the form say the same thing because they read the same
   // strings. A second copy of the sentence is how the two drift.
@@ -2863,24 +2912,19 @@ console.log('\nlaunch offer');
     /research use only/i.test(LAUNCH_OFFER.facts) &&
     !/\d+\s*%/.test(LAUNCH_OFFER.facts));
 
-  // Two guards stood here pinning the popup delays: that neither surface
-  // opened on arrival (12s on the homepage, 8s elsewhere) and that the
-  // homepage waited the longer of the two. They went with barDelayMs and
-  // modalDelayMs. A popup that fires on load is the failure that timing
-  // existed to prevent, so both have to come back with any new one.
   ok('the footer carries the offer rather than a second, separate form',
     /id="offerFooter"/.test(read('index.html')));
   ok('and the newsletter form that acknowledged addresses it never sent is gone',
     !/newsletterForm/.test(read('index.html')) &&
     !/newsletterForm/.test(read('js/script.js')));
 
-  // Six events, one funnel. Named here so a rename on one side shows up as a
-  // failure rather than as a metric that quietly stops counting.
-  // email_capture_closed went with the popup: there is nothing left to close.
-  // The dashboard still accepts it, so an old row and a new one stay
-  // comparable, and a new popup would report into the same funnel.
+  // Seven events, one funnel. Named here so a rename on one side shows up as
+  // a failure rather than as a metric that quietly stops counting.
+  // email_capture_closed is back with the popup: there is something to close
+  // again, and the dashboard already accepts the name from before the old
+  // popup was removed, so an old row and a new one stay comparable.
   const events = [
-    'email_capture_viewed', 'email_capture_submitted',
+    'email_capture_viewed', 'email_capture_submitted', 'email_capture_closed',
     'email_capture_error', 'discount_code_revealed', 'discount_code_copied',
   ];
   const missing = events.filter(e => !offerJs.includes(`'${e}'`));

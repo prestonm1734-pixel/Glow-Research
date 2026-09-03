@@ -249,6 +249,11 @@
       }));
     } catch (e) { /* private mode: thank-you.html shows its no-recent-order state */ }
 
+    // Same durable flag js/checkout.js writes on the typed-card path, read by
+    // js/launch-offer.js so the discount popup never shows again to a browser
+    // that has already bought something.
+    try { localStorage.setItem('glow-has-ordered', '1'); } catch (e) {}
+
     if (window.GlowAnalytics) {
       // piData.paymentIntentId doubles as the Meta event ID, same reasoning
       // as the identical line in js/checkout.js.
