@@ -7,13 +7,13 @@
 // remembers is whether the address has already been given, so it shows the
 // code back rather than asking twice for something already handed over.
 //
-// The second is a popup, on every page except QUIET_PAGES below (an
-// interruption there can only cost an order). There was one here before, a
-// bar on the homepage and a dialog on the catalog and product pages, both on
-// a fixed delay from load, and it was removed because nearly all of this
-// store's traffic arrives from a Facebook ad: an offer thrown over a page
-// someone landed on seconds ago reads as spam from a supplier they have not
-// decided to trust yet. This one is built not to have that problem:
+// The second is a popup, on every page except POPUP_EXCLUDED_PAGES below.
+// There was one here before, a bar on the homepage and a dialog on the
+// catalog and product pages, both on a fixed delay from load, and it was
+// removed because nearly all of this store's traffic arrives from a
+// Facebook ad: an offer thrown over a page someone landed on seconds ago
+// reads as spam from a supplier they have not decided to trust yet. This
+// one is built not to have that problem:
 //
 //   - it never fires on arrival. Desktop waits for exit intent, the cursor
 //     leaving through the top of the viewport, which is the one gesture that
@@ -76,9 +76,18 @@
   var POPUP_DISMISSED_AT = 'glow-offer-popup-dismissed-at'; // localStorage: ms timestamp
   var POPUP_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;   // 14 days
 
-  // Pages where an interruption can only cost an order, the same list and the
-  // same reasoning tools/check-claims.js holds this file to.
-  var QUIET_PAGES = ['/checkout.html', '/thank-you.html', '/cart.html'];
+  // Two different reasons a page ends up here, not one. checkout, thank-you
+  // and cart are where an interruption can only cost an order, the same
+  // list and reasoning tools/check-claims.js holds this file to for those
+  // three. welcome is different: it still loads this script, and still
+  // shows the footer form below, because that is not a popup and nothing
+  // suppresses it. What it does not get is the popup itself — ad traffic
+  // arriving there has read nothing yet, and a popup thrown over the page it
+  // just landed on is the exact "reads as spam" problem this file's own
+  // header explains. Listed twice, /welcome and /welcome.html, because
+  // vercel.json rewrites the ad URL without changing what location.pathname
+  // reports for whichever address actually loaded the page.
+  var POPUP_EXCLUDED_PAGES = ['/checkout.html', '/thank-you.html', '/cart.html', '/welcome', '/welcome.html'];
 
   // Both stores throw in Safari private mode rather than returning null, and
   // an offer popup is never worth taking the page down over.
@@ -340,7 +349,7 @@
      Eligibility is checked once, before anything is armed. Any one of these
      is enough to never show it at all this page view: */
   function popupEligible() {
-    if (QUIET_PAGES.indexOf(location.pathname) !== -1) return false;
+    if (POPUP_EXCLUDED_PAGES.indexOf(location.pathname) !== -1) return false;
     if (get(UNLOCKED)) return false;           // the code is already held
     if (get(SESSION_ACCOUNT)) return false;    // already signed in
     if (get(HAS_ORDERED)) return false;        // already a customer

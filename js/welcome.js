@@ -46,21 +46,6 @@
     })(started);
   }
 
-  /* ---------- catalog ----------
-     index.html's grid, drawn by the same renderer, minus the compounds
-     WELCOME_CATALOG_EXCLUDE names. The exclusion is read from that list
-     rather than written here: a fourth coded compound added to the catalog
-     has to drop off this page on its own, without anyone remembering to
-     come back and edit it. */
-  const grid = document.getElementById('productGrid');
-  if (grid) {
-    renderProductGrid(grid, 'all', {
-      observeReveal: el => revealObserver.observe(el),
-      limit: 8,
-      exclude: WELCOME_CATALOG_EXCLUDE,
-    });
-  }
-
   /* ---------- mobile nav ---------- */
   const hamburger = document.getElementById('hamburger');
   const mainNav = document.getElementById('mainNav');
@@ -112,17 +97,34 @@
      index.html's hero now, image and all, so there is nothing to start and
      nothing to gate. */
 
-  /* A sticky call to action lived here: a bar fixed to the foot of the page
-     carrying "Shop now", revealed by an observer on the hero's own button row
-     once that row was 30% of the way up the viewport, so the handoff happened
-     at the same point of the page at any viewport height.
+  /* ---------- sticky call to action ----------
+     Watches the hero's own Shop now button rather than a scroll offset, so
+     the handoff happens at the same point of the page at any viewport
+     height with no magic number to re-tune.
 
-     Removed once this page got the catalog. The bar existed because the only
-     way to a product was /shop and the hero's button was the only door; the
-     grid above is that door now, on the page itself. Worth knowing if it comes
-     back: it was hidden with visibility and started [hidden] in the markup, not
-     merely translated off screen, so that a page with no JavaScript running
-     never carried a second "Shop now" in the tab order. */
+     The negative top margin below moves the trigger line down from the top
+     edge to 30% of the way into the viewport, so the bar arrives while the
+     button is still in the top strip and on its way out, rather than
+     waiting for it to leave the viewport completely — on a tall screen that
+     would mean scrolling most of the hero before the page offers the
+     action again. The two are briefly on screen together at that distance,
+     which is a fair trade: by the time the button is up in the top third it
+     is on its way out of the reader's attention, and the bar leads with the
+     testing claim rather than repeating the headline anyway. */
+  const sticky = document.getElementById('wlSticky');
+  const heroCta = document.querySelector('.wl-cta');
+  if (sticky && heroCta) {
+    // Removing [hidden] is what opts the bar in, and it happens only here:
+    // with no JavaScript the observer never runs and the bar stays out of
+    // the document entirely rather than sitting off screen in the tab order.
+    sticky.hidden = false;
+    new IntersectionObserver(entries => {
+      entries.forEach(e => sticky.classList.toggle('is-shown', !e.isIntersecting));
+      // A percentage, not pixels: the trigger should sit at the same place on
+      // a phone as on a desktop, and a fixed offset would be most of a short
+      // viewport and a sliver of a tall one.
+    }, { threshold: 0, rootMargin: '-30% 0px 0px 0px' }).observe(heroCta);
+  }
 
   /* The dispatch cutoff lived here: a live countdown to DISPATCH_CUTOFF_HOUR,
      rendered against the visitor's own clock and saying so past the cutoff

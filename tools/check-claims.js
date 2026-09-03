@@ -25,7 +25,6 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
-  WELCOME_CATALOG_EXCLUDE,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, DISPATCH_LABEL,
   DISPATCH_CUTOFF_HOUR, DISPATCH_CUTOFF_LABEL, DISPATCH_CUTOFF_TICKER, DISPATCH_CUTOFF_PDP_LABEL,
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord, PACKAGING_PLAIN,
@@ -1586,30 +1585,34 @@ console.log('\nwelcome landing page');
   const linksIn = pages.filter(f => f !== 'welcome.html' && /href="\/?welcome(\.html)?"/.test(read(f)));
   ok('no other page links to welcome.html', linksIn.length === 0, linksIn.join(', '));
 
-  // --- the catalog it carries, and what it leaves out --------------------
-  // The grid mirrors the homepage's, minus WELCOME_CATALOG_EXCLUDE. Three
-  // things can rot here, so three guards: a name in the list that matches no
-  // product (a rename, and the compound quietly comes back), the page
-  // filtering by a list written into itself instead of the shared one, and
-  // the exclusion silently emptying out.
-  ok('welcome.html carries the catalog grid',
-    /id="productGrid"/.test(wl) && /renderProductGrid\(/.test(wlJs));
+  // The catalog grid stood here briefly, mirroring the homepage's minus a
+  // held-out slice of coded compounds (WELCOME_CATALOG_EXCLUDE). Removed:
+  // this is a single-purpose landing page, and the grid gave it a second,
+  // slower path to the same place the hero button and the sticky bar
+  // already point at. Nothing named WELCOME_CATALOG_EXCLUDE should exist
+  // anywhere in the catalog data any more — it has no reader left.
+  ok('welcome.html carries no catalog grid of its own',
+    !/id="productGrid"/.test(wl) && !/renderProductGrid\(/.test(wlJs));
+  ok('and nothing in the catalog still defines the exclusion list that fed it',
+    !/WELCOME_CATALOG_EXCLUDE/.test(read('js/products-data.js')));
 
-  const strays = WELCOME_CATALOG_EXCLUDE.filter(
-    n => !GLOW_PRODUCTS.some(p => p.name === n));
-  ok('every compound the welcome catalog excludes is one the catalog has',
-    strays.length === 0,
-    `no such product: ${strays.join(', ')}`);
-
-  ok('and the page reads that list rather than naming compounds itself',
-    /exclude:\s*WELCOME_CATALOG_EXCLUDE/.test(wlJs) &&
-    !WELCOME_CATALOG_EXCLUDE.some(n => wlJs.includes(`'${n}'`) || wl.includes(`>${n}<`)));
-
-  // An empty list is a legitimate state (nothing to hold back), but it is
-  // also what a botched edit leaves behind, so it has to be deliberate: the
-  // day it should be empty, this line is the one that says so.
-  ok('and it is holding something back, which is the only reason it exists',
-    WELCOME_CATALOG_EXCLUDE.length > 0);
+  // --- the sticky bar that replaces it as the second path to /shop -------
+  // With the grid gone, the hero button is the only door once it scrolls
+  // out of view, and the bar exists to reopen it. Three things have to hold
+  // together: the bar is in the markup and starts hidden (so a visitor with
+  // no JavaScript never gets a bar stuck off-canvas but still in the tab
+  // order), it says "Shop now" and actually points at the catalog, and
+  // js/welcome.js is the thing that reveals it, watching the same .wl-cta
+  // row the hero button carries.
+  ok('the sticky bar exists and starts out of the tab order, not just off screen',
+    /<div class="wl-sticky" id="wlSticky" hidden>/.test(wl));
+  ok('it says Shop now and links to the catalog',
+    /href="shop" class="btn btn-primary wl-sticky-btn">Shop now/.test(wl));
+  ok('the hero carries the hook the bar watches, and js/welcome.js reveals the bar off it',
+    /class="hero-cta wl-cta reveal"/.test(wl) &&
+    /getElementById\('wlSticky'\)/.test(wlJs) &&
+    /querySelector\('\.wl-cta'\)/.test(wlJs) &&
+    /sticky\.hidden = false/.test(wlJs));
 
   // robots.txt must NOT block it: a Disallow stops a crawler fetching the page
   // at all, so it never reads the noindex above, and the URL can still be
@@ -2876,6 +2879,17 @@ console.log('\nlaunch offer');
   ok('it never shows to a signed-in visitor or an existing customer',
     /SESSION_ACCOUNT/.test(offerCode) && /HAS_ORDERED/.test(offerCode) &&
     /get\(SESSION_ACCOUNT\)/.test(offerCode) && /get\(HAS_ORDERED\)/.test(offerCode));
+  // The ad landing page is excluded by name rather than left to the trigger
+  // timing alone: welcome.html still loads this file (for the footer form
+  // below, which is not a popup and stays unsuppressed) and still runs the
+  // exit-intent / scroll-timer wiring, so without this line the popup would
+  // still be reachable there, exactly the page it was originally removed
+  // from before this whole rebuild happened.
+  ok('the popup itself is excluded from the ad landing page, both spellings of its URL',
+    /POPUP_EXCLUDED_PAGES[\s\S]{0,80}'\/welcome'/.test(offerCode) &&
+    /POPUP_EXCLUDED_PAGES[\s\S]{0,80}'\/welcome\.html'/.test(offerCode));
+  ok('welcome.html still hosts the footer form, unaffected by that exclusion',
+    /id="offerFooter"/.test(read('welcome.html')) && /js\/launch-offer\.js/.test(read('welcome.html')));
   // HAS_ORDERED is worthless as a suppression signal if nothing ever writes
   // it. Both real order paths have to.
   ok('HAS_ORDERED is actually written on both order paths, not just read here',

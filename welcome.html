@@ -153,17 +153,18 @@
       <p class="hero-sub reveal">
         High-purity research compounds, backed by third-party testing and clear documentation.
       </p>
-      <!-- Explore Catalog stays the one dominant action, worded as index.html
-           words it. It read "Shop now" while a sticky bar carrying the same
-           words followed the reader down the page, so the two offers of one
-           action matched. The bar is gone, and with a catalog on the page the
-           button leads to browsing rather than hurrying.
+      <!-- Shop now stays the one dominant action, worded that way rather than
+           index.html's "Explore Catalog" because there is no catalog on this
+           page to explore: the button and the sticky bar below it (which
+           watches .wl-cta to know when this row has scrolled away) both say
+           the same thing and lead to the same place, so the two offers of one
+           action read as one.
 
            The second button is deliberately quieter: it is for the visitor who
            is interested but not ready, who needs proof before purchase rather
            than another reason to hurry. -->
-      <div class="hero-cta reveal">
-        <a href="shop" class="btn btn-primary btn-lg">Explore Catalog <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+      <div class="hero-cta wl-cta reveal">
+        <a href="shop" class="btn btn-primary btn-lg">Shop now <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
         <a href="coa.html" class="btn btn-outline btn-lg">View COAs</a>
       </div>
 
@@ -194,40 +195,13 @@
 </section>
 
 
-<!-- PEPTIDES / PRODUCTS
-     index.html's catalog section, and the same grid renderer behind it, so the
-     two pages cannot show the same compound two ways.
-
-     What differs is the slice: WELCOME_CATALOG_EXCLUDE (js/products-data.js)
-     holds the coded GLP-1 compounds out of this one grid. They are still in
-     the catalog, in search and on their own pages; this is a landing page for
-     paid social and that is a decision about the first screen, not about the
-     store. The link out goes to the full catalog either way, which is where
-     someone who came for one of them will find it. -->
-<section class="section section-light" id="peptides">
-  <div class="container">
-    <div class="section-head catalog-head reveal">
-      <div class="catalog-head-copy">
-        <span class="eyebrow">The Catalog</span>
-        <h2>Peptides</h2>
-      </div>
-      <a href="shop" class="btn btn-outline">Shop all Peptides <span aria-hidden="true">&rarr;</span></a>
-    </div>
-
-    <div class="product-grid" id="productGrid">
-      <!-- injected by js/welcome.js -->
-    </div>
-
-    <!-- The same link as the one beside the heading, and index.html carries
-         both for the same reason: the one above is for a reader deciding
-         whether to bother with the grid, this one is for a reader who has
-         read it. It matters more here, where the grid is a short slice with
-         three compounds held out of it. -->
-    <div class="catalog-view-all reveal">
-      <a href="shop" class="btn btn-outline">Shop all Peptides <span aria-hidden="true">&rarr;</span></a>
-    </div>
-  </div>
-</section>
+<!-- The catalog stood here briefly: index.html's section, the same grid
+     renderer, with the coded GLP-1 compounds held out of the slice. Removed —
+     this is a single-purpose landing page for paid social, and the one
+     path to the catalog it needs is the hero button above and the sticky
+     bar below, both already pointed at /shop. A grid here gave a second,
+     slower way to the same place and something to scroll past before
+     reaching the page's actual case for buying. -->
 
 <!-- THE GLOW STANDARD
      The homepage's promises section, verbatim: three cards, one per thing the
@@ -365,12 +339,15 @@
 <!-- FOOTER -->
 <footer class="site-footer">
   <div class="container">
-    <!-- The standing offer form, built by js/launch-offer.js. The only place
-         the offer is asked for now: the delayed popups that used to carry it
-         were removed, because ad traffic lands on a page it has not read yet
-         and an offer thrown over that reads as spam. Empty here on purpose:
-         with no script there is no form to submit, which is better than a form
-         that silently does nothing. -->
+    <!-- The standing offer form, built by js/launch-offer.js. Not an
+         interruption, so it is not suppressed the way the exit-intent /
+         mobile-timed popup elsewhere on the site is: js/launch-offer.js
+         excludes this page from that popup by name, because ad traffic
+         arriving here has not read anything yet and an offer thrown over the
+         page it just landed on reads as spam. This form waits at the bottom
+         for whoever scrolls there instead. Empty here on purpose: with no
+         script there is no form to submit, which is better than a form that
+         silently does nothing. -->
     <div class="footer-offer" id="offerFooter"></div>
 
     <div class="footer-top">
@@ -419,6 +396,33 @@
     </div>
   </div>
 </footer>
+
+<!-- Sticky call to action, this page only.
+     It is hidden while the hero's own Shop now button is on screen and
+     appears once that scrolls away, so the page never shows the same action
+     twice. js/welcome.js does that with an observer on .wl-cta.
+
+     Back on the page for the same reason it was removed and is now needed
+     again: it existed to be the one path to the catalog once the hero
+     button scrolled out of reach, went away when a catalog grid gave the
+     page a second path, and the grid is gone again.
+
+     Deliberately says nothing with a number in it. Every other standing term
+     on this page (the threshold, the discount, the cutoff) is a figure pinned
+     to a constant somewhere, and a bar that follows the reader down the whole
+     page is the worst place to leave a fourth copy of one to drift. What is
+     left is true on every lot with nothing to keep in sync.
+
+     Starts [hidden] rather than merely translated off screen: with no
+     JavaScript the observer never runs, and a bar that is only visually
+     off-canvas would still be in the tab order and read out by a screen
+     reader as a second Shop now. -->
+<div class="wl-sticky" id="wlSticky" hidden>
+  <div class="container wl-sticky-in">
+    <p class="wl-sticky-copy">Every lot third-party tested, with a published certificate of analysis.</p>
+    <a href="shop" class="btn btn-primary wl-sticky-btn">Shop now <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+  </div>
+</div>
 
 <script src="js/products-data.js"></script>
 <script src="js/cart.js"></script>

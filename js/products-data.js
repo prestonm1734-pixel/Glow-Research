@@ -241,19 +241,6 @@ const TIKTOK_PIXEL_ID = 'DA8CR2BC77U6VIRE2UQG';
 // difficulty as Meta's and TikTok's — see api/_x-capi.js. The matching
 // server-side piece, X_CAPI_ACCESS_TOKEN, is a Vercel environment variable
 // and must never be checked in.
-// The compounds welcome.html's catalog leaves out.
-//
-// That page is the one paid social lands on, and these three are the coded
-// GLP-1 compounds. Every other surface still carries them: the catalog page,
-// the homepage grid, search, their own product pages. This is about what an
-// ad's landing page puts in front of someone who arrived from an ad, not
-// about what the store sells.
-//
-// A list here rather than a filter written into welcome.html, because the
-// page cannot be trusted to remember: a fourth coded compound added to the
-// catalog would appear on it silently. tools/check-claims.js holds every
-// name in this list to a real product and holds the page to reading it.
-const WELCOME_CATALOG_EXCLUDE = ['G1-S', 'G2-T', 'G3-R'];
 
 // GoAffPro's shop identifier for the affiliate program, from the app's own
 // setup screen. Not secret, it only names which shop a browser event belongs
@@ -1600,12 +1587,7 @@ function renderProductGrid(gridEl, filter, opts) {
   opts = opts || {};
   gridEl.innerHTML = '';
   let list = filter === 'all' ? GLOW_PRODUCTS : GLOW_PRODUCTS.filter(p => productKind(p) === filter);
-  if (opts.exclude) {
-    // One name or several. The product page passes a single string (its own
-    // compound); welcome.html passes WELCOME_CATALOG_EXCLUDE.
-    const drop = Array.isArray(opts.exclude) ? opts.exclude : [opts.exclude];
-    list = list.filter(p => drop.indexOf(p.name) === -1);
-  }
+  if (opts.exclude) list = list.filter(p => p.name !== opts.exclude);
   if (opts.query) {
     const q = opts.query.trim().toLowerCase();
     if (q) list = list.filter(p => p.name.toLowerCase().includes(q));
@@ -1768,7 +1750,6 @@ if (typeof module !== 'undefined' && module.exports) {
     X_PIXEL_ID,
     X_EVENT_IDS,
     GOAFFPRO_SHOP_ID,
-    WELCOME_CATALOG_EXCLUDE,
     LAUNCH_OFFER_LIVE,
     LAUNCH_OFFER,
     round2,
