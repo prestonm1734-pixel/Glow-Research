@@ -1460,6 +1460,25 @@ html:not(.js) .faq-a{ max-height: none; }
      button site-wide (nav, newsletter, etc.) once it lost the width
      constraint of a wide screen — scale back down for breathing room */
   .btn{ padding: 12px 20px; font-size: 0.88rem; }
+
+  /* welcome.html only, mobile only: this hero has to be the whole first
+     screen, header and stat row included, on a phone with the browser's
+     own address and tab bars still on screen taking their own share of the
+     viewport. index.html's hero is the top of a long scroll and can afford
+     the air the rules above give it; this one cannot, so every gap here is
+     trimmed rather than just the ones that were obviously too wide.
+     Nothing here touches .hero bare, only .wl-hero, so index.html is pixel
+     identical to before. */
+  .wl-hero{ padding-top: 14px; padding-bottom: 16px; }
+  .wl-hero .hero-grid{ padding-top: 6px; padding-bottom: 8px; }
+  .wl-hero .hero-eyebrow{ margin-bottom: 10px; }
+  .wl-hero .hero-title{
+    margin-bottom: 14px;
+    font-size: clamp(2.05rem, 5vw, 4.1rem);
+  }
+  .wl-hero .hero-sub{ margin-bottom: 18px; }
+  .wl-hero .hero-cta{ margin-bottom: 16px; }
+  .wl-hero .hero-stats{ padding-top: 14px; }
 }
 
 /* ---------- reduced motion ---------- */
