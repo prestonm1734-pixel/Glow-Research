@@ -115,12 +115,17 @@
      The strongest thing on the page is the admission, so it leads, and the
      partner's marks sit beside it as the evidence for it rather than as
      decoration somewhere further down. */
+  /* minmax(0, 1fr), not 1fr. A 1fr track floors at the min-content of its
+     widest item, so the longest unbreakable thing in the column sets the
+     track width: at 320px the marks below pushed it 26px past the container
+     and the page scrolled sideways. minmax(0, ...) lets the track be as
+     narrow as the container and the content wrap inside it. */
   .hw-who-grid{
-    display:grid; grid-template-columns: 1fr;
+    display:grid; grid-template-columns: minmax(0, 1fr);
     gap: clamp(30px, 4vw, 54px); align-items:center;
   }
   @media (min-width: 880px){
-    .hw-who-grid{ grid-template-columns: 1fr 1fr; }
+    .hw-who-grid{ grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   }
   .hw-who h2{
     font-size: clamp(1.6rem, 3vw, 2.3rem); letter-spacing:-.03em;
@@ -136,8 +141,13 @@
      certificate cards and the shipping facts use. Each names what it is
      underneath: the three are not the same kind of thing, and a row of bare
      logos would let a reader take the manufacturing mark for a testing one. */
+  /* minmax(0, ...) rather than a bare 1fr, here and in the single column at
+     460 below: a 1fr track cannot go narrower than its widest item's
+     min-content, so the longest caption word set the column width and, three
+     across, pushed the row past the page. That is what made this page the one
+     that scrolled sideways on a 320px screen. */
   .hw-marks{
-    display:grid; grid-template-columns: repeat(3, 1fr); gap:0;
+    display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:0;
     border-top:1px solid rgba(0,0,0,.13); border-left:1px solid rgba(0,0,0,.13);
   }
   .hw-mark{
@@ -171,6 +181,9 @@
   .hw-verify a{
     color:#0a0a0a; font-weight:600;
     text-decoration:underline; text-underline-offset:3px;
+    /* and the address itself wraps rather than reaching past the column it is
+       now held inside. It only ever breaks on the narrowest screens. */
+    overflow-wrap: anywhere;
   }
   .hw-verify a:hover{ color:#45453f; }
   .hw-mark-cap{
@@ -185,7 +198,7 @@
     letter-spacing:.1em; text-transform:uppercase; color:#8a8a86;
   }
   @media (max-width: 460px){
-    .hw-marks{ grid-template-columns: 1fr; }
+    .hw-marks{ grid-template-columns: minmax(0, 1fr); }
     .hw-mark{ flex-direction:row; gap:18px; min-height:0; padding:18px; justify-content:flex-start; }
     .hw-mark img{ flex:0 0 auto; width:96px; height:46px; }
     .hw-mark-pending{ flex:0 0 auto; width:96px; height:46px; gap:2px; font-size:.56rem; }

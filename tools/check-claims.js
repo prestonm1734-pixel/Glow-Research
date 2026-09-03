@@ -4004,6 +4004,30 @@ console.log('\nclient-side navigation');
     relative.length === 0, relative.join(', '));
 }
 
+console.log('\nscrolling');
+{
+  // The announcement marquee's track is wider than the screen on purpose, and
+  // it is the only thing on the site that overflows horizontally. It used to
+  // be clipped twice: once by its own bar and again by overflow-x:hidden on
+  // <body>.
+  //
+  // That second one was not free. overflow-x on its own computes overflow-y to
+  // auto, which makes <body> a scroll container inside the document's, and on
+  // iOS that shows up as a page you can keep scrolling past the footer into an
+  // empty screen of background. It is gone, and these two lines are what keep
+  // it gone: the clip has to stay where it belongs, on the element that
+  // actually overflows.
+  const sheet = read('css/style.css');
+  const bar = (sheet.match(/\.marquee-bar\{[^}]*\}/) || [''])[0];
+  ok('the marquee clips its own track', /overflow:\s*hidden/.test(bar),
+    'without this the track sets the page width and every page scrolls sideways');
+
+  const bodyRule = (sheet.match(/\nbody\{[^}]*\}/) || [''])[0];
+  ok('and the body sets no overflow of its own, which would scroll inside the page',
+    !/overflow(-x|-y)?\s*:/.test(bodyRule),
+    'overflow-x on body computes overflow-y to auto and makes it a scroll container');
+}
+
 console.log('\nsitemap');
 {
   const locs = [...read('sitemap.xml').matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
