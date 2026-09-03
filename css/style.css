@@ -1143,7 +1143,7 @@ button[disabled].si-forgot{ cursor: progress; }
     min-height: 100dvh;
     display: flex;
     align-items: flex-start;
-    padding-top: 32px;
+    padding-top: 56px;
     padding-bottom: 40px;
   }
   .wl-hero .hero-grid{ min-height: 0; padding-top: 0; padding-bottom: 0; }
