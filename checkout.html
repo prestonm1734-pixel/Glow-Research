@@ -200,13 +200,22 @@
     display:flex; align-items:center; gap:7px;
     margin: 2px 0 16px; font-size:.82rem; color:#86868b;
   }
+  .co-place-secure{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin: 20px 0 0; font-size:.85rem; color:#45453f; text-align:center;
+  }
+  /* The one accent colour on this deliberately colourless page: the same
+     green .co-promo-msg.is-ok already uses for "code applied", reused here
+     rather than a second green invented for one icon. */
+  .co-place-secure svg{ color:#1a7f37; flex-shrink:0; }
+
   /* Restates the same three facts as the trust box at the top of the page,
      below the button that actually charges the card. Plain bordered pills,
      not the trust box's rows: this is a glance on the way out, not
      something to read. */
   .co-place-badges{
     display:flex; flex-wrap:wrap; justify-content:center; gap:8px;
-    margin: 20px 0 0;
+    margin: 14px 0 0;
   }
   .co-place-badge{
     padding: 8px 14px; border:1px solid rgba(0,0,0,0.16);
@@ -551,6 +560,16 @@
             <button type="submit" class="btn btn-primary co-place">
               <span class="co-place-label">Place order</span>
             </button>
+
+            <!-- TLS on this domain, stated as a fact rather than a badge
+                 image: any modern browser hitting an HTTPS page negotiates
+                 at least a 256-bit cipher, so this is what the connection
+                 the visitor is already on actually is, not a claim reaching
+                 past it. -->
+            <p class="co-place-secure">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="1" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg>
+              Encrypted and secure, protected with 256-bit SSL.
+            </p>
 
             <!-- Same three facts as the trust box at the top of the page,
                  restated here because this is the other place someone reads
