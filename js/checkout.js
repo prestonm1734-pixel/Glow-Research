@@ -209,12 +209,11 @@
     // the same bulkOff() the cart itself priced each line against, so this can
     // never disagree with what the tier ladder actually gave the order.
     const hasBulk = items.some(i => bulkOff(i.qty) > 0);
-    const promoToggle = $('coPromoToggle');
     const promoNote = $('coPromoNote');
-    if (promoToggle && promoNote) {
-      promoToggle.hidden = hasBulk;
+    const promoBox = $('coPromoBox');
+    if (promoNote && promoBox) {
       promoNote.hidden = !hasBulk;
-      if (hasBulk) $('coPromoBox').hidden = true;
+      promoBox.hidden = hasBulk;
     }
 
     const totalStr = money(sub - promoDiscount + ship + taxAmount);
@@ -934,13 +933,6 @@
     $('coMakeAcct').addEventListener('change', e => {
       $('coPassField').hidden = !e.target.checked;
       $('coPass').required = e.target.checked;
-    });
-
-    $('coPromoToggle').addEventListener('click', () => {
-      const box = $('coPromoBox');
-      box.hidden = !box.hidden;
-      $('coPromoToggle').setAttribute('aria-expanded', String(!box.hidden));
-      if (!box.hidden) $('coPromo').focus();
     });
 
     $('coPromoBtn').addEventListener('click', async () => {
