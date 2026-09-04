@@ -296,15 +296,30 @@
 
   .co-line{ display:flex; justify-content:space-between; gap:14px; padding: 8px 0; font-size:.94rem; }
   /* same fix as .co-check — the class's own display:flex outranks the
-     browser's default [hidden]{display:none}, so #coSaveRow's
-     saveRow.hidden = true silently did nothing. Currently masked because
-     the sitewide discount always produces a savings amount, but the
-     moment SITEWIDE_DISCOUNT in products-data.js goes to 0, "You saved
-     $0.00" would be stuck on screen permanently without this. */
+     browser's default [hidden]{display:none}, so #coPromoRow's
+     row.hidden = true silently did nothing. Currently masked wherever a
+     promo is applied, but the moment none is, "Promo code $0.00" would be
+     stuck on screen permanently without this. */
   .co-line[hidden]{ display:none; }
   .co-line dt{ color:#6e6e73; }
   .co-line dd{ margin:0; color:#0a0a0a; }
   .co-line.save dd{ color:#0a0a0a; font-weight:600; }
+
+  /* A banner, not a line in the price list: the one figure on this page
+     meant to be noticed on sight rather than read down a column, so it
+     gets the site's one green rather than sitting in the same grey text as
+     Subtotal and Sales tax. Same [hidden] fix as .co-line above, for the
+     same reason — the class's own display:flex would otherwise outrank
+     [hidden]{display:none}. */
+  .co-save-banner{
+    display:flex; align-items:center; gap:9px;
+    margin: 12px 0; padding: 12px 14px;
+    background:#eaf6ee; border:1px solid #bcdfc6;
+    font-size:.88rem; color:#1a7f37;
+  }
+  .co-save-banner[hidden]{ display:none; }
+  .co-save-banner svg{ flex-shrink:0; }
+  .co-save-banner strong{ font-weight:700; }
   .co-total{
     display:flex; justify-content:space-between; align-items:baseline; gap:14px;
     margin-top:12px; padding-top:14px; border-top:1px solid rgba(0,0,0,0.14);
@@ -631,10 +646,16 @@
               <div id="coShipOptions"></div>
             </div>
 
+            <!-- A banner, not a dl row: this is the one figure on the page
+                 meant to be noticed rather than read down a list, so it gets
+                 the site's one green rather than sitting in the same grey
+                 text as Subtotal and Sales tax around it. -->
+            <p class="co-save-banner" id="coSaveRow" hidden>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>You&rsquo;re saving <strong id="coSaved">$0.00</strong> on this order</span>
+            </p>
+
             <dl>
-              <div class="co-line save" id="coSaveRow" hidden>
-                <dt>Savings</dt><dd>&minus;<span id="coSaved">$0.00</span></dd>
-              </div>
               <div class="co-line save" id="coPromoRow" hidden>
                 <dt id="coPromoRowLabel">Promo code</dt><dd>&minus;<span id="coPromoRowAmount">$0.00</span></dd>
               </div>
