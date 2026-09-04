@@ -459,6 +459,12 @@ button[disabled].si-forgot{ cursor: progress; }
    close enough to look almost-systematic, which is what read as sloppy. */
 .hero-cta{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom: 24px; }
 
+/* welcome.html's hero has one button, not two, so it does not inherit
+   index.html's side-by-side sizing: it fills the same column hero-copy
+   already sets a max-width on, at every width the mobile rules below
+   don't already cover. */
+.wl-cta-solo{ width:100%; text-align:center; }
+
 /* the rule seals the stats to the block above rather than letting them float
    as a separate stack — equal 24px breathing room on both sides of it */
 .hero-stats{

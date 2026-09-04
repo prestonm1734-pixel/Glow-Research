@@ -49,6 +49,12 @@
 <link rel="preconnect" href="https://js.stripe.com">
 <link rel="preload" href="assets/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="assets/fonts/sora.woff2" as="font" type="font/woff2" crossorigin />
+<!-- The logo (Fraunces) and the hero eyebrow (JetBrains Mono) are both above
+     the fold here, but without this the browser only discovers either font
+     once it has parsed css/style.css's @font-face rules against the
+     rendered text, well after the two preloads above already started. -->
+<link rel="preload" href="assets/fonts/fraunces-normal.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="assets/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -154,19 +160,16 @@
       <p class="hero-sub reveal">
         High-purity research compounds, backed by third-party testing and clear documentation.
       </p>
-      <!-- Shop now stays the one dominant action, worded that way rather than
+      <!-- Shop now is the one action on this hero, worded that way rather than
            index.html's "Explore Catalog" because there is no catalog on this
            page to explore: the button and the sticky bar below it (which
            watches .wl-cta to know when this row has scrolled away) both say
            the same thing and lead to the same place, so the two offers of one
-           action read as one.
-
-           The second button is deliberately quieter: it is for the visitor who
-           is interested but not ready, who needs proof before purchase rather
-           than another reason to hurry. -->
+           action read as one. Proof of testing lives further down the page
+           (the stat row right below, and the "Why Glow" section's own link to
+           coa.html), not competing for space up here. -->
       <div class="hero-cta wl-cta reveal">
-        <a href="shop" class="btn btn-primary btn-lg">Shop now <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
-        <a href="coa.html" class="btn btn-outline btn-lg">View COAs</a>
+        <a href="shop" class="btn btn-primary btn-lg wl-cta-solo">Shop now <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
       </div>
 
       <!-- The quality layer: two evidence figures, then one delivery figure.
@@ -428,7 +431,15 @@
 </div>
 
 <script src="js/products-data.js"></script>
-<script src="https://js.stripe.com/v3/"></script>
+<!-- Deferred: nothing on this page calls Stripe() until the cart drawer's
+     express-pay mount actually runs, which only happens once the drawer is
+     opened (see js/cart.js's initCartExpressPay, itself guarded by
+     `typeof GlowExpressPay === 'undefined'`, and js/express-pay.js's own
+     `typeof Stripe === 'undefined'` check inside init()). Loading it
+     synchronously here just means every script below it waits on a fetch to
+     an external, uncached domain before it can run, for a client neither
+     needs at parse time. -->
+<script src="https://js.stripe.com/v3/" defer></script>
 <script src="js/express-pay.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/cart-modal.js"></script>
