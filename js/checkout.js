@@ -839,7 +839,9 @@
   // from the flag the moment either one is edited alone.
   function renderTrustCoa() {
     if (typeof COA_COPY === 'undefined') return;
-    [$('coTrustCoa'), $('coSideTrustCoa')].forEach(el => { if (el) el.textContent = COA_COPY.short; });
+    [$('coTrustCoa'), $('coSideTrustCoa'), $('coPlaceBadgeCoa')].forEach(el => {
+      if (el) el.textContent = COA_COPY.short;
+    });
   }
 
   // The collapsed-by-default summary is only real below 1000px — see
