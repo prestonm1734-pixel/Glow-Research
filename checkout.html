@@ -301,14 +301,13 @@
 
   .co-line{ display:flex; justify-content:space-between; gap:14px; padding: 8px 0; font-size:.94rem; }
   /* same fix as .co-check — the class's own display:flex outranks the
-     browser's default [hidden]{display:none}, so #coPromoRow's
-     row.hidden = true silently did nothing. Currently masked wherever a
-     promo is applied, but the moment none is, "Promo code $0.00" would be
-     stuck on screen permanently without this. */
+     browser's default [hidden]{display:none}, so #coTaxRow's
+     row.hidden = true silently did nothing. Currently masked wherever tax
+     applies, but the moment it doesn't, "Sales tax $0.00" would be stuck on
+     screen permanently without this. */
   .co-line[hidden]{ display:none; }
   .co-line dt{ color:#6e6e73; }
   .co-line dd{ margin:0; color:#0a0a0a; }
-  .co-line.save dd{ color:#0a0a0a; font-weight:600; }
 
   /* A banner, not a line in the price list: the one figure on this page
      meant to be noticed on sight rather than read down a column, so it
@@ -655,15 +654,15 @@
                  meant to be noticed rather than read down a list, so it gets
                  the site's one green rather than sitting in the same grey
                  text as Subtotal and Sales tax around it. -->
+            <!-- One figure for every way this order costs less: the launch
+                 markdown and a promo code both land here rather than a promo
+                 code getting a second, separate "-$X" line of its own. -->
             <p class="co-save-banner" id="coSaveRow" hidden>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <span>You&rsquo;re saving <strong id="coSaved">$0.00</strong> on this order</span>
             </p>
 
             <dl>
-              <div class="co-line save" id="coPromoRow" hidden>
-                <dt id="coPromoRowLabel">Promo code</dt><dd>&minus;<span id="coPromoRowAmount">$0.00</span></dd>
-              </div>
               <div class="co-line" id="coTaxRow" hidden><dt>Sales tax</dt><dd id="coTaxCost">$0.00</dd></div>
             </dl>
 

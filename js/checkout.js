@@ -203,15 +203,6 @@
       if (taxAmount > 0) $('coTaxCost').textContent = money(taxAmount);
     }
 
-    const promoRow = $('coPromoRow');
-    if (promoRow) {
-      promoRow.hidden = promoDiscount <= 0;
-      if (promoDiscount > 0) {
-        $('coPromoRowLabel').textContent = appliedPromoCode ? `Promo code (${appliedPromoCode})` : 'Promo code';
-        $('coPromoRowAmount').textContent = money(promoDiscount);
-      }
-    }
-
     // A promo code never stacks with the quantity ladder — api/_lib.js refuses
     // it server-side either way, but asking someone to type a code just to be
     // told no is a worse way to say the same thing. hasBulk is derived from
@@ -234,10 +225,15 @@
     const toggleTotal = $('coToggleTotal');
     if (toggleTotal) toggleTotal.textContent = totalStr;
 
+    // A promo code's discount joins the list-price savings in the same
+    // banner rather than getting a line of its own: both are money this
+    // order saved, and a shopper reads "you're saving $X" once, not twice
+    // with two different numbers on the way to one total.
+    const totalSaved = saved + promoDiscount;
     const saveRow = $('coSaveRow');
-    if (saved > 0) {
+    if (totalSaved > 0) {
       saveRow.hidden = false;
-      $('coSaved').textContent = money(saved);
+      $('coSaved').textContent = money(totalSaved);
     } else {
       saveRow.hidden = true;
     }

@@ -2728,8 +2728,14 @@ console.log('\npromo codes');
     /promoDiscount = data\.discount \|\| 0/.test(coJs) &&
     !/promoDiscount\s*=\s*[^d][^;]*\*/.test(coJs));
 
-  ok('checkout.html carries the discount summary row',
-    /id="coPromoRow"/.test(coHtml) && /id="coPromoRowAmount"/.test(coHtml));
+  // A promo code's discount folds into the same "you're saving" banner the
+  // launch markdown uses, rather than a summary row of its own — so what
+  // this checks is that promoDiscount actually reaches that banner's
+  // figure, not that it names its own line.
+  ok('checkout.html folds the promo discount into the savings banner',
+    /id="coSaveRow"/.test(coHtml) && /id="coSaved"/.test(coHtml) &&
+    /const totalSaved = saved \+ promoDiscount/.test(coJs) &&
+    /\$\('coSaved'\)\.textContent = money\(totalSaved\)/.test(coJs));
 
   // A promo code and the quantity ladder are never allowed to combine: the
   // rule lives once, in resolvePromoCodeForOrder(), and both endpoints that
