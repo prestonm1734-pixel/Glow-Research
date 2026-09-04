@@ -236,9 +236,14 @@
      the total is already on the header row. At 1000px and up it is the
      always-visible sidebar this page has always had, so the chevron button
      stops being clickable and #coSideBody's [hidden] is overridden open. */
-  .co-side{ position:sticky; top: 96px; background:#f5f5f7; padding: 26px 24px 28px; }
+  .co-side{
+    position:sticky; top: 96px; background:#f5f5f7;
+    border:1px solid rgba(0,0,0,0.1); padding: 22px 24px 28px;
+  }
   .co-side-head{
-    display:flex; align-items:center; gap:12px; margin: 0 0 4px;
+    display:flex; align-items:center; gap:12px;
+    padding-bottom: 16px; margin: 0 0 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
   }
   .co-side-toggle{
     display:flex; align-items:center; gap:10px; flex:1; min-width:0;
