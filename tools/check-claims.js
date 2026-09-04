@@ -797,20 +797,19 @@ console.log('\nthe batch analysis panel');
     /if \(!sizeInStock\(size\)\) \{[\s\S]{0,120}?throw new Error/.test(lib),
     'priceOrder() must throw on an out-of-stock size');
 
-  // One wallet implementation, in js/express-pay.js, used by checkout's own
-  // page and by the cart drawer (js/cart.js, offered from every page). A
-  // second copy of a flow that charges a card and places an order is the
-  // last thing this codebase should carry, so neither caller may build its
-  // own payment request. The product buy box is deliberately not a third
-  // caller: it carries no wallet UI of its own, only the drawer's.
+  // One wallet implementation, in js/express-pay.js, and one caller of it:
+  // the cart drawer (js/cart.js), reached from the same cart icon on every
+  // page. Checkout used to carry its own on-page wallet button and the
+  // product buy box never did; neither may build a payment request of its
+  // own, so there is exactly one real way this codebase charges a wallet.
   const ep = read('js/express-pay.js');
   const coJs2 = read('js/checkout.js');
   const cartJs2 = read('js/cart.js');
-  ok('there is one wallet implementation, and its callers use it',
+  ok('there is one wallet implementation, and cart.js is its one caller',
     (ep.match(/\.paymentRequest\(\{/g) || []).length === 1 &&
     !/paymentRequest\(/.test(coJs2) && !/paymentRequest\(/.test(cartJs2) &&
-    /GlowExpressPay\.init\(/.test(coJs2) && /GlowExpressPay\.init\(/.test(cartJs2),
-    'js/express-pay.js owns the flow; checkout.js and cart.js only configure it');
+    !/GlowExpressPay\.init\(/.test(coJs2) && /GlowExpressPay\.init\(/.test(cartJs2),
+    'js/express-pay.js owns the flow; only cart.js configures it, and checkout.js carries none of it');
   ok('the product buy box has no wallet button of its own',
     !/paymentRequest\(/.test(pj) &&
     !/GlowExpressPay/.test(pj) &&
@@ -2431,39 +2430,17 @@ console.log('\ncheckout gate');
   ok('checkout.html carries the coNotLive element',
     /id="coNotLive"/.test(coHtml));
 
-  // The whole point of the wallet on this page is that it is reached without
-  // filling the form in. Inside <form id="coForm"> it would be the same button
-  // gated behind the typing it exists to replace, so where it sits in the
-  // markup is the feature, not a layout preference.
-  const formStart = coHtml.indexOf('<form id="coForm"');
-  const expressAt = coHtml.indexOf('id="coExpress"');
-  ok('the wallet sits above the form, and outside it',
-    expressAt !== -1 && formStart !== -1 && expressAt < formStart);
-  ok('checkout runs the shared wallet flow, not one of its own',
-    /GlowExpressPay\.init\(/.test(coJs) && /express-pay\.js/.test(coHtml));
-
-  // The divider under the wallet button names the alternative instead of
-  // gesturing at it: "or pay another way" was the only route a customer
-  // without Apple Pay had, set in the same grey as the tax fine print above
-  // it. Naming the card makes it a signpost, and makes it a claim, so it is
-  // held to PAY_METHODS. Add crypto or bank transfer and "with a card" stops
-  // being the whole truth, which is the day this fails and points here.
-  {
-    const methods = (coJs.match(/\{ id: '[a-z]+', label: '[^']+', note: '[^']+' \}/g) || []);
-    const namesCard = /or pay with a card below/.test(coHtml);
-    ok('the wallet divider names every way there is to pay',
-      !namesCard || (methods.length === 1 && /id: 'card'/.test(methods[0])),
-      `checkout.html says "or pay with a card below" but PAY_METHODS carries ${methods.length}: ` +
-      'reword the divider in checkout.html to cover the others.');
-  }
-  // A wallet button over an empty cart would charge for nothing, and the cart
-  // can empty from the drawer while this page is open.
-  ok('the wallet is withdrawn when the cart empties',
-    /canOffer: \(\) => cartItems\(\)\.length > 0/.test(coJs) &&
-    /GlowExpressPay\.setOffered\(cartItems\(\)\.length > 0\)/.test(coJs));
-  // finishOrder() clears the cart for the typed-card path; the wallet skips it.
-  ok('a wallet order clears the cart on its way out',
-    /onPlaced: \(\) => \{ if \(window\.GlowCart\) window\.GlowCart\.clear\(\); \}/.test(coJs));
+  // checkout.html no longer carries a wallet button of its own (see the
+  // guards above, in the wallet section) — that flow lives in the cart
+  // drawer now. What is still checked here is the drawer's own version of
+  // the same two guarantees a wallet button anywhere on this site has to
+  // hold: it cannot be offered over an empty cart, and a wallet order has
+  // to clear the cart on its way out same as the typed-card path does.
+  const cartJs3 = read('js/cart.js');
+  ok('the drawer wallet is withdrawn when the cart empties',
+    /canOffer: \(\) => items\.length > 0/.test(cartJs3));
+  ok('a drawer wallet order clears the cart on its way out',
+    /onPlaced: \(\) => clear\(\)/.test(cartJs3));
 
   // While it is false, the order-confirmation email must not exist to be sent
   // — checked structurally above — but if PAYMENTS_LIVE is ever flipped back

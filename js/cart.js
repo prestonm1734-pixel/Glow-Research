@@ -309,22 +309,19 @@
   }
 
   /* ================= express pay (Apple Pay / Google Pay) =================
-     The flow itself lives in js/express-pay.js, shared with checkout's own
-     wallet button. This drawer rebuilds cartFoot's whole innerHTML on every
-     render() (a line added, removed, or its quantity changed), which tears
-     out whatever GlowExpressPay last mounted along with everything else in
-     the footer — so unlike the product page and checkout, which mount once
-     and call reprice() after that, this one calls init() again after every
-     render to remount into the fresh node. canMakePayment() is a local,
-     instant capability check, not a network call, so doing it again on
-     every cart change costs nothing worth avoiding. */
+     The flow itself lives in js/express-pay.js. This drawer is its only
+     mount point now: the product buy box never carried one, and checkout's
+     own on-page wallet button is gone, so whoever wants Apple Pay / Google
+     Pay reaches it here, from the cart icon, on any page. This drawer
+     rebuilds cartFoot's whole innerHTML on every render() (a line added,
+     removed, or its quantity changed), which tears out whatever
+     GlowExpressPay last mounted along with everything else in the footer —
+     so unlike a single mount-once page, this one calls init() again after
+     every render to remount into the fresh node. canMakePayment() is a
+     local, instant capability check, not a network call, so doing it again
+     on every cart change costs nothing worth avoiding. */
   function initCartExpressPay() {
     if (typeof GlowExpressPay === 'undefined') return;
-    // Checkout already offers this exact flow from its own on-page block
-    // (js/checkout.js, #coExpress). GlowExpressPay keeps one wallet session
-    // at a time, so mounting a second here would fight that one for it
-    // rather than adding a second real option.
-    if (document.getElementById('coExpress')) return;
     GlowExpressPay.init({
       wrap: '#cartExpress',
       mount: '#cartExpressBtn',

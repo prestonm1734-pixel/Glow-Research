@@ -93,42 +93,13 @@
     });
   }
 
-  /* ---------- express pay ----------
-     The wallet button above the form, driven by js/express-pay.js, the same
-     flow the product buy box runs. What differs is only what is being bought:
-     there it is one vial and a quantity, here it is the whole cart. */
-
+  // Apple Pay / Google Pay used to mount above the form here, driven by
+  // js/express-pay.js. That block is gone from this page: the same flow now
+  // mounts in the cart drawer instead (js/cart.js, #cartExpress), reached
+  // from the cart icon rather than shown the moment checkout opens. Nothing
+  // in this file drives a wallet any more, but the cart's own items are
+  // still read here for the summary and the analytics events below.
   const cartItems = () => (window.GlowCart ? window.GlowCart.items() : []);
-
-  function initExpressPay() {
-    if (typeof GlowExpressPay === 'undefined') return;
-    GlowExpressPay.init({
-      wrap: '#coExpress',
-      mount: '#coExpressBtn',
-      items: cartItems,
-      // GlowCart.items() hands back the tier-adjusted unitSale, the same figure
-      // the summary on the right totals from, so the sheet cannot quote a
-      // different number from the one on screen.
-      subtotal: () => round2(cartItems().reduce((n, i) => n + i.unitSale * i.qty, 0)),
-      // What the wallet sheet lists the charge against. One line for a single
-      // item, a count once there are several, since the sheet has no room to
-      // itemise and "2 items" is honest where naming only the first would not be.
-      label: () => {
-        const items = cartItems();
-        if (items.length === 1) {
-          const i = items[0];
-          return `${i.name} ${i.variant}${i.qty > 1 ? ` × ${i.qty}` : ''}`;
-        }
-        const count = items.reduce((n, i) => n + i.qty, 0);
-        return `Glow Research (${count} item${count === 1 ? '' : 's'})`;
-      },
-      canOffer: () => cartItems().length > 0,
-      onError: msg => { const el = $('coExpressMsg'); if (el) el.textContent = msg; },
-      // The wallet skips this page's own submit, so nothing else clears the
-      // cart on the way out. finishOrder() does it for the typed-card path.
-      onPlaced: () => { if (window.GlowCart) window.GlowCart.clear(); },
-    });
-  }
 
   /* ---------- summary ---------- */
 
@@ -250,7 +221,13 @@
       if (hasBulk) $('coPromoBox').hidden = true;
     }
 
-    $('coTotal').textContent = money(sub - promoDiscount + ship + taxAmount);
+    const totalStr = money(sub - promoDiscount + ship + taxAmount);
+    $('coTotal').textContent = totalStr;
+    // The same figure, read off the collapsed summary header — see
+    // .co-side-toggle's comment for why there are two elements for one
+    // number rather than one shared between two places in the markup.
+    const toggleTotal = $('coToggleTotal');
+    if (toggleTotal) toggleTotal.textContent = totalStr;
 
     const saveRow = $('coSaveRow');
     if (saved > 0) {
@@ -725,6 +702,9 @@
       const data = await resp.json();
       signedInUser = { email: data.email, name: data.name };
 
+      // Nothing left to log into for someone the cookie already recognises.
+      const returnBar = $('coReturn');
+      if (returnBar) returnBar.hidden = true;
       $('coSignedIn').hidden = false;
       $('coSignedInEmail').textContent = signedInUser.email;
       $('coMakeAcctRow').hidden = true;
@@ -853,8 +833,33 @@
 
   /* ---------- wire up ---------- */
 
+  // COA_COPY (js/products-data.js) already carries whichever wording is true
+  // for COAS_PUBLISHED's current setting; typing "Batch-matched COA" here
+  // directly would be a second copy of that same decision, free to drift
+  // from the flag the moment either one is edited alone.
+  function renderTrustCoa() {
+    if (typeof COA_COPY === 'undefined') return;
+    [$('coTrustCoa'), $('coSideTrustCoa')].forEach(el => { if (el) el.textContent = COA_COPY.short; });
+  }
+
+  // The collapsed-by-default summary is only real below 1000px — see
+  // .co-side-toggle's own media query — but the listener costs nothing to
+  // attach unconditionally rather than tracking viewport width here too.
+  function wireSideToggle() {
+    const btn = $('coSideToggle');
+    const body = $('coSideBody');
+    if (!btn || !body) return;
+    btn.addEventListener('click', () => {
+      const open = body.hidden;
+      body.hidden = !open;
+      btn.setAttribute('aria-expanded', String(open));
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', async () => {
     fillStates();
+    renderTrustCoa();
+    wireSideToggle();
     renderPayMethods();
     renderSummary();
     // Not awaited here, so the payment setup below is not held up by it, but
@@ -870,7 +875,6 @@
     if (!resumed && typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) {
       ensurePaymentIntent();
     }
-    if (!resumed) initExpressPay();
     // Not on the resumed path: a 3D Secure redirect return is a continuation
     // of a checkout that already started, not a fresh one landing on the page.
     // InitiateCheckout is the event with the most identity available to it
@@ -898,13 +902,6 @@
     document.addEventListener('glow-cart-change', () => {
       renderSummary();
       if (typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) ensurePaymentIntent();
-      // The wallet sheet quotes the cart, so it has to follow it: reprice on
-      // every change, and withdraw the offer entirely once the cart is empty
-      // rather than leaving a button that would pay for nothing.
-      if (typeof GlowExpressPay !== 'undefined') {
-        GlowExpressPay.reprice();
-        GlowExpressPay.setOffered(cartItems().length > 0);
-      }
     });
 
     $('coShipOptions').addEventListener('change', e => {
