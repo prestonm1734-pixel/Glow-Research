@@ -29,29 +29,18 @@
     margin:0; letter-spacing:-.03em; color:#0a0a0a;
   }
 
-  /* row-gap:0, not a single gap shorthand: .co-side is a normal grid item
-     (grid-row:2/span 2 pulls it into the sidebar column at 1000px and up,
-     see .co-side's own rule), so the three .co-sec sections auto-place into
-     separate rows of column 1. A row-gap here would add extra space between
-     every pair of sections on top of their own .co-sec + .co-sec rhythm.
-     column-gap is the only gap this layout still needs: the space between
-     the form column and the sidebar. */
+  /* .co-side and .co-left are the only two direct children — see .co-side's
+     own comment for why each gets an explicit grid-column below rather
+     than leaning on auto-placement order. */
   .co-grid{
     display:grid; grid-template-columns: minmax(0,1fr) 360px;
-    column-gap: 64px; row-gap: 0; align-items:start;
+    gap: 64px; align-items:start;
   }
+  .co-left{ grid-column: 1; }
 
   /* ---------- sections ---------- */
-  /* Pinned to column 1: none of the three sections has an explicit column
-     of its own, so without this the auto-placement algorithm is free to
-     drop one into column 2 once .co-side's explicit placement leaves a
-     cell open there. */
-  .co-sec{ grid-column: 1; padding-bottom: 40px; }
-  /* .co-side + .co-sec too: below 1000px the order summary sits between
-     Shipping address and Payment, so Payment's preceding sibling is the
-     aside, not another .co-sec — without this it would silently lose the
-     rule and run flush against the summary above it. */
-  .co-sec + .co-sec, .co-side + .co-sec{ border-top:1px solid rgba(0,0,0,0.11); padding-top: 38px; }
+  .co-sec{ padding-bottom: 40px; }
+  .co-sec + .co-sec{ border-top:1px solid rgba(0,0,0,0.11); padding-top: 38px; }
   .co-sec-head{ display:flex; align-items:center; gap:12px; margin:0 0 22px; }
   .co-sec-head h2{
     margin:0; font-size:1.28rem; font-weight:600;
@@ -246,25 +235,33 @@
   .co-placed-msg{ margin:14px 0 0; font-size:.92rem; color:#0a0a0a; text-align:center; }
 
   /* ---------- order summary ----------
-     A normal child of this form, sitting in source order right after
-     Shipping address — which is exactly where it renders below 1000px,
-     between that section and Payment. At 1000px and up, grid placement
-     alone (.co-side's own rule, further down) pulls it into the sidebar
-     column without moving it in the markup, so the two layouts are the
-     same element, never a duplicate.
+     Sits first in the form, ahead of .co-left (the wrapped sections) —
+     both are direct children of .co-grid, and each gets an explicit
+     column below, so which one comes first in the markup has no bearing
+     on which side of the page it renders on. That is what lets DOM order
+     serve two different, correct layouts: below 1000px, where the grid
+     collapses to one column, DOM order is the only thing left deciding
+     stacking order, and a collapsed summary belongs above the form, not
+     buried after a section of it (checkout convention — Baymard's
+     research among others — and this page's own original layout, before
+     a detour through "between Shipping address and Payment" that this
+     reverts). At 1000px and up it is the sticky sidebar this page has
+     always had, spanning every row of column 1 via grid-row: 1 / -1,
+     which only works cleanly because .co-left is the one item in that
+     column — see .co-left's own comment for what broke the last time
+     three separate sections shared it instead.
 
-     Open by default rather than folded: the itemised breakdown is the
-     first thing on a phone below the address fields, and closing it is
-     one tap on the chevron rather than the other way around. At 1000px
-     and up the chevron stops being clickable and #coSideBody's [hidden]
-     is overridden open regardless, so it can never actually be closed on
-     the sidebar this page has always had there. */
+     Folded by default: the itemised breakdown costs a tap to see rather
+     than a scroll's worth of always-visible receipt before the first
+     field. At 1000px and up the chevron stops being clickable and
+     #coSideBody's [hidden] is overridden open regardless, so the sidebar
+     can never actually be closed there. */
   .co-side{
     background:#f5f5f7;
     border:1px solid rgba(0,0,0,0.1); padding: 22px 24px 28px;
   }
   @media (min-width:1000px){
-    .co-side{ position:sticky; top: 96px; grid-column: 2; grid-row: 2 / span 2; }
+    .co-side{ position:sticky; top: 96px; grid-column: 2; grid-row: 1 / -1; }
   }
   .co-side-head{
     display:flex; align-items:center; gap:12px;
@@ -385,13 +382,7 @@
   .co-empty p{ margin:0 0 26px; color:#6e6e73; }
 
   @media (max-width: 1000px){
-    /* gap:0, not the desktop 64px: .co-sec already sets its own rhythm
-       between sections (.co-sec + .co-sec's border and padding-top), and a
-       grid gap on top of that would double the space between every pair of
-       sections rather than just around the one aside that needs its own
-       margin. */
-    .co-grid{ grid-template-columns:1fr; gap: 0; }
-    .co-side{ margin: 32px 0; }
+    .co-grid{ grid-template-columns:1fr; gap: 32px; }
   }
   @media (max-width: 640px){
     .co-fields{ grid-template-columns:1fr; }
@@ -519,11 +510,95 @@
            now reaches it from the cart drawer instead, so this form is the
            first and only thing checkout shows.
 
-           .co-side (the order summary) is a normal child of this same form,
-           sitting between Shipping address and Payment in source order —
-           see its own comment, further down, for how it becomes the
-           sidebar at 1000px and up without moving in the markup. -->
+           .co-side (the order summary) sits first in this same form, ahead
+           of every section — see its own comment, further down, for why:
+           checkout convention (Baymard's research, and the reference this
+           was built from) puts a collapsed summary at the top on mobile,
+           not buried after a form section, and a sticky sidebar next to
+           the whole form on desktop. Explicit grid placement on both
+           .co-side and .co-left below is what makes DOM order (summary,
+           then form) read as "sidebar beside the form" at 1000px and up
+           without the two swapping visual position there. -->
       <form id="coForm" class="co-grid">
+
+        <!-- ---------- order summary ----------
+             Collapsed by default, ahead of the whole form: the itemised
+             breakdown (and the shipping card, folded into it) costs a tap
+             to see rather than a scroll's worth of always-visible receipt
+             before the first field, since most visitors never need it
+             expanded to fill the form in. At 1000px and up, .co-side's own
+             grid placement turns it into the sticky sidebar this page has
+             always had there, without moving it in the markup. -->
+        <aside class="co-side">
+          <div class="co-side-head">
+            <button type="button" class="co-side-toggle" id="coSideToggle" aria-expanded="false" aria-controls="coSideBody">
+              <svg class="co-side-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Order summary</span>
+            </button>
+            <span class="co-side-total" id="coToggleTotal">$0.00</span>
+            <a href="#" class="co-edit" id="coEditCart">Edit</a>
+          </div>
+
+          <ul class="co-side-trust">
+            <li>Discreet shipping</li>
+            <li id="coSideTrustCoa"></li>
+            <li>Tracked &amp; insured</li>
+          </ul>
+
+          <div class="co-side-body" id="coSideBody" hidden>
+            <div id="coItems"></div>
+
+            <dl style="margin:14px 0 0">
+              <div class="co-line"><dt>Subtotal</dt><dd id="coSub">$0.00</dd></div>
+            </dl>
+
+            <!-- The one thing this section adds over a plain receipt: the
+                 shipping method sits here now, inside the same fold,
+                 instead of its own numbered step in the form. Still the
+                 same #coShipOptions renderShip() has always filled in. -->
+            <div class="co-ship-block">
+              <span class="co-ship-block-label">Shipping</span>
+              <div id="coShipOptions"></div>
+            </div>
+
+            <!-- One figure for every way this order costs less: the
+                 launch markdown and a promo code both land here rather
+                 than a promo code getting a second, separate "-$X" line
+                 of its own. A banner, not a dl row: this is the one
+                 figure on the page meant to be noticed rather than read
+                 down a list, so it gets the site's one green rather than
+                 sitting in the same grey text as Subtotal and Sales tax
+                 around it. -->
+            <p class="co-save-banner" id="coSaveRow" hidden>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>You&rsquo;re saving <strong id="coSaved">$0.00</strong> on this order</span>
+            </p>
+
+            <dl>
+              <div class="co-line" id="coTaxRow" hidden><dt>Sales tax</dt><dd id="coTaxCost">$0.00</dd></div>
+            </dl>
+
+            <div class="co-total"><span>Total</span><b id="coTotal">$0.00</b></div>
+            <p class="co-taxnote" id="coTaxNote">Tax is calculated from your shipping address. Shipment protection included.</p>
+
+            <!-- Shown outright rather than behind a toggle link: the
+                 input costs one line whether or not anyone types in it,
+                 and typing a code was two clicks away for no reason a
+                 toggle actually earned. #coPromoNote takes this exact
+                 spot instead, on a cart that already has a quantity
+                 discount, since the two never stack. -->
+            <p class="co-promo-note" id="coPromoNote" hidden>Quantity discount applied. Promo codes can’t be combined with it.</p>
+            <div id="coPromoBox">
+              <div class="co-promo">
+                <input type="text" id="coPromo" placeholder="Promo code" aria-label="Discount code" />
+                <button type="button" id="coPromoBtn">Apply</button>
+              </div>
+              <p class="co-promo-msg" id="coPromoMsg" role="status" aria-live="polite"></p>
+            </div>
+          </div>
+        </aside>
+
+        <div class="co-left">
 
           <section class="co-sec">
             <div class="co-sec-head"><span class="co-step-num">1</span><h2>Contact</h2></div>
@@ -590,82 +665,6 @@
             </div>
           </section>
 
-          <!-- ---------- order summary ----------
-             A normal child of this form, sitting in source order between
-             Shipping address and Payment — see the comment on <form> itself
-             for why that is also exactly where it renders below 1000px.
-             Open by default: see .co-side's own comment in the style block
-             for why, and for how grid placement alone turns this into the
-             sidebar at 1000px and up without moving it in the markup. -->
-          <aside class="co-side">
-            <div class="co-side-head">
-              <button type="button" class="co-side-toggle" id="coSideToggle" aria-expanded="true" aria-controls="coSideBody">
-                <svg class="co-side-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <span>Order summary</span>
-              </button>
-              <span class="co-side-total" id="coToggleTotal">$0.00</span>
-              <a href="#" class="co-edit" id="coEditCart">Edit</a>
-            </div>
-
-            <ul class="co-side-trust">
-              <li>Discreet shipping</li>
-              <li id="coSideTrustCoa"></li>
-              <li>Tracked &amp; insured</li>
-            </ul>
-
-            <div class="co-side-body" id="coSideBody">
-              <div id="coItems"></div>
-
-              <dl style="margin:14px 0 0">
-                <div class="co-line"><dt>Subtotal</dt><dd id="coSub">$0.00</dd></div>
-              </dl>
-
-              <!-- The one thing this section adds over a plain receipt: the
-                   shipping method sits here now, inside the same fold,
-                   instead of its own numbered step in the form. Still the
-                   same #coShipOptions renderShip() has always filled in. -->
-              <div class="co-ship-block">
-                <span class="co-ship-block-label">Shipping</span>
-                <div id="coShipOptions"></div>
-              </div>
-
-              <!-- One figure for every way this order costs less: the
-                   launch markdown and a promo code both land here rather
-                   than a promo code getting a second, separate "-$X" line
-                   of its own. A banner, not a dl row: this is the one
-                   figure on the page meant to be noticed rather than read
-                   down a list, so it gets the site's one green rather than
-                   sitting in the same grey text as Subtotal and Sales tax
-                   around it. -->
-              <p class="co-save-banner" id="coSaveRow" hidden>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <span>You&rsquo;re saving <strong id="coSaved">$0.00</strong> on this order</span>
-              </p>
-
-              <dl>
-                <div class="co-line" id="coTaxRow" hidden><dt>Sales tax</dt><dd id="coTaxCost">$0.00</dd></div>
-              </dl>
-
-              <div class="co-total"><span>Total</span><b id="coTotal">$0.00</b></div>
-              <p class="co-taxnote" id="coTaxNote">Tax is calculated from your shipping address. Shipment protection included.</p>
-
-              <!-- Shown outright rather than behind a toggle link: the
-                   input costs one line whether or not anyone types in it,
-                   and typing a code was two clicks away for no reason a
-                   toggle actually earned. #coPromoNote takes this exact
-                   spot instead, on a cart that already has a quantity
-                   discount, since the two never stack. -->
-              <p class="co-promo-note" id="coPromoNote" hidden>Quantity discount applied. Promo codes can’t be combined with it.</p>
-              <div id="coPromoBox">
-                <div class="co-promo">
-                  <input type="text" id="coPromo" placeholder="Promo code" aria-label="Discount code" />
-                  <button type="button" id="coPromoBtn">Apply</button>
-                </div>
-                <p class="co-promo-msg" id="coPromoMsg" role="status" aria-live="polite"></p>
-              </div>
-            </div>
-          </aside>
-
           <section class="co-sec">
             <div class="co-sec-head"><span class="co-step-num">3</span><h2>Payment</h2></div>
             <p class="co-secure-top">
@@ -704,6 +703,7 @@
             </div>
             <p class="co-placed-msg" id="coPlacedMsg" role="status" aria-live="polite"></p>
           </section>
+        </div>
       </form>
     </div>
   </div>
