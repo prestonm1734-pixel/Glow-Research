@@ -39,9 +39,12 @@
     margin:0; font-size:1.28rem; font-weight:600;
     letter-spacing:-.02em; color:#0a0a0a;
   }
-  /* A numbered step, not a decoration: the same four sections this page has
-     always had (Contact, Shipping address, Delivery, Payment), just counted
-     off so the form reads as a sequence rather than a wall of headings. */
+  /* A numbered step, not a decoration: the three sections this form still
+     has (Contact, Shipping address, Payment), counted off so it reads as a
+     sequence rather than a wall of headings. Delivery used to be a fourth
+     step here; the shipping method it held now sits inside the order
+     summary instead (.co-ship-block), since there is only ever the one
+     method to state, not a decision that earns its own step. */
   .co-step-num{
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
     width:26px; height:26px; background:#0a0a0a; color:#fff;
@@ -266,6 +269,14 @@
     .co-side-toggle{ cursor:default; pointer-events:none; }
     .co-side-chevron{ display:none; }
     .co-side-body[hidden]{ display:block; margin-top:18px; }
+  }
+
+  /* The shipping method, moved in here from its own numbered step: it reads
+     as a fact about the order the same as the price lines around it, not a
+     separate decision, given there is only the one method to show. */
+  .co-ship-block{ margin: 16px 0; }
+  .co-ship-block-label{
+    display:block; margin:0 0 8px; font-size:.82rem; font-weight:600; color:#6e6e73;
   }
 
   .co-item{ display:flex; gap:13px; padding: 16px 0; border-bottom:1px solid rgba(0,0,0,0.09); }
@@ -540,12 +551,7 @@
           </section>
 
           <section class="co-sec">
-            <div class="co-sec-head"><span class="co-step-num">3</span><h2>Delivery</h2></div>
-            <div id="coShipOptions"></div>
-          </section>
-
-          <section class="co-sec">
-            <div class="co-sec-head"><span class="co-step-num">4</span><h2>Payment</h2></div>
+            <div class="co-sec-head"><span class="co-step-num">3</span><h2>Payment</h2></div>
             <p class="co-secure-top">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="11" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg>
               Secured by Stripe
@@ -597,7 +603,7 @@
           <div class="co-side-head">
             <button type="button" class="co-side-toggle" id="coSideToggle" aria-expanded="false" aria-controls="coSideBody">
               <svg class="co-side-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span>Order summary</span>
+              <span>Order summary &amp; shipping</span>
             </button>
             <span class="co-side-total" id="coToggleTotal">$0.00</span>
             <a href="#" class="co-edit" id="coEditCart">Edit</a>
@@ -614,13 +620,24 @@
 
             <dl style="margin:14px 0 0">
               <div class="co-line"><dt>Subtotal</dt><dd id="coSub">$0.00</dd></div>
+            </dl>
+
+            <!-- The one thing this section adds over a plain receipt: the
+                 shipping method sits here now, inside the same fold, instead
+                 of its own numbered step in the form. Still the same
+                 #coShipOptions renderShip() has always filled in. -->
+            <div class="co-ship-block">
+              <span class="co-ship-block-label">Shipping</span>
+              <div id="coShipOptions"></div>
+            </div>
+
+            <dl>
               <div class="co-line save" id="coSaveRow" hidden>
                 <dt>Savings</dt><dd>&minus;<span id="coSaved">$0.00</span></dd>
               </div>
               <div class="co-line save" id="coPromoRow" hidden>
                 <dt id="coPromoRowLabel">Promo code</dt><dd>&minus;<span id="coPromoRowAmount">$0.00</span></dd>
               </div>
-              <div class="co-line"><dt>Shipping</dt><dd id="coShipCost">$0.00</dd></div>
               <div class="co-line" id="coTaxRow" hidden><dt>Sales tax</dt><dd id="coTaxCost">$0.00</dd></div>
             </dl>
 
