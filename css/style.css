@@ -2355,6 +2355,15 @@ body.search-locked{ overflow:hidden; }
 }
 .cart-subtotal span:last-child{ font-family:var(--font-display); }
 .cart-tax{ margin:6px 0 16px; font-size:.8rem; color:#8a8a86; }
+/* Apple Pay / Google Pay, mounted by initCartExpressPay(). Hidden until
+   canMakePayment() confirms the device actually has a wallet configured,
+   the same gate js/express-pay.js's other two mounts use — nothing here
+   claims wallet support a browser cannot show. */
+.cart-express[hidden]{ display:none; }
+.cart-express{ margin: 0 0 10px; }
+.cart-express-btn{ width:100%; min-height:48px; }
+.cart-express-msg{ margin:8px 0 0; font-size:.82rem; color:#b3261e; text-align:center; }
+.cart-express-msg:empty{ display:none; }
 .cart-checkout{ width:100%; justify-content:center; }
 .cart-checkout-msg{ margin:10px 0 0; font-size:.82rem; color:#8a8a86; text-align:center; }
 .cart-trust{

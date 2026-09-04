@@ -797,24 +797,25 @@ console.log('\nthe batch analysis panel');
     /if \(!sizeInStock\(size\)\) \{[\s\S]{0,120}?throw new Error/.test(lib),
     'priceOrder() must throw on an out-of-stock size');
 
-  // One wallet implementation, in js/express-pay.js, used only by checkout
-  // now. A second copy of a flow that charges a card and places an order is
-  // the last thing this codebase should carry, so the caller may not build
-  // its own payment request, and the product page carries no wallet UI at
-  // all: no Apple Pay / Google Pay button on product pages.
+  // One wallet implementation, in js/express-pay.js, used by checkout's own
+  // page and by the cart drawer (js/cart.js, offered from every page). A
+  // second copy of a flow that charges a card and places an order is the
+  // last thing this codebase should carry, so neither caller may build its
+  // own payment request. The product buy box is deliberately not a third
+  // caller: it carries no wallet UI of its own, only the drawer's.
   const ep = read('js/express-pay.js');
   const coJs2 = read('js/checkout.js');
-  ok('there is one wallet implementation, and checkout uses it',
+  const cartJs2 = read('js/cart.js');
+  ok('there is one wallet implementation, and its callers use it',
     (ep.match(/\.paymentRequest\(\{/g) || []).length === 1 &&
-    !/paymentRequest\(/.test(coJs2) &&
-    /GlowExpressPay\.init\(/.test(coJs2),
-    'js/express-pay.js owns the flow; checkout.js only configures it');
-  ok('the product page has no wallet button of its own',
+    !/paymentRequest\(/.test(coJs2) && !/paymentRequest\(/.test(cartJs2) &&
+    /GlowExpressPay\.init\(/.test(coJs2) && /GlowExpressPay\.init\(/.test(cartJs2),
+    'js/express-pay.js owns the flow; checkout.js and cart.js only configure it');
+  ok('the product buy box has no wallet button of its own',
     !/paymentRequest\(/.test(pj) &&
     !/GlowExpressPay/.test(pj) &&
-    !/pdExpress/.test(pj) &&
-    !/express-pay\.js/.test(pd),
-    'product.js and product.html must carry no Apple Pay / Google Pay wiring');
+    !/pdExpress/.test(pj),
+    'product.js must carry no Apple Pay / Google Pay wiring; that lives in the cart drawer now');
   // The product page's own order-placing code went with it. Anything left
   // would be a second route to create-order that nothing above enforces.
   ok('the product page places no order of its own',

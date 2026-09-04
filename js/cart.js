@@ -287,6 +287,16 @@
         ${money(saved)} off, already applied</p>` : ''}
       <div class="cart-subtotal"><span>Subtotal</span><span>${money(subtotal())}</span></div>
       <p class="cart-tax">Shipping and tax worked out at checkout.</p>
+      <!-- Express pay: a native Apple Pay / Google Pay button, not a styled
+           lookalike. initCartExpressPay() below mounts Stripe's Payment
+           Request Button here and only reveals it once canMakePayment()
+           confirms this device actually has a wallet configured. Skips the
+           checkout page: whatever is in the cart right now, paid and placed
+           from one sheet. -->
+      <div class="cart-express" id="cartExpress" hidden>
+        <div class="cart-express-btn" id="cartExpressBtn"></div>
+        <p class="cart-express-msg" id="cartExpressMsg" role="alert"></p>
+      </div>
       <a href="${pageHref('checkout.html')}" class="btn btn-primary cart-checkout">
         Checkout <span aria-hidden="true">&rarr;</span>
       </a>
@@ -295,7 +305,49 @@
         <li>${COA_COPY.short}</li>
       </ul>
     `;
+    initCartExpressPay();
+  }
 
+  /* ================= express pay (Apple Pay / Google Pay) =================
+     The flow itself lives in js/express-pay.js, shared with checkout's own
+     wallet button. This drawer rebuilds cartFoot's whole innerHTML on every
+     render() (a line added, removed, or its quantity changed), which tears
+     out whatever GlowExpressPay last mounted along with everything else in
+     the footer — so unlike the product page and checkout, which mount once
+     and call reprice() after that, this one calls init() again after every
+     render to remount into the fresh node. canMakePayment() is a local,
+     instant capability check, not a network call, so doing it again on
+     every cart change costs nothing worth avoiding. */
+  function initCartExpressPay() {
+    if (typeof GlowExpressPay === 'undefined') return;
+    // Checkout already offers this exact flow from its own on-page block
+    // (js/checkout.js, #coExpress). GlowExpressPay keeps one wallet session
+    // at a time, so mounting a second here would fight that one for it
+    // rather than adding a second real option.
+    if (document.getElementById('coExpress')) return;
+    GlowExpressPay.init({
+      wrap: '#cartExpress',
+      mount: '#cartExpressBtn',
+      items: () => window.GlowCart.items(),
+      subtotal: () => round2(items.reduce((n, i) => n + lineUnit(i) * i.qty, 0)),
+      label: () => {
+        if (items.length === 1) {
+          const i = items[0];
+          return `${i.name} ${i.variant}${i.qty > 1 ? ` × ${i.qty}` : ''}`;
+        }
+        const n = count();
+        return `Glow Research (${n} item${n === 1 ? '' : 's'})`;
+      },
+      canOffer: () => items.length > 0,
+      onError: msg => {
+        const el = overlay && overlay.querySelector('#cartExpressMsg');
+        if (el) el.textContent = msg;
+      },
+      // The wallet skips this drawer's own Checkout link, so nothing else
+      // clears the cart on the way out — same reasoning as checkout.js's
+      // identical onPlaced.
+      onPlaced: () => clear(),
+    });
   }
 
   // Blog articles live two directories deep, so a bare "checkout.html" would
