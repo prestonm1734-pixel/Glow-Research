@@ -408,6 +408,27 @@
       // timing, worth skipping rather than working around.
       if (document.body.classList.contains('search-locked')) return;
 
+      // Asked again here, not just when the triggers were armed ten seconds
+      // ago. Everything popupEligible() reads can change inside that window,
+      // and two of them do, on this site, without the page ever reloading:
+      //
+      //   - the footer form hands over the code and writes UNLOCKED.
+      //     index.html carries both surfaces, so a visitor who gives their
+      //     address to the footer was then interrupted, seconds later, by a
+      //     popup asking for the same address, for a code already on screen
+      //     behind it.
+      //   - an order is placed without leaving the page, now that the cart
+      //     drawer mounts Apple Pay / Google Pay on every page
+      //     (js/cart.js -> js/express-pay.js writes HAS_ORDERED). A visitor
+      //     who had just bought something got the first-order discount
+      //     offered to them on the way out.
+      //
+      // Both were reproduced against the pre-fix file before this line
+      // existed; neither is theoretical. The triggers have already removed
+      // themselves by the time they call in here, so returning is the whole
+      // of it — there is nothing left armed to take down.
+      if (!popupEligible()) return;
+
       pendingTriggerType = triggerType;
       if (!popOverlay) buildPopup();
       popSurface.triggerType = triggerType;

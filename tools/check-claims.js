@@ -2860,6 +2860,18 @@ console.log('\nlaunch offer');
     /< 0\.5\)/.test(offerCode));
   ok('it shows at most once a session',
     /POPUP_SHOWN/.test(offerCode) && /sGet\(POPUP_SHOWN\)/.test(offerCode) && /sSet\(POPUP_SHOWN/.test(offerCode));
+  // Eligibility answered when the popup would actually interrupt, not ten
+  // seconds earlier when the timer was set. Two of the things it reads change
+  // inside that window without a reload: the footer form on index.html writes
+  // UNLOCKED, and the cart drawer's wallet writes HAS_ORDERED. Without this
+  // line, both produced a popup asking a visitor for an address they had just
+  // given, or offering a first-order discount to someone who had just
+  // ordered. Pinned to the call rather than to popupEligible() existing,
+  // because the bug was never a missing check — it was a check asked once,
+  // too early, and the fix is where it is asked from.
+  const showPopupBody = (offerCode.match(/function showPopup\([\s\S]*?\n    \}/) || [''])[0];
+  ok('popup eligibility is rechecked at fire time, not only when the triggers are armed',
+    /if \(!popupEligible\(\)\) return;/.test(showPopupBody));
   ok('and stays quiet for a real cooldown after being closed unsubmitted, not a shorter one',
     /POPUP_COOLDOWN_MS = 14 \* 24 \* 60 \* 60 \* 1000/.test(offerCode));
   ok('it never shows to a signed-in visitor or an existing customer',
