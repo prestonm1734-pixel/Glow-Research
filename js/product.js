@@ -321,7 +321,6 @@
 
     renderStock();
     renderTiers();
-    updateExpressPay();
   }
 
   // The buy box never offers something we cannot ship. Both the button and the
@@ -336,20 +335,6 @@
       btn.disabled = !ok;
       btn.textContent = ok ? 'Add to cart' : 'Out of stock';
     });
-
-    // The wallet has to go with them. A disabled Add to cart beside a live
-    // Apple Pay button is not a smaller version of the same state: it is a
-    // one-tap purchase of something we cannot ship, sitting next to the
-    // control that just said so. Hidden rather than disabled because Stripe
-    // draws the button in an iframe we do not style, so there is no disabled
-    // state to put on it. api/_lib.js refuses the line as well; this is what
-    // stops it being offered in the first place.
-    //
-    // Only ever hides a block canMakePayment() already revealed, tracked on
-    // the element itself: a browser with no wallet must not be handed one by
-    // an in-stock size later flipping this back.
-    const wallet = $('pdExpress');
-    if (wallet && wallet.dataset.walletReady === 'true') wallet.hidden = !ok;
 
     if (refreshDelivery) refreshDelivery();
   }
@@ -373,15 +358,12 @@
     sub.textContent = money(total);
   }
 
-  // Shows the bar only once every real buy control is out of view. Both are
-  // watched because either one is a way to buy: with a wallet configured the
-  // express button sits below Add to cart, so Add to cart can be off screen
-  // while a perfectly good buy button is still sitting there.
+  // Shows the bar only once the real buy control is out of view.
   function initStickyBar() {
     const bar = $('pdSticky');
     if (!bar || typeof IntersectionObserver === 'undefined') return;
 
-    const watched = [document.querySelector('.pd-buy'), $('pdExpress')].filter(Boolean);
+    const watched = [document.querySelector('.pd-buy')].filter(Boolean);
     if (!watched.length) return;
 
     const onScreen = new Map(watched.map(el => [el, true]));
@@ -419,7 +401,6 @@
     $('pdQtyDec').disabled = qty <= 1;
     renderPrice();
     markActiveTier();
-    updateExpressPay();
   }
 
   function wireBuy() {
@@ -458,49 +439,6 @@
         flash(sticky, 'Added ✓');
       });
     }
-  }
-
-  /* ================= express pay (Apple Pay / Google Pay) =================
-     The flow itself lives in js/express-pay.js, shared with the top of the
-     checkout page. What is product-specific is only ever "what is being
-     bought", which is what these four functions answer. */
-
-  function expressSubtotal() {
-    const s = size();
-    return round2(unitPriceAt(s.price, qty) * qty);
-  }
-
-  function initExpressPay() {
-    if (typeof GlowExpressPay === 'undefined') return;
-    GlowExpressPay.init({
-      wrap: '#pdExpress',
-      mount: '#pdExpressBtn',
-      subtotal: expressSubtotal,
-      // The exact vial and quantity the buy box is showing, priced the way the
-      // buy box priced it, so the sheet cannot quote a different number from
-      // the one on screen.
-      items: () => {
-        const s = size();
-        return [{
-          name: product.name, variant: s.mg, sku: s.sku, qty,
-          unitOriginal: s.price, unitList: listPriceOf(s), unitSale: unitPriceAt(s.price, qty),
-        }];
-      },
-      label: () => {
-        const s = size();
-        return `${product.name} ${s.mg}${qty > 1 ? ` × ${qty}` : ''}`;
-      },
-      // A sold-out size withdraws the offer, the same test renderStock() runs
-      // on the Add to cart buttons.
-      canOffer: () => sizeInStock(size()),
-      onError: msg => { const el = $('pdExpressMsg'); if (el) el.textContent = msg; },
-    });
-  }
-
-  // Called by setQty() and renderSelection(): the sheet's amount follows the
-  // stepper and the mg picker.
-  function updateExpressPay() {
-    if (typeof GlowExpressPay !== 'undefined') GlowExpressPay.reprice();
   }
 
   /* ================= buy more, pay less =================
@@ -638,11 +576,8 @@
     renderSizes(product);
     renderSelection();
     wireBuy();
-    initExpressPay();
     renderDelivery();
     renderRelated(product);
-    // After initExpressPay(), so the express block is already in whatever
-    // state this browser leaves it in before the observer starts watching it.
     initStickyBar();
   });
 })();

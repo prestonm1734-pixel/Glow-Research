@@ -28,7 +28,6 @@
 <meta name="twitter:description" content="GLOW, 70mg per vial at 99.61% purity. Third-party tested, with the batch certificate published against its lot number. Research use only." />
 <meta name="twitter:image" content="https://glowresearch.shop/assets/products/glow-70mg-v3.webp" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
-<link rel="preconnect" href="https://js.stripe.com">
 <link rel="preload" href="../../assets/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="../../assets/fonts/sora.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="../../css/style.css" />
@@ -182,16 +181,6 @@
 
   .pd-buy{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; margin-bottom: 10px; }
 
-  /* --- express pay --- */
-  .pd-express{ margin: 14px 0 16px; }
-  .pd-express-divider{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
-  .pd-express-divider::before, .pd-express-divider::after{ content:''; flex:1; height:1px; background:rgba(0,0,0,.12); }
-  .pd-express-divider span{ font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8a8a86; }
-  .pd-express-btn{ width:100%; min-height:48px; }
-  .pd-express-consent{ margin:10px 0 0; font-size:.74rem; line-height:1.5; color:#8a8a86; text-align:center; }
-  .pd-express-consent a{ color:#55554f; text-decoration:underline; }
-  .pd-express-msg{ margin:8px 0 0; font-size:.82rem; color:#b3261e; text-align:center; }
-  .pd-express-msg:empty{ display:none; }
   .pd-stepper{ display:flex; align-items:center; border:2px solid rgba(0,0,0,.7); }
   .pd-stepper button{
     width:44px; height:56px; background:transparent; border:none; color:#0a0a0a; font-size:1.2rem; cursor:pointer;
@@ -631,9 +620,6 @@
     .pd-name{ margin-bottom: 6px; }
     .pd-desc{ margin-bottom: 14px; }
     .pd-price{ margin-bottom: 16px; }
-    .pd-express{ margin: 12px 0 12px; }
-    .pd-express-divider{ margin-bottom: 10px; }
-    .pd-express-consent{ margin-top: 8px; font-size:.7rem; line-height:1.45; }
 
     /* Two statements of one fact, dispatch and arrival, sat as two padded
        paragraphs. Same two lines, without the padding between them. */
@@ -771,24 +757,6 @@
             <button type="button" id="pdQtyInc" aria-label="Increase quantity">+</button>
           </div>
           <button type="button" class="btn btn-primary pd-add" id="pdAddBtn">Add to cart</button>
-        </div>
-
-        <!-- Express pay: a native Apple Pay / Google Pay button, not a styled
-             lookalike. js/product.js mounts Stripe's Payment Request Button
-             here and only reveals this block once canMakePayment() confirms
-             the visitor's own device actually has a wallet configured — it
-             stays hidden on every browser that cannot show one, same as the
-             COA box only turns into a link once a certificate really exists.
-             Skips the cart and the checkout page: this exact vial and
-             quantity, paid and placed from one sheet. -->
-        <div class="pd-express" id="pdExpress" hidden>
-          <div class="pd-express-divider"><span>or</span></div>
-          <div class="pd-express-btn" id="pdExpressBtn"></div>
-          <p class="pd-express-consent">
-            By continuing you agree to our <a href="../../terms.html">Terms of Sale</a>
-            and <a href="../../ruo-agreement.html">RUO Agreement</a>.
-          </p>
-          <p class="pd-express-msg" id="pdExpressMsg" role="alert"></p>
         </div>
 
         <div class="pd-deliver">
@@ -1039,17 +1007,10 @@
     header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
   });
 </script>
-<!-- Loaded live from Stripe's own CDN, not self-hosted (required for their PCI
-     compliance and fraud signals). Moved here, off the head, so it no longer
-     blocks first paint; document order still guarantees it finishes before
-     js/express-pay.js and js/product.js run and read window.Stripe. -->
-<script src="https://js.stripe.com/v3/"></script>
 <script src="../../js/products-data.js"></script>
 <script src="../../js/cart.js"></script>
 <script src="../../js/cart-modal.js"></script>
 <script src="../../js/search.js"></script>
-<!-- before js/product.js, which reads GlowExpressPay off the global -->
-<script src="../../js/express-pay.js"></script>
 <script src="../../js/product.js"></script>
 <script src="../../js/account.js"></script>
 <script src="../../js/launch-offer.js" defer></script>

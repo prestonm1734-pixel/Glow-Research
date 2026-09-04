@@ -787,15 +787,6 @@ console.log('\nthe batch analysis panel');
     (stockFn[0].match(/\.disabled = /g) || []).length === 1,
     'renderStock() must disable both buttons off the one sizeInStock() test');
 
-  // Sold out is set by hand, one `stock: false` in the catalog, off the back of
-  // a text from the supplier. That single edit is the entire mechanism, so
-  // every way to buy has to answer to it. A disabled Add to cart beside a live
-  // wallet button is not a partial version of that: it is a one-tap purchase
-  // of something we cannot ship, offered next to the control that just refused.
-  ok('a sold-out size takes the wallet down with the Add buttons',
-    stockFn !== null &&
-    /pdExpress/.test(stockFn[0]) && /walletReady/.test(stockFn[0]),
-    'renderStock() must hide the wallet block, and only one canMakePayment() revealed');
   // And the browser is not the thing enforcing it. priceOrder() is the one
   // chokepoint both create-payment-intent.js and create-order.js price through,
   // so refusing the line there covers the wallet sheet, the checkout page, and
@@ -806,17 +797,24 @@ console.log('\nthe batch analysis panel');
     /if \(!sizeInStock\(size\)\) \{[\s\S]{0,120}?throw new Error/.test(lib),
     'priceOrder() must throw on an out-of-stock size');
 
-  // One wallet implementation, in js/express-pay.js, used by the product buy
-  // box and the top of checkout. A second copy of a flow that charges a card
-  // and places an order is the last thing this codebase should carry, so
-  // neither caller may build its own payment request.
+  // One wallet implementation, in js/express-pay.js, used only by checkout
+  // now. A second copy of a flow that charges a card and places an order is
+  // the last thing this codebase should carry, so the caller may not build
+  // its own payment request, and the product page carries no wallet UI at
+  // all: no Apple Pay / Google Pay button on product pages.
   const ep = read('js/express-pay.js');
   const coJs2 = read('js/checkout.js');
-  ok('there is one wallet implementation, and both callers use it',
+  ok('there is one wallet implementation, and checkout uses it',
     (ep.match(/\.paymentRequest\(\{/g) || []).length === 1 &&
-    !/paymentRequest\(/.test(pj) && !/paymentRequest\(/.test(coJs2) &&
-    /GlowExpressPay\.init\(/.test(pj) && /GlowExpressPay\.init\(/.test(coJs2),
-    'js/express-pay.js owns the flow; product.js and checkout.js only configure it');
+    !/paymentRequest\(/.test(coJs2) &&
+    /GlowExpressPay\.init\(/.test(coJs2),
+    'js/express-pay.js owns the flow; checkout.js only configures it');
+  ok('the product page has no wallet button of its own',
+    !/paymentRequest\(/.test(pj) &&
+    !/GlowExpressPay/.test(pj) &&
+    !/pdExpress/.test(pj) &&
+    !/express-pay\.js/.test(pd),
+    'product.js and product.html must carry no Apple Pay / Google Pay wiring');
   // The product page's own order-placing code went with it. Anything left
   // would be a second route to create-order that nothing above enforces.
   ok('the product page places no order of its own',
