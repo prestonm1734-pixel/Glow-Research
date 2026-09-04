@@ -4067,6 +4067,26 @@ console.log('\nhero image');
     ok(`${page}: its alt text names every vial in the photograph`,
       unnamed.length === 0, `missing: ${unnamed.map(l => l.name).join(', ')}`);
   });
+
+  /* Images deleted for what they print, which have to stay deleted.
+     /assets/ is served straight off the CDN with no page needed, so an
+     image nothing links to is still a live URL anyone can open — being
+     unreferenced is not the same as being gone, and the check that would
+     have caught these is the one nobody has: no test reads a JPEG.
+
+     vial-five-black.png printed "GLP3-RT" on the first of five labels,
+     months after that compound left the catalog, and "GHRP-6" on the
+     middle one, which this store has never sold. It also printed 99.8%
+     across all five, against a catalog that claims 99%. Nothing on the
+     site had linked it for some time; it was still being served. */
+  const DELETED_FOR_WHAT_THEY_PRINT = [
+    'assets/vial-five-black.png',
+  ];
+  DELETED_FOR_WHAT_THEY_PRINT.forEach(f => {
+    ok(`${f} stays deleted, not just unreferenced`,
+      !fs.existsSync(path.join(ROOT, f)),
+      'it prints a compound the catalog does not carry; re-render it before it ships');
+  });
 }
 
 /* The in-app browser breakout stood here: js/iab-breakout.js, loaded first and
