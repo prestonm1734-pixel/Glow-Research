@@ -134,14 +134,23 @@
 
   /* ================= static bits ================= */
 
+  // Guarded like renderDelivery and renderSelection's meta-desc below: this
+  // runs as one unbroken chain through wireBuy, renderDelivery and
+  // initStickyBar (see the DOMContentLoaded handler), so one missing element
+  // here must not throw and take the buy button and delivery estimate down
+  // with it.
   function renderBreadcrumb(p) {
-    $('pdCrumbName').textContent = p.name;
+    const el = $('pdCrumbName');
+    if (el) el.textContent = p.name;
   }
 
   function renderHeader(p) {
-    $('pdName').textContent = p.name;
-    $('pdAlias').textContent = p.alias || '';
-    $('pdDesc').textContent = p.blurb;
+    const nameEl = $('pdName');
+    const aliasEl = $('pdAlias');
+    const descEl = $('pdDesc');
+    if (nameEl) nameEl.textContent = p.name;
+    if (aliasEl) aliasEl.textContent = p.alias || '';
+    if (descEl) descEl.textContent = p.blurb;
 
     renderPhoto(p, size());
     renderCoa(p);
