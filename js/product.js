@@ -142,7 +142,6 @@
     $('pdName').textContent = p.name;
     $('pdAlias').textContent = p.alias || '';
     $('pdDesc').textContent = p.blurb;
-    $('pdRenderNote').textContent = VIAL_ART_NOTICE;
 
     renderPhoto(p, size());
     renderCoa(p);

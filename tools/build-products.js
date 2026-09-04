@@ -36,7 +36,7 @@ const OUT_DIR = 'product';
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, hasList, listPriceOf, PRODUCT_PAGES_LIVE,
   sizeInStock, productInStock, batchPanelHtml, unitPriceAt,
-  catFilterGroup, CAT_LABEL, VIAL_ART_NOTICE, productMetaDesc,
+  catFilterGroup, CAT_LABEL, productMetaDesc,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 /* ---------- helpers ---------- */
@@ -282,7 +282,6 @@ function buildProduct(p, donor) {
 
   /* --- content a crawler must see without running scripts --- */
   html = setText(html, 'pdCrumbName', esc(p.name));
-  html = fillEmpty(html, 'pdRenderNote', esc(VIAL_ART_NOTICE));
   html = setText(html, 'pdName', esc(p.name));
   html = fillEmpty(html, 'pdAlias', p.alias ? esc(p.alias) : '');
   html = fillEmpty(html, 'pdDesc', esc(p.blurb));

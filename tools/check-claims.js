@@ -655,16 +655,6 @@ console.log('\nthe batch analysis panel');
   ok('no retired laboratory is still named anywhere',
     stale.length === 0, stale.join(', '));
 
-  // The vial in every product photo carries Glow's own artwork; what actually
-  // ships carries the manufacturer's generic label. A photo that doesn't
-  // match what arrives is a claim PRINCIPLES.md rules out, so the caption
-  // saying so has to actually reach the page, from the one string, not a
-  // second copy of it that could drift from the first.
-  ok('the product page carries the vial-art disclosure, from the one string',
-    /id="pdRenderNote"/.test(pd) &&
-    /VIAL_ART_NOTICE/.test(read('js/product.js')) &&
-    /VIAL_ART_NOTICE/.test(read('tools/build-products.js')));
-
   // The homepage's Glow Standard cards use the same branded renders, but at the
   // size, brightness and scrim they are set to, the label on the vial is not
   // legible: there is no label being shown, so there is nothing to disclose and

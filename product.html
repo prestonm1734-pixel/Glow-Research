@@ -104,15 +104,6 @@
   }
   .pd-photo[hidden]{ display:none; }
 
-  /* A caption under the stage, not an overlay on it — the vial's own printed
-     label in the shot already sits near the bottom of the box, and on the
-     shorter mobile stage the two blocks of text collided. Normal flow costs
-     a little height instead. */
-  .pd-render-note{
-    margin: 10px 4px 0; text-align:center; font-size:.68rem;
-    color:rgba(10,10,10,.45); letter-spacing:.01em;
-  }
-
   /* ---------- buy box ---------- */
   .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:600; margin: 0 0 2px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
   .pd-alias{ font-size: 1rem; color:#8a8a86; margin: 0 0 10px; }
@@ -745,7 +736,6 @@
         <div class="pd-visual">
           <img class="pd-photo" id="pdPhoto" alt="" />
         </div>
-        <p class="pd-render-note" id="pdRenderNote"></p>
       </div>
 
       <!-- Order top to bottom the way the decision is actually made: what it
