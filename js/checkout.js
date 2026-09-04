@@ -158,15 +158,18 @@
     }).join('');
 
     // One method is not a choice, the same reasoning renderPayMethods() below
-    // applies to a single payment method: nothing to label or select, so a
-    // radio input and a hit target around it would be asking for a decision
-    // there isn't one to make. The "Shipping" heading already on the page
-    // says what this row is.
+    // applies to a single payment method: nothing to label or select, so no
+    // radio input and no hit target around the row — there is no decision
+    // to make, and .is-static's cursor:default says so. The dot is still
+    // drawn, filled, the same as a chosen option in the multi-method branch
+    // below: it reads as "this is what's selected" rather than a plain line
+    // of text, which is the point even with nothing else to pick.
     if (SHIPPING.length === 1) {
       const s = SHIPPING[0];
       const free = s.freeOver !== null && sub >= s.freeOver;
       $('coShipOptions').innerHTML = `
-        <div class="co-ship is-static">
+        <div class="co-ship is-static is-on">
+          <span class="co-ship-box" aria-hidden="true"></span>
           <span class="co-ship-copy">
             <span class="co-ship-label">${s.label}</span>
             <span class="co-ship-note">${s.note}</span>
