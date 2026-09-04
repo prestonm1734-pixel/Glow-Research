@@ -1589,13 +1589,13 @@ console.log('\nwelcome landing page');
   // out of view, and the bar exists to reopen it. Three things have to hold
   // together: the bar is in the markup and starts hidden (so a visitor with
   // no JavaScript never gets a bar stuck off-canvas but still in the tab
-  // order), it says "Shop now" and actually points at the catalog, and
+  // order), it says "Shop Peptides" and actually points at the catalog, and
   // js/welcome.js is the thing that reveals it, watching the same .wl-cta
   // row the hero button carries.
   ok('the sticky bar exists and starts out of the tab order, not just off screen',
     /<div class="wl-sticky" id="wlSticky" hidden>/.test(wl));
-  ok('it says Shop now and links to the catalog',
-    /href="shop" class="btn btn-primary wl-sticky-btn">Shop now/.test(wl));
+  ok('it says Shop Peptides and links to the catalog',
+    /href="shop" class="btn btn-primary wl-sticky-btn">Shop Peptides/.test(wl));
   ok('the hero carries the hook the bar watches, and js/welcome.js reveals the bar off it',
     /class="hero-cta wl-cta reveal"/.test(wl) &&
     /getElementById\('wlSticky'\)/.test(wlJs) &&

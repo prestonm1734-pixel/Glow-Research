@@ -98,7 +98,7 @@
      nothing to gate. */
 
   /* ---------- sticky call to action ----------
-     Watches the hero's own Shop now button rather than a scroll offset, so
+     Watches the hero's own Shop Peptides button rather than a scroll offset, so
      the handoff happens at the same point of the page at any viewport
      height with no magic number to re-tune.
 
