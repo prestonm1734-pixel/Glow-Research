@@ -224,7 +224,7 @@ const META_DOMAIN_VERIFICATION = 'vdj6rixbn41crbnftd0jlpbjbzzjxj';
 // entirely while this is empty. The matching server-side piece,
 // TIKTOK_CAPI_ACCESS_TOKEN, is a Vercel environment variable and must never
 // be checked in — see api/_tiktok-capi.js.
-const TIKTOK_PIXEL_ID = 'DADGHFRC77UDHLL3GUHG';
+const TIKTOK_PIXEL_ID = 'DAE5U1RC77UES974K6F0';
 
 // X's (Twitter's) base Pixel ID, same reasoning as META_PIXEL_ID and
 // TIKTOK_PIXEL_ID above: not secret, safe to ship client-side, and
