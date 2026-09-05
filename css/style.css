@@ -432,6 +432,15 @@ button[disabled].si-forgot{ cursor: progress; }
    phone included. Left to wrap on its own it breaks after "Research"
    instead, orphaning "Peptides." on its own line. */
 .hero-br{ display:inline; }
+/* welcome.html's own headline runs bigger than index.html's shared default
+   above: it is the whole reason a visitor lands here, with no catalog grid
+   or nav competing for attention below it, so it can afford to be the
+   biggest thing on the page. The wider column gives the second line
+   ("Research Peptides.") the room the bigger size needs without wrapping to
+   a third; the hero photograph's own fade (see .hero-visual-img) already
+   tolerates copy running further right than the base 700px column does. */
+.wl-hero .hero-copy{ max-width: 860px; }
+.wl-hero .hero-title{ font-size: clamp(2.4rem, 6.4vw, 5.4rem); }
 /* Outline treatment shared with 404.html's stub-hero heading: same idea,
    thin stroke instead of a fill, for a headline word that should read as
    a second weight rather than a second color. */
@@ -465,13 +474,12 @@ button[disabled].si-forgot{ cursor: progress; }
    rules below don't already cover. Its full width is also what pushes
    .wl-cta-coa onto its own line below via flex-wrap, with no flex-direction
    override needed at any width. */
-.wl-cta-shop{ width:100%; text-align:center; }
-
-/* Sized by content, not stretched to the row's cross axis, so the quiet
-   underline reads as a short second line rather than spanning the hero's
-   full width the way the button above it does. Needed once .wl-hero's own
-   mobile breakpoint below switches the row to align-items:stretch. */
-.wl-cta-coa{ align-self: flex-start; }
+.wl-cta-shop,
+.wl-cta-coa{ width:100%; text-align:center; }
+/* Still the quiet option next to Shop Peptides: an outline button, not a
+   filled one, so the hierarchy between them reads the same way it did when
+   they sat side by side, just stacked instead of side by side now. */
+.wl-cta-coa{ margin-top: 4px; }
 
 /* the rule seals the stats to the block above rather than letting them float
    as a separate stack — equal 24px breathing room on both sides of it */
@@ -1151,7 +1159,7 @@ button[disabled].si-forgot{ cursor: progress; }
   }
   .wl-hero .hero-grid{ min-height: 0; padding-top: 0; padding-bottom: 0; }
   .wl-hero .hero-eyebrow{ font-size: 0.86rem; margin-bottom: 18px; }
-  .wl-hero .hero-title{ font-size: clamp(2rem, 8.4vw, 3rem); margin-bottom: 22px; }
+  .wl-hero .hero-title{ font-size: clamp(2.05rem, 9.2vw, 3.3rem); margin-bottom: 22px; }
   .wl-hero .hero-sub{ font-size: 0.88rem; margin-bottom: 36px; }
   .wl-hero .hero-cta{ flex-direction: column; align-items: stretch; gap: 18px; margin-bottom: 36px; }
   .wl-hero .hero-cta .btn-lg{ width: 100%; flex: none; padding: 16px 24px; font-size: 1rem; }
