@@ -16,18 +16,39 @@
   document.getElementById('year').textContent = new Date().getFullYear();
 
   /* ---------- scroll reveal ---------- */
+  function settleIn(el) {
+    el.classList.add('in');
+    // .stat-text is a word, not a numeral: it has nothing to count up to.
+    if (el.classList.contains('hero-stats')) {
+      el.querySelectorAll('.stat-num:not(.stat-text)').forEach(countUp);
+    }
+  }
+
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
-      entry.target.classList.add('in');
-      // .stat-text is a word, not a numeral: it has nothing to count up to.
-      if (entry.target.classList.contains('hero-stats')) {
-        entry.target.querySelectorAll('.stat-num:not(.stat-text)').forEach(countUp);
-      }
+      settleIn(entry.target);
       revealObserver.unobserve(entry.target);
     });
   }, { threshold: 0.15 });
-  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // On a short page against a tall phone screen, a section sitting well
+  // below the hero in the markup can still land inside the viewport at
+  // scrollY 0 — "Why researchers buy from Glow" measured onto-screen at
+  // load on some phones during testing here. observe() fires its first
+  // callback against whatever is already true at that instant, so a
+  // below-the-fold section on a short-hero device gets marked revealed
+  // before the visitor has scrolled at all: indistinguishable from the
+  // reveal never having run. Elements already on screen at load are given
+  // .in directly, here, with no transition to skip past — the same plain,
+  // already-there state the hero would read as on any device. Only what is
+  // actually off screen goes to the observer, so only that genuinely
+  // animates in as the visitor scrolls to it.
+  document.querySelectorAll('.reveal').forEach(el => {
+    const r = el.getBoundingClientRect();
+    if (r.top < window.innerHeight && r.bottom > 0) settleIn(el);
+    else revealObserver.observe(el);
+  });
 
   // The homepage animates its figures on the way in and this page states the
   // same three, so they arrive the same way. Kept local rather than shared:
