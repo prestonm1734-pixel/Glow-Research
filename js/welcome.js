@@ -32,23 +32,30 @@
     });
   }, { threshold: 0.15 });
 
-  // On a short page against a tall phone screen, a section sitting well
-  // below the hero in the markup can still land inside the viewport at
-  // scrollY 0 — "Why researchers buy from Glow" measured onto-screen at
-  // load on some phones during testing here. observe() fires its first
-  // callback against whatever is already true at that instant, so a
-  // below-the-fold section on a short-hero device gets marked revealed
-  // before the visitor has scrolled at all: indistinguishable from the
-  // reveal never having run. Elements already on screen at load are given
-  // .in directly, here, with no transition to skip past — the same plain,
-  // already-there state the hero would read as on any device. Only what is
-  // actually off screen goes to the observer, so only that genuinely
-  // animates in as the visitor scrolls to it.
+  // observe() fires its first callback against whatever is already true the
+  // instant it runs — not against some future scroll. So routing an element
+  // to the observer instead of settling it directly does not, by itself,
+  // delay anything: if that element already clears the 15% threshold when
+  // observe() is called, the observer's own first callback fires right then,
+  // scroll or no scroll. On an iPhone 13/14-sized screen "Why researchers
+  // buy from Glow" measured 83% visible at load, so it kept revealing
+  // instantly no matter which branch it was sent down.
+  //
+  // The fix has to gate on an actual scroll happening, not on intersection
+  // state: elements fully framed at load (the hero) settle immediately, and
+  // everything else waits to even start observing until the page has
+  // registered its first scroll event. Only then does "isIntersecting"
+  // describe something the visitor's scrolling actually caused.
+  const pending = [];
   document.querySelectorAll('.reveal').forEach(el => {
     const r = el.getBoundingClientRect();
-    if (r.top < window.innerHeight && r.bottom > 0) settleIn(el);
-    else revealObserver.observe(el);
+    if (r.top >= 0 && r.bottom <= window.innerHeight) settleIn(el);
+    else pending.push(el);
   });
+  window.addEventListener('scroll', function onFirstScroll() {
+    window.removeEventListener('scroll', onFirstScroll);
+    pending.forEach(el => revealObserver.observe(el));
+  }, { passive: true, once: true });
 
   // The homepage animates its figures on the way in and this page states the
   // same three, so they arrive the same way. Kept local rather than shared:
