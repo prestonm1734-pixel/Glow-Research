@@ -177,9 +177,11 @@
   // different mg. Switching the mg picker swaps the photo along with
   // everything else that reads the selected size.
   function renderPhoto(p, s) {
+    const photo = $('pdPhoto');
+    if (!photo) return;
     const img = (s && s.image) || p.image;
-    $('pdPhoto').src = pageHref(img);
-    $('pdPhoto').alt = `${p.name}${s ? ' ' + s.mg : ''} vial`;
+    photo.src = pageHref(img);
+    photo.alt = `${p.name}${s ? ' ' + s.mg : ''} vial`;
   }
 
   /* ================= certificate =================
@@ -286,9 +288,12 @@
     const listTotal = round2(Math.max(listPriceOf(s), s.price) * qty);
     const total = round2(unit * qty);
 
-    $('pdPrice').innerHTML = listTotal > total
-      ? `${money(total)}<s class="pd-price-was">${money(listTotal)}</s>`
-      : money(total);
+    const priceEl = $('pdPrice');
+    if (priceEl) {
+      priceEl.innerHTML = listTotal > total
+        ? `${money(total)}<s class="pd-price-was">${money(listTotal)}</s>`
+        : money(total);
+    }
 
     renderSticky(total);
 
@@ -405,8 +410,10 @@
   // describe different quantities.
   function setQty(n) {
     qty = Math.max(1, n);
-    $('pdQty').textContent = qty;
-    $('pdQtyDec').disabled = qty <= 1;
+    const qtyEl = $('pdQty');
+    const decEl = $('pdQtyDec');
+    if (qtyEl) qtyEl.textContent = qty;
+    if (decEl) decEl.disabled = qty <= 1;
     renderPrice();
     markActiveTier();
   }
@@ -414,8 +421,10 @@
   function wireBuy() {
     setQty(qty);
 
-    $('pdQtyDec').addEventListener('click', () => setQty(qty - 1));
-    $('pdQtyInc').addEventListener('click', () => setQty(qty + 1));
+    const decBtn = $('pdQtyDec');
+    const incBtn = $('pdQtyInc');
+    if (decBtn) decBtn.addEventListener('click', () => setQty(qty - 1));
+    if (incBtn) incBtn.addEventListener('click', () => setQty(qty + 1));
 
     // the cart line is unitSale × qty, and unitSale is the tier-adjusted price
     // the page just showed, so the cart charges what the buy box quoted
@@ -432,10 +441,13 @@
       });
     };
 
-    $('pdAddBtn').addEventListener('click', () => {
-      addCurrent();
-      flash($('pdAddBtn'), 'Added to cart ✓');
-    });
+    const addBtn = $('pdAddBtn');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        addCurrent();
+        flash(addBtn, 'Added to cart ✓');
+      });
+    }
 
     // Same add, same confirmation. The sticky bar carries no quantity of its
     // own: it adds whatever the stepper above is currently set to, which is
@@ -477,6 +489,7 @@
     const s = size();
     const variants = getProductVariants(product, s.price);
     const wrap = $('pdTiers');
+    if (!wrap) return;
 
     // one vial per unit, but three is enough to read as "several" — past that
     // they just overlap into a smudge, and the label already says the count
@@ -546,6 +559,7 @@
   // under a heading promising the shop.
   function renderRelated(p) {
     const grid = $('pdRelatedGrid');
+    if (!grid) return;
     // Only the grid goes if there is somehow nothing to show. The section stays,
     // because its "view the full catalog" link is the more useful of the two.
     if (GLOW_PRODUCTS.length < 2) { grid.hidden = true; return; }
