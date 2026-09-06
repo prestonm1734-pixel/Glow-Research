@@ -9,7 +9,10 @@
 import { readBody, isEmail } from './_lib.js';
 import { emailShell, heading, paragraph, eyebrow, esc } from './_email.js';
 
-const AFFILIATE_TO = 'affiliates@glowresearch.shop';
+// wholesale@ rather than a dedicated affiliates@ inbox: that's the address
+// actually staffed right now. Point this at a real affiliates@ address if
+// one gets set up later.
+const AFFILIATE_TO = 'wholesale@glowresearch.shop';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -33,7 +36,7 @@ export default async function handler(req, res) {
     // Fails loudly rather than telling the applicant it worked when nobody
     // will ever see what they submitted.
     console.error('affiliate-apply: RESEND_API_KEY is not set.');
-    return res.status(500).json({ error: 'Applications are not being accepted right now. Please email affiliates@glowresearch.shop directly.' });
+    return res.status(500).json({ error: 'Applications are not being accepted right now. Please email wholesale@glowresearch.shop directly.' });
   }
 
   // onboarding@resend.dev works unverified, out of the box. Swap
@@ -72,7 +75,7 @@ export default async function handler(req, res) {
     if (!resp.ok) {
       const errBody = await resp.json().catch(() => null);
       console.error('affiliate-apply: Resend rejected the email.', resp.status, errBody);
-      return res.status(502).json({ error: 'Could not send your application. Please email affiliates@glowresearch.shop directly.' });
+      return res.status(502).json({ error: 'Could not send your application. Please email wholesale@glowresearch.shop directly.' });
     }
 
     // Applicant acknowledgement. Deliberately after the desk copy and
@@ -97,7 +100,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true });
   } catch (e) {
     console.error('affiliate-apply:', e);
-    return res.status(502).json({ error: 'Could not send your application. Please email affiliates@glowresearch.shop directly.' });
+    return res.status(502).json({ error: 'Could not send your application. Please email wholesale@glowresearch.shop directly.' });
   }
 }
 
