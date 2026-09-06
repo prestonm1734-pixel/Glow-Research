@@ -386,7 +386,7 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/g3-r-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [
-      { mg: '10mg', price: 84.99, list: 94, sku: 'GLO-RT10', image: 'assets/products/g3-r-10mg-v5.webp' },
+      { mg: '10mg', price: 94.99, list: 104, sku: 'GLO-RT10', image: 'assets/products/g3-r-10mg-v5.webp' },
     ],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
@@ -417,7 +417,7 @@ const GLOW_PRODUCTS = [
   { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.815%', lot: '5567', badge:'Best Value',
     coa: 'assets/coas/ghk-cu-lot-5567.pdf', coaRef: 'D69A-YY5F', tested: '6 July 2026',
     results: { Identity: 'Conforms', Quantity: '56.93 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
-    sizes: [{ mg: '50mg', price: 44.99, list: 50, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
+    sizes: [{ mg: '50mg', price: 45.99, list: 51, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
     blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
     about: [
       'GHK-Cu is the tripeptide glycyl-L-histidyl-L-lysine complexed with copper(II). The tripeptide occurs naturally in plasma and binds copper with high affinity, and it is the complex rather than the bare peptide that most research uses.',
@@ -432,7 +432,7 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/bpc-157-lot-1400.pdf', coaRef: 'X9RM-SMBN', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.13 mg' },
     sizes: [
-      { mg: '10mg', price: 54.99, list: 61, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg-v3.webp' },
+      { mg: '10mg', price: 57.99, list: 64, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg-v3.webp' },
     ],
     blurb: 'A synthetic pentadecapeptide derived from a protein found in gastric juice. Studied in vitro for angiogenic signalling.',
     about: [
@@ -448,7 +448,7 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/bpc-157-tb-500-lot-5615.pdf', coaRef: '7STD-6SRY', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '9.73 mg' },
     sizes: [
-      { mg: '10mg', price: 69.99, list: 78, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg-v3.webp' },
+      { mg: '10mg', price: 76.99, list: 85, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg-v3.webp' },
     ],
     blurb: 'A combined BPC-157 and TB-500 formulation. Supplied for research using both peptides together in one vial.',
     about: [
@@ -463,7 +463,7 @@ const GLOW_PRODUCTS = [
   { name: 'GLOW', alias: 'GHK-Cu/BPC-157/TB-500', tag: 'Peptide Blend', cat: 'tissue', purity: '99.61%', lot: '1035', badge:null,
     coa: 'assets/coas/glow-lot-1035.pdf', coaRef: 'X7MB-H2H8', tested: '13 June 2026',
     results: { Identity: 'Conforms', Quantity: '65.63 mg' },
-    sizes: [{ mg: '70mg', price: 99.99, list: 111, sku: 'GLO-BBG70', image: 'assets/products/glow-70mg-v3.webp' }],
+    sizes: [{ mg: '70mg', price: 112.99, list: 124, sku: 'GLO-BBG70', image: 'assets/products/glow-70mg-v3.webp' }],
     blurb: 'A compounded blend of GHK-Cu, BPC-157 and TB-500. Supplied for research using all three peptides together in one vial.',
     about: [
       'GLOW is Glow Research’s designation for a compounded blend of three research peptides, GHK-Cu, BPC-157 and TB-500, supplied together in one 70mg vial rather than as separate compounds. It is commonly referred to by its components, GHK-Cu/BPC-157/TB-500, within the peptide research community.',
@@ -476,7 +476,7 @@ const GLOW_PRODUCTS = [
   { name: 'CJC-1295 No DAC/Ipamorelin', tag: 'Peptide Blend', cat: 'growth', purity: '99.08%', lot: '005', badge:null,
     coa: 'assets/coas/cjc-1295-no-dac-ipamorelin-lot-005.pdf', coaRef: 'MHCU-CDXL', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.18 mg' },
-    sizes: [{ mg: '5/5mg', price: 71.99, list: 80, sku: 'GLO-CP10', image: 'assets/products/cjc-1295-ipamorelin-5-5mg-v3.webp' }],
+    sizes: [{ mg: '5/5mg', price: 80.99, list: 89, sku: 'GLO-CP10', image: 'assets/products/cjc-1295-ipamorelin-5-5mg-v3.webp' }],
     blurb: 'A combined CJC-1295 (No DAC) and Ipamorelin formulation. Supplied for research examining GHRH and ghrelin receptor co-agonism.',
     about: [
       'This blend combines CJC-1295 without DAC and Ipamorelin in a single vial, 5/5 mg of each for 10mg total, pairing a GHRH receptor analogue with a selective ghrelin receptor agonist.',
@@ -490,7 +490,7 @@ const GLOW_PRODUCTS = [
   { name: 'G1-S', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:'Popular',
     coa: 'assets/coas/g1-s-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.96 mg' },
-    sizes: [{ mg: '10mg', price: 64.99, list: 72, sku: 'GLO-SM10', image: 'assets/products/g1-s-10mg-v5.webp' }],
+    sizes: [{ mg: '10mg', price: 72.99, list: 80, sku: 'GLO-SM10', image: 'assets/products/g1-s-10mg-v5.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
       'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
@@ -501,7 +501,7 @@ const GLOW_PRODUCTS = [
   { name: 'Tesamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.36%', lot: '1002', badge:null,
     coa: 'assets/coas/tesamorelin-lot-1002.pdf', coaRef: 'R934-S6U9', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.59 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
-    sizes: [{ mg: '10mg', price: 89.99, list: 100, sku: 'GLO-TSM10', image: 'assets/products/tesamorelin-10mg-v3.webp' }],
+    sizes: [{ mg: '10mg', price: 85.99, list: 95, sku: 'GLO-TSM10', image: 'assets/products/tesamorelin-10mg-v3.webp' }],
     blurb: 'A synthetic growth hormone releasing hormone analogue with a stabilised N-terminus. Studied for pituitary receptor engagement.',
     about: [
       'Tesamorelin is a synthetic analogue of growth hormone releasing hormone carrying a trans-3-hexenoic acid modification at the N-terminus that slows enzymatic degradation by DPP-4.',
@@ -515,7 +515,7 @@ const GLOW_PRODUCTS = [
   { name: 'G2-T', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
     coa: 'assets/coas/g2-t-lot-1600.pdf', coaRef: '7RRU-W2LV', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '12.49 mg' },
-    sizes: [{ mg: '10mg', price: 72.99, list: 81, sku: 'GLO-T10', image: 'assets/products/g2-t-10mg-v5.webp' }],
+    sizes: [{ mg: '10mg', price: 81.99, list: 90, sku: 'GLO-T10', image: 'assets/products/g2-t-10mg-v5.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
       'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
@@ -526,7 +526,7 @@ const GLOW_PRODUCTS = [
   { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.84%', lot: '1025', badge:null,
     coa: 'assets/coas/mots-c-lot-1025.pdf', coaRef: 'N8VT-H88T', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.45 mg' },
-    sizes: [{ mg: '10mg', price: 59.99, list: 67, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg-v3.webp' }],
+    sizes: [{ mg: '10mg', price: 67.99, list: 75, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg-v3.webp' }],
     blurb: 'A mitochondrial-derived peptide encoded within the mitochondrial genome. Studied for its role in metabolic signalling.',
     about: [
       'MOTS-C is a 16 amino acid peptide encoded in the mitochondrial 12S rRNA region rather than the nuclear genome, one of a small class of mitochondrial-derived peptides identified in the last two decades.',
