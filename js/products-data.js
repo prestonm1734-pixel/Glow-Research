@@ -164,11 +164,14 @@ const STRIPE_PUBLISHABLE_KEY = 'pk_live_51U3kUmHjOd9MaH5sNxBU6C1neJypFeZGunq4CUy
    Stripe reports, refusing if the code is dead. A stale figure here shows up
    as a mismatch in the logs rather than as a promise the checkout breaks.
 
-   Not valid with the quantity ladder in QTY_TIERS above: a code discounting a
-   price the tiers already discounted would let the two combine into a rate
-   neither was priced for. api/_lib.js is what actually refuses the
-   combination (resolvePromoCodeForOrder(), checked before any code is
-   applied or re-priced) — facts below only has to say so, not enforce it. */
+   Never stacks with the quantity ladder in QTY_TIERS above: a code
+   discounting a price the tiers already discounted would let the two combine
+   into a rate neither was priced for. It is not simply refused on a cart
+   that already earned a tier, though — api/_lib.js's
+   resolvePromoCodeForOrder() prices the code against what the cart would
+   cost with no quantity discount at all, compares that to what the tiers
+   already give it, and applies whichever is cheaper. facts below only has to
+   say so, not enforce it. */
 const LAUNCH_OFFER_LIVE = true;
 const LAUNCH_OFFER = {
   code: 'GLOW15',

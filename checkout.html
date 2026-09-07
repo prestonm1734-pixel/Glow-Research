@@ -582,14 +582,15 @@
             <div class="co-total"><span>Total</span><b id="coTotal">$0.00</b></div>
             <p class="co-taxnote" id="coTaxNote">Tax is calculated from your shipping address. Shipment protection included.</p>
 
-            <!-- Shown outright rather than behind a toggle link: the
-                 input costs one line whether or not anyone types in it,
-                 and typing a code was two clicks away for no reason a
-                 toggle actually earned. #coPromoNote takes this exact
-                 spot instead, on a cart that already has a quantity
-                 discount, since the two never stack. -->
-            <p class="co-promo-note" id="coPromoNote" hidden>Quantity discount applied. Promo codes can’t be combined with it.</p>
-            <div id="coPromoBox">
+            <!-- Shown outright rather than behind a toggle link: the input
+                 costs one line whether or not anyone types in it, and typing
+                 a code was two clicks away for no reason a toggle actually
+                 earned. Always here, even on a cart that already earned a
+                 quantity discount — a code never stacks on top of one, but
+                 js/checkout.js compares the two and applies whichever is
+                 cheaper, so there is no reason to hide the box and make
+                 someone wonder if they are missing a better deal. -->
+            <div>
               <div class="co-promo">
                 <input type="text" id="coPromo" placeholder="Promo code" aria-label="Discount code" />
                 <button type="button" id="coPromoBtn">Apply</button>

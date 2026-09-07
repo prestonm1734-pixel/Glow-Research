@@ -5,8 +5,14 @@
 // answers "is this code good, and for how much" — the actual charge is only
 // ever set by api/create-payment-intent.js, which re-validates the same code
 // itself rather than trusting whatever this endpoint said a moment earlier.
+//
+// "Worth" is not just the coupon's own math: resolvePromoCodeForOrder()
+// compares it against the cart's own quantity discount, if it has one, and
+// reports which one actually wins. useTiered:true means the code is real but
+// the quantity ladder already beats it, so js/checkout.js can say that
+// plainly instead of implying the code failed.
 
-import { readBody, priceOrder, resolvePromoCodeForOrder } from './_lib.js';
+import { readBody, resolvePromoCodeForOrder } from './_lib.js';
 import { PAYMENTS_LIVE } from '../js/products-data.js';
 
 export default async function handler(req, res) {
@@ -23,17 +29,22 @@ export default async function handler(req, res) {
 
   const { code, items, shippingMethodId } = readBody(req);
 
-  let priced;
+  let resolved;
   try {
-    priced = priceOrder(items, shippingMethodId);
+    resolved = await resolvePromoCodeForOrder(code, items, shippingMethodId);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
 
-  const resolved = await resolvePromoCodeForOrder(code, priced);
   if (!resolved.ok) {
     return res.status(200).json({ valid: false, error: resolved.error });
   }
 
-  return res.status(200).json({ valid: true, code: resolved.code, discount: resolved.discount });
+  return res.status(200).json({
+    valid: true,
+    code: resolved.code,
+    discount: resolved.discount,
+    useTiered: resolved.useTiered,
+    beatsCodeBy: resolved.beatsCodeBy || 0,
+  });
 }

@@ -107,15 +107,22 @@ export const SHIPPING_RATES = [
   { id: '2day', cost: 12.95, freeOver: 250 },
 ];
 
-// Throws rather than returning an error object: every caller is about to
-// either charge a card or create an order, and both have to stop hard if the
-// cart cannot be priced, not proceed with a partial or zero total.
-export function priceOrder(items, shippingMethodId) {
+// Turns cart items into priced lines. Throws on anything that would make a
+// charge wrong rather than returning an error object, since every caller is
+// about to either charge a card or create an order and has to stop hard
+// rather than proceed with a partial or zero total.
+//
+// ignoreBulk prices every line at its plain one-vial rate regardless of qty
+// — the "what would this cart cost with no quantity discount at all" figure
+// resolvePromoCodeForOrder() below needs to price a promo code against. The
+// stock check and catalog lookup are identical either way; only the rate a
+// line's own qty earns changes.
+function buildLines(items, { ignoreBulk = false } = {}) {
   if (!Array.isArray(items) || !items.length) {
     throw new Error('The cart is empty.');
   }
 
-  const lines = items.map(i => {
+  return items.map(i => {
     // The SKU is the stable identity; the display name is not. A cart lives
     // in localStorage for weeks and outlives a rename — three products were
     // renamed in one commit recently — and matching on the name alone meant
@@ -147,20 +154,29 @@ export function priceOrder(items, shippingMethodId) {
       throw new Error(`${p.name} ${size.mg} is out of stock.`);
     }
     const qty = Math.max(1, Math.floor(Number(i.qty)) || 1);
-    const unitSale = unitPriceAt(size.price, qty);
+    const unitSale = unitPriceAt(size.price, ignoreBulk ? 1 : qty);
     return { name: p.name, variant: size.mg, sku: size.sku, qty, unitSale, total: round2(unitSale * qty) };
   });
+}
 
+function priceLines(lines, shippingMethodId) {
   const subtotal = round2(lines.reduce((n, l) => n + l.total, 0));
   const rate = SHIPPING_RATES.find(s => s.id === shippingMethodId) || SHIPPING_RATES[0];
   const shipping = (rate.freeOver !== null && subtotal >= rate.freeOver) ? 0 : rate.cost;
-  // A promo code and the quantity ladder are never allowed to combine — see
-  // resolvePromoCodeForOrder() below, which is the one place that rule is
-  // enforced. Derived from the same qty each line already priced against, so
-  // it can never drift from what the tier ladder actually gave the line.
-  const hasBulkDiscount = lines.some(l => bulkOff(l.qty) > 0);
+  return { lines, subtotal, shipping, total: round2(subtotal + shipping), shippingMethodId: rate.id };
+}
 
-  return { lines, subtotal, shipping, hasBulkDiscount, total: round2(subtotal + shipping), shippingMethodId: rate.id };
+export function priceOrder(items, shippingMethodId) {
+  const lines = buildLines(items);
+  const priced = priceLines(lines, shippingMethodId);
+  // Whether any line earned a quantity-tier rate at all. Derived from the
+  // same qty each line already priced against, so it can never drift from
+  // what the tier ladder actually gave the line. resolvePromoCodeForOrder()
+  // below is what a promo code is actually compared against; this field is
+  // only ever informational past that (e.g. what js/checkout.js shows before
+  // anyone has typed a code).
+  const hasBulkDiscount = lines.some(l => bulkOff(l.qty) > 0);
+  return { ...priced, hasBulkDiscount };
 }
 
 /* ============================ promo codes ============================ */
@@ -256,16 +272,55 @@ export async function resolvePromoCode(rawCode, subtotalCents) {
   };
 }
 
-// A promo code never stacks with the quantity ladder: someone at a bulk tier
-// is already getting a rate the launch code was never priced to sit on top
-// of. api/apply-promo.js and priceOrderWithTax() both price a cart before
-// they know whether a code will be involved, so this is the one place both
-// call rather than each growing its own copy of the same refusal.
-export async function resolvePromoCodeForOrder(rawCode, priced) {
-  if (priced.hasBulkDiscount) {
-    return { ok: false, error: 'This cart already has a quantity discount applied. Promo codes can’t be combined with it.' };
+// A promo code never stacks with the quantity ladder — combining a
+// percentage off a rate the tiers already discounted would let the two
+// compound into something neither was priced for — but it is not simply
+// refused on a cart that already earned a tier, either. The code is priced
+// against what the cart would cost with no quantity discount at all, that
+// figure is compared against what the tiers already give the cart, and
+// whichever total is lower for the shopper wins outright. No partial credit,
+// no stacking: one pricing or the other applies to the whole order.
+//
+// api/apply-promo.js and priceOrderWithTax() both need this same comparison
+// before they know whether a code is worth applying, so it lives here once
+// rather than each growing its own copy.
+export async function resolvePromoCodeForOrder(rawCode, items, shippingMethodId) {
+  const tiered = priceOrder(items, shippingMethodId);
+
+  // Nothing to compare a code against on a cart with no quantity discount at
+  // all — the ordinary case — so it is priced and applied exactly as before.
+  if (!tiered.hasBulkDiscount) {
+    const resolved = await resolvePromoCode(rawCode, Math.round(tiered.subtotal * 100));
+    if (!resolved.ok) return resolved;
+    return { ...resolved, useTiered: false, lines: tiered.lines, subtotal: tiered.subtotal, shipping: tiered.shipping };
   }
-  return resolvePromoCode(rawCode, Math.round(priced.subtotal * 100));
+
+  const plainLines = buildLines(items, { ignoreBulk: true });
+  const plain = priceLines(plainLines, shippingMethodId);
+
+  const resolved = await resolvePromoCode(rawCode, Math.round(plain.subtotal * 100));
+  if (!resolved.ok) return resolved;
+
+  const promoTotal = round2(plain.subtotal - resolved.discount + plain.shipping);
+  const tieredTotal = round2(tiered.subtotal + tiered.shipping);
+
+  if (promoTotal < tieredTotal) {
+    return { ...resolved, useTiered: false, lines: plainLines, subtotal: plain.subtotal, shipping: plain.shipping };
+  }
+
+  // The quantity discount already beats this code. Still ok:true — the code
+  // is valid, it is just not the better of the two — so the caller can tell
+  // the shopper why in its own words rather than reading this as an error.
+  return {
+    ok: true,
+    useTiered: true,
+    code: resolved.code,
+    discount: 0,
+    lines: tiered.lines,
+    subtotal: tiered.subtotal,
+    shipping: tiered.shipping,
+    beatsCodeBy: round2(promoTotal - tieredTotal),
+  };
 }
 
 /* ============================ sales tax ============================ */
@@ -349,15 +404,31 @@ export async function calculateTax(lines, shippingCents, address) {
 // across lines the same way, which is the standard treatment and never lets a
 // single SKU absorb a discount larger than its own price.
 export async function priceOrderWithTax(items, shippingMethodId, address, promoCode) {
-  const priced = priceOrder(items, shippingMethodId);
+  let priced = priceOrder(items, shippingMethodId);
 
   let promo = null;
   let discount = 0;
+  // Set only when a code was actually beaten by the quantity ladder, so
+  // api/create-payment-intent.js can hand it back to js/checkout.js and the
+  // shopper finds out their code was compared and lost, not silently ignored.
+  let codeBeatenBy = null;
+
   if (promoCode) {
-    const resolved = await resolvePromoCodeForOrder(promoCode, priced);
+    const resolved = await resolvePromoCodeForOrder(promoCode, items, shippingMethodId);
     if (!resolved.ok) throw new Error(resolved.error);
-    promo = { id: resolved.id, code: resolved.code };
-    discount = resolved.discount;
+    if (resolved.useTiered) {
+      // The quantity discount already won the comparison; priced (built
+      // above, tiered) stands as is and the code does not apply.
+      codeBeatenBy = resolved.beatsCodeBy;
+    } else {
+      // The code wins: reprice on the plain (no-bulk) lines the comparison
+      // already built, so this never re-derives a total the comparison did
+      // not itself produce.
+      priced = { lines: resolved.lines, subtotal: resolved.subtotal, shipping: resolved.shipping,
+        hasBulkDiscount: false, total: round2(resolved.subtotal + resolved.shipping), shippingMethodId };
+      promo = { id: resolved.id, code: resolved.code };
+      discount = resolved.discount;
+    }
   }
 
   const discountRatio = priced.subtotal > 0 ? discount / priced.subtotal : 0;
@@ -371,6 +442,7 @@ export async function priceOrderWithTax(items, shippingMethodId, address, promoC
     ...priced,
     discount,
     promo,
+    codeBeatenBy,
     tax: tax ? tax.amount : 0,
     taxCalculationId: tax ? tax.id : null,
     total: round2(priced.subtotal - discount + priced.shipping + (tax ? tax.amount : 0)),

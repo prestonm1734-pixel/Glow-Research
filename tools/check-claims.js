@@ -2737,23 +2737,34 @@ console.log('\npromo codes');
     /const totalSaved = saved \+ promoDiscount/.test(coJs) &&
     /\$\('coSaved'\)\.textContent = money\(totalSaved\)/.test(coJs));
 
-  // A promo code and the quantity ladder are never allowed to combine: the
-  // rule lives once, in resolvePromoCodeForOrder(), and both endpoints that
-  // can turn a code into a real discount have to call it rather than the
-  // bare resolvePromoCode() that knows nothing about the cart's tiers.
+  // A promo code and the quantity ladder are never allowed to stack, but a
+  // cart that already earned a tier is not simply refused a code either: the
+  // comparison — price the code against the cart with no bulk discount at
+  // all, compare that to what the tiers already give it, cheaper one wins —
+  // lives once, in resolvePromoCodeForOrder(), and both endpoints that can
+  // turn a code into a real discount have to call it rather than the bare
+  // resolvePromoCode() that knows nothing about the cart's tiers.
   ok('priceOrder() reports whether the cart already earned a quantity discount',
     /hasBulkDiscount/.test(lib) && /bulkOff\(l\.qty\) > 0/.test(lib));
-  ok('resolvePromoCodeForOrder() refuses a code on a cart with a quantity discount',
-    /resolvePromoCodeForOrder/.test(lib) && /priced\.hasBulkDiscount/.test(lib));
+  ok('resolvePromoCodeForOrder() prices the code against the cart with no bulk discount',
+    /resolvePromoCodeForOrder/.test(lib) &&
+    /buildLines\(items, \{ ignoreBulk: true \}\)/.test(lib));
+  ok('and compares that to the tiered total rather than refusing outright',
+    /promoTotal < tieredTotal/.test(lib) &&
+    !/if \(priced\.hasBulkDiscount\)/.test(lib));
   ok('api/apply-promo.js checks the combination before a code is ever applied',
     /resolvePromoCodeForOrder/.test(applyPromo));
   ok('priceOrderWithTax() checks the same combination before the charge is set',
-    /resolvePromoCodeForOrder\(promoCode, priced\)/.test(lib));
+    /resolvePromoCodeForOrder\(promoCode, items, shippingMethodId\)/.test(lib));
 
-  // Told once, plainly, before anyone reaches the promo box — not just as an
-  // error after they have already typed a code.
-  ok('the checkout page tells a bulk-discounted cart the promo box will not apply',
-    /coPromoNote/.test(coHtml) && /coPromoNote/.test(coJs) && /bulkOff\(i\.qty\)/.test(coJs));
+  // The promo box used to disappear outright on a bulk-discounted cart. Now
+  // it always shows — js/checkout.js reports which of the two won only after
+  // a code is actually entered, not by hiding the box before anyone tries.
+  ok('the promo box is never hidden because the cart earned a quantity discount',
+    !/promoBox\.hidden = hasBulk/.test(coJs) && !/id="coPromoBox"/.test(coHtml));
+  ok('checkout.js tells the shopper which of the two discounts actually won',
+    /useTiered/.test(coJs) && /codeBeatenBy/.test(coJs) &&
+    /Best available discount applied/.test(coJs));
 }
 
 /* ---------------------------------------------------------------------------

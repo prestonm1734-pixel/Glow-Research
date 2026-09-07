@@ -193,6 +193,11 @@ export default async function handler(req, res) {
       tax: priced.tax,
       discount: priced.discount,
       promoCode: (priced.promo && priced.promo.code) || null,
+      // Set when a promo code was passed but the cart's own quantity discount
+      // priced out cheaper for the shopper — e.g. a line's qty went up since
+      // "Apply" was pressed. js/checkout.js uses this to tell the shopper
+      // their code was compared and lost, not silently dropped.
+      codeBeatenBy: priced.codeBeatenBy || null,
     });
   } catch (err) {
     return res.status(502).json({ error: err.message || 'Could not reach the payment processor.' });

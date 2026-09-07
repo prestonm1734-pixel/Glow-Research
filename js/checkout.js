@@ -203,19 +203,6 @@
       if (taxAmount > 0) $('coTaxCost').textContent = money(taxAmount);
     }
 
-    // A promo code never stacks with the quantity ladder — api/_lib.js refuses
-    // it server-side either way, but asking someone to type a code just to be
-    // told no is a worse way to say the same thing. hasBulk is derived from
-    // the same bulkOff() the cart itself priced each line against, so this can
-    // never disagree with what the tier ladder actually gave the order.
-    const hasBulk = items.some(i => bulkOff(i.qty) > 0);
-    const promoNote = $('coPromoNote');
-    const promoBox = $('coPromoBox');
-    if (promoNote && promoBox) {
-      promoNote.hidden = !hasBulk;
-      promoBox.hidden = hasBulk;
-    }
-
     const totalStr = money(sub - promoDiscount + ship + taxAmount);
     $('coTotal').textContent = totalStr;
     // The same figure, read off the collapsed summary header — see
@@ -453,6 +440,16 @@
         paymentIntentId = data.paymentIntentId;
         taxAmount = data.tax || 0;
         promoDiscount = data.discount || 0;
+        // The comparison is re-run on every reprice, not just the moment
+        // "Apply" was pressed, so a cart change afterward (a line's qty
+        // crossing a tier either way) can flip which one currently wins.
+        // codeBeatenBy only ever comes back set when a code is still applied,
+        // so this never fires for a cart with no code entered at all.
+        if (appliedPromoCode) {
+          setPromoMsg('ok', data.codeBeatenBy
+            ? 'Your quantity discount already beats this code, so that’s what’s applied.'
+            : 'Best available discount applied.');
+        }
         renderSummary();
 
         if (!elements) {
@@ -978,9 +975,17 @@
           return;
         }
 
+        // Kept applied either way, even when the tiers win the comparison:
+        // the code is real, and leaving it entered means a later cart change
+        // (a line dropping below its tier) gets it reconsidered automatically
+        // on the next reprice rather than needing to be retyped.
         appliedPromoCode = data.code;
         setPromoUI('applied');
-        setPromoMsg('ok', `Applied: ${money(data.discount)} off.`);
+        if (data.useTiered) {
+          setPromoMsg('ok', 'Your quantity discount already beats this code, so that’s what’s applied.');
+        } else {
+          setPromoMsg('ok', 'Best available discount applied.');
+        }
 
         if (typeof PAYMENTS_LIVE !== 'undefined' && PAYMENTS_LIVE && stripeClient) await ensurePaymentIntent();
         else renderSummary();
