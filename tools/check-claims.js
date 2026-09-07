@@ -3910,6 +3910,17 @@ console.log('\ndeploy headers');
   const conflicted = all.filter(u => new Set(cacheFor(u)).size > 1);
   ok('no URL matches two conflicting Cache-Control rules',
     conflicted.length === 0, conflicted.join(', '));
+
+  // js/coa.js opens every certificate in an <iframe> pointing at the PDF's
+  // own same-origin URL. X-Frame-Options: DENY blocks a page from being
+  // framed by anyone, itself included — the certificate viewer opened to a
+  // blank frame under that value, since a same-origin embed is still framing.
+  // SAMEORIGIN keeps every other origin locked out (the header's whole job)
+  // while letting the site frame its own documents.
+  const frameOptions = headersFor(assetUrls.find(u => /\.pdf$/.test(u)))
+    .filter(h => h.key === 'X-Frame-Options').map(h => h.value);
+  ok('a certificate PDF is not framed-out from its own viewer',
+    !frameOptions.includes('DENY'), frameOptions.join(', '));
 }
 
 /* ---------------------------------------------------------------------------
