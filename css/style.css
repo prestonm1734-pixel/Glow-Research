@@ -72,13 +72,6 @@
   --teal: #e4e4e2;
   --yellow: #ffffff;
 
-  /* The one deliberate exception to the monochrome rule above, and it stays
-     an exception on purpose: reserved for the handful of things that are
-     specifically about testing, verification or Glow's own mark, never for
-     decoration. Everything else on the page stays black/white/gray so this
-     stays legible as a signal instead of blending in as "the site's color". */
-  --verify-blue: #AFC8D6;
-
   --grad-main: linear-gradient(120deg, #ffffff 0%, #cfcfcd 50%, #9c9c99 100%);
   --grad-alt: linear-gradient(120deg, #ffffff, #8a8a87);
 
@@ -212,20 +205,6 @@ p{ margin:0 0 1em; color: var(--text-dim); line-height:1.65; }
   background: rgba(255,255,255,0.14);
   box-shadow: none;
 }
-/* Homepage hero only (:not(.wl-hero) excludes welcome.html's own hero,
-   which shares this markup): View COAs is a verification action, so it
-   gets the one border/text color on the page that isn't black, white or
-   gray. Explore Catalog stays untouched and stays the one thing that
-   reads as "the" call to action. */
-.hero:not(.wl-hero) .hero-cta .btn-outline{
-  border-color: var(--verify-blue);
-  color: var(--verify-blue);
-}
-.hero:not(.wl-hero) .hero-cta .btn-outline:hover{
-  border-color: var(--verify-blue);
-  color: var(--verify-blue);
-  background: rgba(175,200,214,0.12);
-}
 .btn-ghost{
   background: rgba(255,255,255,0.06);
   border: 1px solid var(--border);
@@ -340,13 +319,6 @@ button[disabled].si-forgot{ cursor: progress; }
   color: #0a0a0a; font-size: 0.7em; display:inline-block;
   transition: transform .5s cubic-bezier(.34,1.56,.64,1);
 }
-/* The one recurring mark on the site, tested here on the footer's dark
-   ground: Glow stays white, the star alone carries the blue. Not applied to
-   the base rule above — the same pale blue that reads clearly on black
-   nearly disappears against the header's white background, so the nav and
-   mobile-menu logo keep the near-black star until there is a version of this
-   that works on both grounds. */
-.site-footer .spark{ color: var(--verify-blue); }
 .logo:hover .spark{ transform: rotate(90deg) scale(1.25); }
 .main-nav{ display:flex; gap: 34px; }
 .main-nav a{
@@ -446,11 +418,6 @@ button[disabled].si-forgot{ cursor: progress; }
   font-size: 0.74rem; letter-spacing:.18em; text-transform:uppercase; font-weight:600;
   color: #ffffff; margin-bottom: 16px; position: relative; z-index: 1;
 }
-/* Scoped to the homepage hero alone (:not(.wl-hero) excludes welcome.html,
-   which shares this markup): the one line in the hero that is literally a
-   verification claim, so it is the one line that gets the verify-blue
-   reserved for exactly that. */
-.hero:not(.wl-hero) .hero-eyebrow{ color: var(--verify-blue); }
 @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
 /* the hero line — solid, semibold, full white, largest size on the page */
@@ -526,15 +493,6 @@ button[disabled].si-forgot{ cursor: progress; }
   background: var(--grad-main); -webkit-background-clip:text; background-clip:text; color:transparent;
 }
 .stat p{ margin:4px 0 0; font-size: 0.76rem; color: var(--text-dimmer); text-transform: uppercase; letter-spacing:.06em; }
-/* Homepage hero only, and only the purity figure: it is the one stat that is
-   actually a verification claim ("tested to this purity"), so it is the one
-   that gets the blue. Batches tested and same-day dispatch are operational
-   facts, not verification, and stay the shared white/gray gradient. */
-.hero:not(.wl-hero) .hero-stats .stat:first-child .stat-num,
-.hero:not(.wl-hero) .hero-stats .stat:first-child .stat-suffix{
-  background: var(--verify-blue);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
 /* Escape hatch for a stat whose headline is a word rather than a number. Keeps
    the gradient and weight but drops a size, because a whole word set at the
    numeral size crowds the other two out of the row. js/script.js skips it when
