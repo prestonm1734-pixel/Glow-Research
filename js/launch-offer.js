@@ -408,6 +408,14 @@
       // timing, worth skipping rather than working around.
       if (document.body.classList.contains('search-locked')) return;
 
+      // The age gate is a condition of entry, not a competing offer: a
+      // visitor who has not yet said they are 21 has not agreed to see
+      // anything else on the page, discount popup included. Exit-intent's
+      // own arm delay is a single second, well inside how long the gate
+      // typically takes to read and click through, so this is not
+      // theoretical — the two triggers really do overlap.
+      if (document.documentElement.classList.contains('age-gate-open')) return;
+
       // Asked again here, not just when the triggers were armed ten seconds
       // ago. Everything popupEligible() reads can change inside that window,
       // and two of them do, on this site, without the page ever reloading:
