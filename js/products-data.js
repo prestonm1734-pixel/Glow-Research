@@ -1144,6 +1144,13 @@ function batchMeta(p) {
 // reads as an image that failed to load, which is worse than the name standing
 // on its own, and any glyph put there to fill it would be a mark for a
 // laboratory nobody has named.
+//
+// The accreditation line itself does not render here any more — a business
+// call, not a claim change: LAB.accreditation still holds the real,
+// unaccredited-pending standing, still governs the check-claims.js guards
+// below that forbid any page from stating it as held, and still appears in
+// full on how-we-test.html's own prose. This card just no longer repeats it
+// as a terse badge under the logo on every product and certificate.
 function batchPanelHtml(p) {
   const lab = labIdentity();
   const method = purityMethod();
@@ -1155,7 +1162,6 @@ function batchPanelHtml(p) {
             : ''}
           <span class="ba-lab-id">
             <span class="ba-lab-name">${escHtml(lab.name)}</span>
-            <span class="ba-lab-sub">${escHtml(lab.accreditation)}</span>
           </span>
         </div>
         <div class="ba-figure">
