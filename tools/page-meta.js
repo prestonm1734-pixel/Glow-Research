@@ -72,11 +72,6 @@ const PAGE_META = {
     title: t('Wholesale'),
     desc: 'Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day.',
   },
-  'affiliates.html': {
-    name: 'Affiliates',
-    title: t('Affiliates'),
-    desc: 'Apply to promote Glow Research. Your own tracked link, commission on every sale it brings in, and a dashboard that shows clicks and conversions in real time.',
-  },
   'coa.html': {
     name: 'Certificate of Analysis',
     title: t('Certificate of Analysis'),
