@@ -421,15 +421,12 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/ghk-cu-lot-5567.pdf', coaRef: 'D69A-YY5F', tested: '6 July 2026',
     results: { Identity: 'Conforms', Quantity: '56.93 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [{ mg: '50mg', price: 45.99, list: 51, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
-    blurb: 'A naturally occurring copper-binding tripeptide complex. Studied in vitro for extracellular matrix remodelling.',
+    blurb: 'A 50mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'GHK-Cu is the tripeptide glycyl-L-histidyl-L-lysine complexed with copper(II). The tripeptide occurs naturally in plasma and binds copper with high affinity, and it is the complex rather than the bare peptide that most research uses.',
-      'It ships as the copper complex, which is blue. That colour is a useful handling cue: it tells you the copper is still coordinated.'
+      'A 50mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
     ],
     research: [
-      { t: 'Extracellular matrix remodelling', d: 'Studied in fibroblast culture for effects on collagen and proteoglycan gene expression.' },
-      { t: 'Copper transport', d: 'Used as a model for how small peptides carry and deliver copper ions between compartments.' },
-      { t: 'Antioxidant enzyme activity', d: 'Examined for interaction with copper-dependent enzyme systems.' }
+      { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
   { name: 'BPC-157', tag: null, cat: 'tissue', purity: '98.2%', lot: '1400', badge:null,
     coa: 'assets/coas/bpc-157-lot-1400.pdf', coaRef: 'X9RM-SMBN', tested: '5 July 2026',
@@ -437,15 +434,12 @@ const GLOW_PRODUCTS = [
     sizes: [
       { mg: '10mg', price: 57.99, list: 64, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg-v3.webp' },
     ],
-    blurb: 'A synthetic pentadecapeptide derived from a protein found in gastric juice. Studied in vitro for angiogenic signalling.',
+    blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'BPC-157 is a synthetic pentadecapeptide: a fifteen amino acid sequence corresponding to a partial fragment of body protection compound, a protein identified in gastric juice. It is supplied lyophilized.',
-      'The sequence is notable in laboratory work for holding up in aqueous and acidic conditions, which is part of why it appears so often in in-vitro and preclinical model systems.'
+      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
     ],
     research: [
-      { t: 'Angiogenic signalling', d: 'Studied in endothelial cell models for interaction with the VEGF receptor 2 pathway and the formation of vessel structures in culture.' },
-      { t: 'Fibroblast migration', d: 'Used in scratch and outgrowth assays examining how tendon and ligament fibroblasts migrate and organise.' },
-      { t: 'Gut epithelial models', d: 'Examined in gastrointestinal tissue models, reflecting the gastric origin of the parent protein.' }
+      { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
   { name: 'BPC-157/TB-500', alias: 'Wolverine', tag: 'Peptide Blend', cat: 'tissue', purity: '98.63%', lot: '5615', badge:null,
     coa: 'assets/coas/bpc-157-tb-500-lot-5615.pdf', coaRef: '7STD-6SRY', tested: '5 July 2026',
@@ -453,42 +447,34 @@ const GLOW_PRODUCTS = [
     sizes: [
       { mg: '10mg', price: 76.99, list: 85, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg-v3.webp' },
     ],
-    blurb: 'A combined BPC-157 and TB-500 formulation. Supplied for research using both peptides together in one vial.',
+    blurb: 'A 10mg lyophilized peptide blend, known as Wolverine. Supplied for in-vitro laboratory studies.',
     about: [
-      'This blend combines BPC-157 and TB-500 in a single vial, 5/5 mg of each for 10mg total, formulated for laboratories that already run both peptides together rather than reconstituting them separately. It is commonly referred to as Wolverine within the peptide research community.',
-      'BPC-157 and TB-500 act through different mechanisms, angiogenic signalling and actin-binding cytoskeletal dynamics respectively, so the blend is a co-formulation, not a new compound with its own mechanism.'
+      'A 10mg lyophilized peptide blend, known as Wolverine. Supplied for in-vitro laboratory studies.'
     ],
     research: [
-      { t: 'Co-formulation stability', d: 'Studied for how the two peptides behave when reconstituted and stored together versus from separate vials.' },
-      { t: 'Combined pathway models', d: 'Used in fibroblast and endothelial culture models examining both peptides applied from a single source.' },
-      { t: 'Comparative protocols', d: 'Applied alongside single-compound vials to compare co-formulated and separately administered research protocols.' }
+      { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
   { name: 'GLOW', alias: 'GHK-Cu/BPC-157/TB-500', tag: 'Peptide Blend', cat: 'tissue', purity: '99.61%', lot: '1035', badge:null,
     coa: 'assets/coas/glow-lot-1035.pdf', coaRef: 'X7MB-H2H8', tested: '13 June 2026',
     results: { Identity: 'Conforms', Quantity: '65.63 mg' },
     sizes: [{ mg: '70mg', price: 112.99, list: 124, sku: 'GLO-BBG70', image: 'assets/products/glow-70mg-v3.webp' }],
-    blurb: 'A compounded blend of GHK-Cu, BPC-157 and TB-500. Supplied for research using all three peptides together in one vial.',
+    blurb: 'A 70mg lyophilized peptide blend, also known as GHK-Cu/BPC-157/TB-500. Supplied for in-vitro laboratory studies.',
     about: [
-      'GLOW is Glow Research’s designation for a compounded blend of three research peptides, GHK-Cu, BPC-157 and TB-500, supplied together in one 70mg vial rather than as separate compounds. It is commonly referred to by its components, GHK-Cu/BPC-157/TB-500, within the peptide research community.',
-      'GHK-Cu, BPC-157 and TB-500 act through distinct mechanisms, copper-dependent extracellular matrix signalling, angiogenic signalling and actin-binding cytoskeletal dynamics respectively, so the blend is a co-formulation of three independent compounds rather than a new one with its own mechanism.'
+      'A 70mg lyophilized peptide blend, also known as GHK-Cu/BPC-157/TB-500. Supplied for in-vitro laboratory studies.'
     ],
     research: [
-      { t: 'Co-formulation research', d: 'Used by laboratories studying multiple compounded peptides delivered from a single vial rather than several discrete kits.' },
-      { t: 'Comparative protocols', d: 'Applied alongside single-compound vials when comparing blended and separately administered research protocols.' }
+      { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
   { name: 'CJC-1295 No DAC/Ipamorelin', tag: 'Peptide Blend', cat: 'growth', purity: '99.08%', lot: '005', badge:null,
     coa: 'assets/coas/cjc-1295-no-dac-ipamorelin-lot-005.pdf', coaRef: 'MHCU-CDXL', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.18 mg' },
     sizes: [{ mg: '5/5mg', price: 80.99, list: 89, sku: 'GLO-CP10', image: 'assets/products/cjc-1295-ipamorelin-5-5mg-v3.webp' }],
-    blurb: 'A combined CJC-1295 (No DAC) and Ipamorelin formulation. Supplied for research examining GHRH and ghrelin receptor co-agonism.',
+    blurb: 'A 5/5mg lyophilized peptide blend. Supplied for in-vitro laboratory studies.',
     about: [
-      'This blend combines CJC-1295 without DAC and Ipamorelin in a single vial, 5/5 mg of each for 10mg total, pairing a GHRH receptor analogue with a selective ghrelin receptor agonist.',
-      'The two peptides act on different receptors within the same growth hormone axis, which is why they are frequently studied together rather than as substitutes for one another.'
+      'A 5/5mg lyophilized peptide blend. Supplied for in-vitro laboratory studies.'
     ],
     research: [
-      { t: 'Dual-pathway secretagogue models', d: 'Used to study whether combined GHRH and ghrelin receptor engagement produces a different pulse profile than either peptide alone.' },
-      { t: 'Co-formulation stability', d: 'Studied for how the two peptides behave when reconstituted and stored from a single vial.' },
-      { t: 'Comparative pulse studies', d: 'Applied alongside single-compound vials in models comparing combined and separate administration protocols.' }
+      { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
   { name: 'G1-S', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:null,
     coa: 'assets/coas/g1-s-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
@@ -505,15 +491,12 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/tesamorelin-lot-1002.pdf', coaRef: 'R934-S6U9', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.59 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [{ mg: '10mg', price: 85.99, list: 95, sku: 'GLO-TSM10', image: 'assets/products/tesamorelin-10mg-v3.webp' }],
-    blurb: 'A synthetic growth hormone releasing hormone analogue with a stabilised N-terminus. Studied for pituitary receptor engagement.',
+    blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'Tesamorelin is a synthetic analogue of growth hormone releasing hormone carrying a trans-3-hexenoic acid modification at the N-terminus that slows enzymatic degradation by DPP-4.',
-      'The modification is what gives it a longer functional window than native GHRH in culture, which is the property most research on the analogue is designed around.'
+      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
     ],
     research: [
-      { t: 'GHRH receptor binding', d: 'Used in receptor occupancy and activation assays at the pituitary GHRH receptor, alongside other GHRH analogues.' },
-      { t: 'DPP-4 resistance', d: 'Studied for resistance to enzymatic cleavage relative to native GHRH, and how that changes assay-window duration.' },
-      { t: 'Comparative secretagogue pharmacology', d: 'Run as a reference GHRH analogue when newer compounds in the class are characterised.' }
+      { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
   { name: 'G2-T', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
     coa: 'assets/coas/g2-t-lot-1600.pdf', coaRef: '7RRU-W2LV', tested: '29 July 2026',
@@ -530,15 +513,12 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/mots-c-lot-1025.pdf', coaRef: 'N8VT-H88T', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.45 mg' },
     sizes: [{ mg: '10mg', price: 67.99, list: 75, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg-v3.webp' }],
-    blurb: 'A mitochondrial-derived peptide encoded within the mitochondrial genome. Studied for its role in metabolic signalling.',
+    blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'MOTS-C is a 16 amino acid peptide encoded in the mitochondrial 12S rRNA region rather than the nuclear genome, one of a small class of mitochondrial-derived peptides identified in the last two decades.',
-      'It is studied for translocating to the nucleus under metabolic stress, which is the behaviour that placed it in metabolic signalling research rather than classical mitochondrial biology alone.'
+      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
     ],
     research: [
-      { t: 'AMPK pathway signalling', d: 'Studied in cell models for activation of AMPK and downstream metabolic gene expression.' },
-      { t: 'Nuclear translocation', d: 'Investigated for movement from mitochondria to the nucleus under metabolic stress conditions in culture.' },
-      { t: 'Mitochondrial-derived peptide research', d: 'Used as a reference compound in the broader study of peptides encoded within the mitochondrial genome.' }
+      { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
 ];
 
