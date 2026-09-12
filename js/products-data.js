@@ -385,7 +385,7 @@ function coaHref(p) {
 // a single `sizes[]` row matching the one size the launch list states; add a
 // second size only once the supplier confirms a SKU for it.
 const GLOW_PRODUCTS = [
-  { name: 'G3-R', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:'Best Seller',
+  { name: 'G3-R', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:null,
     coa: 'assets/coas/g3-r-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [
@@ -417,7 +417,7 @@ const GLOW_PRODUCTS = [
   // double as a ranking signal for this order; it still has to stay rare
   // enough to mean something, which tools/check-claims.js enforces
   // separately.
-  { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.815%', lot: '5567', badge:'Best Value',
+  { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.815%', lot: '5567', badge:null,
     coa: 'assets/coas/ghk-cu-lot-5567.pdf', coaRef: 'D69A-YY5F', tested: '6 July 2026',
     results: { Identity: 'Conforms', Quantity: '56.93 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [{ mg: '50mg', price: 45.99, list: 51, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
@@ -490,7 +490,7 @@ const GLOW_PRODUCTS = [
       { t: 'Co-formulation stability', d: 'Studied for how the two peptides behave when reconstituted and stored from a single vial.' },
       { t: 'Comparative pulse studies', d: 'Applied alongside single-compound vials in models comparing combined and separate administration protocols.' }
     ] },
-  { name: 'G1-S', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:'Popular',
+  { name: 'G1-S', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:null,
     coa: 'assets/coas/g1-s-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.96 mg' },
     sizes: [{ mg: '10mg', price: 72.99, list: 80, sku: 'GLO-SM10', image: 'assets/products/g1-s-10mg-v5.webp' }],
