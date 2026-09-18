@@ -747,29 +747,6 @@
              pattern as pd-alias and pd-desc. -->
         <p class="pd-batch" id="pdBatch">Current HPLC-tested batch: <strong>Lot #5615</strong></p>
 
-        <!-- Moved ahead of the quantity decision on purpose: a price-checking
-             visitor should see the lot match and the testing claim before the
-             tier cards, not after — that is the proof the premium price rests
-             on, and it should land before the offer, not as an afterthought
-             below it. -->
-        <a class="pd-coa" id="pdCoaLink">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M6 2h8l4 4v16H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-            <path d="M14 2v5h4M9 12h6M9 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-          <!-- Wording assumes NO hosted certificate, because that is the state
-               today and it is also what a crawler and the generated static page
-               see. js/product.js swaps it to the "view" wording only once a real
-               href exists — honest by default, upgraded when it can be. -->
-          <span>
-            <b>Certificate of analysis on request</b>
-            <small>Email support@glowresearch.shop with the lot number on your vial and we will send the COA for that batch</small>
-          </span>
-          <svg class="pd-coa-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a>
-
         <div class="pd-buy">
           <div class="pd-stepper">
             <button type="button" id="pdQtyDec" aria-label="Decrease quantity">&minus;</button>
@@ -793,6 +770,24 @@
                until the Add to cart button is pressed. -->
           <div class="pd-tiers" id="pdTiers"></div>
         </div>
+
+        <a class="pd-coa" id="pdCoaLink">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 2h8l4 4v16H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M14 2v5h4M9 12h6M9 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <!-- Wording assumes NO hosted certificate, because that is the state
+               today and it is also what a crawler and the generated static page
+               see. js/product.js swaps it to the "view" wording only once a real
+               href exists — honest by default, upgraded when it can be. -->
+          <span>
+            <b>Certificate of analysis on request</b>
+            <small>Email support@glowresearch.shop with the lot number on your vial and we will send the COA for that batch</small>
+          </span>
+          <svg class="pd-coa-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
       </div>
 
     </div>
