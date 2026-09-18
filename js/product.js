@@ -20,9 +20,11 @@
 
   let product = null;
   let sizeIndex = 0;
-  // 3 rather than 1: it is the first quantity that earns a free vial, and the
-  // card advertising it is the one the page opens on already selected.
-  let qty = QTY_GROUP;
+  // The page opens on one vial, plain, with nothing added to the cart yet.
+  // Landing on the 3-vial card would put a quantity in the buy box the
+  // visitor never chose — the cards are for picking a quantity, not for the
+  // page picking one for them.
+  let qty = 1;
   // set by renderDelivery() so picking a different mg re-reads its stock
   let refreshDelivery = null;
 
