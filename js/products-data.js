@@ -389,7 +389,7 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/g3-r-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [
-      { mg: '10mg', price: 109.99, list: 121, sku: 'GLO-RT10', image: 'assets/products/g3-r-10mg-v5.webp' },
+      { mg: '10mg', price: 119.97, list: 132, sku: 'GLO-RT10', image: 'assets/products/g3-r-10mg-v5.webp' },
     ],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
@@ -420,7 +420,7 @@ const GLOW_PRODUCTS = [
   { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.815%', lot: '5567', badge:null,
     coa: 'assets/coas/ghk-cu-lot-5567.pdf', coaRef: 'D69A-YY5F', tested: '6 July 2026',
     results: { Identity: 'Conforms', Quantity: '56.93 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
-    sizes: [{ mg: '50mg', price: 54.99, list: 60, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
+    sizes: [{ mg: '50mg', price: 59.97, list: 66, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
     blurb: 'A 50mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
       'A 50mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
@@ -432,7 +432,7 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/bpc-157-lot-1400.pdf', coaRef: 'X9RM-SMBN', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.13 mg' },
     sizes: [
-      { mg: '10mg', price: 89.99, list: 99, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg-v3.webp' },
+      { mg: '10mg', price: 84.97, list: 93, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg-v3.webp' },
     ],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
@@ -445,7 +445,7 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/bpc-157-tb-500-lot-5615.pdf', coaRef: '7STD-6SRY', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '9.73 mg' },
     sizes: [
-      { mg: '10mg', price: 99.99, list: 110, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg-v3.webp' },
+      { mg: '10mg', price: 104.97, list: 115, sku: 'GLO-BB10', image: 'assets/products/bpc-157-tb-500-blend-10mg-v3.webp' },
     ],
     blurb: 'A 10mg lyophilized peptide blend, known as Wolverine. Supplied for in-vitro laboratory studies.',
     about: [
@@ -457,7 +457,7 @@ const GLOW_PRODUCTS = [
   { name: 'GLOW', alias: 'GHK-Cu/BPC-157/TB-500', tag: 'Peptide Blend', cat: 'tissue', purity: '99.61%', lot: '1035', badge:null,
     coa: 'assets/coas/glow-lot-1035.pdf', coaRef: 'X7MB-H2H8', tested: '13 June 2026',
     results: { Identity: 'Conforms', Quantity: '65.63 mg' },
-    sizes: [{ mg: '70mg', price: 159.99, list: 176, sku: 'GLO-BBG70', image: 'assets/products/glow-70mg-v3.webp' }],
+    sizes: [{ mg: '70mg', price: 159.97, list: 176, sku: 'GLO-BBG70', image: 'assets/products/glow-70mg-v3.webp' }],
     blurb: 'A 70mg lyophilized peptide blend, also known as GHK-Cu/BPC-157/TB-500. Supplied for in-vitro laboratory studies.',
     about: [
       'A 70mg lyophilized peptide blend, also known as GHK-Cu/BPC-157/TB-500. Supplied for in-vitro laboratory studies.'
@@ -468,7 +468,7 @@ const GLOW_PRODUCTS = [
   { name: 'CJC-1295 No DAC/Ipamorelin', tag: 'Peptide Blend', cat: 'growth', purity: '99.08%', lot: '005', badge:null,
     coa: 'assets/coas/cjc-1295-no-dac-ipamorelin-lot-005.pdf', coaRef: 'MHCU-CDXL', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.18 mg' },
-    sizes: [{ mg: '5/5mg', price: 94.99, list: 104, sku: 'GLO-CP10', image: 'assets/products/cjc-1295-ipamorelin-5-5mg-v3.webp' }],
+    sizes: [{ mg: '5/5mg', price: 109.97, list: 121, sku: 'GLO-CP10', image: 'assets/products/cjc-1295-ipamorelin-5-5mg-v3.webp' }],
     blurb: 'A 5/5mg lyophilized peptide blend. Supplied for in-vitro laboratory studies.',
     about: [
       'A 5/5mg lyophilized peptide blend. Supplied for in-vitro laboratory studies.'
@@ -479,7 +479,7 @@ const GLOW_PRODUCTS = [
   { name: 'G1-S', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:null,
     coa: 'assets/coas/g1-s-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.96 mg' },
-    sizes: [{ mg: '10mg', price: 89.99, list: 99, sku: 'GLO-SM10', image: 'assets/products/g1-s-10mg-v5.webp' }],
+    sizes: [{ mg: '10mg', price: 74.97, list: 82, sku: 'GLO-SM10', image: 'assets/products/g1-s-10mg-v5.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
       'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
@@ -490,7 +490,7 @@ const GLOW_PRODUCTS = [
   { name: 'Tesamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.36%', lot: '1002', badge:null,
     coa: 'assets/coas/tesamorelin-lot-1002.pdf', coaRef: 'R934-S6U9', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.59 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
-    sizes: [{ mg: '10mg', price: 139.99, list: 154, sku: 'GLO-TSM10', image: 'assets/products/tesamorelin-10mg-v3.webp' }],
+    sizes: [{ mg: '10mg', price: 119.97, list: 132, sku: 'GLO-TSM10', image: 'assets/products/tesamorelin-10mg-v3.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
       'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
@@ -501,7 +501,7 @@ const GLOW_PRODUCTS = [
   { name: 'G2-T', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
     coa: 'assets/coas/g2-t-lot-1600.pdf', coaRef: '7RRU-W2LV', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '12.49 mg' },
-    sizes: [{ mg: '10mg', price: 104.99, list: 115, sku: 'GLO-T10', image: 'assets/products/g2-t-10mg-v5.webp' }],
+    sizes: [{ mg: '10mg', price: 109.97, list: 121, sku: 'GLO-T10', image: 'assets/products/g2-t-10mg-v5.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
       'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
@@ -512,7 +512,7 @@ const GLOW_PRODUCTS = [
   { name: 'MOTS-C', tag: null, cat: 'longevity', purity: '99.84%', lot: '1025', badge:null,
     coa: 'assets/coas/mots-c-lot-1025.pdf', coaRef: 'N8VT-H88T', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.45 mg' },
-    sizes: [{ mg: '10mg', price: 104.99, list: 115, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg-v3.webp' }],
+    sizes: [{ mg: '10mg', price: 89.97, list: 99, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg-v3.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
       'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
