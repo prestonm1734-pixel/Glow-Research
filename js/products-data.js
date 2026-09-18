@@ -1377,12 +1377,17 @@ function getProductVariants(p, unitPrice) {
 // beside it. States the rule once in a form provable at any quantity — "every
 // third vial is free" holds whether the order is 4 vials or 40 — plus the two
 // worked examples the cards themselves don't cover.
+//
+// Wholesale used to get a mention here too, but "ordering every month is
+// wholesale" reads as ambiguous mid-decision — does monthly ordering earn
+// wholesale pricing, or does it require becoming a wholesale account? — and
+// it hands a buyer who is about to check out a reason to email instead.
+// Wholesale is a real offer, just not one this line is the place to raise.
 function bulkNote() {
   const a = QTY_GROUP * 2;
   const b = QTY_GROUP * 3;
   return `Every ${ordinal(QTY_GROUP)} vial in the order is free, at any quantity: ` +
-    `${a} for the price of ${paidVials(a)}, ${b} for the price of ${paidVials(b)}. ` +
-    `Ordering every month is <a href="wholesale.html">wholesale</a>.`;
+    `${a} for the price of ${paidVials(a)}, ${b} for the price of ${paidVials(b)}.`;
 }
 
 // The meta description for one compound, for the generated page's head and
