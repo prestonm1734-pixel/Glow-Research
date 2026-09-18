@@ -34,7 +34,7 @@ const {
   verifyUrl, verifyHost, LAB_VERIFY_URL,
   FAQS, faqHtml,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
-  QTY_GROUP, PDP_CARD_QTYS, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, bulkOff,
+  QTY_GROUP, QTY_STOPS, PDP_CARD_QTYS, getProductVariants, unitPriceAt, BULK_MAX_OFF, buyMoreLine, bulkOff,
   ordinal, freeVials, paidVials, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY, PAYMENT_METHODS,
   hasList, listPriceOf, SITEWIDE_DISCOUNT, VIAL_ART_NOTICE, LAUNCH_OFFER, LAUNCH_OFFER_LIVE,
@@ -198,6 +198,18 @@ console.log('\ndispatch window');
   });
   ok('every page with a marquee states the current cutoff ticker',
     staleTicker.length === 0, staleTicker.join(', '));
+
+  // Same discipline for the bulk-pricing line in the marquee: built from
+  // QTY_GROUP, so a group-size change that forgot the sitewide banner shows up
+  // here instead of silently advertising the old ratio on every page.
+  const BULK_MARQUEE_LINE = `EVERY ${ordinal(QTY_GROUP).toUpperCase()} VIAL FREE: APPLIED AUTOMATICALLY AT CHECKOUT`;
+  const staleBulkMarquee = [];
+  pages.forEach(f => {
+    const html = read(f);
+    if (/marquee-track/.test(html) && !html.includes(BULK_MARQUEE_LINE)) staleBulkMarquee.push(f);
+  });
+  ok('every page with a marquee states the bulk-pricing line',
+    staleBulkMarquee.length === 0, staleBulkMarquee.join(', '));
 
   // The marquee scrolls by animating the track from 0 to -50%, which only
   // returns to where it started if the track is the same list written twice.
@@ -2133,19 +2145,26 @@ console.log('\nstructured data');
  * ------------------------------------------------------------------------- */
 console.log('\nbulk pricing');
 {
-  // The three cards ascend and start at a single vial, and the last one is
-  // the group size — the first quantity that actually earns a free vial.
-  ok('the cards ascend from one vial to the group size',
-    PDP_CARD_QTYS[0] === 1 &&
-    PDP_CARD_QTYS.every((q, i) => i === 0 || q > PDP_CARD_QTYS[i - 1]) &&
-    PDP_CARD_QTYS[PDP_CARD_QTYS.length - 1] === QTY_GROUP,
+  // The stepper's stops are 1, 2, then every multiple of QTY_GROUP up to
+  // three bundles — no quantity in between is reachable at all, which is what
+  // keeps a "ragged" quantity (paying for a fraction of a group) from ever
+  // happening in the first place.
+  ok('the stepper stops at 1, 2, and three multiples of the group size',
+    QTY_STOPS.length === 5 && QTY_STOPS[0] === 1 && QTY_STOPS[1] === 2 &&
+    QTY_STOPS.slice(2).every((q, i) => q === QTY_GROUP * (i + 1)),
+    QTY_STOPS.join(', '));
+  // The cards are exactly the bundle stops, ascending.
+  ok('the cards are exactly the bundle stops in QTY_STOPS, in order',
+    PDP_CARD_QTYS.length === 3 &&
+    PDP_CARD_QTYS.every((q, i) => q === QTY_STOPS[i + 2]),
     PDP_CARD_QTYS.join(', '));
 
   // freeVials()/paidVials() are the one place "every Nth vial free" is
-  // computed, checked across a wide range rather than only at the group
-  // boundary, because a quantity between multiples is where an off-by-one
-  // would hide: 4 vials must keep the one free vial already earned at 3, not
-  // lose it, and must not earn a second one until 6.
+  // computed, checked across a wide range rather than only at the stops
+  // themselves, because a quantity between multiples is where an off-by-one
+  // would hide — even though the UI can no longer reach one, the functions
+  // still have to be correct for whatever a cart edit or a promo comparison
+  // hands them.
   const wrong = [];
   for (let q = 0; q <= QTY_GROUP * 6; q++) {
     const expectedFree = Math.floor(q / QTY_GROUP);
@@ -2167,24 +2186,18 @@ console.log('\nbulk pricing');
     /(3[4-9]|[4-9][0-9])% off starting at/.test(read('wholesale.html')),
     'wholesale.html must open above the retail bulk ceiling (33.3%)');
 
-  // The page states the rule this way for anyone who steps past the cards.
-  // This is the one that stops the wording drifting from what the mechanic
-  // actually does.
+  // The permanent line under the price is what tells a visitor stepping from
+  // 1 to 2 that a third is free, before they have looked at a single card —
+  // without a 2-vial card sitting next to the 3-vial one at the same price,
+  // nothing else on the page says so. Checked against product.html's static
+  // markup, since it has to read the same with or without JS.
   const pd = read('product.html');
-  const noteHtml = (pd.match(/id="pdBulkNote"[^>]*>([\s\S]*?)<\/p>/) || [, ''])[1].trim();
-  ok('the fine print under the cards is the one bulkNote() writes',
-    noteHtml === bulkNote(),
-    `run this sentence into product.html:\n          ${bulkNote()}`);
-  ok('js/product.js renders the note from bulkNote()',
-    /pdBulkNote[\s\S]{0,120}bulkNote\(\)/.test(read('js/product.js')));
-  // The two worked examples in the note have to be quantities the note's own
-  // "at any quantity" claim actually covers, and their figures have to be
-  // paidVials(), not typed numbers that could drift from the mechanic.
-  ok('the fine print names the group size and two worked multiples of it',
-    noteHtml.includes(ordinal(QTY_GROUP)) &&
-    noteHtml.includes(`${QTY_GROUP * 2} for the price of ${paidVials(QTY_GROUP * 2)}`) &&
-    noteHtml.includes(`${QTY_GROUP * 3} for the price of ${paidVials(QTY_GROUP * 3)}`),
-    noteHtml);
+  const priceNoteHtml = (pd.match(/id="pdPriceNote"[^>]*>([^<]*)<\/p>/) || [, ''])[1].trim();
+  ok('the line under the price is the one buyMoreLine() writes',
+    priceNoteHtml === buyMoreLine(),
+    `run this sentence into product.html:\n          ${buyMoreLine()}`);
+  ok('js/product.js renders it from buyMoreLine(), once, not per quantity',
+    /renderBuyMoreLine[\s\S]{0,160}buyMoreLine\(\)/.test(read('js/product.js')));
 
   // A card press must set the quantity, never add to the cart. This is the
   // behaviour regression that matters most: it spends the customer's money.
@@ -2194,6 +2207,15 @@ console.log('\nbulk pricing');
   ok('pressing a card does not add to the cart',
     !/GlowCart\.add/.test(tierHandler), 'a card press must never touch the cart');
 
+  // The stepper itself must only ever move along QTY_STOPS, or the whole
+  // point of fixing the stops (no ragged quantity is reachable) is undone by
+  // a plain qty +/- 1 sneaking back in.
+  ok('the stepper moves along QTY_STOPS rather than by one vial',
+    /function stepQty\(direction\)/.test(pj) &&
+    /QTY_STOPS\.indexOf\(qty\)/.test(pj) &&
+    /decBtn\.addEventListener\('click', \(\) => stepQty\(-1\)\)/.test(pj) &&
+    /incBtn\.addEventListener\('click', \(\) => stepQty\(1\)\)/.test(pj));
+
   // One function prices the buy box, the cart line and the generated page.
   ok('the buy box prices from unitPriceAt()', /unitPriceAt\(s\.price, qty\)/.test(pj));
   ok('the cart line is charged the price the buy box quoted',
@@ -2201,20 +2223,21 @@ console.log('\nbulk pricing');
   ok('the generated page bakes the same function',
     /unitPriceAt\(s\.price, 1\)/.test(read('tools/build-products.js')));
 
-  // Across the three cards, the per-vial price must never rise: 1 and 2 vials
-  // are the same plain rate (no group is complete yet), and 3 vials — the
-  // first complete group — must cost strictly less per vial than either. A
-  // threshold or group-size edit that broke that would advertise a bundle
-  // that charges more per vial than buying single.
+  // All three bundle cards must cost exactly the same per vial — the whole
+  // point of a fixed ratio is that 9 is not a richer deal than 3, just more
+  // of the same one — and every bundle must be strictly cheaper per vial than
+  // the plain 1/2-vial rate, or a card would be advertising a worse price
+  // than buying single.
   const inverted = [];
   GLOW_PRODUCTS.forEach(prod => prod.sizes.forEach(sz => {
     const vs = getProductVariants(prod, sz.price);
-    vs.forEach((v, i) => {
-      if (i && v.unitSale > vs[i - 1].unitSale) {
-        inverted.push(`${prod.name} ${sz.mg} ${v.label} costs more per vial than fewer vials`);
+    const plainUnit = unitPriceAt(sz.price, 1);
+    vs.forEach(v => {
+      if (Math.abs(v.unitSale - vs[0].unitSale) > 0.005) {
+        inverted.push(`${prod.name} ${sz.mg} ${v.label} is not the same per-vial rate as the other bundles`);
       }
-      if (v.free > 0 && v.unitSale >= vs[0].unitSale) {
-        inverted.push(`${prod.name} ${sz.mg} ${v.label} earns a free vial but is not cheaper per vial`);
+      if (!(v.unitSale < plainUnit)) {
+        inverted.push(`${prod.name} ${sz.mg} ${v.label} is not cheaper per vial than buying single`);
       }
       // and the struck-through list total must be a real list total
       if (Math.round(v.qty * sz.price * 100) / 100 !== v.original) {
@@ -2222,20 +2245,31 @@ console.log('\nbulk pricing');
       }
     });
   }));
-  ok('the 3-vial card is strictly cheaper per vial, and no card is ever more expensive',
+  ok('every bundle costs the same per vial, and all are cheaper than buying single',
     inverted.length === 0, inverted.join(', '));
 
-  // GHK-Cu is the one product that leads its bulk badge with the percentage
-  // instead of the dollar figure — see the comment on it in
-  // js/products-data.js. Everything else must lead with the dollar figure the
-  // 3-vial card actually saves.
+  // No card claims to be the "best" deal — all three are the same $/vial, so
+  // a best-value claim on the 9 would not survive anyone doing the division.
+  const pjNoComments = read('js/product.js')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/.*$/gm, '');
+  ok('no bulk card copy claims a best value or comparative rank',
+    !/best.value|best.deal|biggest.saving/i.test(pjNoComments));
+
+  // GHK-Cu's smallest bundle is the one card that leads its badge with the
+  // percentage instead of the dollar figure — see the comment on it in
+  // js/products-data.js. The 6- and 9-vial cards must still lead with the
+  // dollar figure even there, since the saving is 2x/3x bigger at those sizes
+  // and the percentage stays flat.
   const badgedWrong = [];
   GLOW_PRODUCTS.forEach(prod => {
     const pctFormat = prod.bulkSavingsFormat === 'pct';
     if (pctFormat && prod.name !== 'GHK-Cu') badgedWrong.push(`${prod.name} is flagged for percent format`);
   });
-  ok('only GHK-Cu is flagged to show the bulk saving as a percentage',
+  ok('only GHK-Cu is flagged to show a bulk saving as a percentage',
     badgedWrong.length === 0, badgedWrong.join('; '));
+  ok('that flag is scoped to the smallest bundle card, not every card',
+    /pctFormat && v\.qty === smallest/.test(pj));
 
   /* The cart is the other place a quantity changes, and it was the hole this
      model opened. unitSale used to be stored on the line when it was added,
@@ -2306,10 +2340,10 @@ console.log('\nlaunch pricing');
   // The whole reason list prices can be round is that no surface states a
   // percentage for them. If one ever did, the rounding would make it a lie on
   // nine of the ten SKUs.
-  // Deliberately not a bare "20% off": the bulk note on product.html says
-  // exactly that about the 10-vial tier, which is a real, enforced discount
-  // generated by bulkNote(). What must not appear is a percentage attached to
-  // the launch markdown itself, since that figure varies by SKU.
+  // Deliberately not a bare "33% off": GHK-Cu's bundle cards say exactly that,
+  // which is a real, enforced discount computed from QTY_GROUP. What must not
+  // appear is a percentage attached to the launch markdown itself, since that
+  // figure varies by SKU.
   const LAUNCH_PCT = /(launch|sitewide|site-wide|storewide|everything|all products)[^.<]{0,40}\d{1,2}\s*%|\d{1,2}\s*%[^.<]{0,40}(launch|sitewide|site-wide|storewide|everything|all products)/i;
   const pctCopy = ['index.html', 'shop.html', 'product.html', 'checkout.html']
     .filter(f => LAUNCH_PCT.test(read(f)));

@@ -300,23 +300,17 @@
     }
 
     renderSticky(total);
+  }
 
-    // One vial at list price is the plain case and needs no explaining. Past
-    // that, say the per-vial rate, and name the tier when one is earning it —
-    // someone on 4 vials should be told they are on the 3-vial rate rather
-    // than left to work out why the number moved.
+  // The one line under the price that states the mechanic itself, not the
+  // current selection — it reads the same at 1 vial as at 9, because it is
+  // the fact that makes the cards below make sense, not a readout of what's
+  // picked right now. Set once; nothing about it depends on qty or size.
+  function renderBuyMoreLine() {
     const note = $('pdPriceNote');
     if (!note) return;
-    if (qty === 1) {
-      note.textContent = '';
-      note.hidden = true;
-      return;
-    }
     note.hidden = false;
-    const free = freeVials(qty);
-    note.innerHTML = free > 0
-      ? `${money(unit)} per vial <span class="pd-note-sep">·</span> ${free} vial${free === 1 ? '' : 's'} free`
-      : `${money(unit)} per vial`;
+    note.textContent = buyMoreLine();
   }
 
   // everything that changes when a different mg is picked
@@ -410,16 +404,32 @@
 
   // Everything that depends on the quantity, in one place. The stepper and the
   // tier cards both call this rather than each updating their own corner of
-  // the page, so the price, the note and the highlighted card can never
-  // describe different quantities.
+  // the page, so the price and the highlighted card can never describe
+  // different quantities.
   function setQty(n) {
-    qty = Math.max(1, n);
+    // Snaps to the nearest stop rather than trusting the caller: every actual
+    // caller already passes an exact stop (the stepper moves one index at a
+    // time, a card press passes its own qty), but landing on a real stop no
+    // matter what is what keeps a ragged quantity from ever reaching the
+    // price at all.
+    qty = QTY_STOPS.reduce((best, s) => (Math.abs(s - n) < Math.abs(best - n) ? s : best), QTY_STOPS[0]);
     const qtyEl = $('pdQty');
     const decEl = $('pdQtyDec');
+    const incEl = $('pdQtyInc');
     if (qtyEl) qtyEl.textContent = qty;
-    if (decEl) decEl.disabled = qty <= 1;
+    if (decEl) decEl.disabled = qty <= QTY_STOPS[0];
+    if (incEl) incEl.disabled = qty >= QTY_STOPS[QTY_STOPS.length - 1];
     renderPrice();
     markActiveTier();
+  }
+
+  // Moves the stepper to the next or previous QTY_STOPS entry rather than by
+  // one vial at a time — the whole point of fixing the stops is that there is
+  // no quantity between them to step onto.
+  function stepQty(direction) {
+    const idx = QTY_STOPS.indexOf(qty);
+    const nextIdx = Math.max(0, Math.min(QTY_STOPS.length - 1, idx + direction));
+    setQty(QTY_STOPS[nextIdx]);
   }
 
   function wireBuy() {
@@ -427,8 +437,8 @@
 
     const decBtn = $('pdQtyDec');
     const incBtn = $('pdQtyInc');
-    if (decBtn) decBtn.addEventListener('click', () => setQty(qty - 1));
-    if (incBtn) incBtn.addEventListener('click', () => setQty(qty + 1));
+    if (decBtn) decBtn.addEventListener('click', () => stepQty(-1));
+    if (incBtn) incBtn.addEventListener('click', () => stepQty(1));
 
     // the cart line is unitSale × qty, and unitSale is the tier-adjusted price
     // the page just showed, so the cart charges what the buy box quoted
@@ -472,12 +482,9 @@
      bundle and being taken straight to a cart is the behaviour that makes
      people distrust a bundle picker, and it also made the stepper pointless. */
 
-  // Highlights the card matching the current quantity exactly. Past the last
-  // card (3 vials) the mechanic keeps applying past three, but per-vial cost
-  // stops falling in a straight line — a fourth vial pays full price until
-  // the next free one — so there is no single card left to light up, and
-  // nothing is highlighted rather than a card stating a rate the buyer isn't
-  // actually getting. The note under the price names the real one instead.
+  // Highlights the card matching the current quantity exactly. qty is always
+  // one of QTY_STOPS, so this either lands on exactly one card (3, 6 or 9) or
+  // on none at all (1 or 2, the plain stepper range with no card to light).
   function markActiveTier() {
     document.querySelectorAll('#pdTiers .pd-tier').forEach(btn => {
       const isOn = +btn.dataset.qty === qty;
@@ -495,24 +502,27 @@
     // one vial per unit, but three is enough to read as "several" — past that
     // they just overlap into a smudge, and the label already says the count
     const vialArt = `<img src="${pageHref(product.image)}" alt="" loading="lazy" />`;
-    // GHK-Cu is the one product whose bulk card leads with the percentage
-    // instead of the dollar figure — see the comment on it in
-    // js/products-data.js.
+    // GHK-Cu is the one product whose smallest bundle leads with the
+    // percentage instead of the dollar figure — see the comment on it in
+    // js/products-data.js. At 6 and 9 vials the dollar figure is unambiguously
+    // the bigger number even there, so the exception is scoped to the first
+    // card rather than the whole product.
     const pctFormat = product.bulkSavingsFormat === 'pct';
+    const smallest = variants[0].qty;
 
     wrap.innerHTML = variants.map(v => {
-      // Only the 3-vial card ever earns a free one — 1 and 2 vials are shown
-      // plain, at the same per-vial rate, so the third card is the only place
-      // the flag and the saving appear.
-      const flag = v.free > 0
-        ? `<span class="pd-tier-flag">${ordinal(QTY_GROUP)} free</span>
-           <span class="pd-tier-off">${pctFormat
-             ? `${Math.round((1 - v.sale / v.original) * 100)}% off`
-             : `Save ${money(v.saveDollars)}`}</span>`
-        : '';
+      const usePct = pctFormat && v.qty === smallest;
+      // All three cards earn a free vial now — the escalating count (1, 2, 3)
+      // is what makes the ladder read as growing, not a "best value" claim on
+      // the 9, which would not survive anyone doing the division: every card
+      // is the same $/vial. The first card gets visual weight instead of a
+      // claim — it is the one most people are actually deciding between.
       return `
-        <button type="button" class="pd-tier${v.free ? ' is-best' : ''}" data-qty="${v.qty}" aria-pressed="false">
-          ${flag}
+        <button type="button" class="pd-tier${v.qty === smallest ? ' is-featured' : ''}" data-qty="${v.qty}" aria-pressed="false">
+          <span class="pd-tier-flag">${v.free} free</span>
+          <span class="pd-tier-off">${usePct
+            ? `${Math.round((1 - v.sale / v.original) * 100)}% off`
+            : `Save ${money(v.saveDollars)}`}</span>
           <span class="pd-tier-vials">${vialArt.repeat(Math.min(v.qty, 3))}</span>
           <span class="pd-tier-qty">${v.label}</span>
           <span class="pd-tier-price">${money(v.sale)}</span>
@@ -522,12 +532,6 @@
     wrap.querySelectorAll('.pd-tier').forEach(btn => {
       btn.addEventListener('click', () => setQty(+btn.dataset.qty));
     });
-
-    // Written from the ladder, so the rates stated in words are the rates
-    // charged. The static copy in product.html is the same sentence and is
-    // pinned to this function by check-claims.js.
-    const note = $('pdBulkNote');
-    if (note) note.innerHTML = bulkNote();
 
     markActiveTier();
   }
@@ -593,6 +597,7 @@
     setCanonical(product);
     renderBreadcrumb(product);
     renderHeader(product);
+    renderBuyMoreLine();
     renderEvidence(product);
     renderSizes(product);
     renderSelection();

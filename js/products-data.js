@@ -1285,12 +1285,18 @@ function bulkSavingPct(original, sale) {
 // ladder needs the shopper to trust that a supplier picked defensible rates.
 const QTY_GROUP = 3;
 
-// The three cards on a product page: one vial, two, and the first quantity
-// that actually earns a free one. The ladder does not stop there — the
-// stepper keeps applying the same rule past three, with no card to press —
-// but three cards is the decision most people are making, and bulkNote()
-// states the rule in words for anyone who steps further.
-const PDP_CARD_QTYS = [1, 2, QTY_GROUP];
+// The stepper's only stops: one vial, two, and then every multiple of
+// QTY_GROUP up to three bundles. Nothing in between — no 4, no 5, no 7 — so a
+// visitor can never land on a "ragged" quantity that pays for a fraction of a
+// group. 1 and 2 are the plain rate; the rest are the bundle cards below.
+// QTY_STOPS.length caps at five entries on purpose: past the third bundle the
+// answer is wholesale, not a bigger card on a cold landing page.
+const QTY_STOPS = [1, 2, QTY_GROUP, QTY_GROUP * 2, QTY_GROUP * 3];
+
+// The three cards on a product page, one per bundle stop. The stepper handles
+// 1 and 2 vials on its own; every quantity that actually earns a free vial
+// gets a card instead, so nobody has to know the mechanic exists to use it.
+const PDP_CARD_QTYS = QTY_STOPS.filter(q => q >= QTY_GROUP);
 
 // The richest this mechanic ever gets on a single compound: one vial free in
 // every QTY_GROUP, which is what it is at every multiple of QTY_GROUP and
@@ -1373,21 +1379,15 @@ function getProductVariants(p, unitPrice) {
   });
 }
 
-// The fine print under the cards, written from QTY_GROUP rather than typed
-// beside it. States the rule once in a form provable at any quantity — "every
-// third vial is free" holds whether the order is 4 vials or 40 — plus the two
-// worked examples the cards themselves don't cover.
-//
-// Wholesale used to get a mention here too, but "ordering every month is
-// wholesale" reads as ambiguous mid-decision — does monthly ordering earn
-// wholesale pricing, or does it require becoming a wholesale account? — and
-// it hands a buyer who is about to check out a reason to email instead.
-// Wholesale is a real offer, just not one this line is the place to raise.
-function bulkNote() {
-  const a = QTY_GROUP * 2;
-  const b = QTY_GROUP * 3;
-  return `Every ${ordinal(QTY_GROUP)} vial in the order is free, at any quantity: ` +
-    `${a} for the price of ${paidVials(a)}, ${b} for the price of ${paidVials(b)}.`;
+// The one line under the price, above the size picker, stated before a
+// visitor has looked at the cards at all. Without a 2-vial card sitting next
+// to the 3-vial one at the same price, nothing else on the page says that
+// going from 2 to 3 costs nothing — the cards show the result, this line is
+// what tells someone stepping from 1 to 2 that a third is free rather than
+// a fourth. Built from QTY_GROUP, so it cannot describe a different number
+// than the cards actually charge.
+function buyMoreLine() {
+  return `Buy ${QTY_GROUP - 1}, get 1 free: every ${ordinal(QTY_GROUP)} vial, automatically.`;
 }
 
 // The meta description for one compound, for the generated page's head and
@@ -1724,9 +1724,10 @@ if (typeof module !== 'undefined' && module.exports) {
     bulkSavingPct,
     SITEWIDE_DISCOUNT,
     QTY_GROUP,
+    QTY_STOPS,
     PDP_CARD_QTYS,
     BULK_MAX_OFF,
-    bulkNote,
+    buyMoreLine,
     ordinal,
     freeVials,
     paidVials,

@@ -197,12 +197,14 @@
   .pd-section h2{ font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight:600; margin: 0 0 6px; letter-spacing:-.02em; color:#0a0a0a; }
 
   /* --- buy more, pay less ---
-     Cards rather than rows: each tier shows the vials you actually get, so
+     Cards rather than rows: each bundle shows the vials you actually get, so
      the quantity reads at a glance before any of the numbers do.
 
-     Three across, because three is how many tiers get a card: one vial, or
-     one of two bundles. The ladder continues past them for anyone who steps
-     higher, and the note underneath says so in words. */
+     Three bundles — 3, 6, 9 vials — because that is where this mechanic stops
+     being a clean sentence: a fourth card would have to sit at 12, and past
+     three bundles the answer is wholesale rather than a bigger card on a cold
+     landing page. 1 and 2 vials have no card at all; the stepper handles them
+     on its own, at the same plain rate. */
   .pd-bulk{ margin-top: 2px; padding-top: 18px; border-top:1px solid rgba(0,0,0,.1); }
   .pd-tiers{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .pd-tier{
@@ -223,9 +225,11 @@
     box-shadow: 0 0 0 3px rgba(10,10,10,.07);
   }
   .pd-tier.is-active:hover{ background:#fff; }
-  /* is-best is a label, not a selection: it only marks the biggest discount,
-     so it gets weight without the selected treatment. */
-  .pd-tier.is-best:not(.is-active){ border-color: rgba(0,0,0,.32); }
+  /* is-featured is weight, not a claim: the smallest bundle is the one most
+     people are actually deciding between, so it reads heavier without a
+     "best value" label attached to it — all three cards cost the same per
+     vial, and a claim like that would not survive anyone doing the division. */
+  .pd-tier.is-featured:not(.is-active){ border-color: rgba(0,0,0,.32); }
 
   /* the vials themselves — overlapped so three still fit a narrow card */
   .pd-tier-vials{
@@ -249,13 +253,12 @@
     font-family:var(--font-display); font-size:1.16rem; font-weight:800;
     letter-spacing:-.02em; color:#0a0a0a; margin-bottom:5px;
   }
-  /* The discount is what the card is for, so it is the loud line. "Standard"
-     takes the same slot on the single vial so all four cards align. */
+  /* The saving is what the card is for, so it is the loud line. Every card
+     has one now — all three bundles earn a free vial. */
   .pd-tier-off{
     font-family:'JetBrains Mono', monospace; font-size:.76rem; font-weight:700;
     letter-spacing:.06em; text-transform:uppercase; color:#0a0a0a;
   }
-  .pd-tier-off.is-plain{ color:#8a8a86; font-weight:600; }
   /* What this quantity actually costs — the number the card exists to show. */
   .pd-tier-price{
     font-family:'JetBrains Mono', monospace; font-size:.86rem; font-weight:700;
@@ -288,11 +291,6 @@
   .pd-batch:empty{ display:none; }
   .pd-batch strong{ color:#0a0a0a; font-weight:700; }
 
-  /* Fine print under the tiers, explaining that any quantity earns the tier
-     it reaches. Someone who steps to 4 should not have to infer the rule. */
-  .pd-bulk-note{
-    margin: 11px 0 0; font-size:.78rem; line-height:1.55; color:#8a8a86;
-  }
   /* a tab straddling the top border, like a ribbon on the winning card */
   .pd-tier-flag{
     position:absolute; top:0; left:50%; transform: translate(-50%, -50%);
@@ -622,7 +620,6 @@
 
     .pd-bulk{ padding-top: 14px; }
     .pd-tiers{ gap: 7px; }
-    .pd-bulk-note{ margin-top: 9px; font-size:.73rem; line-height:1.5; }
 
     .pd-coa{ padding: 13px 14px; gap: 10px; }
     .pd-coa small{ font-size:.75rem; line-height:1.45; }
@@ -657,11 +654,13 @@
     <span>THIRD-PARTY LAB TESTED</span><i class="star-bullet">✦</i>
     <span>COA ON EVERY BATCH</span><i class="star-bullet">✦</i>
     <span>FREE SHIPPING OVER $250</span><i class="star-bullet">✦</i>
+    <span>EVERY 3RD VIAL FREE: APPLIED AUTOMATICALLY AT CHECKOUT</span><i class="star-bullet">✦</i>
     <span>SAME-DAY SHIPPING BEFORE 1:00 PM PT</span><i class="star-bullet">✦</i>
     <span>FOR LABORATORY &amp; RESEARCH USE ONLY</span><i class="star-bullet">✦</i>
     <span>THIRD-PARTY LAB TESTED</span><i class="star-bullet">✦</i>
     <span>COA ON EVERY BATCH</span><i class="star-bullet">✦</i>
     <span>FREE SHIPPING OVER $250</span><i class="star-bullet">✦</i>
+    <span>EVERY 3RD VIAL FREE: APPLIED AUTOMATICALLY AT CHECKOUT</span><i class="star-bullet">✦</i>
     <span>SAME-DAY SHIPPING BEFORE 1:00 PM PT</span><i class="star-bullet">✦</i>
   </div>
 </div>
@@ -737,7 +736,7 @@
         <span class="pd-price" id="pdPrice">$59.97<s class="pd-price-was">$66.00</s></span>
         <!-- Per-vial rate, and which tier is earning it. Empty and hidden at a
              quantity of one, where there is nothing to explain. -->
-        <p class="pd-price-note" id="pdPriceNote" hidden></p>
+        <p class="pd-price-note" id="pdPriceNote">Buy 2, get 1 free: every 3rd vial, automatically.</p>
 
         <span class="pd-label">Size</span>
         <div class="pd-sizes" id="pdSizes"><button type="button" class="pd-size is-active" data-i="0">50mg</button></div>
@@ -793,7 +792,6 @@
                above and reprices the buy box; nothing is added to the cart
                until the Add to cart button is pressed. -->
           <div class="pd-tiers" id="pdTiers"></div>
-          <p class="pd-bulk-note" id="pdBulkNote">Every 3rd vial in the order is free, at any quantity: 6 for the price of 4, 9 for the price of 6.</p>
         </div>
       </div>
 
