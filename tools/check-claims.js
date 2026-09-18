@@ -199,18 +199,6 @@ console.log('\ndispatch window');
   ok('every page with a marquee states the current cutoff ticker',
     staleTicker.length === 0, staleTicker.join(', '));
 
-  // Same discipline for the bulk-pricing line in the marquee: built from
-  // QTY_GROUP, so a group-size change that forgot the sitewide banner shows up
-  // here instead of silently advertising the old ratio on every page.
-  const BULK_MARQUEE_LINE = `EVERY ${ordinal(QTY_GROUP).toUpperCase()} VIAL FREE: APPLIED AUTOMATICALLY AT CHECKOUT`;
-  const staleBulkMarquee = [];
-  pages.forEach(f => {
-    const html = read(f);
-    if (/marquee-track/.test(html) && !html.includes(BULK_MARQUEE_LINE)) staleBulkMarquee.push(f);
-  });
-  ok('every page with a marquee states the bulk-pricing line',
-    staleBulkMarquee.length === 0, staleBulkMarquee.join(', '));
-
   // The marquee scrolls by animating the track from 0 to -50%, which only
   // returns to where it started if the track is the same list written twice.
   // Every page but the homepage and welcome had it written once, so the loop
@@ -2198,6 +2186,18 @@ console.log('\nbulk pricing');
     `run this sentence into product.html:\n          ${buyMoreLine()}`);
   ok('js/product.js renders it from buyMoreLine(), once, not per quantity',
     /renderBuyMoreLine[\s\S]{0,160}buyMoreLine\(\)/.test(read('js/product.js')));
+
+  // The static homepage banner states the same sentence as the PDP line,
+  // rather than its own typed copy that could drift from what the mechanic
+  // actually charges. Homepage only, on purpose — it is one fact the
+  // homepage leads with, not a rotation that belongs in the sitewide marquee.
+  const idx = read('index.html');
+  const bannerText = (idx.match(/class="promo-banner-text">([^<]*)</) || [, ''])[1].trim();
+  ok('the homepage promo banner states the one buyMoreLine() writes',
+    bannerText === buyMoreLine(),
+    `run this sentence into index.html:\n          ${buyMoreLine()}`);
+  ok('the promo banner sits right under the header, before the hero',
+    /<\/header>\s*<!--[\s\S]{0,300}?-->\s*<div class="promo-banner">[\s\S]{0,400}<section class="hero"/.test(idx));
 
   // A card press must set the quantity, never add to the cart. This is the
   // behaviour regression that matters most: it spends the customer's money.

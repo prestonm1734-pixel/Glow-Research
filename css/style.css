@@ -296,6 +296,27 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 .marquee-bar:hover .marquee-track{ animation-play-state: paused; }
 
+/* ---------- promo banner (homepage only) ---------- */
+/* Same dark treatment as the marquee, held still: this is the one fact the
+   homepage leads with, not one of several rotating past. */
+.promo-banner{
+  background: linear-gradient(90deg, #0a0a0a, #1c1c1c);
+  border-bottom: 1px solid var(--border);
+  padding: 13px 0;
+  text-align: center;
+}
+.promo-banner-text{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #fff;
+}
+@media (max-width: 640px){
+  .promo-banner{ padding: 11px 16px; }
+  .promo-banner-text{ font-size: 0.7rem; line-height:1.4; }
+}
+
 /* ---------- header ---------- */
 .site-header{
   position: sticky; top:0; z-index: 100;
