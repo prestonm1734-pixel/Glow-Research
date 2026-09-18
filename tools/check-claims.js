@@ -34,7 +34,7 @@ const {
   verifyUrl, verifyHost, LAB_VERIFY_URL,
   FAQS, faqHtml,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
-  QTY_GROUP, QTY_STOPS, PDP_CARD_QTYS, getProductVariants, unitPriceAt, BULK_MAX_OFF, buyMoreLine, bulkOff,
+  QTY_GROUP, QTY_STOPS, PDP_CARD_QTYS, getProductVariants, unitPriceAt, BULK_MAX_OFF, buyMoreHeadline, nextFreeNudge, bulkOff,
   ordinal, freeVials, paidVials, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY, PAYMENT_METHODS,
   hasList, listPriceOf, SITEWIDE_DISCOUNT, VIAL_ART_NOTICE, LAUNCH_OFFER, LAUNCH_OFFER_LIVE,
@@ -2174,30 +2174,57 @@ console.log('\nbulk pricing');
     /(3[4-9]|[4-9][0-9])% off starting at/.test(read('wholesale.html')),
     'wholesale.html must open above the retail bulk ceiling (33.3%)');
 
-  // The permanent line under the price is what tells a visitor stepping from
-  // 1 to 2 that a third is free, before they have looked at a single card —
-  // without a 2-vial card sitting next to the 3-vial one at the same price,
-  // nothing else on the page says so. Checked against product.html's static
-  // markup, since it has to read the same with or without JS.
+  // The line under the price updates with the quantity — how far this
+  // selection is from a free vial, or what it already earned — the way the
+  // price above it does. Checked against product.html's static markup at its
+  // default quantity (1), since that has to read correctly with or without
+  // JS, and against the function that keeps it live once JS runs.
   const pd = read('product.html');
   const priceNoteHtml = (pd.match(/id="pdPriceNote"[^>]*>([^<]*)<\/p>/) || [, ''])[1].trim();
-  ok('the line under the price is the one buyMoreLine() writes',
-    priceNoteHtml === buyMoreLine(),
-    `run this sentence into product.html:\n          ${buyMoreLine()}`);
-  ok('js/product.js renders it from buyMoreLine(), once, not per quantity',
-    /renderBuyMoreLine[\s\S]{0,160}buyMoreLine\(\)/.test(read('js/product.js')));
+  ok('the line under the price is the one nextFreeNudge() writes at qty 1',
+    priceNoteHtml === nextFreeNudge(1),
+    `run this sentence into product.html:\n          ${nextFreeNudge(1)}`);
+  ok('js/product.js keeps it live from renderPrice(), which runs on every qty change',
+    /function renderPrice\(\)[\s\S]{0,1200}nextFreeNudge\(qty\)/.test(read('js/product.js')));
 
-  // The static homepage banner states the same sentence as the PDP line,
-  // rather than its own typed copy that could drift from what the mechanic
-  // actually charges. Homepage only, on purpose — it is one fact the
-  // homepage leads with, not a rotation that belongs in the sitewide marquee.
-  const idx = read('index.html');
-  const bannerText = (idx.match(/class="promo-banner-text">([^<]*)</) || [, ''])[1].trim();
-  ok('the homepage promo banner states the one buyMoreLine() writes',
-    bannerText === buyMoreLine(),
-    `run this sentence into index.html:\n          ${buyMoreLine()}`);
-  ok('the promo banner sits right under the header, before the hero',
-    /<\/header>\s*<!--[\s\S]{0,300}?-->\s*<div class="promo-banner">[\s\S]{0,400}<section class="hero"/.test(idx));
+  // nextFreeNudge() itself: it must always say something true, both while
+  // counting down to a free vial and once one is earned, checked across a
+  // wide range since QTY_STOPS only exercises five of these values.
+  const nudgeWrong = [];
+  for (let q = 1; q <= QTY_GROUP * 4; q++) {
+    const rem = q % QTY_GROUP;
+    const text = nextFreeNudge(q);
+    if (rem === 0) {
+      const free = freeVials(q);
+      if (text !== `${free} vial${free === 1 ? '' : 's'} free at this quantity.`) {
+        nudgeWrong.push(`qty ${q}: "${text}"`);
+      }
+    } else if (text !== `Add ${QTY_GROUP - rem} more, get 1 free.`) {
+      nudgeWrong.push(`qty ${q}: "${text}"`);
+    }
+  }
+  ok('nextFreeNudge() always states a true count, earned or still needed',
+    nudgeWrong.length === 0, nudgeWrong.join('; '));
+
+  // The sitewide banner states the short headline rather than its own typed
+  // copy, so it can't drift from what the mechanic actually charges. Same
+  // "hand duplicated, checked everywhere" discipline as the marquee ticker.
+  const staleBanner = [];
+  pages.forEach(f => {
+    const html = read(f);
+    const m = html.match(/class="promo-banner-text">([^<]*)</);
+    if (/class="promo-banner"/.test(html) && (!m || m[1].trim() !== buyMoreHeadline())) {
+      staleBanner.push(f);
+    }
+  });
+  ok('every page with a promo banner states the one buyMoreHeadline() writes',
+    staleBanner.length === 0, staleBanner.join(', '));
+  ok('the promo banner sits right under the header, on every page that has one',
+    pages.every(f => {
+      const html = read(f);
+      if (!/class="promo-banner"/.test(html)) return true;
+      return /<\/header>\s*\n?\s*<!--[\s\S]{0,300}?-->\s*<div class="promo-banner">/.test(html);
+    }));
 
   // A card press must set the quantity, never add to the cart. This is the
   // behaviour regression that matters most: it spends the customer's money.

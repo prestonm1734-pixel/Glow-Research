@@ -1379,15 +1379,26 @@ function getProductVariants(p, unitPrice) {
   });
 }
 
-// The one line under the price, above the size picker, stated before a
-// visitor has looked at the cards at all. Without a 2-vial card sitting next
-// to the 3-vial one at the same price, nothing else on the page says that
-// going from 2 to 3 costs nothing — the cards show the result, this line is
-// what tells someone stepping from 1 to 2 that a third is free rather than
-// a fourth. Built from QTY_GROUP, so it cannot describe a different number
-// than the cards actually charge.
-function buyMoreLine() {
-  return `Buy ${QTY_GROUP - 1}, get 1 free: every ${ordinal(QTY_GROUP)} vial, automatically.`;
+// The short form for the sitewide banner: one sentence, no mechanism
+// explained, because the banner's job is to get someone to a product page,
+// not to teach the rule. Built from QTY_GROUP so the number in it can't drift
+// from what the cards actually charge.
+function buyMoreHeadline() {
+  return `Buy ${QTY_GROUP - 1}, get 1 free.`;
+}
+
+// The line under the price, above the size picker. Updates with the
+// quantity, the way the price above it does, because it is answering the
+// question the price just raised: how far is this selection from a free
+// vial. At an exact group multiple it confirms what was earned instead of
+// asking for more — there is nothing left to add at 9, the top stop.
+function nextFreeNudge(qty) {
+  const free = freeVials(qty);
+  const rem = qty % QTY_GROUP;
+  if (rem === 0) {
+    return `${free} vial${free === 1 ? '' : 's'} free at this quantity.`;
+  }
+  return `Add ${QTY_GROUP - rem} more, get 1 free.`;
 }
 
 // The meta description for one compound, for the generated page's head and
@@ -1727,7 +1738,8 @@ if (typeof module !== 'undefined' && module.exports) {
     QTY_STOPS,
     PDP_CARD_QTYS,
     BULK_MAX_OFF,
-    buyMoreLine,
+    buyMoreHeadline,
+    nextFreeNudge,
     ordinal,
     freeVials,
     paidVials,

@@ -273,11 +273,12 @@
      between two blocks. Where :has() is unsupported the price simply keeps its
      own margin, which spaces things out slightly more — never crowds them. */
   .pd-price-note{
-    margin: 0 0 22px; font-size:.82rem; color:#55554f; line-height:1.5;
+    display:inline-block; margin: 0 0 22px; padding: 6px 13px;
+    background:#0a0a0a; color:#fff; font-weight:700; font-size:.78rem;
+    letter-spacing:.02em; line-height:1.3; border-radius:999px;
   }
-  .pd-price:has(+ .pd-price-note:not([hidden])){ margin-bottom: 7px; }
+  .pd-price:has(+ .pd-price-note:not([hidden])){ margin-bottom: 12px; }
   .pd-price-note[hidden]{ display:none; }
-  .pd-note-sep{ color:#b5b5b0; margin: 0 3px; }
 
   /* The lot number the catalog holds for this compound right now, stated
      where the decision to buy is actually made rather than left for the
@@ -693,6 +694,18 @@
   </div>
 </header>
 
+<!-- Static buy-more-pay-less banner, sitewide. Not the scrolling marquee
+     above the header: this is the one offer worth holding still for, not a
+     rotation of several. -->
+<div class="promo-banner">
+  <div class="container promo-banner-inner">
+    <i class="promo-banner-spark" aria-hidden="true">✦</i>
+    <span class="promo-banner-text">Buy 2, get 1 free.</span>
+    <i class="promo-banner-spark" aria-hidden="true">✦</i>
+  </div>
+</div>
+
+
 <nav class="pd-crumb" aria-label="Breadcrumb">
   <div class="container pd-crumb-inner">
     <a href="../../index.html">Home</a> /
@@ -734,7 +747,7 @@
         <span class="pd-price" id="pdPrice">$74.97<s class="pd-price-was">$82.00</s></span>
         <!-- Per-vial rate, and which tier is earning it. Empty and hidden at a
              quantity of one, where there is nothing to explain. -->
-        <p class="pd-price-note" id="pdPriceNote">Buy 2, get 1 free: every 3rd vial, automatically.</p>
+        <p class="pd-price-note" id="pdPriceNote">Add 2 more, get 1 free.</p>
 
         <span class="pd-label">Size</span>
         <div class="pd-sizes" id="pdSizes"><button type="button" class="pd-size is-active" data-i="0">10mg</button></div>

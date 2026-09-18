@@ -300,17 +300,13 @@
     }
 
     renderSticky(total);
-  }
 
-  // The one line under the price that states the mechanic itself, not the
-  // current selection — it reads the same at 1 vial as at 9, because it is
-  // the fact that makes the cards below make sense, not a readout of what's
-  // picked right now. Set once; nothing about it depends on qty or size.
-  function renderBuyMoreLine() {
+    // How far this quantity is from a free vial, or what it already earned.
+    // Updates on every quantity change, same as the price above it, so
+    // stepping from 1 to 2 to 3 reads as a nudge getting closer rather than a
+    // fact stated once and forgotten.
     const note = $('pdPriceNote');
-    if (!note) return;
-    note.hidden = false;
-    note.textContent = buyMoreLine();
+    if (note) note.textContent = nextFreeNudge(qty);
   }
 
   // everything that changes when a different mg is picked
@@ -597,7 +593,6 @@
     setCanonical(product);
     renderBreadcrumb(product);
     renderHeader(product);
-    renderBuyMoreLine();
     renderEvidence(product);
     renderSizes(product);
     renderSelection();
