@@ -2206,6 +2206,14 @@ console.log('\nbulk pricing');
   ok('nextFreeNudge() always states a true count, earned or still needed',
     nudgeWrong.length === 0, nudgeWrong.join('; '));
 
+  // The per-vial rate sits quietly under the nudge, hidden at one vial where
+  // it would just repeat the price above it, shown from renderPrice() so it
+  // reprices with everything else on the page rather than going stale.
+  ok('pdUnitPrice starts hidden, at the default quantity of one',
+    /id="pdUnitPrice" hidden/.test(pd));
+  ok('js/product.js hides it at one vial and states the per-vial rate otherwise',
+    /function renderPrice\(\)[\s\S]{0,1600}unitEl\.hidden = qty === 1[\s\S]{0,200}per vial`/.test(read('js/product.js')));
+
   // The sitewide banner states the short headline rather than its own typed
   // copy, so it can't drift from what the mechanic actually charges. Same
   // "hand duplicated, checked everywhere" discipline as the marquee ticker.

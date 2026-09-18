@@ -307,6 +307,14 @@
     // fact stated once and forgotten.
     const note = $('pdPriceNote');
     if (note) note.textContent = nextFreeNudge(qty);
+
+    // The per-vial rate. Quiet, and only shown once there's a bundle rate to
+    // state — at one vial it would just repeat the price above it.
+    const unitEl = $('pdUnitPrice');
+    if (unitEl) {
+      unitEl.hidden = qty === 1;
+      unitEl.textContent = qty === 1 ? '' : `${money(unit)} per vial`;
+    }
   }
 
   // everything that changes when a different mg is picked

@@ -273,12 +273,19 @@
      between two blocks. Where :has() is unsupported the price simply keeps its
      own margin, which spaces things out slightly more — never crowds them. */
   .pd-price-note{
-    display:inline-block; margin: 0 0 22px; padding: 6px 13px;
+    display:inline-block; margin: 0 0 8px; padding: 6px 13px;
     background:#0a0a0a; color:#fff; font-weight:700; font-size:.78rem;
     letter-spacing:.02em; line-height:1.3; border-radius:999px;
   }
   .pd-price:has(+ .pd-price-note:not([hidden])){ margin-bottom: 12px; }
   .pd-price-note[hidden]{ display:none; }
+  /* The per-vial rate: quiet on purpose, sitting under the loud nudge rather
+     than beside it. This is the number a price-checker is actually looking
+     for once the total moves, so it earns its own line, just not its weight. */
+  .pd-unit-price{
+    margin: 0 0 22px; font-size:.82rem; color:#8a8a86; line-height:1.4;
+  }
+  .pd-unit-price[hidden]{ display:none; }
 
   /* The lot number the catalog holds for this compound right now, stated
      where the decision to buy is actually made rather than left for the
@@ -745,9 +752,14 @@
              move it: the bulk tier is a function of quantity, so stepping from
              2 vials to 3 changes the per-vial rate, not just the multiplier. -->
         <span class="pd-price" id="pdPrice">$89.97<s class="pd-price-was">$99.00</s></span>
-        <!-- Per-vial rate, and which tier is earning it. Empty and hidden at a
-             quantity of one, where there is nothing to explain. -->
+        <!-- How far this quantity is from a free vial, or what it already
+             earned. Updates with the price above it on every quantity change. -->
         <p class="pd-price-note" id="pdPriceNote">Add 2 more, get 1 free.</p>
+        <!-- The per-vial rate at this quantity: the quiet number that makes
+             the total above make sense, not a second claim competing with
+             the nudge above it. Hidden at one vial, where it just restates
+             the price already shown. -->
+        <p class="pd-unit-price" id="pdUnitPrice" hidden></p>
 
         <span class="pd-label">Size</span>
         <div class="pd-sizes" id="pdSizes"><button type="button" class="pd-size is-active" data-i="0">10mg</button></div>
