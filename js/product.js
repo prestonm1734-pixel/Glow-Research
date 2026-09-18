@@ -530,6 +530,7 @@
           <span class="pd-tier-vials">${vialArt.repeat(Math.min(v.qty, 3))}</span>
           <span class="pd-tier-qty">${v.label}</span>
           <span class="pd-tier-price">${money(v.sale)}</span>
+          <span class="pd-tier-unit">${money(v.unitSale)} per vial</span>
         </button>`;
     }).join('');
 

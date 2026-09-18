@@ -2291,6 +2291,19 @@ console.log('\nbulk pricing');
   ok('no bulk card copy claims a best value or comparative rank',
     !/best.value|best.deal|biggest.saving/i.test(pjNoComments));
 
+  // The per-vial rate is present on every card, for anyone doing the math,
+  // but it must never be styled to outweigh SAVE — SAVE is the number that
+  // grows across the three cards (1/2/3 free) and is the reason the ladder
+  // works; per-vial is identical on all three by design and would read as
+  // "no reason to buy more" if it were the louder number instead.
+  ok('every card states the per-vial rate from v.unitSale',
+    /pd-tier-unit">\$\{money\(v\.unitSale\)\} per vial/.test(pj));
+  const tierOffSize = parseFloat((pd.match(/\.pd-tier-off\{[^}]*font-size:\s*([\d.]+)rem/) || [, '0'])[1]);
+  const tierUnitSize = parseFloat((pd.match(/\.pd-tier-unit\{[^}]*font-size:\s*([\d.]+)rem/) || [, '0'])[1]);
+  ok('SAVE stays the visually louder number: bigger than the per-vial rate',
+    tierOffSize > 0 && tierUnitSize > 0 && tierOffSize > tierUnitSize,
+    `pd-tier-off ${tierOffSize}rem vs pd-tier-unit ${tierUnitSize}rem`);
+
   // GHK-Cu's smallest bundle is the one card that leads its badge with the
   // percentage instead of the dollar figure — see the comment on it in
   // js/products-data.js. The 6- and 9-vial cards must still lead with the
