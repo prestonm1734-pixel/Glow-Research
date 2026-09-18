@@ -34,7 +34,8 @@ const {
   verifyUrl, verifyHost, LAB_VERIFY_URL,
   FAQS, faqHtml,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
-  QTY_TIERS, tierFor, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, tierLabel,
+  QTY_GROUP, PDP_CARD_QTYS, getProductVariants, unitPriceAt, BULK_MAX_OFF, bulkNote, bulkOff,
+  ordinal, freeVials, paidVials, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY, PAYMENT_METHODS,
   hasList, listPriceOf, SITEWIDE_DISCOUNT, VIAL_ART_NOTICE, LAUNCH_OFFER, LAUNCH_OFFER_LIVE,
   META_PIXEL_ID, META_DOMAIN_VERIFICATION,
@@ -2132,68 +2133,66 @@ console.log('\nstructured data');
  * ------------------------------------------------------------------------- */
 console.log('\nbulk pricing');
 {
-  // Thresholds ascend and start at a single vial, or tierFor() picks nonsense.
-  const qtys = QTY_TIERS.map(t => t.qty);
-  const offs = QTY_TIERS.map(t => t.off);
-  ok('tiers start at one vial and ascend',
-    qtys[0] === 1 && qtys.every((q, i) => i === 0 || q > qtys[i - 1]), qtys.join(', '));
-  ok('the discount rises with the quantity',
-    offs[0] === 0 && offs.every((o, i) => i === 0 || o > offs[i - 1]), offs.join(', '));
-  ok('no tier discounts more than half', offs.every(o => o < 0.5));
+  // The three cards ascend and start at a single vial, and the last one is
+  // the group size — the first quantity that actually earns a free vial.
+  ok('the cards ascend from one vial to the group size',
+    PDP_CARD_QTYS[0] === 1 &&
+    PDP_CARD_QTYS.every((q, i) => i === 0 || q > PDP_CARD_QTYS[i - 1]) &&
+    PDP_CARD_QTYS[PDP_CARD_QTYS.length - 1] === QTY_GROUP,
+    PDP_CARD_QTYS.join(', '));
 
-  // The rule the customer is told in the fine print: any quantity gets the
-  // rate of the tier it reaches. Checked across every quantity up to well past
-  // the top tier, not just at the thresholds, because the gaps are the part
-  // that was broken.
-  const wrongTier = [];
-  for (let q = 1; q <= qtys[qtys.length - 1] + 5; q++) {
-    const expected = QTY_TIERS.filter(t => q >= t.qty).pop();
-    if (tierFor(q).qty !== expected.qty) wrongTier.push(`${q} -> ${tierFor(q).qty}, expected ${expected.qty}`);
+  // freeVials()/paidVials() are the one place "every Nth vial free" is
+  // computed, checked across a wide range rather than only at the group
+  // boundary, because a quantity between multiples is where an off-by-one
+  // would hide: 4 vials must keep the one free vial already earned at 3, not
+  // lose it, and must not earn a second one until 6.
+  const wrong = [];
+  for (let q = 0; q <= QTY_GROUP * 6; q++) {
+    const expectedFree = Math.floor(q / QTY_GROUP);
+    if (freeVials(q) !== expectedFree) wrong.push(`freeVials(${q})=${freeVials(q)}, expected ${expectedFree}`);
+    if (paidVials(q) !== q - expectedFree) wrong.push(`paidVials(${q})=${paidVials(q)}, expected ${q - expectedFree}`);
   }
-  ok('every quantity gets the rate of the tier it reaches',
-    wrongTier.length === 0, wrongTier.join('; '));
+  ok('every quantity earns exactly one free vial per complete group',
+    wrong.length === 0, wrong.join('; '));
 
-  // 15% on one compound is the ceiling, and wholesale picks up above it. If a
-  // retail tier ever went past what wholesale opens at, the two ladders would
-  // be advertising against each other.
-  ok('the bulk ceiling is 15%', BULK_MAX_OFF === 0.15, `${BULK_MAX_OFF * 100}%`);
+  // No tier discounts more than half a compound away, and 1/3 comfortably
+  // clears that.
+  ok('no tier discounts more than half', BULK_MAX_OFF < 0.5, `${(BULK_MAX_OFF * 100).toFixed(1)}%`);
+  // 1/3 is the richest this mechanic gets on a single compound, and wholesale
+  // picks up above it. If the retail ratio ever reached what wholesale opens
+  // at, the two ladders would be advertising against each other.
+  ok('the bulk ceiling is one vial in three', Math.abs(BULK_MAX_OFF - 1 / 3) < 1e-9,
+    `${(BULK_MAX_OFF * 100).toFixed(2)}%`);
   ok('wholesale still starts richer than the retail ceiling',
-    /(2[5-9]|[3-9][0-9])% off starting at/.test(read('wholesale.html')),
-    'wholesale.html must open above the retail bulk ceiling');
+    /(3[4-9]|[4-9][0-9])% off starting at/.test(read('wholesale.html')),
+    'wholesale.html must open above the retail bulk ceiling (33.3%)');
 
-  // Cards are a subset of the ladder, and they have to be the cheap end of it:
-  // cards for 1 and 10 with the middle hidden would be a worse offer presented
-  // as the whole one.
-  const cards = QTY_TIERS.filter(t => t.card);
-  ok('the cards are the lowest tiers, in order',
-    cards.length >= 2 && QTY_TIERS.slice(0, cards.length).every(t => t.card),
-    'card tiers must be the first rows of the ladder');
-
-  // The page states the rule and every rate past the last card. This is the
-  // one that stops the ladder growing a tier nobody is told about.
+  // The page states the rule this way for anyone who steps past the cards.
+  // This is the one that stops the wording drifting from what the mechanic
+  // actually does.
   const pd = read('product.html');
   const noteHtml = (pd.match(/id="pdBulkNote"[^>]*>([\s\S]*?)<\/p>/) || [, ''])[1].trim();
-  ok('the fine print under the tiers is the one bulkNote() writes',
+  ok('the fine print under the cards is the one bulkNote() writes',
     noteHtml === bulkNote(),
     `run this sentence into product.html:\n          ${bulkNote()}`);
   ok('js/product.js renders the note from bulkNote()',
     /pdBulkNote[\s\S]{0,120}bulkNote\(\)/.test(read('js/product.js')));
+  // The two worked examples in the note have to be quantities the note's own
+  // "at any quantity" claim actually covers, and their figures have to be
+  // paidVials(), not typed numbers that could drift from the mechanic.
+  ok('the fine print names the group size and two worked multiples of it',
+    noteHtml.includes(ordinal(QTY_GROUP)) &&
+    noteHtml.includes(`${QTY_GROUP * 2} for the price of ${paidVials(QTY_GROUP * 2)}`) &&
+    noteHtml.includes(`${QTY_GROUP * 3} for the price of ${paidVials(QTY_GROUP * 3)}`),
+    noteHtml);
 
-  // Every rate that has no card must be named in the copy, or the only way to
-  // find it is to guess a quantity and watch the price move.
-  const unstated = QTY_TIERS.filter(t => !t.card)
-    .filter(t => !noteHtml.includes(`${Math.round(t.off * 100)}%`) ||
-                 !noteHtml.includes(tierLabel(t.qty)));
-  ok('every tier without a card is stated in words',
-    unstated.length === 0, unstated.map(t => tierLabel(t.qty)).join(', '));
-
-  // A tier press must set the quantity, never add to the cart. This is the
+  // A card press must set the quantity, never add to the cart. This is the
   // behaviour regression that matters most: it spends the customer's money.
   const pj = read('js/product.js');
   const tierHandler = (pj.match(/wrap\.querySelectorAll\('\.pd-tier'\)[\s\S]*?\}\);/) || [''])[0];
-  ok('pressing a tier sets the quantity', /setQty\(\+btn\.dataset\.qty\)/.test(tierHandler));
-  ok('pressing a tier does not add to the cart',
-    !/GlowCart\.add/.test(tierHandler), 'a tier press must never touch the cart');
+  ok('pressing a card sets the quantity', /setQty\(\+btn\.dataset\.qty\)/.test(tierHandler));
+  ok('pressing a card does not add to the cart',
+    !/GlowCart\.add/.test(tierHandler), 'a card press must never touch the cart');
 
   // One function prices the buy box, the cart line and the generated page.
   ok('the buy box prices from unitPriceAt()', /unitPriceAt\(s\.price, qty\)/.test(pj));
@@ -2202,15 +2201,20 @@ console.log('\nbulk pricing');
   ok('the generated page bakes the same function',
     /unitPriceAt\(s\.price, 1\)/.test(read('tools/build-products.js')));
 
-  // Every tier, on every size of every product, must cost less per vial than
-  // the one below it. A threshold or percentage edit that inverts that would
-  // advertise a discount that charges more.
+  // Across the three cards, the per-vial price must never rise: 1 and 2 vials
+  // are the same plain rate (no group is complete yet), and 3 vials — the
+  // first complete group — must cost strictly less per vial than either. A
+  // threshold or group-size edit that broke that would advertise a bundle
+  // that charges more per vial than buying single.
   const inverted = [];
   GLOW_PRODUCTS.forEach(prod => prod.sizes.forEach(sz => {
     const vs = getProductVariants(prod, sz.price);
     vs.forEach((v, i) => {
-      if (i && v.unitSale >= vs[i - 1].unitSale) {
-        inverted.push(`${prod.name} ${sz.mg} ${v.label}`);
+      if (i && v.unitSale > vs[i - 1].unitSale) {
+        inverted.push(`${prod.name} ${sz.mg} ${v.label} costs more per vial than fewer vials`);
+      }
+      if (v.free > 0 && v.unitSale >= vs[0].unitSale) {
+        inverted.push(`${prod.name} ${sz.mg} ${v.label} earns a free vial but is not cheaper per vial`);
       }
       // and the struck-through list total must be a real list total
       if (Math.round(v.qty * sz.price * 100) / 100 !== v.original) {
@@ -2218,8 +2222,20 @@ console.log('\nbulk pricing');
       }
     });
   }));
-  ok('each tier costs less per vial than the one below it',
+  ok('the 3-vial card is strictly cheaper per vial, and no card is ever more expensive',
     inverted.length === 0, inverted.join(', '));
+
+  // GHK-Cu is the one product that leads its bulk badge with the percentage
+  // instead of the dollar figure — see the comment on it in
+  // js/products-data.js. Everything else must lead with the dollar figure the
+  // 3-vial card actually saves.
+  const badgedWrong = [];
+  GLOW_PRODUCTS.forEach(prod => {
+    const pctFormat = prod.bulkSavingsFormat === 'pct';
+    if (pctFormat && prod.name !== 'GHK-Cu') badgedWrong.push(`${prod.name} is flagged for percent format`);
+  });
+  ok('only GHK-Cu is flagged to show the bulk saving as a percentage',
+    badgedWrong.length === 0, badgedWrong.join('; '));
 
   /* The cart is the other place a quantity changes, and it was the hole this
      model opened. unitSale used to be stored on the line when it was added,

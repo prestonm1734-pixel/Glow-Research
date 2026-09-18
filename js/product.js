@@ -20,7 +20,9 @@
 
   let product = null;
   let sizeIndex = 0;
-  let qty = 1;
+  // 3 rather than 1: it is the first quantity that earns a free vial, and the
+  // card advertising it is the one the page opens on already selected.
+  let qty = QTY_GROUP;
   // set by renderDelivery() so picking a different mg re-reads its stock
   let refreshDelivery = null;
 
@@ -303,15 +305,15 @@
     // than left to work out why the number moved.
     const note = $('pdPriceNote');
     if (!note) return;
-    const t = tierFor(qty);
     if (qty === 1) {
       note.textContent = '';
       note.hidden = true;
       return;
     }
     note.hidden = false;
-    note.innerHTML = t.off > 0
-      ? `${money(unit)} per vial <span class="pd-note-sep">·</span> ${Math.round(t.off * 100)}% bundle discount at ${t.qty}+`
+    const free = freeVials(qty);
+    note.innerHTML = free > 0
+      ? `${money(unit)} per vial <span class="pd-note-sep">·</span> ${free} vial${free === 1 ? '' : 's'} free`
       : `${money(unit)} per vial`;
   }
 
@@ -468,18 +470,15 @@
      bundle and being taken straight to a cart is the behaviour that makes
      people distrust a bundle picker, and it also made the stepper pointless. */
 
-  // Highlights the tier the current quantity is actually earning, which at 4
-  // vials is the 3-vial card. tierFor() decides, so the highlight and the
-  // price are answering the same question with the same function.
-  //
-  // Past the last card the ladder carries on with no card to light up, and
-  // nothing is highlighted rather than the top card being left lit. Lighting
-  // "3 vials" while the buyer is on 5 and getting 15% would state the wrong
-  // rate on screen; the note under the price names the real one.
+  // Highlights the card matching the current quantity exactly. Past the last
+  // card (3 vials) the mechanic keeps applying past three, but per-vial cost
+  // stops falling in a straight line — a fourth vial pays full price until
+  // the next free one — so there is no single card left to light up, and
+  // nothing is highlighted rather than a card stating a rate the buyer isn't
+  // actually getting. The note under the price names the real one instead.
   function markActiveTier() {
-    const active = tierFor(qty).qty;
     document.querySelectorAll('#pdTiers .pd-tier').forEach(btn => {
-      const isOn = +btn.dataset.qty === active;
+      const isOn = +btn.dataset.qty === qty;
       btn.classList.toggle('is-active', isOn);
       btn.setAttribute('aria-pressed', String(isOn));
     });
@@ -494,29 +493,27 @@
     // one vial per unit, but three is enough to read as "several" — past that
     // they just overlap into a smudge, and the label already says the count
     const vialArt = `<img src="${pageHref(product.image)}" alt="" loading="lazy" />`;
+    // GHK-Cu is the one product whose bulk card leads with the percentage
+    // instead of the dollar figure — see the comment on it in
+    // js/products-data.js.
+    const pctFormat = product.bulkSavingsFormat === 'pct';
 
-    // Only the tiers that get a card. The ladder is longer, and bulkNote()
-    // below states the rest, so the cards stay the three-way decision most
-    // people are making instead of a wall of six.
-    const cards = variants.filter(v => v.card);
-    const ladderTop = Math.max(...variants.map(x => x.off));
-
-    wrap.innerHTML = cards.map(v => {
-      // "Best value" only if this card really is the best the ladder offers.
-      // While the ladder runs past the cards no card earns the flag, and if
-      // the cards are ever extended to cover it, it comes back on its own.
-      const best = v.off === ladderTop;
-      // The advertised figure is the bundle tier itself, stated as configured.
-      // The sitewide markdown stacks on top, so the struck-through total shows
-      // a bigger saving than the badge: the badge under-promises, never over.
-      const pct = Math.round(v.off * 100);
+    wrap.innerHTML = variants.map(v => {
+      // Only the 3-vial card ever earns a free one — 1 and 2 vials are shown
+      // plain, at the same per-vial rate, so the third card is the only place
+      // the flag and the saving appear.
+      const flag = v.free > 0
+        ? `<span class="pd-tier-flag">${ordinal(QTY_GROUP)} free</span>
+           <span class="pd-tier-off">${pctFormat
+             ? `${Math.round((1 - v.sale / v.original) * 100)}% off`
+             : `Save ${money(v.saveDollars)}`}</span>`
+        : '';
       return `
-        <button type="button" class="pd-tier${best ? ' is-best' : ''}" data-qty="${v.qty}" aria-pressed="false">
-          ${best ? '<span class="pd-tier-flag">Best value</span>' : ''}
+        <button type="button" class="pd-tier${v.free ? ' is-best' : ''}" data-qty="${v.qty}" aria-pressed="false">
+          ${flag}
           <span class="pd-tier-vials">${vialArt.repeat(Math.min(v.qty, 3))}</span>
           <span class="pd-tier-qty">${v.label}</span>
-          <span class="pd-tier-off${pct ? '' : ' is-plain'}">${pct ? `${pct}% off` : 'Standard'}</span>
-          <span class="pd-tier-per">${money(v.unitSale)} / vial</span>
+          <span class="pd-tier-price">${money(v.sale)}</span>
         </button>`;
     }).join('');
 

@@ -417,7 +417,12 @@ const GLOW_PRODUCTS = [
   // double as a ranking signal for this order; it still has to stay rare
   // enough to mean something, which tools/check-claims.js enforces
   // separately.
+  // At $59.97 this is the cheapest vial in the catalog, and the one product
+  // whose bulk card is meant to lead with the percentage rather than the
+  // dollar figure — a named, deliberate exception rather than a threshold
+  // every product's price is checked against.
   { name: 'GHK-Cu', tag: null, cat: 'tissue', purity: '99.815%', lot: '5567', badge:null,
+    bulkSavingsFormat: 'pct',
     coa: 'assets/coas/ghk-cu-lot-5567.pdf', coaRef: 'D69A-YY5F', tested: '6 July 2026',
     results: { Identity: 'Conforms', Quantity: '56.93 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [{ mg: '50mg', price: 59.97, list: 66, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
@@ -1262,128 +1267,122 @@ function bulkSavingPct(original, sale) {
   return pct > Math.round(SITEWIDE_DISCOUNT * 100) ? pct : 0;
 }
 
-// Bulk pricing. Each entry is a *threshold*, not a fixed bundle: `qty` is the
-// number of vials at which `off` starts applying.
+// Bulk pricing: every third vial in an order is free. QTY_GROUP is the whole
+// mechanic — everything below reads from it, so raising or lowering "every
+// Nth vial free" is a one-line change.
 //
-// That distinction is the whole design. The discount is a function of how many
-// vials you are buying, so the tier cards and the quantity stepper cannot
-// disagree — the cards are shortcuts that set a quantity, and the quantity is
-// what prices the order. Somebody who steps up to four vials gets the
-// three-vial rate, because "3+ vials, 10% off" is what the card says and four
-// is three or more. The alternative, where the cards are separate products
-// with their own prices, means a stepper set to 4 quietly charges full price
-// next to a card advertising a discount for less product.
+// A fixed ratio is the reason this replaced a percentage ladder (5% at 2
+// vials, 10% at 3, climbing to a 15% ceiling): a percentage ladder gets worse
+// for margin as the order grows, so the rate had to be capped below what
+// wholesale opens at. A free-vial ratio is fixed regardless of order size —
+// at 3 vials or 30, exactly one vial in three is free — so margin does not
+// erode as anyone steps further up the stepper, and there is no ceiling to
+// defend against wholesale (BULK_MAX_OFF below is the ratio itself, and
+// wholesale's 40% still opens comfortably above it).
 //
-// `card: true` marks the thresholds that get a card on the product page. The
-// ladder is longer than the cards on purpose: three cards is the decision most
-// people are actually making, and a wall of six is a worse way to ask it. The
-// rates keep climbing for anyone who steps past the last card, and bulkNote()
-// states the rest in words so nothing is hidden — a discount you only find by
-// guessing a number is not an offer.
-//
-// 15% at five vials is the ceiling for a single compound in one order,
-// confirmed against margin on the lowest-priced SKUs in the catalog rather
-// than the highest: a discount that only works on the $89.99 products would
-// quietly lose money on the $39.99 ones every time someone bought in bulk.
-// Above the ceiling the answer is wholesale, priced on volume per month
-// rather than per order and starting at 40% for 10 vials a month, so the
-// richer rate is what separates the two rather than the quantity.
-//
-// The published tiers, confirmed against supplier margin. Every bulk price on
-// the site is derived from these rows, so a rate change here is the whole
-// change: the cards, the buy box, bulkNote() and the wholesale comparison all
-// read them rather than restating the percentages.
-const QTY_TIERS = [
-  { qty: 1, off: 0, card: true },
-  { qty: 2, off: 0.05, card: true },
-  { qty: 3, off: 0.10, card: true },
-  { qty: 5, off: 0.15 },
-];
+// It is also a ratio a customer can do the arithmetic on standing in line:
+// "every third vial free" is provable from three numbers, where a percentage
+// ladder needs the shopper to trust that a supplier picked defensible rates.
+const QTY_GROUP = 3;
 
-// The most a single compound can be discounted before wholesale. Derived, so
-// adding a richer tier raises it here and in the copy at the same time.
-const BULK_MAX_OFF = Math.max(...QTY_TIERS.map(t => t.off));
+// The three cards on a product page: one vial, two, and the first quantity
+// that actually earns a free one. The ladder does not stop there — the
+// stepper keeps applying the same rule past three, with no card to press —
+// but three cards is the decision most people are making, and bulkNote()
+// states the rule in words for anyone who steps further.
+const PDP_CARD_QTYS = [1, 2, QTY_GROUP];
 
-// "3 vials" / "1 vial". Generated so a threshold change cannot leave a label
-// describing the old number.
+// The richest this mechanic ever gets on a single compound: one vial free in
+// every QTY_GROUP, which is what it is at every multiple of QTY_GROUP and
+// less than that in between. Wholesale has to open above this or the two
+// ladders would be advertising against each other.
+const BULK_MAX_OFF = 1 / QTY_GROUP;
+
+// "3rd", "1st" — the ordinal read off a plain integer, so a QTY_GROUP change
+// cannot leave a sentence describing the old number.
+function ordinal(n) {
+  const rem100 = n % 100;
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1: return `${n}st`;
+    case 2: return `${n}nd`;
+    case 3: return `${n}rd`;
+    default: return `${n}th`;
+  }
+}
+
+// "3 vials" / "1 vial".
 function tierLabel(qty) {
   return `${qty} ${qty === 1 ? 'vial' : 'vials'}`;
 }
 
-// The tier a given quantity actually earns: the highest threshold at or below
-// it. This is the function that makes 4 vials cost the 3-vial rate, and it is
-// the only place that rule lives.
-function tierFor(qty) {
-  let hit = QTY_TIERS[0];
-  for (const t of QTY_TIERS) if (qty >= t.qty) hit = t;
-  return hit;
+// How many vials in an order of this size are free: one for every complete
+// group of QTY_GROUP, however the order is split — this is the only place
+// that count is computed, so the price, the flag on the 3-vial card and the
+// fine print can never disagree about how many vials an order earned.
+function freeVials(qty) {
+  return Math.floor(Math.max(0, qty) / QTY_GROUP);
 }
 
-// The bulk discount alone, before the sitewide markdown. This is the figure the
-// tier cards advertise ("10% off"), so it is stated exactly as configured
-// rather than recomputed from a rounded price.
+// What a quantity actually pays for, in vials. 4 vials means one free and
+// three paid, not zero: the free vial already earned at 3 is not lost by
+// stepping past it, it is just diluted over more paid ones until the next
+// complete group.
+function paidVials(qty) {
+  return Math.max(0, qty) - freeVials(qty);
+}
+
+// The bulk discount as a fraction of the order. Exactly BULK_MAX_OFF at every
+// multiple of QTY_GROUP, smaller in between — the one caller that reads this
+// (api/_lib.js, deciding whether a cart line earned anything at all) only
+// needs to know whether it is above zero.
 function bulkOff(qty) {
-  return tierFor(qty).off;
+  return qty > 0 ? freeVials(qty) / qty : 0;
 }
 
-// What one vial costs at this quantity. The sitewide markdown comes off first
-// and the bulk tier stacks on it, so a buyer at a tier saves more than the
-// tier advertises, never less.
+// What one vial costs at this quantity. The sitewide markdown comes off the
+// list price first, and only the vials actually paid for are billed on the
+// rest.
 //
 // Rounded here, once, and the line total is this figure times the quantity.
 // Rounding the total instead would let "unit x qty" not equal the total the
 // cart charges, and the cart lines are built from exactly this number.
 function unitPriceAt(listUnit, qty) {
-  return round2(listUnit * (1 - SITEWIDE_DISCOUNT) * (1 - bulkOff(qty)));
+  if (qty <= 0) return round2(listUnit * (1 - SITEWIDE_DISCOUNT));
+  return round2(listUnit * (1 - SITEWIDE_DISCOUNT) * paidVials(qty) / qty);
 }
 
-// One row per tier, priced for whichever mg the product page has selected.
+// One row per card, priced for whichever mg the product page has selected.
 // `unitPrice` lets the caller price off the selected size; callers that only
 // know the product get the base size.
 function getProductVariants(p, unitPrice) {
   const unit = unitPrice || p.price;
-  return QTY_TIERS.map(t => {
-    const original = round2(t.qty * unit);        // true list price, struck through
-    const unitSale = unitPriceAt(unit, t.qty);
+  return PDP_CARD_QTYS.map(qty => {
+    const original = round2(qty * unit);           // true list price, struck through
+    const unitSale = unitPriceAt(unit, qty);
+    const sale = round2(unitSale * qty);
     return {
-      qty: t.qty,
-      off: t.off,
-      card: !!t.card,
-      label: tierLabel(t.qty),
+      qty,
+      label: tierLabel(qty),
+      free: freeVials(qty),
       original,
       unitSale,
-      sale: round2(unitSale * t.qty),
+      sale,
+      saveDollars: round2(original - sale),
     };
   });
 }
 
-// The fine print under the tier cards, written from the ladder rather than
-// typed beside it. Two things have to be said and neither can be allowed to go
-// stale: that a quantity between thresholds keeps the lower rate, and that the
-// rates carry on past the last card. Every number in the sentence is read from
-// QTY_TIERS, so changing a tier rewrites the copy.
+// The fine print under the cards, written from QTY_GROUP rather than typed
+// beside it. States the rule once in a form provable at any quantity — "every
+// third vial is free" holds whether the order is 4 vials or 40 — plus the two
+// worked examples the cards themselves don't cover.
 function bulkNote() {
-  const pct = t => `${Math.round(t.off * 100)}%`;
-  const cards = QTY_TIERS.filter(t => t.card);
-  const beyond = QTY_TIERS.filter(t => !t.card);
-  const top = QTY_TIERS[QTY_TIERS.length - 1];
-  const lastCard = cards[cards.length - 1];
-
-  // "4 vials are priced at the 3-vial rate" — the in-between case, named with
-  // a real number rather than described in the abstract.
-  const gap = `Any quantity gets the rate of the tier it reaches: ` +
-    `${lastCard.qty + 1} vials are priced at the ${lastCard.qty}-vial rate.`;
-
-  if (!beyond.length) return gap;
-
-  const more = beyond
-    .map(t => `${tierLabel(t.qty)} ${pct(t)} off`)
-    .join(', ')
-    .replace(/, ([^,]*)$/, ' and $1');
-
-  return `${gap} It keeps going past ${tierLabel(lastCard.qty)}: ${more}. ` +
-    `${pct(top)} is the most on a single compound. ` +
-    `Larger volumes are <a href="wholesale.html">wholesale</a>.`;
+  const a = QTY_GROUP * 2;
+  const b = QTY_GROUP * 3;
+  return `Every ${ordinal(QTY_GROUP)} vial in the order is free, at any quantity: ` +
+    `${a} for the price of ${paidVials(a)}, ${b} for the price of ${paidVials(b)}. ` +
+    `Ordering every month is <a href="wholesale.html">wholesale</a>.`;
 }
 
 // The meta description for one compound, for the generated page's head and
@@ -1719,10 +1718,13 @@ if (typeof module !== 'undefined' && module.exports) {
     batchPanelHtml,
     bulkSavingPct,
     SITEWIDE_DISCOUNT,
-    QTY_TIERS,
+    QTY_GROUP,
+    PDP_CARD_QTYS,
     BULK_MAX_OFF,
     bulkNote,
-    tierFor,
+    ordinal,
+    freeVials,
+    paidVials,
     tierLabel,
     bulkOff,
     unitPriceAt,

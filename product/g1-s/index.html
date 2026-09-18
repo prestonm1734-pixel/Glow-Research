@@ -256,9 +256,11 @@
     letter-spacing:.06em; text-transform:uppercase; color:#0a0a0a;
   }
   .pd-tier-off.is-plain{ color:#8a8a86; font-weight:600; }
-  /* Per-vial is the comparable number across tiers, which is the whole reason
-     someone reads these cards side by side. */
-  .pd-tier-per{ margin-top:6px; font-size:.75rem; color:#8a8a86; }
+  /* What this quantity actually costs — the number the card exists to show. */
+  .pd-tier-price{
+    font-family:'JetBrains Mono', monospace; font-size:.86rem; font-weight:700;
+    color:#0a0a0a; margin-top:4px;
+  }
 
   /* The line under the headline price: per-vial rate, and which tier earned
      it. Sits between the price and the size picker without competing.
@@ -768,7 +770,7 @@
                above and reprices the buy box; nothing is added to the cart
                until the Add to cart button is pressed. -->
           <div class="pd-tiers" id="pdTiers"></div>
-          <p class="pd-bulk-note" id="pdBulkNote">Any quantity gets the rate of the tier it reaches: 4 vials are priced at the 3-vial rate. It keeps going past 3 vials: 5 vials 15% off. 15% is the most on a single compound. Larger volumes are <a href="../../wholesale.html">wholesale</a>.</p>
+          <p class="pd-bulk-note" id="pdBulkNote">Every 3rd vial in the order is free, at any quantity: 6 for the price of 4, 9 for the price of 6. Ordering every month is <a href="../../wholesale.html">wholesale</a>.</p>
         </div>
 
         <a class="pd-coa" id="pdCoaLink">
