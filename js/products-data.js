@@ -1285,18 +1285,12 @@ function bulkSavingPct(original, sale) {
 // ladder needs the shopper to trust that a supplier picked defensible rates.
 const QTY_GROUP = 3;
 
-// The stepper's only stops: one vial, two, and then every multiple of
-// QTY_GROUP up to three bundles. Nothing in between — no 4, no 5, no 7 — so a
-// visitor can never land on a "ragged" quantity that pays for a fraction of a
-// group. 1 and 2 are the plain rate; the rest are the bundle cards below.
-// QTY_STOPS.length caps at five entries on purpose: past the third bundle the
-// answer is wholesale, not a bigger card on a cold landing page.
-const QTY_STOPS = [1, 2, QTY_GROUP, QTY_GROUP * 2, QTY_GROUP * 3];
-
-// The three cards on a product page, one per bundle stop. The stepper handles
-// 1 and 2 vials on its own; every quantity that actually earns a free vial
-// gets a card instead, so nobody has to know the mechanic exists to use it.
-const PDP_CARD_QTYS = QTY_STOPS.filter(q => q >= QTY_GROUP);
+// The three cards on a product page: shortcuts to the first three quantities
+// that actually earn a free vial. The stepper is not limited to these —
+// anyone can step to 4, 5, 7, 12, whatever they want, and freeVials()/
+// paidVials() price it correctly either way — these three just save the
+// common case a click instead of five presses on the stepper.
+const PDP_CARD_QTYS = [QTY_GROUP, QTY_GROUP * 2, QTY_GROUP * 3];
 
 // The richest this mechanic ever gets on a single compound: one vial free in
 // every QTY_GROUP, which is what it is at every multiple of QTY_GROUP and
@@ -1735,7 +1729,6 @@ if (typeof module !== 'undefined' && module.exports) {
     bulkSavingPct,
     SITEWIDE_DISCOUNT,
     QTY_GROUP,
-    QTY_STOPS,
     PDP_CARD_QTYS,
     BULK_MAX_OFF,
     buyMoreHeadline,

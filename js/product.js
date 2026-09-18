@@ -411,29 +411,17 @@
   // the page, so the price and the highlighted card can never describe
   // different quantities.
   function setQty(n) {
-    // Snaps to the nearest stop rather than trusting the caller: every actual
-    // caller already passes an exact stop (the stepper moves one index at a
-    // time, a card press passes its own qty), but landing on a real stop no
-    // matter what is what keeps a ragged quantity from ever reaching the
-    // price at all.
-    qty = QTY_STOPS.reduce((best, s) => (Math.abs(s - n) < Math.abs(best - n) ? s : best), QTY_STOPS[0]);
+    // No upper bound and no fixed stops: anyone can step to 4, 5, 12, whatever
+    // they want. freeVials()/paidVials() price any quantity correctly, so
+    // there is nothing a ragged number could get wrong here — only the
+    // ceiling of what the cards below can shortcut to.
+    qty = Math.max(1, Math.round(n) || 1);
     const qtyEl = $('pdQty');
     const decEl = $('pdQtyDec');
-    const incEl = $('pdQtyInc');
     if (qtyEl) qtyEl.textContent = qty;
-    if (decEl) decEl.disabled = qty <= QTY_STOPS[0];
-    if (incEl) incEl.disabled = qty >= QTY_STOPS[QTY_STOPS.length - 1];
+    if (decEl) decEl.disabled = qty <= 1;
     renderPrice();
     markActiveTier();
-  }
-
-  // Moves the stepper to the next or previous QTY_STOPS entry rather than by
-  // one vial at a time — the whole point of fixing the stops is that there is
-  // no quantity between them to step onto.
-  function stepQty(direction) {
-    const idx = QTY_STOPS.indexOf(qty);
-    const nextIdx = Math.max(0, Math.min(QTY_STOPS.length - 1, idx + direction));
-    setQty(QTY_STOPS[nextIdx]);
   }
 
   function wireBuy() {
@@ -441,8 +429,8 @@
 
     const decBtn = $('pdQtyDec');
     const incBtn = $('pdQtyInc');
-    if (decBtn) decBtn.addEventListener('click', () => stepQty(-1));
-    if (incBtn) incBtn.addEventListener('click', () => stepQty(1));
+    if (decBtn) decBtn.addEventListener('click', () => setQty(qty - 1));
+    if (incBtn) incBtn.addEventListener('click', () => setQty(qty + 1));
 
     // the cart line is unitSale × qty, and unitSale is the tier-adjusted price
     // the page just showed, so the cart charges what the buy box quoted
@@ -486,9 +474,11 @@
      bundle and being taken straight to a cart is the behaviour that makes
      people distrust a bundle picker, and it also made the stepper pointless. */
 
-  // Highlights the card matching the current quantity exactly. qty is always
-  // one of QTY_STOPS, so this either lands on exactly one card (3, 6 or 9) or
-  // on none at all (1 or 2, the plain stepper range with no card to light).
+  // Highlights the card matching the current quantity exactly. Stepping to
+  // anything that isn't 3, 6 or 9 (1, 2, 4, 5, 7...) lights no card at all,
+  // rather than the nearest one — a lit "3 vials" while the buyer is on 4
+  // would state a rate they aren't getting. nextFreeNudge() under the price
+  // is what speaks for every quantity, cards or not.
   function markActiveTier() {
     document.querySelectorAll('#pdTiers .pd-tier').forEach(btn => {
       const isOn = +btn.dataset.qty === qty;

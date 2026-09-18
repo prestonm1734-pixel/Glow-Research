@@ -34,7 +34,7 @@ const {
   verifyUrl, verifyHost, LAB_VERIFY_URL,
   FAQS, faqHtml,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
-  QTY_GROUP, QTY_STOPS, PDP_CARD_QTYS, getProductVariants, unitPriceAt, BULK_MAX_OFF, buyMoreHeadline, nextFreeNudge, bulkOff,
+  QTY_GROUP, PDP_CARD_QTYS, getProductVariants, unitPriceAt, BULK_MAX_OFF, buyMoreHeadline, nextFreeNudge, bulkOff,
   ordinal, freeVials, paidVials, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY, PAYMENT_METHODS,
   hasList, listPriceOf, SITEWIDE_DISCOUNT, VIAL_ART_NOTICE, LAUNCH_OFFER, LAUNCH_OFFER_LIVE,
@@ -2133,26 +2133,23 @@ console.log('\nstructured data');
  * ------------------------------------------------------------------------- */
 console.log('\nbulk pricing');
 {
-  // The stepper's stops are 1, 2, then every multiple of QTY_GROUP up to
-  // three bundles — no quantity in between is reachable at all, which is what
-  // keeps a "ragged" quantity (paying for a fraction of a group) from ever
-  // happening in the first place.
-  ok('the stepper stops at 1, 2, and three multiples of the group size',
-    QTY_STOPS.length === 5 && QTY_STOPS[0] === 1 && QTY_STOPS[1] === 2 &&
-    QTY_STOPS.slice(2).every((q, i) => q === QTY_GROUP * (i + 1)),
-    QTY_STOPS.join(', '));
-  // The cards are exactly the bundle stops, ascending.
-  ok('the cards are exactly the bundle stops in QTY_STOPS, in order',
+  // The stepper is uncapped and steps by one — anyone can reach 4, 5, 7,
+  // whatever they want — so the only thing fixed here is which three
+  // quantities get a card: the first three that actually earn a free vial.
+  ok('the cards are the first three multiples of the group size, ascending',
     PDP_CARD_QTYS.length === 3 &&
-    PDP_CARD_QTYS.every((q, i) => q === QTY_STOPS[i + 2]),
+    PDP_CARD_QTYS.every((q, i) => q === QTY_GROUP * (i + 1)),
     PDP_CARD_QTYS.join(', '));
+  const pjStepper = read('js/product.js');
+  ok('the stepper has no upper bound and moves by one vial at a time',
+    /setQty\(qty - 1\)/.test(pjStepper) && /setQty\(qty \+ 1\)/.test(pjStepper) &&
+    !/incEl\.disabled/.test(pjStepper),
+    'a card-only or capped stepper would stop someone from ordering 4, 5, 7...');
 
   // freeVials()/paidVials() are the one place "every Nth vial free" is
-  // computed, checked across a wide range rather than only at the stops
-  // themselves, because a quantity between multiples is where an off-by-one
-  // would hide — even though the UI can no longer reach one, the functions
-  // still have to be correct for whatever a cart edit or a promo comparison
-  // hands them.
+  // computed, checked across a wide range rather than only at the cards'
+  // own quantities, because a quantity between multiples — very reachable
+  // now that the stepper has no stops — is where an off-by-one would hide.
   const wrong = [];
   for (let q = 0; q <= QTY_GROUP * 6; q++) {
     const expectedFree = Math.floor(q / QTY_GROUP);
@@ -2189,7 +2186,7 @@ console.log('\nbulk pricing');
 
   // nextFreeNudge() itself: it must always say something true, both while
   // counting down to a free vial and once one is earned, checked across a
-  // wide range since QTY_STOPS only exercises five of these values.
+  // wide range since the stepper can reach any of them.
   const nudgeWrong = [];
   for (let q = 1; q <= QTY_GROUP * 4; q++) {
     const rem = q % QTY_GROUP;
@@ -2241,15 +2238,6 @@ console.log('\nbulk pricing');
   ok('pressing a card sets the quantity', /setQty\(\+btn\.dataset\.qty\)/.test(tierHandler));
   ok('pressing a card does not add to the cart',
     !/GlowCart\.add/.test(tierHandler), 'a card press must never touch the cart');
-
-  // The stepper itself must only ever move along QTY_STOPS, or the whole
-  // point of fixing the stops (no ragged quantity is reachable) is undone by
-  // a plain qty +/- 1 sneaking back in.
-  ok('the stepper moves along QTY_STOPS rather than by one vial',
-    /function stepQty\(direction\)/.test(pj) &&
-    /QTY_STOPS\.indexOf\(qty\)/.test(pj) &&
-    /decBtn\.addEventListener\('click', \(\) => stepQty\(-1\)\)/.test(pj) &&
-    /incBtn\.addEventListener\('click', \(\) => stepQty\(1\)\)/.test(pj));
 
   // One function prices the buy box, the cart line and the generated page.
   ok('the buy box prices from unitPriceAt()', /unitPriceAt\(s\.price, qty\)/.test(pj));
