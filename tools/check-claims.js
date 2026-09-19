@@ -2140,6 +2140,24 @@ console.log('\nbulk pricing');
     PDP_CARD_QTYS.length === 3 &&
     PDP_CARD_QTYS.every((q, i) => q === QTY_GROUP * (i + 1)),
     PDP_CARD_QTYS.join(', '));
+
+  // The homepage states the offer once, under the catalog heading, where
+  // prices are first being read. Both numbers in it are pinned: a group-size
+  // change cannot leave it advertising the old ratio.
+  const catalogOffer = (read('index.html').match(/class="catalog-head-offer[^"]*">([^<]*)</) || [, ''])[1].trim();
+  const expectedCatalogOffer =
+    `Buy ${QTY_GROUP - 1}, get 1 free: every ${ordinal(QTY_GROUP)} vial of the same compound.`;
+  ok('the homepage catalog heading states the offer, pinned to the group size',
+    catalogOffer === expectedCatalogOffer,
+    `found "${catalogOffer}", expected "${expectedCatalogOffer}"`);
+  // "of the same compound" is load-bearing, not padding: free vials are
+  // earned per cart line (api/_lib.js prices each line against its own qty),
+  // so three different compounds earn nothing. Copy that dropped the
+  // qualifier would be promising a discount the checkout does not give.
+  ok('and says the free vial is per compound, which is how it is actually priced',
+    /same compound/.test(catalogOffer) &&
+    /unitPriceAt\(size\.price, ignoreBulk \? 1 : qty\)/.test(read('api/_lib.js')));
+
   const pjStepper = read('js/product.js');
   ok('the stepper has no upper bound and moves by one vial at a time',
     /setQty\(qty - 1\)/.test(pjStepper) && /setQty\(qty \+ 1\)/.test(pjStepper) &&

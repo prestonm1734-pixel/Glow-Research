@@ -710,10 +710,24 @@ button[disabled].si-forgot{ cursor: progress; }
 .catalog-head{
   display:flex; align-items:flex-end; justify-content:space-between; gap: 24px;
   max-width: none;
+  /* most of the 56px .section-head leaves is handed to .catalog-head-offer
+     below, which now carries the gap down to the grid */
+  margin-bottom: 16px;
 }
 .catalog-head-copy{ max-width: 640px; }
 .catalog-head .eyebrow{ margin-bottom: 10px; }
 .catalog-head h2{ margin:0; }
+/* The offer, on its own row under the heading of the section it applies to.
+   Set as supporting copy rather than a chip or a badge: at the point someone
+   starts reading prices it is a fact about the grid below, and the grid is
+   what should still be the loud thing on this screen.
+
+   Its own row rather than inside .catalog-head-copy: sharing that column
+   left it wrapping to three lines on a phone and squeezing "Shop all
+   Peptides" into a sliver beside it. */
+.catalog-head-offer{
+  margin: 0 0 40px; font-size: 0.92rem; line-height:1.5; color:#55554f;
+}
 .catalog-head .btn-outline{ flex-shrink:0; white-space:nowrap; }
 /* Stays a row on a phone rather than stacking, which is what the wider
    layout above already does and what the heading is short enough to allow:
@@ -722,7 +736,10 @@ button[disabled].si-forgot{ cursor: progress; }
    heading left and the way out of the section on the right, instead of a
    full-width button reading as the section's own call to action. */
 @media (max-width: 640px){
-  .catalog-head{ align-items:flex-end; gap: 12px; margin-bottom: 34px; }
+  /* the 34px this row used to leave, split between it and the offer line
+     under it, so the distance down to the first card is unchanged */
+  .catalog-head{ align-items:flex-end; gap: 12px; margin-bottom: 12px; }
+  .catalog-head-offer{ margin-bottom: 22px; font-size: 0.88rem; }
   .catalog-head .btn-outline{ width:auto; padding: 10px 13px; font-size: 0.76rem; }
 }
 /* The row is 16px too wide for a 320px screen at the sizes above, and what
