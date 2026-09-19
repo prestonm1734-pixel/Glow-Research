@@ -1387,10 +1387,12 @@ function nextFreeNudge(qty) {
 // scrolling marquee: that track carried RUO/lab-tested facts the hero
 // already states louder, and this offer reaches a visitor who lands
 // straight on a product page from an ad or a search result — not just
-// whoever scrolls the homepage. Built from QTY_GROUP so the number in it
-// cannot drift from what the cards actually charge.
+// whoever scrolls the homepage. Cut down to the offer itself, no mechanism
+// explained — "applied automatically at checkout" is what the cards and the
+// per-vial line under the price are for. Built from QTY_GROUP so the number
+// in it cannot drift from what the cards actually charge.
 function offerBarLine() {
-  return `Buy ${QTY_GROUP - 1}, get 1 free: applied automatically at checkout.`;
+  return `Buy ${QTY_GROUP - 1}, get 1 free.`;
 }
 
 // The meta description for one compound, for the generated page's head and
