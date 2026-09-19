@@ -2141,13 +2141,13 @@ console.log('\nbulk pricing');
     PDP_CARD_QTYS.every((q, i) => q === QTY_GROUP * (i + 1)),
     PDP_CARD_QTYS.join(', '));
 
-  // The homepage hero states the offer too, between the CTA buttons and the
-  // evidence stats' hairline. Pinned to QTY_GROUP so a group-size change
-  // cannot leave the hero naming the old number.
-  const idxHeroOffer = (read('index.html').match(/class="hero-offer[^"]*"[\s\S]{0,120}<\/span>\s*([^<]*)<\/p>/) || [, ''])[1].trim();
-  ok(`the hero states "Buy ${QTY_GROUP - 1}, get 1 free" under the CTA buttons`,
-    idxHeroOffer === `Buy ${QTY_GROUP - 1}, get 1 free: every order, applied at checkout.`,
-    `found "${idxHeroOffer}"`);
+  // The homepage hero states the offer too, as a pill between the CTA
+  // buttons and the evidence stats' hairline — the same pill product.html
+  // uses under the price. Pinned to QTY_GROUP so a group-size change cannot
+  // leave the hero naming the old number.
+  const idxHeroOffer = (read('index.html').match(/class="hero-offer[^"]*">([^<]*)<\/p>/) || [, ''])[1].trim();
+  ok(`the hero pill states "Buy ${QTY_GROUP - 1}, get 1 free."`,
+    idxHeroOffer === `Buy ${QTY_GROUP - 1}, get 1 free.`, `found "${idxHeroOffer}"`);
 
   const pjStepper = read('js/product.js');
   ok('the stepper has no upper bound and moves by one vial at a time',

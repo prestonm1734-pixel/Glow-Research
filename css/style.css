@@ -469,18 +469,14 @@ button[disabled].si-forgot{ cursor: progress; }
    read as sloppy. */
 .hero-cta{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom: 16px; }
 
-/* The offer, sat between the buttons and the stats' own hairline rather than
-   a banner of its own — a fact stated in the same small, quiet register as
-   the dispatch and COA facts elsewhere on this page, not a second headline
-   competing with "Lab-Grade Research Peptides." above it. */
+/* The same pill as the product page's price note (#pdPriceNote in
+   product.html): solid chip, bold, same padding and radius. Inverted to a
+   white chip on black text here since the hero itself is already black —
+   a solid black pill would disappear against it. */
 .hero-offer{
-  display:flex; align-items:center; gap:9px;
-  font-family:'JetBrains Mono', monospace; font-size:.76rem; letter-spacing:.03em;
-  color: #9a9a96; margin: 0 0 16px;
-}
-.hero-offer-dot{
-  display:inline-block; width:5px; height:5px; border-radius:50%;
-  background:#9a9a96; flex-shrink:0;
+  display:inline-block; margin: 0 0 16px; padding: 6px 13px;
+  background:#fff; color:#0a0a0a; font-weight:700; font-size:.78rem;
+  letter-spacing:.02em; line-height:1.3; border-radius:999px;
 }
 
 /* welcome.html's hero leads with one dominant button, not two side by side
