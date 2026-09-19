@@ -417,15 +417,7 @@ button[disabled].si-forgot{ cursor: progress; }
   display:inline-flex; align-items:center; gap: 8px; font-family:'JetBrains Mono', monospace;
   font-size: 0.74rem; letter-spacing:.18em; text-transform:uppercase; font-weight:600;
   color: #ffffff; margin-bottom: 16px; position: relative; z-index: 1;
-  flex-wrap: wrap; row-gap: 4px;
 }
-/* The offer, riding on the eyebrow rather than its own banner: same slot,
-   same size, one dot of separation. Dimmer than "Independently Verified" so
-   it reads as a second fact rather than competing with the trust claim that
-   was there first — costs no vertical space, and it's the first thing on
-   the page either way. */
-.hero-eyebrow-sep{ color: #6b6b69; font-weight:400; }
-.hero-eyebrow-offer{ color: #b5b5b0; }
 @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
 /* the hero line — solid, semibold, full white, largest size on the page */
@@ -472,9 +464,24 @@ button[disabled].si-forgot{ cursor: progress; }
   .hero-sub{ font-size: 0.83rem; }
 }
 /* hero rhythm runs on an 8px scale end to end: eyebrow 16 → title 24 →
-   sub 32 → cta 24 → rule → stats 24. The gaps were previously 20/20/30/30/22,
-   close enough to look almost-systematic, which is what read as sloppy. */
-.hero-cta{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom: 24px; }
+   sub 32 → cta 16 → offer 16 → rule → stats 24. The gaps were previously
+   20/20/30/30/22, close enough to look almost-systematic, which is what
+   read as sloppy. */
+.hero-cta{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom: 16px; }
+
+/* The offer, sat between the buttons and the stats' own hairline rather than
+   a banner of its own — a fact stated in the same small, quiet register as
+   the dispatch and COA facts elsewhere on this page, not a second headline
+   competing with "Lab-Grade Research Peptides." above it. */
+.hero-offer{
+  display:flex; align-items:center; gap:9px;
+  font-family:'JetBrains Mono', monospace; font-size:.76rem; letter-spacing:.03em;
+  color: #9a9a96; margin: 0 0 16px;
+}
+.hero-offer-dot{
+  display:inline-block; width:5px; height:5px; border-radius:50%;
+  background:#9a9a96; flex-shrink:0;
+}
 
 /* welcome.html's hero leads with one dominant button, not two side by side
    like index.html, so it does not inherit that sizing: it fills the same
