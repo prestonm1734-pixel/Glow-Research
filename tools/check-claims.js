@@ -26,7 +26,7 @@ const ROOT = path.join(__dirname, '..');
 const {
   GLOW_PRODUCTS, COAS_PUBLISHED, PRODUCT_PAGES_LIVE, sizeInStock,
   avgPurity, BATCHES_TESTED, TRANSIT_DAYS, DISPATCH_LABEL,
-  DISPATCH_CUTOFF_HOUR, DISPATCH_CUTOFF_LABEL, DISPATCH_CUTOFF_PDP_LABEL, offerBarLine,
+  DISPATCH_CUTOFF_HOUR, DISPATCH_CUTOFF_LABEL, DISPATCH_CUTOFF_TICKER, DISPATCH_CUTOFF_PDP_LABEL,
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord, PACKAGING_PLAIN,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
@@ -75,11 +75,10 @@ function constant(file, name) {
 }
 
 /* ---------------------------------------------------------------------------
- * 1. Free shipping. Stated in shipping.html and shipping-policy.html (the
- *    marquee used to carry it on every page too, before it was replaced by
- *    the static offer bar), enforced in the cart drawer, and enforced again
- *    in the checkout shipping table. A customer who reads $250 somewhere and
- *    then gets charged shipping never comes back.
+ * 1. Free shipping. Stated in the marquee on every page, enforced in the cart
+ *    drawer, and enforced again in the checkout shipping table. Three places,
+ *    one number. A customer who adds $250 of product because the marquee said
+ *    so and then gets charged shipping never comes back.
  * ------------------------------------------------------------------------- */
 console.log('\nfree shipping threshold');
 {
@@ -88,17 +87,12 @@ console.log('\nfree shipping threshold');
   ok('cart.js declares FREE_SHIPPING_AT', cart !== null);
   ok('checkout.js agrees with the cart', cart === checkout, `cart ${cart} vs checkout ${checkout}`);
 
-  // Matches "FREE SHIPPING OVER $250" (the old marquee phrasing, if it ever
-  // comes back), "Free over $250" (shipping.html's meta description) and
-  // "free on orders over $250" (shipping-policy.html's actual policy line) —
-  // whichever wording a page uses, the number has to be the one enforced.
   const claimed = new Set();
   pages.forEach(f => {
-    const m = read(f).match(/free\s+(?:shipping\s+)?(?:on orders\s+)?over\s*\$([0-9]+)/i);
+    const m = read(f).match(/FREE SHIPPING OVER \$([0-9]+)/i);
     if (m) claimed.add(parseInt(m[1], 10));
   });
-  ok('at least one page states the threshold, and every page that does agrees',
-    claimed.size === 1, `found ${[...claimed].join(', ')}`);
+  ok('every page states one threshold', claimed.size === 1, `found ${[...claimed].join(', ')}`);
   ok('the stated threshold is the enforced one', claimed.has(cart),
     `copy says $${[...claimed].join('/')}, code enforces $${cart}`);
 }
@@ -152,17 +146,13 @@ console.log('\ndispatch window');
   ok('no page describes dispatch in "business days" any more',
     staleBusinessDayShipping.length === 0, staleBusinessDayShipping.join(', '));
 
-  // Every clock-time cutoff claim sitewide has to be one of two approved
-  // strings — DISPATCH_CUTOFF_LABEL in prose, DISPATCH_CUTOFF_PDP_LABEL on
-  // the product page — both read from DISPATCH_CUTOFF_HOUR, so a mismatched
-  // one is either a typo or a claim about a different hour than the code
-  // enforces. Scripts are scanned alongside pages for the same reason as
-  // before: a claim rendered from a template literal is still a claim a
-  // customer reads.
-  //
-  // DISPATCH_CUTOFF_TICKER, the marquee's shorter form of this fact, is gone
-  // along with the marquee itself — replaced by the static offer bar, which
-  // states a different fact entirely rather than a compressed cutoff time.
+  // Every clock-time cutoff claim sitewide has to be one of three approved
+  // strings — DISPATCH_CUTOFF_LABEL in prose, DISPATCH_CUTOFF_TICKER in the
+  // marquee, DISPATCH_CUTOFF_PDP_LABEL on the product page — all three read
+  // from DISPATCH_CUTOFF_HOUR, so a mismatched one is either a typo or a
+  // claim about a different hour than the code enforces. Scripts are scanned
+  // alongside pages for the same reason as before: a claim rendered from a
+  // template literal is still a claim a customer reads.
   const cutoffSources = pages.concat(['js/product.js', 'js/products-data.js']);
 
   // Comments stripped, the same rule the privacy and navigation sections use:
@@ -178,22 +168,58 @@ console.log('\ndispatch window');
   // DISPATCH_CUTOFF_PDP_LABEL is not looked for in this scan: the product
   // page's cutoff line is built at runtime from a template literal, so the
   // resolved string never appears in any file's source text the way the
-  // other one does — it is checked below instead, by confirming js/product.js
+  // other two do — it is checked below instead, by confirming js/product.js
   // reads the constant itself rather than typing its own hour.
   const wrongClocks = [];
-  let foundLabel = false;
+  const foundAny = { label: false, ticker: false };
   cutoffSources.forEach(f => {
     for (const m of bareSrc(f).matchAll(/\b\d{1,2}(?::\d{2})?\s*(?:AM|PM)\s*(?:Pacific|PT|P[SD]T)\b/gi)) {
-      if (m[0] === DISPATCH_CUTOFF_LABEL) foundLabel = true;
+      if (m[0] === DISPATCH_CUTOFF_LABEL) foundAny.label = true;
+      else if (m[0] === DISPATCH_CUTOFF_TICKER) foundAny.ticker = true;
       else if (m[0] === DISPATCH_CUTOFF_PDP_LABEL) { /* its own definition, in products-data.js */ }
       else wrongClocks.push(`${f}: "${m[0]}"`);
     }
   });
   ok('every stated dispatch cutoff time matches an approved DISPATCH_CUTOFF_* constant exactly',
     wrongClocks.length === 0, wrongClocks.join(', '));
-  ok('the full cutoff label is stated somewhere', foundLabel);
+  ok('the full cutoff label and the marquee ticker are each stated somewhere',
+    foundAny.label && foundAny.ticker,
+    `label seen: ${foundAny.label}, ticker seen: ${foundAny.ticker}`);
   ok('the product page reads DISPATCH_CUTOFF_PDP_LABEL rather than typing its own hour',
     /DISPATCH_CUTOFF_PDP_LABEL/.test(read('js/product.js')));
+
+  // The marquee is hand-duplicated across every page rather than built from
+  // one template, so the only way to catch a page that kept the old ticker
+  // text is to check each one that has a marquee at all.
+  const staleTicker = [];
+  pages.forEach(f => {
+    const html = read(f);
+    if (/marquee-track/.test(html) && !html.includes(DISPATCH_CUTOFF_TICKER)) staleTicker.push(f);
+  });
+  ok('every page with a marquee states the current cutoff ticker',
+    staleTicker.length === 0, staleTicker.join(', '));
+
+  // The marquee scrolls by animating the track from 0 to -50%, which only
+  // returns to where it started if the track is the same list written twice.
+  // Every page but the homepage and welcome had it written once, so the loop
+  // jumped back visibly every 28 seconds on 28 of 30 pages, for long enough
+  // that nobody had noticed it was a defect rather than the effect.
+  //
+  // Checked rather than fixed and forgotten, because this markup is hand
+  // duplicated into every page: the next new page starts as a copy of one of
+  // these, and half of them were wrong.
+  const brokenLoop = [];
+  pages.forEach(f => {
+    const body = (read(f).match(/<div class="marquee-track">([\s\S]*?)<\/div>/) || [, ''])[1];
+    if (!body.trim()) return;
+    const items = body.split('\n').map(l => l.trim()).filter(l => l.includes('<span>'));
+    const half = items.length / 2;
+    if (items.length % 2 !== 0 ||
+        items.slice(0, half).join('|') !== items.slice(half).join('|')) brokenLoop.push(f);
+  });
+  ok('and its track is the same list twice, so the scroll loops without a jump',
+    brokenLoop.length === 0,
+    `the -50% animation lands mid-list on: ${brokenLoop.join(', ')}`);
 
   ok('the product page reads the shared dispatch days, not its own copy',
     !/const NO_DISPATCH_DAYS|const NO_DELIVERY_DAY/.test(read('js/product.js')) &&
@@ -242,44 +268,6 @@ console.log('\ndispatch window');
   ok('shipping-policy.html states the real Monday-through-Friday dispatch schedule',
     /Monday through\s*\n?\s*Friday/.test(read('shipping-policy.html')) &&
     !/Saturday is a dispatch day/i.test(read('shipping-policy.html')));
-}
-
-/* ---------------------------------------------------------------------------
- * 2a. The offer bar. Replaced the scrolling marquee sitewide: that track
- *     carried RUO/lab-tested facts the hero already states louder, plus a
- *     shipping/dispatch pair now stated on the pages that actually own them.
- *     A static line reaches anyone who lands on a product page cold — not
- *     just whoever scrolls the homepage — and is legible immediately rather
- *     than only part of the time, the way a moving track is.
- * ------------------------------------------------------------------------- */
-console.log('\noffer bar');
-{
-  // Hand duplicated into every page, same as the marquee was, so the only
-  // way to catch a page with stale or missing copy is to check each one.
-  const wrongBar = [];
-  pages.forEach(f => {
-    const html = read(f);
-    const m = html.match(/class="offer-bar-text">([^<]*)</);
-    if (!m || m[1].trim() !== offerBarLine()) wrongBar.push(f);
-  });
-  ok('every page states the one offerBarLine() writes',
-    wrongBar.length === 0, wrongBar.join(', '));
-
-  // Above the header on every page, the same slot the marquee held — a
-  // visitor landing on a product page from an ad has to see it before
-  // anything else, not scroll to find it.
-  const misplacedBar = pages.filter(f => {
-    const html = read(f);
-    return !/<\/script>\s*\n*\s*<!--[\s\S]{0,300}?-->\s*<div class="offer-bar">[\s\S]{0,400}<header /.test(html);
-  });
-  ok('the offer bar sits above the header on every page',
-    misplacedBar.length === 0, misplacedBar.join(', '));
-
-  // The marquee it replaced must actually be gone, not just superseded —
-  // two dark bars stacked above the header would be worse than either alone.
-  const marqueeBack = pages.filter(f => /marquee-bar|marquee-track/.test(read(f)));
-  ok('no page still carries the old marquee markup',
-    marqueeBack.length === 0, marqueeBack.join(', '));
 }
 
 /* ---------------------------------------------------------------------------
@@ -4308,16 +4296,24 @@ console.log('\nclient-side navigation');
 
 console.log('\nscrolling');
 {
-  // overflow-x:hidden on <body> used to be how a wide marquee track got
-  // clipped, and it was not free: overflow-x on its own computes overflow-y
-  // to auto, which makes <body> a scroll container inside the document's, and
-  // on iOS that shows up as a page you can keep scrolling past the footer
-  // into an empty screen of background. The marquee is gone now — replaced
-  // by the static offer bar — but nothing should still be reaching for this
-  // fix, since nothing on the page overflows horizontally on purpose any more.
+  // The announcement marquee's track is wider than the screen on purpose, and
+  // it is the only thing on the site that overflows horizontally. It used to
+  // be clipped twice: once by its own bar and again by overflow-x:hidden on
+  // <body>.
+  //
+  // That second one was not free. overflow-x on its own computes overflow-y to
+  // auto, which makes <body> a scroll container inside the document's, and on
+  // iOS that shows up as a page you can keep scrolling past the footer into an
+  // empty screen of background. It is gone, and these two lines are what keep
+  // it gone: the clip has to stay where it belongs, on the element that
+  // actually overflows.
   const sheet = read('css/style.css');
+  const bar = (sheet.match(/\.marquee-bar\{[^}]*\}/) || [''])[0];
+  ok('the marquee clips its own track', /overflow:\s*hidden/.test(bar),
+    'without this the track sets the page width and every page scrolls sideways');
+
   const bodyRule = (sheet.match(/\nbody\{[^}]*\}/) || [''])[0];
-  ok('the body sets no overflow of its own, which would scroll inside the page',
+  ok('and the body sets no overflow of its own, which would scroll inside the page',
     !/overflow(-x|-y)?\s*:/.test(bodyRule),
     'overflow-x on body computes overflow-y to auto and makes it a scroll container');
 }
