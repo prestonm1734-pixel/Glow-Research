@@ -463,11 +463,11 @@ button[disabled].si-forgot{ cursor: progress; }
 @media (max-width: 560px){
   .hero-sub{ font-size: 0.83rem; }
 }
-/* hero rhythm runs on an 8px scale end to end: eyebrow 16 → title 24 →
-   sub 32 → cta 16 → offer 16 → rule → stats 24. The gaps were previously
+/* hero rhythm runs on an 8px scale end to end: offer 16 → title 24 →
+   sub 32 → cta 24 → rule → stats 24. The gaps were previously
    20/20/30/30/22, close enough to look almost-systematic, which is what
    read as sloppy. */
-.hero-cta{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom: 16px; }
+.hero-cta{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom: 24px; }
 
 /* The same pill as the product page's price note (#pdPriceNote in
    product.html): solid chip, bold, same padding and radius. Inverted to a
