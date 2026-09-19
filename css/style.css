@@ -296,37 +296,6 @@ button[disabled].si-forgot{ cursor: progress; }
 }
 .marquee-bar:hover .marquee-track{ animation-play-state: paused; }
 
-/* ---------- promo banner (sitewide) ---------- */
-/* Same dark treatment as the marquee, held still: this is the one offer
-   worth reading in full rather than one of several rotating past. The
-   display font and the two sparks either side are the "more appealing" part;
-   everything else — monochrome, no rounded pill, no color — is the same
-   restraint the rest of the site keeps. */
-.promo-banner{
-  background: linear-gradient(90deg, #0a0a0a, #1c1c1c);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 0;
-}
-.promo-banner-inner{
-  display:flex; align-items:center; justify-content:center; gap:12px;
-}
-.promo-banner-text{
-  font-family: var(--font-display);
-  font-size: 0.96rem;
-  font-weight: 700;
-  letter-spacing: -0.005em;
-  color: #fff;
-}
-.promo-banner-spark{
-  font-style:normal; color:#8a8a86; font-size:.68rem; flex-shrink:0;
-  animation: twinkle 2.4s ease-in-out infinite;
-}
-@media (max-width: 640px){
-  .promo-banner{ padding: 10px 16px; }
-  .promo-banner-inner{ gap:9px; }
-  .promo-banner-text{ font-size: 0.82rem; }
-}
-
 /* ---------- header ---------- */
 .site-header{
   position: sticky; top:0; z-index: 100;

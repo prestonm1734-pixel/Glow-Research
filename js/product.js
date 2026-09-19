@@ -301,13 +301,6 @@
 
     renderSticky(total);
 
-    // How far this quantity is from a free vial, or what it already earned.
-    // Updates on every quantity change, same as the price above it, so
-    // stepping from 1 to 2 to 3 reads as a nudge getting closer rather than a
-    // fact stated once and forgotten.
-    const note = $('pdPriceNote');
-    if (note) note.textContent = nextFreeNudge(qty);
-
     // The per-vial rate. Quiet, and only shown once there's a bundle rate to
     // state — at one vial it would just repeat the price above it.
     const unitEl = $('pdUnitPrice');
@@ -315,6 +308,16 @@
       unitEl.hidden = qty === 1;
       unitEl.textContent = qty === 1 ? '' : `${money(unit)} per vial`;
     }
+  }
+
+  // The pill under the price. Static on purpose: "Add 2 more, get 1 free"
+  // at one vial reads as if 2 more vials arrive plus a separate free one —
+  // three paid, one free — when the 3-vial card is 2 paid, 1 free. The math
+  // behind the dynamic version was correct; the sentence just asked the
+  // reader to do it. One fixed line nobody has to parse instead.
+  function renderBuyMoreLine() {
+    const note = $('pdPriceNote');
+    if (note) note.textContent = buyMoreHeadline();
   }
 
   // everything that changes when a different mg is picked
@@ -477,8 +480,8 @@
   // Highlights the card matching the current quantity exactly. Stepping to
   // anything that isn't 3, 6 or 9 (1, 2, 4, 5, 7...) lights no card at all,
   // rather than the nearest one — a lit "3 vials" while the buyer is on 4
-  // would state a rate they aren't getting. nextFreeNudge() under the price
-  // is what speaks for every quantity, cards or not.
+  // would state a rate they aren't getting. The per-vial line under the
+  // price is what speaks for a quantity with no card lit.
   function markActiveTier() {
     document.querySelectorAll('#pdTiers .pd-tier').forEach(btn => {
       const isOn = +btn.dataset.qty === qty;
@@ -592,6 +595,7 @@
     setCanonical(product);
     renderBreadcrumb(product);
     renderHeader(product);
+    renderBuyMoreLine();
     renderEvidence(product);
     renderSizes(product);
     renderSelection();

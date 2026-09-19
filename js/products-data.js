@@ -1373,26 +1373,13 @@ function getProductVariants(p, unitPrice) {
   });
 }
 
-// The short form for the sitewide banner: one sentence, no mechanism
-// explained, because the banner's job is to get someone to a product page,
-// not to teach the rule. Built from QTY_GROUP so the number in it can't drift
-// from what the cards actually charge.
+// The pill under the price, above the size picker. Static rather than a
+// per-quantity nudge: "add 2 more, get 1 free" at one vial reads as three
+// paid plus a separate free one, when the 3-vial card is two paid and one
+// free. Built from QTY_GROUP so the number in it can't drift from what the
+// cards actually charge, without asking the reader to do arithmetic on it.
 function buyMoreHeadline() {
   return `Buy ${QTY_GROUP - 1}, get 1 free.`;
-}
-
-// The line under the price, above the size picker. Updates with the
-// quantity, the way the price above it does, because it is answering the
-// question the price just raised: how far is this selection from a free
-// vial. At an exact group multiple it confirms what was earned instead of
-// asking for more — there is nothing left to add at 9, the top stop.
-function nextFreeNudge(qty) {
-  const free = freeVials(qty);
-  const rem = qty % QTY_GROUP;
-  if (rem === 0) {
-    return `${free} vial${free === 1 ? '' : 's'} free at this quantity.`;
-  }
-  return `Add ${QTY_GROUP - rem} more, get 1 free.`;
 }
 
 // The meta description for one compound, for the generated page's head and
@@ -1732,7 +1719,6 @@ if (typeof module !== 'undefined' && module.exports) {
     PDP_CARD_QTYS,
     BULK_MAX_OFF,
     buyMoreHeadline,
-    nextFreeNudge,
     ordinal,
     freeVials,
     paidVials,

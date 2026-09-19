@@ -206,7 +206,7 @@
      card on a cold landing page. The stepper is not limited to these three —
      it steps to any quantity, 4 and 5 included — the cards are shortcuts to
      the common case, not the only quantities the page can sell. */
-  .pd-bulk{ margin-top: 2px; padding-top: 18px; border-top:1px solid rgba(0,0,0,.1); }
+  .pd-bulk{ margin-top: 18px; padding-top: 18px; border-top:1px solid rgba(0,0,0,.1); }
   .pd-tiers{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .pd-tier{
     position:relative; background:#fafaf8; border:1.5px solid rgba(0,0,0,.14); cursor:pointer;
@@ -633,7 +633,7 @@
     .pd-deliver{ margin: 0 0 14px; }
     .pd-deliver p{ padding: 1px 0; font-size:.88rem; }
 
-    .pd-bulk{ padding-top: 14px; }
+    .pd-bulk{ margin-top: 14px; padding-top: 14px; }
     .pd-tiers{ gap: 7px; }
 
     .pd-coa{ padding: 13px 14px; gap: 10px; }
@@ -708,17 +708,6 @@
   </div>
 </header>
 
-<!-- Static buy-more-pay-less banner, sitewide. Not the scrolling marquee
-     above the header: this is the one offer worth holding still for, not a
-     rotation of several. -->
-<div class="promo-banner">
-  <div class="container promo-banner-inner">
-    <i class="promo-banner-spark" aria-hidden="true">✦</i>
-    <span class="promo-banner-text">Buy 2, get 1 free.</span>
-    <i class="promo-banner-spark" aria-hidden="true">✦</i>
-  </div>
-</div>
-
 
 <nav class="pd-crumb" aria-label="Breadcrumb">
   <div class="container pd-crumb-inner">
@@ -759,9 +748,10 @@
              move it: the bulk tier is a function of quantity, so stepping from
              2 vials to 3 changes the per-vial rate, not just the multiplier. -->
         <span class="pd-price" id="pdPrice">$109.97<s class="pd-price-was">$121.00</s></span>
-        <!-- How far this quantity is from a free vial, or what it already
-             earned. Updates with the price above it on every quantity change. -->
-        <p class="pd-price-note" id="pdPriceNote">Add 2 more, get 1 free.</p>
+        <!-- Static, not a per-quantity nudge: "add 2 more, get 1 free" at one
+             vial reads as three paid plus a free one, when the 3-vial card is
+             two paid, one free. One fixed sentence nobody has to parse. -->
+        <p class="pd-price-note" id="pdPriceNote">Buy 2, get 1 free.</p>
         <!-- The per-vial rate at this quantity: the quiet number that makes
              the total above make sense, not a second claim competing with
              the nudge above it. Hidden at one vial, where it just restates
