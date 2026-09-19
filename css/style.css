@@ -463,21 +463,11 @@ button[disabled].si-forgot{ cursor: progress; }
 @media (max-width: 560px){
   .hero-sub{ font-size: 0.83rem; }
 }
-/* hero rhythm runs on an 8px scale end to end: offer 16 → title 24 →
+/* hero rhythm runs on an 8px scale end to end: eyebrow 16 → title 24 →
    sub 32 → cta 24 → rule → stats 24. The gaps were previously
    20/20/30/30/22, close enough to look almost-systematic, which is what
    read as sloppy. */
 .hero-cta{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom: 24px; }
-
-/* The same pill as the product page's price note (#pdPriceNote in
-   product.html): solid chip, bold, same padding and radius. Inverted to a
-   white chip on black text here since the hero itself is already black —
-   a solid black pill would disappear against it. */
-.hero-offer{
-  display:inline-block; margin: 0 0 16px; padding: 6px 13px;
-  background:#fff; color:#0a0a0a; font-weight:700; font-size:.78rem;
-  letter-spacing:.02em; line-height:1.3; border-radius:999px;
-}
 
 /* welcome.html's hero leads with one dominant button, not two side by side
    like index.html, so it does not inherit that sizing: it fills the same
