@@ -671,11 +671,6 @@ const NO_DELIVERY_DAY = 0;                    // FedEx does not deliver Sundays
 // about what "now" means.
 const DISPATCH_CUTOFF_HOUR = 13;
 const DISPATCH_CUTOFF_LABEL = '1:00 PM Pacific';
-// The marquee ticker's shorter form of the same fact — same hour as
-// DISPATCH_CUTOFF_LABEL, just without spelling out "Pacific". Its own
-// constant rather than a second hand-typed "1:00 PM PT" in thirty static
-// pages, so check-claims.js can pin every ticker to this one string.
-const DISPATCH_CUTOFF_TICKER = '1:00 PM PT';
 // The product page's own wording of the same hour. "PST" rather than
 // "Pacific" was asked for specifically here — worth flagging that "PST" names
 // standard time only, and this hour is genuinely Pacific time year-round,
@@ -1388,6 +1383,16 @@ function nextFreeNudge(qty) {
   return more === 1 ? 'Add 1 more, get it free.' : `Add ${more} more, get 1 free.`;
 }
 
+// The sitewide offer bar, above the header on every page. Replaced the
+// scrolling marquee: that track carried RUO/lab-tested facts the hero
+// already states louder, and this offer reaches a visitor who lands
+// straight on a product page from an ad or a search result — not just
+// whoever scrolls the homepage. Built from QTY_GROUP so the number in it
+// cannot drift from what the cards actually charge.
+function offerBarLine() {
+  return `Buy ${QTY_GROUP - 1}, get 1 free: applied automatically at checkout.`;
+}
+
 // The meta description for one compound, for the generated page's head and
 // for js/product.js to set on product.html?p=<slug>. Both read this, because
 // they described the same product in two separately typed sentences and the
@@ -1683,7 +1688,6 @@ if (typeof module !== 'undefined' && module.exports) {
     NO_DELIVERY_DAY,
     DISPATCH_CUTOFF_HOUR,
     DISPATCH_CUTOFF_LABEL,
-    DISPATCH_CUTOFF_TICKER,
     DISPATCH_CUTOFF_PDP_LABEL,
     DISPATCH_LABEL,
     TRANSIT_DAYS,
@@ -1725,6 +1729,7 @@ if (typeof module !== 'undefined' && module.exports) {
     PDP_CARD_QTYS,
     BULK_MAX_OFF,
     nextFreeNudge,
+    offerBarLine,
     ordinal,
     freeVials,
     paidVials,
