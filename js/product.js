@@ -301,6 +301,14 @@
 
     renderSticky(total);
 
+    // How many more to add for the next free vial. Always counts forward,
+    // never confirms one already earned — at 3, 6 or 9 vials that's a full
+    // group away, not "0 more", because the pill is answering the same
+    // question at every quantity rather than switching to a different one
+    // right at the multiples.
+    const note = $('pdPriceNote');
+    if (note) note.textContent = nextFreeNudge(qty);
+
     // The per-vial rate. Quiet, and only shown once there's a bundle rate to
     // state — at one vial it would just repeat the price above it.
     const unitEl = $('pdUnitPrice');
@@ -308,16 +316,6 @@
       unitEl.hidden = qty === 1;
       unitEl.textContent = qty === 1 ? '' : `${money(unit)} per vial`;
     }
-  }
-
-  // The pill under the price. Static on purpose: "Add 2 more, get 1 free"
-  // at one vial reads as if 2 more vials arrive plus a separate free one —
-  // three paid, one free — when the 3-vial card is 2 paid, 1 free. The math
-  // behind the dynamic version was correct; the sentence just asked the
-  // reader to do it. One fixed line nobody has to parse instead.
-  function renderBuyMoreLine() {
-    const note = $('pdPriceNote');
-    if (note) note.textContent = buyMoreHeadline();
   }
 
   // everything that changes when a different mg is picked
@@ -595,7 +593,6 @@
     setCanonical(product);
     renderBreadcrumb(product);
     renderHeader(product);
-    renderBuyMoreLine();
     renderEvidence(product);
     renderSizes(product);
     renderSelection();

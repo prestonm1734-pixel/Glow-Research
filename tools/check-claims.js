@@ -34,7 +34,7 @@ const {
   verifyUrl, verifyHost, LAB_VERIFY_URL,
   FAQS, faqHtml,
   COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
-  QTY_GROUP, PDP_CARD_QTYS, getProductVariants, unitPriceAt, BULK_MAX_OFF, buyMoreHeadline, bulkOff,
+  QTY_GROUP, PDP_CARD_QTYS, getProductVariants, unitPriceAt, BULK_MAX_OFF, nextFreeNudge, bulkOff,
   ordinal, freeVials, paidVials, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY, PAYMENT_METHODS,
   hasList, listPriceOf, SITEWIDE_DISCOUNT, VIAL_ART_NOTICE, LAUNCH_OFFER, LAUNCH_OFFER_LIVE,
@@ -2171,19 +2171,32 @@ console.log('\nbulk pricing');
     /(3[4-9]|[4-9][0-9])% off starting at/.test(read('wholesale.html')),
     'wholesale.html must open above the retail bulk ceiling (33.3%)');
 
-  // The pill under the price is static, not a per-quantity nudge: "add 2
-  // more, get 1 free" at one vial reads as three paid plus a separate free
-  // one, when the 3-vial card is two paid and one free. Checked against
-  // product.html's static markup, since it has to read the same with or
-  // without JS, and against the function that sets it once on load.
+  // The pill under the price counts forward to the next free vial, at every
+  // quantity including exact multiples of the group size (a full group away,
+  // never "0 more"). Checked against product.html's static markup at its
+  // default quantity of one, since that has to read correctly with or
+  // without JS, and against the function that keeps it live once JS runs.
   const pd = read('product.html');
   const priceNoteHtml = (pd.match(/id="pdPriceNote"[^>]*>([^<]*)<\/p>/) || [, ''])[1].trim();
-  ok('the pill under the price is the one buyMoreHeadline() writes',
-    priceNoteHtml === buyMoreHeadline(),
-    `run this sentence into product.html:\n          ${buyMoreHeadline()}`);
-  ok('js/product.js sets it once from buyMoreHeadline(), not per quantity',
-    /function renderBuyMoreLine\(\)[\s\S]{0,200}buyMoreHeadline\(\)/.test(read('js/product.js')) &&
-    !/nextFreeNudge/.test(read('js/product.js')));
+  ok('the pill under the price is the one nextFreeNudge() writes at qty 1',
+    priceNoteHtml === nextFreeNudge(1),
+    `run this sentence into product.html:\n          ${nextFreeNudge(1)}`);
+  ok('js/product.js keeps it live from renderPrice(), which runs on every qty change',
+    /function renderPrice\(\)[\s\S]{0,1200}nextFreeNudge\(qty\)/.test(read('js/product.js')));
+
+  // nextFreeNudge() itself: always the distance to the *next* free vial, not
+  // the one just earned, checked across three full cycles so the "back to a
+  // full group away right at the multiple" behaviour is exercised more than
+  // once. "get it free" only when there is exactly one vial to add.
+  const nudgeWrong = [];
+  for (let q = 1; q <= QTY_GROUP * 3; q++) {
+    const rem = q % QTY_GROUP;
+    const more = rem === 0 ? QTY_GROUP : QTY_GROUP - rem;
+    const expected = more === 1 ? 'Add 1 more, get it free.' : `Add ${more} more, get 1 free.`;
+    if (nextFreeNudge(q) !== expected) nudgeWrong.push(`qty ${q}: "${nextFreeNudge(q)}", expected "${expected}"`);
+  }
+  ok('nextFreeNudge() always counts forward to the next free vial',
+    nudgeWrong.length === 0, nudgeWrong.join('; '));
 
   // The per-vial rate sits quietly under the pill, hidden at one vial where
   // it would just repeat the price above it, shown from renderPrice() so it

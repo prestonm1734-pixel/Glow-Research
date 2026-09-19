@@ -1373,13 +1373,19 @@ function getProductVariants(p, unitPrice) {
   });
 }
 
-// The pill under the price, above the size picker. Static rather than a
-// per-quantity nudge: "add 2 more, get 1 free" at one vial reads as three
-// paid plus a separate free one, when the 3-vial card is two paid and one
-// free. Built from QTY_GROUP so the number in it can't drift from what the
-// cards actually charge, without asking the reader to do arithmetic on it.
-function buyMoreHeadline() {
-  return `Buy ${QTY_GROUP - 1}, get 1 free.`;
+// The pill under the price, above the size picker. Always counts forward to
+// the *next* free vial, never back to one already earned — at an exact
+// multiple of QTY_GROUP (3, 6, 9...) that means a full group away, not "0
+// more". A quantity of 3 already has its free vial; the pill is telling the
+// visitor what it takes to earn a second one, the same question it answers
+// at every other quantity.
+//
+// "get it free" rather than "get 1 free" only when the count to add is
+// exactly one — "add 1 more, get 1 free" reads like a typo repeating itself.
+function nextFreeNudge(qty) {
+  const rem = qty % QTY_GROUP;
+  const more = rem === 0 ? QTY_GROUP : QTY_GROUP - rem;
+  return more === 1 ? 'Add 1 more, get it free.' : `Add ${more} more, get 1 free.`;
 }
 
 // The meta description for one compound, for the generated page's head and
@@ -1718,7 +1724,7 @@ if (typeof module !== 'undefined' && module.exports) {
     QTY_GROUP,
     PDP_CARD_QTYS,
     BULK_MAX_OFF,
-    buyMoreHeadline,
+    nextFreeNudge,
     ordinal,
     freeVials,
     paidVials,

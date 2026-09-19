@@ -748,10 +748,11 @@
              move it: the bulk tier is a function of quantity, so stepping from
              2 vials to 3 changes the per-vial rate, not just the multiplier. -->
         <span class="pd-price" id="pdPrice">$119.97<s class="pd-price-was">$132.00</s></span>
-        <!-- Static, not a per-quantity nudge: "add 2 more, get 1 free" at one
-             vial reads as three paid plus a free one, when the 3-vial card is
-             two paid, one free. One fixed sentence nobody has to parse. -->
-        <p class="pd-price-note" id="pdPriceNote">Buy 2, get 1 free.</p>
+        <!-- How many more to reach the next free vial. Counts forward always,
+             even at an exact multiple of the group size, where it means a
+             full group away rather than "0 more" — updates with the price
+             above it on every quantity change. -->
+        <p class="pd-price-note" id="pdPriceNote">Add 2 more, get 1 free.</p>
         <!-- The per-vial rate at this quantity: the quiet number that makes
              the total above make sense, not a second claim competing with
              the nudge above it. Hidden at one vial, where it just restates
