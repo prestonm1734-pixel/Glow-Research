@@ -718,15 +718,17 @@ button[disabled].si-forgot{ cursor: progress; }
 .catalog-head .eyebrow{ margin-bottom: 10px; }
 .catalog-head h2{ margin:0; }
 /* The offer, on its own row under the heading of the section it applies to.
-   Set as supporting copy rather than a chip or a badge: at the point someone
-   starts reading prices it is a fact about the grid below, and the grid is
-   what should still be the loud thing on this screen.
+   Sora Bold, the same face and weight the product page's price pill uses,
+   set in black rather than on a black chip: this one sits on white, and a
+   filled chip here would read as a second button beside "Shop all Peptides".
 
    Its own row rather than inside .catalog-head-copy: sharing that column
    left it wrapping to three lines on a phone and squeezing "Shop all
    Peptides" into a sliver beside it. */
 .catalog-head-offer{
-  margin: 0 0 40px; font-size: 0.92rem; line-height:1.5; color:#55554f;
+  margin: 0 0 40px;
+  font-size: 1rem; font-weight: 700; letter-spacing: .02em;
+  line-height: 1.4; color: #0a0a0a;
 }
 .catalog-head .btn-outline{ flex-shrink:0; white-space:nowrap; }
 /* Stays a row on a phone rather than stacking, which is what the wider

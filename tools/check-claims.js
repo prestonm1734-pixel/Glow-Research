@@ -2142,20 +2142,28 @@ console.log('\nbulk pricing');
     PDP_CARD_QTYS.join(', '));
 
   // The homepage states the offer once, under the catalog heading, where
-  // prices are first being read. Both numbers in it are pinned: a group-size
+  // prices are first being read. The number in it is pinned: a group-size
   // change cannot leave it advertising the old ratio.
+  //
+  // The line is deliberately short, so it does not carry the "of the same
+  // compound" qualifier the longer version did. That qualifier was not
+  // decoration: free vials are earned per cart line (api/_lib.js prices each
+  // line against its own qty), so three *different* compounds earn nothing.
+  // Read strictly, "Buy 2, get 1 free" over a grid of ten products invites a
+  // mix-and-match reading the checkout will not honour. The product page is
+  // where the mechanic is actually explained, and a visitor reaches it before
+  // they can act on this — but if that ever stops being true, this line is
+  // the one to lengthen again.
   const catalogOffer = (read('index.html').match(/class="catalog-head-offer[^"]*">([^<]*)</) || [, ''])[1].trim();
-  const expectedCatalogOffer =
-    `Buy ${QTY_GROUP - 1}, get 1 free: every ${ordinal(QTY_GROUP)} vial of the same compound.`;
+  const expectedCatalogOffer = `Buy ${QTY_GROUP - 1}, get 1 free.`;
   ok('the homepage catalog heading states the offer, pinned to the group size',
     catalogOffer === expectedCatalogOffer,
     `found "${catalogOffer}", expected "${expectedCatalogOffer}"`);
-  // "of the same compound" is load-bearing, not padding: free vials are
-  // earned per cart line (api/_lib.js prices each line against its own qty),
-  // so three different compounds earn nothing. Copy that dropped the
-  // qualifier would be promising a discount the checkout does not give.
-  ok('and says the free vial is per compound, which is how it is actually priced',
-    /same compound/.test(catalogOffer) &&
+  // The product page has to keep explaining the per-compound mechanic, since
+  // the homepage line no longer does: its pill counts toward the next free
+  // vial on that one product, priced off that line's own quantity.
+  ok('and the product page still explains the mechanic the short line leaves out',
+    /nextFreeNudge\(qty\)/.test(read('js/product.js')) &&
     /unitPriceAt\(size\.price, ignoreBulk \? 1 : qty\)/.test(read('api/_lib.js')));
 
   const pjStepper = read('js/product.js');
