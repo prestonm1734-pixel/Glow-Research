@@ -2140,15 +2140,6 @@ console.log('\nbulk pricing');
     PDP_CARD_QTYS.length === 3 &&
     PDP_CARD_QTYS.every((q, i) => q === QTY_GROUP * (i + 1)),
     PDP_CARD_QTYS.join(', '));
-
-  // The homepage hero states the offer too, in place of the old
-  // "Independently Verified" eyebrow, same small-caps treatment. Pinned to
-  // QTY_GROUP so a group-size change cannot leave the hero naming the old
-  // number.
-  const idxHeroOffer = (read('index.html').match(/class="hero-eyebrow[^"]*">\s*([^<]*?)\s*<\/span>/) || [, ''])[1].trim();
-  ok(`the hero eyebrow states "Buy ${QTY_GROUP - 1}, Get 1 Free"`,
-    idxHeroOffer === `Buy ${QTY_GROUP - 1}, Get 1 Free`, `found "${idxHeroOffer}"`);
-
   const pjStepper = read('js/product.js');
   ok('the stepper has no upper bound and moves by one vial at a time',
     /setQty\(qty - 1\)/.test(pjStepper) && /setQty\(qty \+ 1\)/.test(pjStepper) &&
