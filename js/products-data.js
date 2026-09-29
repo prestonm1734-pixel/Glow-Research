@@ -349,7 +349,13 @@ function coaHref(p) {
 // a single `sizes[]` row matching the one size the launch list states; add a
 // second size only once the supplier confirms a SKU for it.
 const GLOW_PRODUCTS = [
-  { name: 'G3-R', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:null,
+  // The G-series are sold under a short code, and the code is not something a
+  // buyer can decode: "G3-R" says nothing about what is in the vial. The alias
+  // is the compound itself, so the card names it under the code rather than
+  // leaving someone to infer it from a SKU. Generic names only, never a brand
+  // (Ozempic, Wegovy, Mounjaro, Zepbound are Novo Nordisk's and Lilly's, and
+  // naming one would assert an approved medicine this is not).
+  { name: 'G3-R', alias: 'Retatrutide', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:null,
     coa: 'assets/coas/g3-r-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [
@@ -357,7 +363,7 @@ const GLOW_PRODUCTS = [
     ],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
+      'A 10mg lyophilized peptide, retatrutide, supplied for in-vitro laboratory studies.'
     ],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
@@ -445,13 +451,13 @@ const GLOW_PRODUCTS = [
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
-  { name: 'G1-S', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:null,
+  { name: 'G1-S', alias: 'Semaglutide', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:null,
     coa: 'assets/coas/g1-s-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.96 mg' },
     sizes: [{ mg: '10mg', price: 74.97, list: 82, sku: 'GLO-SM10', image: 'assets/products/g1-s-10mg-v5.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
+      'A 10mg lyophilized peptide, semaglutide, supplied for in-vitro laboratory studies.'
     ],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
@@ -467,13 +473,13 @@ const GLOW_PRODUCTS = [
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
-  { name: 'G2-T', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
+  { name: 'G2-T', alias: 'Tirzepatide', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
     coa: 'assets/coas/g2-t-lot-1600.pdf', coaRef: '7RRU-W2LV', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '12.49 mg' },
     sizes: [{ mg: '10mg', price: 109.97, list: 121, sku: 'GLO-T10', image: 'assets/products/g2-t-10mg-v5.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
+      'A 10mg lyophilized peptide, tirzepatide, supplied for in-vitro laboratory studies.'
     ],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
