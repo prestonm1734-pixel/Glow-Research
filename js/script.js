@@ -90,8 +90,9 @@ window.addEventListener('resize', () => {
 
 /* The newsletter form that used to sit here is gone. It claimed "You're on the
    list" without sending the address anywhere, which is the plainest kind of
-   thing PRINCIPLES.md rules out. The footer now carries the launch offer,
-   built and submitted by js/launch-offer.js against a real endpoint. */
+   thing PRINCIPLES.md rules out. The launch-offer form that replaced it, and
+   the exit-intent popup that asked the same thing, are gone too: the site no
+   longer trades a discount for an email address anywhere. */
 
 /* ---------- counters ---------- */
 function animateCount(el) {

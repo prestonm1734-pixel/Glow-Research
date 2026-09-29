@@ -37,7 +37,7 @@ const {
   QTY_GROUP, PDP_CARD_QTYS, getProductVariants, unitPriceAt, BULK_MAX_OFF, nextFreeNudge, bulkOff,
   ordinal, freeVials, paidVials, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY, PAYMENT_METHODS,
-  hasList, listPriceOf, SITEWIDE_DISCOUNT, VIAL_ART_NOTICE, LAUNCH_OFFER, LAUNCH_OFFER_LIVE,
+  hasList, listPriceOf, SITEWIDE_DISCOUNT, VIAL_ART_NOTICE,
   META_PIXEL_ID, META_DOMAIN_VERIFICATION,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
@@ -1679,17 +1679,15 @@ console.log('\nwelcome landing page');
     wl.toLowerCase().includes(`over $${freeAt}`.toLowerCase()),
     `welcome.html does not say "over $${freeAt}"`);
 
-  // The discount is no longer typed into this page at all: js/launch-offer.js
-  // renders the footer offer from LAUNCH_OFFER.percentOff, so it cannot drift
-  // from the constant. What can go wrong now is the opposite, someone writing a
-  // percentage into the markup that the script then contradicts on the same
-  // screen, so that is what is checked instead.
+  // No discount is typed into this page. The launch offer that used to be
+  // rendered into its footer is gone entirely (see the launch-offer section
+  // below), so a percentage here now would be a promise with nothing behind
+  // it at all rather than one that merely risked drifting from a constant.
   // Comments stripped first, or the note above explaining the removed strip
   // would itself read as the page hardcoding a percentage.
   const wlVisible = wl.replace(/<!--[\s\S]*?-->/g, '');
-  const wlPercents = [...wlVisible.matchAll(/(\d{1,2})%\s*off/gi)]
-    .filter(m => Number(m[1]) !== LAUNCH_OFFER.percentOff);
-  ok(`it types no discount of its own to contradict LAUNCH_OFFER (${LAUNCH_OFFER.percentOff}%)`,
+  const wlPercents = [...wlVisible.matchAll(/(\d{1,2})%\s*off/gi)];
+  ok('it types no discount of its own, now that nothing on the page grants one',
     wlPercents.length === 0,
     `welcome.html hardcodes: ${wlPercents.map(m => m[0]).join(', ')}`);
 
@@ -2863,222 +2861,73 @@ console.log('\npromo codes');
 }
 
 /* ---------------------------------------------------------------------------
- * The launch offer. A form that says "20% off with GLOW20" is two claims the
- * catalog cannot keep true on its own: the promotion is Stripe's to end, and
- * the rate is Stripe's to change. So the value is never in the page, and the
- * endpoint that hands it out asks Stripe first.
+ * The launch offer, removed. It was an email-capture form in the footer of
+ * index.html and welcome.html plus an exit-intent / scroll-timed popup on
+ * every other page, both trading a 15% code for an address, backed by
+ * api/unlock-offer.js and a LAUNCH_OFFER object in the catalog.
+ *
+ * All of it is gone. This section guards the absence rather than the
+ * behaviour, the same way the email-wordmark section below does, and for the
+ * same reason: this surface was removed once before and came back, so
+ * "stays gone" is the property worth enforcing. Bringing it back means
+ * deleting this block, not editing around it.
+ *
+ * The promo box at checkout is a different thing and is untouched: a code
+ * typed there still resolves against Stripe through api/apply-promo.js, so
+ * codes handed out by email, an ad or support keep working. What is gone is
+ * the site asking for an address in exchange for one.
  * ------------------------------------------------------------------------- */
-console.log('\nlaunch offer');
+console.log('\nlaunch offer (removed)');
 {
-  const offerJs = read('js/launch-offer.js');
-  const unlock = read('api/unlock-offer.js');
-  const offerCss = read('css/style.css');
-  // Pages where an interruption can only cost an order.
-  const quietPages = ['checkout.html', 'thank-you.html', 'cart.html'].filter(f =>
-    fs.existsSync(path.join(ROOT, f)));
-
-  ok('the offer is described in one place, not typed into a page',
-    typeof LAUNCH_OFFER === 'object' && !!LAUNCH_OFFER.code && LAUNCH_OFFER.percentOff > 0);
-
-  // The whole point of the popup. If the code ships in the markup or the
-  // script, the address is being asked for in exchange for something the
-  // visitor already has.
-  const leaked = [];
-  [...pages, 'js/launch-offer.js', 'css/style.css'].forEach(f => {
-    if (!fs.existsSync(path.join(ROOT, f))) return;
-    if (read(f).includes(LAUNCH_OFFER.code)) leaked.push(f);
+  // The files themselves.
+  ['js/launch-offer.js', 'api/unlock-offer.js'].forEach(f => {
+    ok(`${f} is gone`, !fs.existsSync(path.join(ROOT, f)));
   });
-  ok(`the code is never served to the browser before the address is given`,
-    leaked.length === 0,
-    `${LAUNCH_OFFER.code} appears in: ${leaked.join(', ')}`);
 
-  ok('js/launch-offer.js reads the offer from the catalog rather than restating it',
-    /LAUNCH_OFFER/.test(offerJs) && !/percentOff:\s*\d/.test(offerJs));
+  // Every surface that referenced it, on every page a visitor can reach —
+  // generated product pages included, since they are cut from a donor and a
+  // script tag left in product.html lands in ten more files.
+  const stillReferencing = everyPage.filter(f =>
+    /launch-offer|offerFooter|footer-offer|data-launch-offer/.test(read(f)));
+  ok('no page loads the script, hosts the footer form, or declares the old body attribute',
+    stillReferencing.length === 0, stillReferencing.join(', '));
 
-  // Stripe is the authority on whether the promotion is still live and what it
-  // is worth. Handing out LAUNCH_OFFER.code without asking would be exactly
-  // the "claim we cannot show is true" PRINCIPLES.md rules out.
-  ok('api/unlock-offer.js resolves the code against Stripe before revealing it',
-    /resolvePromoCode\(/.test(unlock) &&
-    unlock.indexOf('resolvePromoCode(') < unlock.indexOf('sendEmail('));
-  ok('and refuses rather than revealing one Stripe would not honour',
-    /if\s*\(!resolved\.ok\)/.test(unlock) && /return res\.status\(503\)/.test(unlock));
-  ok('the revealed discount is the rate Stripe reports, not the catalog’s copy',
-    /resolved\.percentOff/.test(unlock));
-  ok('resolvePromoCode() reports the coupon’s own rate for it to use',
-    /percentOff:\s*percent_off\s*>\s*0/.test(read('api/_lib.js')));
+  // The catalog object and its flag.
+  const catalog = read('js/products-data.js')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^[ \t]*\/\/.*$/gm, '');
+  ok('the LAUNCH_OFFER object and its flag are out of the catalog',
+    !/LAUNCH_OFFER/.test(catalog));
 
-  // Both, for the same reason the checkout endpoints gate: a code is worth
-  // nothing while no order can be taken.
-  ok('api/unlock-offer.js gates on the offer flag and on PAYMENTS_LIVE',
-    /!LAUNCH_OFFER_LIVE\s*\|\|\s*!PAYMENTS_LIVE/.test(unlock));
-  ok('and validates the address rather than mailing whatever it is sent',
-    /isEmail\(email\)/.test(unlock));
+  // The styles. Checked as class names rather than the block comment, which
+  // still names them to explain what was removed.
+  const css = read('css/style.css').replace(/\/\*[\s\S]*?\*\//g, '');
+  ok('the offer’s styles are gone from the stylesheet',
+    !/\.lo-[a-z]/.test(css) && !/\.footer-offer/.test(css));
 
-  // Two surfaces now: the standing footer form, and a popup built entirely by
-  // script rather than baked into every page's markup (there is nothing for a
-  // crawler to read in a frame that only appears after a behavioural trigger,
-  // so there is no served-HTML surface to check here the way the footer's is
-  // checked below). What still has to hold: the footer form exists only where
-  // it always has, nothing quiet carries either surface, the popup's own
-  // eligibility rules are all present and reference the real durable signals
-  // this site already writes, and the old bar/modal identifiers stay dead —
-  // this popup earned a different design, not a resurrection of that one.
-  const footerPages = ['index.html', 'welcome.html'];
-  footerPages.forEach(f => {
-    ok(`${f} hosts the footer form and loads the script that fills it`,
-      /id="offerFooter"/.test(read(f)) && /js\/launch-offer\.js/.test(read(f)));
-  });
-  const declaring = everyPage.filter(f => /data-launch-offer=/.test(read(f)));
-  ok('no page still drives a surface off a body attribute, the old popup\'s own mechanism',
-    declaring.length === 0, declaring.join(', '));
-  quietPages.forEach(f => {
-    ok(`${f} carries no offer at all`,
-      !/launch-offer/.test(read(f)));
-  });
-  const missingScript = everyPage.filter(f =>
-    !quietPages.includes(f) && f !== '404.html' && f !== 'google3c9b57295f818637.html' &&
-    !/launch-offer\.js/.test(read(f)));
-  ok('every other page loads the script, so the popup can reach it',
-    missingScript.length === 0, missingScript.join(', '));
+  // The code itself must not be sitting in a served file, which was the
+  // original rule when the offer existed and is stricter now that nothing
+  // hands it out: there is no endpoint left to check it against Stripe.
+  const leaked = [...everyPage, 'css/style.css', 'js/script.js', 'js/checkout.js']
+    .filter(f => fs.existsSync(path.join(ROOT, f)) && /GLOW15/.test(read(f)));
+  ok('the old launch code is not served anywhere', leaked.length === 0, leaked.join(', '));
 
-  // Comments stripped first, or this file's own explanatory comments above
-  // (which name every one of these) would satisfy the match for the thing
-  // they say must stay gone.
-  const offerCode = offerJs.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-  const frames = ['lo-bar', 'lo-modal without a popup', 'popupVariant']
-    .filter(t => offerCode.includes(t));
-  ok('the old popup\'s own identifiers do not silently reappear',
-    frames.length === 0, frames.join(', '));
+  // glow-has-ordered was written on both order paths purely so the popup
+  // could suppress itself for returning customers. Nothing reads it now, and
+  // a key still being written for a reader that no longer exists is the kind
+  // of leftover that gets mistaken for a live signal later.
+  const orderWriters = ['js/checkout.js', 'js/express-pay.js']
+    .filter(f => /glow-has-ordered/.test(read(f)));
+  ok('the popup’s has-ordered flag is no longer written on the order paths',
+    orderWriters.length === 0, orderWriters.join(', '));
 
-  // The new popup's own honesty rules, each pinned to the actual mechanism
-  // rather than to the comment describing it — every one of these was, at
-  // some point in this file's history, the specific thing that made a launch
-  // popup read as spam. This is the list of what has to stay true for this
-  // one not to repeat that.
-  ok('the popup never fires immediately: exit intent on desktop, a delay or scroll on mobile',
-    /clientY > 0/.test(offerCode) && /armTimer/.test(offerCode) &&
-    /mobileTimer/.test(offerCode) && /onMobileScroll/.test(offerCode));
-  ok('the mobile timer waits at least ten seconds',
-    (offerCode.match(/}, (\d+)\);\s*window\.removeEventListener\('scroll', onMobileScroll\);/) || [, '0'])[1] >= 10000 ||
-    /}, 10000\);/.test(offerCode));
-  ok('and the scroll trigger waits for at least the midpoint of the page',
-    /< 0\.5\)/.test(offerCode));
-  ok('it shows at most once a session',
-    /POPUP_SHOWN/.test(offerCode) && /sGet\(POPUP_SHOWN\)/.test(offerCode) && /sSet\(POPUP_SHOWN/.test(offerCode));
-  // Eligibility answered when the popup would actually interrupt, not ten
-  // seconds earlier when the timer was set. Two of the things it reads change
-  // inside that window without a reload: the footer form on index.html writes
-  // UNLOCKED, and the cart drawer's wallet writes HAS_ORDERED. Without this
-  // line, both produced a popup asking a visitor for an address they had just
-  // given, or offering a first-order discount to someone who had just
-  // ordered. Pinned to the call rather than to popupEligible() existing,
-  // because the bug was never a missing check — it was a check asked once,
-  // too early, and the fix is where it is asked from.
-  const showPopupBody = (offerCode.match(/function showPopup\([\s\S]*?\n    \}/) || [''])[0];
-  ok('popup eligibility is rechecked at fire time, not only when the triggers are armed',
-    /if \(!popupEligible\(\)\) return;/.test(showPopupBody));
-  ok('and stays quiet for a real cooldown after being closed unsubmitted, not a shorter one',
-    /POPUP_COOLDOWN_MS = 14 \* 24 \* 60 \* 60 \* 1000/.test(offerCode));
-  ok('it never shows to a signed-in visitor or an existing customer',
-    /SESSION_ACCOUNT/.test(offerCode) && /HAS_ORDERED/.test(offerCode) &&
-    /get\(SESSION_ACCOUNT\)/.test(offerCode) && /get\(HAS_ORDERED\)/.test(offerCode));
-  // The ad landing page is excluded by name rather than left to the trigger
-  // timing alone: welcome.html still loads this file (for the footer form
-  // below, which is not a popup and stays unsuppressed) and still runs the
-  // exit-intent / scroll-timer wiring, so without this line the popup would
-  // still be reachable there, exactly the page it was originally removed
-  // from before this whole rebuild happened.
-  ok('the popup itself is excluded from the ad landing page, both spellings of its URL',
-    /POPUP_EXCLUDED_PAGES[\s\S]{0,80}'\/welcome'/.test(offerCode) &&
-    /POPUP_EXCLUDED_PAGES[\s\S]{0,80}'\/welcome\.html'/.test(offerCode));
-  ok('welcome.html still hosts the footer form, unaffected by that exclusion',
-    /id="offerFooter"/.test(read('welcome.html')) && /js\/launch-offer\.js/.test(read('welcome.html')));
-  // HAS_ORDERED is worthless as a suppression signal if nothing ever writes
-  // it. Both real order paths have to.
-  ok('HAS_ORDERED is actually written on both order paths, not just read here',
-    /localStorage\.setItem\('glow-has-ordered', '1'\)/.test(read('js/checkout.js')) &&
-    /localStorage\.setItem\('glow-has-ordered', '1'\)/.test(read('js/express-pay.js')));
-  ok('and the same key name is used on both ends',
-    read('js/checkout.js').includes("'glow-has-ordered'") &&
-    read('js/express-pay.js').includes("'glow-has-ordered'") &&
-    offerCode.includes("HAS_ORDERED = 'glow-has-ordered'"));
-
-  // Design: the brief for this asked for a strict dark theme (solid black,
-  // white text, sharp corners, no shadow) rather than the softer near-black
-  // and hairline-border treatment the rest of the site's overlays use, and a
-  // design brief followed halfway is not followed.
-  const popupCss = (offerCss.match(/\.lo-pop\{[\s\S]*?\n\}/) || [''])[0];
-  ok('the popup panel is solid black with square corners and no drop shadow',
-    /background:#000;/.test(popupCss) &&
-    /border-radius:0;/.test(popupCss) &&
-    /box-shadow:none;/.test(popupCss));
-  ok('and no spin-to-win or other gamified control ships with it',
-    !/spin|wheel|gamif/i.test(offerCode) &&
-    !/spin|wheel|gamif/i.test(offerCss.slice(offerCss.indexOf('.lo-pop-overlay'), offerCss.indexOf('.lo-pop-overlay') + 4000)));
-
-  // The email and the form say the same thing because they read the same
-  // strings. A second copy of the sentence is how the two drift.
-  ok('the email is built from the same strings the form shows',
-    /LAUNCH_OFFER\.emailSubject/.test(unlock) &&
-    /LAUNCH_OFFER\.emailBody/.test(unlock) &&
-    /LAUNCH_OFFER\.facts/.test(unlock));
-
-  // The three facts are the ones the rest of the site is already held to.
-  ok('the offer’s supporting line claims nothing new',
-    /third-party tested/i.test(LAUNCH_OFFER.facts) &&
-    /research use only/i.test(LAUNCH_OFFER.facts) &&
-    !/\d+\s*%/.test(LAUNCH_OFFER.facts));
-
-  ok('the footer carries the offer rather than a second, separate form',
-    /id="offerFooter"/.test(read('index.html')));
-  ok('and the newsletter form that acknowledged addresses it never sent is gone',
-    !/newsletterForm/.test(read('index.html')) &&
-    !/newsletterForm/.test(read('js/script.js')));
-
-  // Seven events, one funnel. Named here so a rename on one side shows up as
-  // a failure rather than as a metric that quietly stops counting.
-  // email_capture_closed is back with the popup: there is something to close
-  // again, and the dashboard already accepts the name from before the old
-  // popup was removed, so an old row and a new one stay comparable.
-  const events = [
-    'email_capture_viewed', 'email_capture_submitted', 'email_capture_closed',
-    'email_capture_error', 'discount_code_revealed', 'discount_code_copied',
-  ];
-  const missing = events.filter(e => !offerJs.includes(`'${e}'`));
-  ok('every event in the capture funnel is fired', missing.length === 0,
-    `not fired: ${missing.join(', ')}`);
-
-  // Each event carries what the funnel is sliced by. Without form_location and
-  // trigger_type there is no "submit rate by page" or "by trigger" to report.
-  ok('the events carry the page and the trigger they came from',
-    /form_location:/.test(offerJs) && /trigger_type:/.test(offerJs) &&
-    /page_path:/.test(offerJs) && /form_id:/.test(offerJs));
-  ok('a product-page capture reports which product it came from',
-    /product_sku:/.test(offerJs) && /product_name:/.test(offerJs));
-
-  // js/analytics.js already stamps every beacon with the session and the
-  // session's UTMs. Repeating them per event is how the two copies drift.
-  ok('the events leave session and campaign to the analytics envelope',
-    !/utm_source:/.test(offerJs) && /GlowAnalytics\.track/.test(offerJs));
-
-  // The address is the one piece of personal data the system holds. It must
-  // not travel on analytics beacons, which are anonymous rows by design.
-  ok('no capture event carries the address itself',
-    !/track\([^)]*email:/.test(offerJs));
-
-  // An address captured and not stored is the popup's whole purpose thrown
-  // away, so the endpoint has to do something with it beyond mailing it.
-  ok('a captured address is recorded, not only emailed',
-    /recordLead\(/.test(unlock) &&
-    unlock.indexOf('recordLead(') < unlock.indexOf('sendEmail('));
-  ok('the lead is stored with the page and the campaign that produced it',
-    /sourcePage/.test(unlock) && /formLocation/.test(unlock) &&
-    /utmCampaign/.test(unlock) && /utmSource/.test(unlock));
-  ok('and with the ids that join it back to the funnel and to an order',
-    /sessionId/.test(unlock) && /anonId/.test(unlock));
-  ok('storing a lead never costs the visitor the code they were promised',
-    /never throws/i.test(unlock) || /catch \(e\) \{\s*console\.error\('unlock-offer: could not reach/.test(unlock));
+  // The checkout promo box is deliberately untouched by all of the above.
+  // Removing the capture form must not take the ability to redeem a code
+  // with it, so this is the half that has to still work.
+  ok('a promo code can still be redeemed at checkout',
+    fs.existsSync(path.join(ROOT, 'api/apply-promo.js')) &&
+    /resolvePromoCodeForOrder\(/.test(read('api/apply-promo.js')) &&
+    /coPromo/.test(read('js/checkout.js')));
 }
 
 /* ---------------------------------------------------------------------------

@@ -260,8 +260,10 @@ export async function resolvePromoCode(rawCode, subtotalCents) {
   discountCents = Math.min(discountCents, subtotalCents);
 
   // percentOff/amountOffCents are the coupon's own terms rather than what this
-  // particular subtotal works out to. api/unlock-offer.js states the discount
-  // before there is a cart to price, so it needs the rate, not an amount.
+  // particular subtotal works out to. The launch-offer endpoint that needed
+  // the rate before there was a cart to price is gone; these stay because a
+  // caller stating a coupon's terms wants what the coupon is, not what one
+  // subtotal happens to make it worth.
   return {
     ok: true,
     id: promo.id,

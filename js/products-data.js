@@ -149,56 +149,20 @@ const PAYMENTS_LIVE = true;
 const STRIPE_PUBLISHABLE_KEY = 'pk_live_51U3kUmHjOd9MaH5sNxBU6C1neJypFeZGunq4CUybpTBrzWRC0dA4XY72By2DFkWDwIz8RPdHUhXHZlu6M0dgcTjW00ufOBrU9S';
 
 /* ---------------------------- launch offer ----------------------------
-   The one description of the launch discount. The percentage, the code, when
-   each surface appears, and every sentence either the popup or the email says
-   are all read from here, so no page can quote a discount the next one
-   contradicts, and none can outlive the promotion.
+   Removed entirely. This held the 15%-off launch code, the copy for the
+   email-capture form in the footer and for the exit-intent popup that asked
+   the same thing, and the strings api/unlock-offer.js mailed the code out
+   with. All of it is gone: the form, the popup, the endpoint, the styles and
+   this object.
 
-   LAUNCH_OFFER_LIVE is the master switch: false and no surface renders, the
-   endpoint refuses, and check-claims.js stops requiring the copy anywhere.
+   The promo box at checkout is untouched and unrelated. A code typed there
+   still resolves against Stripe through api/apply-promo.js, so a code handed
+   out by any other means (an email, an ad, support) keeps working. What is
+   gone is this site asking for an address in exchange for one.
 
-   What this object cannot do is make the code work. `code` and `percentOff`
-   are what the site *says*; Stripe is what actually happens at checkout. So
-   api/unlock-offer.js never hands the code out on the strength of this object:
-   it resolves the promotion against Stripe first and reveals the discount
-   Stripe reports, refusing if the code is dead. A stale figure here shows up
-   as a mismatch in the logs rather than as a promise the checkout breaks.
-
-   Never stacks with the quantity ladder in QTY_TIERS above: a code
-   discounting a price the tiers already discounted would let the two combine
-   into a rate neither was priced for. It is not simply refused on a cart
-   that already earned a tier, though — api/_lib.js's
-   resolvePromoCodeForOrder() prices the code against what the cart would
-   cost with no quantity discount at all, compares that to what the tiers
-   already give it, and applies whichever is cheaper. facts below only has to
-   say so, not enforce it. */
-const LAUNCH_OFFER_LIVE = true;
-const LAUNCH_OFFER = {
-  code: 'GLOW15',
-  percentOff: 15,
-
-  // Copy. One surface reads these now, the standing form in the footer.
-  //
-  // The two popups that also read them, a bar on the homepage and a dialog on
-  // the catalog and product pages, were removed along with their delay and
-  // scroll-depth settings. Almost all of this store's traffic arrives from a
-  // Facebook ad, and an offer thrown over a page the visitor landed on seconds
-  // ago reads as spam rather than as a welcome.
-  eyebrow: 'Launch Offer',
-  title: 'Get 15% off your first order.',
-  ask: 'Enter your email to unlock your launch code.',
-  // "Not valid with quantity discounts" belongs here, not just in checkout,
-  // so nobody reaches the promo box having already assumed both apply.
-  facts: 'Lot-level records. Third-party tested. Research use only. Not valid with quantity discounts.',
-  cta: 'Unlock Offer',
-
-  // Shown only after the address is in and Stripe has confirmed the code.
-  revealTitle: code => `Your launch code: ${code}`,
-  revealBody: pct => `Use it at checkout for ${pct}% off your first order.`,
-
-  emailSubject: 'Your Glow launch code',
-  emailBody: code => `Your launch code is ${code}.`,
-};
+   check-claims.js guards the absence rather than the behaviour now: the
+   surface has been removed once before and came back, so "stays gone" is
+   the thing worth enforcing. */
 
 // Meta's Pixel ID, not secret — it identifies which pixel a browser event
 // belongs to, the same way a Google Analytics measurement ID would, and
@@ -1744,8 +1708,6 @@ if (typeof module !== 'undefined' && module.exports) {
     X_PIXEL_ID,
     X_EVENT_IDS,
     GOAFFPRO_SHOP_ID,
-    LAUNCH_OFFER_LIVE,
-    LAUNCH_OFFER,
     round2,
   };
 }
