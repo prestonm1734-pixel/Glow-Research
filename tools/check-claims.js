@@ -1704,6 +1704,28 @@ console.log('\nwelcome landing page');
   ok(`all ${FAQS.length} answers are in its served HTML`,
     (wl.match(/class="faq-q"/g) || []).length === FAQS.length);
 
+  // Product pages carry the homepage's promises and FAQ under the batch
+  // analysis. The cards are static text, so the guard is that each page holds
+  // the homepage's three cards verbatim and the same list faqHtml() renders.
+  {
+    const cards = h => (h.match(/<article class="standard-card[\s\S]*?<\/article>/g) || [])
+      .map(c => c.replace(/ reveal(?=[" ])/g, '').replace(/\s+/g, ' ').replace(/(src|href)="(?:\.\.\/)*/g, '$1="'));
+    const productPages = everyPage.filter(f => f.startsWith('product/')).map(file => ({ file }));
+    const productJs = read('js/product.js');
+    const homeCards = cards(read('index.html'));
+    const badPromises = productPages.filter(({ file }) =>
+      JSON.stringify(cards(read(file))) !== JSON.stringify(homeCards));
+    ok('every product page carries the homepage\'s three promises cards verbatim',
+      homeCards.length === 3 && badPromises.length === 0, badPromises.map(p => p.file).join(', '));
+    const badFaq = productPages.filter(({ file }) => {
+      const m = read(file).match(/<div class="faq-list" id="faqList">([\s\S]*?)<\/div>\s*<\/div>\s*<\/section>/);
+      return !m || m[1].trim() !== faqHtml().trim();
+    });
+    ok('and the same FAQ faqHtml() renders', badFaq.length === 0, badFaq.map(p => p.file).join(', '));
+    ok('js/product.js binds the accordion, since product pages do not load script.js',
+      /function initFaq\(\)/.test(productJs) && /initFaq\(\);/.test(productJs));
+  }
+
   // The terms strip that restated these two standing terms is gone, so the
   // checks move to where each one now lives rather than being deleted with it.
   //

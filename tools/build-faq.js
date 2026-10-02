@@ -45,6 +45,10 @@ const MARK = 'faq-jsonld';   // id on the script tag, so it can be found and rep
 const PAGES = [
   ['index.html', true],
   ['welcome.html', false],
+  // The donor for every generated product page, so each one carries the same
+  // answers as the homepage. No schema: the homepage's FAQPage block already
+  // owns the @id, and ten more copies of it would be duplicates.
+  ['product.html', false],
 ];
 
 const { FAQS, faqHtml } = require(path.join(ROOT, 'js/products-data.js'));

@@ -591,6 +591,42 @@
     });
   }
 
+  // The FAQ under the batch analysis is baked into the page by tools/build-faq.js
+  // like the homepage's; this is only its accordion, the same behaviour
+  // js/script.js binds there. Repeated rather than shared because this page
+  // does not load script.js, which also builds the homepage's catalog grid.
+  function initFaq() {
+    const items = document.querySelectorAll('.faq-item');
+    items.forEach(item => {
+      const btn = item.querySelector('.faq-q');
+      const ans = item.querySelector('.faq-a');
+      if (!btn || !ans) return;
+      const coa = ans.querySelector('#faqCoa');
+      if (coa && typeof COA_COPY !== 'undefined') coa.textContent = COA_COPY.faq;
+      btn.addEventListener('click', () => {
+        const isOpen = item.classList.contains('open');
+        items.forEach(i => {
+          i.classList.remove('open');
+          i.querySelector('.faq-a').style.maxHeight = null;
+          i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+        });
+        if (!isOpen) {
+          item.classList.add('open');
+          ans.style.maxHeight = ans.scrollHeight + 'px';
+          btn.setAttribute('aria-expanded', 'true');
+          if (window.GlowAnalytics) {
+            window.GlowAnalytics.track('faq_opened', { question: btn.textContent.trim() });
+          }
+        }
+      });
+    });
+    // An answer opened wide is taller once the column narrows: re-measure.
+    window.addEventListener('resize', () => {
+      const open = document.querySelector('.faq-item.open .faq-a');
+      if (open) open.style.maxHeight = open.scrollHeight + 'px';
+    });
+  }
+
   /* ================= boot ================= */
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -619,6 +655,7 @@
     wireBuy();
     renderDelivery();
     renderRelated(product);
+    initFaq();
     initStickyBar();
   });
 })();
