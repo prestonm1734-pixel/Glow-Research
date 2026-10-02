@@ -179,7 +179,7 @@
     const pur = $('pdPurity');
     if (pur) {
       pur.innerHTML = p.purity
-        ? `HPLC purity, this lot: <strong>${p.purity}</strong>`
+        ? `HPLC Purity: <strong>${p.purity}</strong>`
         : '';
     }
   }
