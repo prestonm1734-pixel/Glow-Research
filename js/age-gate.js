@@ -73,7 +73,7 @@
       // programmatically trips :focus-visible in Chromium, so the gate would
       // open with a heavy ring already drawn around it
       '<div class="age-gate-panel" id="ageGatePanel" tabindex="-1">' +
-        '<span class="age-gate-eyebrow">Glow Research</span>' +
+        '<span class="age-gate-logo">Glow<span class="spark">&#10022;</span></span>' +
         '<h2 class="age-gate-title" id="ageGateTitle">Age Disclaimer</h2>' +
         '<p class="age-gate-copy">' +
           'You must be at least 21 years old to enter Glow Research and review ' +
