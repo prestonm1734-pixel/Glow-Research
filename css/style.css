@@ -2398,6 +2398,92 @@ body.search-locked{ overflow:hidden; }
   .cart-ship-bar span{ transition:none; }
 }
 
+/* ---------- age / RUO gate ----------
+   Once per browser session (sessionStorage): a new tab confirms again, a
+   closed-and-reopened session confirms again. Sits above the cart drawer and
+   search overlay (z-index 300-340) so nothing can surface over it, and locks
+   the page behind it from scrolling.
+
+   A floating card over a lightly dimmed page, not a full-screen wall: the
+   site stays visible behind it. The backdrop is a translucent wash, never an
+   opaque colour, an image or a blur. */
+.age-gate{
+  position: fixed; inset: 0; z-index: 400;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  background: rgba(10,10,10,.32);
+  overflow-y: auto;
+  transition: opacity .25s ease;
+}
+.age-gate.is-going{ opacity: 0; pointer-events: none; }
+html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
+
+.age-gate-panel{
+  width: 100%; max-width: 420px; margin: auto;
+  text-align: center;
+  padding: 30px 26px 24px;
+  background: #fff; color: #0a0a0a;
+  border-radius: 14px;
+  box-shadow: 0 24px 70px rgba(0,0,0,.35);
+  animation: ageGateIn .3s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes ageGateIn{
+  from{ opacity:0; transform: translateY(10px) scale(.98); }
+  to{ opacity:1; transform:none; }
+}
+.age-gate-logo{
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.45rem; font-weight: 600; color: #0a0a0a;
+  display: inline-flex; align-items: center; gap: 3px;
+  margin-bottom: 14px;
+}
+.age-gate-logo .spark{ font-size: .62em; color: #0a0a0a; }
+.age-gate-eyebrow{
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem; letter-spacing: .2em; text-transform: uppercase;
+  color: #6b6b64; margin-bottom: 10px;
+}
+.age-gate-title{
+  font-size: clamp(1.4rem, 5vw, 1.8rem);
+  font-weight: 600; color: #0a0a0a;
+  letter-spacing: -.02em; line-height: 1.15; margin: 0 0 12px;
+}
+.age-gate-copy{
+  font-size: .88rem; line-height: 1.6; color: #55554f;
+  margin: 0 0 22px;
+}
+.age-gate-copy a{ color: #0a0a0a; text-decoration: underline; text-underline-offset: 3px; }
+
+.age-gate .btn{ width: 100%; justify-content: center; }
+.age-gate-enter{ padding: 14px 22px; font-size: .95rem; background:#0a0a0a; color:#fff; border:1px solid #0a0a0a; }
+.age-gate-enter:hover{ background:#2a2a27; border-color:#2a2a27; color:#fff; }
+.age-gate-exit{ margin-top: 9px; padding: 11px 22px; font-size: .88rem; background:transparent; color:#0a0a0a; border:1px solid rgba(0,0,0,.22); }
+.age-gate-exit:hover{ background: rgba(0,0,0,.05); color:#0a0a0a; }
+
+/* The same three facts the marquee and FAQ already state, restated small. */
+.age-gate-badges{
+  margin: 20px 0 0; padding-top: 16px; border-top: 1px solid rgba(0,0,0,.1);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 6px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem; letter-spacing: .1em; text-transform: uppercase;
+  color: #6b6b64;
+}
+
+@media (max-width: 480px){
+  .age-gate-panel{ padding: 24px 20px 20px; }
+  .age-gate-copy{ font-size: .84rem; }
+  .age-gate-badges{ gap: 6px 12px; font-size: .56rem; }
+}
+@media (prefers-reduced-motion: reduce){
+  .age-gate{ transition: none; }
+  .age-gate-panel{ animation: none; }
+}
+/* the panel is only a focus target, never an outlined control */
+.age-gate-panel:focus{ outline: none; }
+
+
 /* the account panels reuse the sign-in field styling */
 .ac-page .si-field{ margin-bottom:16px; }
 .ac-page .si-field label{
