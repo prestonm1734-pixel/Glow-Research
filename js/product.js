@@ -182,6 +182,16 @@
         ? `HPLC Purity: <strong>${p.purity}</strong>`
         : '';
     }
+
+    // Third line: the certificate for that lot. coaHref() is the one gate, so
+    // there is no link to a 404 and none when certificates are not published.
+    const coa = $('pdCoaLine');
+    if (coa) {
+      const href = coaHref(p);
+      coa.innerHTML = href
+        ? `<a href="${href}" target="_blank" rel="noopener">View COA</a>`
+        : '';
+    }
   }
 
   // Every product now ships with a real photo, so this only ever picks

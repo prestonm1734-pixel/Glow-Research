@@ -1247,6 +1247,24 @@ console.log('\nbatch tracking line');
   ok('every generated page states the catalog\'s purity for that compound',
     wrongPurityLine.length === 0, wrongPurityLine.map(p => p.file).join(', '));
 
+  // The View COA line under the purity: gated by coaHref() at runtime and in
+  // the bake, and every generated page's href must equal coaHref(prod).
+  ok('js/product.js builds the View COA line from coaHref(p)',
+    /\$\('pdCoaLine'\)/.test(productJs) && /View COA<\/a>`/.test(productJs) &&
+    /const href = coaHref\(p\);\s*coa\.innerHTML/.test(productJs));
+  ok('and tools/build-products.js bakes it behind the same coaHref(p) gate',
+    /coaHref\(p\)\s*\? `<a href="\$\{esc\(coaHref\(p\)\)\}"[^`]*View COA<\/a>`/.test(buildProductsJs));
+  const wrongCoaLine = productPages.filter(({ file, slug }) => {
+    const prod = GLOW_PRODUCTS.find(p => productSlug(p.name) === slug);
+    if (!prod) return false;
+    const want = coaHref(prod);
+    const m = read(file).match(/id="pdCoaLine">(?:<a href="([^"]*)"[^>]*>View COA<\/a>)?</);
+    if (!m) return true;
+    return want ? !m[1] || !m[1].endsWith(want.replace(/^\.?\//, '')) : Boolean(m[1]);
+  });
+  ok('every generated page links View COA exactly when the catalog holds a certificate',
+    wrongCoaLine.length === 0, wrongCoaLine.map(p => p.file).join(', '));
+
   // The one figure that would make this a promise rather than a fact, ruled
   // out sitewide rather than only on the product template: a vial count is
   // not data this site holds anywhere (sizes[].stock is in stock or not,
@@ -1441,7 +1459,7 @@ if (PRODUCT_PAGES_LIVE) {
   // Matched on the assignment rather than the bare name, so a mention of
   // coaHref() in a comment does not read as a call site.
   ok('every certificate surface resolves the document through coaHref()',
-    (read('js/product.js').match(/const href = coaHref\(p\);/g) || []).length === 2 &&
+    (read('js/product.js').match(/const href = coaHref\(p\);/g) || []).length === 3 &&
     /coaHref\(/.test(coaJs) &&
     !/p\.coa \|\| \(typeof COA_URL/.test(read('js/product.js')),
     'product.js must ask coaHref() rather than retyping the p.coa || COA_URL test');

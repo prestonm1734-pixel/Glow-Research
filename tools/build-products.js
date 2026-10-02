@@ -35,7 +35,7 @@ const OUT_DIR = 'product';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, hasList, listPriceOf, PRODUCT_PAGES_LIVE,
-  sizeInStock, productInStock, batchPanelHtml, unitPriceAt,
+  sizeInStock, productInStock, batchPanelHtml, unitPriceAt, coaHref,
   catFilterGroup, CAT_LABEL, productMetaDesc,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
@@ -292,6 +292,10 @@ function buildProduct(p, donor) {
     p.lot ? `Current HPLC-tested batch: <strong>Lot #${esc(p.lot)}</strong>` : '');
   html = fillEmpty(html, 'pdPurity',
     p.purity ? `HPLC Purity: <strong>${esc(p.purity)}</strong>` : '');
+  // Same gate as the runtime: coaHref(), so a crawler sees the link only when
+  // a reader would. rewriteDepth() prefixes the href like any other.
+  html = fillEmpty(html, 'pdCoaLine',
+    coaHref(p) ? `<a href="${esc(coaHref(p))}" target="_blank" rel="noopener">View COA</a>` : '');
 
   // The donor ships #pdPhoto with no src: js/product.js fills it in at
   // runtime, which used to mean a crawler that does not execute JavaScript —

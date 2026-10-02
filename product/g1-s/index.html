@@ -308,6 +308,7 @@
      them closes up; the full 14px stays under the last of the pair. */
   .pd-batch:has(+ .pd-batch:not(:empty)){ margin-bottom: 3px; }
   .pd-batch strong{ color:#0a0a0a; font-weight:700; }
+  .pd-batch a{ color:#0a0a0a; font-weight:700; text-decoration:underline; text-underline-offset:2px; }
 
   /* a tab straddling the top border, like a ribbon on the winning card */
   .pd-tier-flag{
@@ -770,6 +771,10 @@
              analysis panel's headline number and the hero average already
              read, so this is a third place to state it, not a second source. -->
         <p class="pd-batch" id="pdPurity">HPLC Purity: <strong>99.57%</strong></p>
+        <!-- A quiet link to that lot's certificate, third line of the same
+             block. Driven by coaHref(), so it is empty rather than a dead
+             link when no document is published. -->
+        <p class="pd-batch" id="pdCoaLine"><a href="../../assets/coas/g1-s-lot-1050.pdf" target="_blank" rel="noopener">View COA</a></p>
 
         <div class="pd-buy">
           <div class="pd-stepper">
