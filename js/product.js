@@ -172,6 +172,34 @@
     const img = (s && s.image) || p.image;
     photo.src = pageHref(img);
     photo.alt = '';
+    renderThumbs(p, img);
+  }
+
+  // The second picture is the certificate for the lot, as an image of page one
+  // of the PDF coaHref() opens (same name, .jpg). It exists only where that
+  // document does, so a product with no certificate shows one picture and no
+  // switcher. Rebuilt on every size change, which also resets the stage to the
+  // product photo.
+  function renderThumbs(p, img) {
+    const box = $('pdThumbs');
+    const stage = box && box.previousElementSibling;
+    if (!box) return;
+    const href = coaHref(p);
+    if (stage) stage.classList.remove('is-doc');
+    if (!href || !/\.pdf$/i.test(href)) { box.innerHTML = ''; return; }
+    const photoSrc = pageHref(img);
+    const docSrc = href.replace(/\.pdf$/i, '.jpg');
+    box.innerHTML =
+      `<button type="button" class="pd-thumb is-on" data-view="photo" aria-label="Product photo"><img src="${photoSrc}" alt="" /></button>` +
+      `<button type="button" class="pd-thumb" data-view="coa" aria-label="Certificate of analysis"><img src="${docSrc}" alt="" /></button>`;
+    box.querySelectorAll('.pd-thumb').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const doc = btn.dataset.view === 'coa';
+        $('pdPhoto').src = btn.querySelector('img').src;
+        if (stage) stage.classList.toggle('is-doc', doc);
+        box.querySelectorAll('.pd-thumb').forEach(b => b.classList.toggle('is-on', b === btn));
+      });
+    });
   }
 
   /* ================= certificate =================

@@ -104,6 +104,22 @@
   }
   .pd-photo[hidden]{ display:none; }
 
+  /* --- picture switcher: product photo / certificate --- */
+  .pd-thumbs{ display:flex; gap:10px; margin-top:10px; }
+  .pd-thumbs:empty{ display:none; }
+  .pd-thumb{
+    width:62px; height:80px; padding:0; cursor:pointer; overflow:hidden;
+    background:linear-gradient(180deg,#f6f6f4,#e7e7e4);
+    border:1px solid rgba(0,0,0,.18);
+  }
+  .pd-thumb img{ width:100%; height:100%; object-fit:cover; object-position:top; display:block; }
+  .pd-thumb[data-view="photo"] img{ object-fit:contain; padding:8%; mix-blend-mode:multiply; }
+  .pd-thumb.is-on{ border-color:#0a0a0a; box-shadow:0 0 0 1px #0a0a0a; }
+  /* The certificate is a document, not a product shot: it fills the stage and
+     is shown as is, with no multiply blend against the gradient. */
+  .pd-visual.is-doc{ padding:14px; background:#fff; }
+  .pd-visual.is-doc .pd-photo{ mix-blend-mode:normal; }
+
   /* ---------- buy box ---------- */
   .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:600; margin: 0 0 2px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
   .pd-alias{ font-size: 1rem; color:#8a8a86; margin: 0 0 10px; }
@@ -717,6 +733,10 @@
         <div class="pd-visual">
           <img class="pd-photo" id="pdPhoto" src="../../assets/products/g3-r-10mg-v5.webp" alt="" />
         </div>
+        <!-- Second picture: the lot's certificate, rendered from the same PDF
+             coaHref() opens. Empty and collapsed when there is no document,
+             so there is never a thumbnail of nothing. -->
+        <div class="pd-thumbs" id="pdThumbs"><button type="button" class="pd-thumb is-on" data-view="photo" aria-label="Product photo"><img src="../../assets/products/g3-r-10mg-v5.webp" alt="" /></button><button type="button" class="pd-thumb" data-view="coa" aria-label="Certificate of analysis"><img src="../../assets/coas/g3-r-lot-1032.jpg" alt="" /></button></div>
       </div>
 
       <!-- Order top to bottom the way the decision is actually made: what it

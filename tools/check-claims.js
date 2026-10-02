@@ -1406,7 +1406,7 @@ if (PRODUCT_PAGES_LIVE) {
   // Matched on the assignment rather than the bare name, so a mention of
   // coaHref() in a comment does not read as a call site.
   ok('every certificate surface resolves the document through coaHref()',
-    (read('js/product.js').match(/const href = coaHref\(p\);/g) || []).length === 2 &&
+    (read('js/product.js').match(/const href = coaHref\(p\);/g) || []).length === 3 &&
     /coaHref\(/.test(coaJs) &&
     !/p\.coa \|\| \(typeof COA_URL/.test(read('js/product.js')),
     'product.js must ask coaHref() rather than retyping the p.coa || COA_URL test');
@@ -4069,6 +4069,28 @@ console.log('\nhero image');
     ok('every footer that links the shipping policy also links the returns policy',
       unlinked.length === 0, unlinked.join(', '));
     ok('the returns policy is in the sitemap', /return-policy\.html/.test(read('sitemap.xml')));
+  }
+
+  // The second picture on a product page is the certificate, an image of page
+  // one of the PDF coaHref() opens. The image must exist for every product
+  // that has a document, and every generated page must offer it exactly then.
+  {
+    const noImage = GLOW_PRODUCTS.filter(p => {
+      const h = coaHref(p);
+      return h && (!/\.pdf$/i.test(h) || !fs.existsSync(path.join(ROOT, h.replace(/\.pdf$/i, '.jpg'))));
+    });
+    ok('every certificate PDF has a matching .jpg for the second product picture',
+      noImage.length === 0, noImage.map(p => p.name).join(', '));
+    const missingThumbs = everyPage.filter(f => f.startsWith('product/')).filter(f => {
+      const slug = f.split('/')[1];
+      const prod = GLOW_PRODUCTS.find(p => productSlug(p.name) === slug);
+      const has = /data-view="coa"/.test(read(f));
+      return prod && Boolean(coaHref(prod)) !== has;
+    });
+    ok('every generated page offers the certificate picture exactly when a document exists',
+      missingThumbs.length === 0, missingThumbs.join(', '));
+    ok('js/product.js builds the switcher from coaHref(p)',
+      /function renderThumbs/.test(read('js/product.js')) && /data-view="coa"/.test(read('js/product.js')));
   }
 
   // Product photographs carry no alt text by request: the vial images on the
