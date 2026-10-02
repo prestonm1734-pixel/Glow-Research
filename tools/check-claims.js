@@ -3822,6 +3822,21 @@ console.log('\nprivacy disclosure');
     ok('the runtime disclosure spans exist for x-pixel.js to correct if the flag ever flips',
       ['xPixelNote3', 'xPixelNote4', 'xPixelNote5'].every(id => privacy.includes(id)));
   }
+
+  // Same reasoning again, Microsoft Advertising's UET tag.
+  if (/bat\.bing\.net/.test(read('js/uet-tag.js'))) {
+    ok('the privacy policy accounts for the Microsoft Advertising tag',
+      /microsoft advertising/i.test(privacy));
+    ok('the runtime disclosure spans exist for uet-tag.js to correct if the flag ever flips',
+      ['uetNote3', 'uetNote4', 'uetNote5'].every(id => privacy.includes(id)));
+    ok('uet-tag.js reads its tag ID from UET_TAG_ID, never a typed copy',
+      /ti: UET_TAG_ID/.test(read('js/uet-tag.js')) && !/\b\d{9}\b/.test(read('js/uet-tag.js')));
+    ok('every page that loads the beacon also loads the UET tag, after identity.js',
+      everyPage.filter(f => /js\/analytics\.js/.test(read(f)))
+        .filter(f => !/js\/uet-tag\.js/.test(read(f))).length === 0);
+    ok("the UET tag's hosts are classified as pixel hosts so a blocked load is not a site fault",
+      /'bat\.bing\.net'/.test(read('js/analytics.js')) && /'bat\.bing\.com'/.test(read('js/analytics.js')));
+  }
 }
 
 /* ---------------------------------------------------------------------------

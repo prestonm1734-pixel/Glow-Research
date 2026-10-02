@@ -665,6 +665,10 @@
     'api.goaffpro.com',
     't.co',
     'analytics.twitter.com',
+    // Microsoft Advertising's UET tag: the script host, and the host it
+    // reports to once it runs.
+    'bat.bing.net',
+    'bat.bing.com',
   ];
   function hostOf(url) {
     try { return new URL(url, location.href).host; } catch (e2) { return ''; }

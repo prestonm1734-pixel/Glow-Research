@@ -216,6 +216,13 @@ const TIKTOK_PIXEL_ID = 'DAE5U1RC77UES974K6F0';
 const GOAFFPRO_SHOP_ID = 'regkhwnoue';
 
 const X_PIXEL_ID = 'repwj';
+
+// Microsoft Advertising's UET tag ID, same reasoning as the pixel IDs above:
+// not secret, safe to ship client-side, and js/uet-tag.js no-ops entirely
+// while this is empty. The tag only reports page views; conversions are set
+// up as destination-URL goals in the Microsoft Advertising account, so no
+// funnel event is forwarded from js/analytics.js.
+const UET_TAG_ID = '187278251';
 const X_EVENT_IDS = {
   viewContent: 'tw-repwj-reuew',
   addToCart: 'tw-repwj-reuex',
@@ -1706,6 +1713,7 @@ if (typeof module !== 'undefined' && module.exports) {
     META_DOMAIN_VERIFICATION,
     TIKTOK_PIXEL_ID,
     X_PIXEL_ID,
+    UET_TAG_ID,
     X_EVENT_IDS,
     GOAFFPRO_SHOP_ID,
     round2,
