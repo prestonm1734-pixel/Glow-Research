@@ -1457,7 +1457,7 @@ console.log('\nhouse style');
   ok('no em dashes in page copy', bad.length === 0, bad.join(', '));
 
   // scripts that render copy: comments are a different register and are exempt
-  const jsCopy = ['js/account.js', 'js/age-gate.js', 'js/cart.js', 'js/cart-modal.js',
+  const jsCopy = ['js/account.js', 'js/cart.js', 'js/cart-modal.js',
                   'js/checkout.js', 'js/product.js', 'js/products-data.js',
                   'js/script.js', 'js/search.js', 'js/thank-you.js'];
   const badJs = jsCopy.filter(f => {
@@ -2928,6 +2928,38 @@ console.log('\nlaunch offer (removed)');
     fs.existsSync(path.join(ROOT, 'api/apply-promo.js')) &&
     /resolvePromoCodeForOrder\(/.test(read('api/apply-promo.js')) &&
     /coPromo/.test(read('js/checkout.js')));
+}
+
+/* ---------------------------------------------------------------------------
+ * The first-visit age / RUO gate, removed. It was a full-screen overlay
+ * (js/age-gate.js, loaded at the top of every page) asking a visitor to
+ * confirm they were 21 or older and accepted the RUO terms once per browser
+ * session. It has been taken out and put back before, so this guards the
+ * absence rather than the behaviour: bringing it back means deleting this
+ * block, not editing around it.
+ *
+ * What still states the research-use-only position, and is checked
+ * elsewhere: the footer disclaimer, ruo-agreement.html, the terms, and the
+ * line on every product page. Those are the claims; the gate was a click
+ * in front of them.
+ * ------------------------------------------------------------------------- */
+console.log('\nage gate (removed)');
+{
+  ok('js/age-gate.js is gone', !fs.existsSync(path.join(ROOT, 'js/age-gate.js')));
+
+  const stillGated = everyPage.filter(f => /age-gate|ageGate|glow-age-ok/.test(read(f)));
+  ok('no page loads the gate or names its storage key',
+    stillGated.length === 0, stillGated.join(', '));
+
+  const css = read('css/style.css').replace(/\/\*[\s\S]*?\*\//g, '');
+  ok('the gate’s styles are gone from the stylesheet',
+    !/\.age-gate|ageGateIn/.test(css));
+
+  // The privacy page lists what clearing browser storage removes. Naming a
+  // confirmation the site no longer stores would be a claim about data the
+  // system does not hold.
+  ok('the privacy page does not claim an age-gate confirmation is stored',
+    !/age-gate confirmation/i.test(read('privacy.html')));
 }
 
 /* ---------------------------------------------------------------------------

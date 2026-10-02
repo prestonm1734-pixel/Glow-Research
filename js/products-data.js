@@ -829,8 +829,8 @@ const VIAL_ART_NOTICE = 'Vials ship with generic labeling, not the label shown.'
 // get the document, how do I know the document is real, and where is the lot
 // number that ties the document to the vial in my hand.
 //
-// Research-use-only is deliberately not among them. It is the age gate, the
-// footer disclaimer, ruo-agreement.html and a line on every product page, so
+// Research-use-only is deliberately not among them. It is the footer
+// disclaimer, ruo-agreement.html and a line on every product page, so
 // an FAQ entry restating it spent the most-read slot on the page on the one
 // thing a visitor has already been told before they scrolled this far.
 //

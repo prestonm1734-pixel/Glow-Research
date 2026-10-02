@@ -34,8 +34,8 @@
     });
   }
 
-  // depth-aware link, same reasoning as the age gate: this file is shared and
-  // may one day be pulled in from a nested page
+  // depth-aware link: this file is shared and may one day be pulled in from a
+  // nested page
   function root() {
     var segs = location.pathname.split('/').filter(Boolean);
     var last = segs[segs.length - 1] || '';
