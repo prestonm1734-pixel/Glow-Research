@@ -33,7 +33,7 @@ const {
   productMetaDesc, productSlug,
   verifyUrl, verifyHost, LAB_VERIFY_URL,
   FAQS, faqHtml,
-  COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
+  COA_COPY, productCardHtml, coaCardHtml, coaHref, coaPicture, COA_PICTURE_WITHHELD, fmtPrice, salePrice,
   QTY_GROUP, PDP_CARD_QTYS, getProductVariants, unitPriceAt, BULK_MAX_OFF, nextFreeNudge, bulkOff,
   ordinal, freeVials, paidVials, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY, PAYMENT_METHODS,
@@ -1406,7 +1406,7 @@ if (PRODUCT_PAGES_LIVE) {
   // Matched on the assignment rather than the bare name, so a mention of
   // coaHref() in a comment does not read as a call site.
   ok('every certificate surface resolves the document through coaHref()',
-    (read('js/product.js').match(/const href = coaHref\(p\);/g) || []).length === 3 &&
+    (read('js/product.js').match(/const href = coaHref\(p\);/g) || []).length === 2 &&
     /coaHref\(/.test(coaJs) &&
     !/p\.coa \|\| \(typeof COA_URL/.test(read('js/product.js')),
     'product.js must ask coaHref() rather than retyping the p.coa || COA_URL test');
@@ -4076,20 +4076,28 @@ console.log('\nhero image');
   // that has a document, and every generated page must offer it exactly then.
   {
     const noImage = GLOW_PRODUCTS.filter(p => {
-      const h = coaHref(p);
-      return h && (!/\.pdf$/i.test(h) || !fs.existsSync(path.join(ROOT, h.replace(/\.pdf$/i, '.jpg'))));
+      const pic = coaPicture(p);
+      return pic && !fs.existsSync(path.join(ROOT, pic));
     });
-    ok('every certificate PDF has a matching .jpg for the second product picture',
+    ok('every certificate shown as a picture has its .jpg on disk',
       noImage.length === 0, noImage.map(p => p.name).join(', '));
+    // The three certificates that print a compound's real name are never shown
+    // as a picture, and their renders are not left on the CDN either:
+    // /assets/ is served straight off disk, so an unreferenced image is
+    // still a public URL.
+    ok('certificates that name the compound are withheld and have no rendered image',
+      ['G3-R', 'G1-S', 'G2-T'].every(n => COA_PICTURE_WITHHELD.includes(n)) &&
+      GLOW_PRODUCTS.filter(p => COA_PICTURE_WITHHELD.includes(p.name))
+        .every(p => !coaPicture(p) && !fs.existsSync(path.join(ROOT, (coaHref(p) || '').replace(/\.pdf$/i, '.jpg')))));
     const missingThumbs = everyPage.filter(f => f.startsWith('product/')).filter(f => {
       const slug = f.split('/')[1];
       const prod = GLOW_PRODUCTS.find(p => productSlug(p.name) === slug);
       const has = /data-view="coa"/.test(read(f));
-      return prod && Boolean(coaHref(prod)) !== has;
+      return prod && Boolean(coaPicture(prod)) !== has;
     });
-    ok('every generated page offers the certificate picture exactly when a document exists',
+    ok('every generated page offers the certificate picture exactly when one is allowed',
       missingThumbs.length === 0, missingThumbs.join(', '));
-    ok('js/product.js builds the switcher from coaHref(p)',
+    ok('js/product.js builds the switcher from coaPicture(p)',
       /function renderThumbs/.test(read('js/product.js')) && /data-view="coa"/.test(read('js/product.js')));
   }
 

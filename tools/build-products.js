@@ -35,7 +35,7 @@ const OUT_DIR = 'product';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, hasList, listPriceOf, PRODUCT_PAGES_LIVE,
-  sizeInStock, productInStock, batchPanelHtml, unitPriceAt, coaHref,
+  sizeInStock, productInStock, batchPanelHtml, unitPriceAt, coaPicture,
   catFilterGroup, CAT_LABEL, productMetaDesc,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
@@ -288,11 +288,11 @@ function buildProduct(p, donor) {
   // The switcher under the photo, same markup js/product.js renders, so a
   // crawler sees both pictures. Only where a certificate document exists.
   {
-    const doc = coaHref(p);
+    const doc = coaPicture(p);
     const photo = esc((s && s.image) || p.image);
-    html = fillEmpty(html, 'pdThumbs', doc && /\.pdf$/i.test(doc)
+    html = fillEmpty(html, 'pdThumbs', doc
       ? `<button type="button" class="pd-thumb is-on" data-view="photo" aria-label="Product photo"><img src="${photo}" alt="" /></button>` +
-        `<button type="button" class="pd-thumb" data-view="coa" aria-label="Certificate of analysis"><img src="${esc(doc.replace(/\.pdf$/i, '.jpg'))}" alt="" /></button>`
+        `<button type="button" class="pd-thumb" data-view="coa" aria-label="Certificate of analysis"><img src="${esc(doc)}" alt="" /></button>`
       : '');
   }
 

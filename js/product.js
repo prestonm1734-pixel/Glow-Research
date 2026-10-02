@@ -184,11 +184,10 @@
     const box = $('pdThumbs');
     const stage = box && box.previousElementSibling;
     if (!box) return;
-    const href = coaHref(p);
+    const docSrc = coaPicture(p);
     if (stage) stage.classList.remove('is-doc');
-    if (!href || !/\.pdf$/i.test(href)) { box.innerHTML = ''; return; }
+    if (!docSrc) { box.innerHTML = ''; return; }
     const photoSrc = pageHref(img);
-    const docSrc = href.replace(/\.pdf$/i, '.jpg');
     box.innerHTML =
       `<button type="button" class="pd-thumb is-on" data-view="photo" aria-label="Product photo"><img src="${photoSrc}" alt="" /></button>` +
       `<button type="button" class="pd-thumb" data-view="coa" aria-label="Certificate of analysis"><img src="${docSrc}" alt="" /></button>`;
