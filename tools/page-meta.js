@@ -67,7 +67,7 @@ const PAGE_META = {
     title: t('Shipping Policy'),
     desc: 'Glow Research shipping policy: processing time, FedEx rates and coverage, delivery area, and the no-returns policy on shipped or opened vials.',
   },
-  'returns.html': {
+  'return-policy.html': {
     name: 'Returns Policy',
     title: t('Returns Policy'),
     desc: 'Glow Research returns policy: all sales are final once a vial has shipped or been opened, what to do before an order ships, and who to contact about a damaged or missing package.',

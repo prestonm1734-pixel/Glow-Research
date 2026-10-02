@@ -4111,17 +4111,17 @@ console.log('\nhero image');
   // position terms.html and shipping-policy.html already hold, so the three
   // cannot say different things, and every page footer links to it.
   {
-    const returns = read('returns.html');
-    ok('returns.html states that all sales are final once shipped or opened',
+    const returns = read('return-policy.html');
+    ok('return-policy.html states that all sales are final once shipped or opened',
       /all sales are final once a vial\s+has shipped or been opened/.test(returns));
     ok('and terms and the shipping policy say the same thing',
       /all sales are final once a vial has\s+shipped or been opened/.test(read('terms.html')) &&
       /all sales are final once a vial\s+has shipped or been opened/.test(read('shipping-policy.html')));
-    const unlinked = everyPage.filter(f => f !== 'returns.html' && /Shipping Policy<\/a>/.test(read(f)) &&
-      !/href="\/?(?:\.\.\/)*returns\.html">Returns Policy<\/a>/.test(read(f)));
+    const unlinked = everyPage.filter(f => f !== 'return-policy.html' && /Shipping Policy<\/a>/.test(read(f)) &&
+      !/href="\/?(?:\.\.\/)*return-policy\.html">Returns Policy<\/a>/.test(read(f)));
     ok('every footer that links the shipping policy also links the returns policy',
       unlinked.length === 0, unlinked.join(', '));
-    ok('the returns policy is in the sitemap', /returns\.html/.test(read('sitemap.xml')));
+    ok('the returns policy is in the sitemap', /return-policy\.html/.test(read('sitemap.xml')));
   }
 
   // Product photographs carry no alt text by request: the vial images on the
