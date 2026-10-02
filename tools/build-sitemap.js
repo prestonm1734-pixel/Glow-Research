@@ -56,6 +56,7 @@ const STATIC_PAGES = [
   ['privacy.html', '0.3'],
   ['ruo-agreement.html', '0.3'],
   ['shipping-policy.html', '0.3'],
+  ['returns.html', '0.3'],
 ];
 
 // A file on disk can serve at a different, extensionless address — shop.html

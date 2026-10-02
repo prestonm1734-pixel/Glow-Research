@@ -4107,6 +4107,23 @@ console.log('\nhero image');
       unnamed.length === 0, `missing: ${unnamed.map(l => l.name).join(', ')}`);
   });
 
+  // The returns policy page Google Merchant Center asks for. It restates the
+  // position terms.html and shipping-policy.html already hold, so the three
+  // cannot say different things, and every page footer links to it.
+  {
+    const returns = read('returns.html');
+    ok('returns.html states that all sales are final once shipped or opened',
+      /all sales are final once a vial\s+has shipped or been opened/.test(returns));
+    ok('and terms and the shipping policy say the same thing',
+      /all sales are final once a vial has\s+shipped or been opened/.test(read('terms.html')) &&
+      /all sales are final once a vial\s+has shipped or been opened/.test(read('shipping-policy.html')));
+    const unlinked = everyPage.filter(f => f !== 'returns.html' && /Shipping Policy<\/a>/.test(read(f)) &&
+      !/href="\/?(?:\.\.\/)*returns\.html">Returns Policy<\/a>/.test(read(f)));
+    ok('every footer that links the shipping policy also links the returns policy',
+      unlinked.length === 0, unlinked.join(', '));
+    ok('the returns policy is in the sitemap', /returns\.html/.test(read('sitemap.xml')));
+  }
+
   // Product photographs carry no alt text by request: the vial images on the
   // catalog, certificate cards and product pages are empty-alt, and the image
   // files hold no embedded metadata. Pinned so a template edit cannot quietly
