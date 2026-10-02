@@ -1196,74 +1196,21 @@ console.log('\ncart drawer on add');
     /if \(left == null\) \{ el\.hidden = true; return; \}/.test(cartCode));
 }
 
-console.log('\nbatch tracking line');
+console.log('\nbatch tracking line (removed)');
 {
-  // The line js/product.js's renderBatch() writes and tools/build-products.js
-  // bakes: the catalog's own lot number, stated with no count of vials beside
-  // it. Three ways this can drift, three guards.
+  // The lot, purity and View COA lines under the size picker are gone from
+  // the product page: the batch analysis panel further down is the one place
+  // the lot, the purity and the certificate are stated. Guarded as absent
+  // because they have been added once already, and a template edit could
+  // quietly bring them back.
   const productJs = read('js/product.js');
-  // Anchored to the closing backtick and tag, not just a substring match: a
-  // vial count appended after the lot number (the exact shape of the claim
-  // this whole section exists to rule out) still contains the substring
-  // "Lot #${p.lot}", so a loose match would wave it through.
-  ok('js/product.js states the lot with no invented quantity beside it',
-    /function renderBatch/.test(productJs) &&
-    /Lot #\$\{p\.lot\}<\/strong>`/.test(productJs));
-
   const buildProductsJs = read('tools/build-products.js');
-  ok('and tools/build-products.js bakes the identical line for a crawler',
-    /Current HPLC-tested batch:.*Lot #\$\{esc\(p\.lot\)\}/.test(buildProductsJs));
-
-  // Every generated product page, checked against the catalog's own figure
-  // rather than just for presence: a page baked before a lot turned over
-  // would otherwise keep quoting the old one silently, the same failure the
-  // certificate-filename guard above exists to catch for the COA link.
-  const productPages = fs.readdirSync(path.join(ROOT, 'product'), { withFileTypes: true })
-    .filter(d => d.isDirectory())
-    .map(d => ({ file: `product/${d.name}/index.html`, slug: d.name }));
-  const wrongBatch = productPages.filter(({ file, slug }) => {
-    const prod = GLOW_PRODUCTS.find(p => productSlug(p.name) === slug);
-    if (!prod || !prod.lot) return false;
-    return !read(file).includes(`Lot #${prod.lot}</strong>`);
-  });
-  ok('every generated page states the catalog\'s current lot for that compound',
-    wrongBatch.length === 0, wrongBatch.map(p => p.file).join(', '));
-
-  // The purity line sits directly under the lot, in the same style. It reads
-  // p.purity, the figure the batch analysis panel's headline already uses, so
-  // it is a third place stating one number, not a second source for it. Same
-  // three drift points as the lot line: the runtime string, the baked string,
-  // and every generated page against the catalog's own figure.
-  ok('js/product.js states the purity from the catalog, nothing beside it',
-    /\$\('pdPurity'\)/.test(productJs) &&
-    /HPLC Purity: <strong>\$\{p\.purity\}<\/strong>`/.test(productJs));
-  ok('and tools/build-products.js bakes the identical line for a crawler',
-    /HPLC Purity: <strong>\$\{esc\(p\.purity\)\}<\/strong>/.test(buildProductsJs));
-  const wrongPurityLine = productPages.filter(({ file, slug }) => {
-    const prod = GLOW_PRODUCTS.find(p => productSlug(p.name) === slug);
-    if (!prod || !prod.purity) return false;
-    return !read(file).includes(`HPLC Purity: <strong>${prod.purity}</strong>`);
-  });
-  ok('every generated page states the catalog\'s purity for that compound',
-    wrongPurityLine.length === 0, wrongPurityLine.map(p => p.file).join(', '));
-
-  // The View COA line under the purity: gated by coaHref() at runtime and in
-  // the bake, and every generated page's href must equal coaHref(prod).
-  ok('js/product.js builds the View COA line from coaHref(p)',
-    /\$\('pdCoaLine'\)/.test(productJs) && /View COA<\/a>`/.test(productJs) &&
-    /const href = coaHref\(p\);\s*coa\.innerHTML/.test(productJs));
-  ok('and tools/build-products.js bakes it behind the same coaHref(p) gate',
-    /coaHref\(p\)\s*\? `<a href="\$\{esc\(coaHref\(p\)\)\}"[^`]*View COA<\/a>`/.test(buildProductsJs));
-  const wrongCoaLine = productPages.filter(({ file, slug }) => {
-    const prod = GLOW_PRODUCTS.find(p => productSlug(p.name) === slug);
-    if (!prod) return false;
-    const want = coaHref(prod);
-    const m = read(file).match(/id="pdCoaLine">(?:<a href="([^"]*)"[^>]*>View COA<\/a>)?</);
-    if (!m) return true;
-    return want ? !m[1] || !m[1].endsWith(want.replace(/^\.?\//, '')) : Boolean(m[1]);
-  });
-  ok('every generated page links View COA exactly when the catalog holds a certificate',
-    wrongCoaLine.length === 0, wrongCoaLine.map(p => p.file).join(', '));
+  ok('js/product.js no longer renders a lot, purity or COA line in the buy box',
+    !/function renderBatch/.test(productJs) && !/pdBatch|pdPurity|pdCoaLine/.test(productJs));
+  ok('and tools/build-products.js no longer bakes them',
+    !/pdBatch|pdPurity|pdCoaLine/.test(buildProductsJs));
+  const stillThere = everyPage.filter(f => /id="(?:pdBatch|pdPurity|pdCoaLine)"|Current HPLC-tested batch/.test(read(f)));
+  ok('no page carries the buy-box batch lines', stillThere.length === 0, stillThere.join(', '));
 
   // The one figure that would make this a promise rather than a fact, ruled
   // out sitewide rather than only on the product template: a vial count is
@@ -1459,7 +1406,7 @@ if (PRODUCT_PAGES_LIVE) {
   // Matched on the assignment rather than the bare name, so a mention of
   // coaHref() in a comment does not read as a call site.
   ok('every certificate surface resolves the document through coaHref()',
-    (read('js/product.js').match(/const href = coaHref\(p\);/g) || []).length === 3 &&
+    (read('js/product.js').match(/const href = coaHref\(p\);/g) || []).length === 2 &&
     /coaHref\(/.test(coaJs) &&
     !/p\.coa \|\| \(typeof COA_URL/.test(read('js/product.js')),
     'product.js must ask coaHref() rather than retyping the p.coa || COA_URL test');

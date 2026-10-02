@@ -158,40 +158,6 @@
 
     renderPhoto(p, size());
     renderCoa(p);
-    renderBatch(p);
-  }
-
-  // The lot p.lot names, stated as a fact rather than as a promise about
-  // supply: no vial count, because js/products-data.js does not hold one —
-  // sizes[].stock is in stock or not, never a number, so there is nothing
-  // true to put beside this. Left empty for a product with no lot on file,
-  // same as pdAlias and pdDesc above.
-  function renderBatch(p) {
-    const el = $('pdBatch');
-    if (!el) return;
-    el.innerHTML = p.lot
-      ? `Current HPLC-tested batch: <strong>Lot #${p.lot}</strong>`
-      : '';
-
-    // Directly under the lot, same style: the purity is that lot's, so it
-    // sits beside the lot number rather than in a spec table further down.
-    // Empty for a product with no purity on file, never a placeholder figure.
-    const pur = $('pdPurity');
-    if (pur) {
-      pur.innerHTML = p.purity
-        ? `HPLC Purity: <strong>${p.purity}</strong>`
-        : '';
-    }
-
-    // Third line: the certificate for that lot. coaHref() is the one gate, so
-    // there is no link to a 404 and none when certificates are not published.
-    const coa = $('pdCoaLine');
-    if (coa) {
-      const href = coaHref(p);
-      coa.innerHTML = href
-        ? `<a href="${href}" target="_blank" rel="noopener">View COA</a>`
-        : '';
-    }
   }
 
   // Every product now ships with a real photo, so this only ever picks

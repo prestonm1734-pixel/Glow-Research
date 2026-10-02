@@ -35,7 +35,7 @@ const OUT_DIR = 'product';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, hasList, listPriceOf, PRODUCT_PAGES_LIVE,
-  sizeInStock, productInStock, batchPanelHtml, unitPriceAt, coaHref,
+  sizeInStock, productInStock, batchPanelHtml, unitPriceAt,
   catFilterGroup, CAT_LABEL, productMetaDesc,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
@@ -285,18 +285,6 @@ function buildProduct(p, donor) {
   html = setText(html, 'pdName', esc(p.name));
   html = fillEmpty(html, 'pdAlias', p.alias ? esc(p.alias) : '');
   html = fillEmpty(html, 'pdDesc', esc(p.blurb));
-  // Same rule js/product.js's renderBatch() renders at runtime: a lot number,
-  // stated as a fact, with no vial count beside it because none exists to
-  // state truthfully.
-  html = fillEmpty(html, 'pdBatch',
-    p.lot ? `Current HPLC-tested batch: <strong>Lot #${esc(p.lot)}</strong>` : '');
-  html = fillEmpty(html, 'pdPurity',
-    p.purity ? `HPLC Purity: <strong>${esc(p.purity)}</strong>` : '');
-  // Same gate as the runtime: coaHref(), so a crawler sees the link only when
-  // a reader would. rewriteDepth() prefixes the href like any other.
-  html = fillEmpty(html, 'pdCoaLine',
-    coaHref(p) ? `<a href="${esc(coaHref(p))}" target="_blank" rel="noopener">View COA</a>` : '');
-
   // The donor ships #pdPhoto with no src: js/product.js fills it in at
   // runtime, which used to mean a crawler that does not execute JavaScript —
   // most of the ones feeding AI answer engines — saw an empty <img> and
