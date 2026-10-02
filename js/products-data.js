@@ -1461,7 +1461,7 @@ function productCardHtml(p, i) {
               ? '<span class="product-badge status is-out">Out of stock</span>'
               : p.badge ? `<span class="product-badge status">${p.badge}</span>` : ''}
           </span>
-          <img class="product-photo" src="${pageHref(p.image)}" alt="${p.name} vial" loading="lazy" />
+          <img class="product-photo" src="${pageHref(p.image)}" alt="" loading="lazy" />
         </a>
         <div class="product-footer">
           <h3><a href="${href}">${name}</a></h3>
@@ -1502,7 +1502,7 @@ function coaCardHtml(p) {
       <article class="coa-card" data-name="${escHtml(p.name.toLowerCase())}" data-type="${escHtml(CAT_LABEL[p.cat].toLowerCase())}" data-lot="${escHtml((p.lot || '').toLowerCase())}" data-alias="${escHtml((p.alias || '').toLowerCase())}">
         <div class="coa-card-visual">
           ${held ? '<span class="coa-card-flag">PDF</span>' : ''}
-          <img src="${pageHref(p.image)}" alt="${escHtml(p.name)} vial" loading="lazy" />
+          <img src="${pageHref(p.image)}" alt="" loading="lazy" />
         </div>
         <div class="coa-card-body">
           <span class="coa-card-type">${escHtml(CAT_LABEL[p.cat])}</span>

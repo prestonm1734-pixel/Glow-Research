@@ -205,7 +205,7 @@
     if (!photo) return;
     const img = (s && s.image) || p.image;
     photo.src = pageHref(img);
-    photo.alt = `${p.name}${s ? ' ' + s.mg : ''} vial`;
+    photo.alt = '';
   }
 
   /* ================= certificate =================

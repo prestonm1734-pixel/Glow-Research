@@ -306,7 +306,7 @@ function buildProduct(p, donor) {
   // correctly for product/<slug>/.
   html = required(html, /<img class="pd-photo" id="pdPhoto"[^>]*\/>/, '#pdPhoto')
     .replace(/<img class="pd-photo" id="pdPhoto"[^>]*\/>/,
-      `<img class="pd-photo" id="pdPhoto" src="${esc((s && s.image) || p.image)}" alt="${esc(p.name)} ${esc(s.mg)} vial" />`);
+      `<img class="pd-photo" id="pdPhoto" src="${esc((s && s.image) || p.image)}" alt="" />`);
 
   // Not setText: with a launch list price the markup is a struck-through
   // figure beside the charged one, and setText stops at the first "<".

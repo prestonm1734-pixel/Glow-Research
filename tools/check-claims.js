@@ -4107,6 +4107,20 @@ console.log('\nhero image');
       unnamed.length === 0, `missing: ${unnamed.map(l => l.name).join(', ')}`);
   });
 
+  // Product photographs carry no alt text by request: the vial images on the
+  // catalog, certificate cards and product pages are empty-alt, and the image
+  // files hold no embedded metadata. Pinned so a template edit cannot quietly
+  // bring either back.
+  {
+    const withAlt = everyPage.filter(f =>
+      /<img[^>]*(?:product-photo|pd-photo|class="thumb-photo")[^>]*alt="[^"]+"/.test(read(f)) ||
+      /<img[^>]*alt="[^"]+"[^>]*(?:product-photo|pd-photo)/.test(read(f)));
+    ok('product photographs carry empty alt text on every page', withAlt.length === 0, withAlt.join(', '));
+    const dataJs = read('js/products-data.js');
+    ok('and the templates that render them never write one',
+      !/alt="\$\{[^}]*\} vial"/.test(dataJs) && !/photo\.alt = `/.test(read('js/product.js')));
+  }
+
   /* Images deleted for what they print, which have to stay deleted.
      /assets/ is served straight off the CDN with no page needed, so an
      image nothing links to is still a live URL anyone can open — being
