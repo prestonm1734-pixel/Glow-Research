@@ -290,6 +290,8 @@ function buildProduct(p, donor) {
   // state truthfully.
   html = fillEmpty(html, 'pdBatch',
     p.lot ? `Current HPLC-tested batch: <strong>Lot #${esc(p.lot)}</strong>` : '');
+  html = fillEmpty(html, 'pdPurity',
+    p.purity ? `HPLC purity, this lot: <strong>${esc(p.purity)}</strong>` : '');
 
   // The donor ships #pdPhoto with no src: js/product.js fills it in at
   // runtime, which used to mean a crawler that does not execute JavaScript —

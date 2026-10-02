@@ -172,6 +172,16 @@
     el.innerHTML = p.lot
       ? `Current HPLC-tested batch: <strong>Lot #${p.lot}</strong>`
       : '';
+
+    // Directly under the lot, same style: the purity is that lot's, so it
+    // sits beside the lot number rather than in a spec table further down.
+    // Empty for a product with no purity on file, never a placeholder figure.
+    const pur = $('pdPurity');
+    if (pur) {
+      pur.innerHTML = p.purity
+        ? `HPLC purity, this lot: <strong>${p.purity}</strong>`
+        : '';
+    }
   }
 
   // Every product now ships with a real photo, so this only ever picks

@@ -1229,6 +1229,24 @@ console.log('\nbatch tracking line');
   ok('every generated page states the catalog\'s current lot for that compound',
     wrongBatch.length === 0, wrongBatch.map(p => p.file).join(', '));
 
+  // The purity line sits directly under the lot, in the same style. It reads
+  // p.purity, the figure the batch analysis panel's headline already uses, so
+  // it is a third place stating one number, not a second source for it. Same
+  // three drift points as the lot line: the runtime string, the baked string,
+  // and every generated page against the catalog's own figure.
+  ok('js/product.js states the purity from the catalog, nothing beside it',
+    /\$\('pdPurity'\)/.test(productJs) &&
+    /HPLC purity, this lot: <strong>\$\{p\.purity\}<\/strong>`/.test(productJs));
+  ok('and tools/build-products.js bakes the identical line for a crawler',
+    /HPLC purity, this lot: <strong>\$\{esc\(p\.purity\)\}<\/strong>/.test(buildProductsJs));
+  const wrongPurityLine = productPages.filter(({ file, slug }) => {
+    const prod = GLOW_PRODUCTS.find(p => productSlug(p.name) === slug);
+    if (!prod || !prod.purity) return false;
+    return !read(file).includes(`HPLC purity, this lot: <strong>${prod.purity}</strong>`);
+  });
+  ok('every generated page states the catalog\'s purity for that compound',
+    wrongPurityLine.length === 0, wrongPurityLine.map(p => p.file).join(', '));
+
   // The one figure that would make this a promise rather than a fact, ruled
   // out sitewide rather than only on the product template: a vial count is
   // not data this site holds anywhere (sizes[].stock is in stock or not,

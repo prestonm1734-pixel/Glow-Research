@@ -304,6 +304,9 @@
     margin: 0 0 14px; font-size:.82rem; color:#55554f; line-height:1.5;
   }
   .pd-batch:empty{ display:none; }
+  /* The lot and the purity read as one two-line fact, so the gap between
+     them closes up; the full 14px stays under the last of the pair. */
+  .pd-batch:has(+ .pd-batch:not(:empty)){ margin-bottom: 3px; }
   .pd-batch strong{ color:#0a0a0a; font-weight:700; }
 
   /* a tab straddling the top border, like a ribbon on the winning card */
@@ -791,6 +794,11 @@
              Empty and collapsed for a product with no lot on file yet, same
              pattern as pd-alias and pd-desc. -->
         <p class="pd-batch" id="pdBatch"></p>
+        <!-- The purity the certificate for that same lot reports, in the same
+             line style directly under it. p.purity is the figure the batch
+             analysis panel's headline number and the hero average already
+             read, so this is a third place to state it, not a second source. -->
+        <p class="pd-batch" id="pdPurity"></p>
 
         <div class="pd-buy">
           <div class="pd-stepper">
