@@ -35,7 +35,7 @@ const OUT_DIR = 'product';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, hasList, listPriceOf, PRODUCT_PAGES_LIVE,
-  sizeInStock, productInStock, batchPanelHtml, unitPriceAt, coaPicture,
+  sizeInStock, productInStock, batchPanelHtml, unitPriceAt,
   catFilterGroup, CAT_LABEL, productMetaDesc,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
@@ -285,17 +285,6 @@ function buildProduct(p, donor) {
   html = setText(html, 'pdName', esc(p.name));
   html = fillEmpty(html, 'pdAlias', p.alias ? esc(p.alias) : '');
   html = fillEmpty(html, 'pdDesc', esc(p.blurb));
-  // The switcher under the photo, same markup js/product.js renders, so a
-  // crawler sees both pictures. Only where a certificate document exists.
-  {
-    const doc = coaPicture(p);
-    const photo = esc((s && s.image) || p.image);
-    html = fillEmpty(html, 'pdThumbs', doc
-      ? `<button type="button" class="pd-thumb is-on" data-view="photo" aria-label="Product photo"><img src="${photo}" alt="" /></button>` +
-        `<button type="button" class="pd-thumb" data-view="coa" aria-label="Certificate of analysis"><img src="${esc(doc)}" alt="" /></button>`
-      : '');
-  }
-
   // The donor ships #pdPhoto with no src: js/product.js fills it in at
   // runtime, which used to mean a crawler that does not execute JavaScript —
   // most of the ones feeding AI answer engines — saw an empty <img> and

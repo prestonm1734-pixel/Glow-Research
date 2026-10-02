@@ -324,21 +324,6 @@ const COA_COPY = COAS_PUBLISHED ? {
 // staged in the catalog ahead of the flip must not put a live link on a page
 // whose surrounding copy still says "on request". Fill the URLs first, flip
 // the flag when they are all in, and every surface turns over together.
-// Products whose certificate prints the compound's real name on the page.
-// The certificate is still linked as a document, but it is not shown as a
-// product picture: these names are deliberately not readable anywhere on the
-// site itself. Add a product here if its certificate names the compound.
-const COA_PICTURE_WITHHELD = ['G3-R', 'G1-S', 'G2-T'];
-
-// The certificate rendered as an image (page one of the PDF, same name with
-// .jpg), for the second picture on a product page. Empty when there is no
-// document or the document is withheld above.
-function coaPicture(p) {
-  const href = coaHref(p);
-  if (!href || !/\.pdf$/i.test(href) || COA_PICTURE_WITHHELD.includes(p.name)) return '';
-  return href.replace(/\.pdf$/i, '.jpg');
-}
-
 function coaHref(p) {
   if (!COAS_PUBLISHED) return '';
   // Through pageHref(), because the generated pages live at
@@ -1694,8 +1679,6 @@ if (typeof module !== 'undefined' && module.exports) {
     productCardHtml,
     coaCardHtml,
     coaHref,
-    coaPicture,
-    COA_PICTURE_WITHHELD,
     productHref,
     catFilterGroup,
     productKind,

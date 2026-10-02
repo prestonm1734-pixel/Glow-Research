@@ -33,7 +33,7 @@ const {
   productMetaDesc, productSlug,
   verifyUrl, verifyHost, LAB_VERIFY_URL,
   FAQS, faqHtml,
-  COA_COPY, productCardHtml, coaCardHtml, coaHref, coaPicture, COA_PICTURE_WITHHELD, fmtPrice, salePrice,
+  COA_COPY, productCardHtml, coaCardHtml, coaHref, fmtPrice, salePrice,
   QTY_GROUP, PDP_CARD_QTYS, getProductVariants, unitPriceAt, BULK_MAX_OFF, nextFreeNudge, bulkOff,
   ordinal, freeVials, paidVials, tierLabel,
   CART_UPSELL, cartUpsell, CAT_LABEL, PAYMENTS_LIVE, PAYMENT_COPY, PAYMENT_METHODS,
@@ -4069,36 +4069,6 @@ console.log('\nhero image');
     ok('every footer that links the shipping policy also links the returns policy',
       unlinked.length === 0, unlinked.join(', '));
     ok('the returns policy is in the sitemap', /return-policy\.html/.test(read('sitemap.xml')));
-  }
-
-  // The second picture on a product page is the certificate, an image of page
-  // one of the PDF coaHref() opens. The image must exist for every product
-  // that has a document, and every generated page must offer it exactly then.
-  {
-    const noImage = GLOW_PRODUCTS.filter(p => {
-      const pic = coaPicture(p);
-      return pic && !fs.existsSync(path.join(ROOT, pic));
-    });
-    ok('every certificate shown as a picture has its .jpg on disk',
-      noImage.length === 0, noImage.map(p => p.name).join(', '));
-    // The three certificates that print a compound's real name are never shown
-    // as a picture, and their renders are not left on the CDN either:
-    // /assets/ is served straight off disk, so an unreferenced image is
-    // still a public URL.
-    ok('certificates that name the compound are withheld and have no rendered image',
-      ['G3-R', 'G1-S', 'G2-T'].every(n => COA_PICTURE_WITHHELD.includes(n)) &&
-      GLOW_PRODUCTS.filter(p => COA_PICTURE_WITHHELD.includes(p.name))
-        .every(p => !coaPicture(p) && !fs.existsSync(path.join(ROOT, (coaHref(p) || '').replace(/\.pdf$/i, '.jpg')))));
-    const missingThumbs = everyPage.filter(f => f.startsWith('product/')).filter(f => {
-      const slug = f.split('/')[1];
-      const prod = GLOW_PRODUCTS.find(p => productSlug(p.name) === slug);
-      const has = /data-view="coa"/.test(read(f));
-      return prod && Boolean(coaPicture(prod)) !== has;
-    });
-    ok('every generated page offers the certificate picture exactly when one is allowed',
-      missingThumbs.length === 0, missingThumbs.join(', '));
-    ok('js/product.js builds the switcher from coaPicture(p)',
-      /function renderThumbs/.test(read('js/product.js')) && /data-view="coa"/.test(read('js/product.js')));
   }
 
   // Product photographs carry no alt text by request: the vial images on the
