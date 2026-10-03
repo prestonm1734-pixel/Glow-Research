@@ -12,6 +12,8 @@
   const $ = id => document.getElementById(id);
   const grid = $('wsGrid');
   if (!grid) return;
+  const panel = $('wsPanel');
+  const toggle = $('wsBarToggle');
 
   const money = n => '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   const pct = n => Math.round(n * 100) + '%';
@@ -49,17 +51,17 @@
     const btn = !inStock
       ? '<button type="button" class="ws-add" disabled>Out of stock</button>'
       : line
-        ? `<button type="button" class="ws-add in" data-add="${s.sku}">In order (${line.qty}) &middot; add ${STEP}</button>`
+        ? `<button type="button" class="ws-add in" data-add="${s.sku}">${line.qty} in order &middot; +${STEP}</button>`
         : `<button type="button" class="ws-add" data-add="${s.sku}">Add ${STEP} units</button>`;
     return `
       <article class="ws-card" data-name="${escHtml((p.name + ' ' + (p.alias || '')).toLowerCase())}" data-product="${escHtml(p.name)}">
         <div class="ws-img"><img src="${pageHref(s.image || p.image)}" alt="" loading="lazy" />${coa}</div>
         <div class="ws-body">
           <h3>${escHtml(p.name)}</h3>
-          <div class="ws-sizes">${sizes}</div>
+          ${p.sizes.length > 1 ? `<div class="ws-sizes">${sizes}</div>` : `<p class="ws-mg">${escHtml(s.mg)} per vial</p>`}
           <div class="ws-rate">
             <strong>${money(at10)}</strong>
-            <span>per vial at ${STEP}, <s>${money(s.price)}</s> list</span>
+            <span>per vial at ${STEP} &middot; <s>${money(s.price)}</s></span>
             ${cap < TOP.off ? `<span class="ws-cap">Wholesale up to ${pct(cap)}</span>` : ''}
           </div>
           ${btn}
@@ -148,6 +150,9 @@
     co.textContent = units ? `Checkout ${units} ${units === 1 ? 'unit' : 'units'}, ${money(total)}` : 'Checkout';
     co.setAttribute('aria-disabled', units ? 'false' : 'true');
 
+    const bar = $('wsBarMobile');
+    if (bar) bar.hidden = !units;
+    if (!units && panel) { panel.classList.remove('open'); if (toggle) { toggle.textContent = 'Review'; toggle.setAttribute('aria-expanded', 'false'); } }
     $('wsBarUnits').textContent = `${units} ${units === 1 ? 'unit' : 'units'}`;
     $('wsBarTotal').textContent = money(total);
   }
@@ -162,8 +167,6 @@
   });
 
   // Mobile: the panel is a sheet behind the sticky bar.
-  const panel = $('wsPanel');
-  const toggle = $('wsBarToggle');
   if (toggle) {
     toggle.addEventListener('click', () => {
       const open = !panel.classList.contains('open');

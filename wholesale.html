@@ -13,14 +13,14 @@
 <link rel="canonical" href="https://glowresearch.shop/wholesale.html" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
-<meta property="og:title" content="Wholesale" />
+<meta property="og:title" content="Buy Research Peptides in Bulk" />
 <meta property="og:description" content="Bulk research peptide pricing: 40% off from 10 units of a compound, 50% from 50, and 55% on orders of 100+ units. Free FedEx 2-Day shipping." />
 <meta property="og:url" content="https://glowresearch.shop/wholesale.html" />
 <meta property="og:image" content="https://glowresearch.shop/assets/vial-trio-black-v3.jpg" />
 <meta property="og:image:width" content="1686" />
 <meta property="og:image:height" content="933" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Wholesale" />
+<meta name="twitter:title" content="Buy Research Peptides in Bulk" />
 <meta name="twitter:description" content="Bulk research peptide pricing: 40% off from 10 units of a compound, 50% from 50, and 55% on orders of 100+ units. Free FedEx 2-Day shipping." />
 <meta name="twitter:image" content="https://glowresearch.shop/assets/vial-trio-black-v3.jpg" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
@@ -41,20 +41,19 @@
   .ws-hero h1{ font-size: clamp(2rem, 4.4vw, 3.2rem); letter-spacing:-.035em; line-height:1.05; margin: 14px 0 14px; font-weight:600; }
   .ws-hero p{ max-width: 70ch; color:#55554f; line-height:1.6; margin:0; font-size:1.02rem; }
 
-  .ws-tiers{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-top: 28px; }
-  .ws-tier{ border:1px solid rgba(0,0,0,.12); background:#f7f7f5; padding: 18px 18px 20px; }
-  .ws-tier.is-top{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
-  .ws-pills{ display:flex; gap:6px; margin-bottom: 18px; }
-  .ws-pills span{ font-family:'JetBrains Mono', monospace; font-size:.62rem; padding: 4px 8px; border:1px solid rgba(0,0,0,.18); color:#6b6b64; }
-  .ws-pills span.on{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
-  .ws-tier.is-top .ws-pills span{ border-color: rgba(255,255,255,.3); color: rgba(255,255,255,.6); }
-  .ws-tier.is-top .ws-pills span.on{ background:#fff; color:#0a0a0a; border-color:#fff; }
-  .ws-tier b{ display:block; font-size: clamp(2rem, 3.6vw, 2.6rem); letter-spacing:-.03em; line-height:1; }
-  .ws-tier strong{ display:block; margin-top: 10px; font-size:.95rem; }
-  .ws-tier small{ display:block; margin-top: 4px; font-size:.8rem; color:#6b6b64; line-height:1.4; }
-  .ws-tier.is-top small{ color: rgba(255,255,255,.6); }
+  /* The rate ladder: three rows on a rule, no cards. The top rate is the
+     only one set in black, because it is the one the progress bar counts to. */
+  .ws-ladder{ list-style:none; margin: 30px 0 0; padding:0; display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); border-top:1px solid #0a0a0a; border-bottom:1px solid rgba(0,0,0,.14); }
+  .ws-ladder li{ display:flex; align-items:baseline; gap: 16px; padding: 22px 22px 22px 0; }
+  .ws-ladder li + li{ border-left:1px solid rgba(0,0,0,.12); padding-left: 22px; }
+  .ws-ladder b{ font-size: clamp(2.2rem, 4vw, 3rem); letter-spacing:-.04em; line-height:1; font-weight:600; color:#8a8a86; }
+  .ws-ladder li.is-top b{ color:#0a0a0a; }
+  .ws-ladder span{ font-size:.86rem; color:#6b6b64; line-height:1.4; }
+  .ws-ladder strong{ display:block; color:#0a0a0a; font-size:.96rem; margin-bottom:2px; }
+  .ws-perks{ display:flex; flex-wrap:wrap; gap: 8px 22px; margin: 16px 0 0 !important; font-family:'JetBrains Mono', monospace; font-size:.68rem !important; letter-spacing:.12em; text-transform:uppercase; color:#6b6b64 !important; }
+  .ws-perks span::before{ content:''; display:inline-block; width:6px; height:6px; background:#0a0a0a; margin-right:8px; vertical-align:1px; }
 
-  .ws-builder{ display:grid; grid-template-columns: minmax(0,1fr) 380px; gap: 28px; align-items:start; padding: 20px 0 clamp(56px, 7vw, 90px); }
+  .ws-builder{ display:grid; grid-template-columns: minmax(0,1fr) 380px; gap: 28px; align-items:start; padding-top: 20px; padding-bottom: clamp(56px, 7vw, 90px); }
   .ws-search{ width:100%; max-width: 420px; padding: 13px 14px 13px 40px; border:1px solid rgba(0,0,0,.18); font: inherit; font-size:.95rem;
     background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b6b64' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M21 21l-4.3-4.3'/%3E%3C/svg%3E") 14px center no-repeat; }
   .ws-search:focus{ outline: 2px solid #0a0a0a; outline-offset: 1px; }
@@ -72,6 +71,7 @@
   .ws-size small{ display:block; font-size:.76rem; color:#6b6b64; }
   .ws-size.on{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
   .ws-size.on small{ color: rgba(255,255,255,.7); }
+  .ws-mg{ margin: -4px 0 12px; font-family:'JetBrains Mono', monospace; font-size:.72rem; letter-spacing:.08em; color:#6b6b64; text-transform:uppercase; }
   .ws-rate{ margin-top:auto; }
   .ws-rate strong{ font-size:1.3rem; letter-spacing:-.02em; }
   .ws-rate span{ display:block; font-size:.8rem; color:#6b6b64; margin-top:2px; }
@@ -112,9 +112,10 @@
   .ws-fine{ font-size:.76rem; color:#6b6b64; line-height:1.5; margin: 12px 0 0; }
 
   .ws-bar-mobile{ display:none; }
+  .ws-bar-mobile[hidden]{ display:none !important; }
   .ws-sheet-close{ display:none; }
 
-  .ws-faq{ max-width: 780px; margin: 0 auto; padding: 0 0 clamp(56px, 7vw, 90px); }
+  .ws-faq{ max-width: 780px; margin: 0 auto; padding-bottom: clamp(56px, 7vw, 90px); }
   .ws-faq h2{ font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing:-.03em; text-align:center; margin: 0 0 22px; font-weight:600; }
   .ws-faq details{ border:1px solid rgba(0,0,0,.12); margin-bottom: 10px; }
   .ws-faq summary{ cursor:pointer; list-style:none; padding: 18px 20px; font-weight:600; display:flex; justify-content:space-between; gap: 14px; }
@@ -125,8 +126,11 @@
 
   @media (max-width: 1100px){ .ws-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
   @media (max-width: 900px){
-    .ws-tiers{ grid-template-columns: repeat(2, minmax(0,1fr)); }
-    .ws-builder{ grid-template-columns: 1fr; padding-bottom: 110px; }
+    .ws-ladder{ grid-template-columns: 1fr; }
+    .ws-ladder li{ padding: 16px 0; }
+    .ws-ladder li + li{ border-left:0; border-top:1px solid rgba(0,0,0,.12); padding-left:0; }
+    .ws-ladder b{ min-width: 92px; }
+    .ws-builder{ grid-template-columns: 1fr; padding-bottom: 120px; }
     /* The order becomes a sheet behind a sticky bar, so the grid gets the
        whole screen and the total is always one tap away. */
     .ws-panel{ position: fixed; left:0; right:0; bottom:0; top:auto; z-index: 250; max-height: 86vh; overflow:auto;
@@ -147,7 +151,6 @@
     .ws-size{ min-width: 0; flex-basis: 100%; }
     .ws-rate strong{ font-size:1.12rem; }
     .ws-add{ padding: 12px 6px; font-size:.9rem; }
-    .ws-tier{ padding: 14px; }
   }
 </style>
 <script type="application/ld+json">
@@ -156,7 +159,7 @@
   "@type": "WebPage",
   "@id": "https://glowresearch.shop/wholesale.html#webpage",
   "url": "https://glowresearch.shop/wholesale.html",
-  "name": "Wholesale",
+  "name": "Buy Research Peptides in Bulk",
   "description": "Bulk research peptide pricing: 40% off from 10 units of a compound, 50% from 50, and 55% on orders of 100+ units. Free FedEx 2-Day shipping.",
   "isPartOf": {
     "@id": "https://glowresearch.shop/#website"
@@ -181,6 +184,55 @@
       }
     ]
   }
+}
+</script>
+<script type="application/ld+json" id="wholesale-faq-jsonld">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://glowresearch.shop/wholesale.html#faq",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the minimum for wholesale pricing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "10 units of a compound. From 10 units every unit of that compound is 40% off, and from 50 units it is 50% off. Below 10, buy 2, get 1 free applies as usual."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I mix compounds?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Each compound earns its own rate from its own quantity, and once the whole order reaches 100 units every unit in it is 55% off, whatever the mix."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does wholesale stack with buy 2, get 1 free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Wholesale replaces it from 10 units, and the lower price always applies."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are any compounds capped?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Two. Tesamorelin is capped at 40% off and GLP-1 (SM) at 50% off. Every other compound can reach 55%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does a wholesale order ship?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Free on FedEx 2-Day. Ordered by 1:00 PM Pacific on a dispatch day, it ships the same day, with tracking. Every lot ships with its published certificate of analysis."
+      }
+    }
+  ]
 }
 </script>
 </head>
@@ -219,7 +271,7 @@
       <a href="shop">Products</a>
       <a href="coa.html">COA</a>
       <a href="shipping.html">Shipping</a>
-      <a href="wholesale.html" class="active">Wholesale</a>
+      <a href="wholesale.html" class="active">Buy in Bulk</a>
       <a href="affiliates.html">Affiliate Program</a>
     </nav>
 
@@ -247,7 +299,7 @@
 
 <section class="ws-hero">
   <div class="container">
-    <span class="ws-kicker">Wholesale</span>
+    <span class="ws-kicker">Wholesale research peptides</span>
     <h1>Buy in bulk. Save up to 55%.</h1>
     <p id="wsLede">
       Wholesale pricing starts at 10 units of a compound: every unit is 40% off
@@ -256,24 +308,12 @@
       2-Day.
     </p>
 
-    <div class="ws-tiers">
-      <div class="ws-tier">
-        <div class="ws-pills"><span class="on">10</span><span>50</span><span>100+</span></div>
-        <b>40%</b><strong>10 to 49 of a compound</strong><small>off every unit of that compound, any sizes</small>
-      </div>
-      <div class="ws-tier">
-        <div class="ws-pills"><span>10</span><span class="on">50</span><span>100+</span></div>
-        <b>50%</b><strong>50+ of a compound</strong><small>every unit of that compound, not only the extras</small>
-      </div>
-      <div class="ws-tier is-top">
-        <div class="ws-pills"><span>10</span><span>50</span><span class="on">100+</span></div>
-        <b>55%</b><strong>Orders of 100+ units</strong><small>every unit in the order, any mix of compounds</small>
-      </div>
-      <div class="ws-tier">
-        <div class="ws-pills"><span class="on">FedEx</span></div>
-        <b>Free</b><strong>FedEx 2-Day shipping</strong><small>every wholesale order clears the free-shipping line, same-day dispatch before 1:00 PM PT</small>
-      </div>
-    </div>
+    <ol class="ws-ladder" aria-label="Wholesale rates">
+      <li><b>40%</b><span><strong>10+ of a compound</strong>off every unit of that compound</span></li>
+      <li><b>50%</b><span><strong>50+ of a compound</strong>off every unit, not only the extras</span></li>
+      <li class="is-top"><b>55%</b><span><strong>100+ units in the order</strong>off every unit, any mix of compounds</span></li>
+    </ol>
+    <p class="ws-perks"><span>Free FedEx 2-Day</span><span>Same-day dispatch before 1:00 PM PT</span><span>COA on every lot</span></p>
   </div>
 </section>
 
@@ -309,7 +349,7 @@
   </aside>
 </section>
 
-<div class="ws-bar-mobile" id="wsBarMobile">
+<div class="ws-bar-mobile" id="wsBarMobile" hidden>
   <div><b id="wsBarUnits">0 units</b><small>YOUR ORDER</small></div>
   <strong id="wsBarTotal">$0</strong>
   <button type="button" id="wsBarToggle" aria-controls="wsPanel" aria-expanded="false">Review</button>

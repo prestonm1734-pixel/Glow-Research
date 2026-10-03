@@ -73,7 +73,7 @@ const PAGE_META = {
     desc: 'Glow Research returns policy: all sales are final once a vial has shipped or been opened, what to do before an order ships, and who to contact about a damaged or missing package.',
   },
   'wholesale.html': {
-    name: 'Wholesale',
+    name: 'Buy Research Peptides in Bulk',
     title: 'Wholesale Peptides: Buy in Bulk, Save up to 55% | Glow Research',
     desc: 'Bulk research peptide pricing: 40% off from 10 units of a compound, 50% from 50, and 55% on orders of 100+ units. Free FedEx 2-Day shipping.',
   },

@@ -2241,6 +2241,14 @@ console.log('\nbulk pricing');
       everyPage.filter(f => f.startsWith('product/')).every(f =>
         read(f).includes(`See wholesale pricing, up to ${Math.round(D.WHOLESALE_MAX_OFF * 100)}% off`) &&
         /class="pd-wholesale" href="(?:\.\.\/)*wholesale\.html"/.test(read(f))));
+    {
+      const ld = (ws.match(/id="wholesale-faq-jsonld">([\s\S]*?)<\/script>/) || [])[1];
+      const vis = [...ws.matchAll(/<details><summary>(.*?)<\/summary><p>(.*?)<\/p><\/details>/g)];
+      let okLd = false;
+      try { const j = JSON.parse(ld); okLd = vis.length > 0 && j.mainEntity.length === vis.length &&
+        j.mainEntity.every((q, i) => q.name === vis[i][1] && q.acceptedAnswer.text === vis[i][2].replace(/<[^>]+>/g, '')); } catch (e) {}
+      ok('the wholesale FAQ markup matches its visible questions and answers', okLd);
+    }
     ok('Tesamorelin never prices below 40% off, GLP-1 (SM) never below 50%',
       Math.abs(at('Tesamorelin', 100, 100) - 0.6) < 0.001 && Math.abs(at('GLP-1 (SM)', 100, 100) - 0.5) < 0.001);
   }
