@@ -19,7 +19,7 @@
   // older version does not carry forward: someone who agreed to a weaker
   // statement has not agreed to this one, and the whole point of recording an
   // attestation is that it says what was actually attested to.
-  var ATTESTATION_VERSION = 5;
+  var ATTESTATION_VERSION = 3;
 
   // sessionStorage throws in Safari private mode rather than returning null,
   // and a gate that hard-fails there would lock the whole site behind an
@@ -66,24 +66,38 @@
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
     el.setAttribute('aria-labelledby', 'ageGateTitle');
-    // No backdrop image: the page behind stays visible, lightly dimmed and
-    // blurred by css/style.css, with the dialog floating over it.
+    // A still frame of the homepage hero's vial, not the video: the gate has
+    // to render instantly on first paint, before js/script.js exists to
+    // decide whether motion is even allowed, so a static image is the only
+    // honest choice here. Layered under a near-opaque wash rather than shown
+    // at full strength — "subtle" is the point, not another hero moment.
     el.innerHTML =
-      // focus lands on the panel rather than the button: focusing a control
-      // programmatically trips :focus-visible in Chromium, so the gate would
-      // open with a heavy ring already drawn around it
-      '<div class="age-gate-panel" id="ageGatePanel" tabindex="-1">' +
-        '<span class="age-gate-logo">Glow<span class="spark">&#10022;</span></span>' +
-        '<h2 class="age-gate-title" id="ageGateTitle">For research use <span>only.</span></h2>' +
+      // focus lands on the panel rather than the Enter button: focusing a
+      // control programmatically trips :focus-visible in Chromium, so the
+      // gate would open with a heavy ring already drawn around it
+      '<div class="age-gate-panel" id="ageGatePanel" tabindex="-1" style="background-image:' +
+        'linear-gradient(rgba(4,4,4,.9), rgba(4,4,4,.95)), url(\'' + root + 'assets/hero-vial-poster.jpg\')">' +
+        '<span class="age-gate-logo">Glow<span class="spark">✦</span></span>' +
+        '<span class="age-gate-eyebrow">Research Use Only</span>' +
+        '<h2 class="age-gate-title" id="ageGateTitle">You must be 21 or older to enter</h2>' +
         '<p class="age-gate-copy">' +
-          'Products on this site are sold exclusively for laboratory research. They are ' +
-          'not for human consumption, medical, veterinary, or any in-vivo use.' +
+          'Glow Research supplies research compounds strictly for in-vitro laboratory use, ' +
+          'not for human or veterinary consumption. By entering you confirm you are at least ' +
+          '21 and agree to our <a href="' + root + 'terms.html">Terms</a> &amp; ' +
+          '<a href="' + root + 'ruo-agreement.html">RUO Agreement</a>.' +
         '</p>' +
-        '<button type="button" class="age-gate-enter" id="ageGateEnter">I am 21 or older</button>' +
-        '<p class="age-gate-links">' +
-          'By entering you confirm you are at least 21 and agree to our ' +
-          '<a href="' + root + 'terms.html">Terms</a> &amp; ' +
-          '<a href="' + root + 'ruo-agreement.html">Research Use Disclaimer</a>.' +
+        '<button type="button" class="btn btn-primary age-gate-enter" id="ageGateEnter">' +
+          'I am 21 or older' +
+        '</button>' +
+        // Three of the same facts the marquee and the FAQ already state in
+        // these words, restated small underneath rather than argued for
+        // again: this is the one screen where a first-time visitor has
+        // nothing else on the page yet to tell them Glow is a real lab
+        // supplier and not a storefront that vanishes with their card number.
+        '<p class="age-gate-badges">' +
+          '<span>HPLC + Identity + Quantity Tested</span>' +
+          '<span>COA on Every Batch</span>' +
+          '<span>Discreet Shipping</span>' +
         '</p>' +
       '</div>';
     return el;
