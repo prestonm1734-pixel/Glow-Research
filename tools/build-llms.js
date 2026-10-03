@@ -113,7 +113,7 @@ ${faq}
 - [Our process](${SITE}/how-we-test.html): what is tested on every lot, who runs it, and what is not tested
 - [About](${SITE}/about.html): where Glow sits in the chain, and the five published principles
 - [Shipping](${SITE}/shipping.html): dispatch window, transit, coverage and terms
-- [Wholesale](${SITE}/wholesale.html): volume pricing for institutions
+- [Wholesale](${SITE}/wholesale.html): bulk pricing: 40% off from 10 units of a compound, 50% from 50, 55% on orders of 100+ units
 - [Contact](${SITE}/contact.html)
 `;
 

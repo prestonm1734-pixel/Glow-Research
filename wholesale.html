@@ -7,21 +7,21 @@
      needs the observer to show it, so without scripting the page must
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
-<title>Wholesale | Glow Research</title>
-<meta name="description" content="Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day." />
+<title>Wholesale Peptides: Buy in Bulk, Save up to 55% | Glow Research</title>
+<meta name="description" content="Bulk research peptide pricing: 40% off from 10 units of a compound, 50% from 50, and 55% on orders of 100+ units. Free FedEx 2-Day shipping." />
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://glowresearch.shop/wholesale.html" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
 <meta property="og:title" content="Wholesale" />
-<meta property="og:description" content="Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day." />
+<meta property="og:description" content="Bulk research peptide pricing: 40% off from 10 units of a compound, 50% from 50, and 55% on orders of 100+ units. Free FedEx 2-Day shipping." />
 <meta property="og:url" content="https://glowresearch.shop/wholesale.html" />
 <meta property="og:image" content="https://glowresearch.shop/assets/vial-trio-black-v3.jpg" />
 <meta property="og:image:width" content="1686" />
 <meta property="og:image:height" content="933" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Wholesale" />
-<meta name="twitter:description" content="Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day." />
+<meta name="twitter:description" content="Bulk research peptide pricing: 40% off from 10 units of a compound, 50% from 50, and 55% on orders of 100+ units. Free FedEx 2-Day shipping." />
 <meta name="twitter:image" content="https://glowresearch.shop/assets/vial-trio-black-v3.jpg" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://js.stripe.com">
@@ -29,152 +29,125 @@
 <link rel="preload" href="assets/fonts/sora.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  /* Plain white page, the same construction as coa.html and the redesigned
-     shipping.html: a scaled-down centred hero (h1 + one line of lede, no
-     eyebrow, no split-colour headline, no live "answered in a day" dot)
-     sitting above a hairlined fact grid built the exact same way the
-     certificate grid is, then a plain white form. Nothing here needs to be
-     a mood piece; the whole page is answering "what does it cost and how do
-     I open an account." */
-  .wholesale-page{ background:#fff; color:#0a0a0a; }
-  .wholesale-page .lp-hero{ padding: clamp(40px, 5.5vw, 64px) 0 clamp(26px, 3.5vw, 38px); }
-  .wholesale-page .lp-hero h1{
-    color:#0a0a0a; font-size: clamp(1.9rem, 3.6vw, 2.6rem);
-    max-width: 20ch; margin: 0 auto 14px;
-  }
-  .wholesale-page .lp-lede{
-    color:#55554f; font-size: clamp(.98rem, 1.1vw, 1.05rem); max-width: 48ch;
-  }
+  /* ---------- wholesale: buy in bulk ----------
+     An order builder over the real cart. Every price on this page comes from
+     unitPriceAt() and the WHOLESALE_TIERS in js/products-data.js, the same
+     function api/_lib.js charges from, so the total shown here is the total
+     checkout takes. */
+  .ws-page{ background:#fff; color:#0a0a0a; }
+  .ws-hero{ padding: clamp(40px, 6vw, 72px) 0 clamp(24px, 3vw, 36px); }
+  .ws-kicker{ font-family:'JetBrains Mono', monospace; font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; color:#6b6b64; display:flex; align-items:center; gap:10px; }
+  .ws-kicker::before{ content:''; width:22px; height:3px; background:#0a0a0a; }
+  .ws-hero h1{ font-size: clamp(2rem, 4.4vw, 3.2rem); letter-spacing:-.035em; line-height:1.05; margin: 14px 0 14px; font-weight:600; }
+  .ws-hero p{ max-width: 70ch; color:#55554f; line-height:1.6; margin:0; font-size:1.02rem; }
 
-  .wholesale-page .btn-primary{ background:#0a0a0a; color:#fff; }
-  .wholesale-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
-  .wholesale-page .btn-outline{ border-color: rgba(0,0,0,.25); color:#0a0a0a; }
-  .wholesale-page .btn-outline:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; }
+  .ws-tiers{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-top: 28px; }
+  .ws-tier{ border:1px solid rgba(0,0,0,.12); background:#f7f7f5; padding: 18px 18px 20px; }
+  .ws-tier.is-top{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+  .ws-pills{ display:flex; gap:6px; margin-bottom: 18px; }
+  .ws-pills span{ font-family:'JetBrains Mono', monospace; font-size:.62rem; padding: 4px 8px; border:1px solid rgba(0,0,0,.18); color:#6b6b64; }
+  .ws-pills span.on{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+  .ws-tier.is-top .ws-pills span{ border-color: rgba(255,255,255,.3); color: rgba(255,255,255,.6); }
+  .ws-tier.is-top .ws-pills span.on{ background:#fff; color:#0a0a0a; border-color:#fff; }
+  .ws-tier b{ display:block; font-size: clamp(2rem, 3.6vw, 2.6rem); letter-spacing:-.03em; line-height:1; }
+  .ws-tier strong{ display:block; margin-top: 10px; font-size:.95rem; }
+  .ws-tier small{ display:block; margin-top: 4px; font-size:.8rem; color:#6b6b64; line-height:1.4; }
+  .ws-tier.is-top small{ color: rgba(255,255,255,.6); }
 
-  .wholesale-page .lp-section{ padding: clamp(56px, 7vw, 90px) 0; }
-  /* A hairline in place of the dark/light tint alternation the sitewide
-     .lp-section.tint pattern uses: the whole page is one white surface now,
-     so what used to separate two moods separates two topics instead. */
-  .wholesale-page .lp-section + .lp-section{ border-top:1px solid rgba(0,0,0,.1); }
+  .ws-builder{ display:grid; grid-template-columns: minmax(0,1fr) 380px; gap: 28px; align-items:start; padding: 20px 0 clamp(56px, 7vw, 90px); }
+  .ws-search{ width:100%; max-width: 420px; padding: 13px 14px 13px 40px; border:1px solid rgba(0,0,0,.18); font: inherit; font-size:.95rem;
+    background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b6b64' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M21 21l-4.3-4.3'/%3E%3C/svg%3E") 14px center no-repeat; }
+  .ws-search:focus{ outline: 2px solid #0a0a0a; outline-offset: 1px; }
+  .ws-grid{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-top: 18px; }
+  .ws-card{ border:1px solid rgba(0,0,0,.12); background:#fff; display:flex; flex-direction:column; }
+  .ws-card[hidden]{ display:none; }
+  .ws-img{ position:relative; aspect-ratio: 1/1; background: linear-gradient(180deg,#f6f6f4,#e9e9e6); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .ws-img img{ width:100%; height:100%; object-fit:contain; mix-blend-mode:multiply; padding: 8%; }
+  .ws-coa{ position:absolute; left:10px; bottom:10px; background:#fff; color:#0a0a0a; font-family:'JetBrains Mono', monospace; font-size:.62rem; letter-spacing:.12em; padding: 5px 8px; text-decoration:none; border:1px solid rgba(0,0,0,.12); }
+  .ws-coa::before{ content:''; display:inline-block; width:6px; height:6px; background:#0a0a0a; border-radius:50%; margin-right:6px; vertical-align:1px; }
+  .ws-body{ padding: 14px 14px 16px; display:flex; flex-direction:column; flex:1; }
+  .ws-body h3{ margin:0 0 10px; font-size:1.08rem; letter-spacing:-.01em; }
+  .ws-sizes{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 12px; }
+  .ws-size{ flex:1 1 auto; min-width: 70px; text-align:left; padding: 8px 10px; border:1px solid rgba(0,0,0,.18); background:#fff; font: inherit; font-size:.86rem; cursor:pointer; line-height:1.25; }
+  .ws-size small{ display:block; font-size:.76rem; color:#6b6b64; }
+  .ws-size.on{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+  .ws-size.on small{ color: rgba(255,255,255,.7); }
+  .ws-rate{ margin-top:auto; }
+  .ws-rate strong{ font-size:1.3rem; letter-spacing:-.02em; }
+  .ws-rate span{ display:block; font-size:.8rem; color:#6b6b64; margin-top:2px; }
+  .ws-cap{ display:block; font-size:.74rem; color:#6b6b64; margin-top:4px; font-family:'JetBrains Mono', monospace; letter-spacing:.04em; }
+  .ws-add{ margin-top: 12px; width:100%; padding: 13px 10px; background:#0a0a0a; color:#fff; border:1px solid #0a0a0a; font: inherit; font-weight:700; cursor:pointer; }
+  .ws-add:hover{ background:#2a2a27; }
+  .ws-add.in{ background:#fff; color:#0a0a0a; }
+  .ws-add:disabled{ background:#f1f1ef; color:#8a8a86; border-color: rgba(0,0,0,.1); cursor:not-allowed; }
 
-  .wholesale-page .eyebrow{ color:#8a8a86; }
-  .wholesale-page .lp-h2{ color:#0a0a0a; }
-  .wholesale-page .lp-sub{ color:#55554f; }
-  .wholesale-page .lp-fine{ color:#55554f; }
-  .wholesale-page .lp-fine strong{ color:#0a0a0a; }
+  .ws-panel{ position: sticky; top: 84px; border:1px solid rgba(0,0,0,.14); background:#fff; padding: 20px; }
+  .ws-panel-head{ display:flex; justify-content:space-between; align-items:baseline; }
+  .ws-panel-head h2{ margin:0; font-size:1.2rem; }
+  .ws-units{ font-family:'JetBrains Mono', monospace; font-size:.72rem; letter-spacing:.14em; }
+  .ws-progress{ margin: 14px 0 16px; background:#f4f4f2; padding: 14px; }
+  .ws-bar{ height:6px; background: rgba(0,0,0,.1); }
+  .ws-bar i{ display:block; height:100%; background:#0a0a0a; width:0; transition: width .25s ease; }
+  .ws-bar-labels{ display:flex; justify-content:space-between; margin-top:8px; font-family:'JetBrains Mono', monospace; font-size:.62rem; letter-spacing:.1em; color:#6b6b64; }
+  .ws-bar-labels b{ color:#0a0a0a; }
+  .ws-progress p{ margin: 8px 0 0; font-size:.86rem; color:#3d3d39; line-height:1.45; }
+  .ws-lines{ list-style:none; margin:0; padding:0; max-height: 46vh; overflow:auto; }
+  .ws-line{ display:grid; grid-template-columns: 44px minmax(0,1fr) auto; gap: 10px; padding: 12px 0; border-bottom:1px solid rgba(0,0,0,.08); align-items:start; }
+  .ws-line img{ width:44px; height:44px; object-fit:contain; background:#f1f1ef; mix-blend-mode:multiply; }
+  .ws-line h4{ margin:0; font-size:.94rem; }
+  .ws-line small{ display:block; font-family:'JetBrains Mono', monospace; font-size:.66rem; color:#6b6b64; margin: 3px 0 8px; }
+  .ws-line > b{ font-size:.94rem; }
+  .ws-step{ display:inline-flex; border:1px solid rgba(0,0,0,.18); }
+  .ws-step button{ border:0; background:#fff; font: inherit; font-size:.8rem; padding: 6px 9px; cursor:pointer; font-family:'JetBrains Mono', monospace; }
+  .ws-step button:hover{ background:#f1f1ef; }
+  .ws-step span{ min-width: 38px; text-align:center; padding: 6px 4px; font-weight:700; font-size:.86rem; border-left:1px solid rgba(0,0,0,.12); border-right:1px solid rgba(0,0,0,.12); }
+  .ws-empty{ color:#6b6b64; font-size:.92rem; padding: 10px 0 4px; }
+  .ws-sum{ margin-top: 12px; }
+  .ws-sum div{ display:flex; justify-content:space-between; padding: 5px 0; font-size:.92rem; color:#3d3d39; }
+  .ws-sum s{ color:#8a8a86; }
+  .ws-total{ border-top:1px solid rgba(0,0,0,.12); margin-top:6px; padding-top: 12px !important; font-size:1.25rem !important; color:#0a0a0a !important; font-weight:700; }
+  .ws-checkout{ display:block; text-align:center; margin-top: 14px; padding: 15px 12px; background:#0a0a0a; color:#fff; text-decoration:none; font-weight:700; }
+  .ws-checkout:hover{ background:#2a2a27; color:#fff; }
+  .ws-checkout[aria-disabled="true"]{ background:#f1f1ef; color:#8a8a86; pointer-events:none; }
+  .ws-fine{ font-size:.76rem; color:#6b6b64; line-height:1.5; margin: 12px 0 0; }
 
-  /* The three-point row becomes a hairlined card grid, the same construction
-     as the certificate grid on coa.html and the shipping page's fact grid:
-     border-top/left on the container, border-right/bottom on each card, so
-     partial rows never leave a bare patch of background exposed. */
-  .wholesale-page .lp-points{
-    display:grid; grid-template-columns: repeat(3, 1fr); gap:0; text-align:left;
-    border-top:1px solid rgba(0,0,0,.13); border-left:1px solid rgba(0,0,0,.13);
-    margin-top: clamp(40px, 5.5vw, 56px);
+  .ws-bar-mobile{ display:none; }
+  .ws-sheet-close{ display:none; }
+
+  .ws-faq{ max-width: 780px; margin: 0 auto; padding: 0 0 clamp(56px, 7vw, 90px); }
+  .ws-faq h2{ font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing:-.03em; text-align:center; margin: 0 0 22px; font-weight:600; }
+  .ws-faq details{ border:1px solid rgba(0,0,0,.12); margin-bottom: 10px; }
+  .ws-faq summary{ cursor:pointer; list-style:none; padding: 18px 20px; font-weight:600; display:flex; justify-content:space-between; gap: 14px; }
+  .ws-faq summary::-webkit-details-marker{ display:none; }
+  .ws-faq summary::after{ content:'+'; font-weight:400; font-size:1.25rem; line-height:1; }
+  .ws-faq details[open] summary::after{ content:'\2212'; }
+  .ws-faq details p{ margin:0; padding: 0 20px 18px; color:#55554f; line-height:1.65; }
+
+  @media (max-width: 1100px){ .ws-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  @media (max-width: 900px){
+    .ws-tiers{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .ws-builder{ grid-template-columns: 1fr; padding-bottom: 110px; }
+    /* The order becomes a sheet behind a sticky bar, so the grid gets the
+       whole screen and the total is always one tap away. */
+    .ws-panel{ position: fixed; left:0; right:0; bottom:0; top:auto; z-index: 250; max-height: 86vh; overflow:auto;
+      transform: translateY(105%); transition: transform .28s ease; border-left:0; border-right:0; padding-bottom: 96px; }
+    .ws-panel.open{ transform: none; box-shadow: 0 -20px 60px rgba(0,0,0,.25); }
+    .ws-lines{ max-height:none; }
+    .ws-bar-mobile{ display:flex; position: fixed; left:12px; right:12px; bottom:12px; z-index: 260; background:#0a0a0a; color:#fff;
+      padding: 12px 12px 12px 18px; align-items:center; justify-content:space-between; gap: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+    .ws-bar-mobile b{ display:block; font-size:1.05rem; }
+    .ws-bar-mobile small{ font-family:'JetBrains Mono', monospace; font-size:.6rem; letter-spacing:.16em; color: rgba(255,255,255,.6); }
+    .ws-bar-mobile strong{ font-size:1.1rem; }
+    .ws-bar-mobile button{ background:#fff; color:#0a0a0a; border:0; padding: 12px 18px; font: inherit; font-weight:700; cursor:pointer; }
   }
-  .wholesale-page .lp-point{
-    padding: clamp(26px, 3vw, 34px);
-    border-right:1px solid rgba(0,0,0,.13); border-bottom:1px solid rgba(0,0,0,.13);
-  }
-  .wholesale-page .lp-point svg{ color:#0a0a0a; margin-bottom:16px; }
-  .wholesale-page .lp-point h3{
-    color:#0a0a0a; font-size:1.15rem; font-weight:700;
-    margin:0 0 10px; letter-spacing:-.02em; line-height:1.25;
-  }
-  .wholesale-page .lp-point p{ color:#55554f; font-size:.98rem; }
-  @media (max-width: 720px){
-    /* Stacked to one column, the container's left border and each card's
-       right border both become vertical lines running the full height of
-       the stack, boxing it in. Dropped for the same reason shipping.html
-       drops them: a single column needs no side borders to separate
-       anything, only the horizontal rule between cards. */
-    .wholesale-page .lp-points{ grid-template-columns:1fr; border-left:none; padding-left:0; }
-    .wholesale-page .lp-point{ border-right:none; padding-left:0; padding-right:0; }
-  }
-
-  /* ---------- the application form ----------
-     Recoloured for the white surface, the same square hairlined input the
-     sign-in page's own form uses (.si-field), not the dark-surface fill
-     this form was built against. */
-  .ws-form{ max-width: 560px; margin: clamp(40px, 5.5vw, 52px) auto 0; }
-  .ws-field{ margin-bottom: 16px; }
-  .ws-field label{
-    display:block; margin-bottom:9px;
-    font-size:.9rem; font-weight:500; color:#6e6e73;
-  }
-  .ws-field input, .ws-field textarea{
-    width:100%; padding: 14px 16px; border-radius: 0;
-    border:1px solid rgba(0,0,0,.22); background:#fff; color:#0a0a0a;
-    font-family:inherit; font-size:1rem;
-    transition: border-color .18s ease;
-  }
-  .ws-field textarea{ resize:vertical; min-height: 96px; }
-  .ws-field input::placeholder, .ws-field textarea::placeholder{ color:#8a8a86; }
-  .ws-field input:hover, .ws-field textarea:hover{ border-color: rgba(0,0,0,.4); }
-  .ws-field input:focus, .ws-field textarea:focus{ outline:none; border-color:#0a0a0a; }
-  .ws-field input:focus-visible, .ws-field textarea:focus-visible{
-    outline: 2px solid #0a0a0a; outline-offset: 2px;
-  }
-  .ws-field:focus-within label{ color:#0a0a0a; }
-
-  /* fields arrive one after another, like the rows above them */
-  .js .ws-form .ws-field, .js .ws-form .ws-submit{
-    opacity:0; transform: translateY(14px);
-    transition: opacity .6s var(--lp-ease), transform .6s var(--lp-ease);
-  }
-  .ws-form.in .ws-field, .ws-form.in .ws-submit{ opacity:1; transform:none; }
-  .ws-form.in .ws-field:nth-child(2){ transition-delay:.06s; }
-  .ws-form.in .ws-field:nth-child(3){ transition-delay:.12s; }
-  .ws-form.in .ws-field:nth-child(4){ transition-delay:.18s; }
-  .ws-form.in .ws-field:nth-child(5){ transition-delay:.24s; }
-  .ws-form.in .ws-submit{ transition-delay:.3s; }
-
-  .ws-submit{ margin-top: 26px; }
-  .ws-form{ transition: opacity .3s ease; }
-  .ws-form.is-gone{ opacity:0; }
-  .ws-error{
-    max-width: 560px; margin: clamp(40px, 5.5vw, 52px) auto 0;
-    color:#c0392b; font-size:.95rem;
-  }
-  .ws-error[hidden]{ display:none; }
-
-  /* ---------- the confirmation ----------
-     Submitting is the one thing this page is for, so it gets a real moment
-     instead of a line of text appearing under the button. */
-  .ws-done{ max-width: 560px; margin: clamp(40px, 5.5vw, 52px) auto 0; }
-  .ws-done[hidden]{ display:none; }
-  .ws-done-mark{ display:block; margin: 0 0 20px; color:#0a0a0a; }
-  .js .ws-done-mark .lp-draw{
-    stroke-dasharray: 1; stroke-dashoffset: 1;
-    transition: stroke-dashoffset .85s var(--lp-ease);
-  }
-  .ws-done.is-in .ws-done-mark .lp-draw{ stroke-dashoffset: 0; }
-  .ws-done.is-in .ws-tick{ transition-delay: .38s; }
-  .ws-done h3{ color:#0a0a0a; font-size: clamp(1.35rem, 2.4vw, 1.75rem); letter-spacing:-.035em; margin: 0 0 10px; }
-  .ws-done p{ font-size: 1.02rem; margin: 0; color:#55554f; }
-  .js .ws-done > *{ opacity:0; transform: translateY(12px); transition: opacity .6s var(--lp-ease), transform .6s var(--lp-ease); }
-  .ws-done.is-in > *{ opacity:1; transform:none; }
-  .ws-done.is-in h3{ transition-delay: .18s; }
-  .ws-done.is-in p{ transition-delay: .26s; }
-
-  /* ---------- marks ----------
-     Each one animates the idea in its own heading: the bars step lower,
-     the contact comes online, the fill level rises. */
-  .ws-bar{ transform-box: view-box; transform-origin: center 21px; transition: transform .55s var(--lp-ease); }
-  .lp-point:hover .ws-bar1{ transform: scaleY(.80); }
-  .lp-point:hover .ws-bar2{ transform: scaleY(.72); transition-delay:.05s; }
-  .lp-point:hover .ws-bar3{ transform: scaleY(.60); transition-delay:.1s; }
-
-  .ws-live{ transform-box: view-box; transform-origin: 18.4px 5.6px; transform: scale(0); transition: transform .4s var(--lp-ease); }
-  .lp-point:hover .ws-live{ transform: scale(1); }
-
-  .ws-fill{ transform-box: view-box; transform-origin: center; transition: transform .55s var(--lp-ease); }
-  .lp-point:hover .ws-fill{ transform: translateY(-3.6px); }
-
-  @media (prefers-reduced-motion: reduce){
-    .lp-point:hover .ws-bar1, .lp-point:hover .ws-bar2, .lp-point:hover .ws-bar3,
-    .lp-point:hover .ws-fill{ transform: none; }
-    .ws-live{ transform: scale(1); }
+  @media (max-width: 560px){
+    .ws-grid{ gap: 10px; }
+    .ws-body{ padding: 12px 10px 12px; }
+    .ws-body h3{ font-size:.98rem; }
+    .ws-size{ min-width: 0; flex-basis: 100%; }
+    .ws-rate strong{ font-size:1.12rem; }
+    .ws-add{ padding: 12px 6px; font-size:.9rem; }
+    .ws-tier{ padding: 14px; }
   }
 </style>
 <script type="application/ld+json">
@@ -184,7 +157,7 @@
   "@id": "https://glowresearch.shop/wholesale.html#webpage",
   "url": "https://glowresearch.shop/wholesale.html",
   "name": "Wholesale",
-  "description": "Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day.",
+  "description": "Bulk research peptide pricing: 40% off from 10 units of a compound, 50% from 50, and 55% on orders of 100+ units. Free FedEx 2-Day shipping.",
   "isPartOf": {
     "@id": "https://glowresearch.shop/#website"
   },
@@ -270,114 +243,85 @@
 </header>
 
 
-<main class="lp-page wholesale-page">
+<main class="lp-page ws-page">
 
-<section class="lp-hero">
+<section class="ws-hero">
   <div class="container">
-    <h1>Order more, pay less.</h1>
-    <p class="lp-lede">
-      Volume pricing, a named contact, and custom fill sizes for labs buying
-      in quantity. Applications are answered within one business day.
+    <span class="ws-kicker">Wholesale</span>
+    <h1>Buy in bulk. Save up to 55%.</h1>
+    <p id="wsLede">
+      Wholesale pricing starts at 10 units of a compound: every unit is 40% off
+      from 10, 50% off once a compound reaches 50, and 55% off everything once
+      the order reaches 100 units, any mix. One checkout, shipped free on FedEx
+      2-Day.
     </p>
-    <div class="lp-actions">
-      <a href="#apply" class="btn btn-primary btn-lg">Apply for an account <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
-    </div>
-  </div>
-</section>
 
-<section class="lp-section">
-  <div class="container">
-    <span class="eyebrow">Volume pricing</span>
-    <h2 class="lp-h2">Your rate drops as your volume climbs.</h2>
-
-    <div class="lp-points reveal">
-      <div class="lp-point">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-          <path pathLength="1" class="lp-draw" d="M3 21h18"/>
-          <path pathLength="1" class="lp-draw ws-bar ws-bar1" d="M6.5 21V7"/>
-          <path pathLength="1" class="lp-draw ws-bar ws-bar2" d="M12 21v-8.5"/>
-          <path pathLength="1" class="lp-draw ws-bar ws-bar3" d="M17.5 21v-4.5"/>
-        </svg>
-        <h3>Tiered pricing</h3>
-        <p>40% off starting at 10 vials a month, scaling to 45% at 250&ndash;499. Custom quote at 500 and up.</p>
+    <div class="ws-tiers">
+      <div class="ws-tier">
+        <div class="ws-pills"><span class="on">10</span><span>50</span><span>100+</span></div>
+        <b>40%</b><strong>10 to 49 of a compound</strong><small>off every unit of that compound, any sizes</small>
       </div>
-      <div class="lp-point">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-          <circle pathLength="1" class="lp-draw" cx="12" cy="8.4" r="3.6"/>
-          <path pathLength="1" class="lp-draw" d="M5.2 20.5c0-3.75 3.05-6.8 6.8-6.8s6.8 3.05 6.8 6.8"/>
-          <circle class="ws-live" cx="18.4" cy="5.6" r="2.1" fill="currentColor" stroke="none"/>
-        </svg>
-        <h3>A named contact</h3>
-        <p>One person who knows your account and reorders with you directly, not a ticket queue.</p>
+      <div class="ws-tier">
+        <div class="ws-pills"><span>10</span><span class="on">50</span><span>100+</span></div>
+        <b>50%</b><strong>50+ of a compound</strong><small>every unit of that compound, not only the extras</small>
       </div>
-      <div class="lp-point">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-          <rect pathLength="1" class="lp-draw" x="8.6" y="2.6" width="6.8" height="2.9" rx="0.5"/>
-          <path pathLength="1" class="lp-draw" d="M9.7 5.5v11.9a2.3 2.3 0 0 0 2.3 2.3 2.3 2.3 0 0 0 2.3-2.3V5.5"/>
-          <path pathLength="1" class="lp-draw ws-fill" d="M9.7 13.6h4.6"/>
-        </svg>
-        <h3>Custom fills</h3>
-        <p>Fill sizes and compounds outside the public catalog, on the same three independent tests as a retail order.</p>
+      <div class="ws-tier is-top">
+        <div class="ws-pills"><span>10</span><span>50</span><span class="on">100+</span></div>
+        <b>55%</b><strong>Orders of 100+ units</strong><small>every unit in the order, any mix of compounds</small>
+      </div>
+      <div class="ws-tier">
+        <div class="ws-pills"><span class="on">FedEx</span></div>
+        <b>Free</b><strong>FedEx 2-Day shipping</strong><small>every wholesale order clears the free-shipping line, same-day dispatch before 1:00 PM PT</small>
       </div>
     </div>
   </div>
 </section>
 
-<section class="lp-section" id="apply">
-  <div class="container">
-    <span class="eyebrow">Open an account</span>
-    <h2 class="lp-h2">Five fields. We do the rest by email.</h2>
-    <p class="lp-sub">10-vial monthly minimum to qualify.</p>
-
-    <form class="ws-form reveal" id="wsForm">
-      <div class="ws-field">
-        <label for="wsName">Contact name</label>
-        <input type="text" id="wsName" name="name" placeholder="Dr. Jane Okafor" required />
-      </div>
-      <div class="ws-field">
-        <label for="wsCompany">Company or institution</label>
-        <input type="text" id="wsCompany" name="company" placeholder="Northline Research Lab" required />
-      </div>
-      <div class="ws-field">
-        <label for="wsEmail">Work email</label>
-        <input type="email" id="wsEmail" name="email" placeholder="jane@lab.com" required />
-      </div>
-      <div class="ws-field">
-        <label for="wsVolume">Expected monthly volume (vials)</label>
-        <input type="number" id="wsVolume" name="volume" placeholder="e.g. 40" min="10" step="1" required />
-      </div>
-      <div class="ws-field">
-        <label for="wsCompounds">Compounds of interest</label>
-        <textarea id="wsCompounds" name="compounds" placeholder="BPC-157, TB-500, GLP-1 (SM). Note any custom fill sizes here." required></textarea>
-      </div>
-      <div class="ws-submit">
-        <button type="submit" class="btn btn-primary" id="wsSubmitBtn" aria-busy="false"><span class="btn-label"><span>Submit application</span></span> <span class="lp-arrow" aria-hidden="true">&rarr;</span></button>
-      </div>
-    </form>
-
-    <div class="ws-done" id="wsDone" role="status" aria-live="polite" hidden>
-      <svg class="ws-done-mark" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle pathLength="1" class="lp-draw" cx="12" cy="12" r="9.4"/>
-        <path pathLength="1" class="lp-draw ws-tick" d="M7.8 12.4l2.9 2.9 5.5-5.9"/>
-      </svg>
-      <h3>Application received.</h3>
-      <p>The wholesale desk replies within one business day.</p>
-    </div>
-
-    <p class="ws-error" id="wsError" role="alert" hidden></p>
-
-    <p class="lp-fine">Wholesale orders are <strong>invoiced and paid in full before we place them</strong>. There are no net terms yet.</p>
-    <details class="disc">
-      <summary>Read the full terms <span class="disc-mark" aria-hidden="true"></span></summary>
-      <div class="disc-body">
-        <p class="lp-fine">
-      Ships in standard Glow Research vials with no private-label or custom branding.
-      For qualified researchers and institutions inside the United States. All products
-      are sold strictly for in-vitro laboratory research use.
-        </p>
-      </div>
-    </details>
+<section class="container ws-builder">
+  <div>
+    <input type="search" class="ws-search" id="wsSearch" placeholder="Search compounds" aria-label="Search compounds" />
+    <div class="ws-grid" id="wsGrid"></div>
   </div>
+
+  <aside class="ws-panel" id="wsPanel" aria-label="Your order">
+    <div class="ws-panel-head">
+      <h2>Your order</h2>
+      <span class="ws-units" id="wsUnits">0 UNITS</span>
+    </div>
+    <div class="ws-progress">
+      <div class="ws-bar"><i id="wsBarFill"></i></div>
+      <div class="ws-bar-labels"><span>0 UNITS</span><b>100 &middot; 55% ON EVERYTHING</b></div>
+      <p id="wsProgressMsg">Add 10 units of any compound to unlock wholesale pricing.</p>
+    </div>
+    <ul class="ws-lines" id="wsLines"></ul>
+    <div class="ws-sum">
+      <div><span>List price</span><s id="wsList">$0</s></div>
+      <div><span>You save</span><span id="wsSave">$0</span></div>
+      <div class="ws-total"><span>Order total</span><span id="wsTotal">$0</span></div>
+    </div>
+    <a href="checkout.html" class="ws-checkout" id="wsCheckout" aria-disabled="true">Checkout</a>
+    <p class="ws-fine">
+      Rates apply per compound, and to every unit once the order reaches 100.
+      Wholesale replaces buy 2, get 1 free and does not stack with it.
+      Tesamorelin is capped at 40% off and GLP-1 (SM) is capped at 50% off.
+      For laboratory research use only.
+    </p>
+  </aside>
+</section>
+
+<div class="ws-bar-mobile" id="wsBarMobile">
+  <div><b id="wsBarUnits">0 units</b><small>YOUR ORDER</small></div>
+  <strong id="wsBarTotal">$0</strong>
+  <button type="button" id="wsBarToggle" aria-controls="wsPanel" aria-expanded="false">Review</button>
+</div>
+
+<section class="container ws-faq">
+  <h2>Wholesale, answered.</h2>
+  <details><summary>What is the minimum for wholesale pricing?</summary><p>10 units of a compound. From 10 units every unit of that compound is 40% off, and from 50 units it is 50% off. Below 10, buy 2, get 1 free applies as usual.</p></details>
+  <details><summary>Can I mix compounds?</summary><p>Yes. Each compound earns its own rate from its own quantity, and once the whole order reaches 100 units every unit in it is 55% off, whatever the mix.</p></details>
+  <details><summary>Does wholesale stack with buy 2, get 1 free?</summary><p>No. Wholesale replaces it from 10 units, and the lower price always applies.</p></details>
+  <details><summary>Are any compounds capped?</summary><p>Two. Tesamorelin is capped at 40% off and GLP-1 (SM) at 50% off. Every other compound can reach 55%.</p></details>
+  <details><summary>How does a wholesale order ship?</summary><p>Free on FedEx 2-Day. Ordered by 1:00 PM Pacific on a dispatch day, it ships the same day, with tracking. Every lot ships with its published certificate of analysis.</p></details>
 </section>
 
 </main>
@@ -433,111 +377,11 @@
   </div>
 </footer>
 
-<script>
-  document.getElementById('stubYear').textContent = new Date().getFullYear();
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
-    });
-  }, { threshold: 0.15 });
-  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-  const hamburger = document.getElementById('hamburger');
-  const mainNav = document.getElementById('mainNav');
-  hamburger.addEventListener('click', () => {
-    mainNav.classList.toggle('open');
-    hamburger.classList.toggle('open');
-  });
-  mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mainNav.classList.remove('open')));
-  const header = document.getElementById('siteHeader');
-  window.addEventListener('scroll', () => {
-    header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
-  });
-
-  /* Application form. Posts to /api/wholesale-apply, which emails the
-     submission to wholesale@glowresearch.shop via Resend — there is no
-     portal or database behind this, just that one email.
-
-     Submitting swaps the form for a confirmation rather than appending a
-     line under the button, since the form has done its job by then. The
-     panel carries role="status", so the swap is announced rather than just
-     seen. */
-  (function () {
-    const form = document.getElementById('wsForm');
-    const done = document.getElementById('wsDone');
-    const error = document.getElementById('wsError');
-    if (!form || !done) return;
-    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const submitLabel = submitBtn.querySelector('.btn-label');
-    const submitArrow = submitBtn.querySelector('.lp-arrow');
-
-    // ring-of-eight-ticks spinner, same mark as checkout's place-order button
-    function spinHtml() {
-      let ticks = '';
-      for (let i = 0; i < 8; i++) {
-        const angle = i * 45;
-        const delay = (i * 0.1).toFixed(3);
-        ticks += `<i style="transform:rotate(${angle}deg) translate(0,-5px);animation-delay:-${delay}s"></i>`;
-      }
-      return `<span class="btn-spin" aria-hidden="true">${ticks}</span>`;
-    }
-    function setBusy(busy) {
-      submitLabel.style.opacity = '0';
-      setTimeout(() => {
-        submitLabel.innerHTML = (busy ? spinHtml() : '') + '<span>' + (busy ? 'Sending…' : 'Submit application') + '</span>';
-        submitLabel.style.opacity = '1';
-      }, 120);
-      submitBtn.disabled = busy;
-      submitBtn.setAttribute('aria-busy', busy ? 'true' : 'false');
-      if (submitArrow) submitArrow.style.display = busy ? 'none' : '';
-    }
-
-    function show() {
-      form.hidden = true;
-      done.hidden = false;
-      if (still) { done.classList.add('is-in'); return; }
-      // one frame with the panel laid out but not yet marked, so the
-      // transition has a start value to run from
-      requestAnimationFrame(() => requestAnimationFrame(() => done.classList.add('is-in')));
-    }
-
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      error.hidden = true;
-      setBusy(true);
-
-      try {
-        const resp = await fetch('/api/wholesale-apply', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: document.getElementById('wsName').value,
-            company: document.getElementById('wsCompany').value,
-            email: document.getElementById('wsEmail').value,
-            volume: document.getElementById('wsVolume').value,
-            compounds: document.getElementById('wsCompounds').value,
-          }),
-        });
-        const data = await resp.json().catch(() => ({}));
-        if (!resp.ok) throw new Error(data.error || 'Could not send your application.');
-
-        form.reset();
-        if (still) { show(); return; }
-        form.classList.add('is-gone');
-        setTimeout(show, 300);
-      } catch (err) {
-        error.hidden = false;
-        error.textContent = err.message;
-      } finally {
-        setBusy(false);
-      }
-    });
-  })();
-</script>
 <script src="js/products-data.js"></script>
 <script src="https://js.stripe.com/v3/"></script>
 <script src="js/express-pay.js"></script>
 <script src="js/cart.js"></script>
+<script src="js/wholesale.js"></script>
 <script src="js/cart-modal.js"></script>
 <script src="js/search.js"></script>
 <script src="js/account.js"></script></body>

@@ -278,7 +278,7 @@
   // comparison rather than the headline.
   function renderPrice() {
     const s = size();
-    const unit = unitPriceAt(s.price, qty);
+    const unit = unitPriceAt(s.price, qty, qty, s.sku);
     // The higher of the launch list price and the plain per-vial price, for
     // the same reason lineRef() in js/cart.js takes a max: a quantity earning
     // a bulk tier must not quote a reference below the launch price.
@@ -300,7 +300,7 @@
     // question at every quantity rather than switching to a different one
     // right at the multiples.
     const note = $('pdPriceNote');
-    if (note) note.textContent = nextFreeNudge(qty);
+    if (note) note.textContent = nextTierNudge(qty, s.sku);
 
     // The per-vial rate. Quiet, and only shown once there's a bundle rate to
     // state — at one vial it would just repeat the price above it.
@@ -437,7 +437,7 @@
         qty,
         unitOriginal: s.price,
         unitList: listPriceOf(s),
-        unitSale: unitPriceAt(s.price, qty),
+        unitSale: unitPriceAt(s.price, qty, qty, s.sku),
       });
     };
 

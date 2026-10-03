@@ -52,8 +52,12 @@
   // 2 more charged the 1-vial rate on all three. The customer reaching a tier
   // and not being given it is the version of this that actually costs them
   // money.
+  //
+  // count() goes in too: the 100-unit wholesale tier is order-wide, so a
+  // line's price depends on every other line. The SKU finds the compound's
+  // wholesale cap, the same lookup api/_lib.js makes.
   const lineUnit = i => (typeof unitPriceAt === 'function'
-    ? unitPriceAt(i.unitOriginal, i.qty)
+    ? unitPriceAt(i.unitOriginal, i.qty, count(), i.sku || i.name)
     : i.unitSale);
 
   // What the struck-through price is measured against. Two separate things can
@@ -495,6 +499,34 @@
     if (!overlay || !overlay.classList.contains('open')) open();
   }
 
+  // Set a line to an exact quantity, adding it if it is missing and removing
+  // it at zero. The wholesale page steps in tens and needs this without the
+  // drawer opening on every press, which add() does.
+  function set(item, qty) {
+    const key = item.name + '::' + item.variant;
+    const found = items.find(i => i.name + '::' + i.variant === key);
+    const n = Math.max(0, Math.floor(Number(qty)) || 0);
+    if (!n) { items = items.filter(i => i !== found); save(); render(); return; }
+    if (found) found.qty = n;
+    else {
+      if (window.GlowAnalytics) {
+        window.GlowAnalytics.track('cart_add', {
+          sku: item.sku || skuFor(item.name, item.variant), name: item.name,
+          variant: item.variant, qty: n, price: Number(item.unitOriginal) || null,
+        });
+      }
+      items.push({
+        name: item.name, variant: item.variant,
+        sku: item.sku || skuFor(item.name, item.variant),
+        qty: n, unitOriginal: item.unitOriginal,
+        unitList: Number(item.unitList) || listFor(item.name, item.variant),
+        unitSale: item.unitOriginal,
+      });
+    }
+    save();
+    render();
+  }
+
   function clear() {
     items = [];
     save();
@@ -504,7 +536,7 @@
   // items() hands back copies so callers (the checkout page) cannot mutate
   // cart state behind our back
   window.GlowCart = {
-    add, open, close, count, subtotal, clear,
+    add, set, open, close, count, subtotal, clear,
     // unitSale is overwritten with the price this line's quantity actually
     // earns. js/checkout.js and api/create-order.js both total from it, so a
     // stale stored figure here is what the customer would be charged.

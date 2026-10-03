@@ -74,8 +74,8 @@ const PAGE_META = {
   },
   'wholesale.html': {
     name: 'Wholesale',
-    title: t('Wholesale'),
-    desc: 'Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day.',
+    title: 'Wholesale Peptides: Buy in Bulk, Save up to 55% | Glow Research',
+    desc: 'Bulk research peptide pricing: 40% off from 10 units of a compound, 50% from 50, and 55% on orders of 100+ units. Free FedEx 2-Day shipping.',
   },
   'affiliates.html': {
     name: 'Peptide Affiliate Program',
@@ -90,7 +90,7 @@ const PAGE_META = {
   'contact.html': {
     name: 'Contact Us',
     title: t('Contact Us'),
-    desc: 'Reach the Glow Research team at support@glowresearch.shop for order status, wholesale applications, or general questions.',
+    desc: 'Reach the Glow Research team at support@glowresearch.shop for order status, bulk orders, or general questions.',
   },
   'privacy.html': {
     name: 'Privacy Policy',

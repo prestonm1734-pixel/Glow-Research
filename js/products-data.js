@@ -508,6 +508,8 @@ const GLOW_PRODUCTS = [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
   { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:null,
+    // Cost does not carry the deeper wholesale tiers: capped at 50%.
+    wholesaleMaxOff: 0.50,
     coa: 'assets/coas/g1-s-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.96 mg' },
     sizes: [{ mg: '10mg', price: 74.97, list: 82, sku: 'GLO-SM10', image: 'assets/products/g1-s-10mg-v5.webp' }],
@@ -520,6 +522,8 @@ const GLOW_PRODUCTS = [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
   { name: 'Tesamorelin', tag: 'Growth Hormone Secretagogue', cat: 'growth', purity: '99.36%', lot: '1002', badge:null,
+    // Cost does not carry the deeper wholesale tiers: capped at 40%.
+    wholesaleMaxOff: 0.40,
     coa: 'assets/coas/tesamorelin-lot-1002.pdf', coaRef: 'R934-S6U9', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.59 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [{ mg: '10mg', price: 119.97, list: 132, sku: 'GLO-TSM10', image: 'assets/products/tesamorelin-10mg-v3.webp' }],
@@ -1387,9 +1391,74 @@ function bulkOff(qty) {
 // Rounded here, once, and the line total is this figure times the quantity.
 // Rounding the total instead would let "unit x qty" not equal the total the
 // cart charges, and the cart lines are built from exactly this number.
-function unitPriceAt(listUnit, qty) {
-  if (qty <= 0) return round2(listUnit * (1 - SITEWIDE_DISCOUNT));
-  return round2(listUnit * (1 - SITEWIDE_DISCOUNT) * paidVials(qty) / qty);
+//
+// orderUnits and key are for the wholesale ladder below. orderUnits is every
+// vial in the order across all compounds (the 100-unit tier is order-wide);
+// key is the size's SKU, or the product name, so a compound's cap can be
+// found. Both are optional: called with two arguments this prices a line on
+// its own, which is what the product page's buy box shows.
+//
+// Wholesale replaces buy-2-get-1 once it applies, never stacks with it: the
+// line pays whichever is cheaper, and from 10 units the wholesale rate always
+// is.
+function unitPriceAt(listUnit, qty, orderUnits, key) {
+  const base = listUnit * (1 - SITEWIDE_DISCOUNT);
+  if (qty <= 0) return round2(base);
+  const b2g1 = base * paidVials(qty) / qty;
+  const off = wholesaleOff(qty, Math.max(qty, Number(orderUnits) || 0), key);
+  return round2(off > 0 ? Math.min(b2g1, base * (1 - off)) : b2g1);
+}
+
+// Wholesale: a percentage off every unit, earned by quantity. The first two
+// tiers count one compound's units, the third counts the whole order, any mix.
+// One ladder above buy-2-get-1 (33% at most), with no gap between them.
+//
+// Read by the wholesale page, the product page, the cart and api/_lib.js,
+// which is what actually prices the charge, so a rate changed here is a rate
+// changed everywhere at once.
+const WHOLESALE_TIERS = [
+  { min: 10, off: 0.40, scope: 'product' },
+  { min: 50, off: 0.50, scope: 'product' },
+  { min: 100, off: 0.55, scope: 'order' },
+];
+const WHOLESALE_MIN = WHOLESALE_TIERS[0].min;
+const WHOLESALE_MAX_OFF = Math.max(...WHOLESALE_TIERS.map(t => t.off));
+
+// The deepest rate a compound can reach, for the two whose cost does not carry
+// the top tiers. Set on the catalog row (`wholesaleMaxOff`) and looked up by
+// SKU or name, so a cart line saved under an old product name still finds it.
+function wholesaleCap(key) {
+  if (!key) return WHOLESALE_MAX_OFF;
+  const p = GLOW_PRODUCTS.find(pr => pr.name === key || pr.sizes.some(s => s.sku === key));
+  return p && typeof p.wholesaleMaxOff === 'number' ? p.wholesaleMaxOff : WHOLESALE_MAX_OFF;
+}
+
+function wholesaleOff(qty, orderUnits, key) {
+  let off = 0;
+  WHOLESALE_TIERS.forEach(t => {
+    const n = t.scope === 'order' ? Math.max(qty, orderUnits || 0) : qty;
+    if (n >= t.min && t.off > off) off = t.off;
+  });
+  return Math.min(off, wholesaleCap(key));
+}
+
+// The pill under the product page price: what the next step up earns. Below
+// the wholesale minimum it is the buy-2-get-1 nudge; from there it names the
+// next wholesale rate this compound can actually reach, and says so plainly
+// once it has the top one.
+function nextTierNudge(qty, key) {
+  const cap = wholesaleCap(key);
+  if (qty < WHOLESALE_MIN - 1) return nextFreeNudge(qty);
+  if (qty < WHOLESALE_MIN) {
+    return `Add ${WHOLESALE_MIN - qty} more for ${Math.round(Math.min(WHOLESALE_TIERS[0].off, cap) * 100)}% off every vial.`;
+  }
+  const now = wholesaleOff(qty, qty, key);
+  const next = WHOLESALE_TIERS.find(t => t.min > qty && Math.min(t.off, cap) > now);
+  if (!next) return `${Math.round(now * 100)}% off every vial, the best rate on this compound.`;
+  const word = next.scope === 'order' ? 'vials in your order' : 'more';
+  return next.scope === 'order'
+    ? `${next.min} ${word} unlocks ${Math.round(Math.min(next.off, cap) * 100)}% off.`
+    : `Add ${next.min - qty} more for ${Math.round(Math.min(next.off, cap) * 100)}% off every vial.`;
 }
 
 // One row per card, priced for whichever mg the product page has selected.
@@ -1854,6 +1923,12 @@ if (typeof module !== 'undefined' && module.exports) {
     tierLabel,
     bulkOff,
     unitPriceAt,
+    WHOLESALE_TIERS,
+    WHOLESALE_MIN,
+    WHOLESALE_MAX_OFF,
+    wholesaleCap,
+    wholesaleOff,
+    nextTierNudge,
     PRODUCT_PAGES_LIVE,
     COAS_PUBLISHED,
     COA_COPY,

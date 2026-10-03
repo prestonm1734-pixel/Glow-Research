@@ -114,7 +114,7 @@ function ackHtml(m) {
       eyebrow('Faster answers') +
       fine('<strong style="color:#0a0a0a;">Order or shipping.</strong> Have your order number handy. It is on your confirmation email.') +
       fine('<strong style="color:#0a0a0a;">Certificates of analysis.</strong> Include the lot number from the vial.') +
-      fine('<strong style="color:#0a0a0a;">Wholesale and bulk.</strong> The <a href="https://glowresearch.shop/wholesale.html" style="color:#0a0a0a;">wholesale page</a> has the application form and answers most of it.'),
+      fine('<strong style="color:#0a0a0a;">Wholesale and bulk.</strong> The <a href="https://glowresearch.shop/wholesale.html" style="color:#0a0a0a;">wholesale page</a> prices bulk orders up to 55% off and checks out directly.'),
     ],
   });
 }
@@ -136,8 +136,8 @@ function ackText(m) {
     '  - Order or shipping. Have your order number handy. It is on your',
     '    confirmation email.',
     '  - Certificates of analysis. Include the lot number from the vial.',
-    '  - Wholesale and bulk. The wholesale page has the application form and',
-    '    answers most of it.',
+    '  - Wholesale and bulk. The wholesale page prices bulk orders up to 55%',
+    '    off and checks out directly.',
     '',
     'Glow Research',
   ].join('\n');

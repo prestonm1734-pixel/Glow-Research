@@ -2173,8 +2173,8 @@ console.log('\nbulk pricing');
   // the homepage line no longer does: its pill counts toward the next free
   // vial on that one product, priced off that line's own quantity.
   ok('and the product page still explains the mechanic the short line leaves out',
-    /nextFreeNudge\(qty\)/.test(read('js/product.js')) &&
-    /unitPriceAt\(size\.price, ignoreBulk \? 1 : qty\)/.test(read('api/_lib.js')));
+    /nextTierNudge\(qty, s\.sku\)/.test(read('js/product.js')) &&
+    /unitPriceAt\(size\.price, qty, orderUnits, size\.sku\)/.test(read('api/_lib.js')));
 
   const pjStepper = read('js/product.js');
   ok('the stepper has no upper bound and moves by one vial at a time',
@@ -2203,9 +2203,43 @@ console.log('\nbulk pricing');
   // at, the two ladders would be advertising against each other.
   ok('the bulk ceiling is one vial in three', Math.abs(BULK_MAX_OFF - 1 / 3) < 1e-9,
     `${(BULK_MAX_OFF * 100).toFixed(2)}%`);
-  ok('wholesale still starts richer than the retail ceiling',
-    /(3[4-9]|[4-9][0-9])% off starting at/.test(read('wholesale.html')),
-    'wholesale.html must open above the retail bulk ceiling (33.3%)');
+  // Wholesale: one ladder above buy-2-get-1, priced by the same unitPriceAt()
+  // the server charges from. The page's figures, its caps and its free
+  // shipping claim are each checked against the data that makes them true.
+  {
+    const D = require(path.join(ROOT, 'js/products-data.js'));
+    const ws = read('wholesale.html');
+    ok('wholesale opens richer than the buy-2-get-1 ceiling',
+      D.WHOLESALE_TIERS[0].off > BULK_MAX_OFF,
+      `${D.WHOLESALE_TIERS[0].off} vs ${BULK_MAX_OFF}`);
+    const tierText = D.WHOLESALE_TIERS.every(t => ws.includes(`<b>${Math.round(t.off * 100)}%</b>`)) &&
+      ws.includes(`Save up to ${Math.round(D.WHOLESALE_MAX_OFF * 100)}%`) &&
+      ws.includes(`${Math.round(D.WHOLESALE_TIERS[0].off * 100)}% off\n      from ${D.WHOLESALE_TIERS[0].min}`) &&
+      ws.includes(`once a compound reaches ${D.WHOLESALE_TIERS[1].min}`) &&
+      ws.includes(`once\n      the order reaches ${D.WHOLESALE_TIERS[2].min} units`);
+    ok('wholesale.html states the rates and thresholds WHOLESALE_TIERS holds', tierText);
+    const caps = GLOW_PRODUCTS.filter(p => typeof p.wholesaleMaxOff === 'number');
+    ok('and names every compound cap the catalog sets, at its figure',
+      caps.length > 0 && caps.every(p => ws.includes(`${p.name} is capped at ${Math.round(p.wholesaleMaxOff * 100)}%`)),
+      caps.map(p => p.name).join(', '));
+    // "Free FedEx 2-Day" is only true if the smallest possible wholesale order
+    // clears the cart's free-shipping line.
+    const freeAt = Number((read('js/cart.js').match(/FREE_SHIPPING_AT = (\d+)/) || [])[1]);
+    const smallest = Math.min(...GLOW_PRODUCTS.flatMap(p => p.sizes.map(z =>
+      D.unitPriceAt(z.price, D.WHOLESALE_MIN, D.WHOLESALE_MIN, z.sku) * D.WHOLESALE_MIN)));
+    ok('every wholesale order clears the free-shipping line, so "free FedEx 2-Day" holds',
+      freeAt > 0 && smallest >= freeAt, `smallest ${smallest.toFixed(2)} vs ${freeAt}`);
+    ok('the builder writes into the real cart rather than keeping its own prices',
+      /GlowCart\.set\(/.test(read('js/wholesale.js')) && !/\* 0\.(4|5|55)\b/.test(read('js/wholesale.js')) &&
+      /unitPriceAt\(i\.unitOriginal, i\.qty, count\(\), i\.sku \|\| i\.name\)/.test(read('js/cart.js')));
+    ok('and the server prices with the order-wide unit count and the SKU cap',
+      /const orderUnits = items\.reduce/.test(read('api/_lib.js')) &&
+      /unitPriceAt\(size\.price, qty, orderUnits, size\.sku\)/.test(read('api/_lib.js')));
+    // The two caps from the margin review, pinned to the price they produce.
+    const at = (n, q, o) => { const z = GLOW_PRODUCTS.find(p => p.name === n).sizes[0]; return D.unitPriceAt(z.price, q, o, z.sku) / z.price; };
+    ok('Tesamorelin never prices below 40% off, GLP-1 (SM) never below 50%',
+      Math.abs(at('Tesamorelin', 100, 100) - 0.6) < 0.001 && Math.abs(at('GLP-1 (SM)', 100, 100) - 0.5) < 0.001);
+  }
 
   // The pill under the price counts forward to the next free vial, at every
   // quantity including exact multiples of the group size (a full group away,
@@ -2218,7 +2252,7 @@ console.log('\nbulk pricing');
     priceNoteHtml === nextFreeNudge(1),
     `run this sentence into product.html:\n          ${nextFreeNudge(1)}`);
   ok('js/product.js keeps it live from renderPrice(), which runs on every qty change',
-    /function renderPrice\(\)[\s\S]{0,1200}nextFreeNudge\(qty\)/.test(read('js/product.js')));
+    /function renderPrice\(\)[\s\S]{0,1200}nextTierNudge\(qty, s\.sku\)/.test(read('js/product.js')));
 
   // nextFreeNudge() itself: always the distance to the *next* free vial, not
   // the one just earned, checked across three full cycles so the "back to a
@@ -2259,9 +2293,9 @@ console.log('\nbulk pricing');
     !/GlowCart\.add/.test(tierHandler), 'a card press must never touch the cart');
 
   // One function prices the buy box, the cart line and the generated page.
-  ok('the buy box prices from unitPriceAt()', /unitPriceAt\(s\.price, qty\)/.test(pj));
+  ok('the buy box prices from unitPriceAt()', /unitPriceAt\(s\.price, qty, qty, s\.sku\)/.test(pj));
   ok('the cart line is charged the price the buy box quoted',
-    /unitSale: unitPriceAt\(s\.price, qty\)/.test(pj));
+    /unitSale: unitPriceAt\(s\.price, qty, qty, s\.sku\)/.test(pj));
   ok('the generated page bakes the same function',
     /unitPriceAt\(s\.price, 1\)/.test(read('tools/build-products.js')));
 

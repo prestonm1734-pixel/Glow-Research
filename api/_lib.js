@@ -122,6 +122,9 @@ function buildLines(items, { ignoreBulk = false } = {}) {
     throw new Error('The cart is empty.');
   }
 
+  // Every vial in the order, for the order-wide 100-unit wholesale tier.
+  const orderUnits = items.reduce((n, i) => n + Math.max(1, Math.floor(Number(i.qty)) || 1), 0);
+
   return items.map(i => {
     // The SKU is the stable identity; the display name is not. A cart lives
     // in localStorage for weeks and outlives a rename — three products were
@@ -154,7 +157,7 @@ function buildLines(items, { ignoreBulk = false } = {}) {
       throw new Error(`${p.name} ${size.mg} is out of stock.`);
     }
     const qty = Math.max(1, Math.floor(Number(i.qty)) || 1);
-    const unitSale = unitPriceAt(size.price, ignoreBulk ? 1 : qty);
+    const unitSale = ignoreBulk ? unitPriceAt(size.price, 1) : unitPriceAt(size.price, qty, orderUnits, size.sku);
     return { name: p.name, variant: size.mg, sku: size.sku, qty, unitSale, total: round2(unitSale * qty) };
   });
 }
@@ -175,7 +178,11 @@ export function priceOrder(items, shippingMethodId) {
   // below is what a promo code is actually compared against; this field is
   // only ever informational past that (e.g. what js/checkout.js shows before
   // anyone has typed a code).
-  const hasBulkDiscount = lines.some(l => bulkOff(l.qty) > 0);
+  const hasBulkDiscount = lines.some(l => {
+    const p = GLOW_PRODUCTS.find(pr => pr.sizes.some(s => s.sku === l.sku));
+    const size = p && p.sizes.find(s => s.sku === l.sku);
+    return size ? l.unitSale < unitPriceAt(size.price, 1) : bulkOff(l.qty) > 0;
+  });
   return { ...priced, hasBulkDiscount };
 }
 
