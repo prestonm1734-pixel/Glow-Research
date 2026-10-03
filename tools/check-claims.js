@@ -4207,6 +4207,17 @@ console.log('\nhero image');
       return nav && !/href="(?:\/|(?:\.\.\/)*)partners\.html"/.test(nav);
     });
     ok('every page header links to the partner program', noPartnerNav.length === 0, noPartnerNav.join(', '));
+    // The page repeats the rate, the cookie and the payout methods in the
+    // hero, the steps, the calculator and the FAQ. Every one of those has to
+    // be PARTNER_PROGRAM's, not just the terms card.
+    const ptMain = (pt.match(/<main[\s\S]*?<\/main>/) || [''])[0].replace(/<!--[\s\S]*?-->/g, '');
+    const pcts = [...new Set((ptMain.match(/\b\d+%/g) || []))];
+    const days = [...new Set((ptMain.match(/\b(\d+)[- ]days?\b/g) || []).map(d => d.match(/\d+/)[0]))];
+    ok('every rate, cookie length and payout list on the partner page is PARTNER_PROGRAM\'s',
+      pcts.every(x => x === `${PP.commissionPct}%`) && days.every(d => Number(d) === PP.cookieDays) &&
+      (ptMain.match(/PayPal[^.<]*/g) || []).every(t => t.startsWith(PP.payouts)) &&
+      /PARTNER_PROGRAM\.commissionPct/.test(pt),
+      `rates ${pcts.join(', ')} | days ${days.join(', ')}`);
     // Partners get a referral link only: the store runs no discounts or promo
     // codes for partners, and GoAffPro on the SDK platform cannot create a
     // code our Stripe-validated checkout would accept anyway.

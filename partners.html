@@ -29,21 +29,90 @@
 <link rel="preload" href="assets/fonts/sora.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  /* ---------- partner program ---------- */
-  .pt-eyebrow{ display:block; margin-bottom: 14px; }
-  .pt-terms{ max-width: 720px; margin: 0 auto; padding: 8px 28px; border:1px solid rgba(0,0,0,.14); border-radius: 18px; background:#fafaf8; }
+  /* ---------- partner program ----------
+     Built after the strongest partner pages in this category, holding only
+     what is true here: one flat rate (no tiers), instant approval (GoAffPro
+     auto-approves), a 30-day cookie and the payout methods actually turned
+     on. Every figure comes from PARTNER_PROGRAM in js/products-data.js and
+     check-claims.js fails the build if the page and that object disagree. */
+  .pt-hero{ background:#0a0a0a; color:#fff; padding: clamp(48px, 7vw, 96px) 0; overflow:hidden; }
+  .pt-hero-grid{ display:grid; grid-template-columns: minmax(0,1.05fr) minmax(0,.95fr); gap: 48px; align-items:center; }
+  .pt-kicker{ font-family:'JetBrains Mono', monospace; font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+  .pt-hero h1{ font-size: clamp(2.2rem, 4.6vw, 3.6rem); line-height:1.04; letter-spacing:-.035em; font-weight:600; margin: 14px 0 18px; color:#fff; }
+  .pt-hero p{ font-size: 1.08rem; line-height:1.6; color: rgba(255,255,255,.72); max-width: 52ch; margin:0 0 28px; }
+  .pt-hero-actions{ display:flex; flex-wrap:wrap; gap: 14px 22px; align-items:center; }
+  .pt-btn{ display:inline-flex; align-items:center; gap:8px; padding: 16px 26px; background:#fff; color:#0a0a0a; font-weight:700; text-decoration:none; border:1px solid #fff; }
+  .pt-btn:hover{ background:#e6e6e3; border-color:#e6e6e3; color:#0a0a0a; }
+  .pt-btn-dark{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+  .pt-btn-dark:hover{ background:#2a2a27; border-color:#2a2a27; color:#fff; }
+  .pt-link{ color:#fff; font-weight:600; text-decoration:underline; text-underline-offset:4px; }
+  .pt-hero-badges{ display:flex; flex-wrap:wrap; gap: 8px 18px; margin-top: 26px; font-family:'JetBrains Mono', monospace; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color: rgba(255,255,255,.55); }
+  .pt-hero-art{ position:relative; border:1px solid rgba(255,255,255,.14); }
+  .pt-hero-art img{ display:block; width:100%; height:auto; }
+  .pt-hero-art span{ position:absolute; left:18px; bottom:16px; padding: 8px 12px; background:#fff; color:#0a0a0a; font-weight:700; font-size:.92rem; }
+
+  .pt-sec{ padding: clamp(56px, 7vw, 92px) 0; }
+  .pt-sec + .pt-sec{ border-top:1px solid rgba(0,0,0,.1); }
+  .pt-sec-alt{ background:#f7f7f5; }
+  .pt-head{ text-align:center; max-width: 680px; margin: 0 auto 34px; }
+  .pt-head .pt-kicker{ color:#6b6b64; }
+  .pt-head h2{ font-size: clamp(1.8rem, 3.4vw, 2.5rem); letter-spacing:-.03em; line-height:1.1; margin: 10px 0 12px; color:#0a0a0a; font-weight:600; }
+  .pt-head p{ color:#55554f; line-height:1.6; margin:0; }
+
+  .pt-steps{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; }
+  .pt-step{ background:#fff; border:1px solid rgba(0,0,0,.12); padding: 28px 24px; text-align:center; }
+  .pt-step b{ display:inline-flex; width:38px; height:38px; align-items:center; justify-content:center; background:#0a0a0a; color:#fff; font-size:1rem; margin-bottom: 14px; }
+  .pt-step h3{ font-size:1.2rem; margin: 0 0 8px; color:#0a0a0a; }
+  .pt-step p{ margin:0; color:#55554f; line-height:1.6; font-size:.96rem; }
+
+  .pt-calc{ max-width: 920px; margin: 0 auto; }
+  .pt-sliders{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 28px; margin-bottom: 24px; }
+  .pt-sliders label{ display:flex; justify-content:space-between; font-weight:600; color:#0a0a0a; margin-bottom: 10px; font-size:.95rem; }
+  .pt-sliders output{ font-family:'JetBrains Mono', monospace; color:#0a0a0a; }
+  .pt-sliders input[type=range]{ width:100%; accent-color:#0a0a0a; }
+  .pt-result{ display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); border:1px solid rgba(0,0,0,.14); }
+  .pt-result-main{ background:#0a0a0a; color:#fff; padding: 30px 28px; }
+  .pt-result-main small{ color: rgba(255,255,255,.6); font-size:.9rem; }
+  .pt-result-main strong{ display:block; font-size: clamp(2.4rem, 5vw, 3.2rem); letter-spacing:-.03em; margin: 6px 0 2px; }
+  .pt-result-main em{ font-style:normal; color: rgba(255,255,255,.6); }
+  .pt-result-side{ background:#fff; padding: 26px 28px; display:flex; flex-direction:column; justify-content:center; gap: 14px; }
+  .pt-result-side div strong{ display:block; font-size:1.4rem; color:#0a0a0a; }
+  .pt-result-side div span{ color:#6b6b64; font-size:.9rem; }
+  .pt-fine{ color:#6b6b64; font-size:.85rem; line-height:1.55; margin: 14px 0 0; text-align:center; }
+
+  .pt-terms{ max-width: 760px; margin: 0 auto; padding: 8px 28px; border:1px solid rgba(0,0,0,.14); background:#fff; }
   .pt-terms div{ padding: 20px 0; border-bottom:1px solid rgba(0,0,0,.08); }
   .pt-terms div:last-child{ border-bottom:0; }
   .pt-terms dt{ font-family:'JetBrains Mono', monospace; font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:#55554f; margin-bottom: 8px; }
   .pt-terms dd{ margin:0; font-size:1.05rem; line-height:1.6; color:#2a2a27; }
   .pt-terms dd strong{ color:#0a0a0a; }
-  .pt-terms dd a{ color:#0a0a0a; font-weight:700; font-size:1.12rem; }
-  .pt-points{ max-width: 720px; margin: 22px auto 0; padding: 0; list-style:none; text-align:left; }
-  .pt-points li{ padding: 14px 0; border-bottom:1px solid rgba(0,0,0,.08); line-height:1.6; color:#3d3d39; }
-  .pt-points a, .pt-rules a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
-  .pt-rules{ max-width: 640px; margin-left:auto; margin-right:auto; }
-  @media (max-width: 600px){ .pt-terms{ padding: 4px 18px; } }
+  .pt-terms dd a{ color:#0a0a0a; font-weight:700; font-size:1.1rem; }
 
+  .pt-proof{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; max-width: 960px; margin: 0 auto; }
+  .pt-proof div{ border:1px solid rgba(0,0,0,.12); padding: 24px; background:#fff; }
+  .pt-proof h3{ margin: 0 0 8px; font-size:1.1rem; color:#0a0a0a; }
+  .pt-proof p{ margin:0; color:#55554f; line-height:1.6; }
+  .pt-proof a, .pt-rules a, .pt-faq a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
+
+  .pt-cta{ background:#0a0a0a; color:#fff; text-align:center; padding: clamp(48px, 6vw, 72px) 24px; }
+  .pt-cta h2{ color:#fff; font-size: clamp(1.8rem, 3.4vw, 2.4rem); margin: 0 0 10px; letter-spacing:-.03em; font-weight:600; }
+  .pt-cta p{ color: rgba(255,255,255,.7); margin: 0 0 24px; }
+  .pt-cta small{ display:block; margin-top: 18px; color: rgba(255,255,255,.6); }
+  .pt-cta small a{ color:#fff; }
+
+  .pt-faq{ max-width: 780px; margin: 0 auto; }
+  .pt-faq details{ border:1px solid rgba(0,0,0,.12); background:#fff; margin-bottom: 10px; }
+  .pt-faq summary{ cursor:pointer; list-style:none; padding: 20px 22px; font-weight:600; font-size:1.02rem; color:#0a0a0a; display:flex; justify-content:space-between; gap: 16px; }
+  .pt-faq summary::-webkit-details-marker{ display:none; }
+  .pt-faq summary::after{ content:'+'; font-weight:400; font-size:1.3rem; line-height:1; }
+  .pt-faq details[open] summary::after{ content:'\2212'; }
+  .pt-faq details p{ margin:0; padding: 0 22px 20px; color:#55554f; line-height:1.65; }
+
+  @media (max-width: 860px){
+    .pt-hero-grid, .pt-steps, .pt-sliders, .pt-result, .pt-proof{ grid-template-columns: 1fr; }
+    .pt-hero-art{ order:-1; }
+    .pt-terms{ padding: 4px 18px; }
+  }
   /* Plain white page, the same construction as coa.html and the redesigned
      shipping.html: a scaled-down centred hero (h1 + one line of lede, no
      eyebrow, no split-colour headline, no live "answered in a day" dot)
@@ -287,22 +356,85 @@
 
 <main class="lp-page partners-page">
 
-<section class="lp-hero">
-  <div class="container">
-    <span class="eyebrow pt-eyebrow">Partner program</span>
-    <h1 id="ptHeadline">Earn 20% on every order you send us.</h1>
-    <p class="lp-lede">
-      Sign up and you get your own referral link right away, with a dashboard
-      that shows clicks, orders and earnings as they happen.
-    </p>
-    <div class="lp-actions">
-      <a href="https://glowresearch.goaffpro.com/create-account" class="btn btn-primary btn-lg" data-partner-signup>Create my partner account <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+<section class="pt-hero">
+  <div class="container pt-hero-grid">
+    <div>
+      <span class="pt-kicker">Partner program</span>
+      <h1 id="ptHeadline">Earn 20% on every order you send us.</h1>
+      <p>
+        Recommend research peptides with a certificate behind every lot. Sign
+        up and you get your own referral link right away, with a dashboard
+        that shows clicks, orders and earnings as they happen.
+      </p>
+      <div class="pt-hero-actions">
+        <a href="https://glowresearch.goaffpro.com/create-account" class="pt-btn" data-partner-signup>Become a partner <span aria-hidden="true">&rarr;</span></a>
+        <a href="#earnings" class="pt-link">Calculate your earnings</a>
+      </div>
+      <div class="pt-hero-badges">
+        <span>Free to join</span><span>Approved instantly</span><span>30-day cookie</span>
+      </div>
+    </div>
+    <div class="pt-hero-art">
+      <img src="assets/vial-trio-black-v3.jpg" alt="" width="1686" height="933" />
+      <span>20% on every referred order</span>
     </div>
   </div>
 </section>
 
-<section class="lp-section">
+<section class="pt-sec pt-sec-alt">
   <div class="container">
+    <div class="pt-head">
+      <span class="pt-kicker">How it works</span>
+      <h2>Start earning in 3 steps.</h2>
+    </div>
+    <div class="pt-steps">
+      <div class="pt-step"><b>1</b><h3>Sign up</h3><p>Create your partner account in a minute. Approval is instant, so your link is ready the moment you finish.</p></div>
+      <div class="pt-step"><b>2</b><h3>Share</h3><p>Post your link wherever researchers gather: social, YouTube, a blog, email, Discord or a group chat.</p></div>
+      <div class="pt-step"><b>3</b><h3>Earn</h3><p>Every order placed through your link earns 20% of the order subtotal, tracked live in your dashboard.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="pt-sec" id="earnings">
+  <div class="container">
+    <div class="pt-head">
+      <span class="pt-kicker">See your upside</span>
+      <h2>What could you earn?</h2>
+      <p>Drag the sliders to match your audience. One flat rate, on every referred order.</p>
+    </div>
+    <div class="pt-calc">
+      <div class="pt-sliders">
+        <div>
+          <label for="ptCustomers">Orders you refer per month <output id="ptCustomersOut">15</output></label>
+          <input type="range" id="ptCustomers" min="1" max="200" step="1" value="15" />
+        </div>
+        <div>
+          <label for="ptAov">Average order subtotal <output id="ptAovOut">$180</output></label>
+          <input type="range" id="ptAov" min="60" max="600" step="10" value="180" />
+        </div>
+      </div>
+      <div class="pt-result">
+        <div class="pt-result-main">
+          <small>Estimated earnings at 20%</small>
+          <strong id="ptMonthly">$540<em>/mo</em></strong>
+          <em id="ptYearly">$6,480 / year</em>
+        </div>
+        <div class="pt-result-side">
+          <div><strong id="ptVolume">$2,700</strong><span>Monthly sales you drive</span></div>
+          <div><strong id="ptPerOrder">$36</strong><span>Earned per referred order</span></div>
+        </div>
+      </div>
+      <p class="pt-fine">Estimates only. Commission is paid on approved referred orders, on the subtotal after shipping and taxes.</p>
+    </div>
+  </div>
+</section>
+
+<section class="pt-sec pt-sec-alt">
+  <div class="container">
+    <div class="pt-head">
+      <span class="pt-kicker">The terms</span>
+      <h2>Simple, and in writing.</h2>
+    </div>
     <dl class="pt-terms">
       <div>
         <dt>Commission</dt>
@@ -318,7 +450,7 @@
       </div>
       <div>
         <dt>Payouts</dt>
-        <dd id="ptPayouts">By PayPal or Stripe. Refunded or cancelled orders do not earn commission.</dd>
+        <dd id="ptPayouts">By PayPal, Venmo, Cash App or bank transfer. Refunded or cancelled orders do not earn commission.</dd>
       </div>
       <div>
         <dt>Already a partner?</dt>
@@ -328,30 +460,57 @@
   </div>
 </section>
 
-<section class="lp-section">
+<section class="pt-sec">
   <div class="container">
-    <span class="eyebrow">What you can point people to</span>
-    <h2 class="lp-h2">Proof, not promises.</h2>
-    <ul class="pt-points">
-      <li><strong>A certificate for every lot.</strong> Each compound has its own <a href="coa.html">certificate page</a> with the lot number, the laboratory, the report reference and the results.</li>
-      <li><strong>Independent testing.</strong> Purity by HPLC, identity and quantity on every lot, run by an outside laboratory. <a href="how-we-test.html">How we test</a>.</li>
-      <li><strong>Same-day shipping.</strong> Ordered by 1:00 PM Pacific, it ships that day on FedEx 2-Day. <a href="shipping.html">Shipping details</a>.</li>
-      <li><strong>Buy 2, get 1 free.</strong> Every third vial of the same compound is free, on the <a href="shop">whole catalog</a>.</li>
-    </ul>
+    <div class="pt-head">
+      <span class="pt-kicker">Why it converts</span>
+      <h2>Proof, not promises.</h2>
+      <p>Research buyers check before they buy. Every link you share lands on a page that answers them.</p>
+    </div>
+    <div class="pt-proof">
+      <div><h3>A certificate for every lot</h3><p>Each compound has its own <a href="coa.html">certificate page</a> with the lot number, the laboratory, the report reference and the results.</p></div>
+      <div><h3>Independent testing</h3><p>Purity by HPLC, identity and quantity on every lot, run by an outside laboratory. <a href="how-we-test.html">How we test</a>.</p></div>
+      <div><h3>Same-day shipping</h3><p>Ordered by 1:00 PM Pacific, it ships that day on FedEx 2-Day. <a href="shipping.html">Shipping details</a>.</p></div>
+      <div><h3>Buy 2, get 1 free</h3><p>Every third vial of the same compound is free, so your audience gets more for the same order. <a href="shop">See the catalog</a>.</p></div>
+    </div>
   </div>
 </section>
 
-<section class="lp-section">
+<section class="pt-sec pt-sec-alt">
   <div class="container">
-    <span class="eyebrow">The rules</span>
-    <h2 class="lp-h2">Research use only, in everything you post.</h2>
-    <p class="lp-sub pt-rules">
-      Partners promote research compounds for laboratory use only: no dosing
-      advice, no health or treatment claims, and nothing that suggests use in
-      people or animals. See our <a href="ruo-agreement.html">RUO Agreement</a>.
-    </p>
-    <div class="lp-actions">
-      <a href="https://glowresearch.goaffpro.com/create-account" class="btn btn-primary" data-partner-signup>Create my partner account <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+    <div class="pt-head">
+      <span class="pt-kicker">The rules</span>
+      <h2>Research use only, in everything you post.</h2>
+      <p class="pt-rules">
+        Partners promote research compounds for laboratory use only: no dosing
+        advice, no health or treatment claims, and nothing that suggests use in
+        people or animals. See our <a href="ruo-agreement.html">RUO Agreement</a>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="pt-cta">
+  <h2>Join the Glow Research Partner Program</h2>
+  <p>Free to join, no minimum audience, approved instantly.</p>
+  <a href="https://glowresearch.goaffpro.com/create-account" class="pt-btn" data-partner-signup>Become a partner <span aria-hidden="true">&rarr;</span></a>
+  <small>Questions before you join? Email <a href="mailto:support@glowresearch.shop">support@glowresearch.shop</a>.</small>
+</section>
+
+<section class="pt-sec">
+  <div class="container">
+    <div class="pt-head">
+      <span class="pt-kicker">Partner program FAQ</span>
+      <h2>Questions, answered.</h2>
+    </div>
+    <div class="pt-faq">
+      <details><summary>How much do I earn?</summary><p>20% of the order subtotal on every order placed through your link. Shipping and taxes are excluded, and the rate is the same on every product.</p></details>
+      <details><summary>How do I get paid?</summary><p>By PayPal, Venmo, Cash App or bank transfer. You choose your method in the partner dashboard, and your earnings are tracked there in real time.</p></details>
+      <details><summary>How long is the referral cookie?</summary><p>30 days. If someone clicks your link and orders within 30 days, the order is credited to you.</p></details>
+      <details><summary>Which products can I promote?</summary><p>The whole catalog. Every compound has a published certificate for its current lot, so you can link straight to the proof.</p></details>
+      <details><summary>Can I refer myself?</summary><p>No. Orders you place through your own link are not recorded, and neither are orders from other partners.</p></details>
+      <details><summary>What happens if a referred order is refunded?</summary><p>Refunded or cancelled orders do not earn commission. Sales are verified automatically against the order status.</p></details>
+      <details><summary>Is there a minimum audience?</summary><p>No. Sign-up is free and approval is instant, whatever the size of your following.</p></details>
     </div>
   </div>
 </section>
@@ -409,6 +568,27 @@
 </footer>
 
 <script src="js/products-data.js"></script>
+<script>
+/* Earnings calculator. The rate is PARTNER_PROGRAM.commissionPct from
+   js/products-data.js, loaded just above, so the estimate cannot quote a
+   different rate from the one stated on the page. */
+(function () {
+  var pct = (typeof PARTNER_PROGRAM !== 'undefined' ? PARTNER_PROGRAM.commissionPct : 20) / 100;
+  var c = document.getElementById('ptCustomers'), a = document.getElementById('ptAov');
+  if (!c || !a) return;
+  function usd(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+  function run() {
+    var n = Number(c.value), v = Number(a.value), vol = n * v, month = vol * pct;
+    document.getElementById('ptCustomersOut').textContent = n;
+    document.getElementById('ptAovOut').textContent = usd(v);
+    document.getElementById('ptMonthly').innerHTML = usd(month) + '<em>/mo</em>';
+    document.getElementById('ptYearly').textContent = usd(month * 12) + ' / year';
+    document.getElementById('ptVolume').textContent = usd(vol);
+    document.getElementById('ptPerOrder').textContent = usd(v * pct);
+  }
+  c.addEventListener('input', run); a.addEventListener('input', run); run();
+})();
+</script>
 <script src="https://js.stripe.com/v3/"></script>
 <script src="js/express-pay.js"></script>
 <script src="js/cart.js"></script>

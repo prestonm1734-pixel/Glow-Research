@@ -229,7 +229,7 @@ const X_PIXEL_ID = 'repwj';
 const PARTNER_PROGRAM = {
   commissionPct: 20,
   cookieDays: 30,
-  payouts: 'PayPal or Stripe',
+  payouts: 'PayPal, Venmo, Cash App or bank transfer',
   signupUrl: 'https://glowresearch.goaffpro.com/create-account',
   loginUrl: 'https://glowresearch.goaffpro.com/login',
   fallbackEmail: 'support@glowresearch.shop',
