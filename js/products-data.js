@@ -411,7 +411,9 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/bpc-157-lot-1400.pdf', coaRef: 'X9RM-SMBN', tested: '5 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.13 mg' },
     sizes: [
-      { mg: '10mg', price: 84.97, list: 93, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg-v3.webp' },
+      { mg: '10mg', price: 84.97, list: 93, sku: 'GLO-BC10', image: 'assets/products/bpc-157-10mg-v4.webp',
+        // Square full-bleed studio shot: fills the product-page stage.
+        fit: 'fill' },
     ],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
