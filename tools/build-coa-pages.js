@@ -225,8 +225,15 @@ function buildPage(p, donor) {
 // The homepage's certificate row: one tile per compound with a certificate,
 // its first page as an image (the .jpg beside the .pdf), linking to that
 // compound's certificate page. Written between markers in index.html.
+//
+// The three coded metabolic compounds are left out of this row only: their
+// certificates print the compound's full name, which the homepage does not
+// carry. They stay in the COA Library and on their own certificate pages.
+const STRIP_EXCLUDE = ['GLP-3 (RT)', 'GLP-1 (SM)', 'GLP-2 (TZ)'];
+const inStrip = p => eligible(p) && !STRIP_EXCLUDE.includes(p.name);
+
 function stripHtml() {
-  return GLOW_PRODUCTS.filter(eligible).map(p => {
+  return GLOW_PRODUCTS.filter(inStrip).map(p => {
     const img = coaHref(p).replace(/\.pdf$/i, '.jpg');
     return `      <a class="coa-tile" href="${OUT_DIR}/${productSlug(p.name)}/">
         <div class="coa-tile-doc"><img src="${esc(img)}" alt="Certificate of analysis for ${esc(p.name)}, lot ${esc(p.lot)}" width="560" height="725" loading="lazy" /></div>
@@ -240,7 +247,7 @@ function buildStrip() {
   const html = fs.readFileSync(file, 'utf8');
   const re = /(<!-- coa-strip:start -->)[\s\S]*?(<!-- coa-strip:end -->)/;
   if (!re.test(html)) throw new Error('index.html is missing the coa-strip markers.');
-  const missing = GLOW_PRODUCTS.filter(eligible)
+  const missing = GLOW_PRODUCTS.filter(inStrip)
     .map(p => coaHref(p).replace(/\.pdf$/i, '.jpg'))
     .filter(f => !fs.existsSync(path.join(ROOT, f)));
   if (missing.length) throw new Error(`Certificate images missing for the homepage row: ${missing.join(', ')}`);
@@ -261,9 +268,9 @@ function build() {
   });
   console.log(`  coa/: ${made.length} certificate pages (${made.join(', ')})`);
   buildStrip();
-  console.log(`  index.html: certificate row with ${made.length} certificates`);
+  console.log(`  index.html: certificate row with ${GLOW_PRODUCTS.filter(inStrip).length} certificates`);
 }
 
-module.exports = { build, eligible };
+module.exports = { build, eligible, STRIP_EXCLUDE };
 
 if (require.main === module) build();

@@ -4206,13 +4206,18 @@ console.log('\nhero image');
     // The homepage certificate row: every compound with a certificate, each
     // tile showing that certificate's own first page and linking to its page.
     const strip = (read('index.html').match(/<!-- coa-strip:start -->([\s\S]*?)<!-- coa-strip:end -->/) || [, ''])[1];
-    const offStrip = wantCoa.filter(p => {
+    const { STRIP_EXCLUDE } = require('./build-coa-pages.js');
+    const wantStrip = wantCoa.filter(p => !STRIP_EXCLUDE.includes(p.name));
+    ok('the three coded compounds stay out of the homepage certificate row',
+      ['GLP-3 (RT)', 'GLP-1 (SM)', 'GLP-2 (TZ)'].every(n => !strip.includes(`>${n}<`)) &&
+      !/g3-r-lot|g1-s-lot|g2-t-lot/.test(strip));
+    const offStrip = wantStrip.filter(p => {
       const img = coaHref(p).replace(/\.pdf$/i, '.jpg');
       return !strip.includes(`href="coa/${productSlug(p.name)}/"`) || !strip.includes(`src="${img}"`) ||
         !fs.existsSync(path.join(ROOT, img));
     });
-    ok('the homepage certificate row shows every certificate, each with its own image',
-      offStrip.length === 0 && (strip.match(/class="coa-tile"/g) || []).length === wantCoa.length,
+    ok('the homepage certificate row shows every other certificate, each with its own image',
+      offStrip.length === 0 && (strip.match(/class="coa-tile"/g) || []).length === wantStrip.length,
       offStrip.map(p => p.name).join(', '));
 
     // Dead addresses that once served pages go somewhere real rather than 404.
