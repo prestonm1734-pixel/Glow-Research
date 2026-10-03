@@ -4207,6 +4207,16 @@ console.log('\nhero image');
       return nav && !/href="(?:\/|(?:\.\.\/)*)partners\.html"/.test(nav);
     });
     ok('every page header links to the partner program', noPartnerNav.length === 0, noPartnerNav.join(', '));
+    // Partners get a referral link only: the store runs no discounts or promo
+    // codes for partners, and GoAffPro on the SDK platform cannot create a
+    // code our Stripe-validated checkout would accept anyway.
+    ok('the partner page promises a link, never a coupon or discount code',
+      !/coupon|discount code|promo code/i.test(pt) && !/coupon/i.test(read('tools/page-meta.js').match(/'partners\.html'[\s\S]*?\}/)[0]));
+    // Commission is paid on the subtotal, as the page says, only if GoAffPro
+    // is told the subtotal: total alone includes shipping and tax.
+    ok('thank-you.js reports the subtotal, shipping and tax to GoAffPro',
+      /subtotal: gSub/.test(read('js/thank-you.js')) && /shipping: ship/.test(read('js/thank-you.js')) &&
+      /tax: tax/.test(read('js/thank-you.js')));
   }
 
   // Product photographs carry no alt text by request: the vial images on the

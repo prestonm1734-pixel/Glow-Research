@@ -130,9 +130,24 @@
     var alreadySent = false;
     try { alreadySent = localStorage.getItem(goaffproKey) === String(order.number); } catch (e) {}
     if (!alreadySent) {
+      // The extended order schema from GoAffPro's SDK guide. subtotal is
+      // what the partner page says commission is paid on: the order total
+      // less shipping and tax, so the "exclude shipping and taxes" setting in
+      // GoAffPro has the figures it needs. With total alone, commission was
+      // being paid on the shipping charge too.
+      var gTotal = order.total != null ? Number(order.total) : grandTotal;
+      var gSub = Math.max(0, Math.round((gTotal - ship - tax) * 100) / 100);
       window.goaffproTrackConversion({
         number: '#' + order.number,
-        total: order.total != null ? order.total : grandTotal,
+        total: gTotal,
+        subtotal: gSub,
+        shipping: ship,
+        tax: tax,
+        discount: discount,
+        currency: 'USD',
+        line_items: items.map(function (i) {
+          return { name: i.name, sku: i.sku, quantity: i.qty || 1, price: i.unitSale };
+        }),
       });
       try { localStorage.setItem(goaffproKey, String(order.number)); } catch (e) {}
     }
