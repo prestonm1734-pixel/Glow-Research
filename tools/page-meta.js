@@ -77,6 +77,11 @@ const PAGE_META = {
     title: t('Wholesale'),
     desc: 'Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day.',
   },
+  'partners.html': {
+    name: 'Partner Program',
+    title: t('Partner Program'),
+    desc: 'Earn 20% on every order you refer to Glow Research. Your own referral link and coupon code at signup, a live dashboard, 30-day tracking and PayPal or Stripe payouts.',
+  },
   'coa.html': {
     name: 'Certificate of Analysis',
     title: t('Certificate of Analysis'),

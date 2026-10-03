@@ -7,21 +7,21 @@
      needs the observer to show it, so without scripting the page must
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
-<title>Wholesale | Glow Research</title>
-<meta name="description" content="Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day." />
+<title>Partner Program | Glow Research</title>
+<meta name="description" content="Earn 20% on every order you refer to Glow Research. Your own referral link and coupon code at signup, a live dashboard, 30-day tracking and PayPal or Stripe payouts." />
 <meta name="robots" content="index,follow" />
-<link rel="canonical" href="https://glowresearch.shop/wholesale.html" />
+<link rel="canonical" href="https://glowresearch.shop/partners.html" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
-<meta property="og:title" content="Wholesale" />
-<meta property="og:description" content="Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day." />
-<meta property="og:url" content="https://glowresearch.shop/wholesale.html" />
+<meta property="og:title" content="Partner Program" />
+<meta property="og:description" content="Earn 20% on every order you refer to Glow Research. Your own referral link and coupon code at signup, a live dashboard, 30-day tracking and PayPal or Stripe payouts." />
+<meta property="og:url" content="https://glowresearch.shop/partners.html" />
 <meta property="og:image" content="https://glowresearch.shop/assets/vial-trio-black-v3.jpg" />
 <meta property="og:image:width" content="1686" />
 <meta property="og:image:height" content="933" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Wholesale" />
-<meta name="twitter:description" content="Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day." />
+<meta name="twitter:title" content="Partner Program" />
+<meta name="twitter:description" content="Earn 20% on every order you refer to Glow Research. Your own referral link and coupon code at signup, a live dashboard, 30-day tracking and PayPal or Stripe payouts." />
 <meta name="twitter:image" content="https://glowresearch.shop/assets/vial-trio-black-v3.jpg" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://js.stripe.com">
@@ -29,6 +29,21 @@
 <link rel="preload" href="assets/fonts/sora.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="css/style.css" />
 <style>
+  /* ---------- partner program ---------- */
+  .pt-eyebrow{ display:block; margin-bottom: 14px; }
+  .pt-terms{ max-width: 720px; margin: 0 auto; padding: 8px 28px; border:1px solid rgba(0,0,0,.14); border-radius: 18px; background:#fafaf8; }
+  .pt-terms div{ padding: 20px 0; border-bottom:1px solid rgba(0,0,0,.08); }
+  .pt-terms div:last-child{ border-bottom:0; }
+  .pt-terms dt{ font-family:'JetBrains Mono', monospace; font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:#55554f; margin-bottom: 8px; }
+  .pt-terms dd{ margin:0; font-size:1.05rem; line-height:1.6; color:#2a2a27; }
+  .pt-terms dd strong{ color:#0a0a0a; }
+  .pt-terms dd a{ color:#0a0a0a; font-weight:700; font-size:1.12rem; }
+  .pt-points{ max-width: 720px; margin: 22px auto 0; padding: 0; list-style:none; text-align:left; }
+  .pt-points li{ padding: 14px 0; border-bottom:1px solid rgba(0,0,0,.08); line-height:1.6; color:#3d3d39; }
+  .pt-points a, .pt-rules a{ color:#0a0a0a; text-decoration:underline; text-underline-offset:3px; }
+  .pt-rules{ max-width: 640px; margin-left:auto; margin-right:auto; }
+  @media (max-width: 600px){ .pt-terms{ padding: 4px 18px; } }
+
   /* Plain white page, the same construction as coa.html and the redesigned
      shipping.html: a scaled-down centred hero (h1 + one line of lede, no
      eyebrow, no split-colour headline, no live "answered in a day" dot)
@@ -36,60 +51,60 @@
      certificate grid is, then a plain white form. Nothing here needs to be
      a mood piece; the whole page is answering "what does it cost and how do
      I open an account." */
-  .wholesale-page{ background:#fff; color:#0a0a0a; }
-  .wholesale-page .lp-hero{ padding: clamp(40px, 5.5vw, 64px) 0 clamp(26px, 3.5vw, 38px); }
-  .wholesale-page .lp-hero h1{
+  .partners-page{ background:#fff; color:#0a0a0a; }
+  .partners-page .lp-hero{ padding: clamp(40px, 5.5vw, 64px) 0 clamp(26px, 3.5vw, 38px); }
+  .partners-page .lp-hero h1{
     color:#0a0a0a; font-size: clamp(1.9rem, 3.6vw, 2.6rem);
     max-width: 20ch; margin: 0 auto 14px;
   }
-  .wholesale-page .lp-lede{
+  .partners-page .lp-lede{
     color:#55554f; font-size: clamp(.98rem, 1.1vw, 1.05rem); max-width: 48ch;
   }
 
-  .wholesale-page .btn-primary{ background:#0a0a0a; color:#fff; }
-  .wholesale-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
-  .wholesale-page .btn-outline{ border-color: rgba(0,0,0,.25); color:#0a0a0a; }
-  .wholesale-page .btn-outline:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; }
+  .partners-page .btn-primary{ background:#0a0a0a; color:#fff; }
+  .partners-page .btn-primary:hover{ background:#2a2a28; color:#fff; }
+  .partners-page .btn-outline{ border-color: rgba(0,0,0,.25); color:#0a0a0a; }
+  .partners-page .btn-outline:hover{ border-color:#0a0a0a; background:#0a0a0a; color:#fff; }
 
-  .wholesale-page .lp-section{ padding: clamp(56px, 7vw, 90px) 0; }
+  .partners-page .lp-section{ padding: clamp(56px, 7vw, 90px) 0; }
   /* A hairline in place of the dark/light tint alternation the sitewide
      .lp-section.tint pattern uses: the whole page is one white surface now,
      so what used to separate two moods separates two topics instead. */
-  .wholesale-page .lp-section + .lp-section{ border-top:1px solid rgba(0,0,0,.1); }
+  .partners-page .lp-section + .lp-section{ border-top:1px solid rgba(0,0,0,.1); }
 
-  .wholesale-page .eyebrow{ color:#8a8a86; }
-  .wholesale-page .lp-h2{ color:#0a0a0a; }
-  .wholesale-page .lp-sub{ color:#55554f; }
-  .wholesale-page .lp-fine{ color:#55554f; }
-  .wholesale-page .lp-fine strong{ color:#0a0a0a; }
+  .partners-page .eyebrow{ color:#8a8a86; }
+  .partners-page .lp-h2{ color:#0a0a0a; }
+  .partners-page .lp-sub{ color:#55554f; }
+  .partners-page .lp-fine{ color:#55554f; }
+  .partners-page .lp-fine strong{ color:#0a0a0a; }
 
   /* The three-point row becomes a hairlined card grid, the same construction
      as the certificate grid on coa.html and the shipping page's fact grid:
      border-top/left on the container, border-right/bottom on each card, so
      partial rows never leave a bare patch of background exposed. */
-  .wholesale-page .lp-points{
+  .partners-page .lp-points{
     display:grid; grid-template-columns: repeat(3, 1fr); gap:0; text-align:left;
     border-top:1px solid rgba(0,0,0,.13); border-left:1px solid rgba(0,0,0,.13);
     margin-top: clamp(40px, 5.5vw, 56px);
   }
-  .wholesale-page .lp-point{
+  .partners-page .lp-point{
     padding: clamp(26px, 3vw, 34px);
     border-right:1px solid rgba(0,0,0,.13); border-bottom:1px solid rgba(0,0,0,.13);
   }
-  .wholesale-page .lp-point svg{ color:#0a0a0a; margin-bottom:16px; }
-  .wholesale-page .lp-point h3{
+  .partners-page .lp-point svg{ color:#0a0a0a; margin-bottom:16px; }
+  .partners-page .lp-point h3{
     color:#0a0a0a; font-size:1.15rem; font-weight:700;
     margin:0 0 10px; letter-spacing:-.02em; line-height:1.25;
   }
-  .wholesale-page .lp-point p{ color:#55554f; font-size:.98rem; }
+  .partners-page .lp-point p{ color:#55554f; font-size:.98rem; }
   @media (max-width: 720px){
     /* Stacked to one column, the container's left border and each card's
        right border both become vertical lines running the full height of
        the stack, boxing it in. Dropped for the same reason shipping.html
        drops them: a single column needs no side borders to separate
        anything, only the horizontal rule between cards. */
-    .wholesale-page .lp-points{ grid-template-columns:1fr; border-left:none; padding-left:0; }
-    .wholesale-page .lp-point{ border-right:none; padding-left:0; padding-right:0; }
+    .partners-page .lp-points{ grid-template-columns:1fr; border-left:none; padding-left:0; }
+    .partners-page .lp-point{ border-right:none; padding-left:0; padding-right:0; }
   }
 
   /* ---------- the application form ----------
@@ -181,10 +196,10 @@
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "@id": "https://glowresearch.shop/wholesale.html#webpage",
-  "url": "https://glowresearch.shop/wholesale.html",
-  "name": "Wholesale",
-  "description": "Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day.",
+  "@id": "https://glowresearch.shop/partners.html#webpage",
+  "url": "https://glowresearch.shop/partners.html",
+  "name": "Partner Program",
+  "description": "Earn 20% on every order you refer to Glow Research. Your own referral link and coupon code at signup, a live dashboard, 30-day tracking and PayPal or Stripe payouts.",
   "isPartOf": {
     "@id": "https://glowresearch.shop/#website"
   },
@@ -203,8 +218,8 @@
       {
         "@type": "ListItem",
         "position": 2,
-        "name": "Wholesale",
-        "item": "https://glowresearch.shop/wholesale.html"
+        "name": "Partner Program",
+        "item": "https://glowresearch.shop/partners.html"
       }
     ]
   }
@@ -246,8 +261,8 @@
       <a href="shop">Catalog</a>
       <a href="coa.html">COA</a>
       <a href="shipping.html">Shipping</a>
-      <a href="wholesale.html" class="active">Wholesale</a>
-      <a href="partners.html">Partners</a>
+      <a href="wholesale.html">Wholesale</a>
+      <a href="partners.html" class="active">Partners</a>
     </nav>
 
     <div class="nav-actions">
@@ -270,113 +285,74 @@
 </header>
 
 
-<main class="lp-page wholesale-page">
+<main class="lp-page partners-page">
 
 <section class="lp-hero">
   <div class="container">
-    <h1>Order more, pay less.</h1>
+    <span class="eyebrow pt-eyebrow">Partner program</span>
+    <h1 id="ptHeadline">Earn 20% on every order you send us.</h1>
     <p class="lp-lede">
-      Volume pricing, a named contact, and custom fill sizes for labs buying
-      in quantity. Applications are answered within one business day.
+      Sign up and you get your own referral link and coupon code right away,
+      with a dashboard that shows clicks, orders and earnings as they happen.
     </p>
     <div class="lp-actions">
-      <a href="#apply" class="btn btn-primary btn-lg">Apply for an account <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
+      <a href="mailto:support@glowresearch.shop?subject=Partner%20program" class="btn btn-primary btn-lg" data-partner-signup>Create my partner account <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
     </div>
   </div>
 </section>
 
 <section class="lp-section">
   <div class="container">
-    <span class="eyebrow">Volume pricing</span>
-    <h2 class="lp-h2">Your rate drops as your volume climbs.</h2>
-
-    <div class="lp-points reveal">
-      <div class="lp-point">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-          <path pathLength="1" class="lp-draw" d="M3 21h18"/>
-          <path pathLength="1" class="lp-draw ws-bar ws-bar1" d="M6.5 21V7"/>
-          <path pathLength="1" class="lp-draw ws-bar ws-bar2" d="M12 21v-8.5"/>
-          <path pathLength="1" class="lp-draw ws-bar ws-bar3" d="M17.5 21v-4.5"/>
-        </svg>
-        <h3>Tiered pricing</h3>
-        <p>40% off starting at 10 vials a month, scaling to 45% at 250&ndash;499. Custom quote at 500 and up.</p>
+    <dl class="pt-terms">
+      <div>
+        <dt>Commission</dt>
+        <dd id="ptCommission"><strong>20%</strong> of every order referred through your link or coupon code, on the order subtotal (shipping and taxes excluded).</dd>
       </div>
-      <div class="lp-point">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-          <circle pathLength="1" class="lp-draw" cx="12" cy="8.4" r="3.6"/>
-          <path pathLength="1" class="lp-draw" d="M5.2 20.5c0-3.75 3.05-6.8 6.8-6.8s6.8 3.05 6.8 6.8"/>
-          <circle class="ws-live" cx="18.4" cy="5.6" r="2.1" fill="currentColor" stroke="none"/>
-        </svg>
-        <h3>A named contact</h3>
-        <p>One person who knows your account and reorders with you directly, not a ticket queue.</p>
+      <div>
+        <dt>Tracking</dt>
+        <dd id="ptTracking"><strong>30 days.</strong> If someone clicks your link and orders within 30 days, you get the credit.</dd>
       </div>
-      <div class="lp-point">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-          <rect pathLength="1" class="lp-draw" x="8.6" y="2.6" width="6.8" height="2.9" rx="0.5"/>
-          <path pathLength="1" class="lp-draw" d="M9.7 5.5v11.9a2.3 2.3 0 0 0 2.3 2.3 2.3 2.3 0 0 0 2.3-2.3V5.5"/>
-          <path pathLength="1" class="lp-draw ws-fill" d="M9.7 13.6h4.6"/>
-        </svg>
-        <h3>Custom fills</h3>
-        <p>Fill sizes and compounds outside the public catalog, on the same three independent tests as a retail order.</p>
+      <div>
+        <dt>From day one</dt>
+        <dd>Your own link and coupon code, plus a live dashboard of clicks, orders and earnings.</dd>
       </div>
-    </div>
+      <div>
+        <dt>Payouts</dt>
+        <dd id="ptPayouts">By PayPal or Stripe. Refunded or cancelled orders do not earn commission.</dd>
+      </div>
+      <div>
+        <dt>Already a partner?</dt>
+        <dd><a href="mailto:support@glowresearch.shop?subject=Partner%20dashboard" data-partner-login>Log in to your dashboard</a></dd>
+      </div>
+    </dl>
   </div>
 </section>
 
-<section class="lp-section" id="apply">
+<section class="lp-section">
   <div class="container">
-    <span class="eyebrow">Open an account</span>
-    <h2 class="lp-h2">Five fields. We do the rest by email.</h2>
-    <p class="lp-sub">10-vial monthly minimum to qualify.</p>
+    <span class="eyebrow">What you can point people to</span>
+    <h2 class="lp-h2">Proof, not promises.</h2>
+    <ul class="pt-points">
+      <li><strong>A certificate for every lot.</strong> Each compound has its own <a href="coa.html">certificate page</a> with the lot number, the laboratory, the report reference and the results.</li>
+      <li><strong>Independent testing.</strong> Purity by HPLC, identity and quantity on every lot, run by an outside laboratory. <a href="how-we-test.html">How we test</a>.</li>
+      <li><strong>Same-day shipping.</strong> Ordered by 1:00 PM Pacific, it ships that day on FedEx 2-Day. <a href="shipping.html">Shipping details</a>.</li>
+      <li><strong>Buy 2, get 1 free.</strong> Every third vial of the same compound is free, on the <a href="shop">whole catalog</a>.</li>
+    </ul>
+  </div>
+</section>
 
-    <form class="ws-form reveal" id="wsForm">
-      <div class="ws-field">
-        <label for="wsName">Contact name</label>
-        <input type="text" id="wsName" name="name" placeholder="Dr. Jane Okafor" required />
-      </div>
-      <div class="ws-field">
-        <label for="wsCompany">Company or institution</label>
-        <input type="text" id="wsCompany" name="company" placeholder="Northline Research Lab" required />
-      </div>
-      <div class="ws-field">
-        <label for="wsEmail">Work email</label>
-        <input type="email" id="wsEmail" name="email" placeholder="jane@lab.com" required />
-      </div>
-      <div class="ws-field">
-        <label for="wsVolume">Expected monthly volume (vials)</label>
-        <input type="number" id="wsVolume" name="volume" placeholder="e.g. 40" min="10" step="1" required />
-      </div>
-      <div class="ws-field">
-        <label for="wsCompounds">Compounds of interest</label>
-        <textarea id="wsCompounds" name="compounds" placeholder="BPC-157, TB-500, GLP-1 (SM). Note any custom fill sizes here." required></textarea>
-      </div>
-      <div class="ws-submit">
-        <button type="submit" class="btn btn-primary" id="wsSubmitBtn" aria-busy="false"><span class="btn-label"><span>Submit application</span></span> <span class="lp-arrow" aria-hidden="true">&rarr;</span></button>
-      </div>
-    </form>
-
-    <div class="ws-done" id="wsDone" role="status" aria-live="polite" hidden>
-      <svg class="ws-done-mark" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle pathLength="1" class="lp-draw" cx="12" cy="12" r="9.4"/>
-        <path pathLength="1" class="lp-draw ws-tick" d="M7.8 12.4l2.9 2.9 5.5-5.9"/>
-      </svg>
-      <h3>Application received.</h3>
-      <p>The wholesale desk replies within one business day.</p>
+<section class="lp-section">
+  <div class="container">
+    <span class="eyebrow">The rules</span>
+    <h2 class="lp-h2">Research use only, in everything you post.</h2>
+    <p class="lp-sub pt-rules">
+      Partners promote research compounds for laboratory use only: no dosing
+      advice, no health or treatment claims, and nothing that suggests use in
+      people or animals. See our <a href="ruo-agreement.html">RUO Agreement</a>.
+    </p>
+    <div class="lp-actions">
+      <a href="mailto:support@glowresearch.shop?subject=Partner%20program" class="btn btn-primary" data-partner-signup>Create my partner account <span class="lp-arrow" aria-hidden="true">&rarr;</span></a>
     </div>
-
-    <p class="ws-error" id="wsError" role="alert" hidden></p>
-
-    <p class="lp-fine">Wholesale orders are <strong>invoiced and paid in full before we place them</strong>. There are no net terms yet.</p>
-    <details class="disc">
-      <summary>Read the full terms <span class="disc-mark" aria-hidden="true"></span></summary>
-      <div class="disc-body">
-        <p class="lp-fine">
-      Ships in standard Glow Research vials with no private-label or custom branding.
-      For qualified researchers and institutions inside the United States. All products
-      are sold strictly for in-vitro laboratory research use.
-        </p>
-      </div>
-    </details>
   </div>
 </section>
 
@@ -432,107 +408,6 @@
   </div>
 </footer>
 
-<script>
-  document.getElementById('stubYear').textContent = new Date().getFullYear();
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) { entry.target.classList.add('in'); revealObserver.unobserve(entry.target); }
-    });
-  }, { threshold: 0.15 });
-  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-  const hamburger = document.getElementById('hamburger');
-  const mainNav = document.getElementById('mainNav');
-  hamburger.addEventListener('click', () => {
-    mainNav.classList.toggle('open');
-    hamburger.classList.toggle('open');
-  });
-  mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mainNav.classList.remove('open')));
-  const header = document.getElementById('siteHeader');
-  window.addEventListener('scroll', () => {
-    header.style.boxShadow = window.scrollY > 20 ? '0 6px 24px -12px rgba(0,0,0,0.5)' : 'none';
-  });
-
-  /* Application form. Posts to /api/wholesale-apply, which emails the
-     submission to wholesale@glowresearch.shop via Resend — there is no
-     portal or database behind this, just that one email.
-
-     Submitting swaps the form for a confirmation rather than appending a
-     line under the button, since the form has done its job by then. The
-     panel carries role="status", so the swap is announced rather than just
-     seen. */
-  (function () {
-    const form = document.getElementById('wsForm');
-    const done = document.getElementById('wsDone');
-    const error = document.getElementById('wsError');
-    if (!form || !done) return;
-    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const submitLabel = submitBtn.querySelector('.btn-label');
-    const submitArrow = submitBtn.querySelector('.lp-arrow');
-
-    // ring-of-eight-ticks spinner, same mark as checkout's place-order button
-    function spinHtml() {
-      let ticks = '';
-      for (let i = 0; i < 8; i++) {
-        const angle = i * 45;
-        const delay = (i * 0.1).toFixed(3);
-        ticks += `<i style="transform:rotate(${angle}deg) translate(0,-5px);animation-delay:-${delay}s"></i>`;
-      }
-      return `<span class="btn-spin" aria-hidden="true">${ticks}</span>`;
-    }
-    function setBusy(busy) {
-      submitLabel.style.opacity = '0';
-      setTimeout(() => {
-        submitLabel.innerHTML = (busy ? spinHtml() : '') + '<span>' + (busy ? 'Sending…' : 'Submit application') + '</span>';
-        submitLabel.style.opacity = '1';
-      }, 120);
-      submitBtn.disabled = busy;
-      submitBtn.setAttribute('aria-busy', busy ? 'true' : 'false');
-      if (submitArrow) submitArrow.style.display = busy ? 'none' : '';
-    }
-
-    function show() {
-      form.hidden = true;
-      done.hidden = false;
-      if (still) { done.classList.add('is-in'); return; }
-      // one frame with the panel laid out but not yet marked, so the
-      // transition has a start value to run from
-      requestAnimationFrame(() => requestAnimationFrame(() => done.classList.add('is-in')));
-    }
-
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      error.hidden = true;
-      setBusy(true);
-
-      try {
-        const resp = await fetch('/api/wholesale-apply', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: document.getElementById('wsName').value,
-            company: document.getElementById('wsCompany').value,
-            email: document.getElementById('wsEmail').value,
-            volume: document.getElementById('wsVolume').value,
-            compounds: document.getElementById('wsCompounds').value,
-          }),
-        });
-        const data = await resp.json().catch(() => ({}));
-        if (!resp.ok) throw new Error(data.error || 'Could not send your application.');
-
-        form.reset();
-        if (still) { show(); return; }
-        form.classList.add('is-gone');
-        setTimeout(show, 300);
-      } catch (err) {
-        error.hidden = false;
-        error.textContent = err.message;
-      } finally {
-        setBusy(false);
-      }
-    });
-  })();
-</script>
 <script src="js/products-data.js"></script>
 <script src="https://js.stripe.com/v3/"></script>
 <script src="js/express-pay.js"></script>

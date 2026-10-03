@@ -217,6 +217,24 @@ const GOAFFPRO_SHOP_ID = 'regkhwnoue';
 
 const X_PIXEL_ID = 'repwj';
 
+// The partner program's terms, as configured in GoAffPro, stated once.
+// partners.html prints these figures and check-claims.js fails the build if
+// the page and this object disagree, so changing the commission in GoAffPro
+// means changing it here too, in the same sitting.
+//
+// signupUrl / loginUrl are GoAffPro's hosted partner portal: signing up
+// there issues the referral link, the coupon code and the dashboard at once.
+// While signupUrl is empty, the page's buttons fall back to emailing
+// support, because a button that opens nothing is worse than an inbox.
+const PARTNER_PROGRAM = {
+  commissionPct: 20,
+  cookieDays: 30,
+  payouts: 'PayPal or Stripe',
+  signupUrl: '',
+  loginUrl: '',
+  fallbackEmail: 'support@glowresearch.shop',
+};
+
 // Microsoft Advertising's UET tag ID, same reasoning as the pixel IDs above:
 // not secret, safe to ship client-side, and js/uet-tag.js no-ops entirely
 // while this is empty. The tag only reports page views; conversions are set
@@ -1847,6 +1865,7 @@ if (typeof module !== 'undefined' && module.exports) {
     META_DOMAIN_VERIFICATION,
     TIKTOK_PIXEL_ID,
     X_PIXEL_ID,
+    PARTNER_PROGRAM,
     UET_TAG_ID,
     X_EVENT_IDS,
     GOAFFPRO_SHOP_ID,

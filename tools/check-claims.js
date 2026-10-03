@@ -4182,6 +4182,33 @@ console.log('\nhero image');
       !fs.existsSync(path.join(ROOT, 'affiliates.html')) && !fs.existsSync(path.join(ROOT, 'returns.html')));
   }
 
+  // The partner page states the program's terms. Every figure on it is
+  // PARTNER_PROGRAM's, and its buttons go to the GoAffPro portal once that is
+  // set, or to the support inbox until then: never to nothing.
+  {
+    const { PARTNER_PROGRAM: PP } = require(path.join(ROOT, 'js/products-data.js'));
+    const pt = read('partners.html');
+    ok('partners.html states the commission, tracking window and payouts PARTNER_PROGRAM holds',
+      pt.includes(`Earn ${PP.commissionPct}% on every order`) &&
+      pt.includes(`<strong>${PP.commissionPct}%</strong> of every order`) &&
+      pt.includes(`<strong>${PP.cookieDays} days.</strong>`) &&
+      pt.includes(`orders within ${PP.cookieDays} days`) &&
+      pt.includes(`By ${PP.payouts}.`) &&
+      read('tools/page-meta.js').includes(`Earn ${PP.commissionPct}% on every order you refer`));
+    const signups = [...pt.matchAll(/<a href="([^"]*)"[^>]*data-partner-signup/g)].map(m => m[1]);
+    const logins = [...pt.matchAll(/<a href="([^"]*)"[^>]*data-partner-login/g)].map(m => m[1]);
+    const wantSignup = h => PP.signupUrl ? h === PP.signupUrl : h.startsWith(`mailto:${PP.fallbackEmail}`);
+    const wantLogin = h => PP.loginUrl ? h === PP.loginUrl : h.startsWith(`mailto:${PP.fallbackEmail}`);
+    ok('and its buttons go to the partner portal, or the support inbox until that is set',
+      signups.length >= 1 && signups.every(wantSignup) && logins.length >= 1 && logins.every(wantLogin));
+    const noPartnerNav = everyPage.filter(f => {
+      const h = read(f);
+      const nav = (h.match(/<nav class="main-nav" id="mainNav">([\s\S]*?)<\/nav>/) || [])[1];
+      return nav && !/href="(?:\/|(?:\.\.\/)*)partners\.html"/.test(nav);
+    });
+    ok('every page header links to the partner program', noPartnerNav.length === 0, noPartnerNav.join(', '));
+  }
+
   // Product photographs carry no alt text by request: the vial images on the
   // catalog, certificate cards and product pages are empty-alt, and the image
   // files hold no embedded metadata. Pinned so a template edit cannot quietly
