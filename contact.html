@@ -129,6 +129,38 @@
     .ct-form.is-gone, .js .ct-done > *{ transition:none; }
   }
 
+
+  /* ---------- contact, two-column ----------
+     A form card and a details card side by side. Only what is true here:
+     one email address and one reply time. No phone line and no mailing
+     address, because the business publishes neither. */
+  .cx-page{ background:#fff; color:#0a0a0a; }
+  .cx-hero{ text-align:center; padding: clamp(44px, 6vw, 76px) 0 clamp(28px, 4vw, 44px); }
+  .cx-kicker{ display:inline-flex; align-items:center; gap:10px; font-family:'JetBrains Mono', monospace; font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; color:#6b6b64; }
+  .cx-kicker::before{ content:''; width:20px; height:3px; background:#0a0a0a; }
+  .cx-hero h1{ font-size: clamp(2.1rem, 4.6vw, 3.3rem); letter-spacing:-.04em; line-height:1.05; margin: 14px 0 12px; font-weight:600; }
+  .cx-hero p{ max-width: 62ch; margin: 0 auto; color:#55554f; line-height:1.6; font-size: clamp(1rem, 1.3vw, 1.08rem); }
+  .cx-grid{ display:grid; grid-template-columns: minmax(0,1.6fr) minmax(0,1fr); gap: 20px; align-items:start; padding-bottom: clamp(64px, 8vw, 100px); }
+  .cx-card{ border:1px solid rgba(0,0,0,.14); padding: clamp(20px, 2.6vw, 30px); background:#fff; }
+  .cx-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .cx-form .ct-field{ margin-bottom: 16px; }
+  .cx-form label{ display:block; font-weight:600; font-size:.9rem; margin-bottom:7px; color:#0a0a0a; }
+  .cx-form input, .cx-form select, .cx-form textarea{ width:100%; padding: 12px 13px; border:1px solid rgba(0,0,0,.2); border-radius:0; font: inherit; font-size:.95rem; background:#fff; color:#0a0a0a; }
+  .cx-form textarea{ min-height: 150px; resize: vertical; }
+  .cx-form input:focus, .cx-form select:focus, .cx-form textarea:focus{ outline:2px solid #0a0a0a; outline-offset:0; border-color:#0a0a0a; }
+  .cx-form .btn-primary{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+  .cx-info{ display:flex; flex-direction:column; gap: 22px; }
+  .cx-label{ display:block; font-family:'JetBrains Mono', monospace; font-size:.64rem; letter-spacing:.18em; text-transform:uppercase; color:#6b6b64; margin-bottom: 6px; }
+  .cx-email{ font-weight:700; font-size:1.05rem; color:#0a0a0a; text-decoration:none; overflow-wrap:anywhere; }
+  .cx-email:hover{ text-decoration:underline; text-underline-offset:3px; }
+  .cx-info p{ margin:0; color:#3d3d39; line-height:1.5; }
+  .cx-links{ list-style:none; margin:0; padding:0; }
+  .cx-links li{ border-top:1px solid rgba(0,0,0,.08); }
+  .cx-links a{ display:flex; justify-content:space-between; padding: 10px 0; color:#0a0a0a; font-weight:600; text-decoration:none; font-size:.95rem; }
+  .cx-links a::after{ content:'\2192'; color:#8a8a86; }
+  .cx-links a:hover{ text-decoration:underline; text-underline-offset:3px; }
+  @media (max-width: 860px){ .cx-grid{ grid-template-columns: 1fr; } }
+  @media (max-width: 560px){ .cx-row{ grid-template-columns: 1fr; gap: 0; } }
 </style>
 <script type="application/ld+json">
 {
@@ -226,69 +258,91 @@
 </header>
 
 
-<main class="ct-page">
+<main class="ct-page cx-page">
 
-<section class="ct-hero">
+<section class="cx-hero">
   <div class="container">
-    <span class="ct-eyebrow">Resources</span>
-    <h1>Contact us.</h1>
-    <p class="ct-lede">
-      One inbox, checked by a person. Email us and we will get back to you.
+    <span class="cx-kicker">Contact</span>
+    <h1>Contact Glow Research.</h1>
+    <p>
+      Orders, certificates and bulk orders all reach the same team. Include
+      your order number if you have one and we can answer faster.
     </p>
   </div>
 </section>
 
-<section class="ct-main">
-  <div class="container">
-    <div class="ct-card">
-      <span class="ct-card-label">Email</span>
-      <a class="ct-email" href="mailto:support@glowresearch.shop">support@glowresearch.shop</a>
-      <p class="ct-reply">We reply within <strong>one business day</strong>.</p>
-    </div>
-
-    <div class="ct-form-wrap">
-      <h2>Or write to us here.</h2>
-      <p class="ct-form-sub">
-        Goes to the same inbox. We reply to the address you give us, within one business day.
-      </p>
-
-      <form class="ct-form" id="ctForm" novalidate>
+<section class="container cx-grid">
+  <div class="cx-card cx-form-card">
+    <form class="ct-form cx-form" id="ctForm" novalidate>
+      <div class="cx-row">
         <div class="ct-field">
-          <label for="ctName">Your name</label>
-          <input type="text" id="ctName" name="name" placeholder="Dr. Jane Okafor" required />
+          <label for="ctName">Name</label>
+          <input type="text" id="ctName" name="name" required autocomplete="name" />
         </div>
         <div class="ct-field">
           <label for="ctEmail">Email</label>
-          <input type="email" id="ctEmail" name="email" placeholder="jane@lab.com" required autocomplete="email" />
+          <input type="email" id="ctEmail" name="email" required autocomplete="email" />
         </div>
-        <div class="ct-field">
-          <label for="ctRef">Order or lot number <span class="ct-opt">(optional)</span></label>
-          <input type="text" id="ctRef" name="reference" placeholder="e.g. 4471, or lot BP5-2409" />
-        </div>
-        <div class="ct-field">
-          <label for="ctMessage">How can we help?</label>
-          <textarea id="ctMessage" name="message" placeholder="Tell us what you need and we will sort it out." required maxlength="5000"></textarea>
-        </div>
-
-        <!-- bots fill every field they find; people never see this one -->
-        <div class="ct-hp" aria-hidden="true">
-          <label for="ctWebsite">Leave this empty</label>
-          <input type="text" id="ctWebsite" name="website" tabindex="-1" autocomplete="off" />
-        </div>
-
-        <div class="ct-submit">
-          <button type="submit" class="btn btn-primary" id="ctSubmit" aria-busy="false"><span class="btn-label"><span>Send message</span></span> <span class="lp-arrow" aria-hidden="true">&rarr;</span></button>
-        </div>
-        <p class="ct-error" id="ctError" role="alert" hidden></p>
-      </form>
-
-      <div class="ct-done" id="ctDone" hidden role="status">
-        <h3>Message sent.</h3>
-        <p>A confirmation is on its way to your inbox, and a person replies within one business day.</p>
       </div>
-    </div>
+      <div class="cx-row">
+        <div class="ct-field">
+          <label for="ctTopic">Topic</label>
+          <select id="ctTopic" name="topic">
+            <option>Order or shipping</option>
+            <option>Certificates of analysis</option>
+            <option>Bulk order</option>
+            <option>Affiliate program</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="ct-field">
+          <label for="ctRef">Order number <span class="ct-opt">(optional)</span></label>
+          <input type="text" id="ctRef" name="reference" />
+        </div>
+      </div>
+      <div class="ct-field">
+        <label for="ctMessage">Message</label>
+        <textarea id="ctMessage" name="message" required maxlength="5000"></textarea>
+      </div>
 
+      <!-- bots fill every field they find; people never see this one -->
+      <div class="ct-hp" aria-hidden="true">
+        <label for="ctWebsite">Leave this empty</label>
+        <input type="text" id="ctWebsite" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div class="ct-submit">
+        <button type="submit" class="btn btn-primary" id="ctSubmit" aria-busy="false"><span class="btn-label"><span>Send message</span></span> <span class="lp-arrow" aria-hidden="true">&rarr;</span></button>
+      </div>
+      <p class="ct-error" id="ctError" role="alert" hidden></p>
+    </form>
+
+    <div class="ct-done" id="ctDone" hidden role="status">
+      <h3>Message sent.</h3>
+      <p>A confirmation is on its way to your inbox, and a person replies within one business day.</p>
+    </div>
   </div>
+
+  <aside class="cx-card cx-info">
+    <div>
+      <span class="cx-label">Email</span>
+      <a class="cx-email" href="mailto:support@glowresearch.shop">support@glowresearch.shop</a>
+    </div>
+    <div>
+      <span class="cx-label">Reply time</span>
+      <p>Within one business day, from a person.</p>
+    </div>
+    <div>
+      <span class="cx-label">Quick answers</span>
+      <ul class="cx-links">
+        <li><a href="shipping.html">Shipping and delivery</a></li>
+        <li><a href="return-policy.html">Returns policy</a></li>
+        <li><a href="coa.html">COA Library</a></li>
+        <li><a href="wholesale.html">Buy in bulk</a></li>
+        <li><a href="affiliates.html">Affiliate program</a></li>
+      </ul>
+    </div>
+  </aside>
 </section>
 
 </main>
@@ -429,6 +483,7 @@
           body: JSON.stringify({
             name, email, message,
             reference: document.getElementById('ctRef').value.trim(),
+            topic: document.getElementById('ctTopic').value,
             website: document.getElementById('ctWebsite').value,
           }),
         });

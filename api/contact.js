@@ -21,6 +21,10 @@ export default async function handler(req, res) {
   const name = (body.name || '').trim();
   const email = (body.email || '').trim().toLowerCase();
   const reference = (body.reference || '').trim();
+  // One of the form's own topics, or nothing: a free-text value from a
+  // crafted request never reaches the subject line.
+  const TOPICS = ['Order or shipping', 'Certificates of analysis', 'Bulk order', 'Affiliate program', 'Something else'];
+  const topic = TOPICS.includes(body.topic) ? body.topic : '';
   const message = (body.message || '').trim();
 
   // Honeypot: a field positioned off-screen and hidden from assistive tech, so
@@ -42,7 +46,7 @@ export default async function handler(req, res) {
   const delivered = await sendEmail({
     to: SUPPORT,
     replyTo: email,
-    subject: `Contact form: ${name}${reference ? ` (${reference})` : ''}`,
+    subject: `Contact form${topic ? ` [${topic}]` : ''}: ${name}${reference ? ` (${reference})` : ''}`,
     text: deskText(m),
     html: deskHtml(m),
   });
