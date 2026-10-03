@@ -7,21 +7,21 @@
      needs the observer to show it, so without scripting the page must
      opt out of hiding rather than opt in to showing -->
 <script>document.documentElement.classList.add('js');</script>
-<title>Certificate of Analysis | Glow Research</title>
-<meta name="description" content="Certificates of analysis for Glow Research peptides." />
+<title>COA Library: Peptide Certificates of Analysis | Glow Research</title>
+<meta name="description" content="Certificates of analysis for every Glow Research peptide: purity by HPLC, identity and quantity for the current lot, tested by an independent laboratory." />
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://glowresearch.shop/coa.html" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Glow Research" />
-<meta property="og:title" content="Certificate of Analysis" />
-<meta property="og:description" content="Certificates of analysis for Glow Research peptides." />
+<meta property="og:title" content="COA Library" />
+<meta property="og:description" content="Certificates of analysis for every Glow Research peptide: purity by HPLC, identity and quantity for the current lot, tested by an independent laboratory." />
 <meta property="og:url" content="https://glowresearch.shop/coa.html" />
 <meta property="og:image" content="https://glowresearch.shop/assets/vial-trio-black-v3.jpg" />
 <meta property="og:image:width" content="1686" />
 <meta property="og:image:height" content="933" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Certificate of Analysis" />
-<meta name="twitter:description" content="Certificates of analysis for Glow Research peptides." />
+<meta name="twitter:title" content="COA Library" />
+<meta name="twitter:description" content="Certificates of analysis for every Glow Research peptide: purity by HPLC, identity and quantity for the current lot, tested by an independent laboratory." />
 <meta name="twitter:image" content="https://glowresearch.shop/assets/vial-trio-black-v3.jpg" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://js.stripe.com">
@@ -47,7 +47,21 @@
     color:#0a0a0a; font-size: clamp(1.9rem, 3.6vw, 2.6rem);
     max-width: none; margin-bottom: 14px;
   }
-  .coa-page .lp-lede{ font-size: clamp(.98rem, 1.1vw, 1.05rem); max-width: 48ch; }
+  .coa-page .lp-lede{ font-size: clamp(.98rem, 1.1vw, 1.05rem); max-width: 60ch; margin-left:auto; margin-right:auto; }
+  .coa-kicker{ display:inline-flex; align-items:center; gap:10px; font-family:'JetBrains Mono', monospace; font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; color:#6b6b64; margin-bottom: 12px; }
+  .coa-kicker::before{ content:''; width:20px; height:3px; background:#0a0a0a; }
+  .coa-facts-line{ display:flex; flex-wrap:wrap; justify-content:center; gap: 8px 22px; margin: 18px 0 0; font-family:'JetBrains Mono', monospace; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:#6b6b64; }
+  .coa-facts-line span::before{ content:''; display:inline-block; width:6px; height:6px; background:#0a0a0a; border-radius:50%; margin-right:8px; vertical-align:1px; }
+  /* How to read one: three short definitions under the grid. */
+  .coa-read{ border-top:1px solid rgba(0,0,0,.1); padding: clamp(48px, 6vw, 80px) 0; }
+  .coa-read h2{ text-align:center; font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing:-.03em; margin: 0 0 8px; font-weight:600; color:#0a0a0a; }
+  .coa-read > .container > p{ text-align:center; color:#55554f; margin: 0 auto 28px; max-width: 58ch; line-height:1.6; }
+  .coa-read-grid{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
+  .coa-read-grid div{ border:1px solid rgba(0,0,0,.12); padding: 20px; }
+  .coa-read-grid h3{ margin:0 0 8px; font-size:1rem; color:#0a0a0a; }
+  .coa-read-grid p{ margin:0; color:#55554f; font-size:.92rem; line-height:1.6; }
+  @media (max-width: 860px){ .coa-read-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  @media (max-width: 520px){ .coa-read-grid{ grid-template-columns: 1fr; } }
   /* --text-dim is a light gray tuned for the dark lp-page background; on
      white it reads as barely-there. Same value product.html and account.html
      use for secondary text on their own white surfaces. */
@@ -326,8 +340,8 @@
   "@type": "WebPage",
   "@id": "https://glowresearch.shop/coa.html#webpage",
   "url": "https://glowresearch.shop/coa.html",
-  "name": "Certificate of Analysis",
-  "description": "Certificates of analysis for Glow Research peptides.",
+  "name": "COA Library",
+  "description": "Certificates of analysis for every Glow Research peptide: purity by HPLC, identity and quantity for the current lot, tested by an independent laboratory.",
   "isPartOf": {
     "@id": "https://glowresearch.shop/#website"
   },
@@ -387,7 +401,7 @@
 
     <nav class="main-nav" id="mainNav">
       <a href="shop">Products</a>
-      <a href="coa.html" class="active">COA</a>
+      <a href="coa.html" class="active">COA Library</a>
       <a href="shipping.html">Shipping</a>
       <a href="wholesale.html">Buy in Bulk</a>
       <a href="affiliates.html">Affiliate Program</a>
@@ -417,11 +431,15 @@
 
 <section class="lp-hero">
   <div class="container">
-    <h1>Certificate of Analysis</h1>
+    <span class="coa-kicker">Certificates of analysis</span>
+    <h1>COA Library</h1>
     <p class="lp-lede">
-      Purity by HPLC, identity and quantity, documented against the lot number
-      on every vial.
+      Every lot is tested by Accumark Labs, an independent third-party
+      laboratory, before it is listed. Here is the current lot for each
+      compound with its purity, the laboratory's report reference and the
+      signed certificate, one click away.
     </p>
+    <p class="coa-facts-line"><span>Batch-matched to the vial</span><span>Independent laboratory</span><span>Report numbers you can verify</span></p>
   </div>
 </section>
 
@@ -444,6 +462,19 @@
          same catalog every other listing on the site reads. -->
     <div class="coa-grid" id="coaGrid"></div>
     <p class="coa-empty" id="coaEmpty" hidden>No compound matches that search.</p>
+  </div>
+</section>
+
+<section class="coa-read">
+  <div class="container">
+    <h2>How to read a certificate.</h2>
+    <p>Each certificate reports three analyses on one lot. Match the lot number on your vial to the one on the certificate, and every figure below is yours.</p>
+    <div class="coa-read-grid">
+      <div><h3>Purity</h3><p>Measured by HPLC: the share of the sample that is the compound itself, as a percentage.</p></div>
+      <div><h3>Identity</h3><p>Confirms the compound in the vial is the one named on the label.</p></div>
+      <div><h3>Quantity</h3><p>The amount actually measured in the vial, set against the amount on the label.</p></div>
+      <div><h3>Lot and report</h3><p>The lot number ties the certificate to your vial, and the report reference can be checked against the laboratory's own records.</p></div>
+    </div>
   </div>
 </section>
 

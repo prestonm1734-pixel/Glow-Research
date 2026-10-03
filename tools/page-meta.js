@@ -83,9 +83,9 @@ const PAGE_META = {
     desc: 'Peptide affiliate program: earn 20% on every order you refer. Approved instantly, 30-day cookie, payouts by PayPal, Venmo, Cash App or bank transfer.',
   },
   'coa.html': {
-    name: 'Certificate of Analysis',
-    title: t('Certificate of Analysis'),
-    desc: 'Certificates of analysis for Glow Research peptides.',
+    name: 'COA Library',
+    title: 'COA Library: Peptide Certificates of Analysis | Glow Research',
+    desc: 'Certificates of analysis for every Glow Research peptide: purity by HPLC, identity and quantity for the current lot, tested by an independent laboratory.',
   },
   'contact.html': {
     name: 'Contact Us',
