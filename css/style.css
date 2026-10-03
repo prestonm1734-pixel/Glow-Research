@@ -2584,3 +2584,90 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
   .coa-strip-head p{ justify-self:start; }
   .coa-tile{ flex-basis: 64vw; }
 }
+
+/* ---------- certificate viewer ----------
+   The dialog js/coa.js opens: used by the COA Library and the product page,
+   so it lives here rather than in either page. */
+.coa-overlay{
+    position:fixed; inset:0; z-index:280; display:none;
+    align-items:center; justify-content:center; padding: 24px;
+    background: rgba(10,10,10,.6);
+  }
+.coa-overlay.open{ display:flex; }
+.coa-modal{
+    background:#fff; color:#0a0a0a; width:min(760px, 100%);
+    max-height: min(88vh, 900px); display:flex; flex-direction:column;
+    border:1px solid rgba(0,0,0,.18);
+  }
+.coa-modal-head{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:18px;
+    padding: 22px 24px; border-bottom:1px solid rgba(0,0,0,.13);
+  }
+.coa-modal-heading{ flex:1 1 auto; min-width:0; }
+.coa-modal-kicker{
+    display:flex; align-items:baseline; justify-content:space-between; gap:16px;
+  }
+.coa-modal-type,
+  .coa-modal-lot{
+    font-family:'JetBrains Mono', monospace; font-size:.62rem;
+    font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#8a8a86;
+  }
+.coa-modal-lot{ flex:0 0 auto; color:#0a0a0a; }
+.coa-modal-name{
+    margin: 8px 0 0; font-size:1.35rem; font-weight:700; letter-spacing:-.025em;
+  }
+.coa-modal-close{
+    flex:0 0 auto; width:36px; height:36px; display:flex;
+    align-items:center; justify-content:center;
+    background:none; border:1px solid rgba(0,0,0,.18); color:#0a0a0a; cursor:pointer;
+    transition: background .18s ease, border-color .18s ease;
+  }
+.coa-modal-close:hover{ background:#f5f5f4; border-color:#0a0a0a; }
+.coa-modal-close:focus-visible{ outline:2px solid #0a0a0a; outline-offset:2px; }
+.coa-modal-body{ padding: 22px 24px 26px; overflow-y:auto; }
+.coa-modal-meta{
+    margin:0 0 20px; display:flex; flex-wrap:wrap; gap: 14px 40px;
+    padding-bottom: 20px; border-bottom:1px solid rgba(0,0,0,.09);
+  }
+.coa-modal-meta dt{
+    font-family:'JetBrains Mono', monospace; font-size:.58rem; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase; color:#8a8a86; margin-bottom:6px;
+  }
+.coa-modal-meta dd{ margin:0; font-size:1rem; font-weight:700; }
+.coa-modal-doc{
+    border:1px solid rgba(0,0,0,.13); background:#f5f5f4; height: min(56vh, 520px);
+  }
+.coa-modal-doc iframe{ width:100%; height:100%; border:none; display:block; }
+.coa-modal-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top: 18px; }
+.coa-modal-actions .btn{ padding: 13px 22px; font-size:.9rem; }
+.coa-overlay .btn-primary{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+.coa-overlay .btn-primary:hover{ background:#2a2a28; color:#fff; }
+.coa-overlay .btn-outline{ border-color:rgba(0,0,0,.28); color:#0a0a0a; background:none; }
+.coa-overlay .btn-outline:hover{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+.coa-modal-request h3{ margin:0 0 8px; font-size:1.05rem; font-weight:700; }
+.coa-modal-request p{ margin:0 0 18px; font-size:.95rem; line-height:1.65; color:#55554f; }
+.coa-modal-request .btn{ padding: 13px 22px; font-size:.9rem; }
+.coa-modal-note{
+    margin: 18px 0 0; font-size:.8rem; line-height:1.6; color:#8a8a86;
+  }
+.coa-modal-verify{
+    display:inline-block; margin-top:6px; color:#0a0a0a;
+    font-weight:600; text-decoration:underline; text-underline-offset:3px;
+  }
+.coa-modal-verify:hover{ color:#45453f; }
+@media (max-width: 560px){
+  .coa-overlay{ padding: 0; align-items:flex-end; }
+  .coa-modal{ max-height: 92vh; width:100%; border:none; }
+  .coa-modal-actions .btn{ width:100%; justify-content:center; }
+  .coa-modal-head{ padding: 15px 16px; }
+  .coa-modal-name{ margin-top: 5px; font-size:1.15rem; }
+  .coa-modal-body{ padding: 15px 16px 20px; }
+  .coa-modal-meta{
+      display:grid; grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px 16px; margin-bottom: 15px; padding-bottom: 15px;
+    }
+  .coa-modal-meta dd{ font-size:.92rem; }
+  .coa-modal-doc{ height: 52vh; }
+  .coa-modal-actions{ margin-top: 14px; }
+  .coa-modal-note{ margin-top: 14px; font-size:.75rem; }
+}

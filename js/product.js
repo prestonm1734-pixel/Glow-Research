@@ -208,10 +208,18 @@
     const smallEl = box.querySelector('small');
     if (bEl) bEl.textContent = COA_COPY.boxTitle;
     if (smallEl) smallEl.textContent = COA_COPY.boxSub;
-    // a certificate is a document, not a step in the buying flow, so it
-    // opens alongside the page rather than replacing it
-    box.target = '_blank';
-    box.rel = 'noopener';
+    // Opens in the certificate viewer on this page rather than taking the
+    // reader away from the buy box. The href stays, so without scripts (or
+    // with a modifier-click) it still opens the PDF itself.
+    box.removeAttribute('target');
+    if (!box.dataset.viewer) {
+      box.dataset.viewer = '1';
+      box.addEventListener('click', e => {
+        if (!window.GlowCoaViewer || e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        window.GlowCoaViewer.open(product);
+      });
+    }
   }
 
   /* ================= batch analysis =================
@@ -240,9 +248,12 @@
       const a = document.createElement('a');
       a.className = 'gs-report';
       a.href = href;
-      a.target = '_blank';
-      a.rel = 'noopener';
       a.textContent = `${COA_COPY.panelLink} →`;
+      a.addEventListener('click', e => {
+        if (!window.GlowCoaViewer || e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        window.GlowCoaViewer.open(p);
+      });
       foot.after(a);
     }
   }
@@ -556,47 +567,42 @@
     // because its "view the full catalog" link is the more useful of the two.
     if (GLOW_PRODUCTS.length < 2) { grid.hidden = true; return; }
 
-    renderProductGrid(grid, 'all', {
-      limit: 4,
-      prefer: p.cat,
-      exclude: p.name,
-      observeReveal: el => el.classList.add('in'),
-    });
-  }
+    // Every other compound, same-category ones first, each with its purity
+    // and a View COA chip that opens the certificate in place.
+    const others = GLOW_PRODUCTS.filter(o => o.name !== p.name)
+      .sort((a, b) => (b.cat === p.cat) - (a.cat === p.cat));
+    grid.innerHTML = others.map(o => {
+      const s = o.sizes.find(z => sizeInStock(z)) || o.sizes[0];
+      const inStock = sizeInStock(s);
+      const list = Math.max(listPriceOf(s), s.price);
+      const doc = coaHref(o);
+      return `
+        <article class="pr-card">
+          <a class="pr-img" href="${productHref(o)}"><img src="${pageHref(s.image || o.image)}" alt="" loading="lazy" />
+            ${o.purity && doc ? `<button type="button" class="pr-chip" data-coa="${escHtml(o.name)}">&#10003; ${escHtml(o.purity)} &middot; <u>View COA</u></button>` : ''}</a>
+          <div class="pr-body">
+            <a href="${productHref(o)}">${escHtml(o.name)}</a>
+            <span class="pr-price">${money(s.price)}${list > s.price ? `<s>${money(list)}</s>` : ''}</span>
+            <button type="button" class="pr-add" data-add="${escHtml(s.sku)}"${inStock ? '' : ' disabled'}>${inStock ? '+ Add' : 'Sold out'}</button>
+          </div>
+        </article>`;
+    }).join('');
 
-  // The FAQ under the batch analysis is baked into the page by tools/build-faq.js
-  // like the homepage's; this is only its accordion, the same behaviour
-  // js/script.js binds there. Repeated rather than shared because this page
-  // does not load script.js, which also builds the homepage's catalog grid.
-  function initFaq() {
-    const items = document.querySelectorAll('.faq-item');
-    items.forEach(item => {
-      const btn = item.querySelector('.faq-q');
-      const ans = item.querySelector('.faq-a');
-      if (!btn || !ans) return;
-      const coa = ans.querySelector('#faqCoa');
-      if (coa && typeof COA_COPY !== 'undefined') coa.textContent = COA_COPY.faq;
-      btn.addEventListener('click', () => {
-        const isOpen = item.classList.contains('open');
-        items.forEach(i => {
-          i.classList.remove('open');
-          i.querySelector('.faq-a').style.maxHeight = null;
-          i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
-        });
-        if (!isOpen) {
-          item.classList.add('open');
-          ans.style.maxHeight = ans.scrollHeight + 'px';
-          btn.setAttribute('aria-expanded', 'true');
-          if (window.GlowAnalytics) {
-            window.GlowAnalytics.track('faq_opened', { question: btn.textContent.trim() });
-          }
-        }
-      });
-    });
-    // An answer opened wide is taller once the column narrows: re-measure.
-    window.addEventListener('resize', () => {
-      const open = document.querySelector('.faq-item.open .faq-a');
-      if (open) open.style.maxHeight = open.scrollHeight + 'px';
+    grid.addEventListener('click', e => {
+      const chip = e.target.closest('[data-coa]');
+      if (chip) {
+        e.preventDefault();
+        const o = GLOW_PRODUCTS.find(x => x.name === chip.dataset.coa);
+        if (o && window.GlowCoaViewer) window.GlowCoaViewer.open(o);
+        return;
+      }
+      const add = e.target.closest('[data-add]');
+      if (add && window.GlowCart) {
+        const o = GLOW_PRODUCTS.find(x => x.sizes.some(z => z.sku === add.dataset.add));
+        const s = o.sizes.find(z => z.sku === add.dataset.add);
+        window.GlowCart.add({ name: o.name, variant: s.mg, sku: s.sku, qty: 1,
+          unitOriginal: s.price, unitList: listPriceOf(s), unitSale: unitPriceAt(s.price, 1) });
+      }
     });
   }
 
@@ -629,7 +635,6 @@
     wireBuy();
     renderDelivery();
     renderRelated(product);
-    initFaq();
     initStickyBar();
   });
 })();

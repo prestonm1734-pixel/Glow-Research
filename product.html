@@ -509,8 +509,31 @@
   .gs-more:hover{ border-bottom-color:#0a0a0a; }
 
   /* --- related --- */
-  .pd-related h2{ margin-bottom: 28px; }
-  .pd-related .gs-more{ margin-top: 34px; }
+  /* A row of every other compound that scrolls sideways: purity and a View
+     COA chip on the photo, price, and an Add button that adds one vial. */
+  .pr-head{ display:flex; justify-content:space-between; align-items:flex-end; gap: 16px; margin-bottom: 22px; }
+  .pr-head h2{ margin: 6px 0 0; }
+  .pr-head .gs-more{ margin:0; white-space:nowrap; }
+  .pr-row{ display:flex; gap: 14px; overflow-x:auto; scroll-snap-type: x mandatory; padding: 2px 2px 14px; scrollbar-width: thin; scrollbar-color:#0a0a0a #ececea; }
+  .pr-row::-webkit-scrollbar{ height:6px; }
+  .pr-row::-webkit-scrollbar-track{ background:#ececea; }
+  .pr-row::-webkit-scrollbar-thumb{ background:#0a0a0a; }
+  .pr-card{ flex: 0 0 clamp(190px, 21vw, 240px); scroll-snap-align:start; border:1px solid rgba(0,0,0,.12); background:#fff; display:flex; flex-direction:column; }
+  .pr-img{ position:relative; display:block; aspect-ratio: 1/1; background: linear-gradient(180deg,#f6f6f4,#e9e9e6); }
+  .pr-img img{ width:100%; height:100%; object-fit:contain; padding: 8%; mix-blend-mode:multiply; }
+  .pr-chip{ position:absolute; left:10px; bottom:10px; display:inline-flex; align-items:center; gap:6px; padding: 5px 9px; background:#fff; border:1px solid rgba(0,0,0,.14);
+    font-family:'JetBrains Mono', monospace; font-size:.62rem; letter-spacing:.04em; color:#0a0a0a; cursor:pointer; }
+  .pr-chip u{ text-underline-offset:2px; }
+  .pr-chip:hover{ border-color:#0a0a0a; }
+  .pr-body{ padding: 12px 12px 14px; display:flex; flex-direction:column; gap: 4px; flex:1; }
+  .pr-body a{ color:#0a0a0a; text-decoration:none; font-weight:700; font-size:.95rem; }
+  .pr-body a:hover{ text-decoration:underline; text-underline-offset:3px; }
+  .pr-price{ font-size:.95rem; color:#3d3d39; }
+  .pr-price s{ color:#8a8a86; margin-left:4px; font-size:.85rem; }
+  .pr-add{ margin-top: 10px; width:100%; padding: 11px 10px; background:#0a0a0a; color:#fff; border:1px solid #0a0a0a; font: inherit; font-weight:700; font-size:.9rem; cursor:pointer; }
+  .pr-add:hover{ background:#2a2a27; }
+  .pr-add:disabled{ background:#f1f1ef; color:#8a8a86; border-color: rgba(0,0,0,.1); cursor:not-allowed; }
+  @media (max-width: 640px){ .pr-card{ flex-basis: 58vw; } .pr-head{ flex-direction:column; align-items:flex-start; } }
 
   /* ---------- sticky buy bar ----------
      Hidden outright above 560px: this exists because the buy box scrolls away
@@ -943,107 +966,6 @@
     </div>
   </section>
 
-<!-- Both sections below are the homepage's, markup for markup: the same three
-     cards and the same list. The cards are static text held to the same data
-     as there, and the list is baked from FAQS by tools/build-faq.js, so a
-     product page cannot answer a question differently from the homepage. The
-     .reveal fade is dropped because this page does not load js/script.js,
-     which is what would ever fade them in. -->
-<!-- THE GLOW STANDARD
-     Three cards, one per thing the site can actually back up: the analyses the
-     catalog holds, the dispatch window products-data.js declares, and the
-     certificate-to-lot link COAS_PUBLISHED gates. Nothing here is a promise the
-     data cannot support, so nothing here needs remembering to keep true. -->
-<section class="section standard-sec" id="standard">
-  <div class="container">
-    <div class="section-head center light">
-      <span class="eyebrow">The Glow Standard</span>
-      <h2>Three promises on every order.</h2>
-    </div>
-
-    <div class="standard-grid">
-      <article class="standard-card">
-        <img class="standard-media" src="assets/products/standard-tested.jpg"
-             alt="A Glow Research vial on a laboratory bench beside a microscope."
-             width="760" height="950" loading="lazy" decoding="async" />
-        <div class="standard-body">
-          <span class="standard-eyebrow">Testing</span>
-          <h3>Third-party tested</h3>
-          <!-- The three bodies are cut to the same length on purpose: they set
-               the same number of lines, which is what keeps the headings and
-               links across the row on one baseline. -->
-          <p>
-            Purity by HPLC, identity and quantity, run by an outside laboratory
-            before a lot is listed.
-          </p>
-          <a href="coa.html" class="standard-link">See the certificates <span aria-hidden="true">&rarr;</span></a>
-        </div>
-      </article>
-
-      <article class="standard-card">
-        <img class="standard-media" src="assets/products/standard-dispatch.jpg"
-             alt="A Glow Research vial beside sealed packaging and tape, ready to go out."
-             width="760" height="950" loading="lazy" decoding="async" />
-        <div class="standard-body">
-          <span class="standard-eyebrow">Dispatch</span>
-          <h3>Same Day Shipping</h3>
-          <p>
-            Sealed, packed and handed to FedEx the same day when ordered by
-            1:00 PM Pacific, then tracked to your door.
-          </p>
-          <a href="shipping.html" class="standard-link">Shipping details <span aria-hidden="true">&rarr;</span></a>
-        </div>
-      </article>
-
-      <article class="standard-card">
-        <img class="standard-media" src="assets/products/standard-coa.jpg"
-             alt="A Glow Research vial photographed beside its paperwork."
-             width="760" height="950" loading="lazy" decoding="async" />
-        <div class="standard-body">
-          <span class="standard-eyebrow">Backed by COA</span>
-          <h3>Matched to its lot</h3>
-          <p>
-            Every vial ships against the lot number on the certificate published
-            for that batch.
-          </p>
-          <a href="coa.html" class="standard-link">View COAs <span aria-hidden="true">&rarr;</span></a>
-        </div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section class="section section-light" id="faq">
-  <div class="container">
-    <div class="section-head">
-      <span class="eyebrow">Questions</span>
-      <h2>Frequently asked.</h2>
-    </div>
-
-    <div class="faq-list" id="faqList">
-      <div class="faq-col">
-        <div class="faq-item">
-          <button class="faq-q" type="button" aria-expanded="false">Is every compound third-party tested? <span class="icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></button>
-          <div class="faq-a"><p>Yes. Three analyses on every lot before it ships: purity by HPLC, identity and quantity. Some lots also get sterility and endotoxin testing, some do not, so read the certificate for the lot you have. We do not run appearance and solubility or heavy metals. An outside lab does all of it, so the certificate is not ours to write.</p></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-q" type="button" aria-expanded="false">How fast does my order ship? <span class="icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></button>
-          <div class="faq-a"><p>Every order ships the same day when ordered by 1:00 PM Pacific, otherwise the next dispatch day on FedEx 2-Day. Tracking follows within a day. United States only.</p></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-q" type="button" aria-expanded="false">Is checkout discreet and secure? <span class="icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></button>
-          <div class="faq-a"><p>Always. Orders ship in a plain padded envelope, no branding, nothing on the outside naming what is inside, and checkout runs on Stripe’s own encrypted payment form, card only. Stripe handles and stores the card details, not us.</p></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-q" type="button" aria-expanded="false">What does "research use only" mean? <span class="icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></button>
-          <div class="faq-a"><p>No. Not for use in humans or animals. Laboratory and in-vitro research only, sold to qualified buyers and institutions, not a drug or a supplement. We do not publish dosing or administration guidance and will not supply it if asked. The RUO Agreement covers what you accepted on the way in.</p></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ============ more from Glow ============
        Last, and reachable without reading anything: everything above it is
        either the buy box, four rows of provenance, or two closed accordions.
@@ -1051,11 +973,14 @@
        heading is not writing a cheque a thin category cannot cash. -->
   <section class="pd-section pd-related" id="pdRelatedSection">
     <div class="container">
-      <h2>More from Glow</h2>
-      <div class="product-grid" id="pdRelatedGrid"></div>
-      <a class="gs-more" href="shop">
-        View the full catalog <span aria-hidden="true">&rarr;</span>
-      </a>
+      <div class="pr-head">
+        <div>
+          <span class="pd-label">More from Glow</span>
+          <h2>Every lot, certificate on file.</h2>
+        </div>
+        <a class="gs-more" href="shop">View the full catalog <span aria-hidden="true">&rarr;</span></a>
+      </div>
+      <div class="pr-row" id="pdRelatedGrid" tabindex="0" aria-label="More compounds"></div>
     </div>
   </section>
 
@@ -1168,6 +1093,7 @@
 <script src="js/cart.js"></script>
 <script src="js/cart-modal.js"></script>
 <script src="js/search.js"></script>
+<script src="js/coa.js"></script>
 <script src="js/product.js"></script>
 <script src="js/account.js"></script></body>
 </html>

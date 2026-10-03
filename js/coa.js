@@ -14,13 +14,15 @@
 // Fill the URLs, flip the flag, and the same dialog renders the PDF with a
 // download beside it. Nothing here needs rewriting for that to happen.
 (function () {
+  // The viewer below is shared: the product page loads this file for it alone,
+  // with no grid, so only the list and search wait on the grid existing.
   const grid = document.getElementById('coaGrid');
-  if (!grid) return;
 
   const input = document.getElementById('coaSearch');
   const countEl = document.getElementById('coaCount');
   const emptyEl = document.getElementById('coaEmpty');
 
+  if (grid) {
   /* ---------- the list ---------- */
 
   grid.innerHTML = GLOW_PRODUCTS.map(coaCardHtml).join('');
@@ -76,6 +78,7 @@
         }
       }, 400);
     });
+  }
   }
 
   /* ---------- the viewer ----------
@@ -231,7 +234,9 @@
 
   // Delegated, so it keeps working over cards the search has hidden and shown
   // rather than needing rebinding on every keystroke.
-  grid.addEventListener('click', e => {
+  window.GlowCoaViewer = { open };
+
+  if (grid) grid.addEventListener('click', e => {
     const btn = e.target.closest('[data-coa-view]');
     if (!btn) return;
     const p = GLOW_PRODUCTS.find(x => x.name === btn.dataset.coaView);

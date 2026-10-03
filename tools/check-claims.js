@@ -769,7 +769,10 @@ console.log('\nthe batch analysis panel');
     !/function renderSticky\(\)/.test(pj),
     'renderSticky() must be handed renderPrice()\'s total rather than deriving one');
   ok('the bar adds through the one cart line the buy box builds',
-    (pj.match(/GlowCart\.add\(/g) || []).length === 1 &&
+    // Two adds in the file: the buy box's addCurrent(), which the bar shares,
+    // and the one-vial Add on each card in the More from Glow row.
+    (pj.match(/GlowCart\.add\(/g) || []).length === 2 &&
+    /function renderRelated[\s\S]*?GlowCart\.add\(/.test(pj) &&
     /const sticky = \$\('pdStickyAdd'\)/.test(pj) &&
     /sticky\.addEventListener\('click', \(\) => \{\s*addCurrent\(\);/.test(pj));
   // Out of stock has to reach both buttons from the same test, or the bar
@@ -1658,26 +1661,17 @@ console.log('\nwelcome landing page');
   ok(`all ${FAQS.length} answers are in its served HTML`,
     (wl.match(/class="faq-q"/g) || []).length === FAQS.length);
 
-  // Product pages carry the homepage's promises and FAQ under the batch
-  // analysis. The cards are static text, so the guard is that each page holds
-  // the homepage's three cards verbatim and the same list faqHtml() renders.
+  // The three promises and the FAQ were taken off product pages: the page is
+  // the buy box, the analysis, the compound and the next product to look at.
+  // Guarded as absent so a template edit cannot quietly bring them back.
   {
-    const cards = h => (h.match(/<article class="standard-card[\s\S]*?<\/article>/g) || [])
-      .map(c => c.replace(/ reveal(?=[" ])/g, '').replace(/\s+/g, ' ').replace(/(src|href)="(?:\.\.\/)*/g, '$1="'));
-    const productPages = everyPage.filter(f => f.startsWith('product/')).map(file => ({ file }));
-    const productJs = read('js/product.js');
-    const homeCards = cards(read('index.html'));
-    const badPromises = productPages.filter(({ file }) =>
-      JSON.stringify(cards(read(file))) !== JSON.stringify(homeCards));
-    ok('every product page carries the homepage\'s three promises cards verbatim',
-      homeCards.length === 3 && badPromises.length === 0, badPromises.map(p => p.file).join(', '));
-    const badFaq = productPages.filter(({ file }) => {
-      const m = read(file).match(/<div class="faq-list" id="faqList">([\s\S]*?)<\/div>\s*<\/div>\s*<\/section>/);
-      return !m || m[1].trim() !== faqHtml().trim();
-    });
-    ok('and the same FAQ faqHtml() renders', badFaq.length === 0, badFaq.map(p => p.file).join(', '));
-    ok('js/product.js binds the accordion, since product pages do not load script.js',
-      /function initFaq\(\)/.test(productJs) && /initFaq\(\);/.test(productJs));
+    const productPages = everyPage.filter(f => f.startsWith('product/'));
+    const still = productPages.filter(f => /class="standard-card|id="faqList"/.test(read(f)));
+    ok('product pages carry no promises cards and no FAQ', still.length === 0, still.join(', '));
+    ok('and product certificates open in the shared viewer, not a new tab',
+      /window\.GlowCoaViewer\.open\(product\)/.test(read('js/product.js')) &&
+      /window\.GlowCoaViewer = \{ open \}/.test(read('js/coa.js')) &&
+      /<script src="js\/coa\.js"><\/script>/.test(read('product.html')));
   }
 
   // The terms strip that restated these two standing terms is gone, so the
