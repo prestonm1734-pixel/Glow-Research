@@ -230,8 +230,8 @@ const PARTNER_PROGRAM = {
   commissionPct: 20,
   cookieDays: 30,
   payouts: 'PayPal or Stripe',
-  signupUrl: '',
-  loginUrl: '',
+  signupUrl: 'https://glowresearch.goaffpro.com/create-account',
+  loginUrl: 'https://glowresearch.goaffpro.com/login',
   fallbackEmail: 'support@glowresearch.shop',
 };
 
