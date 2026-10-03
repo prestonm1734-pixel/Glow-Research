@@ -38,20 +38,18 @@
   .ws-hero{ padding: clamp(40px, 6vw, 72px) 0 clamp(24px, 3vw, 36px); }
   .ws-kicker{ font-family:'JetBrains Mono', monospace; font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; color:#6b6b64; display:flex; align-items:center; gap:10px; }
   .ws-kicker::before{ content:''; width:22px; height:3px; background:#0a0a0a; }
-  .ws-hero h1{ font-size: clamp(2rem, 4.4vw, 3.2rem); letter-spacing:-.035em; line-height:1.05; margin: 14px 0 14px; font-weight:600; }
-  .ws-hero p{ max-width: 70ch; color:#55554f; line-height:1.6; margin:0; font-size:1.02rem; }
+  .ws-hero h1{ font-size: clamp(2.6rem, 7vw, 4.6rem); letter-spacing:-.045em; line-height:1; margin: 16px 0 12px; font-weight:600; }
+  .ws-hero p{ color:#55554f; line-height:1.5; margin:0; font-size: clamp(1rem, 1.6vw, 1.15rem); }
 
-  /* The rate ladder: three rows on a rule, no cards. The top rate is the
-     only one set in black, because it is the one the progress bar counts to. */
-  .ws-ladder{ list-style:none; margin: 30px 0 0; padding:0; display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); border-top:1px solid #0a0a0a; border-bottom:1px solid rgba(0,0,0,.14); }
-  .ws-ladder li{ display:flex; align-items:baseline; gap: 16px; padding: 22px 22px 22px 0; }
-  .ws-ladder li + li{ border-left:1px solid rgba(0,0,0,.12); padding-left: 22px; }
-  .ws-ladder b{ font-size: clamp(2.2rem, 4vw, 3rem); letter-spacing:-.04em; line-height:1; font-weight:600; color:#8a8a86; }
+  /* The rate ladder: three numbers and three short labels. Grey climbing to
+     black, because the top rate is the one the order bar counts toward. */
+  .ws-ladder{ list-style:none; margin: clamp(30px, 4vw, 44px) 0 0; padding:0; display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); border-top:1px solid rgba(0,0,0,.14); }
+  .ws-ladder li{ padding: 18px 0 0; }
+  .ws-ladder li + li{ border-left:1px solid rgba(0,0,0,.1); padding-left: clamp(14px, 3vw, 32px); }
+  .ws-ladder b{ display:block; font-size: clamp(2.4rem, 7vw, 4.4rem); letter-spacing:-.05em; line-height:.95; font-weight:600; color:#b4b4ae; }
+  .ws-ladder li:nth-child(2) b{ color:#6b6b64; }
   .ws-ladder li.is-top b{ color:#0a0a0a; }
-  .ws-ladder span{ font-size:.86rem; color:#6b6b64; line-height:1.4; }
-  .ws-ladder strong{ display:block; color:#0a0a0a; font-size:.96rem; margin-bottom:2px; }
-  .ws-perks{ display:flex; flex-wrap:wrap; gap: 8px 22px; margin: 16px 0 0 !important; font-family:'JetBrains Mono', monospace; font-size:.68rem !important; letter-spacing:.12em; text-transform:uppercase; color:#6b6b64 !important; }
-  .ws-perks span::before{ content:''; display:inline-block; width:6px; height:6px; background:#0a0a0a; margin-right:8px; vertical-align:1px; }
+  .ws-ladder span{ display:block; margin-top: 10px; font-family:'JetBrains Mono', monospace; font-size: clamp(.58rem, 1.6vw, .7rem); letter-spacing:.12em; text-transform:uppercase; color:#6b6b64; line-height:1.5; }
 
   .ws-builder{ display:grid; grid-template-columns: minmax(0,1fr) 380px; gap: 28px; align-items:start; padding-top: 20px; padding-bottom: clamp(56px, 7vw, 90px); }
   .ws-search{ width:100%; max-width: 420px; padding: 13px 14px 13px 40px; border:1px solid rgba(0,0,0,.18); font: inherit; font-size:.95rem;
@@ -126,10 +124,6 @@
 
   @media (max-width: 1100px){ .ws-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
   @media (max-width: 900px){
-    .ws-ladder{ grid-template-columns: 1fr; }
-    .ws-ladder li{ padding: 16px 0; }
-    .ws-ladder li + li{ border-left:0; border-top:1px solid rgba(0,0,0,.12); padding-left:0; }
-    .ws-ladder b{ min-width: 92px; }
     .ws-builder{ grid-template-columns: 1fr; padding-bottom: 120px; }
     /* The order becomes a sheet behind a sticky bar, so the grid gets the
        whole screen and the total is always one tap away. */
@@ -299,21 +293,15 @@
 
 <section class="ws-hero">
   <div class="container">
-    <span class="ws-kicker">Wholesale research peptides</span>
-    <h1>Buy in bulk. Save up to 55%.</h1>
-    <p id="wsLede">
-      Wholesale pricing starts at 10 units of a compound: every unit is 40% off
-      from 10, 50% off once a compound reaches 50, and 55% off everything once
-      the order reaches 100 units, any mix. One checkout, shipped free on FedEx
-      2-Day.
-    </p>
+    <span class="ws-kicker">Wholesale</span>
+    <h1>Buy in bulk.</h1>
+    <p id="wsLede">Save up to 55% on every vial. Free FedEx 2-Day.</p>
 
     <ol class="ws-ladder" aria-label="Wholesale rates">
-      <li><b>40%</b><span><strong>10+ of a compound</strong>off every unit of that compound</span></li>
-      <li><b>50%</b><span><strong>50+ of a compound</strong>off every unit, not only the extras</span></li>
-      <li class="is-top"><b>55%</b><span><strong>100+ units in the order</strong>off every unit, any mix of compounds</span></li>
+      <li><b>40%</b><span>10+ of one compound</span></li>
+      <li><b>50%</b><span>50+ of one compound</span></li>
+      <li class="is-top"><b>55%</b><span>100+ units, any mix</span></li>
     </ol>
-    <p class="ws-perks"><span>Free FedEx 2-Day</span><span>Same-day dispatch before 1:00 PM PT</span><span>COA on every lot</span></p>
   </div>
 </section>
 

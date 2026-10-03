@@ -2214,9 +2214,9 @@ console.log('\nbulk pricing');
       `${D.WHOLESALE_TIERS[0].off} vs ${BULK_MAX_OFF}`);
     const tierText = D.WHOLESALE_TIERS.every(t => ws.includes(`<b>${Math.round(t.off * 100)}%</b>`)) &&
       ws.includes(`Save up to ${Math.round(D.WHOLESALE_MAX_OFF * 100)}%`) &&
-      ws.includes(`${Math.round(D.WHOLESALE_TIERS[0].off * 100)}% off\n      from ${D.WHOLESALE_TIERS[0].min}`) &&
-      ws.includes(`once a compound reaches ${D.WHOLESALE_TIERS[1].min}`) &&
-      ws.includes(`once\n      the order reaches ${D.WHOLESALE_TIERS[2].min} units`);
+      D.WHOLESALE_TIERS.every(x => ws.includes(`<b>${Math.round(x.off * 100)}%</b><span>${x.min}+ `)) &&
+      ws.includes(`From ${D.WHOLESALE_TIERS[0].min} units every unit of that compound is ${Math.round(D.WHOLESALE_TIERS[0].off * 100)}% off, and from ${D.WHOLESALE_TIERS[1].min} units it is ${Math.round(D.WHOLESALE_TIERS[1].off * 100)}% off`) &&
+      ws.includes(`once the whole order reaches ${D.WHOLESALE_TIERS[2].min} units every unit in it is ${Math.round(D.WHOLESALE_TIERS[2].off * 100)}% off`);
     ok('wholesale.html states the rates and thresholds WHOLESALE_TIERS holds', tierText);
     const caps = GLOW_PRODUCTS.filter(p => typeof p.wholesaleMaxOff === 'number');
     ok('and names every compound cap the catalog sets, at its figure',
