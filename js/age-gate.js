@@ -66,31 +66,43 @@
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
     el.setAttribute('aria-labelledby', 'ageGateTitle');
-    // No backdrop image: the page behind stays visible through a light wash
-    // set in css/style.css, which is the point of this being a floating card.
+    // A still frame of the homepage hero's vial, not the video: the gate has
+    // to render instantly on first paint, before js/script.js exists to
+    // decide whether motion is even allowed, so a static image is the only
+    // honest choice here. Layered under a near-opaque wash rather than shown
+    // at full strength — "subtle" is the point, not another hero moment.
+    el.style.backgroundImage =
+      'linear-gradient(rgba(4,4,4,.92), rgba(4,4,4,.95)), url("' + root + 'assets/hero-vial-poster.jpg")';
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
     el.innerHTML =
-      // focus lands on the panel rather than the button: focusing a control
-      // programmatically trips :focus-visible in Chromium, so the gate would
-      // open with a heavy ring already drawn around it
+      // focus lands on the panel rather than the Enter button: focusing a
+      // control programmatically trips :focus-visible in Chromium, so the
+      // gate would open with a heavy ring already drawn around it
       '<div class="age-gate-panel" id="ageGatePanel" tabindex="-1">' +
-        '<span class="age-gate-logo">Glow<span class="spark">&#10022;</span></span>' +
-        '<h2 class="age-gate-title" id="ageGateTitle">Age Disclaimer</h2>' +
+        '<span class="age-gate-logo">Glow<span class="spark">✦</span></span>' +
+        '<span class="age-gate-eyebrow">Research Use Only</span>' +
+        '<h2 class="age-gate-title" id="ageGateTitle">You must be 21 or older to enter</h2>' +
         '<p class="age-gate-copy">' +
-          'You must be at least 21 years old to enter Glow Research and review ' +
-          'products intended for laboratory research use only.' +
+          'Glow Research supplies research compounds strictly for in-vitro laboratory use, ' +
+          'not for human or veterinary consumption. By entering you confirm you are at least ' +
+          '21 and agree to our <a href="' + root + 'terms.html">Terms</a> &amp; ' +
+          '<a href="' + root + 'ruo-agreement.html">RUO Agreement</a>.' +
         '</p>' +
-        '<div class="age-gate-actions">' +
-          '<button type="button" class="age-gate-enter" id="ageGateEnter">' +
-            'I am 21 or older <span aria-hidden="true">&rarr;</span>' +
-          '</button>' +
-          // Same facts the footer and the RUO Agreement already state, in the
-          // same words: not for human or animal use, and what entering means.
-          '<p class="age-gate-fine">' +
-            'Not for human or veterinary use. By entering you agree to our ' +
-            '<a href="' + root + 'terms.html">Terms</a> &amp; ' +
-            '<a href="' + root + 'ruo-agreement.html">RUO Agreement</a>.' +
-          '</p>' +
-        '</div>' +
+        '<button type="button" class="btn btn-primary age-gate-enter" id="ageGateEnter">' +
+          'I am 21 or older' +
+        '</button>' +
+        '<button type="button" class="btn btn-outline age-gate-exit" id="ageGateExit">Exit</button>' +
+        // Three of the same facts the marquee and the FAQ already state in
+        // these words, restated small underneath rather than argued for
+        // again: this is the one screen where a first-time visitor has
+        // nothing else on the page yet to tell them Glow is a real lab
+        // supplier and not a storefront that vanishes with their card number.
+        '<p class="age-gate-badges">' +
+          '<span>HPLC + Identity + Quantity Tested</span>' +
+          '<span>COA on Every Batch</span>' +
+          '<span>Discreet Shipping</span>' +
+        '</p>' +
       '</div>';
     return el;
   }
@@ -101,6 +113,7 @@
     document.documentElement.classList.add('age-gate-open');
 
     var enter = el.querySelector('#ageGateEnter');
+    var exit = el.querySelector('#ageGateExit');
 
     enter.addEventListener('click', function () {
       remember();
@@ -109,6 +122,10 @@
       // let the fade finish before the node goes, but don't leave it in the
       // tree if the transition never fires (reduced-motion, background tab)
       setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 260);
+    });
+
+    exit.addEventListener('click', function () {
+      window.location.href = 'https://www.google.com';
     });
 
     // A gate is not dismissible: no Esc, no click-outside. Keep focus inside
