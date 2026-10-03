@@ -5,10 +5,28 @@
     { "source": "/shop", "destination": "/shop.html" }
   ],
   "redirects": [
+    { "source": "/peptides/glp-3-rt/", "destination": "/product/g3-r/", "permanent": true },
+    { "source": "/peptides/glp-3-rt", "destination": "/product/g3-r/", "permanent": true },
+    { "source": "/product/glp-3-rt/", "destination": "/product/g3-r/", "permanent": true },
+    { "source": "/product/glp-3-rt", "destination": "/product/g3-r/", "permanent": true },
+    { "source": "/peptides/glp-1-sm/", "destination": "/product/g1-s/", "permanent": true },
+    { "source": "/peptides/glp-1-sm", "destination": "/product/g1-s/", "permanent": true },
+    { "source": "/product/glp-1-sm/", "destination": "/product/g1-s/", "permanent": true },
+    { "source": "/product/glp-1-sm", "destination": "/product/g1-s/", "permanent": true },
+    { "source": "/peptides/glp-2-tr/", "destination": "/product/g2-t/", "permanent": true },
+    { "source": "/peptides/glp-2-tr", "destination": "/product/g2-t/", "permanent": true },
+    { "source": "/product/glp-2-tr/", "destination": "/product/g2-t/", "permanent": true },
+    { "source": "/product/glp-2-tr", "destination": "/product/g2-t/", "permanent": true },
+    { "source": "/peptides/glp-2-tz/", "destination": "/product/g2-t/", "permanent": true },
+    { "source": "/peptides/glp-2-tz", "destination": "/product/g2-t/", "permanent": true },
+    { "source": "/product/glp-2-tz/", "destination": "/product/g2-t/", "permanent": true },
+    { "source": "/product/glp-2-tz", "destination": "/product/g2-t/", "permanent": true },
     { "source": "/peptides/:slug/", "destination": "/product/:slug/", "permanent": true },
     { "source": "/peptides/:slug", "destination": "/product/:slug", "permanent": true },
     { "source": "/affiliates.html", "destination": "/", "permanent": true },
-    { "source": "/returns.html", "destination": "/return-policy.html", "permanent": true }
+    { "source": "/returns.html", "destination": "/return-policy.html", "permanent": true },
+    { "source": "/peptides.html", "destination": "/shop", "permanent": true },
+    { "source": "/product/:slug/:page((?!index\\.html$).+\\.html)", "destination": "/:page", "permanent": true }
   ],
   "headers": [
     {

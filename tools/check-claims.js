@@ -4161,6 +4161,22 @@ console.log('\nhero image');
     // Dead addresses that once served pages go somewhere real rather than 404.
     const vercel = JSON.parse(read('vercel.json'));
     const redirected = (vercel.redirects || []).map(r => r.source);
+    // The five addresses Search Console reported as 404 on 3 October 2026:
+    // the old /peptides/ GLP URLs (which the generic /peptides/:slug rule sent
+    // to product slugs that never existed), the old catalog page, and a page
+    // reached through a relative link resolved under a product directory.
+    // Specific rules have to come before the generic one, since Vercel takes
+    // the first match.
+    const rules = vercel.redirects || [];
+    const firstMatch = src => rules.find(r => r.source === src);
+    const generic = rules.findIndex(r => r.source === '/peptides/:slug/');
+    ok('the old GLP addresses redirect to the pages that replaced them, ahead of the generic rule',
+      [['/peptides/glp-3-rt/', '/product/g3-r/'], ['/peptides/glp-1-sm/', '/product/g1-s/'], ['/peptides/glp-2-tr/', '/product/g2-t/']]
+        .every(([src, dest]) => firstMatch(src) && firstMatch(src).destination === dest &&
+          rules.indexOf(firstMatch(src)) < generic &&
+          fs.existsSync(path.join(ROOT, dest.slice(1), 'index.html'))));
+    ok('the old catalog page and stray nested .html links redirect',
+      !!firstMatch('/peptides.html') && !!rules.find(r => /^\/product\/:slug\/:page/.test(r.source) && /\(\?!index/.test(r.source)));
     ok('removed pages redirect instead of 404ing',
       ['/affiliates.html', '/returns.html'].every(s => redirected.includes(s)) &&
       !fs.existsSync(path.join(ROOT, 'affiliates.html')) && !fs.existsSync(path.join(ROOT, 'returns.html')));
