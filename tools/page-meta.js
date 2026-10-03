@@ -78,9 +78,11 @@ const PAGE_META = {
     desc: 'Volume pricing, a named contact, and custom fill sizes for labs ordering at scale. Applications are answered within one business day.',
   },
   'partners.html': {
-    name: 'Partner Program',
-    title: t('Partner Program'),
-    desc: 'Earn 20% on every order you refer to Glow Research. Your own referral link at signup, a live dashboard, 30-day tracking and PayPal or Stripe payouts.',
+    name: 'Peptide Affiliate Program',
+    // "Partner Program" in the header, but searchers type "affiliate":
+    // the title and description carry the words the page is found by.
+    title: 'Peptide Affiliate Program: Earn 20% | Glow Research',
+    desc: 'Peptide affiliate program: earn 20% on every order you refer. Approved instantly, 30-day cookie, payouts by PayPal, Venmo, Cash App or bank transfer.',
   },
   'coa.html': {
     name: 'Certificate of Analysis',

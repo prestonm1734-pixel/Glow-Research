@@ -4194,7 +4194,9 @@ console.log('\nhero image');
       pt.includes(`<strong>${PP.cookieDays} days.</strong>`) &&
       pt.includes(`orders within ${PP.cookieDays} days`) &&
       pt.includes(`By ${PP.payouts}.`) &&
-      read('tools/page-meta.js').includes(`Earn ${PP.commissionPct}% on every order you refer`));
+      read('tools/page-meta.js').toLowerCase().includes(`earn ${PP.commissionPct}% on every order you refer`) &&
+      read('tools/page-meta.js').includes(`payouts by ${PP.payouts}.`) &&
+      pt.includes(`payouts by ${PP.payouts}.`));
     const signups = [...pt.matchAll(/<a href="([^"]*)"[^>]*data-partner-signup/g)].map(m => m[1]);
     const logins = [...pt.matchAll(/<a href="([^"]*)"[^>]*data-partner-login/g)].map(m => m[1]);
     const wantSignup = h => PP.signupUrl ? h === PP.signupUrl : h.startsWith(`mailto:${PP.fallbackEmail}`);
@@ -4218,6 +4220,26 @@ console.log('\nhero image');
       (ptMain.match(/PayPal[^.<]*/g) || []).every(t => t.startsWith(PP.payouts)) &&
       /PARTNER_PROGRAM\.commissionPct/.test(pt),
       `rates ${pcts.join(', ')} | days ${days.join(', ')}`);
+    // Search: the FAQPage markup states exactly the questions and answers the
+    // reader sees, and the page is linked from every footer as well as the
+    // header, so it is not one link deep from nowhere.
+    const faqLd = (pt.match(/<script type="application\/ld\+json" id="partners-faq-jsonld">([\s\S]*?)<\/script>/) || [])[1];
+    const visibleQa = [...pt.matchAll(/<details><summary>(.*?)<\/summary><p>(.*?)<\/p><\/details>/g)]
+      .map(m => [m[1], m[2].replace(/<[^>]+>/g, '')]);
+    let faqOk = false;
+    try {
+      const ld = JSON.parse(faqLd);
+      const unesc = t => t.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+      faqOk = ld.mainEntity.length === visibleQa.length && visibleQa.length > 0 &&
+        ld.mainEntity.every((q, i) => q.name === unesc(visibleQa[i][0]) && q.acceptedAnswer.text === unesc(visibleQa[i][1]));
+    } catch (e) { faqOk = false; }
+    ok('the partner page FAQ markup matches its visible questions and answers', faqOk,
+      'regenerate the partners-faq-jsonld block from the visible FAQ');
+    const noFooterLink = everyPage.filter(f => {
+      const col = (read(f).match(/<h4>Company<\/h4>([\s\S]*?)<\/div>/) || [])[1];
+      return col !== undefined && !/partners\.html">Partner Program<\/a>/.test(col);
+    });
+    ok('and every footer links to it', noFooterLink.length === 0, noFooterLink.join(', '));
     // Partners get a referral link only: the store runs no discounts or promo
     // codes for partners, and GoAffPro on the SDK platform cannot create a
     // code our Stripe-validated checkout would accept anyway.
