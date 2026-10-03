@@ -1706,7 +1706,7 @@ console.log('\nwelcome landing page');
     const want = PAYMENTS_LIVE ? PAYMENT_METHODS.filter(m => m.logo) : [];
     const bad = everyPage.filter(f => {
       const h = read(f);
-      if (!/class="footer-bottom"/.test(h)) return false;
+      if (!/class="footer-legal"/.test(h)) return false;
       const row = (h.match(/<!-- pay:start -->([\s\S]*?)<!-- pay:end -->/) || [])[1];
       if (row === undefined) return true;
       const alts = [...row.matchAll(/alt="([^"]+)"/g)].map(m => m[1]);

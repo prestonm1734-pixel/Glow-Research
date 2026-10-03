@@ -2693,8 +2693,6 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
 .home-faq .faq-a p{ padding: 0 0 24px; max-width: 72ch; color: rgba(255,255,255,.68); line-height:1.7; }
 .home-faq .faq-list, .home-faq .faq-list:has(> .faq-col:only-child){ max-width:none; display:block; }
 
-/* Accepted payment marks, last line of every footer, from PAYMENT_METHODS. */
-.footer-bottom{ align-items:center; justify-content:space-between; }
-.footer-pay{ display:flex; flex-wrap:wrap; gap:8px; }
+/* Accepted payment marks, under the copyright line, from PAYMENT_METHODS. */
+.footer-pay{ display:flex; flex-wrap:wrap; gap:8px; margin-top: 14px; }
 .footer-pay img{ display:block; width:44px; height:28px; }
-@media (max-width: 760px){ .footer-bottom{ flex-direction:column; align-items:flex-start; gap:14px; } }
