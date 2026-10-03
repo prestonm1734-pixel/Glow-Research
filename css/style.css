@@ -2671,3 +2671,24 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
   .coa-modal-actions{ margin-top: 14px; }
   .coa-modal-note{ margin-top: 14px; font-size:.75rem; }
 }
+
+/* ---------- homepage FAQ ----------
+   One column of rules on black, under the white certificate row: a question
+   per line with a plus that turns to a minus, no boxes. Homepage only, so
+   the welcome page keeps its own two-column cards. */
+.home-faq{ background:#000; color:#fff; padding: clamp(64px, 8vw, 104px) 0; }
+.home-faq-head{ margin-bottom: 28px; }
+.home-faq-head .eyebrow{ color: rgba(255,255,255,.55); display:inline-flex; align-items:center; gap:10px; }
+.home-faq-head .eyebrow::before{ content:''; width:20px; height:3px; background:#fff; }
+.home-faq-head h2{ margin: 12px 0 0; font-size: clamp(2rem, 4.4vw, 3rem); letter-spacing:-.035em; line-height:1.05; color:#fff; }
+.home-faq .faq-list{ display:block; max-width:none; margin:0; border-top:1px solid rgba(255,255,255,.18); }
+.home-faq .faq-col{ display:block; gap:0; }
+.home-faq .faq-item{ border:0; border-bottom:1px solid rgba(255,255,255,.18); }
+.home-faq .faq-q{ padding: 22px 0; font-size: clamp(.98rem, 1.3vw, 1.08rem); font-weight:600; color:#fff; background:none; }
+.home-faq .faq-q:hover{ color: rgba(255,255,255,.75); }
+.home-faq .faq-q .icon svg{ display:none; }
+.home-faq .faq-q .icon::before{ content:'+'; font-size:1.35rem; font-weight:300; line-height:1; color: rgba(255,255,255,.7); }
+.home-faq .faq-item.open .faq-q .icon{ transform:none; }
+.home-faq .faq-item.open .faq-q .icon::before{ content:'\2212'; }
+.home-faq .faq-a p{ padding: 0 0 24px; max-width: 72ch; color: rgba(255,255,255,.68); line-height:1.7; }
+.home-faq .faq-list, .home-faq .faq-list:has(> .faq-col:only-child){ max-width:none; display:block; }

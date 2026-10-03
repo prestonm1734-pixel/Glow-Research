@@ -1604,8 +1604,10 @@ console.log('\nwelcome landing page');
   ok('welcome.html\'s FAQ is not section-light',
     !/class="section wl-faq-sec"[\s\S]{0,20}section-light|section-light wl-faq-sec/.test(wl) &&
     /class="section wl-faq-sec"/.test(wl));
-  ok('and index.html\'s FAQ still is',
-    /class="section section-light" id="faq"/.test(read('index.html')));
+  // index.html's FAQ is black too now, under the white certificate row, but
+  // in its own one-column style (home-faq), so the two stay separate.
+  ok('and index.html\'s FAQ uses its own home-faq style, not this page\'s',
+    /class="section home-faq" id="faq"/.test(read('index.html')) && !/wl-faq-sec/.test(read('index.html')));
   const wlNoComments = wl.replace(/<!--[\s\S]*?-->/g, '');
   ok('the black FAQ carries a centred, light-on-dark head like the section above it',
     /id="faq">[\s\S]{0,40}<div class="section-head center reveal light">/.test(wlNoComments));
