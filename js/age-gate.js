@@ -19,7 +19,7 @@
   // older version does not carry forward: someone who agreed to a weaker
   // statement has not agreed to this one, and the whole point of recording an
   // attestation is that it says what was actually attested to.
-  var ATTESTATION_VERSION = 4;
+  var ATTESTATION_VERSION = 5;
 
   // sessionStorage throws in Safari private mode rather than returning null,
   // and a gate that hard-fails there would lock the whole site behind an
@@ -42,7 +42,6 @@
         v: ATTESTATION_VERSION,
         at: new Date().toISOString(),
         age21: true,
-        qualifiedResearcher: true,
         researchUseOnly: true,
       }));
     } catch (e) { /* private mode: gate reappears next page, harmless */ }
@@ -80,23 +79,11 @@
           'Products on this site are sold exclusively for laboratory research. They are ' +
           'not for human consumption, medical, veterinary, or any in-vivo use.' +
         '</p>' +
-        '<label class="age-gate-check">' +
-          '<input type="checkbox" id="ageGateAge" />' +
-          '<span class="age-gate-box" aria-hidden="true"></span>' +
-          '<span>I am at least <strong>21 years of age.</strong></span>' +
-        '</label>' +
-        '<label class="age-gate-check">' +
-          '<input type="checkbox" id="ageGateResearcher" />' +
-          '<span class="age-gate-box" aria-hidden="true"></span>' +
-          '<span>I confirm I am a <strong>qualified researcher</strong> purchasing for ' +
-            '<strong>in-vitro / laboratory research</strong> only, not for human or ' +
-            'veterinary use.</span>' +
-        '</label>' +
-        '<button type="button" class="age-gate-enter" id="ageGateEnter" disabled>Enter site</button>' +
+        '<button type="button" class="age-gate-enter" id="ageGateEnter">I am 21 or older</button>' +
         '<p class="age-gate-links">' +
-          '<a href="' + root + 'terms.html">Terms of Service</a>' +
-          '<span aria-hidden="true">&middot;</span>' +
-          '<a href="' + root + 'ruo-agreement.html">Research Use Disclaimer</a>' +
+          'By entering you confirm you are at least 21 and agree to our ' +
+          '<a href="' + root + 'terms.html">Terms</a> &amp; ' +
+          '<a href="' + root + 'ruo-agreement.html">Research Use Disclaimer</a>.' +
         '</p>' +
       '</div>';
     return el;
@@ -108,17 +95,8 @@
     document.documentElement.classList.add('age-gate-open');
 
     var enter = el.querySelector('#ageGateEnter');
-    var age = el.querySelector('#ageGateAge');
-    var researcher = el.querySelector('#ageGateResearcher');
-
-    // Both statements have to be affirmed, each on its own: the button stays
-    // disabled until they are, so there is no way in on one box alone.
-    function sync() { enter.disabled = !(age.checked && researcher.checked); }
-    age.addEventListener('change', sync);
-    researcher.addEventListener('change', sync);
 
     enter.addEventListener('click', function () {
-      if (enter.disabled) return;
       remember();
       document.documentElement.classList.remove('age-gate-open');
       el.classList.add('is-going');
@@ -131,7 +109,7 @@
     // it so a keyboard user can't tab into the page they haven't agreed to.
     el.addEventListener('keydown', function (e) {
       if (e.key !== 'Tab') return;
-      var focusable = el.querySelectorAll('a[href], button:not([disabled]), input');
+      var focusable = el.querySelectorAll('a[href], button');
       var first = focusable[0];
       var last = focusable[focusable.length - 1];
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
