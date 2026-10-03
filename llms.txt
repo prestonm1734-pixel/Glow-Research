@@ -35,9 +35,9 @@ benefit.
 
 ### Metabolic Research
 
-- **G3-R** (https://glowresearch.shop/product/g3-r/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $119.97 per vial. Current lot 1032, 99.9% purity. COA: https://glowresearch.shop/assets/coas/g3-r-lot-1032.pdf.
-- **G1-S** (https://glowresearch.shop/product/g1-s/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $74.97 per vial. Current lot 1050, 99.57% purity. COA: https://glowresearch.shop/assets/coas/g1-s-lot-1050.pdf.
-- **G2-T** (https://glowresearch.shop/product/g2-t/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $109.97 per vial. Current lot 1600, 99.75% purity. COA: https://glowresearch.shop/assets/coas/g2-t-lot-1600.pdf.
+- **GLP-3 (RT)** (https://glowresearch.shop/product/g3-r/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $119.97 per vial. Current lot 1032, 99.9% purity. COA: https://glowresearch.shop/assets/coas/g3-r-lot-1032.pdf.
+- **GLP-1 (SM)** (https://glowresearch.shop/product/g1-s/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $74.97 per vial. Current lot 1050, 99.57% purity. COA: https://glowresearch.shop/assets/coas/g1-s-lot-1050.pdf.
+- **GLP-2 (TZ)** (https://glowresearch.shop/product/g2-t/): A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies. Sizes: 10mg. From $109.97 per vial. Current lot 1600, 99.75% purity. COA: https://glowresearch.shop/assets/coas/g2-t-lot-1600.pdf.
 
 ### Tissue Research
 

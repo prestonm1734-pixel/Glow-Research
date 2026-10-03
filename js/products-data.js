@@ -356,7 +356,7 @@ function coaHref(p) {
 // a single `sizes[]` row matching the one size the launch list states; add a
 // second size only once the supplier confirms a SKU for it.
 const GLOW_PRODUCTS = [
-  { name: 'G3-R', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:null,
+  { name: 'GLP-3 (RT)', tag: null, cat: 'metabolic', purity: '99.9%', lot: '1032', badge:null,
     coa: 'assets/coas/g3-r-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [
@@ -371,13 +371,13 @@ const GLOW_PRODUCTS = [
     ] },
   // Order is curated, not alphabetical or by add date: it drives the
   // catalog's default "Featured" sort. The homepage does not read this order
-  // directly any more — js/script.js features G3-R first there via
+  // directly any more — js/script.js features GLP-3 (RT) first there via
   // renderProductGrid's featureFirst option, since the homepage and the
   // catalog want different first impressions and used to fight over the one
   // order both pages shared.
   //
   // Leads with the tissue-repair peptides and their blend, then the three
-  // "metabolic" compounds (G3-R, G1-S, G2-T) interleaved with the
+  // "metabolic" compounds (GLP-3 (RT), GLP-1 (SM), GLP-2 (TZ)) interleaved with the
   // secretagogue and longevity products rather than run together. Three of
   // them back to back in the grid reads as a weight-loss storefront's
   // product line, the same concern behind dropping "Metabolic Research"
@@ -452,7 +452,7 @@ const GLOW_PRODUCTS = [
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
-  { name: 'G1-S', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:null,
+  { name: 'GLP-1 (SM)', tag: null, cat: 'metabolic', purity: '99.57%', lot: '1050', badge:null,
     coa: 'assets/coas/g1-s-lot-1050.pdf', coaRef: 'WVED-FDT9', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '11.96 mg' },
     sizes: [{ mg: '10mg', price: 74.97, list: 82, sku: 'GLO-SM10', image: 'assets/products/g1-s-10mg-v5.webp' }],
@@ -474,7 +474,7 @@ const GLOW_PRODUCTS = [
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
-  { name: 'G2-T', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
+  { name: 'GLP-2 (TZ)', tag: null, cat: 'metabolic', purity: '99.75%', lot: '1600', badge:null,
     coa: 'assets/coas/g2-t-lot-1600.pdf', coaRef: '7RRU-W2LV', tested: '29 July 2026',
     results: { Identity: 'Conforms', Quantity: '12.49 mg' },
     sizes: [{ mg: '10mg', price: 109.97, list: 121, sku: 'GLO-T10', image: 'assets/products/g2-t-10mg-v5.webp' }],
@@ -1178,7 +1178,7 @@ function productKind(p) {
 // Sort comparators for the catalog's sort control. Keyed so the <option>
 // values and the sorting logic can't drift apart. 'featured' is deliberately
 // absent — no comparator means the curated GLOW_PRODUCTS order stands.
-// Names are compared with localeCompare + numeric so G3-R and CJC-1295
+// Names are compared with localeCompare + numeric so GLP-3 (RT) and CJC-1295
 // order by their digits rather than lexically ("CJC-1295" before "CJC-295").
 const PRODUCT_SORTS = {
   az:          (a, b) => a.name.localeCompare(b.name, 'en', { numeric: true }),
@@ -1376,7 +1376,18 @@ function productMetaDesc(p, size) {
 }
 
 // URL-safe id for linking a card to its detail page: "BPC-157" -> "bpc-157"
+//
+// The three metabolic compounds were renamed on the page (GLP-3 (RT), GLP-1
+// (SM), GLP-2 (TZ)) but keep their original addresses: /product/g3-r/ is in
+// the sitemap, in the shopping feeds and in anyone's bookmarks, and a rename
+// is not a reason to break any of them. Only these three are listed.
+const SLUG_OVERRIDES = {
+  'GLP-3 (RT)': 'g3-r',
+  'GLP-1 (SM)': 'g1-s',
+  'GLP-2 (TZ)': 'g2-t',
+};
 function productSlug(name) {
+  if (SLUG_OVERRIDES[name]) return SLUG_OVERRIDES[name];
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 function findProductBySlug(slug) {
@@ -1635,6 +1646,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     GLOW_PRODUCTS,
     productSlug,
+    SLUG_OVERRIDES,
     productMetaDesc,
     findProductBySlug,
     getProductVariants,
