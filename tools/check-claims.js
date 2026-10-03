@@ -4178,8 +4178,9 @@ console.log('\nhero image');
     ok('the old catalog page and stray nested .html links redirect',
       !!firstMatch('/peptides.html') && !!rules.find(r => /^\/product\/:slug\/:page/.test(r.source) && /\(\?!index/.test(r.source)));
     ok('removed pages redirect instead of 404ing',
-      ['/affiliates.html', '/returns.html'].every(s => redirected.includes(s)) &&
-      !fs.existsSync(path.join(ROOT, 'affiliates.html')) && !fs.existsSync(path.join(ROOT, 'returns.html')));
+      ['/returns.html', '/partners.html'].every(s => redirected.includes(s)) &&
+      !redirected.includes('/affiliates.html') && fs.existsSync(path.join(ROOT, 'affiliates.html')) &&
+      !fs.existsSync(path.join(ROOT, 'returns.html')) && !fs.existsSync(path.join(ROOT, 'partners.html')));
   }
 
   // The partner page states the program's terms. Every figure on it is
@@ -4187,8 +4188,8 @@ console.log('\nhero image');
   // set, or to the support inbox until then: never to nothing.
   {
     const { PARTNER_PROGRAM: PP } = require(path.join(ROOT, 'js/products-data.js'));
-    const pt = read('partners.html');
-    ok('partners.html states the commission, tracking window and payouts PARTNER_PROGRAM holds',
+    const pt = read('affiliates.html');
+    ok('affiliates.html states the commission, tracking window and payouts PARTNER_PROGRAM holds',
       pt.includes(`Earn ${PP.commissionPct}% on every order`) &&
       pt.includes(`<strong>${PP.commissionPct}%</strong> of every order`) &&
       pt.includes(`<strong>${PP.cookieDays} days.</strong>`) &&
@@ -4206,7 +4207,7 @@ console.log('\nhero image');
     const noPartnerNav = everyPage.filter(f => {
       const h = read(f);
       const nav = (h.match(/<nav class="main-nav" id="mainNav">([\s\S]*?)<\/nav>/) || [])[1];
-      return nav && !/href="(?:\/|(?:\.\.\/)*)partners\.html"/.test(nav);
+      return nav && !/href="(?:\/|(?:\.\.\/)*)affiliates\.html"/.test(nav);
     });
     ok('every page header links to the partner program', noPartnerNav.length === 0, noPartnerNav.join(', '));
     // The page repeats the rate, the cookie and the payout methods in the
@@ -4237,14 +4238,14 @@ console.log('\nhero image');
       'regenerate the partners-faq-jsonld block from the visible FAQ');
     const noFooterLink = everyPage.filter(f => {
       const col = (read(f).match(/<h4>Company<\/h4>([\s\S]*?)<\/div>/) || [])[1];
-      return col !== undefined && !/partners\.html">Partner Program<\/a>/.test(col);
+      return col !== undefined && !/affiliates\.html">Affiliate Program<\/a>/.test(col);
     });
     ok('and every footer links to it', noFooterLink.length === 0, noFooterLink.join(', '));
     // Partners get a referral link only: the store runs no discounts or promo
     // codes for partners, and GoAffPro on the SDK platform cannot create a
     // code our Stripe-validated checkout would accept anyway.
     ok('the partner page promises a link, never a coupon or discount code',
-      !/coupon|discount code|promo code/i.test(pt) && !/coupon/i.test(read('tools/page-meta.js').match(/'partners\.html'[\s\S]*?\}/)[0]));
+      !/coupon|discount code|promo code/i.test(pt) && !/coupon/i.test(read('tools/page-meta.js').match(/'affiliates\.html'[\s\S]*?\}/)[0]));
     // Commission is paid on the subtotal, as the page says, only if GoAffPro
     // is told the subtotal: total alone includes shipping and tax.
     ok('thank-you.js reports the subtotal, shipping and tax to GoAffPro',

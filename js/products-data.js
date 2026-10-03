@@ -218,7 +218,7 @@ const GOAFFPRO_SHOP_ID = 'regkhwnoue';
 const X_PIXEL_ID = 'repwj';
 
 // The partner program's terms, as configured in GoAffPro, stated once.
-// partners.html prints these figures and check-claims.js fails the build if
+// affiliates.html prints these figures and check-claims.js fails the build if
 // the page and this object disagree, so changing the commission in GoAffPro
 // means changing it here too, in the same sitting.
 //

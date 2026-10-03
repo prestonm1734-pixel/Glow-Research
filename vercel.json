@@ -23,8 +23,8 @@
     { "source": "/product/glp-2-tz", "destination": "/product/g2-t/", "permanent": true },
     { "source": "/peptides/:slug/", "destination": "/product/:slug/", "permanent": true },
     { "source": "/peptides/:slug", "destination": "/product/:slug", "permanent": true },
-    { "source": "/affiliates.html", "destination": "/", "permanent": true },
     { "source": "/returns.html", "destination": "/return-policy.html", "permanent": true },
+    { "source": "/partners.html", "destination": "/affiliates.html", "permanent": true },
     { "source": "/peptides.html", "destination": "/shop", "permanent": true },
     { "source": "/product/:slug/:page((?!index\\.html$).+\\.html)", "destination": "/:page", "permanent": true }
   ],

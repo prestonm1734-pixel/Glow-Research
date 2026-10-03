@@ -51,7 +51,7 @@ const STATIC_PAGES = [
   ['about.html', '0.6'],
   ['shipping.html', '0.6'],
   ['wholesale.html', '0.6'],
-  ['partners.html', '0.5'],
+  ['affiliates.html', '0.5'],
   ['contact.html', '0.5'],
   ['terms.html', '0.3'],
   ['privacy.html', '0.3'],
