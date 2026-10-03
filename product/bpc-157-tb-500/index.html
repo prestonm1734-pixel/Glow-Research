@@ -213,6 +213,9 @@
      the common case, not the only quantities the page can sell. */
   .pd-bulk{ margin-top: 18px; padding-top: 18px; border-top:1px solid rgba(0,0,0,.1); }
   .pd-tiers{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .pd-wholesale{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:10px; padding: 12px 14px;
+    border:1px solid rgba(0,0,0,.14); background:#f7f7f5; color:#0a0a0a; font-size:.88rem; font-weight:600; text-decoration:none; }
+  .pd-wholesale:hover{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
   .pd-tier{
     position:relative; background:#fafaf8; border:1.5px solid rgba(0,0,0,.14); cursor:pointer;
     padding: 18px 12px 16px; display:flex; flex-direction:column; align-items:center; gap:2px;
@@ -795,6 +798,9 @@
                above and reprices the buy box; nothing is added to the cart
                until the Add to cart button is pressed. -->
           <div class="pd-tiers" id="pdTiers"></div>
+          <!-- The cards stop at 9 vials; from 10 the wholesale ladder takes
+               over, so the step past the last card says where it goes. -->
+          <a class="pd-wholesale" href="../../wholesale.html">Buying 10 or more? See wholesale pricing, up to 55% off <span aria-hidden="true">&rarr;</span></a>
         </div>
 
         <a class="pd-coa" id="pdCoaLink">

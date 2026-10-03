@@ -2237,6 +2237,10 @@ console.log('\nbulk pricing');
       /unitPriceAt\(size\.price, qty, orderUnits, size\.sku\)/.test(read('api/_lib.js')));
     // The two caps from the margin review, pinned to the price they produce.
     const at = (n, q, o) => { const z = GLOW_PRODUCTS.find(p => p.name === n).sizes[0]; return D.unitPriceAt(z.price, q, o, z.sku) / z.price; };
+    ok('every product page links to wholesale with the top rate WHOLESALE_TIERS holds',
+      everyPage.filter(f => f.startsWith('product/')).every(f =>
+        read(f).includes(`See wholesale pricing, up to ${Math.round(D.WHOLESALE_MAX_OFF * 100)}% off`) &&
+        /class="pd-wholesale" href="(?:\.\.\/)*wholesale\.html"/.test(read(f))));
     ok('Tesamorelin never prices below 40% off, GLP-1 (SM) never below 50%',
       Math.abs(at('Tesamorelin', 100, 100) - 0.6) < 0.001 && Math.abs(at('GLP-1 (SM)', 100, 100) - 0.5) < 0.001);
   }
