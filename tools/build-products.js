@@ -285,6 +285,11 @@ function buildProduct(p, donor) {
   html = setText(html, 'pdName', esc(p.name));
   html = fillEmpty(html, 'pdAlias', p.alias ? esc(p.alias) : '');
   html = fillEmpty(html, 'pdDesc', esc(p.blurb));
+  if (s && s.fit === 'fill') {
+    html = required(html, /<div class="pd-visual" id="pdStage">/, '#pdStage')
+      .replace('<div class="pd-visual" id="pdStage">', '<div class="pd-visual is-fill" id="pdStage">');
+  }
+
   // The donor ships #pdPhoto with no src: js/product.js fills it in at
   // runtime, which used to mean a crawler that does not execute JavaScript —
   // most of the ones feeding AI answer engines — saw an empty <img> and

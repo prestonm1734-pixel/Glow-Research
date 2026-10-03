@@ -360,7 +360,10 @@ const GLOW_PRODUCTS = [
     coa: 'assets/coas/g3-r-lot-1032.pdf', coaRef: 'VMGN-S9MH', tested: '23 June 2026',
     results: { Identity: 'Conforms', Quantity: '10.37 mg', Sterility: 'Pass', Endotoxin: 'Pass' },
     sizes: [
-      { mg: '10mg', price: 119.97, list: 132, sku: 'GLO-RT10', image: 'assets/products/g3-r-10mg-v6.webp' },
+      { mg: '10mg', price: 119.97, list: 132, sku: 'GLO-RT10', image: 'assets/products/g3-r-10mg-v6.webp',
+        // A square, full-bleed studio shot rather than a cut-out on white: the
+        // product page lets it fill the stage instead of floating it in padding.
+        fit: 'fill' },
     ],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [

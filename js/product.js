@@ -172,6 +172,8 @@
     const img = (s && s.image) || p.image;
     photo.src = pageHref(img);
     photo.alt = '';
+    const stage = $('pdStage');
+    if (stage) stage.classList.toggle('is-fill', !!(s && s.fit === 'fill'));
   }
 
   /* ================= certificate =================

@@ -103,6 +103,11 @@
     mix-blend-mode: multiply;
   }
   .pd-photo[hidden]{ display:none; }
+  /* A full-bleed square studio shot (sizes[].fit = 'fill') fills the stage
+     edge to edge, cropping only its plain side margins, instead of being
+     floated in the padding a white cut-out needs. */
+  .pd-visual.is-fill{ padding:0; }
+  .pd-visual.is-fill .pd-photo{ object-fit:cover; mix-blend-mode:normal; }
 
   /* ---------- buy box ---------- */
   .pd-name{ font-size: clamp(2rem, 3.4vw, 2.6rem); font-weight:600; margin: 0 0 2px; letter-spacing:-.03em; line-height:1.02; color:#0a0a0a; }
@@ -714,7 +719,7 @@
     <div class="container pd-hero-grid">
 
       <div class="pd-visual-col">
-        <div class="pd-visual">
+        <div class="pd-visual" id="pdStage">
           <img class="pd-photo" id="pdPhoto" src="../../assets/products/tesamorelin-10mg-v3.webp" alt="" />
         </div>
       </div>
