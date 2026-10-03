@@ -1709,32 +1709,50 @@ function productCardHtml(p, i) {
 // the request route when one does not. The label describing the destination
 // is not itself the claim; the claim is what the destination says, and that
 // has been true since coaHref() was gated on the flag.
+// One card in the COA Library: the lab's own figures for the current lot,
+// read from the same catalog fields the product page's batch panel reads.
+// Purity leads; then labeled against measured quantity; then a tile for
+// every other analysis the report actually lists (identity always, sterility
+// and endotoxin only where that lot was tested for them), so a card never
+// shows a test the laboratory did not run. No appearance row: the catalog
+// does not hold one, and a typed-in "white powder" would be the first figure
+// on this page with no certificate behind it.
+function labeledMg(mg) {
+  const nums = String(mg || '').match(/\d+(?:\.\d+)?/g) || [];
+  const total = nums.reduce((n, x) => n + Number(x), 0);
+  return total ? `${total}mg` : '';
+}
+
 function coaCardHtml(p) {
   const single = p.sizes.length === 1;
   const name = single ? `${p.name} ${p.sizes[0].mg}` : p.name;
   const held = Boolean(coaHref(p));
+  const r = p.results || {};
+  const labeled = labeledMg(p.sizes[0] && p.sizes[0].mg);
+  const tests = Object.entries(r).filter(([k]) => k !== 'Quantity');
+  const analyses = (p.purity ? 1 : 0) + Object.keys(r).length;
+  const tile = ([k, v]) => `<div class="cc-test"><dt>${escHtml(k)}</dt><dd>${escHtml(v)}</dd></div>`;
   return `
       <article class="coa-card" data-name="${escHtml(p.name.toLowerCase())}" data-type="${escHtml(CAT_LABEL[p.cat].toLowerCase())}" data-lot="${escHtml((p.lot || '').toLowerCase())}" data-alias="${escHtml((p.alias || '').toLowerCase())}">
-        <div class="coa-card-visual">
-          ${held ? '<span class="coa-card-flag">PDF</span>' : ''}
+        <div class="cc-head">
           <img src="${pageHref(p.image)}" alt="" loading="lazy" />
+          <div>
+            <h3 class="coa-card-name">${held && p.lot ? `<a href="${pageHref(coaPageHref(p))}">${escHtml(name)}</a>` : escHtml(name)}</h3>
+            <span class="cc-lot">${p.lot ? `Lot ${escHtml(p.lot)}` : escHtml(CAT_LABEL[p.cat])}</span>
+          </div>
         </div>
-        <div class="coa-card-body">
-          <span class="coa-card-type">${escHtml(CAT_LABEL[p.cat])}</span>
-          <h3 class="coa-card-name">${held && p.lot ? `<a href="${pageHref(coaPageHref(p))}">${escHtml(name)}</a>` : escHtml(name)}</h3>
-          <dl class="coa-card-meta">
-            <div><dt>Purity</dt><dd>${escHtml(p.purity || '')  || '—'}</dd></div>
-            <div><dt>Lot</dt><dd>${escHtml(p.lot || '') || '—'}</dd></div>
-          </dl>
-          <button type="button" class="coa-card-view" data-coa-view="${escHtml(p.name)}">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-              <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke-linejoin="round"/>
-              <path d="M14 3v5h5" stroke-linejoin="round"/>
-              <path d="M9 13.5h6M9 17h4" stroke-linecap="round"/>
-            </svg>
-            View certificate
-          </button>
-        </div>
+        <div class="cc-purity"><b>${escHtml(String(p.purity || '—').replace('%', ''))}${p.purity ? '<small>%</small>' : ''}</b><span>Purity &middot; HPLC</span></div>
+        ${r.Quantity && labeled ? `
+        <dl class="cc-qty">
+          <div><dt>Labeled</dt><dd>${escHtml(labeled)}</dd></div>
+          <span aria-hidden="true">&rarr;</span>
+          <div><dt>Measured</dt><dd>${escHtml(r.Quantity)}</dd></div>
+        </dl>` : ''}
+        ${tests.length ? `<dl class="cc-tests">${tests.map(tile).join('')}</dl>` : ''}
+        <p class="cc-meta">${p.tested ? `Tested ${escHtml(p.tested)} &middot; ` : ''}${analyses} analyses${p.coaRef ? `<br>Report ${escHtml(p.coaRef)}` : ''}</p>
+        <button type="button" class="coa-card-view" data-coa-view="${escHtml(p.name)}">
+          View certificate <span aria-hidden="true">&rarr;</span>
+        </button>
       </article>`;
 }
 

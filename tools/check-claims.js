@@ -1398,6 +1398,22 @@ if (PRODUCT_PAGES_LIVE) {
 {
   const coaJs = read('js/coa.js');
   const coaHtml = read('coa.html');
+  // Each card states the lab's figures for the current lot and nothing else:
+  // its purity, its measured quantity, and a tile for exactly the analyses in
+  // that lot's results.
+  {
+    const bad = GLOW_PRODUCTS.filter(p => {
+      const h = coaCardHtml(p);
+      const r = p.results || {};
+      const tiles = (h.match(/class="cc-test"><dt>([^<]+)</g) || []).map(t => t.replace(/.*<dt>/, ''));
+      const want = Object.keys(r).filter(k => k !== 'Quantity');
+      return (p.purity && !h.includes(p.purity.replace('%', ''))) ||
+        (r.Quantity && !h.includes(r.Quantity)) ||
+        tiles.join('|') !== want.join('|') || /appearance/i.test(h);
+    });
+    ok('every COA Library card shows its lot\'s purity, quantity and only the analyses that lot reports',
+      bad.length === 0, bad.map(p => p.name).join(', '));
+  }
   ok('the certificate index renders every compound in the catalog',
     /GLOW_PRODUCTS\.map\(coaCardHtml\)/.test(coaJs),
     'coa.js must render the catalog itself, not a list kept beside it');

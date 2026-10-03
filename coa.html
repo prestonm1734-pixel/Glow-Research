@@ -96,7 +96,7 @@
   }
 
   .coa-grid{
-    display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 0; background:#fff;
     border-top:1px solid rgba(0,0,0,.13); border-left:1px solid rgba(0,0,0,.13);
     margin-top: 34px;
@@ -112,70 +112,29 @@
      that will not shrink is how a single long compound name widens the whole
      column and takes the document past the viewport. */
   .coa-card{
-    background:#fff; display:flex; flex-direction:column; min-width:0;
+    background:#fff; display:flex; flex-direction:column; min-width:0; padding: 18px;
     border-right:1px solid rgba(0,0,0,.13); border-bottom:1px solid rgba(0,0,0,.13);
   }
   .coa-card[hidden]{ display:none; }
-
-  /* aspect-ratio with a percentage padding is a combination Safari has
-     historically resolved differently from Chromium — the padding resolves
-     against the width, which the ratio is also deriving the height from, and
-     the box can end up far taller than square. A fixed padding takes the
-     circular reference out of it and costs nothing here.
-     min-width:0 because a grid item's default is auto, which lets a wide
-     child push the column, and the column, past the screen. */
-  .coa-card-visual{
-    position:relative; aspect-ratio: 1 / 1; min-width:0;
-    background: linear-gradient(180deg,#fafafa,#f1f1ef);
-    border-bottom:1px solid rgba(0,0,0,.09);
-  }
-  /* Absolute, not a flex child. The vials are portrait, and in flow the
-     image's own 1:1.4 ratio drives the container's height — aspect-ratio only
-     applies where the box is not otherwise sized, so it silently loses and
-     every tile comes out tall instead of square. Out of flow the tile's
-     height is the ratio's alone and nothing the image does can change it.
-     Explicit inset and size rather than `inset` alone, because a replaced
-     element with auto width against four insets centres at intrinsic size
-     instead of filling. */
-  .coa-card-visual img{
-    position:absolute; top:26px; left:26px;
-    width:calc(100% - 52px); height:calc(100% - 52px);
-    object-fit:contain; mix-blend-mode:multiply;
-  }
-  /* Only drawn when a document actually exists, so the badge is a fact about
-     this card rather than decoration on all of them. */
-  .coa-card-flag{
-    position:absolute; top:12px; right:12px;
-    font-family:'JetBrains Mono', monospace; font-size:.6rem; font-weight:600;
-    letter-spacing:.14em; color:#8a8a86;
-  }
-
-  .coa-card-body{ padding: 20px 20px 22px; display:flex; flex-direction:column; flex:1; }
-  .coa-card-type{
-    font-family:'JetBrains Mono', monospace; font-size:.62rem; font-weight:600;
-    letter-spacing:.16em; text-transform:uppercase; color:#8a8a86;
-  }
-  .coa-card-name{
-    margin: 10px 0 0; font-size:1.02rem; font-weight:700;
-    letter-spacing:-.02em; color:#0a0a0a; line-height:1.3;
-  }
-  /* The name links to that compound's own certificate page. */
+  .cc-head{ display:flex; gap: 12px; align-items:center; min-width:0; }
+  .cc-head img{ width:44px; height:44px; flex:0 0 44px; object-fit:contain; background:#f3f3f1; mix-blend-mode:multiply; }
+  .cc-head > div{ min-width:0; }
+  .coa-card-name{ margin:0; font-size:.98rem; font-weight:700; letter-spacing:-.02em; color:#0a0a0a; line-height:1.25; }
   .coa-card-name a{ color:inherit; text-decoration:none; }
   .coa-card-name a:hover{ text-decoration:underline; text-underline-offset:3px; }
-  /* margin-bottom rather than relying on the button's margin-top:auto for
-     the gap above it: auto only spends leftover space once a taller card in
-     the row has created any, so on a card with no slack it was landing at
-     zero — the button sat flush against the purity/lot row instead of
-     reading as its own element below it. */
-  .coa-card-meta{
-    margin: 16px 0 18px; display:flex; gap: 26px; flex-wrap:wrap;
-    padding-top: 14px; border-top:1px solid rgba(0,0,0,.09);
-  }
-  .coa-card-meta dt{
-    font-family:'JetBrains Mono', monospace; font-size:.58rem; font-weight:600;
-    letter-spacing:.16em; text-transform:uppercase; color:#8a8a86; margin-bottom:5px;
-  }
-  .coa-card-meta dd{ margin:0; font-size:.9rem; font-weight:700; color:#0a0a0a; }
+  .cc-lot{ display:block; margin-top:3px; font-family:'JetBrains Mono', monospace; font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:#8a8a86; }
+  .cc-purity{ margin: 18px 0 14px; }
+  .cc-purity b{ display:block; font-size: clamp(2rem, 3vw, 2.5rem); letter-spacing:-.04em; line-height:1; color:#0a0a0a; font-weight:600; }
+  .cc-purity small{ font-size:.5em; letter-spacing:0; margin-left:2px; color:#55554f; }
+  .cc-purity span{ display:block; margin-top:6px; font-family:'JetBrains Mono', monospace; font-size:.6rem; letter-spacing:.16em; text-transform:uppercase; color:#8a8a86; }
+  .cc-qty{ display:flex; align-items:center; gap: 12px; margin:0 0 10px; padding: 10px 12px; background:#f5f5f3; }
+  .cc-qty > span{ color:#8a8a86; }
+  .cc-qty dt, .cc-test dt{ font-family:'JetBrains Mono', monospace; font-size:.56rem; letter-spacing:.16em; text-transform:uppercase; color:#8a8a86; margin-bottom:3px; }
+  .cc-qty dd, .cc-test dd{ margin:0; font-size:.9rem; font-weight:700; color:#0a0a0a; white-space:nowrap; }
+  .cc-tests{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 6px; margin:0 0 12px; }
+  .cc-test{ border:1px solid rgba(0,0,0,.12); padding: 8px 10px; }
+  .cc-test dd::before{ content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:#0a0a0a; margin-right:6px; vertical-align:2px; }
+  .cc-meta{ margin: auto 0 14px; padding-top: 12px; border-top:1px solid rgba(0,0,0,.08); font-family:'JetBrains Mono', monospace; font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:#8a8a86; line-height:1.7; }
 
   /* Boxed like the catalog's Add to cart button — same 44px square-cornered
      shape, same Sora weight — but outlined rather than filled, and inverted
@@ -292,12 +251,14 @@
 
     /* everything inside the tile steps down to suit the narrower column,
        the same scaling the catalog card goes through at this width */
-    .coa-card-visual{ padding: 18px; }
-    .coa-card-visual img{ top:18px; left:18px; width:calc(100% - 36px); height:calc(100% - 36px); }
-    .coa-card-body{ padding: 14px 13px 15px; }
-    .coa-card-type{ font-size:.56rem; }
-    .coa-card-name{ font-size:.88rem; margin-top:7px; }
-    .coa-card-meta{ margin-top:10px; padding-top:10px; gap: 14px; }
+    .coa-card{ padding: 13px 11px; }
+    .cc-head{ gap: 8px; }
+    .cc-head img{ width:34px; height:34px; flex-basis:34px; }
+    .coa-card-name{ font-size:.84rem; }
+    .cc-qty{ gap: 6px; padding: 8px; }
+    .cc-qty dd, .cc-test dd{ font-size:.78rem; }
+    .cc-tests{ grid-template-columns: 1fr; }
+    .cc-meta{ font-size:.54rem; }
     .coa-card-view{ height:38px; font-size:.74rem; gap:6px; }
     .coa-card-view svg{ width:13px; height:13px; }
   }
