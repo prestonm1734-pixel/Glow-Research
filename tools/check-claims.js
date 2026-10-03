@@ -1405,7 +1405,7 @@ if (PRODUCT_PAGES_LIVE) {
     const bad = GLOW_PRODUCTS.filter(p => {
       const h = coaCardHtml(p);
       const r = p.results || {};
-      const tiles = [...h.matchAll(/class="cc-test"><dt>([^<]+)</g)].map(m => m[1]);
+      const tiles = (h.match(/class="cc-test"><dt>([^<]+)</g) || []).map(t => t.replace(/.*<dt>/, ''));
       const want = Object.keys(r).filter(k => k !== 'Quantity');
       return (p.purity && !h.includes(p.purity.replace('%', ''))) ||
         (r.Quantity && !h.includes(r.Quantity)) ||
