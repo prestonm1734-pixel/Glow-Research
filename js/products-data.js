@@ -297,6 +297,16 @@ const PAYMENT_METHODS = [
   { name: 'Discover', wallet: false },
 ];
 
+// The accepted methods as one sentence, from PAYMENT_METHODS, for the FAQ
+// and llms.txt. Wallets are said to depend on the browser, because they do.
+function paymentSentence() {
+  const cards = PAYMENT_METHODS.filter(m => !m.wallet).map(m => m.name);
+  const wallets = PAYMENT_METHODS.filter(m => m.wallet).map(m => m.name);
+  const c = cards.length > 1 ? `${cards.slice(0, -1).join(', ')} or ${cards[cards.length - 1]}` : (cards[0] || '');
+  const w = wallets.join(' and ');
+  return `Pay by ${c}${w ? `, or ${w} where your browser supports them` : ''}.`;
+}
+
 // The certificate copy, in one place. Both branches describe the same
 // operation — third-party tested lots, a certificate per batch — and differ
 // only in how the reader gets hold of the document.
@@ -969,8 +979,8 @@ const FAQS = [
     // actually requests rather than a generic "secure checkout" claim.
     q: 'Is checkout discreet and secure?',
     a: `Always. Orders ship in ${PACKAGING_PLAIN.charAt(0).toLowerCase()}${PACKAGING_PLAIN.slice(1)}, ` +
-       'and checkout runs on Stripe\u2019s own encrypted payment form, card only. ' +
-       'Stripe handles and stores the card details, not us.',
+       'and checkout runs on Stripe\u2019s own encrypted payment form. ' +
+       `${paymentSentence()} Stripe handles and stores the card details, not us.`,
   },
   {
     // No hedging and no softening. This is the one answer on the site where
@@ -1937,6 +1947,7 @@ if (typeof module !== 'undefined' && module.exports) {
     PAYMENTS_LIVE,
     PAYMENT_COPY,
     PAYMENT_METHODS,
+    paymentSentence,
     STRIPE_PUBLISHABLE_KEY,
     META_PIXEL_ID,
     META_DOMAIN_VERIFICATION,

@@ -32,7 +32,7 @@ const {
   GLOW_PRODUCTS, FAQS, productHref, salePrice, onSaleNow, fmtPrice,
   DISPATCH_LABEL, TRANSIT_DAYS, ANALYSIS_LONG, SOURCE_LONG, COA_COPY,
   PRODUCT_PAGES_LIVE, avgPurity, CAT_LABEL, LAB, coaHref, verifyUrl,
-  ANALYSIS_NOT_RUN, ANALYSIS_SOME_LOTS, listWords, verifyHost,
+  ANALYSIS_NOT_RUN, ANALYSIS_SOME_LOTS, listWords, verifyHost, paymentSentence, PAYMENTS_LIVE
 } = require(path.join(ROOT, 'js/products-data.js'));
 
 // The row names are capitalised in the catalog because they are labels in a
@@ -96,7 +96,8 @@ benefit.
 - Fulfilment: US-based climate-controlled facility, stock held by lot.
 - Dispatch: every order ships ${DISPATCH_LABEL}, then ${TRANSIT_DAYS}-day FedEx
   Express within the United States.
-- Average catalog purity: ${avgPurity()}%. Individual figures are per compound.
+- Average catalog purity: ${avgPurity()}%. Individual figures are per compound.${PAYMENTS_LIVE ? `
+- Payment: ${paymentSentence()} Checkout runs on Stripe.` : ''}
 
 ## Catalog
 
@@ -109,11 +110,13 @@ ${faq}
 ## Pages
 
 - [Products](${SITE}/shop): the full catalog
-- [Certificates](${SITE}/coa.html): every compound's certificate of analysis, searchable by compound or lot
+- [COA Library](${SITE}/coa.html): every compound's certificate of analysis, searchable by compound or lot, with a page per compound under /coa/
 - [Our process](${SITE}/how-we-test.html): what is tested on every lot, who runs it, and what is not tested
 - [About](${SITE}/about.html): where Glow sits in the chain, and the five published principles
 - [Shipping](${SITE}/shipping.html): dispatch window, transit, coverage and terms
-- [Wholesale](${SITE}/wholesale.html): bulk pricing: 40% off from 10 units of a compound, 50% from 50, 55% on orders of 100+ units
+- [Buy in Bulk](${SITE}/wholesale.html): bulk pricing: 40% off from 10 units of a compound, 50% from 50, 55% on orders of 100+ units
+- [Affiliate Program](${SITE}/affiliates.html): 20% commission on referred orders, 30-day tracking
+- [Returns Policy](${SITE}/return-policy.html): all sales final once a vial has shipped or been opened
 - [Contact](${SITE}/contact.html)
 `;
 

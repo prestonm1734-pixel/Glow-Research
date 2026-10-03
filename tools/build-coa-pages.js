@@ -83,8 +83,8 @@ function pageDesc(p) {
   const s = p.sizes[0];
   const by = LAB && LAB.name ? ` by ${LAB.name}` : '';
   const when = p.tested ? ` on ${p.tested}` : '';
-  return `Certificate of analysis for ${p.name} ${s.mg}, lot ${p.lot}: purity by HPLC ` +
-    `${p.purity}, identity and quantity, tested${by}${when}. Open the PDF or verify the report.`;
+  return `${p.name} ${s.mg} certificate of analysis, lot ${p.lot}: HPLC purity ${p.purity}, ` +
+    `identity and quantity, tested${by}${when}.`;
 }
 
 function factsHtml(p) {

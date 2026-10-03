@@ -30,6 +30,7 @@ benefit.
 - Dispatch: every order ships the same day when ordered by 1:00 PM Pacific, otherwise the next dispatch day, then 2-day FedEx
   Express within the United States.
 - Average catalog purity: 99.4%. Individual figures are per compound.
+- Payment: Pay by Visa, Mastercard, Amex or Discover, or Apple Pay and Google Pay where your browser supports them. Checkout runs on Stripe.
 
 ## Catalog
 
@@ -67,7 +68,7 @@ Every order ships the same day when ordered by 1:00 PM Pacific, otherwise the ne
 
 **Is checkout discreet and secure?**
 
-Always. Orders ship in a plain padded envelope, no branding, nothing on the outside naming what is inside, and checkout runs on Stripe’s own encrypted payment form, card only. Stripe handles and stores the card details, not us.
+Always. Orders ship in a plain padded envelope, no branding, nothing on the outside naming what is inside, and checkout runs on Stripe’s own encrypted payment form. Pay by Visa, Mastercard, Amex or Discover, or Apple Pay and Google Pay where your browser supports them. Stripe handles and stores the card details, not us.
 
 **What does "research use only" mean?**
 
@@ -76,9 +77,11 @@ No. Not for use in humans or animals. Laboratory and in-vitro research only, sol
 ## Pages
 
 - [Products](https://glowresearch.shop/shop): the full catalog
-- [Certificates](https://glowresearch.shop/coa.html): every compound's certificate of analysis, searchable by compound or lot
+- [COA Library](https://glowresearch.shop/coa.html): every compound's certificate of analysis, searchable by compound or lot, with a page per compound under /coa/
 - [Our process](https://glowresearch.shop/how-we-test.html): what is tested on every lot, who runs it, and what is not tested
 - [About](https://glowresearch.shop/about.html): where Glow sits in the chain, and the five published principles
 - [Shipping](https://glowresearch.shop/shipping.html): dispatch window, transit, coverage and terms
-- [Wholesale](https://glowresearch.shop/wholesale.html): bulk pricing: 40% off from 10 units of a compound, 50% from 50, 55% on orders of 100+ units
+- [Buy in Bulk](https://glowresearch.shop/wholesale.html): bulk pricing: 40% off from 10 units of a compound, 50% from 50, 55% on orders of 100+ units
+- [Affiliate Program](https://glowresearch.shop/affiliates.html): 20% commission on referred orders, 30-day tracking
+- [Returns Policy](https://glowresearch.shop/return-policy.html): all sales final once a vial has shipped or been opened
 - [Contact](https://glowresearch.shop/contact.html)

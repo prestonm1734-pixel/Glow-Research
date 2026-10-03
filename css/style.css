@@ -2696,3 +2696,6 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
 /* Accepted payment marks, under the copyright line, from PAYMENT_METHODS. */
 .footer-pay{ display:flex; flex-wrap:wrap; gap:8px; margin-top: 14px; }
 .footer-pay img{ display:block; width:44px; height:28px; }
+
+/* The catalog page's one heading: the page needs an h1 for search, kept the size of the section heads. */
+.catalog-title{ margin: 8px 0 0; font-size: clamp(1.8rem, 3.6vw, 2.6rem); letter-spacing:-.035em; line-height:1.05; }

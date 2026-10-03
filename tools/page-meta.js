@@ -40,7 +40,7 @@ const PAGE_META = {
   'shop.html': {
     name: 'Full Catalog',
     title: t('Full Catalog'),
-    desc: 'Browse the full Glow Research peptide catalog: growth, tissue, cognitive, and metabolic research compounds. Every lot is tested by an independent third-party laboratory.',
+    desc: 'Shop research peptides: growth, tissue, cognitive and metabolic compounds, each lot tested by an independent laboratory with its certificate published.',
   },
   'product.html': {
     name: 'Product',
@@ -50,12 +50,12 @@ const PAGE_META = {
   'how-we-test.html': {
     name: 'How We Test',
     title: t('How We Test'),
-    desc: 'Purity, identity and quantity on every batch, run by an independent laboratory before a lot reaches our catalog. Every certificate is published against its lot number.',
+    desc: 'Purity, identity and quantity on every batch, tested by an independent laboratory before a lot is listed, with each certificate published by lot.',
   },
   'about.html': {
     name: 'About Glow Research',
     title: 'About Glow Research | Research Peptide Supplier',
-    desc: 'Glow Research supplies research peptides and research-use-only compounds to laboratories nationwide. A retailer, not a manufacturer: we work with a manufacturing partner.',
+    desc: 'Glow Research supplies research peptides to laboratories nationwide. A retailer, not a manufacturer: production runs at a manufacturing partner.',
   },
   'shipping.html': {
     name: 'Shipping',
@@ -70,7 +70,7 @@ const PAGE_META = {
   'return-policy.html': {
     name: 'Returns Policy',
     title: t('Returns Policy'),
-    desc: 'Glow Research returns policy: all sales are final once a vial has shipped or been opened, what to do before an order ships, and who to contact about a damaged or missing package.',
+    desc: 'Glow Research returns policy: all sales are final once a vial has shipped or been opened, and what to do about a damaged or missing package.',
   },
   'wholesale.html': {
     name: 'Buy Research Peptides in Bulk',
@@ -105,7 +105,7 @@ const PAGE_META = {
   'ruo-agreement.html': {
     name: 'Research Use Only Agreement',
     title: t('Research Use Only Agreement'),
-    desc: 'The Research Use Only agreement every Glow Research buyer accepts: no human or animal use, no dosing guidance, and buyer responsibility for lawful, qualified handling.',
+    desc: 'The Research Use Only agreement every buyer accepts: no human or animal use, no dosing guidance, and lawful, qualified handling by the buyer.',
   },
 };
 
