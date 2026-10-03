@@ -12,6 +12,7 @@ node tools/build-meta.js     # every copy of each page's title + description
 node tools/build-faq.js      # homepage FAQ markup + FAQPage schema
 node tools/build-catalog.js  # shop.html grid + CollectionPage schema
 node tools/build-llms.js     # llms.txt
+node tools/build-coa-pages.js # one certificate page per compound
 node tools/build-products.js # one page per compound
 node tools/build-sitemap.js  # sitemap.xml on its own
 node tools/check-claims.js   # promise audit, run before every commit
@@ -20,7 +21,7 @@ node tools/check-claims.js   # promise audit, run before every commit
 ## `build.js`
 
 The everyday entry point. Runs `build-meta.js`, `build-faq.js`,
-`build-catalog.js`, `build-llms.js`, then `build-products.js` (which refreshes `sitemap.xml` on its
+`build-catalog.js`, `build-llms.js`, `build-coa-pages.js`, then `build-products.js` (which refreshes `sitemap.xml` on its
 way through), then `check-claims.js`.
 
 ### One rule for all of them
@@ -185,6 +186,16 @@ language models, generated from `js/products-data.js`.
 engine has confirmed reading one. It is here because it costs nothing. It is not
 a substitute for having the content in the HTML of the pages themselves, and if
 it is ever the only place something is stated, that is a bug.
+
+## `build-coa-pages.js`
+
+Writes `coa/<slug>/index.html` for every compound with a lot and a published
+certificate, using `return-policy.html` as the shell. Each page states the
+lot, laboratory, report reference, test date and results from the catalog,
+links the PDF, the laboratory's verification page and the product, and lists
+the other certificates. The `coa/` folder is rebuilt from empty on every run,
+so a compound that leaves the catalog leaves no page behind. Runs before
+`build-products.js` so the sitemap it writes includes these pages.
 
 ## `build-products.js`
 

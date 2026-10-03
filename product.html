@@ -387,6 +387,21 @@
      on the whole site and everything else here is deliberately quiet. Below it
      the panel is hairlines and mono labels: no green ticks, no rounded pills,
      no colour standing in for a result the laboratory has not returned. */
+  /* ---------- about this compound ---------- */
+  .pd-profile{ padding: 58px 0 54px; border-top:1px solid rgba(0,0,0,.1); background:#fff; }
+  .pp-head h2{ font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight:600; letter-spacing:-.02em; margin: 6px 0 22px; color:#0a0a0a; }
+  .pp-grid{ display:grid; grid-template-columns: minmax(0,1.1fr) minmax(0,1fr); gap: 44px; align-items:start; }
+  .pp-copy p{ font-size: 1rem; line-height: 1.7; color:#3d3d39; margin: 0 0 14px; max-width: 62ch; }
+  .pp-copy .gs-more{ margin-top: 6px; }
+  .pp-spec{ margin:0; border-top:1px solid rgba(0,0,0,.12); }
+  .pp-spec div{ display:grid; grid-template-columns: 42% 58%; gap: 12px; padding: 12px 0; border-bottom:1px solid rgba(0,0,0,.08); }
+  .pp-spec dt{ font-family:'JetBrains Mono', monospace; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:#6b6b64; padding-top:2px; }
+  .pp-spec dd{ margin:0; font-size:.92rem; color:#0a0a0a; font-weight:600; overflow-wrap:anywhere; }
+  @media (max-width: 860px){
+    .pd-profile{ padding: 44px 0 40px; }
+    .pp-grid{ grid-template-columns: 1fr; gap: 26px; }
+  }
+
   .pd-standard{ background:#f7f7f5; border-top:1px solid rgba(0,0,0,.1); padding: 62px 0 66px; }
   .gs-head{ margin-bottom: 28px; }
   .gs-head h2{
@@ -829,6 +844,18 @@
         </a>
       </div>
 
+    </div>
+  </section>
+
+  <!-- ============ about this compound ============
+       What the compound is, its reference data, and the current lot in a
+       sentence. Everything inside #pdProfile comes from productProfileHtml()
+       in js/products-data.js: js/product.js draws it on load and
+       tools/build-products.js bakes it, so each product page carries its own
+       text instead of one sentence shared by every vial. -->
+  <section class="pd-profile">
+    <div class="container">
+      <section id="pdProfile"></section>
     </div>
   </section>
 

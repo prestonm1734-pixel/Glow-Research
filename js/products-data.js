@@ -367,8 +367,9 @@ const GLOW_PRODUCTS = [
     ],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
+      'GLP-3 (RT) is a synthetic research peptide in the metabolic research line, listed under Glow\'s own catalog code rather than a trade name. Each vial holds 10mg of lyophilized peptide, sealed under a single lot number that matches its certificate.'
     ],
+    spec: [],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
@@ -402,7 +403,13 @@ const GLOW_PRODUCTS = [
     sizes: [{ mg: '50mg', price: 59.97, list: 66, sku: 'GLO-CU50', image: 'assets/products/ghk-cu-50mg-v3.webp' }],
     blurb: 'A 50mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 50mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
+      'GHK-Cu is the copper(II) complex of GHK, the tripeptide glycyl-L-histidyl-L-lysine, with copper held by the peptide at roughly one ion per molecule. Each vial holds 50mg of lyophilized powder.'
+    ],
+    spec: [
+      ['Sequence', 'Gly-His-Lys, as the Cu(II) complex'],
+      ['Molecular formula', 'C14H22CuN6O4'],
+      ['Molecular weight', '401.9 g/mol'],
+      ['CAS number', '89030-95-5'],
     ],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
@@ -417,7 +424,13 @@ const GLOW_PRODUCTS = [
     ],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
+      'BPC-157 is a synthetic pentadecapeptide: fifteen amino acids, Gly-Glu-Pro-Pro-Pro-Gly-Lys-Pro-Ala-Asp-Asp-Ala-Gly-Leu-Val. Each vial holds 10mg of lyophilized peptide.'
+    ],
+    spec: [
+      ['Sequence', 'GEPPPGKPADDAGLV (15 residues)'],
+      ['Molecular formula', 'C62H98N16O22'],
+      ['Molecular weight', '1419.5 g/mol'],
+      ['CAS number', '137525-51-0'],
     ],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
@@ -430,7 +443,13 @@ const GLOW_PRODUCTS = [
     ],
     blurb: 'A 10mg lyophilized peptide blend, known as Wolverine. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 10mg lyophilized peptide blend, known as Wolverine. Supplied for in-vitro laboratory studies.'
+      'BPC-157/TB-500, known as Wolverine, combines two synthetic peptides in one vial: BPC-157, a fifteen-residue peptide, and TB-500, a synthetic peptide based on thymosin beta-4. Each vial holds 10mg of lyophilized blend.'
+    ],
+    spec: [
+      ['Components', 'BPC-157 and TB-500'],
+      ['BPC-157 sequence', 'GEPPPGKPADDAGLV (15 residues)'],
+      ['BPC-157 CAS number', '137525-51-0'],
+      ['TB-500', 'Synthetic peptide based on thymosin beta-4'],
     ],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
@@ -441,7 +460,13 @@ const GLOW_PRODUCTS = [
     sizes: [{ mg: '70mg', price: 159.97, list: 176, sku: 'GLO-BBG70', image: 'assets/products/glow-70mg-v3.webp' }],
     blurb: 'A 70mg lyophilized peptide blend, also known as GHK-Cu/BPC-157/TB-500. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 70mg lyophilized peptide blend, also known as GHK-Cu/BPC-157/TB-500. Supplied for in-vitro laboratory studies.'
+      'GLOW, also listed as GHK-Cu/BPC-157/TB-500, is a three-peptide blend in one vial: GHK-Cu, the copper complex of the tripeptide GHK; BPC-157, a fifteen-residue peptide; and TB-500, a synthetic peptide based on thymosin beta-4. Each vial holds 70mg of lyophilized blend.'
+    ],
+    spec: [
+      ['Components', 'GHK-Cu, BPC-157 and TB-500'],
+      ['GHK-Cu CAS number', '89030-95-5'],
+      ['BPC-157 CAS number', '137525-51-0'],
+      ['TB-500', 'Synthetic peptide based on thymosin beta-4'],
     ],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
@@ -452,7 +477,14 @@ const GLOW_PRODUCTS = [
     sizes: [{ mg: '5/5mg', price: 109.97, list: 121, sku: 'GLO-CP10', image: 'assets/products/cjc-1295-ipamorelin-5-5mg-v3.webp' }],
     blurb: 'A 5/5mg lyophilized peptide blend. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 5/5mg lyophilized peptide blend. Supplied for in-vitro laboratory studies.'
+      'This vial pairs two synthetic peptides, 5mg of each: CJC-1295 without DAC, also called Modified GRF (1-29), a 29-residue analogue of the first 29 amino acids of growth hormone-releasing hormone; and Ipamorelin, a pentapeptide with the sequence Aib-His-D-2-Nal-D-Phe-Lys-NH2.'
+    ],
+    spec: [
+      ['Components', 'CJC-1295 no DAC (Mod GRF 1-29) and Ipamorelin'],
+      ['CJC-1295 no DAC formula', 'C152H252N44O42, 3367.9 g/mol'],
+      ['CJC-1295 no DAC CAS number', '863288-34-0'],
+      ['Ipamorelin formula', 'C38H49N9O5, 711.9 g/mol'],
+      ['Ipamorelin CAS number', '170851-70-4'],
     ],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
@@ -463,8 +495,9 @@ const GLOW_PRODUCTS = [
     sizes: [{ mg: '10mg', price: 74.97, list: 82, sku: 'GLO-SM10', image: 'assets/products/g1-s-10mg-v5.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
+      'GLP-1 (SM) is a synthetic research peptide from the same metabolic research line as GLP-3 (RT) and GLP-2 (TZ), sold under a Glow catalog code. Each vial holds 10mg of lyophilized peptide, and every lot is analysed before it is listed.'
     ],
+    spec: [],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
@@ -474,7 +507,13 @@ const GLOW_PRODUCTS = [
     sizes: [{ mg: '10mg', price: 119.97, list: 132, sku: 'GLO-TSM10', image: 'assets/products/tesamorelin-10mg-v3.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
+      'Tesamorelin is a synthetic 44-amino-acid analogue of human growth hormone-releasing factor, with a trans-3-hexenoyl group attached to the N-terminal tyrosine. Each vial holds 10mg of lyophilized peptide.'
+    ],
+    spec: [
+      ['Length', '44 residues, N-terminal hexenoyl group'],
+      ['Molecular formula', 'C221H366N72O67S'],
+      ['Molecular weight', '5135.9 g/mol'],
+      ['CAS number', '218949-48-5'],
     ],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
@@ -485,8 +524,9 @@ const GLOW_PRODUCTS = [
     sizes: [{ mg: '10mg', price: 109.97, list: 121, sku: 'GLO-T10', image: 'assets/products/g2-t-10mg-v5.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
+      'GLP-2 (TZ) is a synthetic research peptide carried in the metabolic research line under Glow\'s own code name. Each vial holds 10mg of lyophilized peptide, and the lot printed on the vial is the lot on its certificate.'
     ],
+    spec: [],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
     ] },
@@ -496,7 +536,13 @@ const GLOW_PRODUCTS = [
     sizes: [{ mg: '10mg', price: 89.97, list: 99, sku: 'GLO-MS10', image: 'assets/products/mots-c-10mg-v3.webp' }],
     blurb: 'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.',
     about: [
-      'A 10mg lyophilized peptide. Supplied for in-vitro laboratory studies.'
+      'MOTS-C is a sixteen-residue peptide, MRWQEMGYIFYPRKLR, whose sequence is encoded in the 12S rRNA region of the mitochondrial genome. Each vial holds 10mg of lyophilized synthetic peptide.'
+    ],
+    spec: [
+      ['Sequence', 'MRWQEMGYIFYPRKLR (16 residues)'],
+      ['Molecular formula', 'C101H152N28O22S2'],
+      ['Molecular weight', '2174.6 g/mol'],
+      ['CAS number', '1627580-64-6'],
     ],
     research: [
       { t: 'General handling', d: 'Supplied as a lyophilized peptide for in-vitro laboratory use.' }
@@ -1373,6 +1419,72 @@ function nextFreeNudge(qty) {
 // which it could before: purity was placeholder and the documents were not
 // hosted. Both are now true of every compound and both are the things a
 // search result or an answer engine is actually asked for.
+// The "About" block on a product page: what the compound is (about[0], typed
+// once and checked for outcome words like every other listing field), the
+// reference data in spec[], and the current lot stated from the same fields
+// the batch panel reads. Shared by js/product.js and tools/build-products.js,
+// like batchPanelHtml(), so a crawler and a reader get the same block.
+//
+// spec[] holds only reference values checked against more than one public
+// source. TB-500 has no formula or sequence here on purpose: what is sold
+// under that name is not one agreed molecule, so there is no single true
+// figure to print. The coded metabolic compounds carry none either.
+function lotSentence(p) {
+  if (!p.lot) return '';
+  const r = p.results || {};
+  const parts = [];
+  if (p.purity) parts.push(`purity by HPLC ${p.purity}`);
+  Object.entries(r).forEach(([k, v]) => {
+    parts.push(`${k.toLowerCase()} ${v === 'Pass' ? 'passed' : String(v).toLowerCase()}`);
+  });
+  const by = LAB && LAB.name ? ` by ${LAB.name}` : '';
+  const ref = p.coaRef ? `, report ${p.coaRef}` : '';
+  const when = p.tested ? `, tested ${p.tested}` : '';
+  return `The current lot, ${p.lot}, was analysed${by}${ref}${when}: ${parts.join(', ')}.`;
+}
+
+function coaPageHref(p) {
+  return `coa/${productSlug(p.name)}/`;
+}
+
+function productProfileHtml(p, size) {
+  const s = size || (p.sizes && p.sizes[0]) || {};
+  const rows = [
+    ['Form', 'Lyophilized powder'],
+    ['Amount per vial', s.mg || ''],
+    ...(p.spec || []),
+    ...(p.purity ? [['Purity (HPLC)', p.lot ? `${p.purity}, lot ${p.lot}` : p.purity]] : []),
+    ['Testing', LAB && LAB.name ? `Independent third-party laboratory (${LAB.name})` : 'Independent third-party laboratory'],
+  ].filter(r => r[1]);
+  const lot = lotSentence(p);
+  return `
+      <div class="pp-head">
+        <span class="pd-label">About this compound</span>
+        <h2>About ${escHtml(p.name)}</h2>
+      </div>
+      <div class="pp-grid">
+        <div class="pp-copy">
+          <p>${escHtml(p.about[0])}</p>
+          ${lot ? `<p>${escHtml(lot)}</p>` : ''}
+          <p>Sold strictly for in-vitro laboratory research. Not for human or veterinary use.</p>
+          ${p.lot ? `<a class="gs-more" href="${pageHref(coaPageHref(p))}">Certificate for lot ${escHtml(p.lot)} <span aria-hidden="true">&rarr;</span></a>` : ''}
+        </div>
+        <dl class="pp-spec">
+          ${rows.map(([k, v]) => `<div><dt>${escHtml(k)}</dt><dd>${escHtml(v)}</dd></div>`).join('\n          ')}
+        </dl>
+      </div>`;
+}
+
+// The <title> of a product page. The purity is the lot's own figure, so the
+// title states something a buyer searching for that compound can check on the
+// certificate. One function, read by js/product.js and the build, so the
+// static title and the hydrated one are the same string.
+function productTitle(p, size) {
+  const s = size || (p.sizes && p.sizes[0]) || {};
+  const purity = p.purity ? `, ${p.purity} Purity` : '';
+  return `${p.name} ${s.mg}${purity} | Glow Research`;
+}
+
 function productMetaDesc(p, size) {
   const s = size || (p.sizes && p.sizes[0]) || {};
   const purity = p.purity ? ` at ${p.purity} purity` : '';
@@ -1522,7 +1634,7 @@ function coaCardHtml(p) {
         </div>
         <div class="coa-card-body">
           <span class="coa-card-type">${escHtml(CAT_LABEL[p.cat])}</span>
-          <h3 class="coa-card-name">${escHtml(name)}</h3>
+          <h3 class="coa-card-name">${held && p.lot ? `<a href="${pageHref(coaPageHref(p))}">${escHtml(name)}</a>` : escHtml(name)}</h3>
           <dl class="coa-card-meta">
             <div><dt>Purity</dt><dd>${escHtml(p.purity || '')  || '—'}</dd></div>
             <div><dt>Lot</dt><dd>${escHtml(p.lot || '') || '—'}</dd></div>
@@ -1707,6 +1819,11 @@ if (typeof module !== 'undefined' && module.exports) {
     batchRows,
     batchMeta,
     batchPanelHtml,
+    productProfileHtml,
+    escHtml,
+    productTitle,
+    lotSentence,
+    coaPageHref,
     bulkSavingPct,
     SITEWIDE_DISCOUNT,
     QTY_GROUP,

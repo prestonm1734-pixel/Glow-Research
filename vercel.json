@@ -6,7 +6,9 @@
   ],
   "redirects": [
     { "source": "/peptides/:slug/", "destination": "/product/:slug/", "permanent": true },
-    { "source": "/peptides/:slug", "destination": "/product/:slug", "permanent": true }
+    { "source": "/peptides/:slug", "destination": "/product/:slug", "permanent": true },
+    { "source": "/affiliates.html", "destination": "/", "permanent": true },
+    { "source": "/returns.html", "destination": "/return-policy.html", "permanent": true }
   ],
   "headers": [
     {

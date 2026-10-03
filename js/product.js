@@ -221,6 +221,11 @@
      another's record after a navigation, and it is what fills the panel on
      product.html?p=<slug>, which has no baked content at all. */
 
+  function renderProfile(p) {
+    const wrap = $('pdProfile');
+    if (wrap) wrap.innerHTML = productProfileHtml(p, size());
+  }
+
   function renderEvidence(p) {
     const wrap = $('pdEvidence');
     if (!wrap) return;
@@ -313,7 +318,7 @@
     renderPrice();
     renderPhoto(product, s);
 
-    document.title = `${product.name} ${s.mg} | Glow Research`;
+    document.title = productTitle(product, s);
     const desc = document.querySelector('meta[name="description"]');
     if (desc) {
       // productMetaDesc() from the catalog, which tools/build-products.js
@@ -617,6 +622,7 @@
     setCanonical(product);
     renderBreadcrumb(product);
     renderHeader(product);
+    renderProfile(product);
     renderEvidence(product);
     renderSizes(product);
     renderSelection();

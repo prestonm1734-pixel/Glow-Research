@@ -30,6 +30,7 @@ const {
   ANALYSIS_TESTS, TESTS_PER_BATCH, numberWord, PACKAGING_PLAIN,
   ANALYSIS_SHORT, ANALYSIS_LONG, ANALYSIS_NOT_RUN, SOURCE_LONG,
   LAB, labIdentity, PURITY_ROW, RESULT_ON_COA, batchRows, batchMeta, batchPanelHtml,
+  productProfileHtml, lotSentence, coaPageHref, productTitle, escHtml,
   productMetaDesc, productSlug,
   verifyUrl, verifyHost, LAB_VERIFY_URL,
   FAQS, faqHtml,
@@ -66,6 +67,11 @@ const everyPage = [
   ...fs.readdirSync(path.join(ROOT, 'product'), { withFileTypes: true })
     .filter(d => d.isDirectory())
     .map(d => `product/${d.name}/index.html`),
+  // The per-compound certificate pages tools/build-coa-pages.js writes. Held
+  // to every sitewide rule the hand-written pages are.
+  ...(fs.existsSync(path.join(ROOT, 'coa')) ? fs.readdirSync(path.join(ROOT, 'coa'), { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(d => `coa/${d.name}/index.html`) : []),
 ];
 
 // Pull a numeric literal out of a source file by its identifier.
@@ -679,7 +685,7 @@ console.log('\nthe batch analysis panel');
   // explanation of what the compound is and how it is studied, the full depth
   // that someone landing from a search engine deserves to see.
   ok('the Product schema uses the full description, not the summary',
-    /description: p\.about\[0\]/.test(read('tools/build-products.js')));
+    /description: \[p\.about\[0\], lotSentence\(p\)\]/.test(read('tools/build-products.js')));
   ok('the panel is rendered from the catalog, not from its own markup',
     /batchPanelHtml\(/.test(read('js/product.js')) &&
     /batchPanelHtml\(/.test(read('tools/build-products.js')),
@@ -967,6 +973,7 @@ console.log('\nlisting copy');
     const fields = { blurb: p.blurb };
     (p.about || []).forEach((t, i) => { fields[`about[${i}]`] = t; });
     (p.research || []).forEach((a, i) => { fields[`research[${i}]`] = `${a.t} ${a.d}`; });
+    (p.spec || []).forEach(([k, v], i) => { fields[`spec[${i}]`] = `${k} ${v}`; });
     Object.entries(fields).forEach(([k, v]) => {
       const hits = [...new Set((v.match(OUTCOME) || []).map(h => h.toLowerCase()))];
       if (hits.length) bad.push(`${p.name}.${k}: "${hits.join('", "')}"`);
@@ -4069,6 +4076,94 @@ console.log('\nhero image');
     ok('every footer that links the shipping policy also links the returns policy',
       unlinked.length === 0, unlinked.join(', '));
     ok('the returns policy is in the sitemap', /return-policy\.html/.test(read('sitemap.xml')));
+  }
+
+  // Search foundation. Each product page has to be its own page to a search
+  // engine: its own description, its own reference data, its own certificate
+  // page, and Product markup complete enough for a merchant listing. These
+  // all drifted or were missing once; each line here keeps one of them true.
+  {
+    const productPages = everyPage.filter(f => f.startsWith('product/'));
+    const bySlug = slug => GLOW_PRODUCTS.find(p => productSlug(p.name) === slug);
+
+    // No two products share a description, and none is a one-liner: seven of
+    // ten once carried the same eleven words, which is a duplicate-page
+    // signal on every one of them.
+    const intros = GLOW_PRODUCTS.map(p => (p.about && p.about[0]) || '');
+    const dupes = intros.filter((t, i) => intros.indexOf(t) !== i);
+    ok('every product has its own description', dupes.length === 0, dupes.join(' | '));
+    const thin = GLOW_PRODUCTS.filter(p => ((p.about && p.about[0]) || '').split(/\s+/).length < 15);
+    ok('and none is a one-liner (15 words at least)', thin.length === 0, thin.map(p => p.name).join(', '));
+
+    // The About block is baked into every generated page, with the
+    // compound's own description and its current lot sentence.
+    const noProfile = productPages.filter(f => {
+      const p = bySlug(f.split('/')[1]);
+      const h = read(f);
+      return p && !(h.includes(escHtml(p.about[0])) && (!p.lot || h.includes(escHtml(lotSentence(p)))));
+    });
+    ok('every product page carries its own About block and lot sentence',
+      noProfile.length === 0, noProfile.join(', '));
+    ok('the About block is one shared renderer for runtime and build',
+      /productProfileHtml\(/.test(read('js/product.js')) && /productProfileHtml\(/.test(read('tools/build-products.js')));
+
+    // Titles state the lot's purity, from one function on both paths.
+    const badTitle = productPages.filter(f => {
+      const p = bySlug(f.split('/')[1]);
+      return p && !read(f).includes(`<title>${escHtml(productTitle(p, p.sizes[0]))}</title>`);
+    });
+    ok('every product title comes from productTitle()', badTitle.length === 0, badTitle.join(', '));
+    ok('and the runtime title does too', /document\.title = productTitle\(/.test(read('js/product.js')));
+
+    // Merchant listing fields on every offer: shipping priced from the rate
+    // Stripe actually charges, and a return policy Google reads as complete.
+    const rate = (read('api/_lib.js').match(/id:\s*'2day',\s*cost:\s*([\d.]+)/) || [])[1];
+    const badOffers = productPages.filter(f => {
+      const blocks = [...read(f).matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
+        .map(m => { try { return JSON.parse(m[1]); } catch (e) { return {}; } });
+      const prod = blocks.find(b => b['@type'] === 'Product');
+      if (!prod) return true;
+      return !(prod.offers || []).every(o =>
+        o.shippingDetails && o.shippingDetails.shippingRate &&
+        Number(o.shippingDetails.shippingRate.value) === Number(rate) &&
+        o.shippingDetails.shippingDestination.addressCountry === 'US' &&
+        o.hasMerchantReturnPolicy && o.hasMerchantReturnPolicy.applicableCountry === 'US' &&
+        o.mpn && o.itemCondition) || typeof prod.description !== 'string';
+    });
+    ok('every Product offer carries shipping at the charged rate and a complete return policy',
+      !!rate && badOffers.length === 0, badOffers.join(', '));
+    ok('the homepage Organization states the same return policy',
+      /"hasMerchantReturnPolicy":\s*\{[\s\S]*?"applicableCountry": "US"[\s\S]*?MerchantReturnNotPermitted/.test(read('index.html')));
+
+    // One certificate page per compound with a published certificate, linked
+    // from its product page, from the certificate index and from the sitemap,
+    // and stating the catalog's own lot and purity.
+    const wantCoa = GLOW_PRODUCTS.filter(p => p.lot && coaHref(p));
+    const badCoa = wantCoa.filter(p => {
+      const f = `coa/${productSlug(p.name)}/index.html`;
+      if (!fs.existsSync(path.join(ROOT, f))) return true;
+      const h = read(f);
+      return !h.includes(`Lot ${p.lot}`) || !h.includes(p.purity) ||
+        !h.includes(`<link rel="canonical" href="https://glowresearch.shop/coa/${productSlug(p.name)}/" />`);
+    });
+    ok('every compound with a certificate has its own certificate page, stating its lot and purity',
+      badCoa.length === 0, badCoa.map(p => p.name).join(', '));
+    const unlinkedCoa = wantCoa.filter(p => {
+      const f = `product/${productSlug(p.name)}/index.html`;
+      return fs.existsSync(path.join(ROOT, f)) && !read(f).includes(`../../${coaPageHref(p)}`);
+    });
+    ok('and its product page links to it', unlinkedCoa.length === 0, unlinkedCoa.map(p => p.name).join(', '));
+    ok('and the certificate index cards link to them', /coaPageHref\(p\)/.test(read('js/products-data.js').match(/function coaCardHtml[\s\S]*?\n\}/)[0]));
+    const sitemap = read('sitemap.xml');
+    const offMap = wantCoa.filter(p => !sitemap.includes(`https://glowresearch.shop/coa/${productSlug(p.name)}/`));
+    ok('and the sitemap lists them', offMap.length === 0, offMap.map(p => p.name).join(', '));
+
+    // Dead addresses that once served pages go somewhere real rather than 404.
+    const vercel = JSON.parse(read('vercel.json'));
+    const redirected = (vercel.redirects || []).map(r => r.source);
+    ok('removed pages redirect instead of 404ing',
+      ['/affiliates.html', '/returns.html'].every(s => redirected.includes(s)) &&
+      !fs.existsSync(path.join(ROOT, 'affiliates.html')) && !fs.existsSync(path.join(ROOT, 'returns.html')));
   }
 
   // Product photographs carry no alt text by request: the vial images on the

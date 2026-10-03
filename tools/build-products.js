@@ -35,7 +35,7 @@ const OUT_DIR = 'product';
 
 const {
   GLOW_PRODUCTS, productSlug, salePrice, onSaleNow, hasList, listPriceOf, PRODUCT_PAGES_LIVE,
-  sizeInStock, productInStock, batchPanelHtml, unitPriceAt,
+  sizeInStock, productInStock, batchPanelHtml, productProfileHtml, lotSentence, productTitle, unitPriceAt,
   catFilterGroup, CAT_LABEL, productMetaDesc,
 } = require(path.join(ROOT, 'js/products-data.js'));
 
@@ -133,7 +133,36 @@ function rewriteDepth(html, depth) {
 // implying returns are allowed by omission.
 const RETURN_POLICY = {
   '@type': 'MerchantReturnPolicy',
+  // Required by Google's merchant listings alongside the category: without
+  // it the policy is read as incomplete and the offer loses eligibility.
+  applicableCountry: 'US',
+  returnPolicyCountry: 'US',
   returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+  merchantReturnLink: `${SITE}/return-policy.html`,
+};
+
+// The rate a single order under the free-shipping line is charged, read from
+// SHIPPING_RATES in api/_lib.js, the copy Stripe actually prices from, rather
+// than typed here. Every product sells for less than the free-shipping
+// threshold, so this is the true cost of buying one vial. Handling is 0-1
+// days (same day before the 1:00 PM Pacific cutoff, otherwise the next
+// dispatch day) and FedEx 2-Day is 2 days in transit.
+const SHIPPING_RATE = (() => {
+  const src = fs.readFileSync(path.join(ROOT, 'api/_lib.js'), 'utf8');
+  const m = src.match(/\{\s*id:\s*'2day',\s*cost:\s*([\d.]+),\s*freeOver:\s*(\d+)\s*\}/);
+  if (!m) throw new Error('Could not read the 2-day rate from SHIPPING_RATES in api/_lib.js');
+  return { cost: Number(m[1]), freeOver: Number(m[2]) };
+})();
+
+const SHIPPING_DETAILS = {
+  '@type': 'OfferShippingDetails',
+  shippingRate: { '@type': 'MonetaryAmount', value: SHIPPING_RATE.cost.toFixed(2), currency: 'USD' },
+  shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'US' },
+  deliveryTime: {
+    '@type': 'ShippingDeliveryTime',
+    handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+    transitTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 2, unitCode: 'DAY' },
+  },
 };
 
 function productJsonLd(p, url) {
@@ -145,6 +174,9 @@ function productJsonLd(p, url) {
     name: `${p.name} ${s.mg}`,
     url,
     sku: s.sku,
+    // Our own product, so the SKU is the manufacturer part number too.
+    mpn: s.sku,
+    itemCondition: 'https://schema.org/NewCondition',
     price: (onSaleNow() ? salePrice(s.price) : s.price).toFixed(2),
     priceCurrency: 'USD',
     // Read from the catalog, same field the buy box reads. Google surfaces
@@ -154,6 +186,7 @@ function productJsonLd(p, url) {
       ? 'https://schema.org/InStock'
       : 'https://schema.org/OutOfStock',
     hasMerchantReturnPolicy: RETURN_POLICY,
+    shippingDetails: SHIPPING_DETAILS,
     seller: { '@id': `${SITE}/#organization` },
   }));
 
@@ -163,7 +196,9 @@ function productJsonLd(p, url) {
     '@id': `${url}#product`,
     name: p.name,
     ...(p.alias ? { alternateName: p.alias } : {}),
-    description: p.about[0],
+    // What it is, then the current lot: the same two sentences the page's
+    // About block shows, so the description is specific to this compound.
+    description: [p.about[0], lotSentence(p)].filter(Boolean).join(' '),
     category: CAT_LABEL[p.cat],
     url,
     // Same file og:image points at. Structured data with no image is
@@ -204,7 +239,7 @@ function buildProduct(p, donor) {
 
   // Matches what js/product.js sets on load, so the title does not change
   // under the reader between the static page and hydration.
-  const title = `${p.name} ${s.mg} | Glow Research`;
+  const title = productTitle(p, s);
   // productMetaDesc() rather than a sentence typed here: js/product.js sets
   // the same description at runtime on product.html?p=<slug>, and the two
   // copies had already drifted once. Both read the catalog now.
@@ -337,6 +372,7 @@ function buildProduct(p, donor) {
   // times, and every analysis with no released figure behind it bakes the null
   // indicator rather than a number a crawler would read as a result.
   html = setInner(html, 'pdEvidence', 'section', batchPanelHtml(p));
+  html = setInner(html, 'pdProfile', 'section', productProfileHtml(p, s));
 
   return rewriteDepth(html, 2);
 }

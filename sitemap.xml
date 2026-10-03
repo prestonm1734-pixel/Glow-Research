@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://glowresearch.shop/</loc>
     <lastmod>2026-10-02</lastmod>
@@ -69,50 +69,110 @@
     <loc>https://glowresearch.shop/product/g3-r/</loc>
     <lastmod>2026-10-03</lastmod>
     <priority>0.8</priority>
+    <image:image><image:loc>https://glowresearch.shop/assets/products/g3-r-10mg-v6.webp</image:loc></image:image>
   </url>
   <url>
     <loc>https://glowresearch.shop/product/ghk-cu/</loc>
     <lastmod>2026-10-03</lastmod>
     <priority>0.8</priority>
+    <image:image><image:loc>https://glowresearch.shop/assets/products/ghk-cu-50mg-v3.webp</image:loc></image:image>
   </url>
   <url>
     <loc>https://glowresearch.shop/product/bpc-157/</loc>
     <lastmod>2026-10-03</lastmod>
     <priority>0.8</priority>
+    <image:image><image:loc>https://glowresearch.shop/assets/products/bpc-157-10mg-v4.webp</image:loc></image:image>
   </url>
   <url>
     <loc>https://glowresearch.shop/product/bpc-157-tb-500/</loc>
     <lastmod>2026-10-03</lastmod>
     <priority>0.8</priority>
+    <image:image><image:loc>https://glowresearch.shop/assets/products/bpc-157-tb-500-blend-10mg-v3.webp</image:loc></image:image>
   </url>
   <url>
     <loc>https://glowresearch.shop/product/glow/</loc>
     <lastmod>2026-10-03</lastmod>
     <priority>0.8</priority>
+    <image:image><image:loc>https://glowresearch.shop/assets/products/glow-70mg-v3.webp</image:loc></image:image>
   </url>
   <url>
     <loc>https://glowresearch.shop/product/cjc-1295-no-dac-ipamorelin/</loc>
     <lastmod>2026-10-03</lastmod>
     <priority>0.8</priority>
+    <image:image><image:loc>https://glowresearch.shop/assets/products/cjc-1295-ipamorelin-5-5mg-v3.webp</image:loc></image:image>
   </url>
   <url>
     <loc>https://glowresearch.shop/product/g1-s/</loc>
     <lastmod>2026-10-03</lastmod>
     <priority>0.8</priority>
+    <image:image><image:loc>https://glowresearch.shop/assets/products/g1-s-10mg-v5.webp</image:loc></image:image>
   </url>
   <url>
     <loc>https://glowresearch.shop/product/tesamorelin/</loc>
     <lastmod>2026-10-03</lastmod>
     <priority>0.8</priority>
+    <image:image><image:loc>https://glowresearch.shop/assets/products/tesamorelin-10mg-v3.webp</image:loc></image:image>
   </url>
   <url>
     <loc>https://glowresearch.shop/product/g2-t/</loc>
     <lastmod>2026-10-03</lastmod>
     <priority>0.8</priority>
+    <image:image><image:loc>https://glowresearch.shop/assets/products/g2-t-10mg-v5.webp</image:loc></image:image>
   </url>
   <url>
     <loc>https://glowresearch.shop/product/mots-c/</loc>
     <lastmod>2026-10-03</lastmod>
     <priority>0.8</priority>
+    <image:image><image:loc>https://glowresearch.shop/assets/products/mots-c-10mg-v3.webp</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://glowresearch.shop/coa/g3-r/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glowresearch.shop/coa/ghk-cu/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glowresearch.shop/coa/bpc-157/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glowresearch.shop/coa/bpc-157-tb-500/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glowresearch.shop/coa/glow/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glowresearch.shop/coa/cjc-1295-no-dac-ipamorelin/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glowresearch.shop/coa/g1-s/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glowresearch.shop/coa/tesamorelin/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glowresearch.shop/coa/g2-t/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glowresearch.shop/coa/mots-c/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <priority>0.7</priority>
   </url>
 </urlset>

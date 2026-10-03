@@ -66,9 +66,12 @@ const STATIC_PAGES = [
 // this map, so the one page with a clean URL gets it there too.
 const CLEAN_URL = { 'shop.html': 'shop' };
 
-function url(loc, lastmod, priority) {
+// image: an absolute URL for the page's main product photograph, listed so
+// image search finds the vial on the page it belongs to.
+function url(loc, lastmod, priority, image) {
+  const img = image ? `    <image:image><image:loc>${image}</image:loc></image:image>\n` : '';
   return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n` +
-         `    <priority>${priority}</priority>\n  </url>`;
+         `    <priority>${priority}</priority>\n${img}  </url>`;
 }
 
 function build() {
@@ -99,13 +102,22 @@ function build() {
     ...(PRODUCT_PAGES_LIVE
       ? GLOW_PRODUCTS.map(p => {
           const rel = `product/${productSlug(p.name)}/index.html`;
-          return url(`${SITE}/product/${productSlug(p.name)}/`, lastCommitDate(rel) || today, '0.8');
+          return url(`${SITE}/product/${productSlug(p.name)}/`, lastCommitDate(rel) || today, '0.8',
+            p.image ? `${SITE}/${p.image}` : '');
         })
       : []),
+    // One certificate page per compound with a published certificate, written
+    // by tools/build-coa-pages.js. Listed from the files actually on disk, so
+    // the sitemap can never advertise a certificate page that was not built.
+    ...GLOW_PRODUCTS
+      .map(p => `coa/${productSlug(p.name)}/index.html`)
+      .filter(rel => fs.existsSync(path.join(ROOT, rel)))
+      .map(rel => url(`${SITE}/${rel.replace(/index\.html$/, '')}`, lastCommitDate(rel) || today, '0.7')),
   ];
 
   return `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`;
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" ` +
+    `xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${urls.join('\n')}\n</urlset>\n`;
 }
 
 function write() {
