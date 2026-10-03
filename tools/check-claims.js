@@ -1699,6 +1699,23 @@ console.log('\nwelcome landing page');
     wlPercents.length === 0,
     `welcome.html hardcodes: ${wlPercents.map(m => m[0]).join(', ')}`);
 
+  // The footer's accepted-payment marks: every page that has a footer shows
+  // exactly the PAYMENT_METHODS that carry a logo, in order, each file real,
+  // and none while payments are closed.
+  {
+    const want = PAYMENTS_LIVE ? PAYMENT_METHODS.filter(m => m.logo) : [];
+    const bad = everyPage.filter(f => {
+      const h = read(f);
+      if (!/class="footer-bottom"/.test(h)) return false;
+      const row = (h.match(/<!-- pay:start -->([\s\S]*?)<!-- pay:end -->/) || [])[1];
+      if (row === undefined) return true;
+      const alts = [...row.matchAll(/alt="([^"]+)"/g)].map(m => m[1]);
+      return alts.join('|') !== want.map(m => m.name).join('|');
+    });
+    ok('every footer shows the accepted payment marks PAYMENT_METHODS lists',
+      bad.length === 0 && want.every(m => fs.existsSync(path.join(ROOT, m.logo))), bad.join(', '));
+  }
+
   // Four guards over the accepted-payment row stood here: the marks matching
   // PAYMENT_METHODS in name and order, each one carrying a screen-reader label
   // since the artwork has no text node, the row appearing only while

@@ -287,11 +287,13 @@ const PAYMENT_COPY = PAYMENTS_LIVE ? {
 // sequence is decided here rather than by whoever last edited the markup.
 // Wallets lead: they are the one-tap options and the reason the row converts.
 const PAYMENT_METHODS = [
-  { name: 'Apple Pay', wallet: true },
-  { name: 'Google Pay', wallet: true },
-  { name: 'Visa', wallet: false },
-  { name: 'Mastercard', wallet: false },
-  { name: 'Amex', wallet: false },
+  // logo: the mark shown in every page's footer (assets/pay/), written there
+  // by tools/build-footer.js. A method with no logo is accepted but not shown.
+  { name: 'Apple Pay', wallet: true, logo: 'assets/pay/apple-pay.svg' },
+  { name: 'Google Pay', wallet: true, logo: 'assets/pay/google-pay.svg' },
+  { name: 'Visa', wallet: false, logo: 'assets/pay/visa.svg' },
+  { name: 'Mastercard', wallet: false, logo: 'assets/pay/mastercard.svg' },
+  { name: 'Amex', wallet: false, logo: 'assets/pay/amex.svg' },
   { name: 'Discover', wallet: false },
 ];
 
