@@ -2556,3 +2556,31 @@ html.age-gate-open, html.age-gate-open body{ overflow: hidden; }
    offer is gone (form, popup, endpoint, catalog object), so its styles went
    with it rather than being left for a future page to find and reuse. */
 
+
+/* ---------- certificate strip (homepage) ----------
+   Under the three promises: a row of real certificates that scrolls sideways.
+   White, after the black promises section, so the documents read as paper. */
+.coa-strip-sec{ background:#fff; color:#0a0a0a; padding: clamp(56px, 7vw, 90px) 0; }
+.coa-strip-head{ display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 24px; align-items:end; margin-bottom: 28px; }
+.coa-strip-head .eyebrow{ color:#6b6b64; }
+.coa-strip-head h2{ margin: 10px 0 0; font-size: clamp(1.8rem, 3.6vw, 2.6rem); letter-spacing:-.035em; line-height:1.05; color:#0a0a0a; }
+.coa-strip-head p{ margin:0; color:#55554f; line-height:1.6; max-width: 46ch; justify-self:end; }
+.coa-strip{ display:flex; gap: 16px; overflow-x:auto; scroll-snap-type: x mandatory; padding: 2px 2px 16px; scrollbar-width: thin; scrollbar-color: #0a0a0a #ececea; }
+.coa-strip::-webkit-scrollbar{ height:6px; }
+.coa-strip::-webkit-scrollbar-track{ background:#ececea; }
+.coa-strip::-webkit-scrollbar-thumb{ background:#0a0a0a; }
+.coa-strip:focus-visible{ outline:2px solid #0a0a0a; outline-offset:4px; }
+.coa-tile{ flex: 0 0 clamp(210px, 24vw, 280px); scroll-snap-align: start; border:1px solid rgba(0,0,0,.14); background:#fafaf8; color:#0a0a0a; text-decoration:none; display:flex; flex-direction:column; transition: border-color .18s ease, transform .18s ease; }
+.coa-tile:hover{ border-color:#0a0a0a; transform: translateY(-2px); }
+.coa-tile-doc{ padding: 14px 14px 0; }
+.coa-tile-doc img{ display:block; width:100%; height:auto; aspect-ratio: 560 / 725; border:1px solid rgba(0,0,0,.08); background:#fff; box-shadow: 0 6px 18px rgba(0,0,0,.06); }
+.coa-tile-body{ padding: 14px; }
+.coa-tile-body strong{ display:block; font-size:.86rem; letter-spacing:.06em; text-transform:uppercase; }
+.coa-tile-body span{ display:block; margin-top:4px; font-family:'JetBrains Mono', monospace; font-size:.68rem; letter-spacing:.08em; color:#6b6b64; }
+.coa-strip-more{ margin-top: 22px; border-color: rgba(0,0,0,.25); color:#0a0a0a; }
+.coa-strip-more:hover{ background:#0a0a0a; color:#fff; border-color:#0a0a0a; }
+@media (max-width: 760px){
+  .coa-strip-head{ grid-template-columns: 1fr; gap: 10px; }
+  .coa-strip-head p{ justify-self:start; }
+  .coa-tile{ flex-basis: 64vw; }
+}

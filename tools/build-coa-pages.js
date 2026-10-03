@@ -222,6 +222,31 @@ function buildPage(p, donor) {
   return rewriteDepth(html, 2);
 }
 
+// The homepage's certificate row: one tile per compound with a certificate,
+// its first page as an image (the .jpg beside the .pdf), linking to that
+// compound's certificate page. Written between markers in index.html.
+function stripHtml() {
+  return GLOW_PRODUCTS.filter(eligible).map(p => {
+    const img = coaHref(p).replace(/\.pdf$/i, '.jpg');
+    return `      <a class="coa-tile" href="${OUT_DIR}/${productSlug(p.name)}/">
+        <div class="coa-tile-doc"><img src="${esc(img)}" alt="Certificate of analysis for ${esc(p.name)}, lot ${esc(p.lot)}" width="560" height="725" loading="lazy" /></div>
+        <div class="coa-tile-body"><strong>${esc(p.name)}</strong><span>${esc(p.sizes.map(s => s.mg).join(' / '))} &middot; Lot ${esc(p.lot)}</span></div>
+      </a>`;
+  }).join('\n');
+}
+
+function buildStrip() {
+  const file = path.join(ROOT, 'index.html');
+  const html = fs.readFileSync(file, 'utf8');
+  const re = /(<!-- coa-strip:start -->)[\s\S]*?(<!-- coa-strip:end -->)/;
+  if (!re.test(html)) throw new Error('index.html is missing the coa-strip markers.');
+  const missing = GLOW_PRODUCTS.filter(eligible)
+    .map(p => coaHref(p).replace(/\.pdf$/i, '.jpg'))
+    .filter(f => !fs.existsSync(path.join(ROOT, f)));
+  if (missing.length) throw new Error(`Certificate images missing for the homepage row: ${missing.join(', ')}`);
+  fs.writeFileSync(file, html.replace(re, (m, a, b) => `${a}\n${stripHtml()}\n${b}`));
+}
+
 function build() {
   const donor = fs.readFileSync(path.join(ROOT, DONOR), 'utf8');
   const outRoot = path.join(ROOT, OUT_DIR);
@@ -235,6 +260,8 @@ function build() {
     return productSlug(p.name);
   });
   console.log(`  coa/: ${made.length} certificate pages (${made.join(', ')})`);
+  buildStrip();
+  console.log(`  index.html: certificate row with ${made.length} certificates`);
 }
 
 module.exports = { build, eligible };

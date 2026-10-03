@@ -4203,6 +4203,17 @@ console.log('\nhero image');
     const sitemap = read('sitemap.xml');
     const offMap = wantCoa.filter(p => !sitemap.includes(`https://glowresearch.shop/coa/${productSlug(p.name)}/`));
     ok('and the sitemap lists them', offMap.length === 0, offMap.map(p => p.name).join(', '));
+    // The homepage certificate row: every compound with a certificate, each
+    // tile showing that certificate's own first page and linking to its page.
+    const strip = (read('index.html').match(/<!-- coa-strip:start -->([\s\S]*?)<!-- coa-strip:end -->/) || [, ''])[1];
+    const offStrip = wantCoa.filter(p => {
+      const img = coaHref(p).replace(/\.pdf$/i, '.jpg');
+      return !strip.includes(`href="coa/${productSlug(p.name)}/"`) || !strip.includes(`src="${img}"`) ||
+        !fs.existsSync(path.join(ROOT, img));
+    });
+    ok('the homepage certificate row shows every certificate, each with its own image',
+      offStrip.length === 0 && (strip.match(/class="coa-tile"/g) || []).length === wantCoa.length,
+      offStrip.map(p => p.name).join(', '));
 
     // Dead addresses that once served pages go somewhere real rather than 404.
     const vercel = JSON.parse(read('vercel.json'));
