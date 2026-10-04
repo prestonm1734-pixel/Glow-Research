@@ -847,6 +847,17 @@
     });
   }
 
+  // The email given at the researcher gate (verify.html), kept on this device,
+  // prefills the email field when nothing else has. A signed-in account's
+  // email, set further down, always wins over it.
+  document.addEventListener('DOMContentLoaded', () => {
+    try {
+      const r = JSON.parse(localStorage.getItem('glow-researcher') || 'null');
+      const f = $('coEmail');
+      if (r && r.email && f && !f.value) f.value = r.email;
+    } catch (e) { /* storage blocked */ }
+  });
+
   document.addEventListener('DOMContentLoaded', async () => {
     fillStates();
     renderTrustCoa();

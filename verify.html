@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Researcher Access | Glow Research</title>
+<meta name="description" content="Glow Research supplies research compounds for laboratory use only. Confirm your researcher type to continue." />
+<!-- An entry route for ad traffic, not a page to rank: kept out of the index. -->
+<meta name="robots" content="noindex,follow" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
+<link rel="preload" href="assets/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  /* The researcher gate. One box on black, nothing else on the page: the
+     same thing for every visitor, reviewers included, and it leads to the
+     same site everyone else sees. */
+  html, body{ background:#000; }
+  .vf{ min-height:100vh; min-height:100dvh; display:flex; align-items:center; justify-content:center; padding: 24px 18px; }
+  .vf-box{ width:100%; max-width: 420px; border:1px solid rgba(255,255,255,.22); padding: clamp(26px, 5vw, 38px) clamp(22px, 5vw, 34px); color:#fff; background:#000; }
+  .vf-logo{ font-family:'Fraunces', Georgia, serif; font-size:1.7rem; font-weight:600; color:#fff; display:inline-flex; align-items:center; gap:3px; text-decoration:none; }
+  .vf-logo .spark{ font-size:.62em; color:#fff; }
+  .vf-kicker{ display:block; margin: 22px 0 8px; font-family:'JetBrains Mono', monospace; font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color: rgba(255,255,255,.5); }
+  .vf h1{ margin:0 0 24px; font-size: clamp(1.35rem, 4.6vw, 1.6rem); font-weight:600; letter-spacing:-.02em; line-height:1.25; color:#fff; }
+  .vf label{ display:block; margin: 0 0 7px; font-family:'JetBrains Mono', monospace; font-size:.64rem; letter-spacing:.16em; text-transform:uppercase; color: rgba(255,255,255,.6); }
+  .vf select, .vf input{ width:100%; margin: 0 0 18px; padding: 14px 14px; background:#000; color:#fff; border:1px solid rgba(255,255,255,.3); border-radius:0; font: inherit; font-size:1rem; }
+  .vf select{ appearance:none; -webkit-appearance:none; cursor:pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16' fill='none' stroke='%23ffffff' stroke-width='1.6'%3E%3Cpath d='M4 6.5 8 10.5 12 6.5'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position: right 14px center; padding-right: 38px; }
+  .vf select:invalid{ color: rgba(255,255,255,.5); }
+  .vf option{ color:#0a0a0a; }
+  .vf select:focus, .vf input:focus{ outline:none; border-color:#fff; }
+  .vf input::placeholder{ color: rgba(255,255,255,.4); }
+  .vf button{ width:100%; margin-top: 4px; padding: 16px 14px; background:#fff; color:#0a0a0a; border:1px solid #fff; border-radius:0; font-family:'JetBrains Mono', monospace; font-size:.8rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; cursor:pointer; }
+  .vf button:hover{ background:#e6e6e3; }
+  .vf-err{ margin: -6px 0 14px; font-size:.84rem; color:#ffb4a8; }
+  .vf-err[hidden]{ display:none; }
+  .vf-fine{ margin: 18px 0 0; font-size:.78rem; line-height:1.55; color: rgba(255,255,255,.5); }
+  .vf-fine a{ color: rgba(255,255,255,.8); text-decoration:underline; text-underline-offset:3px; }
+</style>
+</head>
+<body>
+<script src="js/identity.js" defer></script>
+<script src="js/meta-pixel.js" defer></script>
+<script src="js/tiktok-pixel.js" defer></script>
+<script src="js/x-pixel.js" defer></script>
+<script src="js/uet-tag.js" defer></script>
+<script src="js/analytics.js" defer></script>
+
+<main class="vf">
+  <form class="vf-box" id="vfForm" novalidate>
+    <a class="vf-logo" href="index.html" aria-label="Glow Research">Glow<span class="spark">&#10022;</span></a>
+    <span class="vf-kicker">Researcher access</span>
+    <h1>Enter your credentials to continue.</h1>
+
+    <label for="vfType">Type of researcher</label>
+    <select id="vfType" name="type" required>
+      <option value="" disabled selected>Select type of researcher</option>
+      <option>Academic</option>
+      <option>CRO</option>
+      <option>Independent</option>
+    </select>
+
+    <label for="vfEmail">Email address</label>
+    <input type="email" id="vfEmail" name="email" placeholder="you@lab.com" autocomplete="email" required />
+
+    <p class="vf-err" id="vfErr" role="alert" hidden></p>
+    <button type="submit">Verify and Enter</button>
+
+    <p class="vf-fine">
+      By verifying, you confirm you are 21 or older and agree to our
+      <a href="ruo-agreement.html">RUO Agreement</a> and <a href="terms.html">Terms</a>.
+    </p>
+  </form>
+</main>
+
+<script src="js/verify.js"></script>
+</body>
+</html>

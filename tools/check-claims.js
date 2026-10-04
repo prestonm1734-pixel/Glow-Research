@@ -4328,6 +4328,29 @@ console.log('\nhero image');
       /tax: tax/.test(read('js/thank-you.js')));
   }
 
+  // The researcher gate (/verify): one page for every visitor, out of the
+  // index and the sitemap. It records the same attestation version the age
+  // gate checks, so the age pop-up is skipped only for someone who entered
+  // through it and confirmed age and terms there; every other route still
+  // shows the pop-up. Disclosed in the privacy policy as the browser storage
+  // it is.
+  {
+    const vf = read('verify.html');
+    const ag = read('js/age-gate.js');
+    const agVer = (ag.match(/ATTESTATION_VERSION = (\d+)/) || [])[1];
+    ok('the researcher gate is noindex and kept out of the sitemap',
+      /<meta name="robots" content="noindex,follow"/.test(vf) && !/verify/.test(read('sitemap.xml')));
+    ok('and it records the attestation version the age gate honours',
+      new RegExp(`const VERSION = ${agVer};`).test(read('js/verify.js')) &&
+      /localStorage\.getItem\('glow-researcher'\)/.test(ag) && new RegExp(`glow_researcher=${agVer}`).test(ag));
+    ok('the gate confirms age and terms beside its button, since it stands in for the age pop-up',
+      /21 or older/.test(vf) && /RUO Agreement/.test(vf) && /Terms/.test(vf) && /Verify and Enter/.test(vf));
+    ok('the gate page itself does not load the age pop-up', !/js\/age-gate\.js/.test(vf));
+    ok('the privacy policy discloses what the gate keeps', /Researcher access:<\/strong>/.test(read('privacy.html')));
+    ok('and /verify serves it',
+      JSON.parse(read('vercel.json')).rewrites.some(r => r.source === '/verify' && r.destination === '/verify.html'));
+  }
+
   // Every page with a mobile menu button loads something that opens it.
   // wholesale.html and affiliates.html lost theirs when an inline block went
   // with the wholesale form, and nothing noticed until a phone did.

@@ -25,6 +25,14 @@
   // and a gate that hard-fails there would lock the whole site behind an
   // exception.
   function accepted() {
+    // The researcher gate (verify.html) keeps a long-lived record of the same
+    // attestation. Someone who came in through it has already agreed, on this
+    // device, to everything this screen asks, so it does not ask again.
+    try {
+      var r = JSON.parse(localStorage.getItem('glow-researcher') || 'null');
+      if (r && r.v === ATTESTATION_VERSION) return true;
+    } catch (e) { /* fall through */ }
+    if (/(?:^|; )glow_researcher=3(?:;|$)/.test(document.cookie)) return true;
     try {
       var raw = sessionStorage.getItem(KEY);
       if (!raw) return false;

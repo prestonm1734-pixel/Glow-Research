@@ -2,7 +2,8 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     { "source": "/welcome", "destination": "/welcome.html" },
-    { "source": "/shop", "destination": "/shop.html" }
+    { "source": "/shop", "destination": "/shop.html" },
+    { "source": "/verify", "destination": "/verify.html" }
   ],
   "redirects": [
     { "source": "/peptides/glp-3-rt/", "destination": "/product/g3-r/", "permanent": true },
