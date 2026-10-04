@@ -4328,6 +4328,15 @@ console.log('\nhero image');
       /tax: tax/.test(read('js/thank-you.js')));
   }
 
+  // Every page with a mobile menu button loads something that opens it.
+  // wholesale.html and affiliates.html lost theirs when an inline block went
+  // with the wholesale form, and nothing noticed until a phone did.
+  {
+    const MENU_JS = /js\/(script|product|welcome|page-chrome)\.js|getElementById\('hamburger'\)/;
+    const dead = everyPage.filter(f => /id="hamburger"/.test(read(f)) && !MENU_JS.test(read(f)));
+    ok('every page with a menu button loads the code that opens it', dead.length === 0, dead.join(', '));
+  }
+
   // Product photographs carry no alt text by request: the vial images on the
   // catalog, certificate cards and product pages are empty-alt, and the image
   // files hold no embedded metadata. Pinned so a template edit cannot quietly
